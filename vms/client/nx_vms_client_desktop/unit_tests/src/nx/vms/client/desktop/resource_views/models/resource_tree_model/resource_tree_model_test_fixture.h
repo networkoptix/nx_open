@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
@@ -50,7 +51,7 @@ protected:
     QnAviResourcePtr addLocalMedia(const QString& path) const;
     QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;
-    QnLayoutResourcePtr addLayout(const QString& name,
+    LayoutResourcePtr addLayout(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
     QnWebPageResourcePtr addWebPage(const QString& name) const;
     QnWebPageResourcePtr addProxiedWebResource(
@@ -91,7 +92,7 @@ protected:
         const QString& name,
         const QnUuid& parentId = QnUuid(),
         const QString& hostAddress = QString()) const;
-    QnLayoutResourcePtr addIntercomLayout(
+    LayoutResourcePtr addIntercomLayout(
         const QString& name,
         const QnUuid& parentId = QnUuid()) const;
     void removeCamera(const QnVirtualCameraResourcePtr& camera) const;

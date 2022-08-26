@@ -3,57 +3,49 @@
 #include "videowall_item_widget.h"
 
 #include <QtCore/QMimeData>
-
 #include <QtGui/QDrag>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+#include <qt_graphics_items/graphics_label.h>
+
 #include <common/common_globals.h>
-
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-
-#include <core/resource_access/resource_access_filter.h>
-
-#include <core/resource_management/resource_pool.h>
-
-#include <core/resource/resource.h>
-#include <core/resource/media_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/utils/mime_data.h>
-#include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
-
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
-
-#include <ui/animation/variant_animator.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/animation/opacity_animator.h>
+#include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
-#include <qt_graphics_items/graphics_label.h>
+#include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
-#include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
-#include <nx/vms/client/core/utils/geometry.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -95,7 +87,6 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     Qt::WindowFlags windowFlags)
     :
     base_type(parentWidget, windowFlags),
-    QnWorkbenchContextAware(parent),
     m_parentWidget(parentWidget),
     m_widget(parent),
     m_videowall(videowall),
@@ -295,9 +286,12 @@ void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent* /*event*
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
+    auto context = m_widget->windowContext()->workbenchContext();
+
     action::Parameters parameters;
 
-    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_mimeData->entities());
+    const auto videoWallItems = context->resourcePool()->getVideoWallItemsByUuid(
+        m_mimeData->entities());
     if (!videoWallItems.isEmpty())
     {
         parameters = videoWallItems;
@@ -305,13 +299,13 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
     else
     {
         parameters = m_mimeData->resources();
-        resourcePool()->addNewResources(m_mimeData->resources());
+        context->resourcePool()->addNewResources(m_mimeData->resources());
     }
 
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    menu()->trigger(action::DropOnVideoWallItemAction, parameters);
+    context->menu()->trigger(action::DropOnVideoWallItemAction, parameters);
 
     m_mimeData.reset();
     event->acceptProposedAction();
@@ -365,8 +359,11 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::RightButton)
         return;
 
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(
-        action::SceneScope, mainWindowWidget(), m_indices));
+    auto context = m_widget->windowContext()->workbenchContext();
+    QScopedPointer<QMenu> popupMenu(context->menu()->newMenu(
+        action::SceneScope,
+        context->mainWindowWidget(),
+        m_indices));
 
     if (popupMenu->isEmpty())
         return;
@@ -389,13 +386,15 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
     if (button != Qt::LeftButton)
         return;
 
-    menu()->triggerIfPossible(action::StartVideoWallControlAction, m_indices);
+    auto context = m_widget->windowContext()->workbenchContext();
+    context->menu()->triggerIfPossible(action::StartVideoWallControlAction, m_indices);
 }
 
 void QnVideowallItemWidget::updateLayout()
 {
+    auto context = m_widget->windowContext()->workbenchContext();
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    auto layout = context->resourcePool()->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 

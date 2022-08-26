@@ -5,10 +5,9 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/desktop/export/tools/abstract_export_tool.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
-
+#include <nx/vms/client/desktop/export/tools/abstract_export_tool.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <recording/stream_recorder.h>
 
 class QnClientVideoCamera;
@@ -26,7 +25,10 @@ class ExportLayoutTool: public AbstractExportTool
     using base_type = AbstractExportTool;
 
 public:
-    explicit ExportLayoutTool(ExportLayoutSettings settings, QnLayoutResourcePtr layout, QObject* parent = nullptr);
+    explicit ExportLayoutTool(
+        ExportLayoutSettings settings,
+        LayoutResourcePtr layout,
+        QObject* parent = nullptr);
     virtual ~ExportLayoutTool() override;
 
     virtual bool start() override;

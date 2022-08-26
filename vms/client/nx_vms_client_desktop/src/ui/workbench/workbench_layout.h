@@ -2,21 +2,24 @@
 
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <QtCore/QHash>
 #include <QtGui/QIcon>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <utils/math/magnitude.h>
 #include <utils/rect_set.h>
 
 #include "matrix_map.h"
 
 class QnWorkbenchItem;
+class QnWorkbenchLayoutSynchronizer;
 
 enum class QnLayoutFlag
 {
@@ -43,6 +46,7 @@ class QnWorkbenchLayout: public QObject, public nx::vms::client::core::CommonMod
     Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
 
 public:
+    using LayoutResourcePtr = nx::vms::client::desktop::LayoutResourcePtr;
     static constexpr auto kDefaultCellSpacing = Qn::CellSpacing::Small;
 
     /**
@@ -62,12 +66,12 @@ public:
      * @param resource Layout resource that this layout will be in sync with.
      * @param parent Parent object for this layout.
      */
-    QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
+    QnWorkbenchLayout(const LayoutResourcePtr& resource, QObject* parent = nullptr);
 
     /**
      * @return Resource associated with this layout, if any.
      */
-    QnLayoutResourcePtr resource() const;
+    LayoutResourcePtr resource() const;
 
     /**
      * @return Plain pointer to the associated resource. Needed by QML.
@@ -77,7 +81,12 @@ public:
     /**
      * @return Layout associated with the given resource, if any.
      */
-    static QnWorkbenchLayout* instance(const QnLayoutResourcePtr& layout);
+    static QnWorkbenchLayout* instance(const QnLayoutResourcePtr& resource);
+
+    /**
+     * @return Layout associated with the given resource, if any.
+     */
+    static QnWorkbenchLayout* instance(const LayoutResourcePtr& resource);
 
     // TODO: #sivanov Reimplement the same way as layout tour reviews are implemented.
     /**
@@ -90,6 +99,8 @@ public:
      */
     virtual ~QnWorkbenchLayout();
 
+    QnWorkbenchLayoutSynchronizer* layoutSynchronizer() const;
+
     QIcon icon() const;
 
     QnLayoutFlags flags() const;
@@ -100,23 +111,18 @@ public:
     /**
      * @return Name of this layout.
      */
-    const QString& name() const;
-
-    /**
-     * @param name New name for this layout.
-     */
-    void setName(const QString& name);
+    QString name() const;
 
     /**
      * @param resource Resource to update layout from.
      * @return Whether there were no errors during loading.
      */
-    bool update(const QnLayoutResourcePtr& resource);
+    bool update(const LayoutResourcePtr& resource);
 
     /**
      * @param[out] resource Resource to submit layout to.
      */
-    void submit(const QnLayoutResourcePtr& resource) const;
+    void submit(const LayoutResourcePtr& resource) const;
 
     /**
      * Notify all subscribers that layout title should be updated.
@@ -258,35 +264,15 @@ public:
     bool hasCellAspectRatio() const;
 
     /**
-     * @param cellAspectRatio New aspect ratio for cells of this layout.
-     */
-    void setCellAspectRatio(float value);
-
-    static qreal cellSpacingValue(Qn::CellSpacing spacing);
-
-    /**
      * @return Spacing between cells of this layout,
      * relative to cell size.
      */
     qreal cellSpacing() const;
 
     /**
-     * @param cellSpacing New spacing between cells for this layout,
-     * relative to cell size.
-     */
-    void setCellSpacing(qreal spacing);
-
-    void setCellSpacing(Qn::CellSpacing value);
-
-    /**
      * @return Lock state of this layout.
      */
     bool locked() const;
-
-    /**
-     * @param cellSpacing New lock state for this layout.
-     */
-    void setLocked(bool value);
 
     /**
      * @return Bounding rectangle of all pinned items in this layout.
@@ -315,31 +301,32 @@ public:
      * @param role Role to get data for.
      * @return Data for the given role.
      */
-    QVariant data(int role) const;
+    QVariant data(Qn::ItemDataRole role) const;
 
     /**
      * @param role Role to set data for.
      * @param value New value for the given data role.
-     * @return Whether the data was successfully set.
      */
-    bool setData(int role, const QVariant& value);
+    void setData(Qn::ItemDataRole role, const QVariant& value);
 
-    QHash<int, QVariant> data() const;
-
+public:
     /**
      * Move all items to the center of the grid coordinates (relative position is not changed).
      */
     void centralizeItems();
 
     /**
-     * Check if this layout is preview search layout
+     * Whether this layout is a preview search layout.
      */
-    bool isSearchLayout() const;
+    bool isPreviewSearchLayout() const;
 
     /**
-     * Check if this layout is a tour review.
+     * Whether this layout is a showreel review layout.
      */
-    bool isLayoutTourReview() const;
+    bool isShowreelReviewLayout() const;
+
+    /** Whether this layout is a Video Wall review layout. */
+    bool isVideoWallReviewLayout() const;
 
     /** Debug string representation. */
     QString toString() const;
@@ -380,12 +367,7 @@ signals:
     void boundingRectChanged(const QRect& oldRect, const QRect& newRect);
 
     /**
-     * Emitted whenever name of this layout changes.
-     */
-    void nameChanged();
-
-    /**
-     * Emitted whenever title of this layout changes.
+     * Emitted whenever or icon of this layout changes.
      */
     void titleChanged();
 
@@ -399,14 +381,12 @@ signals:
      */
     void cellSpacingChanged();
 
-    void lockedChanged();
-
     /**
      * Emitted whenever data associated with the provided role is changed.
      *
      * @param role Role of the changed data.
      */
-    void dataChanged(int role);
+    void dataChanged(Qn::ItemDataRole role);
 
 private:
     void moveItemInternal(QnWorkbenchItem* item, const QRect& geometry);
@@ -424,53 +404,11 @@ private:
     bool own(QnWorkbenchItem* item) const;
 
     /** Calculate what icon should be used for the layout. */
-    QIcon calculateIcon(const QnLayoutResourcePtr& layout) const;
+    QIcon calculateIcon() const;
 
 private:
-    /** Name of this layout. */
-    QString m_name;
-
-    /** Matrix map from coordinate to item. */
-    QnMatrixMap<QnWorkbenchItem*> m_itemMap;
-
-    /** Set of all items on this layout. */
-    QSet<QnWorkbenchItem*> m_items;
-
-    /** Map from item to its zoom target. */
-    QHash<QnWorkbenchItem *, QnWorkbenchItem*> m_zoomTargetItemByItem;
-
-    /** Map from zoom target item to its associated zoom items. */
-    QMultiHash<QnWorkbenchItem *, QnWorkbenchItem*> m_itemsByZoomTargetItem;
-
-    /** Set of item borders for fast bounding rect calculation. */
-    QnRectSet m_rectSet;
-
-    /** Current bounding rectangle. */
-    QRect m_boundingRect;
-
-    /** Map from resource to a set of items. */
-    QHash<QnResourcePtr, QSet<QnWorkbenchItem*>> m_itemsByResource;
-
-    /** Aspect ratio of a single cell. Zero or negative value means 'invalid'. */
-    float m_cellAspectRatio = 0.0;
-
-    /** Spacing between cells, relative to cell width. */
-    qreal m_cellSpacing = cellSpacingValue(kDefaultCellSpacing);
-
-    /** Lock status of the layout. */
-    bool m_locked = false;
-
-    /** Map from item's universally unique identifier to item. */
-    QHash<QnUuid, QnWorkbenchItem*> m_itemByUuid;
-
-    /** Empty item list, to return a reference to. */
-    const QSet<QnWorkbenchItem*> m_noItems;
-
-    /** User data by role. */
-    QHash<int, QVariant> m_dataByRole;
-
-    QnLayoutFlags m_flags = QnLayoutFlag::Empty;
-    QIcon m_icon;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 using QnWorkbenchLayoutList = QList<QnWorkbenchLayout*>;

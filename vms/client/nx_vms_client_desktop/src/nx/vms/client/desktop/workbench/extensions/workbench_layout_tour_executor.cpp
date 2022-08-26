@@ -5,7 +5,6 @@
 #include <QtCore/QTimerEvent>
 
 #include <client/client_settings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/layout_tour_item.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/layout_tour_data.h>
@@ -13,6 +12,7 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -202,24 +202,23 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
         if (!existing)
             continue;
 
-        const auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+        const auto existingLayout = existing.dynamicCast<LayoutResource>();
 
-        QnLayoutResource::ItemsRemapHash remapHash;
+        LayoutResource::ItemsRemapHash remapHash;
 
-        QnLayoutResourcePtr layout = existingLayout
+        LayoutResourcePtr layout = existingLayout
             ? existingLayout->clone(&remapHash)
             : layoutFromResource(existing);
 
-        NX_ASSERT(layout);
-        if (!layout)
+        if (!NX_ASSERT(layout))
             continue;
 
         if (existingLayout)
         {
             for (auto iter = remapHash.cbegin(); iter != remapHash.cend(); ++iter)
             {
-                const QnLayoutItemIndex oldIndex(existingLayout, iter.key());
-                const QnLayoutItemIndex newIndex(layout, iter.value());
+                const LayoutItemIndex oldIndex(existingLayout, iter.key());
+                const LayoutItemIndex newIndex(layout, iter.value());
                 const auto mode = radassManager->mode(oldIndex);
                 if (mode != RadassMode::Auto)
                     radassManager->setMode(newIndex, mode);

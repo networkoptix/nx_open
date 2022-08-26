@@ -2,8 +2,8 @@
 
 #include "workbench_layout_aspect_ratio_watcher.h"
 
-#include <core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -47,7 +47,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::setAppropriateAspectRatio(QnResourceWi
         if (!m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
             aspectRatio = QnAspectRatio::closestStandardRatio(aspectRatio).toFloat();
 
-        m_watchedLayout->setCellAspectRatio(aspectRatio);
+        m_watchedLayout->resource()->setCellAspectRatio(aspectRatio);
     }
 }
 

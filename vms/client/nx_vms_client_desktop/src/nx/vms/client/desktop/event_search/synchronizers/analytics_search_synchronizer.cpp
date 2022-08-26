@@ -11,12 +11,12 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_item_index.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>

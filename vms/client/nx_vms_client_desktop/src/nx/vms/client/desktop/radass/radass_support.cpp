@@ -4,10 +4,11 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_data.h>
-#include <core/resource/layout_item_index.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
@@ -49,7 +50,7 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
         });
 }
 
-bool isRadassSupported(const QnLayoutItemIndex& item)
+bool isRadassSupported(const LayoutItemIndex& item)
 {
     if (!item.layout())
         return false;
@@ -72,19 +73,19 @@ bool isRadassSupported(const QnVirtualCameraResourceList& cameras, MatchMode mat
         });
 }
 
-bool isRadassSupported(const QnLayoutItemIndexList& items, MatchMode match)
+bool isRadassSupported(const LayoutItemIndexList& items, MatchMode match)
 {
-    return GenericCondition::check<QnLayoutItemIndex>(items, match,
-        [](const QnLayoutItemIndex& item)
+    return GenericCondition::check<LayoutItemIndex>(items, match,
+        [](const LayoutItemIndex& item)
         {
             return isRadassSupported(item);
         });
 }
 
-ConditionResult isRadassSupported(const QnLayoutItemIndexList& items)
+ConditionResult isRadassSupported(const LayoutItemIndexList& items)
 {
-    return GenericCondition::check<QnLayoutItemIndex>(items,
-        [](const QnLayoutItemIndex& item)
+    return GenericCondition::check<LayoutItemIndex>(items,
+        [](const LayoutItemIndex& item)
         {
             return isRadassSupported(item);
         });

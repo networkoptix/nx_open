@@ -192,12 +192,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
-    connect(d->tabBar, &QnLayoutTabBar::closeRequested, this,
-        [this](QnWorkbenchLayout* layout)
-        {
-            menu()->trigger(action::CloseLayoutAction,
-                QnWorkbenchLayoutList() << layout);
-        });
 
     d->cloudPanel = new QnCloudStatusPanel(this);
     d->cloudPanel->setFocusPolicy(Qt::NoFocus);

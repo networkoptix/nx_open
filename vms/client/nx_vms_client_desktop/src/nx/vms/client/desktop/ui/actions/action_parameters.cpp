@@ -2,18 +2,15 @@
 
 #include "action_parameters.h"
 
-#include <nx/utils/log/log.h>
-
 #include <core/resource/resource.h>
-#include <core/resource/layout_item_index.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
-
-#include <ui/workbench/workbench_layout.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-
+#include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -60,9 +57,9 @@ Parameters::Parameters(const QnWorkbenchLayoutList& layouts, const ArgumentHash&
     init(QVariant::fromValue<QnWorkbenchLayoutList>(layouts), arguments);
 }
 
-Parameters::Parameters(const QnLayoutItemIndexList& layoutItems, const ArgumentHash& arguments)
+Parameters::Parameters(const LayoutItemIndexList& layoutItems, const ArgumentHash& arguments)
 {
-    init(QVariant::fromValue<QnLayoutItemIndexList>(layoutItems), arguments);
+    init(QVariant::fromValue<LayoutItemIndexList>(layoutItems), arguments);
 }
 
 Parameters::Parameters(const QnVideoWallItemIndexList& videoWallItems,
@@ -126,7 +123,7 @@ QnResourcePtr Parameters::resource(int key) const
     return resources.isEmpty() ? QnResourcePtr() : resources.front();
 }
 
-QnLayoutItemIndexList Parameters::layoutItems(int key) const
+LayoutItemIndexList Parameters::layoutItems(int key) const
 {
     return ParameterTypes::layoutItems(argument(key));
 }

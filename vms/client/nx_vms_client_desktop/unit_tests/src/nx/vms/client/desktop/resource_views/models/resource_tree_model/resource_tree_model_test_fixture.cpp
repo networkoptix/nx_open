@@ -24,8 +24,9 @@
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
@@ -159,11 +160,11 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayout(
     return fileLayout;
 }
 
-QnLayoutResourcePtr ResourceTreeModelTest::addLayout(
+LayoutResourcePtr ResourceTreeModelTest::addLayout(
     const QString& name,
     const QnUuid& parentId) const
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setName(name);
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(parentId);
@@ -367,11 +368,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     return camera;
 }
 
-QnLayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
+LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     const QString& name,
     const QnUuid& parentId) const
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setName(name);
     layout->setIdUnsafe(nx::vms::common::calculateIntercomLayoutId(parentId));
     layout->setParentId(parentId);

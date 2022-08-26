@@ -9,8 +9,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_item_index.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
@@ -25,6 +23,8 @@
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -138,9 +138,9 @@ QnResourceList childCamerasRecursive(const QModelIndex& index)
     return result;
 }
 
-QnLayoutItemIndexList selectedLayoutItems(const QModelIndexList& selection)
+LayoutItemIndexList selectedLayoutItems(const QModelIndexList& selection)
 {
-    QnLayoutItemIndexList result;
+    LayoutItemIndexList result;
 
     for (const auto& modelIndex: selection)
     {
@@ -148,9 +148,9 @@ QnLayoutItemIndexList selectedLayoutItems(const QModelIndexList& selection)
         if (id.isNull())
             continue;
 
-        const auto layout = getResource<QnLayoutResource>(modelIndex.parent());
+        const auto layout = getResource<LayoutResource>(modelIndex.parent());
         if (layout)
-            result.push_back(QnLayoutItemIndex(layout, id));
+            result.push_back(LayoutItemIndex(layout, id));
     }
 
     return result;
@@ -583,10 +583,10 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 break;
             }
 
-            const bool isLayoutTourReviewMode =
-                d->context->workbench()->currentLayout()->isLayoutTourReview();
+            const bool isShowreelReviewLayout =
+                d->context->workbench()->currentLayout()->isShowreelReviewLayout();
 
-            const auto actionId = isLayoutTourReviewMode || modifiers == Qt::ControlModifier
+            const auto actionId = isShowreelReviewLayout || modifiers == Qt::ControlModifier
                 ? ui::action::OpenInNewTabAction
                 : ui::action::DropResourcesAction;
 

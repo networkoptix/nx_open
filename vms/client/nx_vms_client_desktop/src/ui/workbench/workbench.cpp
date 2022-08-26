@@ -5,7 +5,6 @@
 #include <common/common_module.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -16,6 +15,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -132,11 +132,8 @@ QnWorkbenchItem* bestItemForRole(QnWorkbenchItem** itemByRole, Qn::ItemRole role
 void addLayoutCreators(LayoutsFactory* factory)
 {
     const auto standardLayoutCreator =
-        [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
+        [](const LayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
         {
-            if (!resource)
-                return new QnWorkbenchLayout(resource, parent);
-
             return resource->data(Qn::IsSpecialLayoutRole).toBool()
                 ? new SpecialLayout(resource, parent)
                 : new QnWorkbenchLayout(resource, parent);
@@ -162,7 +159,8 @@ QnWorkbench::QnWorkbench(QObject *parent):
     const QSizeF kDefaultCellSize(kUnitSize, kUnitSize / QnLayoutResource::kDefaultCellAspectRatio);
     m_mapper = new QnWorkbenchGridMapper(kDefaultCellSize, this);
 
-    m_dummyLayout = factory->create(this);
+    auto dummyLayoutResource = LayoutResourcePtr(new LayoutResource());
+    m_dummyLayout = factory->create(dummyLayoutResource, this);
     setCurrentLayout(m_dummyLayout);
 
     auto delegate = new StateDelegate(this);
@@ -228,6 +226,11 @@ void QnWorkbench::clear()
     emit layoutsChanged();
 
     qDeleteAll(layoutsToDestroy);
+}
+
+LayoutResourcePtr QnWorkbench::currentLayoutResource() const
+{
+    return currentLayout()->resource();
 }
 
 QnWorkbenchLayout *QnWorkbench::layout(int index) const {
@@ -427,10 +430,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
         for(int i = 0; i < Qn::ItemRoleCount; i++)
             setItem(static_cast<Qn::ItemRole>(i), nullptr);
 
-        disconnect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),           this, nullptr);
-        disconnect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, nullptr);
-        disconnect(m_currentLayout, SIGNAL(cellAspectRatioChanged()),               this, nullptr);
-        disconnect(m_currentLayout, SIGNAL(cellSpacingChanged()),                   this, nullptr);
+        m_currentLayout->disconnect(this);
     }
 
     /* Prepare new layout. */
@@ -451,10 +451,14 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
     if (!activeItemUuid.isNull())
         setItem(Qn::ActiveRole, m_currentLayout->item(activeItemUuid));
 
-    connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-    connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
-    connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
+    connect(m_currentLayout, &QnWorkbenchLayout::itemAdded,
+        this, &QnWorkbench::at_layout_itemAdded);
+    connect(m_currentLayout, &QnWorkbenchLayout::itemRemoved,
+        this, &QnWorkbench::at_layout_itemRemoved);
+    connect(m_currentLayout, &QnWorkbenchLayout::cellAspectRatioChanged,
+        this, &QnWorkbench::at_layout_cellAspectRatioChanged);
+    connect(m_currentLayout, &QnWorkbenchLayout::cellSpacingChanged,
+        this, &QnWorkbench::at_layout_cellSpacingChanged);
 
     const qreal newCellAspectRatio = m_currentLayout->cellAspectRatio();
     const qreal newCellSpacing = m_currentLayout->cellSpacing();
@@ -566,7 +570,7 @@ void QnWorkbench::update(const QnWorkbenchState& state)
 
     for (const auto& id: state.layoutUuids)
     {
-        if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
+        if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
         {
             const auto factory = LayoutsFactory::instance(this);
             const auto workbenchLayout = factory->create(layout, this);
@@ -596,12 +600,10 @@ void QnWorkbench::update(const QnWorkbenchState& state)
             if (stateLayout.parentId != userId)
                 continue;
 
-            QnResourcePtr resource = resourcePool()->getResourceById(stateLayout.id);
-            QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-
+            auto layoutResource = resourcePool()->getResourceById<LayoutResource>(stateLayout.id);
             if (!layoutResource)
             {
-                layoutResource.reset(new QnLayoutResource());
+                layoutResource.reset(new LayoutResource());
                 layoutResource->addFlags(Qn::local);
                 layoutResource->setParentId(stateLayout.parentId);
                 layoutResource->setIdUnsafe(stateLayout.id);
@@ -660,10 +662,10 @@ void QnWorkbench::update(const QnWorkbenchState& state)
 
 void QnWorkbench::submit(QnWorkbenchState& state)
 {
-    auto isLayoutSupported = [](const QnLayoutResourcePtr& layout)
+    auto isLayoutSupported = [](const LayoutResourcePtr& layout)
         {
-            // Support layout tours.
-            if (!layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull())
+            // Support showreels.
+            if (layout->isShowreelReviewLayout())
                 return true;
 
             if (layout->data().contains(Qn::VideoWallResourceRole))
@@ -673,10 +675,14 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
                 return false;
 
+            // Ignore temporary layouts such as preview search or audit trail.
+            if (!layout->systemContext())
+                return false;
+
             return true;
         };
 
-    auto sourceId = [](const QnLayoutResourcePtr& layout)
+    auto sourceId = [](const LayoutResourcePtr& layout)
         {
             if (const auto videoWall = layout->data(Qn::VideoWallResourceRole)
                 .value<QnVideoWallResourcePtr>())
@@ -704,11 +710,9 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             if (isLayoutSupported(resource))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            auto systemContext = SystemContext::fromResource(resource);
-            const bool isSaveable = NX_ASSERT(systemContext)
-                && systemContext->layoutSnapshotManager()->isSaveable(resource);
-
-            if (ini().enableMultiSystemTabBar && (resource->hasFlags(Qn::local) || isSaveable))
+            if (ini().enableMultiSystemTabBar
+                && resource->hasFlags(Qn::local)
+                && !resource->hasFlags(Qn::cross_system))
             {
                 QnWorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();

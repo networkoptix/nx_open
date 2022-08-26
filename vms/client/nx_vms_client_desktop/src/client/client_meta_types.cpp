@@ -33,6 +33,10 @@
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
+#include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_properties/fisheye/fisheye_calibrator.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
@@ -43,7 +47,6 @@
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
-#include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <nx/vms/client/desktop/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/thumbnails/roi_camera_thumbnail.h>
@@ -61,8 +64,6 @@
 #include <nx/vms/client/desktop/ui/common/item_grabber.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
-#include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
-#include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
@@ -161,10 +162,12 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaTypeStreamOperators<QnTimePeriod>();
     qRegisterMetaTypeStreamOperators<QList<QRegion>>();
 
+    qRegisterMetaType<LayoutResourcePtr>();
+
     qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
-    qRegisterMetaType<nx::vms::client::desktop::workbench::timeline::ThumbnailPtr>();
+    qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
     qRegisterMetaType<QnLicenseWarningState>();
     qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
     qRegisterMetaType<QnLicenseWarningStateHash>();
@@ -181,7 +184,7 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnPingUtility::PingResponse>();
-    qRegisterMetaType<nx::vms::client::desktop::ServerFileCache::OperationResult>();
+    qRegisterMetaType<ServerFileCache::OperationResult>();
 
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<VirtualCameraState>();
@@ -191,7 +194,7 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<nx::cloud::db::api::SystemData>();
     qRegisterMetaType<rest::ServerConnectionPtr>();
 
-    qRegisterMetaType<nx::vms::client::desktop::ExportMediaPersistentSettings>();
+    qRegisterMetaType<ExportMediaPersistentSettings>();
 
     qRegisterMetaType<QnNotificationLevel::Value>();
 
@@ -210,7 +213,7 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaType<QnServerFields>();
 
-    nx::vms::client::desktop::WebViewController::registerMetaType();
+    WebViewController::registerMetaType();
 
     QMetaType::registerComparators<QnUuid>();
 
@@ -218,10 +221,10 @@ void QnClientMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QnBackgroundImage>();
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
-    qRegisterMetaType<nx::vms::client::desktop::BackupQueueSize>();
+    qRegisterMetaType<BackupQueueSize>();
 
-    qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
-    QMetaType::registerComparators<nx::vms::client::desktop::RecordScheduleCellData>();
+    qRegisterMetaType<RecordScheduleCellData>();
+    QMetaType::registerComparators<RecordScheduleCellData>();
 
     registerQmlTypes();
 }
@@ -254,9 +257,8 @@ void QnClientMetaTypes::registerQmlTypes()
     AudioDispatcher::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
-    qmlRegisterType<nx::vms::client::desktop::ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
-    qmlRegisterType<nx::vms::client::desktop::PerformanceInfo>(
-        "nx.vms.client.desktop", 1, 0, "PerformanceInfo");
+    qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
+    qmlRegisterType<PerformanceInfo>("nx.vms.client.desktop", 1, 0, "PerformanceInfo");
 
     qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
         "Cannot create instance of Workbench.");
@@ -301,8 +303,8 @@ void QnClientMetaTypes::registerQmlTypes()
     MotionRegionsItem::registerQmlType();
     GlobalToolTip::registerQmlType();
     CursorOverride::registerQmlType();
-    nx::vms::client::desktop::utils::WebEngineProfileManager::registerQmlType();
-    nx::vms::client::desktop::analytics::TaxonomyManager::registerQmlTypes();
-    nx::vms::client::desktop::analytics::IconManager::registerQmlType();
-    nx::vms::client::desktop::workbench::timeline::registerQmlType();
+    utils::WebEngineProfileManager::registerQmlType();
+    analytics::TaxonomyManager::registerQmlTypes();
+    analytics::IconManager::registerQmlType();
+    workbench::timeline::registerQmlType();
 }

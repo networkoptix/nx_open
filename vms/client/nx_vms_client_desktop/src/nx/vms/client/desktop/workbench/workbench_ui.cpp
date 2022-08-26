@@ -4,76 +4,75 @@
 
 #include <cmath> /* For std::floor. */
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QMargins>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLayout>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <qt_graphics_items/graphics_widget.h>
 
 #include <camera/fps_calculator.h>
 #include <client/client_meta_types.h>
-#include <client/client_settings.h>
-#include <client/client_runtime_settings.h>
 #include <client/client_module.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <ui/animation/viewport_animator.h>
-#include <ui/animation/viewport_animator.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
+#include <ui/animation/viewport_animator.h>
 #include <ui/common/palette.h>
-#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
-#include <ui/graphics/instruments/activity_listener_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
-#include <qt_graphics_items/graphics_widget.h>
+#include <ui/graphics/items/controls/control_background_widget.h>
+#include <ui/graphics/items/controls/navigation_item.h>
+#include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/gui_elements_widget.h>
-#include <ui/graphics/items/controls/navigation_item.h>
-#include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench_ui_globals.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
 
+#include "panels/calendar_workbench_panel.h"
+#include "panels/left_workbench_panel.h"
 #include "panels/notifications_workbench_panel.h"
 #include "panels/resource_tree_workbench_panel.h"
 #include "panels/timeline_workbench_panel.h"
-#include "panels/calendar_workbench_panel.h"
 #include "panels/title_workbench_panel.h"
-#include "panels/left_workbench_panel.h"
 
 namespace nx::vms::client::desktop {
 

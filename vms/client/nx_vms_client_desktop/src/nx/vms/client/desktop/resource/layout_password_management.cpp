@@ -4,11 +4,9 @@
 
 #include <QtGui/QGuiApplication>
 
-#include <core/resource/layout_resource.h>
 #include <core/resource/file_layout_resource.h>
+#include <core/resource/layout_resource.h>
 #include <nx/core/layout/layout_file_info.h>
-#include <core/resource_management/resource_runtime_data.h>
-
 #include <ui/dialogs/common/input_dialog.h>
 
 namespace {

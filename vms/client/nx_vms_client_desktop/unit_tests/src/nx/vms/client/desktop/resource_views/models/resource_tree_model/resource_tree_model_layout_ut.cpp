@@ -2,13 +2,13 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_matrix.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>

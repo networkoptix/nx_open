@@ -2,7 +2,6 @@
 
 #include "layout_snapshot_manager.h"
 
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/layout_data.h>
@@ -10,6 +9,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -189,7 +189,7 @@ void LayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource)
     disconnectFrom(resource);
     {
         const auto snapshot = m_storage->snapshot(resource);
-        QnLayoutResourcePtr restored(new QnLayoutResource());
+        QnLayoutResourcePtr restored(new LayoutResource());
         ec2::fromApiToResource(snapshot, restored);
 
         // Overwrite flags as they are runtime data and not stored in the snapshot.

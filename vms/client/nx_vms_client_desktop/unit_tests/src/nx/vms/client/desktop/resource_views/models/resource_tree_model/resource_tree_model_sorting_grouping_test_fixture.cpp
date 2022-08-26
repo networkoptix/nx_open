@@ -9,6 +9,7 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

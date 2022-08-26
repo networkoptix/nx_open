@@ -19,7 +19,6 @@
 struct QnStartupParameters;
 
 class QnWorkbench;
-class QnWorkbenchSynchronizer;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
@@ -119,7 +118,6 @@ private:
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<nx::vms::client::desktop::ui::action::Manager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
-    QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
     QScopedPointer<nx::vms::client::desktop::ResourceTreeSettings> m_resourceTreeSettings;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> m_joystickManager;

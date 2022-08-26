@@ -5,13 +5,13 @@
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/datetime.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <plugins/resource/archive/syncplay_wrapper.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -211,8 +211,11 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged(
     m_syncPlay->onConsumerBlocksReader(display->dataProvider(), !m_watcher->isDisplaying(display));
 }
 
-void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
-    QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
+void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged()
+{
+    QnTimePeriod period = workbench()->currentLayout()->resource()
+        ? workbench()->currentLayout()->resource()->localRange()
+        : QnTimePeriod();
     m_syncPlay->setLiveModeEnabled(period.isEmpty());
 }
 

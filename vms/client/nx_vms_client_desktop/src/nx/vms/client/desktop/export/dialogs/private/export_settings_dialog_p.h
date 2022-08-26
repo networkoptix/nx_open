@@ -4,9 +4,9 @@
 
 #include <array>
 
+#include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
-#include <QtCore/QDir>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/flux/flux_state_store.h>
@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.h>
 #include <nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.h>
 #include <nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 #include "../export_settings_dialog.h"
 #include "export_settings_dialog_state.h"
@@ -50,7 +51,7 @@ public:
     void saveSettings();
 
     void setMediaResource(const QnMediaResourcePtr& media);
-    void setLayout(const QnLayoutResourcePtr& layout, const QPalette& palette);
+    void setLayout(const LayoutResourcePtr& layout, const QPalette& palette);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(Mode mode) const;
@@ -58,7 +59,7 @@ public:
     static FileExtensionList allowedFileExtensions(Mode mode);
 
     QnMediaResourcePtr mediaResource() const;
-    QnLayoutResourcePtr layout() const;
+    LayoutResourcePtr layout() const;
 
     void createOverlays(QWidget* overlayContainer);
 
@@ -121,7 +122,7 @@ private:
 
     // Layout group
 
-    QnLayoutResourcePtr m_layout;
+    LayoutResourcePtr m_layout;
     // Image provider for layout preview
     std::unique_ptr<ImageProvider> m_layoutPreviewProvider;
     QPointer<nx::vms::client::desktop::AsyncImageWidget> m_layoutPreviewWidget;

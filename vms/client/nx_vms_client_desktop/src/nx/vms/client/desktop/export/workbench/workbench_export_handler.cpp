@@ -12,7 +12,6 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -32,6 +31,7 @@
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -91,11 +91,11 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget*>(display->activeWidget());
 }
 
-QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
+LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
-    layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+    layout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
 
     // First we must count unique cameras to get the matrix size.
     QnVirtualCameraResourceList cameras;
@@ -594,7 +594,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
     else if (auto layoutSettings = std::get_if<ExportLayoutSettings>(&settings))
     {
         layoutSettings->transcodingSettings.forceTranscoding = forceTranscoding;
-        tool.reset(new ExportLayoutTool(*layoutSettings, resource.dynamicCast<QnLayoutResource>()));
+        tool.reset(new ExportLayoutTool(*layoutSettings, resource.dynamicCast<LayoutResource>()));
     }
     else
     {
@@ -634,7 +634,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                 //  - export from the scene, uses rotation from the layout.
                 //  - export from bookmark. Matches rotation from camera settings.
                 const auto& resourcePtr = dialog.mediaResource()->toResourcePtr();
-                QnLayoutResourcePtr layout = layoutFromResource(resourcePtr);
+                LayoutResourcePtr layout = layoutFromResource(resourcePtr);
                 auto layoutItems = layout->getItems();
                 if (!layoutItems.empty())
                 {
@@ -765,7 +765,7 @@ bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout
 void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+    const auto layout = parameters.resource().dynamicCast<LayoutResource>();
 
     NX_ASSERT(layout && layout->isFile());
     if (!layout || !layout->isFile())
@@ -782,7 +782,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     ExportLayoutSettings layoutSettings;
     layoutSettings.fileName = Filename::parse(layout->getUrl());
     layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
-    layoutSettings.period = layout->getLocalRange();
+    layoutSettings.period = layout->localRange();
     layoutSettings.readOnly = readOnly;
     layoutSettings.encryption = {layout::isEncrypted(layout), layout::password(layout)};
 

@@ -9,6 +9,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchLayout;
@@ -50,20 +51,20 @@ private:
     void connectToLayout(QnWorkbenchLayout* layout);
 
     void updateOrder();
-    void updateButtons(const QnLayoutResourcePtr& layout);
+    void updateButtons(const LayoutResourcePtr& layout);
     void updatePlaceholders();
     void updateItemsLayout();
 
-    void resetReviewLayout(const QnLayoutResourcePtr& layout,
+    void resetReviewLayout(const LayoutResourcePtr& layout,
         const nx::vms::api::LayoutTourItemDataList& items);
 
     void addItemToReviewLayout(
-        const QnLayoutResourcePtr& layout,
+        const LayoutResourcePtr& layout,
         const nx::vms::api::LayoutTourItemData& item,
         const QPointF& position,
         bool pinItem);
     void addResourcesToReviewLayout(
-        const QnLayoutResourcePtr& layout,
+        const LayoutResourcePtr& layout,
         const QnResourceList& resources,
         const QPointF& position);
 
@@ -82,7 +83,7 @@ private:
 
 private:
     nx::utils::ScopedConnections m_connections;
-    QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
+    QHash<QnUuid, LayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
     QSet<QnUuid> m_saveToursQueue;
     nx::utils::PendingOperation* m_saveToursOperation = nullptr;

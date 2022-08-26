@@ -2,10 +2,10 @@
 
 #include "layout_resource_source.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
 #include <client/client_globals.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
@@ -98,9 +98,9 @@ void LayoutResourceSource::processResource(
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return;
 
-    const auto layout = resource.staticCast<QnLayoutResource>();
+    const auto layout = resource.staticCast<LayoutResource>();
 
-    if (layout->isServiceLayout() || layout->data().contains(Qn::LayoutSearchStateRole))
+    if (layout->isServiceLayout() || layout->isPreviewSearchLayout())
         return;
 
     if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))
