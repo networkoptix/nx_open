@@ -80,7 +80,7 @@ signals:
     void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
     void progressChanged(double progress);
     void itemListChanged();
-    void itemChanged(int idx);
+    void itemsChanged(QList<UnitPtr> units);
 
     void logLevelChanged();
 
