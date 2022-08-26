@@ -9,12 +9,11 @@
 #include <nx/network/http/server/handler/http_server_handler_create_tunnel.h>
 #include <nx/network/http/tunneling/server.h>
 
-#include "message_dispatcher.h"
 #include "server_connection.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
+
+namespace detail { class TunnelAuthorizer; }
 
 /**
  * NOTE: Uses nx::network::http::tunneling::Server inside.
@@ -25,17 +24,18 @@ public:
     using StunConnectionPool =
         nx::network::server::StreamServerConnectionHolder<nx::network::stun::ServerConnection>;
 
-    static const char* const kStunProtocolName;
+    static constexpr char kStunProtocolName[] = "STUN/rfc5389";
 
-    StunOverHttpServer(nx::network::stun::MessageDispatcher* stunMessageDispatcher);
+    StunOverHttpServer(nx::network::stun::AbstractMessageHandler* messageHandler);
+    ~StunOverHttpServer();
 
     template<typename HttpMessageDispatcherType>
     void setupHttpTunneling(
         HttpMessageDispatcherType* httpMessageDispatcher,
         const std::string& stunOverHttpPath)
     {
-        using namespace std::placeholders;
-        using CreateStunOverHttpConnectionHandler = nx::network::http::server::handler::CreateTunnelHandler;
+        using CreateStunOverHttpConnectionHandler =
+            nx::network::http::server::handler::CreateTunnelHandler;
 
         // TODO: #akolesnikov Remove it after the end of 3.2 support.
         httpMessageDispatcher->registerRequestProcessor(
@@ -44,7 +44,9 @@ public:
             {
                 return std::make_unique<CreateStunOverHttpConnectionHandler>(
                     kStunProtocolName,
-                    std::bind(&StunOverHttpServer::createStunConnection, this, _1));
+                    [this](auto&&... args) {
+                        this->createStunConnection(std::forward<decltype(args)>(args)...);
+                    });
             });
 
         m_httpTunnelingServer.registerRequestHandlers(
@@ -59,13 +61,18 @@ public:
 
 private:
     StunConnectionPool m_stunConnectionPool;
-    nx::network::stun::MessageDispatcher* m_dispatcher = nullptr;
-    nx::network::http::tunneling::Server<> m_httpTunnelingServer;
+    nx::network::stun::AbstractMessageHandler* m_messageHandler = nullptr;
+    std::unique_ptr<detail::TunnelAuthorizer> m_tunnelAuthorizer;
+    nx::network::http::tunneling::Server<nx::utils::stree::StringAttrDict> m_httpTunnelingServer;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
 
-    void createStunConnection(std::unique_ptr<AbstractStreamSocket> connection);
+    void createStunConnection(
+        std::unique_ptr<AbstractStreamSocket> connection,
+        nx::utils::stree::StringAttrDict attrs);
+
+    void createStunConnection(
+        std::unique_ptr<AbstractStreamSocket> connection,
+        nx::network::http::RequestContext ctx);
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

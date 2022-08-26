@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 namespace stun {
 
-class MessageDispatcher;
+class AbstractMessageHandler;
 
 class SocketServer:
     public nx::network::server::StreamSocketServer<SocketServer, ServerConnection>
@@ -21,11 +21,11 @@ class SocketServer:
 public:
     template<typename... Args>
     SocketServer(
-        const MessageDispatcher* dispatcher,
+        AbstractMessageHandler* messageHandler,
         Args&&... args)
         :
         base_type(std::forward<Args>(args)...),
-        m_dispatcher(dispatcher)
+        m_messageHandler(messageHandler)
     {
     }
 
@@ -39,13 +39,12 @@ protected:
         std::unique_ptr<AbstractStreamSocket> socket) override
     {
         auto connection = std::make_shared<ServerConnection>(
-            std::move(socket),
-            *m_dispatcher);
+            std::move(socket), m_messageHandler);
         return connection;
     }
 
 private:
-    const MessageDispatcher* m_dispatcher;
+    AbstractMessageHandler* m_messageHandler = nullptr;
 };
 
 } // namespace stun

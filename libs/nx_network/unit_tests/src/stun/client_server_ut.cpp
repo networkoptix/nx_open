@@ -26,8 +26,8 @@ class TestServer:
     public SocketServer
 {
 public:
-    TestServer(const nx::network::stun::MessageDispatcher& dispatcher):
-        SocketServer(&dispatcher),
+    TestServer(AbstractMessageHandler* messageHandler):
+        SocketServer(messageHandler),
         m_totalConnectionsAccepted(0)
     {
     }
@@ -108,7 +108,7 @@ protected:
     SocketAddress startServer(
         const SocketAddress& address = SocketAddress(HostAddress::localhost, 0))
     {
-        server = std::make_unique<TestServer>(dispatcher);
+        server = std::make_unique<TestServer>(&dispatcher);
 
         EXPECT_TRUE(server->bind(address)) <<
             SystemError::getLastOSErrorText();

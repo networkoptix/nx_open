@@ -9,21 +9,20 @@
 #include <nx/utils/singleton.h>
 #include <nx/network/async_stoppable.h>
 
+#include "abstract_message_handler.h"
 #include "abstract_server_connection.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 /**
  * Dispatches STUN protocol messages to corresponding processor.
  * NOTE: This class methods are not thread-safe.
  */
-class NX_NETWORK_API MessageDispatcher
+class NX_NETWORK_API MessageDispatcher:
+    public AbstractMessageHandler
 {
 public:
-    using MessageProcessor = std::function<
-        void(std::shared_ptr< AbstractServerConnection >, stun::Message)>;
+    using MessageProcessor = std::function<void(MessageContext)>;
 
     MessageDispatcher() = default;
 
@@ -47,20 +46,14 @@ public:
     void registerDefaultRequestProcessor(MessageProcessor processor);
 
     /**
-     * Pass message to corresponding processor.
-     * @param message This object is not moved in case of failure to find processor.
-     * @return true if request processing passed to corresponding processor and
-     *   async processing has been started, false otherwise.
+     * Pass message to handler registered for the message method.
+     * If no handler was matched, a notFound reply is sent.
      */
-    virtual bool dispatchRequest(
-        std::shared_ptr< AbstractServerConnection > connection,
-        stun::Message message) const;
+    virtual void serve(MessageContext ctx) override;
 
 private:
     std::unordered_map<int, MessageProcessor> m_processors;
     MessageProcessor m_defaultProcessor;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

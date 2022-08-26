@@ -4,9 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 bool MessageDispatcher::registerRequestProcessor(
     int method, MessageProcessor processor)
@@ -20,26 +18,30 @@ void MessageDispatcher::registerDefaultRequestProcessor(
     m_defaultProcessor = std::move(processor);
 }
 
-bool MessageDispatcher::dispatchRequest(
-    std::shared_ptr< AbstractServerConnection > connection,
-    stun::Message message) const
+void MessageDispatcher::serve(MessageContext ctx)
 {
-    const auto it = m_processors.find(message.header.method);
+    const auto it = m_processors.find(ctx.message.header.method);
     const MessageProcessor& processor =
         it == m_processors.end()
         ? m_defaultProcessor
         : it->second;
 
     NX_VERBOSE(this, "ServerConnection %1. Dispatching request %2",
-        connection.get(), message.header.method);
+        ctx.connection.get(), ctx.message.header.method);
 
-    if (!processor)
-        return false;
+    if (processor)
+        return processor(std::move(ctx));
 
-    processor(std::move(connection), std::move(message));
-    return true;
+    stun::Message response(stun::Header(
+        stun::MessageClass::errorResponse,
+        ctx.message.header.method,
+        std::move(ctx.message.header.transactionId)));
+
+    // TODO: verify with RFC
+    response.newAttribute< stun::attrs::ErrorCode >(
+        stun::error::notFound, "Method is not supported");
+
+    ctx.connection->sendMessage(std::move(response), nullptr);
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

@@ -528,7 +528,7 @@ private:
 
     void saveServerTunnel(
         std::unique_ptr<AbstractStreamSocket> connection,
-        RequestPathParams /*requestParams*/)
+        RequestContext)
     {
         if (connection)
             connection->setNonBlockingMode(false);

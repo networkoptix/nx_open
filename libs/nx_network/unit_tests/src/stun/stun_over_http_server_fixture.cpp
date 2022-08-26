@@ -14,8 +14,6 @@ static const char* const kStunOverHttpPath = "/StunOverHttp";
 StunOverHttpServer::StunOverHttpServer():
     m_stunOverHttpServer(&m_dispatcher)
 {
-    using namespace std::placeholders;
-
     m_stunOverHttpServer.setupHttpTunneling(
         &m_httpServer.httpMessageDispatcher(),
         kStunOverHttpPath);
@@ -62,11 +60,9 @@ static constexpr int kStunMethodToUse = nx::network::stun::MethodType::userMetho
 
 void StunOverHttpServerFixture::SetUp()
 {
-    using namespace std::placeholders;
-
     m_server.dispatcher().registerRequestProcessor(
         kStunMethodToUse,
-        std::bind(&StunOverHttpServerFixture::processStunMessage, this, _1, _2));
+        [this](auto&&... args) { processStunMessage(std::forward<decltype(args)>(args)...); });
 
     ASSERT_TRUE(m_server.bind(network::SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(m_server.listen());
@@ -123,17 +119,15 @@ void StunOverHttpServerFixture::assertStunClientIsAbleToPerformRequest(
         std::get<1>(result).header.messageClass);
 }
 
-void StunOverHttpServerFixture::processStunMessage(
-    std::shared_ptr<nx::network::stun::AbstractServerConnection> serverConnection,
-    nx::network::stun::Message message)
+void StunOverHttpServerFixture::processStunMessage(nx::network::stun::MessageContext ctx)
 {
-    m_messagesReceived.push(message);
+    m_messagesReceived.push(ctx.message);
 
     nx::network::stun::Message response(nx::network::stun::Header(
         nx::network::stun::MessageClass::successResponse,
-        message.header.method,
-        message.header.transactionId));
-    serverConnection->sendMessage(std::move(response), nullptr);
+        ctx.message.header.method,
+        ctx.message.header.transactionId));
+    ctx.connection->sendMessage(std::move(response), nullptr);
 }
 
 } // namespace test

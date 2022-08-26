@@ -59,14 +59,12 @@ public:
      */
     void addServer()
     {
-        using namespace std::placeholders;
-
         auto ctx = std::make_unique<ServerContext>();
         ctx->server = std::make_unique<UdpServer>(&ctx->messageDispatcher);
         ASSERT_TRUE(ctx->server->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(ctx->server->listen());
         ctx->messageDispatcher.registerDefaultRequestProcessor(
-            std::bind(&UdpClient::onMessage, this, _1, _2));
+            [this](auto&&... args) { onMessage(std::forward<decltype(args)>(args)...); });
 
         m_udpServers.emplace_back(std::move(ctx));
     }
@@ -221,9 +219,7 @@ private:
     nx::utils::SyncQueue<RequestResult> m_requestResults;
     std::vector<std::string> m_blockedHosts;
 
-    void onMessage(
-        std::shared_ptr< AbstractServerConnection > connection,
-        stun::Message message)
+    void onMessage(stun::MessageContext ctx)
     {
         ++m_totalMessagesReceived;
 
@@ -238,9 +234,9 @@ private:
             stun::Header(
                 nx::network::stun::MessageClass::successResponse,
                 nx::network::stun::bindingMethod,
-                message.header.transactionId));
+                ctx.message.header.transactionId));
         response.newAttribute<stun::attrs::Nonce>(kServerResponseNonce);
-        connection->sendMessage(std::move(response), nullptr);
+        ctx.connection->sendMessage(std::move(response), nullptr);
     }
 
     void saveRequestResult(
@@ -549,40 +545,40 @@ protected:
 
     void givenContentServer()
     {
-        using namespace std::placeholders;
-
         contentServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::processBindingRequest, this, _1, _2));
+            [this](auto&&... args) { processBindingRequest(std::forward<decltype(args)>(args)...); });
     }
 
     void givenSilentContentServer()
     {
-        using namespace std::placeholders;
-
         contentServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::ignoreMessage, this, _1, _2));
+            [this](auto&&... args) { ignoreMessage(std::forward<decltype(args)>(args)...); });
     }
 
     void givenRedirectionServer()
     {
-        using namespace std::placeholders;
-
         redirectionServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::redirectHandler, this,
-                _1, _2, contentServer().server->address()));
+            [this](auto&&... args)
+            {
+                redirectHandler(
+                    std::forward<decltype(args)>(args)...,
+                    contentServer().server->address());
+            });
     }
 
     void givenBrokenRedirectionServer()
     {
-        using namespace std::placeholders;
-
         redirectionServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::brokenRedirectHandler, this,
-                _1, _2, contentServer().server->address()));
+            [this](auto&&... args)
+            {
+                brokenRedirectHandler(
+                    std::forward<decltype(args)>(args)...,
+                    contentServer().server->address());
+            });
     }
 
     void givenTwoServersWithRedirection()
@@ -593,12 +589,14 @@ protected:
 
     void givenTwoServersWithRedirectionLoop()
     {
-        using namespace std::placeholders;
-
         contentServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::redirectHandler, this,
-                _1, _2, redirectionServer().server->address()));
+            [this](auto&&... args)
+            {
+                redirectHandler(
+                    std::forward<decltype(args)>(args)...,
+                    redirectionServer().server->address());
+            });
 
         givenRedirectionServer();
     }
@@ -685,46 +683,41 @@ private:
         addServer();
     }
 
-    void processBindingRequest(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        stun::Message message)
+    void processBindingRequest(stun::MessageContext ctx)
     {
         stun::Message response(stun::Header(
             stun::MessageClass::successResponse,
             stun::bindingMethod,
-            message.header.transactionId));
-        response.newAttribute<stun::attrs::MappedAddress>(connection->getSourceAddress());
-        connection->sendMessage(std::move(response), nullptr);
+            ctx.message.header.transactionId));
+        response.newAttribute<stun::attrs::MappedAddress>(ctx.connection->getSourceAddress());
+        ctx.connection->sendMessage(std::move(response), nullptr);
     }
 
     void redirectHandler(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        stun::Message message,
+        stun::MessageContext ctx,
         SocketAddress targetAddress)
     {
         sendRedirectResponse(
             ResponseGenerationRule::createCorrectResponse,
-            std::move(connection),
-            std::move(message),
+            std::move(ctx.connection),
+            std::move(ctx.message),
             std::move(targetAddress));
     }
 
     void brokenRedirectHandler(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        stun::Message message,
+        stun::MessageContext ctx,
         SocketAddress targetAddress)
     {
         sendRedirectResponse(
             ResponseGenerationRule::doNotAddAlternateServer,
-            std::move(connection),
-            std::move(message),
+            std::move(ctx.connection),
+            std::move(ctx.message),
             std::move(targetAddress));
     }
 
-    void ignoreMessage(
-        std::shared_ptr<stun::AbstractServerConnection> /*connection*/,
-        stun::Message /*message*/)
+    void ignoreMessage(stun::MessageContext /*ctx*/)
     {
+        // Just ignoring.
     }
 
     void sendRedirectResponse(

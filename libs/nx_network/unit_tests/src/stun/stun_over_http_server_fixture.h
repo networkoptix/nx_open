@@ -58,9 +58,7 @@ private:
     StunOverHttpServer m_server;
     nx::utils::SyncQueue<nx::network::stun::Message> m_messagesReceived;
 
-    void processStunMessage(
-        std::shared_ptr<nx::network::stun::AbstractServerConnection> serverConnection,
-        nx::network::stun::Message message);
+    void processStunMessage(nx::network::stun::MessageContext ctx);
 };
 
 } // namespace test

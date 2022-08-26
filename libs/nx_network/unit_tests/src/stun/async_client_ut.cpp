@@ -60,11 +60,9 @@ protected:
 
     void givenRegularStunServer()
     {
-        using namespace std::placeholders;
-
         m_dispatcher.registerRequestProcessor(
             kTestMethodNumber,
-            std::bind(&StunClient::sendResponse, this, _1, _2));
+            [this](auto&&... args) { sendResponse(std::forward<decltype(args)>(args)...); });
 
         startServer();
     }
@@ -79,22 +77,18 @@ protected:
 
     void givenServerThatBreaksConnectionAfterReceivingRequest()
     {
-        using namespace std::placeholders;
-
         m_dispatcher.registerRequestProcessor(
             kTestMethodNumber,
-            std::bind(&StunClient::closeConnection, this, _1, _2));
+            [this](auto&&... args) { closeConnection(std::forward<decltype(args)>(args)...); });
 
         startServer();
     }
 
     void givenServerThatRandomlyClosesConnections()
     {
-        using namespace std::placeholders;
-
         dispatcher().registerRequestProcessor(
             kTestMethodNumber,
-            std::bind(&StunClient::randomlyCloseConnection, this, _1, _2));
+            [this](auto&&... args) { randomlyCloseConnection(std::forward<decltype(args)>(args)...); });
 
         startServer();
     }
@@ -102,7 +96,8 @@ protected:
     void givenConnectedClient()
     {
         m_stunClient->connect(
-            nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_serverEndpoint));
+            nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
+                .setEndpoint(m_serverEndpoint));
     }
 
     void givenTcpConnectionToTheServer()
@@ -207,23 +202,19 @@ private:
             settings);
     }
 
-    void closeConnection(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::network::stun::Message /*message*/)
+    void closeConnection(nx::network::stun::MessageContext ctx)
     {
-        connection->close();
+        ctx.connection->close();
     }
 
-    void sendResponse(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::network::stun::Message request)
+    void sendResponse(nx::network::stun::MessageContext ctx)
     {
         nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
-                request.header.method,
-                request.header.transactionId));
-        connection->sendMessage(std::move(response));
+                ctx.message.header.method,
+                ctx.message.header.transactionId));
+        ctx.connection->sendMessage(std::move(response));
     }
 
     void storeRequestResult(
@@ -233,22 +224,20 @@ private:
         m_requestResult.push(sysErrorCode);
     }
 
-    void randomlyCloseConnection(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::network::stun::Message request)
+    void randomlyCloseConnection(nx::network::stun::MessageContext ctx)
     {
         if (nx::utils::random::number<int>(0, 1) > 0)
         {
-            connection->close();
+            ctx.connection->close();
             return;
         }
 
         nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
-                request.header.method,
-                request.header.transactionId));
-        connection->sendMessage(std::move(response));
+                ctx.message.header.method,
+                ctx.message.header.transactionId));
+        ctx.connection->sendMessage(std::move(response));
     }
 
     void startServer()
