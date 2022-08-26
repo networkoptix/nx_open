@@ -1,29 +1,37 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QStyle>
+
 #include "password_input_field.h"
 #include "password_strength_indicator.h"
 #include "private/password_preview_button.h"
-
-#include <QKeyEvent>
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QString kPasswordPlaceholder("**********");
+QString passwordPlaceholder(QStyle* style)
+{
+    static constexpr auto kPlaceholderLength = 10;
+    const auto passwordPlaceholderChar = style->styleHint(QStyle::SH_LineEdit_PasswordCharacter);
+    return QString(kPlaceholderLength, passwordPlaceholderChar);
+}
 
 } // namespace
 
 struct PasswordInputField::Private
 {
-    explicit Private(PasswordInputField* q): q(q)
-    {
-    }
-
     void updatePasswordIndicatorVisibility()
     {
         if (!passwordIndicator)
             return;
+
+        if (hasRemotePassword)
+        {
+            passwordIndicator->setVisible(false);
+            return;
+        }
 
         if (!q->text().trimmed().isEmpty())
             passwordIndicator->setVisible(true);
@@ -31,26 +39,17 @@ struct PasswordInputField::Private
             passwordIndicator->setVisible(false);
     }
 
-    void updateDisplayedText()
-    {
-        q->base_type::setText(!storedPassword.isEmpty() || hasRemotePassword
-            ? kPasswordPlaceholder
-            : QString());
-    }
-
     PasswordInputField* const q;
     PasswordStrengthIndicator* passwordIndicator = nullptr;
     bool hidePasswordIndicatorWhenEmpty = true;
-    bool passwordIsLocked = true;
     bool hasRemotePassword = false;
-    QString storedPassword;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 PasswordInputField::PasswordInputField(QWidget* parent):
     base_type(ValidationBehavior::validateOnFocus, parent),
-    d(new Private(this))
+    d(new Private({this}))
 {
     const auto lineEdit = qobject_cast<QLineEdit*>(input());
     lineEdit->setObjectName("passwordLineEdit");
@@ -59,27 +58,24 @@ PasswordInputField::PasswordInputField(QWidget* parent):
         [lineEdit](const QString& name) { lineEdit->setObjectName(name + "_passwordLineEdit"); });
 
     lineEdit->setEchoMode(QLineEdit::Password);
-    PasswordPreviewButton::createInline(lineEdit, [this]() { return !d->passwordIsLocked; });
+
+    PasswordPreviewButton::createInline(lineEdit, [this]() { return !hasRemotePassword(); });
 
     connect(lineEdit, &QLineEdit::textChanged, this,
-        [this]()
-        {
-            d->updatePasswordIndicatorVisibility();
-            emit textChanged(text());
-        });
+        [this](const QString& text) { d->updatePasswordIndicatorVisibility(); });
 
-    connect(lineEdit, &QLineEdit::textEdited, this, [this]() { d->passwordIsLocked = false; });
+    connect(lineEdit, &QLineEdit::textEdited, this,
+        [this]() { setHasRemotePassword(false); });
 
-    connect(lineEdit,
-        &QLineEdit::selectionChanged,
-        this,
+    connect(lineEdit, &QLineEdit::selectionChanged, this,
         [this, lineEdit]()
         {
-            if (d->passwordIsLocked
+            if (hasRemotePassword()
                 && lineEdit->hasFocus()
                 && lineEdit->selectionLength() < lineEdit->displayText().size())
             {
-                // Do not allow a user to change selection while password is locked
+                // Do not allow a user to change selection while control displays the presence
+                // of a remote password.
                 lineEdit->selectAll();
             }
         });
@@ -94,24 +90,25 @@ PasswordInputField::~PasswordInputField()
 
 bool PasswordInputField::eventFilter(QObject* watched, QEvent* event)
 {
-    const auto lineEdit = qobject_cast<QLineEdit*>(input());
-    if (watched == lineEdit && d->passwordIsLocked)
+    if (watched == lineEdit() && hasRemotePassword())
     {
         if (event->type() == QEvent::FocusIn)
-        {
-            lineEdit->selectAll();
-        }
-        else if (event->type() == QEvent::FocusOut)
-        {
-            lineEdit->deselect();
-        }
+            lineEdit()->selectAll();
+
+        if (event->type() == QEvent::FocusOut)
+            lineEdit()->deselect();
     }
+
     return base_type::eventFilter(watched, event);
 }
 
 ValidationResult PasswordInputField::calculateValidationResult() const
 {
+    if (hasRemotePassword())
+        return ValidationResult(QValidator::Acceptable);
+
     auto result = base_type::calculateValidationResult();
+
     if ((result.state == QValidator::Acceptable) && d->passwordIndicator
         && d->passwordIndicator->isVisible())
     {
@@ -153,14 +150,15 @@ void PasswordInputField::setPasswordIndicatorEnabled(
 
 QString PasswordInputField::text() const
 {
-    return d->passwordIsLocked ? d->storedPassword : base_type::text();
+    return hasRemotePassword()
+        ? QString()
+        : base_type::text();
 }
 
 void PasswordInputField::setText(const QString& value)
 {
-    d->storedPassword = value;
-    d->passwordIsLocked = true;
-    d->updateDisplayedText();
+    setHasRemotePassword(false);
+    base_type::setText(value);
 }
 
 bool PasswordInputField::hasRemotePassword() const
@@ -174,7 +172,22 @@ void PasswordInputField::setHasRemotePassword(bool value)
         return;
 
     d->hasRemotePassword = value;
-    d->updateDisplayedText();
+
+    if (d->hasRemotePassword)
+    {
+        if (!base_type::text().isEmpty())
+            emit textChanged(QString());
+
+        lineEdit()->clearFocus();
+
+        QSignalBlocker textChangedSignalBlocker(this);
+        base_type::setText(passwordPlaceholder(style()));
+    }
+    else if (base_type::text() == passwordPlaceholder(style()))
+    {
+        QSignalBlocker textChangedSignalBlocker(this);
+        base_type::setText(QString());
+    }
 }
 
 } // namespace nx::vms::client::desktop

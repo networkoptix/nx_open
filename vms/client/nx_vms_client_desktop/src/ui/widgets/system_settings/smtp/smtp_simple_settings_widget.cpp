@@ -5,52 +5,16 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <ui/common/read_only.h>
+#include <nx/branding.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
-
-#include <utils/email/email.h>
-
-#include <nx/branding.h>
+#include <ui/common/read_only.h>
 
 using namespace nx::vms::client::desktop;
 
-QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) const
-{
-    QnEmailSettings result;
-    QnEmailAddress address(email);
-    if (address.smtpServer().isNull())
-    {
-        /* Current simple settings are not valid. */
-        result = base;
-    }
-    else
-    {
-        result = address.settings();
-        result.user = address.value();
-    }
-    result.email = email;
-    result.password = password;
-    result.signature = signature;
-    result.supportEmail = supportEmail;
-    return result;
-}
-
-QnSimpleSmtpSettings QnSimpleSmtpSettings::fromSettings(const QnEmailSettings &source)
-{
-    QnSimpleSmtpSettings result;
-    result.email = source.email;
-    result.password = source.password;
-    result.signature = source.signature;
-    result.supportEmail = source.supportEmail;
-    return result;
-}
-
-QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullptr*/) :
+QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent):
     QWidget(parent),
-    ui(new Ui::SmtpSimpleSettingsWidget),
-    m_updating(false),
-    m_readOnly(false)
+    ui(new Ui::SmtpSimpleSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -69,7 +33,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 
     // TODO: #sivanov Strings duplication.
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setValidator(defaultNonEmptyValidator(tr("Password cannot be empty.")));
+    ui->passwordInputField->setValidator(defaultPasswordValidator(/*allowEmpty*/ false));
 
     // TODO: #sivanov Strings duplication.
     ui->signatureInputField->setTitle(tr("System Signature"));
@@ -99,9 +63,21 @@ QnSmtpSimpleSettingsWidget::~QnSmtpSimpleSettingsWidget()
 {
 }
 
-QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
+QnEmailSettings QnSmtpSimpleSettingsWidget::settings(const QnEmailSettings& baseSettings) const
 {
-    QnSimpleSmtpSettings result;
+    QnEmailSettings result;
+
+    QnEmailAddress emailAddress(ui->emailInputField->text());
+    if (!emailAddress.smtpServer().isNull())
+    {
+        result = emailAddress.settings();
+        result.user = emailAddress.value();
+    }
+    else
+    {
+        result = baseSettings;
+    }
+
     result.email = ui->emailInputField->text();
     result.password = ui->passwordInputField->text();
     result.signature = ui->signatureInputField->text();
@@ -109,12 +85,13 @@ QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
     return result;
 }
 
-void QnSmtpSimpleSettingsWidget::setSettings(const QnSimpleSmtpSettings &value)
+void QnSmtpSimpleSettingsWidget::setSettings(const QnEmailSettings& value)
 {
     QScopedValueRollback<bool> guard(m_updating, true);
 
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(value.password);
+    if (!ui->passwordInputField->hasRemotePassword() || !value.password.isEmpty())
+        ui->passwordInputField->setText(value.password);
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }
@@ -132,6 +109,11 @@ void QnSmtpSimpleSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->passwordInputField, readOnly);
     setReadOnly(ui->signatureInputField, readOnly);
     setReadOnly(ui->supportInputField, readOnly);
+}
+
+bool QnSmtpSimpleSettingsWidget::hasRemotePassword() const
+{
+    return ui->passwordInputField->hasRemotePassword();
 }
 
 void QnSmtpSimpleSettingsWidget::setHasRemotePassword(bool value)

@@ -11,10 +11,7 @@ namespace nx::vms::client::desktop {
 
 /**
  * Common class for the password input fields. Can check input for validity and display warning
- * hint if something wrong. Stored password text which set using `setText()` method will be is
- * considered locked, so user won't be able to open it with the "eye" button, copy to clipboard or
- * change any part of the password except completely overwrite it. When user starts typing the
- * password, the stored one will be cleared and the input field will become unlocked.
+ * hint if something wrong.
  */
 class PasswordInputField: public InputField
 {
@@ -33,11 +30,32 @@ public:
         bool showImmediately = false,
         PasswordInformation::AnalyzeFunction analyzeFunction = nx::utils::passwordStrength);
 
+    /**
+     * @return Value entered in the input field if <tt>hasRemotePassword()<tt> returns false, null
+     *     string otherwise despite the fact that input field appears as non-empty.
+     */
     virtual QString text() const override;
+
+    /**
+     * Sets given value to the input field. Remote password indication state resets after this call
+     * regardless of the value passed.
+     */
     virtual void setText(const QString& value) override;
 
-    // Whether the password is stored on the server and isn't accessible on the client.
+    /**
+     * Remote password indication state lets know if password is stored on the server but isn't
+     * accessible on the client. In this state input field appears as non-empty, but it doesn't
+     * provide any value. Respectively, no input value validation are made.
+     * The control changes to its normal state on any attempt to change the value of
+     * the input field.
+     * @return Whether control is in remote password indication state or not.
+     */
     bool hasRemotePassword() const;
+
+    /**
+     * Toggles remote password indication state. The entered value is discarded upon enabling
+     * this state.
+     */
     void setHasRemotePassword(bool value);
 
 protected:

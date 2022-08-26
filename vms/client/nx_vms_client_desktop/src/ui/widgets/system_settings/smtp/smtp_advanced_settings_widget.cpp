@@ -5,15 +5,12 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <ui/common/read_only.h>
+#include <nx/branding.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
-
+#include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <utils/email/email.h>
-
-#include <nx/branding.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -25,17 +22,19 @@ QList<QnEmail::ConnectionType> connectionTypesAllowed()
         << QnEmail::ConnectionType::unsecure
         << QnEmail::ConnectionType::ssl
         << QnEmail::ConnectionType::tls;
-}
+} // namespace
 
-class QnPortNumberValidator : public QIntValidator
+class QnPortNumberValidator: public QIntValidator
 {
-    typedef QIntValidator base_type;
+    using base_type = QIntValidator;
+
 public:
-    QnPortNumberValidator(const QString &autoString, QObject* parent = 0) :
-        base_type(parent), m_autoString(autoString)
+    QnPortNumberValidator(const QString& autoString, QObject* parent = nullptr):
+        base_type(parent),
+        m_autoString(autoString)
     {}
 
-    virtual QValidator::State validate(QString &input, int &pos) const override
+    virtual QValidator::State validate(QString& input, int& pos) const override
     {
         if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
             return QValidator::Acceptable;
@@ -48,26 +47,26 @@ public:
             return QValidator::Intermediate;
         else
             return QValidator::Invalid;
-    }
+    };
 
-    virtual void fixup(QString &input) const override
+    virtual void fixup(QString& input) const override
     {
         if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
             return;
+
         if (input.toInt() == 0 || input.toInt() > USHRT_MAX)
             input = m_autoString;
-    }
+    };
+
 private:
     QString m_autoString;
 };
 
-}
+} // namespace
 
-QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= nullptr*/) :
-    QWidget(parent),
-    ui(new Ui::SmtpAdvancedSettingsWidget),
-    m_updating(false),
-    m_readOnly(false)
+QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent):
+    base_type(parent),
+    ui(new Ui::SmtpAdvancedSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -78,7 +77,9 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     ui->serverInputField->setValidator(defaultNonEmptyValidator(tr("Server cannot be empty.")));
 
     ui->userInputField->setTitle(tr("User"));
+
     ui->passwordInputField->setTitle(tr("Password"));
+    ui->passwordInputField->setValidator(defaultPasswordValidator(/*allowEmpty*/ true));
 
     ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short System description here."));
@@ -115,6 +116,9 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
 
         aligner->addWidget(field);
     }
+    aligner->addWidget(ui->tlsRadioButtonAligner);
+    aligner->addWidget(ui->sslRadioButtonAligner);
+    aligner->addWidget(ui->unsecuredRadioButtonAligner);
 
     connect(ui->portComboBox, QnComboboxCurrentIndexChanged,
         this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
@@ -155,16 +159,22 @@ QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
     return result;
 }
 
-void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings &value)
+void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings& value)
 {
     QScopedValueRollback<bool> guard(m_updating, true);
     setConnectionType(value.connectionType, value.port);
     ui->serverInputField->setText(value.server);
     ui->userInputField->setText(value.user);
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(value.password);
+    if (!ui->passwordInputField->hasRemotePassword() || !value.password.isNull())
+        ui->passwordInputField->setText(value.password);
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
+}
+
+bool QnSmtpAdvancedSettingsWidget::hasRemotePassword() const
+{
+    return ui->passwordInputField->hasRemotePassword();
 }
 
 void QnSmtpAdvancedSettingsWidget::setHasRemotePassword(bool value)
@@ -193,7 +203,9 @@ void QnSmtpAdvancedSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->supportInputField, readOnly);
 }
 
-void QnSmtpAdvancedSettingsWidget::setConnectionType(QnEmail::ConnectionType connectionType, int port /*= 0*/)
+void QnSmtpAdvancedSettingsWidget::setConnectionType(
+    QnEmail::ConnectionType connectionType,
+    int port)
 {
     bool portFound = false;
     for (int i = 0; i < ui->portComboBox->count(); i++)

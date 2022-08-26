@@ -2,27 +2,26 @@
 
 #pragma once
 
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <optional>
 
+#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <utils/email/email_fwd.h>
 
-namespace Ui {
-    class SmtpSettingsWidget;
-}
+namespace Ui { class SmtpSettingsWidget; }
 
 class QnSmtpSimpleSettingsWidget;
 class QnSmtpAdvancedSettingsWidget;
 class QnSmtpTestConnectionWidget;
 
-class QnSmtpSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnSmtpSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    using base_type = QnAbstractPreferencesWidget;
 
-    typedef QnAbstractPreferencesWidget base_type;
 public:
-    explicit QnSmtpSettingsWidget(QWidget *parent = 0);
-    ~QnSmtpSettingsWidget();
+    explicit QnSmtpSettingsWidget(QWidget* parent = nullptr);
+    virtual ~QnSmtpSettingsWidget() override;
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -36,8 +35,8 @@ private:
     QnEmailSettings settings() const;
     void finishTesting();
 
-    void at_testButton_clicked();
-    void at_advancedCheckBox_toggled(bool toggled);
+    void atTestButtonClicked();
+    void atAdvancedCheckBoxToggled(bool toggled);
 
 private:
     QScopedPointer<Ui::SmtpSettingsWidget> ui;
@@ -46,7 +45,5 @@ private:
     QnSmtpAdvancedSettingsWidget* m_advancedSettingsWidget;
     QnSmtpTestConnectionWidget* m_testSettingsWidget;
 
-    QString m_currentPassword;
-    bool m_passwordChanged = false;
     bool m_updating;
 };
