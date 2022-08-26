@@ -60,6 +60,7 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
             case Private::State::done: //< To support stream of gzipped files.
                 // 32 is added for automatic zlib header detection, see
                 // http://www.zlib.net/manual.html#Advanced.
+                inflateEnd(&d->zStream);
                 zResult = inflateInit2(&d->zStream, 32 + MAX_WBITS);
                 NX_ASSERT(zResult == Z_OK);
                 d->state = Private::State::inProgress;
