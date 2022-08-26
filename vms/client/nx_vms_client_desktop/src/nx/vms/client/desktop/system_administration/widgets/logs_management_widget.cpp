@@ -5,9 +5,11 @@
 
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QPainter>
 #include <QtWidgets/QFileDialog>
 
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
@@ -76,13 +78,15 @@ void LogsManagementWidget::setupUi()
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));
     ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
 
-    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+    auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn, this);
+    ui->unitsTable->setHorizontalHeader(header);
+    header->setSectionResizeMode(
         LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
-    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+    header->setSectionResizeMode(
         LogsManagementModel::Columns::LogLevelColumn, QHeaderView::Stretch);
-    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+    header->setSectionResizeMode(
         LogsManagementModel::Columns::CheckBoxColumn, QHeaderView::ResizeToContents);
-    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+    header->setSectionResizeMode(
         LogsManagementModel::Columns::StatusColumn, QHeaderView::ResizeToContents);
 
     ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
@@ -92,6 +96,18 @@ void LogsManagementWidget::setupUi()
 
     ui->resetButton->setFlat(true);
     ui->openFolderButton->setFlat(true);
+
+    connect(ui->unitsTable->horizontalHeader(), &QHeaderView::sectionClicked, this,
+        [this](int logicalIndex)
+        {
+            if (!NX_ASSERT(m_watcher))
+                return;
+
+            if (logicalIndex != LogsManagementModel::Columns::CheckBoxColumn)
+                return;
+
+            m_watcher->setAllItemsAreChecked(m_watcher->itemsCheckState() == Qt::Unchecked);
+        });
 
     connect(ui->unitsTable, &QTableView::clicked, this,
         [this](const QModelIndex& index)
@@ -107,6 +123,12 @@ void LogsManagementWidget::setupUi()
             model->setData(checkBoxIndex, state, Qt::CheckStateRole);
 
             ui->unitsTable->update(checkBoxIndex);
+        });
+
+    connect(m_watcher, &LogsManagementWatcher::selectionChanged, this,
+        [this, header](Qt::CheckState state)
+        {
+            header->setCheckState(state);
         });
 
     connect(ui->settingsButton, &QPushButton::clicked, this,
