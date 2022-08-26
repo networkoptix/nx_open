@@ -158,9 +158,29 @@ QString desktopClientDisplayName()
     return R"(${clientDisplayName})";
 }
 
+QString mobileHelpShortcutName()
+{
+    return R"(${mobile_help_shortcut_name})";
+}
+
+QString mobileHelpDocumentName()
+{
+    return R"(${mobile_help_document_name})";
+}
+
+QString mobileHelpFileName()
+{
+    return R"(${mobile_help_file_name})";
+}
+
 QString quickStartGuideShortcutName()
 {
     return R"(${quick_start_guide_shortcut_name})";
+}
+
+QString quickStartGuideDocumentName()
+{
+    return R"(${quick_start_guide_document_name})";
 }
 
 QString quickStartGuideFileName()
@@ -211,6 +231,11 @@ QString installerName()
 bool isDesktopClientCustomized()
 {
     return QString(R"(${customization.desktop.customClient})").toLower() == "true";
+}
+
+bool isMobileClientEnabledInCustomization()
+{
+    return QString(R"(${customization.mobile.enabled})").toLower() == "true";
 }
 
 bool clientAutoUpdateEnabledByDefault()

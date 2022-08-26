@@ -77,10 +77,16 @@ copyTranslations()
     done
 }
 
-copyQuickStartGuide()
+copyHelpFiles()
 {
-    echo "Copying QuickStartGuide"
+    echo "Copying Quick Start Guide"
     cp "${QUICK_START_GUIDE_FILE}" "$APP_RESOURCES_DIR"
+
+    if [[ "${CUSTOMIZATION_MOBILE_CLIENT_ENABLED}" == "true" ]]
+    then
+        echo "Copying Mobile Help"
+        cp "${MOBILE_HELP_FILE}" "$APP_RESOURCES_DIR"
+    fi
 }
 
 buildDistribution()
@@ -100,7 +106,7 @@ buildDistribution()
     copyWebEngineFiles
     copyResources
     copyTranslations
-    copyQuickStartGuide
+    copyHelpFiles
 
     if [ $CODE_SIGNING = true ]
     then
