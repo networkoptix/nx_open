@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/desktop/resource_properties/server/widgets/details/backup_queue_size.h>
 
 namespace Ui { class BackupStatusWidget; }
 
@@ -33,9 +33,9 @@ public:
 
 private:
     void setupSkipBackupButton();
-    Q_INVOKABLE void onBackupQueueSizeCalculated(
+    Q_INVOKABLE void onBackupTimePointCalculated(
         const QnMediaServerResourcePtr server,
-        const nx::vms::client::desktop::BackupQueueSize queueSize);
+        const std::chrono::milliseconds timePoint);
 
 private:
     const std::unique_ptr<Ui::BackupStatusWidget> ui;
