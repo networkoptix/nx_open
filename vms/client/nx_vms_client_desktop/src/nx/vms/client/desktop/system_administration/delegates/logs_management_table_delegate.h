@@ -22,6 +22,17 @@ public:
         const QModelIndex& index) const override;
 
 private:
+    void paintNameColumn(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+    void paintCheckBoxColumn(
+        QPainter* painter,
+        const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+private:
     mutable QnTextPixmapCache m_textPixmapCache;
 };
 

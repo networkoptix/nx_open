@@ -93,6 +93,22 @@ void LogsManagementWidget::setupUi()
     ui->resetButton->setFlat(true);
     ui->openFolderButton->setFlat(true);
 
+    connect(ui->unitsTable, &QTableView::clicked, this,
+        [this](const QModelIndex& index)
+        {
+            auto model = ui->unitsTable->model();
+            const auto checkBoxIndex =
+                index.siblingAtColumn(LogsManagementModel::Columns::CheckBoxColumn);
+
+            auto state = model->data(checkBoxIndex, Qt::CheckStateRole).value<Qt::CheckState>();
+            state = (state == Qt::CheckState::Checked)
+                ? Qt::CheckState::Unchecked
+                : Qt::CheckState::Checked;
+            model->setData(checkBoxIndex, state, Qt::CheckStateRole);
+
+            ui->unitsTable->update(checkBoxIndex);
+        });
+
     connect(ui->settingsButton, &QPushButton::clicked, this,
         [this]
         {
