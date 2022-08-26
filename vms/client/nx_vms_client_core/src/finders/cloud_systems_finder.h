@@ -4,8 +4,6 @@
 
 #include <network/cloud_system_description.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
 
 #include "abstract_systems_finder.h"
 

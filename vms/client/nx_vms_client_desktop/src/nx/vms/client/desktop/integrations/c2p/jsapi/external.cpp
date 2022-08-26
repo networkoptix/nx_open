@@ -4,11 +4,10 @@
 
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
@@ -76,6 +75,9 @@ void External::Private::resetC2pLayout(
 
     const auto currentItemId = widgetItem->uuid();
     auto currentLayout = layout->resource();
+    if (!NX_ASSERT(currentLayout))
+        return;
+
     auto existingItems = currentLayout->getItems();
 
     QnLayoutItemDataList items;
@@ -113,9 +115,6 @@ void External::Private::resetC2pLayout(
 
     const QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
 
-    const auto dataManager =
-        SystemContext::fromResource(currentLayout)->resourceRuntimeDataManager();
-
     // Select camera as an active item to display timeline.
     QnUuid activeItemId;
     const auto allItems = currentLayout->getItems();
@@ -124,11 +123,12 @@ void External::Private::resetC2pLayout(
         if (item.uuid == currentItemId)
             continue;
 
-        dataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
-        dataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, timestamp.count());
-        dataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole,
+        currentLayout->setItemData(item.uuid, Qn::ItemPausedRole, true);
+        currentLayout->setItemData(item.uuid, Qn::ItemTimeRole,
+            QVariant::fromValue<qint64>(timestamp.count()));
+        currentLayout->setItemData(item.uuid, Qn::ItemSliderWindowRole,
             QVariant::fromValue(sliderWindow));
-        dataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, {});
+        currentLayout->setItemData(item.uuid, Qn::ItemSliderSelectionRole, {});
 
         activeItemId = item.uuid;
     }

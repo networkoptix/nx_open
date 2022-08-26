@@ -8,6 +8,7 @@
 #include <client/client_model_types.h>
 #include <core/resource/resource_fwd.h>
 #include <network/base_system_description.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 #include "workbench_context_aware.h"
 
@@ -92,6 +93,12 @@ public:
     QnWorkbenchLayout *currentLayout() const {
         return m_currentLayout;
     }
+
+    /**
+     * Resource for the current layout.
+     * Note that this function never returns nullptr.
+     */
+    nx::vms::client::desktop::LayoutResourcePtr currentLayoutResource() const;
 
     /**
      * \returns                         Index of the current layout. May return -1 if dummy layout is currently in use.

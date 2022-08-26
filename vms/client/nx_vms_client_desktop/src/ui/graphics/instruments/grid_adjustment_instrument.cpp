@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "grid_adjustment_instrument.h"
-#include <cassert>
-#include <QtWidgets/QGraphicsSceneWheelEvent>
+
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_layout.h>
 
 GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
     Instrument(
@@ -69,21 +71,22 @@ bool GridAdjustmentInstrument::wheelEvent(
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
-    if(workbench())
+    if (NX_ASSERT(workbench()))
     {
-        const qreal spacing = workbench()->currentLayout()->cellSpacing();
+        auto layout = workbench()->currentLayoutResource();
+        const qreal spacing = layout->cellSpacing();
         const qreal delta = m_speed * -degrees;
 
         qreal k = 1.0;
-        if(!qFuzzyIsNull(delta))
+        if (!qFuzzyIsNull(delta))
         {
-            if(delta < 0)
+            if (delta < 0)
                 k = qMin(k, spacing / -delta);
             else
                 k = qMin(k, (m_maxSpacing - spacing) / delta);
         }
 
-        workbench()->currentLayout()->setCellSpacing(spacing + k * delta);
+        layout->setCellSpacing(spacing + k * delta);
 
         static const auto kNoDelta = QPoint(0, 0);
         moveViewportScene(this->view(viewport), kNoDelta);

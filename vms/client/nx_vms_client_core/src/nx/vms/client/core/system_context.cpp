@@ -152,7 +152,8 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
     {
         NX_MUTEX_LOCKER lock(&d->sessionMutex);
         NX_ASSERT(!d->connection);
-        d->session = session;
+        // Make sure existing session will be terminated outside of the mutex.
+        std::swap(d->session, session);
     }
     emit remoteIdChanged(currentServerId());
 }

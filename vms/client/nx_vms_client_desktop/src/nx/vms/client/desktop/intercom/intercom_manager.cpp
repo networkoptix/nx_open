@@ -5,7 +5,6 @@
 #include <api/model/api_ioport_data.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -13,6 +12,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -136,7 +136,7 @@ struct IntercomManager::Private: public QObject
 
         if (!layoutResource)
         {
-            QnLayoutResourcePtr intercomLayout = layoutFromResource(intercom);
+            LayoutResourcePtr intercomLayout = layoutFromResource(intercom);
             intercomLayout->setName(tr("%1 Layout").arg(intercom->getName()));
             intercomLayout->setIdUnsafe(intercomLayoutId);
             intercomLayout->addFlags(Qn::local_intercom_layout);

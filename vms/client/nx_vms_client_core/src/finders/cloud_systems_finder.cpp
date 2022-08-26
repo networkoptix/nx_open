@@ -12,8 +12,10 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 
 using namespace std::chrono;
 using nx::network::http::ClientPool;

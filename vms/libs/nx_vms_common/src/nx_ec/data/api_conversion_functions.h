@@ -90,15 +90,6 @@ NX_VMS_COMMON_API void fromApiToResource(
 NX_VMS_COMMON_API void fromResourceToApi(
     const QnLayoutResourcePtr& src,
     nx::vms::api::LayoutData& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::LayoutDataList& src,
-    QnResourceList& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::LayoutDataList& src,
-    QnLayoutResourceList& dst);
-NX_VMS_COMMON_API void fromResourceListToApi(
-    const QnLayoutResourceList& src,
-    nx::vms::api::LayoutDataList& dst);
 
 NX_VMS_COMMON_API void fromResourceToApi(const QnLicensePtr& src, nx::vms::api::LicenseData& dst);
 NX_VMS_COMMON_API void fromApiToResource(const nx::vms::api::LicenseData& src, QnLicensePtr& dst);
@@ -152,12 +143,6 @@ NX_VMS_COMMON_API void fromApiToResource(
 NX_VMS_COMMON_API void fromResourceToApi(
     const QnVideoWallResourcePtr& src,
     nx::vms::api::VideowallData& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::VideowallDataList& src,
-    QnResourceList& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::VideowallDataList& src,
-    QnVideoWallResourceList& dst);
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::VideowallControlMessageData& data,
@@ -172,12 +157,6 @@ NX_VMS_COMMON_API void fromApiToResource(
 NX_VMS_COMMON_API void fromResourceToApi(
     const QnWebPageResourcePtr& src,
     nx::vms::api::WebPageData& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::WebPageDataList& src,
-    QnResourceList& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::WebPageDataList& src,
-    QnWebPageResourceList& dst);
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::AnalyticsPluginData& src,
@@ -185,12 +164,6 @@ NX_VMS_COMMON_API void fromApiToResource(
 NX_VMS_COMMON_API void fromResourceToApi(
     const nx::vms::common::AnalyticsPluginResourcePtr& src,
     nx::vms::api::AnalyticsPluginData& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::AnalyticsPluginDataList& src,
-    QnResourceList& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::AnalyticsPluginDataList& src,
-    nx::vms::common::AnalyticsPluginResourceList& dst);
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::AnalyticsEngineData& src,
@@ -198,12 +171,6 @@ NX_VMS_COMMON_API void fromApiToResource(
 NX_VMS_COMMON_API void fromResourceToApi(
     const nx::vms::common::AnalyticsEngineResourcePtr& src,
     nx::vms::api::AnalyticsEngineData& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::AnalyticsEngineDataList& src,
-    QnResourceList& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::AnalyticsEngineDataList& src,
-    nx::vms::common::AnalyticsEngineResourceList& dst);
 
 NX_VMS_COMMON_API void deserializeNetAddrList(
     const QString& source,

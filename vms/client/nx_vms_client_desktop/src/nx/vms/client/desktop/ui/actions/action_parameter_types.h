@@ -2,17 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QSet>
 #include <QtCore/QList>
-
-class QVariant;
-class QGraphicsItem;
-
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/ui/actions/action_types.h>
 
+class QVariant;
+class QGraphicsItem;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnServerResourceWidget;
@@ -36,7 +35,7 @@ public:
 
     static nx::vms::client::desktop::ui::action::ActionParameterType type(const QVariant& items);
     static QnResourceList resources(const QVariant& items);
-    static QnLayoutItemIndexList layoutItems(const QVariant& items);
+    static LayoutItemIndexList layoutItems(const QVariant& items);
     static QnVideoWallItemIndexList videoWallItems(const QVariant& items);
     static QnVideoWallMatrixIndexList videoWallMatrices(const QVariant& items);
     static QnWorkbenchLayoutList layouts(const QVariant& items);
@@ -45,12 +44,12 @@ public:
     static QnResourcePtr resource(QnWorkbenchLayout* layout);
     static QnResourceList resources(QnResourceWidget* widget);
     static QnResourceList resources(const QnResourceWidgetList& widgets);
-    static QnResourceList resources(const QnLayoutItemIndexList& layoutItems);
+    static QnResourceList resources(const LayoutItemIndexList& layoutItems);
     static QnResourceList resources(QnWorkbenchLayout* layout);
     static QnResourceList resources(const QnWorkbenchLayoutList& layouts);
-    static QnLayoutItemIndex layoutItem(QnResourceWidget* widget);
-    static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList& widgets);
-    static QnLayoutItemIndexList layoutItems(QnResourceWidget* widget);
+    static LayoutItemIndex layoutItem(QnResourceWidget* widget);
+    static LayoutItemIndexList layoutItems(const QnResourceWidgetList& widgets);
+    static LayoutItemIndexList layoutItems(QnResourceWidget* widget);
     static QnResourceWidgetList widgets(const QList<QGraphicsItem*>& items);
 
     /** Debug string representation of the action parameter items. */

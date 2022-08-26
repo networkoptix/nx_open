@@ -50,6 +50,12 @@ public:
     virtual ~QnWorkbenchItem();
 
     /**
+     * Set layout this item belongs to. Value is set after item is completely initialized and reset
+     * just before destroying.
+     */
+    void setLayout(QnWorkbenchLayout* layout);
+
+    /**
      * \returns                         Layout item data of this workbench item.
      */
     QnLayoutItemData data() const;

@@ -16,7 +16,6 @@
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
@@ -36,6 +35,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
@@ -404,7 +404,7 @@ void StartupActionsHandler::handleAcsModeResources(
     if (windowStart.count() < 0 || windowStart + kAcsModeTimelineWindowSize > maxTime)
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);

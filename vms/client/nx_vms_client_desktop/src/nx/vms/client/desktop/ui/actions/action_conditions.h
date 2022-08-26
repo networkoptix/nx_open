@@ -5,20 +5,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <common/common_globals.h>
 #include <client/client_globals.h>
-
-#include <core/resource/resource_fwd.h>
-#include <core/ptz/ptz_fwd.h>
+#include <common/common_globals.h>
 #include <core/ptz/ptz_constants.h>
-
-#include <ui/workbench/workbench_context_aware.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
-
+#include <core/ptz/ptz_fwd.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/ui/actions/action_fwd.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchContext;
 
@@ -66,7 +62,7 @@ public:
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of layout items (<tt>Qn::LayoutItemType</tt>).
      */
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context);
+    virtual ActionVisibility check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context);
 
     /**
      * Specialized condition function that catches all action parameters that
@@ -222,7 +218,9 @@ public:
 class LayoutItemRemovalCondition: public Condition
 {
 public:
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(
+        const LayoutItemIndexList& layoutItems,
+        QnWorkbenchContext* context) override;
 };
 
 
@@ -347,7 +345,7 @@ class OpenInFolderCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class LayoutSettingsCondition: public Condition
@@ -401,14 +399,14 @@ class OpenInNewEntityCondition: public OpenInLayoutCondition
 public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class SetAsBackgroundCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class ChangeResolutionCondition: public Condition

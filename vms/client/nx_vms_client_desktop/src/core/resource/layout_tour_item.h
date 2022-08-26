@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <core/resource/client_resource_fwd.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 struct QnLayoutTourItem
 {
-    QnLayoutResourcePtr layout;
+    nx::vms::client::desktop::LayoutResourcePtr layout;
     int delayMs = 0;
 
     QnLayoutTourItem() = default;
-    QnLayoutTourItem(const QnLayoutResourcePtr& layout, int delayMs):
+    QnLayoutTourItem(const nx::vms::client::desktop::LayoutResourcePtr& layout, int delayMs):
         layout(layout), delayMs(delayMs)
     {
     }

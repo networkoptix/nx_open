@@ -3,17 +3,13 @@
 #pragma once
 
 #include <QtCore/QRectF>
-#include <nx/utils/uuid.h>
 
-#include <recording/time_period.h>
-
-#include <core/resource/resource.h>
-#include <core/resource/layout_item_data.h>
-
-#include <utils/common/threadsafe_item_storage.h>
 #include <common/common_globals.h>
-
+#include <core/resource/layout_item_data.h>
+#include <core/resource/resource.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <utils/common/threadsafe_item_storage.h>
 
 /**
  * QnLayoutResource class describes the set of resources together with their view options.
@@ -41,30 +37,6 @@ public:
     virtual nx::vms::api::ResourceStatus getStatus() const override;
     virtual void setStatus(nx::vms::api::ResourceStatus newStatus,
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
-
-    using ItemsRemapHash = QHash<QnUuid, QnUuid>;
-
-    /**
-     * Clone items of the current layout to the target layout. Ids of the layout items will be
-     *     re-generated, zoom links correspondingly fixed.
-     * @param target Target layout. Existing items will be removed (if any).
-     * @param remapHash If passed, filled with map of new items ids by old items ids.
-     */
-    void cloneItems(QnLayoutResourcePtr target, ItemsRemapHash* remapHash = nullptr) const;
-
-    /**
-     * Clone current layout to the target one.
-     * @param target Target layout. Existing items will be removed (if any).
-     * @param remapHash If passed, filled with map of new items ids by old items ids.
-     */
-    void cloneTo(QnLayoutResourcePtr target, ItemsRemapHash* remapHash = nullptr) const;
-
-    /**
-     * Clone current layout to the new layout.
-     * @param remapHash If passed, filled with map of new items ids by old items ids.
-     * @return New layout (not added to any system context).
-     */
-    QnLayoutResourcePtr clone(ItemsRemapHash* remapHash = nullptr) const;
 
     void setItems(const QnLayoutItemDataList &items);
 
@@ -99,17 +71,6 @@ public:
     qreal cellSpacing() const;
 
     void setCellSpacing(qreal spacing);
-
-    void setData(const QHash<int, QVariant> &dataByRole);
-
-    void setData(int role, const QVariant &value);
-
-    QVariant data(int role) const; // TODO: #ynikitenkov Possibly move to QnResourceRuntimeDataManager
-
-    QHash<int, QVariant> data() const;
-
-    QnTimePeriod getLocalRange() const;
-    void setLocalRange(const QnTimePeriod& value);
 
     virtual void setUrl(const QString& value) override;
 
@@ -166,8 +127,6 @@ signals:
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
 
-    void dataChanged(int role);
-
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
@@ -177,12 +136,10 @@ protected:
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
-private:
+protected:
     QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
-    float m_cellAspectRatio = 0; //< Means 'auto'.
+    float m_cellAspectRatio = 0; //< 0 means 'auto'.
     qreal m_cellSpacing = nx::vms::api::LayoutData::kDefaultCellSpacing;
-    QHash<int, QVariant> m_dataByRole; //< TODO: Client-only variable, must be removed.
-    QnTimePeriod m_localRange;
     QSize m_fixedSize;
     int m_logicalId = 0;
     QSize m_backgroundSize;

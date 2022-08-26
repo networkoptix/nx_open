@@ -12,21 +12,23 @@
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
+#include "workbench.h"
+#include "workbench_context.h"
 #include "workbench_grid_walker.h"
 #include "workbench_item.h"
 #include "workbench_layout_synchronizer.h"
@@ -51,35 +53,91 @@ void pointize(const QRect& rect, QSet<QPoint>* points)
 
 } // namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObject* parent):
-    QObject(parent)
+struct QnWorkbenchLayout::Private
+{
+    LayoutResourcePtr resource;
+
+    std::unique_ptr<QnWorkbenchLayoutSynchronizer> synchronizer;
+
+    /** Matrix map from coordinate to item. */
+    QnMatrixMap<QnWorkbenchItem*> itemMap;
+
+    /** Set of all items on this layout. */
+    QSet<QnWorkbenchItem*> items;
+
+    /** Map from item to its zoom target. */
+    QHash<QnWorkbenchItem*, QnWorkbenchItem*> zoomTargetItemByItem;
+
+    /** Map from zoom target item to its associated zoom items. */
+    QMultiHash<QnWorkbenchItem*, QnWorkbenchItem*> itemsByZoomTargetItem;
+
+    /** Set of item borders for fast bounding rect calculation. */
+    QnRectSet rectSet;
+
+    /** Current bounding rectangle. */
+    QRect boundingRect;
+
+    /** Map from resource to a set of items. */
+    QHash<QnResourcePtr, QSet<QnWorkbenchItem*>> itemsByResource;
+
+    /** Map from item's universally unique identifier to item. */
+    QHash<QnUuid, QnWorkbenchItem*> itemByUuid;
+
+    /** Empty item list, to return a reference to. */
+    const QSet<QnWorkbenchItem*> noItems;
+
+    QnLayoutFlags flags = QnLayoutFlag::Empty;
+
+    QIcon icon;
+};
+
+QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource, QObject* parent):
+    QObject(parent),
+    d(new Private{.resource = resource})
 {
     // TODO: #sivanov This does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(
         QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
-    if (!resource)
+    if (!NX_ASSERT(resource))
         return;
 
     if (resource->data().contains(Qn::LayoutFlagsRole))
         setFlags(flags() | resource->data(Qn::LayoutFlagsRole).value<QnLayoutFlags>());
 
-    m_icon = calculateIcon(resource);
+    d->icon = calculateIcon();
 
-    auto synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
-    synchronizer->setAutoDeleting(true);
-    synchronizer->update();
+    d->synchronizer = std::make_unique<QnWorkbenchLayoutSynchronizer>(this);
+    d->synchronizer->update();
+
+    connect(resource.get(), &QnResource::nameChanged, this, &QnWorkbenchLayout::titleChanged);
+    connect(resource.get(), &LayoutResource::dataChanged, this, &QnWorkbenchLayout::dataChanged);
+    connect(resource.get(), &QnLayoutResource::cellSpacingChanged,
+        this, &QnWorkbenchLayout::cellSpacingChanged);
+    connect(resource.get(), &QnLayoutResource::cellAspectRatioChanged,
+        this, &QnWorkbenchLayout::cellAspectRatioChanged);
+
+    connect(resource.get(), &QnLayoutResource::lockedChanged,
+        this,
+        [this]()
+        {
+            d->icon = calculateIcon();
+            emit titleChanged();
+        });
 
     connect(this, &QnWorkbenchLayout::dataChanged, this,
         [this](int role)
         {
             if (role == Qn::LayoutIconRole)
-                emit iconChanged();
+                emit titleChanged();
         });
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
 {
+    // Synchronizer must be stopped here to avoid removing layout items.
+    d->synchronizer.reset();
+
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
@@ -89,20 +147,20 @@ QnWorkbenchLayout::~QnWorkbenchLayout()
 
 QnLayoutFlags QnWorkbenchLayout::flags() const
 {
-    return m_flags;
+    return d->flags;
 }
 
 QIcon QnWorkbenchLayout::icon() const
 {
-    return m_icon;
+    return d->icon;
 }
 
 void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
 {
-    if (m_flags == value)
+    if (d->flags == value)
         return;
 
-    m_flags = value;
+    d->flags = value;
     emit flagsChanged();
 }
 
@@ -112,11 +170,9 @@ QnUuid QnWorkbenchLayout::resourceId() const
     return layout ? layout->getId() : QnUuid();
 }
 
-QnLayoutResourcePtr QnWorkbenchLayout::resource() const
+LayoutResourcePtr QnWorkbenchLayout::resource() const
 {
-    if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout*>(this)))
-        return synchronizer->resource();
-    return QnLayoutResourcePtr();
+    return d->resource;
 }
 
 QnLayoutResource* QnWorkbenchLayout::resourcePtr() const
@@ -124,17 +180,36 @@ QnLayoutResource* QnWorkbenchLayout::resourcePtr() const
     return resource().data();
 }
 
-QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnLayoutResourcePtr& layout)
+QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnLayoutResourcePtr& resource)
 {
-    if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
-        return synchronizer->layout();
+    const auto layouts = 
+        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
+    for (const auto& layout: layouts)
+    {
+        if (layout->resource() == resource)
+            return layout;
+    }
+
+    return nullptr;
+}
+
+QnWorkbenchLayout* QnWorkbenchLayout::instance(const LayoutResourcePtr& resource)
+{
+    const auto layouts = 
+        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
+    for (const auto& layout: layouts)
+    {
+        if (layout->resource() == resource)
+            return layout;
+    }
+
     return nullptr;
 }
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& videoWall)
 {
     auto resourcePool = videoWall->resourcePool();
-    for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
+    for (const auto& layout: resourcePool->getResources<LayoutResource>())
     {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
             return QnWorkbenchLayout::instance(layout);
@@ -142,32 +217,21 @@ QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& vid
     return nullptr;
 }
 
-const QString& QnWorkbenchLayout::name() const
+QnWorkbenchLayoutSynchronizer* QnWorkbenchLayout::layoutSynchronizer() const
 {
-    return m_name;
+    return d->synchronizer.get();
 }
 
-void QnWorkbenchLayout::setName(const QString& name)
+QString QnWorkbenchLayout::name() const
 {
-    if (m_name == name)
-        return;
-
-    m_name = name;
-
-    emit nameChanged();
-    emit dataChanged(Qn::ResourceNameRole);
+    return d->resource->getName();
 }
 
-bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
+bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
 {
-    setName(resource->getName());
-    setCellAspectRatio(resource->cellAspectRatio());
-    setCellSpacing(resource->cellSpacing());
-    setLocked(resource->locked());
-
     // TODO: #sivanov Note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
-    const QHash<int, QVariant> data = resource->data();
+    const QHash<Qn::ItemDataRole, QVariant> data = resource->data();
     for (auto i = data.begin(); i != data.end(); i++)
     {
         if (i.key() == Qn::VideoWallItemGuidRole)
@@ -179,7 +243,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
 
     /* Unpin all items so that pinned state does not interfere with
      * incrementally moving the items. */
-    for (auto item: m_items)
+    for (auto item: d->items)
         item->setPinned(false);
 
     for (const auto& data: resource->getItems())
@@ -230,12 +294,8 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
     return result;
 }
 
-void QnWorkbenchLayout::submit(const QnLayoutResourcePtr& resource) const
+void QnWorkbenchLayout::submit(const LayoutResourcePtr& resource) const
 {
-    resource->setName(name());
-    resource->setCellAspectRatio(cellAspectRatio());
-    resource->setCellSpacing(cellSpacing());
-
     QnLayoutItemDataList datas;
     datas.reserve(items().size());
     for (auto item: items())
@@ -264,8 +324,10 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
     if (!item)
         return;
 
-    if (m_itemByUuid.contains(item->uuid()))
-        NX_ASSERT(false, "Item with UUID '%1' is already on layout '%2'.", item->uuid().toString(), m_name);
+    NX_ASSERT(!d->itemByUuid.contains(item->uuid()),
+        "Item with UUID '%1' is already on layout '%2'.",
+        item->uuid().toString(),
+        name());
 
     if (item->layout())
     {
@@ -274,20 +336,20 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
         item->layout()->removeItem(item);
     }
 
-    if (item->isPinned() && m_itemMap.isOccupied(item->geometry()))
+    if (item->isPinned() && d->itemMap.isOccupied(item->geometry()))
         item->setFlag(Qn::Pinned, false);
 
-    item->m_layout = this;
-    m_items.insert(item);
+    item->setLayout(this);
+    d->items.insert(item);
 
     if (item->isPinned())
     {
-        m_itemMap.fill(item->geometry(), item);
+        d->itemMap.fill(item->geometry(), item);
         NX_VERBOSE(this, nx::format("Add item to cell %1").arg(item->geometry()));
     }
-    m_rectSet.insert(item->geometry());
-    m_itemsByResource[item->resource()].insert(item);
-    m_itemByUuid[item->uuid()] = item;
+    d->rectSet.insert(item->geometry());
+    d->itemsByResource[item->resource()].insert(item);
+    d->itemByUuid[item->uuid()] = item;
 
     emit itemAdded(item);
 
@@ -308,33 +370,31 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
     /* Update internal data structures. */
     if (item->isPinned())
     {
-        m_itemMap.clear(item->geometry());
+        d->itemMap.clear(item->geometry());
         NX_VERBOSE(this, nx::format("Item removed from cell %1").arg(item->geometry()));
     }
 
-    m_rectSet.remove(item->geometry());
+    d->rectSet.remove(item->geometry());
 
-    if (const auto itemsByResource = m_itemsByResource.find(item->resource());
-        NX_ASSERT(itemsByResource != m_itemsByResource.end()))
+    if (const auto itemsByResource = d->itemsByResource.find(item->resource());
+        NX_ASSERT(itemsByResource != d->itemsByResource.end()))
     {
         itemsByResource->remove(item);
         if (itemsByResource->empty())
-            m_itemsByResource.erase(itemsByResource);
+            d->itemsByResource.erase(itemsByResource);
     }
 
-    m_itemByUuid.remove(item->uuid());
+    d->itemByUuid.remove(item->uuid());
 
-    item->m_layout = nullptr;
-    m_items.remove(item);
+    if (NX_ASSERT(item->layout()))
+    {
+        auto layoutResource = item->layout()->resource();
+        if (NX_ASSERT(layoutResource))
+            layoutResource->cleanupItemData(item->uuid());
+    }
 
-    // FIXME: #sivanov Workaround destruction issue order.
-    auto layoutContext = resource()
-        ? SystemContext::fromResource(resource())
-        : appContext()->currentSystemContext();
-    layoutContext->resourceRuntimeDataManager()->cleanupData(
-        item->uuid(),
-        Qn::ItemWebPageSavedStateDataRole);
-
+    item->setLayout(nullptr);
+    d->items.remove(item);
     emit itemRemoved(item);
 
     updateBoundingRectInternal();
@@ -364,8 +424,8 @@ void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* zoom
 void QnWorkbenchLayout::addZoomLinkInternal(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem,
     bool notifyItem)
 {
-    m_zoomTargetItemByItem.insert(item, zoomTargetItem);
-    m_itemsByZoomTargetItem.insert(zoomTargetItem, item);
+    d->zoomTargetItemByItem.insert(item, zoomTargetItem);
+    d->itemsByZoomTargetItem.insert(zoomTargetItem, item);
 
     emit zoomLinkAdded(item, zoomTargetItem);
     if (notifyItem)
@@ -377,10 +437,10 @@ void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* z
     if (!own(item) || !own(zoomTargetItem))
         return;
 
-    NX_ASSERT(m_zoomTargetItemByItem.value(item) == zoomTargetItem,
+    NX_ASSERT(d->zoomTargetItemByItem.value(item) == zoomTargetItem,
         "Cannot remove a zoom link that does not exist in this layout.");
 
-    if (m_zoomTargetItemByItem.value(item) != zoomTargetItem)
+    if (d->zoomTargetItemByItem.value(item) != zoomTargetItem)
         return;
 
     removeZoomLinkInternal(item, zoomTargetItem, true);
@@ -389,8 +449,8 @@ void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* z
 void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem* item,
     QnWorkbenchItem* zoomTargetItem, bool notifyItem)
 {
-    m_zoomTargetItemByItem.remove(item);
-    m_itemsByZoomTargetItem.remove(zoomTargetItem, item);
+    d->zoomTargetItemByItem.remove(item);
+    d->itemsByZoomTargetItem.remove(zoomTargetItem, item);
 
     emit zoomLinkRemoved(item, zoomTargetItem);
     if (notifyItem)
@@ -399,15 +459,8 @@ void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem* item,
 
 void QnWorkbenchLayout::clear()
 {
-    // FIXME: #sivanov We need to get a context for this layout but resource is unavailable.
-    auto layoutContext = appContext()->currentSystemContext();
-    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
-    foreach(QnWorkbenchItem *item, m_items)
-    {
-        resourceRuntimeDataManager->cleanupData(item->uuid(), Qn::ItemWebPageSavedStateDataRole);
-        delete item;
-    }
-    m_items.clear();
+    qDeleteAll(d->items);
+    d->items.clear();
 }
 
 bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem* item, const QRect& geometry,
@@ -421,7 +474,7 @@ bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem* item, const QRect& geometry
 
     if (item->isPinned())
     {
-        return m_itemMap.isOccupiedBy(
+        return d->itemMap.isOccupiedBy(
             geometry,
             item,
             disposition ? &disposition->free : nullptr,
@@ -440,8 +493,8 @@ bool QnWorkbenchLayout::moveItem(QnWorkbenchItem* item, const QRect& geometry)
 
     if (item->isPinned())
     {
-        m_itemMap.clear(item->geometry());
-        m_itemMap.fill(geometry, item);
+        d->itemMap.clear(item->geometry());
+        d->itemMap.fill(geometry, item);
         NX_VERBOSE(this, nx::format("Item moved from cell %1 to cell %2")
             .arg(item->geometry())
             .arg(geometry));
@@ -454,8 +507,8 @@ bool QnWorkbenchLayout::moveItem(QnWorkbenchItem* item, const QRect& geometry)
 
 void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem* item, const QRect& geometry)
 {
-    m_rectSet.remove(item->geometry());
-    m_rectSet.insert(geometry);
+    d->rectSet.remove(item->geometry());
+    d->rectSet.insert(geometry);
 
     updateBoundingRectInternal();
 
@@ -523,7 +576,7 @@ bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem*>& items,
             continue;
         }
 
-        bool conforms = m_itemMap.isOccupiedBy(
+        bool conforms = d->itemMap.isOccupiedBy(
             geometries[i],
             itemSet,
             returnEarly ? nullptr : &goodPointSet,
@@ -556,7 +609,7 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem*>& items,
     {
         if (item->isPinned())
         {
-            m_itemMap.clear(item->geometry());
+            d->itemMap.clear(item->geometry());
             NX_VERBOSE(this, nx::format("Batch move items: clear cell %1").arg(item->geometry()));
         }
     }
@@ -566,7 +619,7 @@ bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem*>& items,
         auto item = items[i];
         if (item->isPinned())
         {
-            m_itemMap.fill(geometries[i], item);
+            d->itemMap.fill(geometries[i], item);
             NX_VERBOSE(this, nx::format("Batch move items: put on cell %1").arg(geometries[i]));
         }
         moveItemInternal(item, geometries[i]);
@@ -584,10 +637,10 @@ bool QnWorkbenchLayout::pinItem(QnWorkbenchItem* item, const QRect& geometry)
     if (item->isPinned())
         return moveItem(item, geometry);
 
-    if (m_itemMap.isOccupied(geometry))
+    if (d->itemMap.isOccupied(geometry))
         return false;
 
-    m_itemMap.fill(geometry, item);
+    d->itemMap.fill(geometry, item);
     NX_VERBOSE(this, nx::format("Pin item to cell %1").arg(geometry));
     moveItemInternal(item, geometry);
     item->setFlagInternal(Qn::Pinned, true);
@@ -602,7 +655,7 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem* item)
     if (!item->isPinned())
         return true;
 
-    m_itemMap.clear(item->geometry());
+    d->itemMap.clear(item->geometry());
     NX_VERBOSE(this, nx::format("Unpin item from cell %1").arg(item->geometry()));
     item->setFlagInternal(Qn::Pinned, false);
     return true;
@@ -610,17 +663,17 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem* item)
 
 QnWorkbenchItem* QnWorkbenchLayout::item(const QPoint& position) const
 {
-    return m_itemMap.value(position, nullptr);
+    return d->itemMap.value(position, nullptr);
 }
 
 QnWorkbenchItem* QnWorkbenchLayout::item(const QnUuid& uuid) const
 {
-    return m_itemByUuid.value(uuid, nullptr);
+    return d->itemByUuid.value(uuid, nullptr);
 }
 
 QnWorkbenchItem* QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem* item) const
 {
-    return m_zoomTargetItemByItem.value(item, nullptr);
+    return d->zoomTargetItemByItem.value(item, nullptr);
 }
 
 QnUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem* item) const
@@ -631,54 +684,54 @@ QnUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem* item) const
 
 QList<QnWorkbenchItem*> QnWorkbenchLayout::zoomItems(QnWorkbenchItem* zoomTargetItem) const
 {
-    return m_itemsByZoomTargetItem.values(zoomTargetItem);
+    return d->itemsByZoomTargetItem.values(zoomTargetItem);
 }
 
 bool QnWorkbenchLayout::isEmpty() const
 {
-    return m_items.isEmpty();
+    return d->items.isEmpty();
 }
 
 float QnWorkbenchLayout::cellAspectRatio() const
 {
-    return m_cellAspectRatio;
+    return d->resource->cellAspectRatio();
 }
 
 bool QnWorkbenchLayout::hasCellAspectRatio() const
 {
-    return m_cellAspectRatio > 0.0;
+    return cellAspectRatio() > 0.0;
 }
 
 QSet<QnWorkbenchItem*> QnWorkbenchLayout::items(const QRect& region) const
 {
-    return m_itemMap.values(region);
+    return d->itemMap.values(region);
 }
 
 QSet<QnWorkbenchItem*> QnWorkbenchLayout::items(const QList<QRect>& regions) const
 {
-    return m_itemMap.values(regions);
+    return d->itemMap.values(regions);
 }
 
 const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QnResourcePtr& resource) const
 {
-    auto pos = m_itemsByResource.find(resource);
-    return pos == m_itemsByResource.end() ? m_noItems : pos.value();
+    auto pos = d->itemsByResource.find(resource);
+    return pos == d->itemsByResource.end() ? d->noItems : pos.value();
 }
 
 const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const
 {
-    return m_items;
+    return d->items;
 }
 
 QnResourceList QnWorkbenchLayout::itemResources() const
 {
-    return m_itemsByResource.keys();
+    return d->itemsByResource.keys();
 }
 
 bool QnWorkbenchLayout::isFreeSlot(const QPointF& gridPos, const QSize& size) const
 {
     QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();
-    return !m_itemMap.isOccupied(QRect(gridCell, size));
+    return !d->itemMap.isOccupied(QRect(gridCell, size));
 }
 
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& size,
@@ -732,7 +785,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
             // We have improved result a bit, do not exclude this edge next time
             processingEdge = noEdge;
 
-            if (m_itemMap.isOccupied(QRect(gridCell + delta, size)))
+            if (d->itemMap.isOccupied(QRect(gridCell + delta, size)))
             {
                 NX_VERBOSE(this, nx::format("delta %1 is occupied, skip").args(delta));
                 continue;
@@ -808,95 +861,28 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
 
 void QnWorkbenchLayout::updateBoundingRectInternal()
 {
-    QRect boundingRect = m_rectSet.boundingRect();
-    if (m_boundingRect == boundingRect)
+    QRect boundingRect = d->rectSet.boundingRect();
+    if (d->boundingRect == boundingRect)
         return;
 
-    QRect oldRect = m_boundingRect;
-    m_boundingRect = boundingRect;
+    QRect oldRect = d->boundingRect;
+    d->boundingRect = boundingRect;
     emit boundingRectChanged(oldRect, boundingRect);
-    emit dataChanged(Qn::LayoutBoundingRectRole);
-}
-
-void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio)
-{
-    if (cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio))
-        cellAspectRatio = 0.0;
-
-    if (qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
-        return;
-
-    m_cellAspectRatio = cellAspectRatio;
-
-    emit cellAspectRatioChanged();
-    emit dataChanged(Qn::LayoutCellAspectRatioRole);
-}
-
-qreal QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing spacing)
-{
-    switch (spacing)
-    {
-        case Qn::CellSpacing::None:
-            return 0.0;
-        case Qn::CellSpacing::Small:
-            return nx::vms::api::LayoutData::kDefaultCellSpacing;
-        case Qn::CellSpacing::Medium:
-            return nx::vms::api::LayoutData::kDefaultCellSpacing * 2;
-        case Qn::CellSpacing::Large:
-            return nx::vms::api::LayoutData::kDefaultCellSpacing * 3;
-    }
-    NX_ASSERT(false, "Unhandled enum value");
-    return nx::vms::api::LayoutData::kDefaultCellSpacing;
 }
 
 qreal QnWorkbenchLayout::cellSpacing() const
 {
-    return m_cellSpacing;
-}
-
-void QnWorkbenchLayout::setCellSpacing(qreal spacing)
-{
-    if (spacing < 0.0) //< Negative means 'use default value'
-    {
-        setCellSpacing(kDefaultCellSpacing);
-        return;
-    }
-
-    if (qFuzzyEquals(m_cellSpacing, spacing))
-        return;
-
-    m_cellSpacing = spacing;
-
-    emit cellSpacingChanged();
-    emit dataChanged(Qn::LayoutCellSpacingRole);
-}
-
-void QnWorkbenchLayout::setCellSpacing(Qn::CellSpacing value)
-{
-    setCellSpacing(cellSpacingValue(value));
+    return d->resource->cellSpacing();
 }
 
 bool QnWorkbenchLayout::locked() const
 {
-    return m_locked;
-}
-
-void QnWorkbenchLayout::setLocked(bool value)
-{
-    if (m_locked == value)
-        return;
-
-    m_locked = value;
-
-    if (auto layout = resource())
-        m_icon = calculateIcon(layout);
-
-    emit lockedChanged();
+    return d->resource->locked();
 }
 
 const QRect& QnWorkbenchLayout::boundingRect() const
 {
-    return m_boundingRect;
+    return d->boundingRect;
 }
 
 bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
@@ -906,96 +892,25 @@ bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
     return item && item->layout() == this;
 }
 
-QIcon QnWorkbenchLayout::calculateIcon(const QnLayoutResourcePtr& layout) const
+QIcon QnWorkbenchLayout::calculateIcon() const
 {
-    if (layout->hasFlags(Qn::cross_system))
+    if (d->resource->hasFlags(Qn::cross_system))
         return qnSkin->icon("layouts/cloud_layout.svg");
 
-    return layout->data(Qn::LayoutIconRole).value<QIcon>();
+    if (d->resource->isPreviewSearchLayout())
+        return qnSkin->icon("layouts/preview_search.png");
+
+    return d->resource->data(Qn::LayoutIconRole).value<QIcon>();
 }
 
-QVariant QnWorkbenchLayout::data(int role) const
+QVariant QnWorkbenchLayout::data(Qn::ItemDataRole role) const
 {
-    switch (role)
-    {
-        case Qn::ResourceNameRole:
-            return m_name;
-        case Qn::LayoutCellSpacingRole:
-            return m_cellSpacing;
-        case Qn::LayoutCellAspectRatioRole:
-            return m_cellAspectRatio;
-        case Qn::LayoutBoundingRectRole:
-            return m_boundingRect;
-        default:
-            return m_dataByRole.value(role);
-    }
+    return d->resource->data(role);
 }
 
-QHash<int, QVariant> QnWorkbenchLayout::data() const
+void QnWorkbenchLayout::setData(Qn::ItemDataRole role, const QVariant& value)
 {
-    return m_dataByRole;
-}
-
-bool QnWorkbenchLayout::setData(int role, const QVariant& value)
-{
-    switch (role)
-    {
-        case Qn::ResourceNameRole:
-            if (value.canConvert<QString>())
-            {
-                setName(value.toString());
-                return true;
-            }
-            else
-            {
-                NX_ASSERT(false, "Provided name value '%1' must be convertible to QString.", value);
-                return false;
-            }
-        case Qn::LayoutCellSpacingRole:
-            if (value.canConvert<qreal>())
-            {
-                setCellSpacing(value.toReal());
-                return true;
-            }
-            else
-            {
-                NX_ASSERT(false, "Provided cell spacing value '%1' must be convertible to qreal.", value);
-                return false;
-            }
-        case Qn::LayoutCellAspectRatioRole:
-        {
-            bool ok;
-            qreal cellAspectRatio = value.toReal(&ok);
-            if (ok)
-            {
-                setCellAspectRatio(cellAspectRatio);
-                return true;
-            }
-            else
-            {
-                NX_ASSERT(false, "Provided cell aspect ratio value '%1' must be convertible to qreal.", value);
-                return false;
-            }
-        }
-        case Qn::LayoutBoundingRectRole:
-            if (m_boundingRect == value.toRect())
-            {
-                return true;
-            }
-            else
-            {
-                NX_ASSERT(false, "Changing bounding rect of a workbench layout is not supported.");
-                return false;
-            }
-        default:
-            QVariant& localValue = m_dataByRole[role];
-            if (localValue != value)
-            {
-                localValue = value;
-                emit dataChanged(role);
-            }
-            return true;
-    }
+    d->resource->setData(role, value);
 }
 
 void QnWorkbenchLayout::centralizeItems()
@@ -1004,26 +919,29 @@ void QnWorkbenchLayout::centralizeItems()
     int xdiff = -brect.center().x();
     int ydiff = -brect.center().y();
 
-    QList<QnWorkbenchItem*> itemsList = m_items.values();
+    QList<QnWorkbenchItem*> itemsList = d->items.values();
     QList<QRect> geometries;
     foreach(QnWorkbenchItem* item, itemsList)
         geometries << item->geometry().adjusted(xdiff, ydiff, xdiff, ydiff);
     moveItems(itemsList, geometries);
 }
 
-bool QnWorkbenchLayout::isSearchLayout() const
+bool QnWorkbenchLayout::isPreviewSearchLayout() const
 {
-    if (!data().contains(Qn::LayoutSearchStateRole))
-        return false;
-    return data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+    return resource()->isPreviewSearchLayout();
 }
 
-bool QnWorkbenchLayout::isLayoutTourReview() const
+bool QnWorkbenchLayout::isShowreelReviewLayout() const
 {
-    return data().contains(Qn::LayoutTourUuidRole);
+    return resource()->isShowreelReviewLayout();
+}
+
+bool QnWorkbenchLayout::isVideoWallReviewLayout() const
+{
+    return resource()->isVideoWallReviewLayout();
 }
 
 QString QnWorkbenchLayout::toString() const
 {
-    return nx::format("QnWorkbenchLayout %1 (%2)").args(m_name, resource());
+    return nx::format("QnWorkbenchLayout %1 (%2)").args(name(), resource());
 }

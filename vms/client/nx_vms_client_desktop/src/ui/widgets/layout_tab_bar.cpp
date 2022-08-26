@@ -12,13 +12,14 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -54,9 +55,15 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
 
-    connect(this, &QTabBar::currentChanged,     this, &QnLayoutTabBar::at_currentChanged);
-    connect(this, &QTabBar::tabCloseRequested,  this, &QnLayoutTabBar::at_tabCloseRequested);
-    connect(this, &QTabBar::tabMoved,           this, &QnLayoutTabBar::at_tabMoved);
+    connect(this, &QTabBar::currentChanged, this, &QnLayoutTabBar::at_currentChanged);
+    connect(this, &QTabBar::tabMoved, this, &QnLayoutTabBar::at_tabMoved);
+
+    connect(this, &QTabBar::tabCloseRequested, this,
+        [this](int index)
+        {
+            menu()->trigger(action::CloseLayoutAction,
+                QnWorkbenchLayoutList() << m_layouts[index]);
+        });
 
     /* Connect to context. */
     at_workbench_layoutsChanged();
@@ -166,7 +173,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
 
     QnLayoutResourcePtr resource = layout->resource();
     auto systemContext = SystemContext::fromResource(resource);
-    if (!NX_ASSERT(systemContext))
+    if (!systemContext) //< Perfectly valid for temporary layouts like showreel.
         return baseName;
 
     return systemContext->layoutSnapshotManager()->isModified(resource)
@@ -179,15 +186,11 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     if (!layout)
         return QIcon();
 
-    auto layoutIcon = layout->icon();
+    const auto layoutIcon = layout->icon();
     if (!layoutIcon.isNull())
         return layoutIcon;
 
     // TODO: #ynikitenkov #high refactor code below to use only layout->icon()
-
-    layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
-    if (!layoutIcon.isNull())
-        return layoutIcon;
 
     // TODO: #sivanov Refactor this logic as in Alarm Layout. Tab bar should not know layout
     // internal structure.
@@ -406,23 +409,7 @@ void QnLayoutTabBar::tabInserted(int index)
     {
         QScopedValueRollback<bool> guard(m_update, false);
 
-        QString name;
-        if (m_layouts.size() != count())
-        { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-            QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
-            m_layouts.insert(index, layout);
-            name = tabText(index);
-        }
-
         QnWorkbenchLayout* layout = m_layouts[index];
-        connect(layout,
-            &QnWorkbenchLayout::nameChanged,
-            this,
-            [this, layout] { updateTabText(layout); });
-        connect(layout,
-            &QnWorkbenchLayout::lockedChanged,
-            this,
-            [this, layout] { updateTabIcon(layout); });
         connect(layout,
             &QnWorkbenchLayout::titleChanged,
             this,
@@ -431,13 +418,6 @@ void QnLayoutTabBar::tabInserted(int index)
                 updateTabText(layout);
                 updateTabIcon(layout);
             });
-        connect(layout,
-            &QnWorkbenchLayout::iconChanged,
-            this,
-            [this, layout]() { updateTabIcon(layout); });
-
-        if (!name.isNull())
-            layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
 
         if (m_submit)
             workbench()->insertLayout(layout, index);
@@ -480,11 +460,6 @@ void QnLayoutTabBar::at_tabMoved(int from, int to)
     }
 
     checkInvariants();
-}
-
-void QnLayoutTabBar::at_tabCloseRequested(int index)
-{
-    emit closeRequested(m_layouts[index]);
 }
 
 void QnLayoutTabBar::at_currentChanged(int index)

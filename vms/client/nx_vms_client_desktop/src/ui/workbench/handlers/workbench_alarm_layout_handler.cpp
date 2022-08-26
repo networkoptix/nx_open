@@ -11,7 +11,6 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,6 +18,7 @@
 #include <nx/utils/qset.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -186,10 +186,11 @@ void QnWorkbenchAlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
 
 void QnWorkbenchAlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
 {
-    for (auto widget: display()->widgets(layout->resource()))
+    for (auto widget: display()->widgets())
     {
         const auto aspect = widget->visualChannelAspectRatio();
-        layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(aspect).toFloat());
+        layout->resource()->setCellAspectRatio(
+            QnAspectRatio::closestStandardRatio(aspect).toFloat());
         break; // Break after first camera aspect set.
     }
 }
@@ -252,16 +253,16 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
     if (!context()->user())
         return nullptr;
 
-    auto alarmLayout = resourcePool()->getResourceById<QnLayoutResource>(m_alarmLayoutId);
+    auto alarmLayout = resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId);
     if (!alarmLayout)
     {
-        alarmLayout.reset(new QnLayoutResource());
+        alarmLayout.reset(new LayoutResource());
         alarmLayout->addFlags(Qn::local);
         alarmLayout->setIdUnsafe(QnUuid::createUuid());
         m_alarmLayoutId = alarmLayout->getId();
         resourcePool()->addResource(alarmLayout);
         alarmLayout->setName(tr("Alarms"));
-        alarmLayout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+        alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
         alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
         alarmLayout->setData(Qn::LayoutPermissionsRole,
             static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));

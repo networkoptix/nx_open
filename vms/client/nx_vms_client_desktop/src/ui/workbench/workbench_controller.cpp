@@ -19,7 +19,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/videowall_item.h>
@@ -33,6 +32,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -1337,7 +1337,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
-    if (workbench()->currentLayout()->isLayoutTourReview())
+    if (workbench()->currentLayout()->isShowreelReviewLayout())
     {
         if (auto resource = widget->resource())
             menu()->trigger(action::OpenInNewTabAction, resource);

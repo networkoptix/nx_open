@@ -6,9 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
-
-#include <ui/workbench/workbench_state_manager.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/event/event_fwd.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
@@ -22,10 +22,10 @@ class LayoutsHandler: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
 public:
-    explicit LayoutsHandler(QObject *parent = 0);
+    explicit LayoutsHandler(QObject* parent = nullptr);
     virtual ~LayoutsHandler();
 
-    void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
+    void renameLayout(const LayoutResourcePtr& layout, const QString& newName);
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
@@ -49,32 +49,32 @@ private:
      * Save target file, local or remote layout.
      * @param layout Layout to save.
      */
-    void saveLayout(const QnLayoutResourcePtr& layout);
+    void saveLayout(const LayoutResourcePtr& layout);
 
     /**
      * Save provided layout under another name. Remote layout will be copied for the current user.
      */
-    void saveLayoutAs(const QnLayoutResourcePtr& layout);
+    void saveLayoutAs(const LayoutResourcePtr& layout);
 
     /** Save a copy of remote layout for the current user. */
-    void saveRemoteLayoutAs(const QnLayoutResourcePtr& layout);
+    void saveRemoteLayoutAs(const LayoutResourcePtr& layout);
 
     /** Save common remote layout as a cloud one. */
-    void saveLayoutAsCloud(const QnLayoutResourcePtr& layout);
+    void saveLayoutAsCloud(const LayoutResourcePtr& layout);
 
     /** Save existing cloud layout under another name. */
-    void saveCloudLayoutAs(const QnLayoutResourcePtr& layout);
+    void saveCloudLayoutAs(const LayoutResourcePtr& layout);
 
-    void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
+    void removeLayoutItems(const LayoutItemIndexList& items, bool autoSave);
 
     struct LayoutChange
     {
-        QnLayoutResourcePtr layout;
+        LayoutResourcePtr layout;
         QnResourceList added;
         QnResourceList removed;
     };
 
-    LayoutChange calculateLayoutChange(const QnLayoutResourcePtr& layout);
+    LayoutChange calculateLayoutChange(const LayoutResourcePtr& layout);
 
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
@@ -82,22 +82,25 @@ private:
     bool confirmLayoutChange(const LayoutChange& change, const QnUserResourcePtr& layoutOwner);
 
     bool confirmChangeSharedLayout(const LayoutChange& change);
-    bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
+    bool confirmDeleteSharedLayouts(const LayoutResourceList& layouts);
     bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
-    bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
+    bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const LayoutResourceList& layouts);
     bool confirmChangeVideoWallLayout(const LayoutChange& change);
 
-    /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
+    /**
+     * If user has custom access rights, he must be given direct access to cameras on changed local
+     * layout.
+     */
     void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
-    bool canRemoveLayouts(const QnLayoutResourceList &layouts);
+    bool canRemoveLayouts(const LayoutResourceList& layouts);
 
-    void removeLayouts(const QnLayoutResourceList &layouts);
+    void removeLayouts(const LayoutResourceList& layouts);
 
     void closeLayoutsInternal(
-        const QnLayoutResourceList& resources,
-        const QnLayoutResourceList& rollbackResources);
-    bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
+        const LayoutResourceList& resources,
+        const LayoutResourceList& rollbackResources);
+    bool closeLayouts(const LayoutResourceList& resources, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
 
     /**
@@ -105,7 +108,7 @@ private:
      * @param state Playback synchronization state for the layout if it is not opened yet.
      */
     void openLayouts(
-        const QnLayoutResourceList& layouts,
+        const LayoutResourceList& layouts,
         const QnStreamSynchronizationState& playbackState);
 };
 

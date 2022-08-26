@@ -382,7 +382,7 @@ Item
                         visible: d.isOnline
                             && resourceBrowser.scene.itemCount == 0
                             && !resourceBrowser.scene.isLocked
-                            && !resourceBrowser.scene.isLayoutTourReview
+                            && !resourceBrowser.scene.isShowreelReviewLayout
 
                         onTriggered:
                             motionSearchPanel.model.addCameraToLayout()

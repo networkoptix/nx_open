@@ -12,7 +12,6 @@
 
 class QnCameraBookmarksManager;
 class QnCameraDataManager;
-class QnResourceRuntimeDataManager;
 class QnServerStorageManager;
 
 namespace nx::vms::client::desktop {
@@ -57,7 +56,6 @@ public:
     QnServerStorageManager* serverStorageManager() const;
     QnCameraBookmarksManager* cameraBookmarksManager() const;
     QnCameraDataManager* cameraDataManager() const;
-    QnResourceRuntimeDataManager* resourceRuntimeDataManager() const;
     VirtualCameraManager* virtualCameraManager() const;
     VideoCache* videoCache() const;
     LayoutSnapshotManager* layoutSnapshotManager() const;

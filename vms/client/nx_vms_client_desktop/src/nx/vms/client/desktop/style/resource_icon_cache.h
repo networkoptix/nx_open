@@ -104,14 +104,6 @@ public:
 
     static Key key(const QnResourcePtr& resource);
 
-    /**
-     * @brief setKey            Bind custom key to the provided resource instance.
-     * @param resource          Target resource.
-     * @param key               Custom key.
-     */
-    static void setKey(const QnResourcePtr& resource, Key key);
-    static void clearKey(const QnResourcePtr& resource);
-
     static QnResourceIconCache* instance();
 
     static QIcon cameraRecordingStatusIcon(nx::vms::client::desktop::CameraExtraStatus status);

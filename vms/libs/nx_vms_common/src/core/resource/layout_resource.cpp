@@ -2,16 +2,8 @@
 
 #include "layout_resource.h"
 
-#include <list>
-
-#include <nx/utils/qset.h>
-
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource_access/resource_access_filter.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-#include <core/resource/avi/avi_resource.h>
+#include <nx/utils/math/fuzzy.h>
 
 QnLayoutResource::QnLayoutResource():
     base_type(),
@@ -32,49 +24,6 @@ void QnLayoutResource::setStatus(nx::vms::api::ResourceStatus newStatus,
     Q_UNUSED(newStatus);
     Q_UNUSED(reason);
     NX_ASSERT(false, "Not implemented");
-}
-
-void QnLayoutResource::cloneItems(QnLayoutResourcePtr target, ItemsRemapHash* remapHash) const
-{
-    QnLayoutItemDataList items = m_items->getItems().values();
-    ItemsRemapHash newUuidByOldUuid;
-    for (int i = 0; i < items.size(); i++)
-    {
-        QnUuid newUuid = QnUuid::createUuid();
-        newUuidByOldUuid[items[i].uuid] = newUuid;
-        items[i].uuid = newUuid;
-    }
-    for (int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
-    if (remapHash)
-        *remapHash = newUuidByOldUuid;
-
-    target->setItems(items);
-}
-
-void QnLayoutResource::cloneTo(QnLayoutResourcePtr target, ItemsRemapHash* remapHash) const
-{
-    {
-        NX_MUTEX_LOCKER locker(&m_mutex);
-        target->setIdUnsafe(QnUuid::createUuid());
-        target->setUrl(m_url);
-        target->setName(m_name);
-        target->setParentId(m_parentId);
-        target->setCellSpacing(m_cellSpacing);
-        target->setCellAspectRatio(m_cellAspectRatio);
-        target->setBackgroundImageFilename(m_backgroundImageFilename);
-        target->setBackgroundOpacity(m_backgroundOpacity);
-        target->setBackgroundSize(m_backgroundSize);
-    }
-
-    cloneItems(target, remapHash);
-}
-
-QnLayoutResourcePtr QnLayoutResource::clone(ItemsRemapHash* remapHash) const
-{
-    QnLayoutResourcePtr result(new QnLayoutResource());
-    cloneTo(result, remapHash);
-    return result;
 }
 
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
@@ -197,33 +146,6 @@ void QnLayoutResource::updateInternal(const QnResourcePtr& source, NotifierList&
             notifiers << [r = toSharedPointer(this)]{ emit r->logicalIdChanged(r); };
         }
 
-        m_localRange = localOther->m_localRange;
-
-        // IMPORTANT: According to current update() usage practice, "data" should not be updated.
-        // Do not expect update() to work like assignment operator.
-        /*
-        // Remove extra data.
-        const auto oldDataKeys = m_dataByRole.keys();
-        for (int role: oldDataKeys)
-        {
-            if (!localOther->m_dataByRole.contains(role))
-            {
-                m_dataByRole.remove(role);
-                notifiers << [r = toSharedPointer(this), role]{ emit r->dataChanged(role); };
-            }
-        }
-
-        // Add essential data.
-        for (int role: localOther->m_dataByRole.keys())
-        {
-            if(m_dataByRole.value(role) != localOther->m_dataByRole.value(role))
-            {
-                m_dataByRole[role] = localOther->m_dataByRole.value(role);
-                notifiers << [r = toSharedPointer(this), role]{ emit r->dataChanged(role); };
-            }
-        }
-        */
-
         setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
 }
@@ -246,60 +168,6 @@ void QnLayoutResource::removeItem(const QnUuid &itemUuid)
 void QnLayoutResource::updateItem(const QnLayoutItemData &item)
 {
     m_items->updateItem(item);
-}
-
-QnTimePeriod QnLayoutResource::getLocalRange() const
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_localRange;
-}
-
-void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    m_localRange = value;
-}
-
-void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole)
-{
-    QSet<int> updatedRoles;
-
-    {
-        NX_MUTEX_LOCKER locker(&m_mutex);
-
-        updatedRoles = nx::utils::toQSet(dataByRole.keys() + m_dataByRole.keys());
-        m_dataByRole = dataByRole;
-    }
-
-    for (const auto role: updatedRoles)
-        emit dataChanged(role);
-}
-
-void QnLayoutResource::setData(int role, const QVariant &value)
-{
-    {
-        NX_MUTEX_LOCKER locker(&m_mutex);
-
-        m_dataByRole[role] = value;
-    }
-    emit dataChanged(role);
-}
-
-QVariant QnLayoutResource::data(int role) const
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    const auto it = m_dataByRole.find(role);
-    return it != m_dataByRole.end()
-        ? it.value()
-        : QVariant();
-}
-
-QHash<int, QVariant> QnLayoutResource::data() const
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    return m_dataByRole;
 }
 
 /********* Properties getters and setters **********/

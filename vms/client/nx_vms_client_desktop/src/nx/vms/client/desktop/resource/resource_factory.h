@@ -12,6 +12,8 @@ public:
     virtual QnResourcePtr createResource(
         const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
+
+    virtual QnLayoutResourcePtr createLayout() const override;
 };
 
 } // namespace nx::vms::client::desktop

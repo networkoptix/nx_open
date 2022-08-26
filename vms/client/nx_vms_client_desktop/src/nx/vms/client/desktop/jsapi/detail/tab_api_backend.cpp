@@ -4,13 +4,11 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/layout_resource.h>
-#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -204,13 +202,11 @@ void TabApiBackend::Private::updateLayoutItemData(
         return;
 
     auto currentLayout = layout->resource();
-    if (!currentLayout)
+    if (!NX_ASSERT(currentLayout))
         return;
 
-    const auto manager = SystemContext::fromResource(currentLayout)->resourceRuntimeDataManager();
-
     // We always skip focuse state for newly added items to preserve selection on layout.
-    manager->setLayoutItemData(itemId, Qn::ItemSkipFocusOnAdditionRole, true);
+    currentLayout->setItemData(itemId, Qn::ItemSkipFocusOnAdditionRole, true);
 
     if (!params.media)
         return;
@@ -218,26 +214,26 @@ void TabApiBackend::Private::updateLayoutItemData(
     if (params.media->speed.has_value())
     {
         const qreal speed = params.media->speed.value();
-        manager->setLayoutItemData(itemId, Qn::ItemPausedRole, qFuzzyEquals(speed, 0));
-        manager->setLayoutItemData(itemId, Qn::ItemSpeedRole, speed);
+        currentLayout->setItemData(itemId, Qn::ItemPausedRole, qFuzzyEquals(speed, 0));
+        currentLayout->setItemData(itemId, Qn::ItemSpeedRole, speed);
     }
 
     if (params.media->timestampMs.has_value())
     {
-        manager->setLayoutItemData(itemId, Qn::ItemTimeRole,
-            params.media->timestampMs->count());
+        currentLayout->setItemData(itemId, Qn::ItemTimeRole,
+            QVariant::fromValue<qint64>(params.media->timestampMs->count()));
     }
 
     if (params.media->timelineWindow.has_value())
     {
-        manager->setLayoutItemData(itemId, Qn::ItemSliderWindowRole,
-            periodFromTimeWindow(params.media->timelineWindow.value()));
+        currentLayout->setItemData(itemId, Qn::ItemSliderWindowRole,
+            QVariant::fromValue(periodFromTimeWindow(params.media->timelineWindow.value())));
     }
 
     if (params.media->timelineSelection.has_value())
     {
-        manager->setLayoutItemData(itemId, Qn::ItemSliderSelectionRole,
-            periodFromTimeWindow(params.media->timelineSelection.value()));
+        currentLayout->setItemData(itemId, Qn::ItemSliderSelectionRole,
+            QVariant::fromValue(periodFromTimeWindow(params.media->timelineSelection.value())));
     }
 }
 
@@ -398,12 +394,14 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
     const auto tryFillFromItemData =
         [this, &result](const QnUuid& itemId)
         {
-            auto manager = SystemContext::fromResource(layout->resource())
-                ->resourceRuntimeDataManager();
-            const auto selectionValue = manager->layoutItemData(
-                itemId, Qn::ItemSliderSelectionRole);
-            const auto windowValue = manager->layoutItemData(
-                itemId, Qn::ItemSliderWindowRole);
+            auto layoutResource = layout->resource();
+            if (!NX_ASSERT(layoutResource))
+                return false;
+
+            const auto selectionValue = layoutResource->itemData(itemId,
+                Qn::ItemSliderSelectionRole);
+            const auto windowValue = layoutResource->itemData(itemId,
+                Qn::ItemSliderWindowRole);
             if (!selectionValue.isValid() || !windowValue.isValid())
                 return false; //< We suppose these values should be set simultaniously.
 

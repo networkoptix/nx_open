@@ -13,7 +13,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -235,7 +234,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
         return calculateFileLayoutPermissions(layout);
 
     // Note that QnFileLayoutResource case is treated above.
-    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+    if (LayoutResourcePtr layout = resource.dynamicCast<LayoutResource>())
         return calculateRemoteLayoutPermissions(layout);
 
     if (qnRuntime->isVideoWallMode())
@@ -272,7 +271,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculateRemoteLayoutPermissions(
-    const QnLayoutResourcePtr& layout) const
+    const LayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
 

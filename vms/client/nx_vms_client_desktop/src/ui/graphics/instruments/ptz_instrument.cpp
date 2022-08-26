@@ -1586,17 +1586,29 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
 
     QnPtzObject ptzObject;
     if (const auto* mediaWidget = qobject_cast<QnMediaResourceWidget*>(display()->widget(role)))
-        mediaWidget->ptzController()->getActiveObject(&ptzObject);
+    {
+        auto ptzController = mediaWidget->ptzController();
+        ptzController->getActiveObject(&ptzObject);
 
-    const bool ptzStateActive = ptzObject.type != Qn::InvalidPtzObject;
-    if (ptzStateActive)
-        return;
+        const bool ptzStateActive = ptzObject.type != Qn::InvalidPtzObject;
+        if (ptzStateActive)
+            return;
 
-    m_externalPtzDirections = {};
+        m_externalPtzDirections = {};
 
-    menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
-        .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
-        .withArgument(Qn::ItemDataRole::ForceRole, true));
+        // Forcefully stop ptz movement on a camera.
+        if (mediaWidget->item()->layout())
+        {
+            menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
+                .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
+                .withArgument(Qn::ItemDataRole::ForceRole, true));
+        }
+        else
+        {
+            // TODO: #sivanov Make sure stopping PTZ should occur in this case.
+            // ptzController->continuousMove({});
+        }
+    }
 }
 
 void PtzInstrument::updateExternalPtzSpeed()

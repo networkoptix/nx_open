@@ -7,7 +7,6 @@
 #include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 

@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/image_providers/proxy_image_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/utils/transcoding_image_processor.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -176,7 +177,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_prevNeedTranscoding = !state().exportMediaPersistentSettings.applyFilters;
 }
 
-void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout, const QPalette& palette)
+void ExportSettingsDialog::Private::setLayout(const LayoutResourcePtr& layout, const QPalette& palette)
 {
     m_layout = layout;
     m_layoutPreviewProvider.reset();
@@ -219,7 +220,7 @@ QnMediaResourcePtr ExportSettingsDialog::Private::mediaResource() const
     return m_mediaResource;
 }
 
-QnLayoutResourcePtr ExportSettingsDialog::Private::layout() const
+LayoutResourcePtr ExportSettingsDialog::Private::layout() const
 {
     return m_layout;
 }

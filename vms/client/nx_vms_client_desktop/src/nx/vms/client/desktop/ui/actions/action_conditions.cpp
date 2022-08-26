@@ -375,7 +375,7 @@ ActionVisibility Condition::check(const QnResourceList& /*resources*/, QnWorkben
     return InvisibleAction;
 }
 
-ActionVisibility Condition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility Condition::check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
 {
     return check(ParameterTypes::resources(layoutItems), context);
 }
@@ -489,7 +489,7 @@ ActionVisibility PreventWhenFullscreenTransition::check(
 
 bool VideoWallReviewModeCondition::isVideoWallReviewMode(QnWorkbenchContext* context) const
 {
-    return context->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole);
+    return context->workbench()->currentLayout()->isVideoWallReviewLayout();
 }
 
 ActionVisibility VideoWallReviewModeCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
@@ -766,12 +766,15 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
     return InvisibleAction;
 }
 
-ActionVisibility LayoutItemRemovalCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility LayoutItemRemovalCondition::check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
 {
-    for (const QnLayoutItemIndex& item: layoutItems)
+    for (const LayoutItemIndex& item: layoutItems)
     {
-        if (!context->accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
+        if (!context->accessController()->hasPermissions(item.layout(),
+            Qn::WritePermission | Qn::AddRemoveItemsPermission))
+        {
             return InvisibleAction;
+        }
 
         const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
         const auto resource = context->resourcePool()->getResourceById<QnResource>(resourceId);
@@ -790,7 +793,7 @@ ActionVisibility LayoutItemRemovalCondition::check(const QnLayoutItemIndexList& 
                     intercomLayoutItemIds.insert(intercomLayoutItem.uuid);
             }
 
-            for (const QnLayoutItemIndex& item: layoutItems)
+            for (const LayoutItemIndex& item: layoutItems)
                 intercomLayoutItemIds.remove(item.uuid());
 
             // If all intercom copies on the layout is selected - removal is forbidden.
@@ -811,7 +814,7 @@ ActionVisibility SaveLayoutCondition::check(
     const QnResourceList& resources,
     QnWorkbenchContext* context)
 {
-    QnLayoutResourcePtr layout;
+    LayoutResourcePtr layout;
 
     if (m_current)
     {
@@ -822,7 +825,7 @@ ActionVisibility SaveLayoutCondition::check(
         if (resources.size() != 1)
             return InvisibleAction;
 
-        layout = resources[0].dynamicCast<QnLayoutResource>();
+        layout = resources[0].dynamicCast<LayoutResource>();
     }
 
     if (!layout)
@@ -984,7 +987,7 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
 
     if (parameters.scope() == SceneScope)
     {
-        if (!context->workbench()->currentLayout()->isSearchLayout())
+        if (!context->workbench()->currentLayout()->isPreviewSearchLayout())
             return InvisibleAction;
 
         const auto widget = parameters.widget();
@@ -1019,7 +1022,7 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
 
 ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
-    const auto tourId = context->workbench()->currentLayout()->data()
+    const auto tourId = context->workbench()->currentLayoutResource()->data()
         .value(Qn::LayoutTourUuidRole).value<QnUuid>();
     const auto tour = context->systemContext()->showreelManager()->tour(tourId);
     if (tour.isValid() && tour.items.size() > 0)
@@ -1072,9 +1075,9 @@ ActionVisibility OpenInFolderCondition::check(const QnResourceList& resources, Q
     return isLocalResource || isExportedLayout ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility OpenInFolderCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility OpenInFolderCondition::check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
 {
-    foreach(const QnLayoutItemIndex &index, layoutItems)
+    foreach(const LayoutItemIndex &index, layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
@@ -1166,8 +1169,8 @@ ActionVisibility OpenInLayoutCondition::check(
     const Parameters& parameters,
     QnWorkbenchContext* /*context*/)
 {
-    auto layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
-    if (!layout)
+    auto layout = parameters.argument<LayoutResourcePtr>(Qn::LayoutResourceRole);
+    if (!NX_ASSERT(layout))
         return InvisibleAction;
 
     return canOpen(parameters.resources(), layout)
@@ -1193,12 +1196,14 @@ bool OpenInLayoutCondition::canOpen(
         return std::any_of(resources.cbegin(), resources.cend(),
             [getAccessController](const QnResourcePtr& resource)
             {
+                if (resource->hasFlags(Qn::layout))
+                    return true;
+
                 auto accessController = getAccessController(resource);
 
-                return QnResourceAccessFilter::isOpenableInEntity(resource)
-                    && (resource->hasFlags(Qn::layout)
-                        || (accessController && accessController->hasPermissions(
-                            resource, Qn::ViewContentPermission)));
+                return QnResourceAccessFilter::isOpenableInLayout(resource)
+                    && accessController
+                    && accessController->hasPermissions(resource, Qn::ViewContentPermission);
             });
     }
 
@@ -1260,10 +1265,10 @@ ActionVisibility OpenInNewEntityCondition::check(
 }
 
 ActionVisibility OpenInNewEntityCondition::check(
-    const QnLayoutItemIndexList& layoutItems,
+    const LayoutItemIndexList& layoutItems,
     QnWorkbenchContext* context)
 {
-    for (const QnLayoutItemIndex& index: layoutItems)
+    for (const LayoutItemIndex& index: layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
@@ -1301,10 +1306,10 @@ ActionVisibility SetAsBackgroundCondition::check(
 }
 
 ActionVisibility SetAsBackgroundCondition::check(
-    const QnLayoutItemIndexList& layoutItems,
+    const LayoutItemIndexList& layoutItems,
     QnWorkbenchContext* context)
 {
-    foreach(const QnLayoutItemIndex &index, layoutItems)
+    for (const LayoutItemIndex& index: layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
@@ -1376,7 +1381,7 @@ ActionVisibility PtzCondition::check(const Parameters& parameters, QnWorkbenchCo
 {
     bool isPreviewSearchMode =
         parameters.scope() == SceneScope &&
-        context->workbench()->currentLayout()->isSearchLayout();
+        context->workbench()->currentLayout()->isPreviewSearchLayout();
     if (isPreviewSearchMode)
         return InvisibleAction;
     return Condition::check(parameters, context);
@@ -1467,7 +1472,7 @@ ActionVisibility SaveVideowallReviewCondition::check(
         if (!layout)
             return InvisibleAction;
 
-        if (context->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole))
+        if (context->workbench()->currentLayout()->isVideoWallReviewLayout())
             layouts << layout;
     }
     else
@@ -2000,7 +2005,7 @@ ConditionWrapper isPreviewSearchMode()
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
             return parameters.scope() == SceneScope
-                && context->workbench()->currentLayout()->isSearchLayout();
+                && context->workbench()->currentLayout()->isPreviewSearchLayout();
         });
 }
 
@@ -2050,7 +2055,7 @@ ConditionWrapper isLayoutTourReviewMode()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            return context->workbench()->currentLayout()->isLayoutTourReview();
+            return context->workbench()->currentLayout()->isShowreelReviewLayout();
         });
 }
 
@@ -2349,7 +2354,7 @@ ConditionWrapper canSaveLayoutAs()
             if (resources.size() != 1)
                 return false;
 
-            auto layout = resources[0].dynamicCast<QnLayoutResource>();
+            auto layout = resources[0].dynamicCast<LayoutResource>();
 
             if (!layout)
                 return false;

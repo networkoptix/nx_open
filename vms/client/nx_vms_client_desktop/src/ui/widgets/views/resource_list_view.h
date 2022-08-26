@@ -46,6 +46,8 @@ public:
 
     QnResourcePtr selectedResource() const;
 
+    QnResourceListModel* model() const;
+
 protected:
     virtual QSize sizeHint() const override;
 

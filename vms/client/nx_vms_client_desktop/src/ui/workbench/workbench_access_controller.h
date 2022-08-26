@@ -10,6 +10,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnWorkbenchContext;
@@ -144,7 +145,8 @@ private:
 
     Qn::Permissions calculatePermissions(const QnResourcePtr& resource) const;
     // Deal with layouts; called from calculatePermissions().
-    Qn::Permissions calculateRemoteLayoutPermissions(const QnLayoutResourcePtr& layout) const;
+    Qn::Permissions calculateRemoteLayoutPermissions(
+        const nx::vms::client::desktop::LayoutResourcePtr& layout) const;
     Qn::Permissions calculateFileLayoutPermissions(const QnFileLayoutResourcePtr& layout) const;
 
     GlobalPermissions calculateGlobalPermissions() const;

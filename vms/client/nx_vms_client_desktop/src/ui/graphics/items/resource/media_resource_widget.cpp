@@ -37,13 +37,11 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/file_layout_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/network/cloud/protocol_type.h>
@@ -64,6 +62,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -280,7 +279,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     d->isPreviewSearchLayout = item
         && item->layout()
-        && item->layout()->isSearchLayout();
+        && item->layout()->isPreviewSearchLayout();
 
     initRenderer();
     initDisplay();
@@ -452,19 +451,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 
-    auto layoutContext = SystemContext::fromResource(item->layout()->resource());
-
-    connect(layoutContext->resourceRuntimeDataManager(),
-        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+    auto layoutResource = item->layout()->resource();
+    NX_ASSERT(layoutResource);
+    connect(layoutResource.get(),
+        &LayoutResource::itemDataChanged,
         this,
         &QnMediaResourceWidget::handleItemDataChanged);
 
     // Update paused state after all initialization for widget is done.
-    executeLater(
-        [this, layoutContext]()
+    executeDelayedParented(
+        [this]()
         {
-            const QVariant isPaused = layoutContext->resourceRuntimeDataManager()->layoutItemData(
-                m_itemId, Qn::ItemPausedRole);
+            auto layoutResource = this->item()->layout()->resource();
+            NX_ASSERT(layoutResource);
+            const QVariant isPaused = layoutResource->itemData(m_itemId, Qn::ItemPausedRole);
             if (isPaused.isValid())
             {
                 handleItemDataChanged(
@@ -521,8 +521,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 void QnMediaResourceWidget::beforeDestroy()
 {
-    auto layoutContext = SystemContext::fromResource(item()->layout()->resource());
-    layoutContext->resourceRuntimeDataManager()->disconnect(this);
+    item()->layout()->resource()->disconnect(this);
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(

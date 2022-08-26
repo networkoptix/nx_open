@@ -12,7 +12,6 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -25,6 +24,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -66,11 +66,11 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
-    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<QnLayoutResource>();
+    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<LayoutResource>();
     if (context()->user())
     {
         layouts.append(resourcePool()->getResourcesByParentId(context()->user()->getId())
-            .filtered<QnLayoutResource>());
+            .filtered<LayoutResource>());
     }
 
     std::sort(layouts.begin(), layouts.end(),
@@ -94,7 +94,7 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
             continue;
 
         // TODO: #sivanov Do not add preview search layouts to the resource pool.
-        if (layout->data().contains(Qn::LayoutSearchStateRole))
+        if (layout->isPreviewSearchLayout())
         {
             if (!QnWorkbenchLayout::instance(layout))
                 continue; /* Not opened. */
@@ -251,7 +251,7 @@ Factory::ActionList AspectRatioFactory::newActions(const Parameters& /*parameter
         connect(action, &QAction::triggered, this,
             [this, ar = aspectRatio.toFloat()]
             {
-                workbench()->currentLayout()->setCellAspectRatio(ar);
+                workbench()->currentLayoutResource()->setCellAspectRatio(ar);
             });
         actionGroup->addAction(action);
     }
@@ -271,7 +271,7 @@ Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& para
 
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
     const bool isCurrentTour = id.isNull();
-    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isLayoutTourReview());
+    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isShowreelReviewLayout());
 
     if (isCurrentTour)
         id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();

@@ -2,6 +2,7 @@
 
 #include "integrations.h"
 
+#include <client/client_runtime_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -46,7 +47,11 @@ void initialize(QObject* storageParent)
 {
     NX_ASSERT(!Storage::instance());
     auto storage = new Storage(storageParent);
-    storage->addIntegration(new OverlappedIdIntegration(storage));
+
+    if (qnRuntime->isDesktopMode())
+    {
+        storage->addIntegration(new OverlappedIdIntegration(storage));
+    }
 }
 
 void connectionEstablished(

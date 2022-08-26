@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,7 +26,7 @@ public:
     virtual ~CloudLayoutsManager() override;
 
     /** Convert layout to the cloud one. */
-    QnLayoutResourcePtr convertLocalLayout(const QnLayoutResourcePtr& layout);
+    LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout);
 
     using SaveCallback = std::function<void(bool)>;
     void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback = {});

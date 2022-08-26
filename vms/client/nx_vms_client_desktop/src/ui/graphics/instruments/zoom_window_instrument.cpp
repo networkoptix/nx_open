@@ -2,35 +2,33 @@
 
 #include "zoom_window_instrument.h"
 
-#include <utils/math/color_transformations.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/hash.h>
-#include <nx/utils/random.h>
+#include <qt_graphics_items/graphics_widget.h>
 
-#include <nx/vms/client/core/utils/geometry.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/media_resource.h>
+#include <nx/utils/random.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
-#include <nx/vms/client/desktop/style/style.h>
-#include <qt_graphics_items/graphics_widget.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#include <core/resource_management/resource_runtime_data.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/hash.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/math/color_transformations.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
