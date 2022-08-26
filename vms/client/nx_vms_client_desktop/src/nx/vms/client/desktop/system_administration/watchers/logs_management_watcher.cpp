@@ -50,6 +50,14 @@ QString shortList(const QList<QnMediaServerResourcePtr>& servers)
     return result;
 }
 
+LogsManagementWatcher::State watcherState(Qt::CheckState state)
+{
+    return state == Qt::Unchecked
+        ? LogsManagementWatcher::State::empty
+        : LogsManagementWatcher::State::hasSelection;
+}
+
+
 } // namespace
 
 struct LogsManagementWatcher::Unit::Private
@@ -373,14 +381,16 @@ struct LogsManagementWatcher::Private
         return result;
     }
 
-    State selectionState() const
+    Qt::CheckState selectionState() const
     {
-        bool isChecked = client->isChecked();
-        for (auto& server: servers)
-        {
-            isChecked |= server->isChecked();
-        }
-        return isChecked ? State::hasSelection : State::empty;
+        const auto allItems = items();
+        const auto selectedItems = checkedItems();
+
+        return selectedItems.isEmpty()
+            ? Qt::Unchecked
+            : (selectedItems.size() == allItems.size())
+                ? Qt::Checked
+                : Qt::PartiallyChecked;
     }
 
     void initNotificationManager()
@@ -827,14 +837,55 @@ void LogsManagementWatcher::setItemIsChecked(LogsManagementUnitPtr item, bool ch
     item->data()->setChecked(checked);
 
     // Evaluate the new state.
-    auto newState = d->selectionState();
-    if (d->state != newState)
-    {
-        d->state = newState;
+    const auto selectionState = d->selectionState();
+    const auto oldState = d->state;
+    const auto newState = watcherState(selectionState);
+    d->state = newState;
 
-        lock.unlock();
+    // Emit signals.
+    lock.unlock();
+    if (oldState != newState)
         emit stateChanged(newState);
+    emit itemsChanged({item});
+    emit selectionChanged(selectionState);
+}
+
+void LogsManagementWatcher::setAllItemsAreChecked(bool checked)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    NX_ASSERT(d->state == State::empty || d->state == State::hasSelection);
+
+    QList<UnitPtr> changedItems;
+    for (auto& item: d->items())
+    {
+        if (auto server = item->server();
+            checked && server && !server->isOnline())
+        {
+            continue;
+        }
+
+        item->data()->setChecked(checked);
+        changedItems << item;
     }
+
+    // Evaluate the new state.
+    const auto selectionState = d->selectionState();
+    const auto oldState = d->state;
+    const auto newState = watcherState(selectionState);
+    d->state = newState;
+
+    // Emit signals.
+    lock.unlock();
+    if (oldState != newState)
+        emit stateChanged(newState);
+    emit itemsChanged(changedItems);
+    emit selectionChanged(selectionState);
+}
+
+Qt::CheckState LogsManagementWatcher::itemsCheckState() const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    return d->selectionState();
 }
 
 void LogsManagementWatcher::startDownload(const QString& path)
@@ -865,7 +916,7 @@ void LogsManagementWatcher::cancelDownload()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::loading);
-    const auto newState = d->selectionState();
+    const auto newState = watcherState(d->selectionState());
 
     //TODO: #spanasenko Stop client log collection.
     d->client->data()->setState(Unit::DownloadState::none);
@@ -919,7 +970,7 @@ void LogsManagementWatcher::completeDownload()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::finished || d->state == State::hasErrors);
-    const auto newState = d->selectionState();
+    const auto newState = watcherState(d->selectionState());
 
     //TODO: #spanasenko Clean-up.
     d->client->data()->setState(Unit::DownloadState::none);
