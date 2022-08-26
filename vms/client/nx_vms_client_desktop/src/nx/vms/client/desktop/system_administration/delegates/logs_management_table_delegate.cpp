@@ -29,18 +29,34 @@ void LogsManagementTableDelegate::paint(
     const QStyleOptionViewItem& styleOption,
     const QModelIndex& index) const
 {
-    if (index.column() != Model::NameColumn)
+    switch (index.column())
     {
-        base_type::paint(painter, styleOption, index);
-        return;
-    }
+        case Model::NameColumn:
+            paintNameColumn(painter, styleOption, index);
+            break;
 
+        case Model::CheckBoxColumn:
+            paintCheckBoxColumn(painter, styleOption, index);
+            break;
+
+        default:
+            base_type::paint(painter, styleOption, index);
+            break;
+    }
+}
+
+void LogsManagementTableDelegate::paintNameColumn(
+    QPainter* painter,
+    const QStyleOptionViewItem& styleOption,
+    const QModelIndex& index) const
+{
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
     QStyle* style = option.widget->style();
     const int kOffset = -2;
-    // Obtain sub-element rectangles
+
+    // Obtain sub-element rectangles.
     QRect textRect = style->subElementRect(
         QStyle::SE_ItemViewItemText,
         &option,
@@ -52,14 +68,14 @@ void LogsManagementTableDelegate::paint(
         option.widget);
     iconRect.translate(kOffset, 0);
 
-    // Paint background
+    // Paint background.
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
-    // Draw icon
+    // Draw icon.
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
         option.icon.paint(painter, iconRect, option.decorationAlignment, QIcon::Normal, QIcon::On);
 
-    // Draw text
+    // Draw text.
     const QString extraInfo = index.data(Model::IpAddressRole).toString();
     const QColor textColor = colorTheme()->color("light10");
     const QColor ipAddressColor = colorTheme()->color("dark17");
@@ -101,6 +117,48 @@ void LogsManagementTableDelegate::paint(
                 painter->drawPixmap(textPos + extra.origin, extra.pixmap);
         }
     }
+}
+
+void LogsManagementTableDelegate::paintCheckBoxColumn(
+    QPainter* painter,
+    const QStyleOptionViewItem& styleOption,
+    const QModelIndex& index) const
+{
+    QStyleOptionViewItem option(styleOption);
+    initStyleOption(&option, index);
+
+    QStyle* style = option.widget->style();
+
+    // Paint background.
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
+
+    const auto checkStateData = index.data(Qt::CheckStateRole);
+    if (checkStateData.isNull())
+        return;
+
+    QStyleOptionViewItem checkMarkOption(styleOption);
+    checkMarkOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+
+    checkMarkOption.features = QStyleOptionViewItem::HasCheckIndicator;
+
+    switch (checkStateData.value<Qt::CheckState>())
+    {
+        case Qt::Checked:
+            checkMarkOption.state |= QStyle::State_On;
+            break;
+        case Qt::PartiallyChecked:
+            checkMarkOption.state |= QStyle::State_NoChange;
+            break;
+        case Qt::Unchecked:
+            checkMarkOption.state |= QStyle::State_Off;
+            break;
+    }
+
+    const auto widget = styleOption.widget;
+    checkMarkOption.rect =
+        style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &checkMarkOption, widget);
+    style->drawPrimitive(
+        QStyle::PE_IndicatorItemViewItemCheck, &checkMarkOption, painter, widget);
 }
 
 } // namespace nx::vms::client::desktop
