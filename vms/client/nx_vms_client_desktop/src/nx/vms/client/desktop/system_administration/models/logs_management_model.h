@@ -30,7 +30,8 @@ public:
 
     enum Roles
     {
-        IpAddressRole = Qn::ItemDataRoleCount,
+        IpAddressRole = Qt::UserRole + 1,
+        EnabledRole,
     };
 
     explicit LogsManagementModel(QObject* parent, LogsManagementWatcher* watcher);
@@ -47,6 +48,7 @@ public:
 
 private:
     void onItemsListChanged();
+    void onItemsChanged(QList<LogsManagementUnitPtr> items);
 
 private:
     QPointer<LogsManagementWatcher> m_watcher;
