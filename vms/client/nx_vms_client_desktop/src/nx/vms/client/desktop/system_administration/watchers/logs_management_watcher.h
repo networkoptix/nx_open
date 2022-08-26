@@ -65,6 +65,9 @@ public:
 
     void setItemIsChecked(UnitPtr item, bool checked);
 
+    void setAllItemsAreChecked(bool checked);
+    Qt::CheckState itemsCheckState() const;
+
     void startDownload(const QString& path);
     void cancelDownload();
     void restartFailed();
@@ -79,10 +82,11 @@ public:
 signals:
     void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
     void progressChanged(double progress);
+
     void itemListChanged();
     void itemsChanged(QList<UnitPtr> units);
 
-    void logLevelChanged();
+    void selectionChanged(Qt::CheckState state);
 
 private:
     void onReceivedServerLogSettings(
