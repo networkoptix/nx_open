@@ -36,7 +36,6 @@
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_properties/fisheye/fisheye_calibrator.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
-#include <nx/vms/client/desktop/resource_properties/server/widgets/details/backup_queue_size.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
 #include <nx/vms/client/desktop/resources/resource_status_helper.h>
@@ -216,8 +215,6 @@ void QnClientMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<Qn::ImageBehavior>();
     QnJsonSerializer::registerSerializer<QnBackgroundImage>();
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
-
-    qRegisterMetaType<nx::vms::client::desktop::BackupQueueSize>();
 
     qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
     QMetaType::registerComparators<nx::vms::client::desktop::RecordScheduleCellData>();

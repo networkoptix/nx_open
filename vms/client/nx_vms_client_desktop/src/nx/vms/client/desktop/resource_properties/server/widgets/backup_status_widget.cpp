@@ -12,21 +12,27 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/html/html.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
+
+using namespace std::chrono;
 
 namespace {
 
 nx::vms::api::BackupPosition backupPositionFromCurrentTime()
 {
-    const auto currentTimePointMs = std::chrono::system_clock::time_point(
-        std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+    const auto currentTimePointMs = system_clock::time_point(
+        milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 
     nx::vms::api::BackupPosition result;
     result.positionHighMs = currentTimePointMs;
@@ -80,7 +86,6 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
     const auto lightAccentColor = colorTheme()->color("light10");
     setPaletteColor(ui->backupNotConfiguredStatusLabel, QPalette::WindowText, lightAccentColor);
     setPaletteColor(ui->backupCamerasCountLabel, QPalette::WindowText, lightAccentColor);
-    setPaletteColor(ui->backupQueueValueLabel, QPalette::WindowText, lightAccentColor);
     setWarningStyle(ui->storageIssueLabel);
 
     ui->refreshStatusButton1->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
@@ -222,33 +227,32 @@ void BackupStatusWidget::updateBackupStatus()
 
     const auto mutex = std::make_shared<nx::Mutex>();
     const auto backupPositionRequestHandles = std::make_shared<std::set<rest::Handle>>();
-    const auto queueSize = std::make_shared<nx::vms::client::desktop::BackupQueueSize>();
 
-    const auto actualPositionCallback =
-        [this, mutex, server = m_server, backupPositionRequestHandles, queueSize]
+    const auto currentTimePoint = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    const auto backupTimePoint = std::make_shared<milliseconds>(currentTimePoint);
+
+    const auto actualPositionCallback = nx::utils::guarded(this,
+        [this, mutex, server = m_server, backupPositionRequestHandles,
+            currentTimePoint, backupTimePoint]
         (bool success, rest::Handle requestId, nx::vms::api::BackupPositionEx actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
             if (auto count = backupPositionRequestHandles->erase(requestId); count > 0 && success)
             {
-                const auto deviceBackupQueueDuration =
-                    std::chrono::duration_cast<std::chrono::seconds>(std::max(
-                        actualPosition.toBackupHighMs,
-                        actualPosition.toBackupLowMs));
-
-                queueSize->duration = std::max(queueSize->duration, deviceBackupQueueDuration);
+                const auto deviceBackupTimePoint = currentTimePoint -
+                    std::max(actualPosition.toBackupHighMs, actualPosition.toBackupLowMs);
+                *backupTimePoint = std::min(*backupTimePoint, deviceBackupTimePoint);
 
                 if (backupPositionRequestHandles->empty())
                 {
-                    QMetaObject::invokeMethod(
-                        this,
-                        "onBackupQueueSizeCalculated",
-                        Qt::QueuedConnection,
-                        Q_ARG(QnMediaServerResourcePtr, server),
-                        Q_ARG(nx::vms::client::desktop::BackupQueueSize, *queueSize));
+                    executeLater(
+                        [this, server, timePoint = *backupTimePoint]
+                        {
+                            onBackupTimePointCalculated(server, timePoint);
+                        }, this);
                 }
             }
-        };
+        });
 
     m_interruptBackupQueueSizeCalculation = false;
     for (const auto& camera: cameras)
@@ -261,15 +265,23 @@ void BackupStatusWidget::updateBackupStatus()
     }
 }
 
-void BackupStatusWidget::onBackupQueueSizeCalculated(
+void BackupStatusWidget::onBackupTimePointCalculated(
     const QnMediaServerResourcePtr server,
-    const nx::vms::client::desktop::BackupQueueSize queueSize)
+    const milliseconds backupTimePoint)
 {
+    namespace html = nx::vms::common::html;
+    namespace time = nx::vms::time;
+
+    // Maximum backup position lag at which the presence of non-backed up data won't be reported.
+    static constexpr auto kAllBackedUpThreshold = 30s;
+
     if (server != m_server || m_interruptBackupQueueSizeCalculation)
         return;
 
+    const auto currentTimePoint = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+
     ui->stackedWidget->setCurrentWidget(ui->backupConfiguredPage);
-    if (queueSize.isEmpty())
+    if (currentTimePoint - backupTimePoint < kAllBackedUpThreshold)
     {
         ui->descriptionStackedWidget->setCurrentWidget(ui->allBackedUpPage);
         ui->skipQueueWidget->setHidden(true);
@@ -280,7 +292,23 @@ void BackupStatusWidget::onBackupQueueSizeCalculated(
         ui->skipQueueWidget->setHidden(false);
     }
 
-    ui->backupQueueValueLabel->setText(queueSize.toString());
+    const auto backupTimePointLabelText =
+        tr("Footage from these cameras is backed up through to %1 %2",
+            "%1 and %2 will be replaced respectively by the date and time in the system format.");
+
+    const auto formatDateTime =
+        [](const QString& text)
+        {
+            static const auto lightAccentColor = colorTheme()->color("light10");
+            auto result = html::colored(text, lightAccentColor);
+            result.prepend(QChar::Nbsp); //< Extra spacing for better visual perception;
+            return result;
+        };
+
+    const auto backupDateTimePoint = QDateTime::fromMSecsSinceEpoch(backupTimePoint.count());
+    ui->backupTimePointLabel->setText(backupTimePointLabelText
+        .arg(formatDateTime(time::toString(backupDateTimePoint.date())))
+        .arg(formatDateTime(time::toString(backupDateTimePoint.time()))));
 }
 
 void BackupStatusWidget::showEvent(QShowEvent* event)
