@@ -326,9 +326,12 @@ GlobalPermissions QnUserResource::getRawPermissions() const
 
 void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 {
+    const auto oldPredefinedRole = userRole();
     const auto oldValue = m_permissions.exchange(permissions);
     if (oldValue != permissions)
         emit permissionsChanged(::toSharedPointer(this));
+    if (oldPredefinedRole != userRole())
+        emit userRolesChanged(::toSharedPointer(this), userRoleIds());
 }
 
 void QnUserResource::setPasswordHashes(const PasswordHashes& hashes)
