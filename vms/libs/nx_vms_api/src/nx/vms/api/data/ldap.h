@@ -14,7 +14,6 @@ namespace nx::vms::api {
 
 using namespace std::chrono_literals;
 
-NX_VMS_API extern const QString kDefaultLdapSearchFilter;
 NX_VMS_API extern const QString kDefaultLdapLoginAttribute;
 NX_VMS_API extern const QString kDefaultLdapGroupObjectClass;
 NX_VMS_API extern const QString kDefaultLdapMemberAttribute;
@@ -34,7 +33,7 @@ struct NX_VMS_API LdapSettings
     QString searchBase;
 
     /**%apidoc[opt] LDAP User search filter. */
-    QString searchFilter = kDefaultLdapSearchFilter;
+    QString searchFilter;
 
     /**%apidoc[opt]
      * LDAP User login attribute.
