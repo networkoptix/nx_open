@@ -740,8 +740,12 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
                     if (auto server = resource.dynamicCast<QnMediaServerResource>();
                         server && !server->hasFlags(Qn::fake_server))
                     {
-                        d->servers << Unit::Private::createServerUnit(server);
+                        auto unit = Unit::Private::createServerUnit(server);
+                        d->servers << unit;
                         addedServers << server->getId();
+
+                        auto notify = [this, unit]{ emit itemsChanged({unit}); };
+                        connect(server.get(), &QnResource::statusChanged, this, notify);
                     }
                 }
             }
@@ -775,6 +779,7 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
                         if (it == d->servers.end())
                             continue;
 
+                        server->disconnect(this);
                         d->servers.erase(it);
                         removed = true;
                     }

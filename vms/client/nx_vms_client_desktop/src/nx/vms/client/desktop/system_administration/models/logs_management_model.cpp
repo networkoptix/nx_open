@@ -57,6 +57,14 @@ QColor logLevelColor(LogsManagementUnitPtr unit)
         : colorTheme()->color(kWarningLogLevelColor);
 }
 
+bool isOnline(LogsManagementUnitPtr unit)
+{
+    if (auto server = unit->server())
+        return server->isOnline();
+
+    return true; //< The unit is a client.
+}
+
 } // namespace
 
 LogsManagementModel::LogsManagementModel(QObject* parent, LogsManagementWatcher* watcher):
@@ -69,6 +77,10 @@ LogsManagementModel::LogsManagementModel(QObject* parent, LogsManagementWatcher*
     connect(
         m_watcher, &LogsManagementWatcher::itemListChanged,
         this, &LogsManagementModel::onItemsListChanged);
+
+    connect(
+        m_watcher, &LogsManagementWatcher::itemsChanged,
+        this, &LogsManagementModel::onItemsChanged);
 
     m_items = watcher->items();
 }
@@ -116,12 +128,18 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(unit))
         return {};
 
-    if (role == IpAddressRole)
+    switch (role)
     {
-        if (auto server = unit->server())
-            return QnResourceDisplayInfo(server).host();
+        case IpAddressRole:
+        {
+            if (auto server = unit->server())
+                return QnResourceDisplayInfo(server).host();
 
-        return {};
+            return {};
+        }
+
+        case EnabledRole:
+            return isOnline(unit);
     }
 
     switch (index.column())
@@ -144,7 +162,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
             switch (role)
             {
                 case Qt::DisplayRole:
-                    return logLevelName(logLevel(unit));
+                    return isOnline(unit) ? logLevelName(logLevel(unit)) : "";
 
                 case Qt::ForegroundRole:
                     return logLevelColor(unit);
@@ -189,6 +207,11 @@ bool LogsManagementModel::setData(const QModelIndex& index, const QVariant& valu
     auto item = m_items.value(index.row());
     auto state = static_cast<Qt::CheckState>(value.toInt());
 
+    // Offline servers can't be checked, but it should be possible to uncheck a server that went
+    // offline after it was checked by user.
+    if (!isOnline(item))
+        state = Qt::Unchecked;
+
     m_watcher->setItemIsChecked(item, state == Qt::Checked);
     return true;
 }
@@ -218,6 +241,32 @@ void LogsManagementModel::onItemsListChanged()
     beginResetModel();
     m_items = m_watcher->items();
     endResetModel();
+}
+
+void LogsManagementModel::onItemsChanged(QList<LogsManagementUnitPtr> items)
+{
+    QList<QnUuid> ids;
+    for (const auto& item: items)
+    {
+        ids << item->id();
+    }
+
+    int first = -1, last = -1;
+    for (int i = 0; i < m_items.size(); ++i)
+    {
+        if (ids.contains(m_items[i]->id()))
+        {
+            if (first < 0)
+                first = i;
+            last = i;
+        }
+    }
+
+    if (first >= 0)
+    {
+        // Redraw items.
+        emit dataChanged(index(first, 0), index(last, ColumnCount - 1));
+    }
 }
 
 } // namespace nx::vms::client::desktop
