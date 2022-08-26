@@ -186,18 +186,11 @@ bool LogsManagementModel::setData(const QModelIndex& index, const QVariant& valu
     if (!m_watcher)
         return false;
 
-    const auto state = static_cast<Qt::CheckState>(value.toInt());
-    m_watcher->setItemIsChecked(m_items.value(index.row()), state == Qt::Checked);
+    auto item = m_items.value(index.row());
+    auto state = static_cast<Qt::CheckState>(value.toInt());
 
+    m_watcher->setItemIsChecked(item, state == Qt::Checked);
     return true;
-}
-
-Qt::ItemFlags LogsManagementModel::flags(const QModelIndex& index) const
-{
-    if (index.column() == CheckBoxColumn)
-        return {Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled};
-
-    return base_type::flags(index);
 }
 
 QList<nx::utils::log::Level> LogsManagementModel::logLevels()
