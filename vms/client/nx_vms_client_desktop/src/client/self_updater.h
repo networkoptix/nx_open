@@ -43,7 +43,7 @@ private:
         registerUriHandler,
         updateApplauncher,
         updateMinilauncher,
-        updateQuickStartGuide
+        updateHelpFile,
     };
 
     enum class Result
@@ -59,10 +59,18 @@ private:
         bool upgrade = false;
     };
 
+    struct HelpFileDescription
+    {
+        QString fileName;
+        QString shortcutName;
+        QString helpName;
+        QString componentDataDirName;
+    };
+
     UriHandlerUpdateResult registerUriHandler();
     bool updateApplauncher();
     bool updateMinilauncherOnWindows(bool hasAdminRights);
-    bool updateQuickStartGuide();
+    bool updateHelpFile(const HelpFileDescription& helpDescription);
 
     nx::utils::SoftwareVersion getVersionFromFile(const QString& filename) const;
     bool saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const;

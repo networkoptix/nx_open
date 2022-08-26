@@ -72,6 +72,8 @@ nx_libraries = [
 
 
 def create_client_update_file(config, output_file):
+    customization_mobile_client_enabled = config['customization_mobile_client_enabled']
+
     # Directory, where icu libraries reside:
     icu_lib_directory = os.path.join(config['icu_directory'], 'bin')
 
@@ -85,6 +87,8 @@ def create_client_update_file(config, output_file):
     client_update_files_directory = config['client_update_files_directory']
     locale_resources_directory = os.path.join(qt_directory, 'resources')
     webengine_locales_directory = os.path.join(qt_directory, 'translations', 'qtwebengine_locales')
+    mobile_help_source_file_path = config['mobile_help_source_file_path']
+    mobile_help_destination_file_name = config['mobile_help_destination_file_name']
     quick_start_guide_source_file_path = config['quick_start_guide_source_file_path']
     quick_start_guide_destination_file_name = config['quick_start_guide_destination_file_name']
     asan_library_name = config['asan_library_name']
@@ -101,6 +105,10 @@ def create_client_update_file(config, output_file):
         tools.zip_files_to(zip, tools.icu_files(icu_lib_directory), icu_lib_directory)
         tools.zip_files_to(zip, tools.find_all_files(locale_resources_directory), qt_directory)
         tools.zip_files_to(zip, tools.find_all_files(webengine_locales_directory), qt_directory)
+
+        if customization_mobile_client_enabled:
+            zip.write(mobile_help_source_file_path, mobile_help_destination_file_name)
+
         zip.write(quick_start_guide_source_file_path, quick_start_guide_destination_file_name)
 
         qt_bin_dir = os.path.join(qt_directory, 'bin')
