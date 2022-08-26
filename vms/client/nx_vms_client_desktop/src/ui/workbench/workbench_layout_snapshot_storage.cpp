@@ -4,32 +4,31 @@
 
 #include <core/resource/layout_resource.h>
 
-QnWorkbenchLayoutSnapshotStorage::QnWorkbenchLayoutSnapshotStorage(QObject *parent):
-    QObject(parent)
-{}
-
-QnWorkbenchLayoutSnapshotStorage::~QnWorkbenchLayoutSnapshotStorage() {
-    return;
+bool QnWorkbenchLayoutSnapshotStorage::hasSnapshot(const QnLayoutResourcePtr& layout) const
+{
+    return m_snapshotByLayout.contains(layout);
 }
 
-const QnWorkbenchLayoutSnapshot &QnWorkbenchLayoutSnapshotStorage::snapshot(const QnLayoutResourcePtr &resource) const {
-    QHash<QnLayoutResourcePtr, QnWorkbenchLayoutSnapshot>::const_iterator pos = m_snapshotByLayout.find(resource);
-    if(pos == m_snapshotByLayout.end()) {
-        NX_ASSERT(false, "No saved snapshot exists for layout '%1'.", resource ? resource->getName() : QLatin1String("null"));
-        return m_emptyState;
-    }
+QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotStorage::snapshot(
+    const QnLayoutResourcePtr& layout) const
+{
+    if (!NX_ASSERT(layout, "An attempt to get snapshot for null layout"))
+        return {};
 
-    return *pos;
+    NX_ASSERT(hasSnapshot(layout), "No saved snapshot exists for layout '%1'", layout->getName());
+
+    return m_snapshotByLayout.value(layout, QnWorkbenchLayoutSnapshot());
 }
 
-void QnWorkbenchLayoutSnapshotStorage::store(const QnLayoutResourcePtr &resource) {
-    m_snapshotByLayout[resource] = QnWorkbenchLayoutSnapshot(resource);
+void QnWorkbenchLayoutSnapshotStorage::storeSnapshot(const QnLayoutResourcePtr& layout)
+{
+    if (!NX_ASSERT(layout, "An attempt to store snapshot for null layout"))
+        return;
+
+    m_snapshotByLayout.insert(layout, QnWorkbenchLayoutSnapshot(layout));
 }
 
-void QnWorkbenchLayoutSnapshotStorage::remove(const QnLayoutResourcePtr &resource) {
-    m_snapshotByLayout.remove(resource);
-}
-
-void QnWorkbenchLayoutSnapshotStorage::clear() {
-    m_snapshotByLayout.clear();
+void QnWorkbenchLayoutSnapshotStorage::removeSnapshot(const QnLayoutResourcePtr& layout)
+{
+    m_snapshotByLayout.remove(layout);
 }

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/abstract_save_state_manager.h>
@@ -35,6 +37,7 @@ public:
     typedef std::function<void(bool, const QnLayoutResourcePtr &)>  SaveLayoutResultFunction;
     bool save(const QnLayoutResourcePtr &resource, SaveLayoutResultFunction callback = SaveLayoutResultFunction());
 
+    bool hasSnapshot(const QnLayoutResourcePtr& layout) const;
     QnWorkbenchLayoutSnapshot snapshot(const QnLayoutResourcePtr &layout) const;
 
     void store(const QnLayoutResourcePtr &resource);
@@ -64,5 +67,5 @@ private:
     friend class QnWorkbenchLayoutReplyProcessor;
 
     /** Layout state storage that this object manages. */
-    QnWorkbenchLayoutSnapshotStorage *m_storage;
+    std::unique_ptr<QnWorkbenchLayoutSnapshotStorage> m_storage;
 };

@@ -192,13 +192,19 @@ QnWorkbench::~QnWorkbench() {
 
 void QnWorkbench::clear()
 {
-    QnLayoutResourceList resources;
     for (const auto layout: qAsConst(m_layouts))
     {
-        if (layout->data(Qn::IsSpecialLayoutRole).isValid() && layout->data(Qn::IsSpecialLayoutRole).toBool())
+        if (layout->data(Qn::IsSpecialLayoutRole).isValid()
+            && layout->data(Qn::IsSpecialLayoutRole).toBool())
+        {
             continue;
+        }
 
-        snapshotManager()->restore(layout->resource());
+        if (const auto layoutResource = layout->resource())
+        {
+            if (snapshotManager()->hasSnapshot(layoutResource))
+                snapshotManager()->restore(layoutResource);
+        }
     }
 
     setCurrentLayout(nullptr);

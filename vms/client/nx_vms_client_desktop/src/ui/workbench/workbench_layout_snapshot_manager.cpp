@@ -31,7 +31,7 @@
 QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):
     base_type(parent),
     QnCommonModuleAware(parent),
-    m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
+    m_storage(new QnWorkbenchLayoutSnapshotStorage())
 {
     /* Start listening to changes. */
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
@@ -145,12 +145,14 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     return success;
 }
 
+bool QnWorkbenchLayoutSnapshotManager::hasSnapshot(const QnLayoutResourcePtr& layout) const
+{
+    return m_storage->hasSnapshot(layout);
+}
+
 QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(
     const QnLayoutResourcePtr& layout) const
 {
-    NX_ASSERT(layout);
-    if (!layout)
-        return QnWorkbenchLayoutSnapshot();
     return m_storage->snapshot(layout);
 }
 
@@ -162,7 +164,7 @@ void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource
     /* We don't want to get queued layout change signals that are not yet delivered,
      * so there are no options but to disconnect. */
     disconnectFrom(resource);
-    m_storage->store(resource);
+    m_storage->storeSnapshot(resource);
     connectTo(resource);
     markChanged(resource->getId(), false);
 }
@@ -176,7 +178,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
      * so there are no options but to disconnect before making them. */
     disconnectFrom(resource);
     {
-        const QnWorkbenchLayoutSnapshot &snapshot = m_storage->snapshot(resource);
+        const auto snapshot = m_storage->snapshot(resource);
 
         // Cleanup from snapshot resources which are already deleted from the resource pool.
         QnLayoutItemDataMap existingItems;
@@ -257,7 +259,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
         return;
 
     /* Consider it saved by default. */
-    m_storage->store(layoutResource);
+    m_storage->storeSnapshot(layoutResource);
 
     clean(layoutResource->getId()); //< Not changed, not being saved.
 
@@ -269,7 +271,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
 {
     if (const auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        m_storage->remove(layout);
+        m_storage->removeSnapshot(layout);
         clean(layout->getId());
         disconnectFrom(layout);
     }
