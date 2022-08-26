@@ -39,6 +39,7 @@ static constexpr int kUpdateLockTimeoutMs = 1000;
 static const QString kApplauncher = "applauncher";
 static const QString kApplauncherBackup = "applauncher-backup";
 static const QString kQuickStartGuide = "quick_start_guide";
+static const QString kMobileHelp = "mobile_help";
 static const QString kDesktopFileName = nx::branding::installerName() + ".desktop";
 
 QDir applicationRootDir(const QDir& binDir)
@@ -62,16 +63,15 @@ QString componentDataDir(const QString& component)
         nx::branding::customization()));
 }
 
-QString quickStartGuideFilePath()
+QString helpFilePath(const QString& fileName)
 {
-    const auto guideFileName = nx::branding::quickStartGuideFileName();
     const auto appDirPath = QDir(qApp->applicationDirPath());
 
     QStringList searchPathSuffixes{ "", "../", "../Resources/" };
 
     for(auto searchPathSuffix: searchPathSuffixes)
     {
-        QString sourceFile = appDirPath.absoluteFilePath(searchPathSuffix + guideFileName);
+        QString sourceFile = appDirPath.absoluteFilePath(searchPathSuffix + fileName);
 
         if (QFileInfo(sourceFile).exists())
             return sourceFile;
@@ -80,7 +80,7 @@ QString quickStartGuideFilePath()
     return QString();
 }
 
-bool hasQuickStartGuideFromInstaller()
+bool hasHelpFilesFromInstaller()
 {
     return build_info::isWindows();
 }
@@ -103,7 +103,8 @@ bool runMinilaucherInternal(const QStringList& args)
 
     if (!QFileInfo::exists(minilauncherPath))
     {
-        NX_ERROR(typeid(SelfUpdater), nx::format("Can not start Minilauncher: file %1 does not exist.").arg(minilauncherPath));
+        NX_ERROR(typeid(SelfUpdater), "Can not start Minilauncher: file %1 does not exist.",
+            minilauncherPath);
         return false;
     }
     else if (QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
@@ -113,7 +114,8 @@ bool runMinilaucherInternal(const QStringList& args)
         return true;
     }
 
-    NX_ERROR(typeid(SelfUpdater), lit("Minilauncher process could not be started %1.").arg(minilauncherPath));
+    NX_ERROR(typeid(SelfUpdater), "Minilauncher process could not be started %1.",
+        minilauncherPath);
     return false;
 }
 
@@ -164,21 +166,45 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
         updateApplauncher();
 
-        bool updateQuickStartGuideNeeded = hasQuickStartGuideFromInstaller()
+        bool updateHelpFilesNeeded = hasHelpFilesFromInstaller()
             ? uriHandlerUpdateResult.upgrade : true;
 
-        if (updateQuickStartGuideNeeded)
+        if (updateHelpFilesNeeded)
         {
-            bool result = updateQuickStartGuide();
+            std::vector<HelpFileDescription> helpFileDescriptions{
+                {
+                    .fileName = nx::branding::quickStartGuideFileName(),
+                    .shortcutName = nx::branding::quickStartGuideShortcutName(),
+                    .helpName = nx::branding::quickStartGuideDocumentName(),
+                    .componentDataDirName = kQuickStartGuide
+                },
+            };
 
-            if (!result)
+            if (!nx::branding::isMobileClientEnabledInCustomization())
             {
-                NX_WARNING(this,
-                    "Unable to update Quick Start Guide "
-                        "(possibly because of insufficient permissions).");
+                helpFileDescriptions.push_back(
+                    {
+                        .fileName = nx::branding::mobileHelpFileName(),
+                        .shortcutName = nx::branding::mobileHelpShortcutName(),
+                        .helpName = nx::branding::mobileHelpDocumentName(),
+                        .componentDataDirName = kMobileHelp
+                    }
+                );
+            }
 
-                if (!hasAdminRights)
-                    possiblyFixableWithAdminRightsErrorOccurred = true;
+            for (const auto& helpFileDescription: helpFileDescriptions)
+            {
+                bool result = updateHelpFile(helpFileDescription);
+
+                if (!result)
+                {
+                    NX_WARNING(this,
+                        "Unable to update %1 (possibly because of insufficient permissions).",
+                        helpFileDescription.helpName);
+
+                    if (!hasAdminRights)
+                        possiblyFixableWithAdminRightsErrorOccurred = true;
+                }
             }
         }
     }
@@ -246,10 +272,8 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
             auto result = copy(src, dst, OverwriteExisting);
             if (!result)
             {
-                NX_ERROR(typeid(SelfUpdater), lit("Cannot copy %1 to %2. Code: %3")
-                    .arg(src)
-                    .arg(dst)
-                    .arg(result.code));
+                NX_ERROR(typeid(SelfUpdater), "Cannot copy %1 to %2. Code: %3", src, dst,
+                    result.code);
                 return false;
             }
             return true;
@@ -312,8 +336,8 @@ void SelfUpdater::updateApplauncher()
         QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     if (!ensureDir(companyDataDir))
     {
-        NX_ERROR(this, lit("Cannot create a folder for application data: %1")
-            .arg(companyDataDir.absolutePath()));
+        NX_ERROR(this, "Cannot create a folder for application data: %1",
+            companyDataDir.absolutePath());
         return;
     }
 
@@ -327,7 +351,7 @@ void SelfUpdater::updateApplauncher()
     QLockFile applauncherLock(lockFilePath);
     if (!applauncherLock.tryLock(kUpdateLockTimeoutMs))
     {
-        NX_ERROR(this, lit("Lock file is not available: %1").arg(lockFilePath));
+        NX_ERROR(this, "Lock file is not available: %1", lockFilePath);
         return;
     }
 
@@ -340,14 +364,14 @@ void SelfUpdater::updateApplauncher()
 
         if (backupDir.exists())
         {
-            NX_INFO(this, lit("Removing the outdated backup %1").arg(backupDir.absolutePath()));
+            NX_INFO(this, "Removing the outdated backup %1", backupDir.absolutePath());
             QDir(backupDir).removeRecursively();
         }
 
         return;
     }
 
-    NX_INFO(this, lit("Updating applauncher from %1").arg(applauncherVersion.toString()));
+    NX_INFO(this, "Updating applauncher from %1", applauncherVersion.toString());
 
     // Ensure applauncher will be started even if update failed.
     auto runApplauncherGuard = nx::utils::makeScopeGuard(
@@ -385,14 +409,14 @@ void SelfUpdater::updateApplauncher()
 
     if (backupDir.exists())
     {
-        NX_INFO(this, lit("Using the existing backup %1").arg(backupDir.absolutePath()));
+        NX_INFO(this, "Using the existing backup %1", backupDir.absolutePath());
         QDir(targetDir).removeRecursively();
     }
     else if (targetDir.exists())
     {
         if (!QDir().rename(targetDir.absolutePath(), backupDir.absolutePath()))
         {
-            NX_ERROR(this, lit("Could not backup applauncher to %1").arg(backupDir.absolutePath()));
+            NX_ERROR(this, "Could not backup applauncher to %1", backupDir.absolutePath());
             // Continue without backup
         }
     }
@@ -406,15 +430,15 @@ void SelfUpdater::updateApplauncher()
                 QDir(targetDir).removeRecursively();
                 if (!QDir().rename(backupDir.absolutePath(), targetDir.absolutePath()))
                 {
-                    NX_ERROR(this, lit("Could not restore applauncher from %1!")
-                            .arg(backupDir.absolutePath()));
+                    NX_ERROR(this, "Could not restore applauncher from %1!",
+                        backupDir.absolutePath());
                 }
             });
     }
 
     if (!ensureDir(targetDir))
     {
-        NX_ERROR(this, lit("Cannot create a folder for applauncher: %1").arg(targetDir.absolutePath()));
+        NX_ERROR(this, "Cannot create a folder for applauncher: %1", targetDir.absolutePath());
         return;
     }
 
@@ -436,15 +460,15 @@ void SelfUpdater::updateApplauncher()
 
     if (!updateApplauncherDesktopIcon())
     {
-        NX_ERROR(this, lit("Failed to update desktop icon."));
+        NX_ERROR(this, "Failed to update desktop icon.");
         return;
     }
 
     /* Finally, is case of success, save version to file. */
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
-        NX_ERROR(this, lit("Version could not be written to file: %1.").arg(versionFile));
-        NX_ERROR(this, lit("Failed to update Applauncher."));
+        NX_ERROR(this, "Version could not be written to file: %1.", versionFile);
+        NX_ERROR(this, "Failed to update Applauncher.");
         return;
     }
 
@@ -453,33 +477,32 @@ void SelfUpdater::updateApplauncher()
     NX_INFO(this, lit("Applauncher updated successfully."));
 }
 
-bool SelfUpdater::updateQuickStartGuide()
+bool SelfUpdater::updateHelpFile(const HelpFileDescription& helpDescription)
 {
     using namespace nx::utils;
     using namespace nx::utils::file_system;
 
-    NX_DEBUG(typeid(SelfUpdater), "Updating Quick Start Guide...");
+    NX_DEBUG(typeid(SelfUpdater), "Updating %1...", helpDescription.helpName);
 
-    const auto guideFileName = nx::branding::quickStartGuideFileName();
-
-    QString sourceFile = quickStartGuideFilePath();
+    QString sourceFile = helpFilePath(helpDescription.fileName);
     if (sourceFile.isNull())
     {
-        NX_WARNING(this, "No Quick Start Guide file detected.");
+        NX_WARNING(this, "No %1 file detected.", helpDescription.helpName);
         return true; //< We can't fix it, thus just ignore.
     }
 
-    const QDir targetDir = hasQuickStartGuideFromInstaller()
-        ? nx::branding::installationRoot() : componentDataDir(kQuickStartGuide);
+    const QDir targetDir = hasHelpFilesFromInstaller()
+        ? nx::branding::installationRoot()
+        : componentDataDir(helpDescription.componentDataDirName);
     ensureDir(targetDir);
-    const auto targetFile = targetDir.absoluteFilePath(guideFileName);
+    const auto targetFile = targetDir.absoluteFilePath(helpDescription.fileName);
 
-    bool guideAlreadyCopied = QFileInfo::exists(targetFile);
+    bool helpAlreadyCopied = QFileInfo::exists(targetFile);
     // Create shortcut only on the first quick start guide document copying.
     bool shouldCreateDesktopShortcut = false;
     bool shouldCreateApplicationsShortcut = false;
 
-    if (!guideAlreadyCopied)
+    if (!helpAlreadyCopied)
     {
         file_system::Result copied = copy(sourceFile, targetFile, OverwriteExisting);
 
@@ -506,38 +529,39 @@ bool SelfUpdater::updateQuickStartGuide()
     }
     else
     {
-        NX_DEBUG(typeid(SelfUpdater),
-            "Quick Start Guide document already present on path %1.", targetFile);
+        NX_DEBUG(typeid(SelfUpdater), "%1 document already present on path %2.",
+            helpDescription.helpName, targetFile);
     }
 
-    auto createShortcutInDir = [&targetFile](const QString& destinationDir)
-    {
-        bool success = qnPlatform->shortcuts()->createShortcut(
-            targetFile,
-            destinationDir,
-            nx::branding::quickStartGuideShortcutName());
-
-        if (!success)
+    auto createShortcutInDir =
+        [&targetFile, &helpDescription](const QString& destinationDir)
         {
-            NX_ERROR(typeid(SelfUpdater), "Cannot create shortcut %1 in dir %2 to %3.",
-                nx::branding::quickStartGuideShortcutName(),
+            bool success = qnPlatform->shortcuts()->createShortcut(
+                targetFile,
+                destinationDir,
+                helpDescription.shortcutName);
+
+            if (!success)
+            {
+                NX_ERROR(typeid(SelfUpdater), "Cannot create shortcut %1 in dir %2 to %3.",
+                    helpDescription.shortcutName,
+                    destinationDir,
+                    targetFile);
+
+                return false;
+            }
+
+            NX_DEBUG(typeid(SelfUpdater), "Shortcut %1 in dir %2 to %3 created successfully.",
+                helpDescription.shortcutName,
                 destinationDir,
                 targetFile);
 
-            return false;
-        }
-
-        NX_DEBUG(typeid(SelfUpdater), "Shortcut %1 in dir %2 to %3 created successfully.",
-            nx::branding::quickStartGuideShortcutName(),
-            destinationDir,
-            targetFile);
-
-        return true;
-    };
+            return true;
+        };
 
     if (shouldCreateDesktopShortcut)
     {
-        QString desktopPath = hasQuickStartGuideFromInstaller()
+        QString desktopPath = hasHelpFilesFromInstaller()
             ? desktopForAllUsersPathOnWindows()
             : QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 
@@ -547,7 +571,7 @@ bool SelfUpdater::updateQuickStartGuide()
 
     if (shouldCreateApplicationsShortcut)
     {
-        QString applicationsPath = hasQuickStartGuideFromInstaller()
+        QString applicationsPath = hasHelpFilesFromInstaller()
             ? applicationsForAllUsersPathOnWindows()
             : QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
 
@@ -561,7 +585,8 @@ bool SelfUpdater::updateQuickStartGuide()
 bool SelfUpdater::updateMinilauncherOnWindows(bool hasAdminRights)
 {
     /* Do not try to update minilauncher when started from the default directory. */
-    if (qApp->applicationDirPath().startsWith(nx::branding::installationRoot(), Qt::CaseInsensitive))
+    if (qApp->applicationDirPath().startsWith(nx::branding::installationRoot(),
+        Qt::CaseInsensitive))
     {
         NX_INFO(this, lit("Minilauncher will not be updated."));
         return true;
@@ -571,8 +596,7 @@ bool SelfUpdater::updateMinilauncherOnWindows(bool hasAdminRights)
         nx::branding::minilauncherBinaryName());
     if (!QFileInfo::exists(sourceMinilauncherPath))
     {
-        NX_ERROR(this, lit("Source minilauncher could not be found at %1!")
-            .arg(sourceMinilauncherPath));
+        NX_ERROR(this, "Source minilauncher could not be found at %1!", sourceMinilauncherPath);
         // Silently exiting because we still can't do anything.
         return true;
     }
@@ -591,25 +615,26 @@ nx::utils::SoftwareVersion SelfUpdater::getVersionFromFile(const QString& filena
     QFile versionFile(filename);
     if (!versionFile.exists())
     {
-        NX_ERROR(this, lit("Version file does not exist: %1").arg(filename));
+        NX_ERROR(this, "Version file does not exist: %1", filename);
         return nx::utils::SoftwareVersion();
     }
 
     if (!versionFile.open(QIODevice::ReadOnly))
     {
-        NX_ERROR(this, lit("Version file could not be open for reading: %1").arg(filename));
+        NX_ERROR(this, "Version file could not be open for reading: %1", filename);
         return nx::utils::SoftwareVersion();
     }
 
     return nx::utils::SoftwareVersion(versionFile.readLine());
 }
 
-bool SelfUpdater::saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const
+bool SelfUpdater::saveVersionToFile(const QString& filename,
+    const nx::utils::SoftwareVersion& version) const
 {
     QFile versionFile(filename);
     if (!versionFile.open(QIODevice::WriteOnly))
     {
-        NX_ERROR(this, lit("Version file could not be open for writing: %1").arg(filename));
+        NX_ERROR(this, "Version file could not be open for writing: %1", filename);
         return false;
     }
 
@@ -684,16 +709,14 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
             installRoot.absoluteFilePath(nx::branding::minilauncherBinaryName());
         if (!QFileInfo::exists(sourceApplauncherPath))
         {
-            NX_ERROR(this, lit("Source applauncher could not be found at %1!")
-               .arg(sourceApplauncherPath));
+            NX_ERROR(this, "Source applauncher could not be found at %1!", sourceApplauncherPath);
             return false;
         }
 
         if (!QFile(sourceApplauncherPath).copy(applauncherPath))
         {
-            NX_ERROR(this, lit("Could not copy applauncher from %1 to %2")
-                   .arg(sourceApplauncherPath)
-                   .arg(applauncherPath));
+            NX_ERROR(this, "Could not copy applauncher from %1 to %2", sourceApplauncherPath,
+                applauncherPath);
             return false;
         }
         NX_INFO(this, lit("Applauncher renamed successfully"));
@@ -711,23 +734,22 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
     {
         if (QFileInfo::exists(minilauncherBackupPath) && !QFile(minilauncherBackupPath).remove())
         {
-            NX_ERROR(this, lit("Could not clean minilauncher backup %1")
-               .arg(minilauncherBackupPath));
+            NX_ERROR(this, "Could not clean minilauncher backup %1", minilauncherBackupPath);
             return false;
         }
 
         if (!QFile(minilauncherPath).rename(minilauncherBackupPath))
         {
-            NX_ERROR(this, lit("Could not backup minilauncher from %1 to %2")
-                .arg(minilauncherPath, minilauncherBackupPath));
+            NX_ERROR(this, "Could not backup minilauncher from %1 to %2", minilauncherPath,
+                minilauncherBackupPath);
             return false;
         }
     }
 
     if (!QFile(sourceMinilauncherPath).copy(minilauncherPath))
     {
-        NX_ERROR(this, lit("Could not copy minilauncher from %1 to %2")
-            .arg(sourceMinilauncherPath, minilauncherPath));
+        NX_ERROR(this, "Could not copy minilauncher from %1 to %2", sourceMinilauncherPath,
+            minilauncherPath);
 
         /* Silently trying to restore backup. */
         if (QFileInfo::exists(minilauncherBackupPath))
@@ -740,7 +762,7 @@ bool SelfUpdater::updateMinilauncherOnWindowsInDir(const QDir& installRoot,
     const auto versionFile = installRoot.absoluteFilePath(nx::branding::launcherVersionFile());
     if (!saveVersionToFile(versionFile, m_clientVersion))
     {
-        NX_ERROR(this, lit("Version could not be written to file: %1.").arg(versionFile));
+        NX_ERROR(this, "Version could not be written to file: %1.", versionFile);
         return false;
     }
 

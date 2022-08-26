@@ -58,12 +58,23 @@ copyIcons()
 }
 
 # [in] STAGE_MODULE
-copyHelp()
+copyHelpFiles()
 {
-    echo "Copying help"
+    echo ""
+
+    echo "Copying Desktop Client help"
     local -r STAGE_HELP="$STAGE_MODULE/help"
     mkdir -p "$STAGE_HELP"
     cp -r "$CLIENT_HELP_PATH"/* "$STAGE_HELP/"
+
+    echo "Copying Quick Start Guide"
+    cp "$QUICK_START_GUIDE_FILE" "$STAGE_MODULE"
+
+    if [[ "${CUSTOMIZATION_MOBILE_CLIENT_ENABLED}" == "true" ]]
+    then
+        echo "Copying Mobile Help"
+        cp "$MOBILE_HELP_FILE" "$STAGE_MODULE"
+    fi
 }
 
 # [in] STAGE_BIN
@@ -138,7 +149,6 @@ copyLibs()
         nx_vms_client_core
         nx_vms_client_desktop
         nx_vms_common
-        nx_vms_json_rpc
         nx_vms_rules
         nx_vms_update
         nx_vms_utils
@@ -347,15 +357,6 @@ copyAdditionalQtFiles()
     cp -r "$QT_DIR/translations/qtwebengine_locales" "$STAGE_MODULE/translations/qtwebengine_locales"
 }
 
-# [in] STAGE_IN
-copyQuickStartGuide()
-{
-    echo ""
-    echo "Copying Quick Start Guide"
-
-    cp "$QUICK_START_GUIDE_FILE" "$STAGE_MODULE"
-}
-
 # [in] STAGE
 createDebianDir()
 {
@@ -426,7 +427,7 @@ buildDistribution()
 
     copyBins
     copyIcons
-    copyHelp
+    copyHelpFiles
     copyFonts
     copyBackgrounds
     copyResources
@@ -436,7 +437,6 @@ buildDistribution()
     copyQml
     copyQtLibs
     copyAdditionalQtFiles
-    copyQuickStartGuide
 
     echo "Setting permissions"
     find "$STAGE" -type d -print0 |xargs -0 chmod 755
