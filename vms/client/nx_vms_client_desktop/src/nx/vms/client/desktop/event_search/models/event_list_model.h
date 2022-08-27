@@ -36,18 +36,25 @@ public:
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
-        QString cloudSystemId; //< The field is filled in only for events received from cloud.
         std::chrono::milliseconds lifetime{0};
         int helpId = -1;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
+        std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
+        QnUuid ruleId;
+
+        // Resource data.
+        QString cloudSystemId; //< The field is filled in only for events received from cloud.
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
         QnResourcePtr source;
-        std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
+        QString sourceName;
+
+        // Client action data.
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
         CommandActionPtr extraAction;
-        QVariant extraData;
+
+        // Analytics data.
         QnUuid objectTrackId;
         nx::common::metadata::GroupedAttributes attributes;
     };
@@ -72,6 +79,7 @@ protected:
 
     bool addEvent(const EventData& event, Position where = Position::front);
     bool updateEvent(const EventData& event);
+    bool updateEvent(QnUuid id);
     bool removeEvent(const QnUuid& id);
 
     virtual bool defaultAction(const QModelIndex& index) override;

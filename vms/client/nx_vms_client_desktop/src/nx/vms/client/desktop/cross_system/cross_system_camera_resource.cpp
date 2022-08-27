@@ -115,6 +115,8 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
         if (data.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
             addFlags(Qn::virtual_camera);
 
+        removeFlags(Qn::fake);
+
         setTypeId(data.typeId);
         setModel(data.model);
         setVendor(data.vendor);

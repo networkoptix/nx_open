@@ -30,14 +30,16 @@ public:
     int maximumCount() const;
     void setMaximumCount(int value);
 
-    using ExtraData = QPair<QnUuid /*ruleId*/, QnResourcePtr>;
-    static ExtraData extraData(const EventData& event);
-
 private:
-    void onNotificationAction(const QSharedPointer<nx::vms::rules::NotificationAction>& action,
+    void onNotificationAction(
+        const QSharedPointer<nx::vms::rules::NotificationAction>& action,
         QString cloudSystemId = {});
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
+
+    void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
+    void onCloudCrossSystemStatusChanged(const QString& systemId);
+    void updateCloudItems(const QString& systemId);
 
     void setupAcknowledgeAction(EventData& eventData, const QnUuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);
@@ -61,17 +63,17 @@ private:
         const nx::vms::rules::NotificationAction* action,
         EventData& eventData) const;
 
-    QnResourcePtr getResource(QnUuid resouceId, const QString& cloudSystemId) const;
-
     void truncateToMaximumCount();
 
 private:
     NotificationListModel* const q = nullptr;
+    int m_maximumCount = NotificationListModel::kDefaultMaximumCount;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+
     QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
     QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
     QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
-    int m_maximumCount = NotificationListModel::kDefaultMaximumCount;
+    QMultiHash<QString /*system id*/, QnUuid /*item id*/> m_itemsByCloudSystem;
 };
 
 } // namespace nx::vms::client::desktop

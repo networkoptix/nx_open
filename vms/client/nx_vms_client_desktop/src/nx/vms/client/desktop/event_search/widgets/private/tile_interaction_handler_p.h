@@ -41,7 +41,11 @@ private:
     TileInteractionHandler(QnWorkbenchContext* context, QObject* parent = nullptr);
 
     void handleClick(
-        const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
+        const QModelIndex& index,
+        Qt::MouseButton button,
+        Qt::KeyboardModifiers modifiers);
+    void handleDoubleClick(const QModelIndex& index);
+
     void navigateToSource(const QPersistentModelIndex& index, bool instantMessages);
     void openSource(const QModelIndex& index, bool inNewTab, bool fromDoubleClick);
     void performDragAndDrop(const QModelIndex& index, const QPoint& pos, const QSize& size);

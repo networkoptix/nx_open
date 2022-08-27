@@ -9,15 +9,10 @@
 #include "engine.h"
 #include "utils/event_details.h"
 #include "utils/field.h"
+#include "utils/string_helper.h"
 #include "utils/type.h"
 
 namespace nx::vms::rules {
-
-BasicEvent::BasicEvent(const nx::vms::api::rules::EventInfo& info):
-    m_type(info.eventType),
-    m_state(info.state)
-{
-}
 
 BasicEvent::BasicEvent(std::chrono::microseconds timestamp, State state):
     m_timestamp(timestamp),
@@ -27,9 +22,6 @@ BasicEvent::BasicEvent(std::chrono::microseconds timestamp, State state):
 
 QString BasicEvent::type() const
 {
-    if (!m_type.isEmpty())
-        return m_type;
-
     return utils::type(metaObject()); //< Assert?
 }
 
@@ -69,7 +61,7 @@ QString BasicEvent::cacheKey() const
     return {};
 }
 
-QVariantMap BasicEvent::details(common::SystemContext*) const
+QVariantMap BasicEvent::details(common::SystemContext* context) const
 {
     QVariantMap result;
 
@@ -78,7 +70,13 @@ QVariantMap BasicEvent::details(common::SystemContext*) const
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
 
     if (const auto source = sourceId(); !source.isNull())
+    {
         result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
+        utils::insertIfNotEmpty(
+            result,
+            utils::kSourceNameDetailName,
+            utils::StringHelper(context).resource(source));
+    }
 
     return result;
 }

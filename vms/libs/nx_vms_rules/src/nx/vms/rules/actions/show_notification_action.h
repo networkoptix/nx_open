@@ -35,6 +35,7 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
 
     // Notification look and feel fields.
+    FIELD(QString, sourceName, setSourceName)
     FIELD(nx::vms::event::Level, level, setLevel)
     FIELD(nx::vms::rules::Icon, icon, setIcon)
     FIELD(QString, customIcon, setCustomIcon)

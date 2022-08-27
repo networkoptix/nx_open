@@ -96,6 +96,18 @@ bool EventListModel::Private::updateEvent(const EventData& data)
     return true;
 }
 
+bool EventListModel::Private::updateEvent(QnUuid id)
+{
+    const auto index = m_events.index_of(id);
+    if (index < 0)
+        return false;
+
+    const auto modelIndex = q->index(index);
+    emit q->dataChanged(modelIndex, modelIndex);
+
+    return true;
+}
+
 const EventListModel::EventData& EventListModel::Private::getEvent(int index) const
 {
     if (index < 0 || index >= m_events.count())
@@ -113,11 +125,15 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
     if (!event.previewCamera)
         return {};
 
-    auto systemContext = SystemContext::fromResource(event.previewCamera);
-    auto accessController = systemContext->accessController();
-    const bool hasAccess =
-        accessController->hasPermissions(event.previewCamera, Qn::ViewContentPermission)
-        && accessController->hasGlobalPermission(GlobalPermission::viewArchive);
+    // Assuming the rights are checked before sending the notification.
+    if (event.previewCamera->hasFlags(Qn::ResourceFlag::cross_system))
+        return event.previewCamera;
+    
+    const bool hasAccess = QnWorkbenchAccessController::checkPermissions(
+        event.previewCamera,
+        Qn::ViewContentPermission,
+        GlobalPermission::viewArchive);
+
     return hasAccess ? event.previewCamera : QnVirtualCameraResourcePtr();
 }
 
@@ -126,9 +142,14 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
     return event.cameras.filtered(
         [this](const QnVirtualCameraResourcePtr& camera) -> bool
         {
-            auto systemContext = SystemContext::fromResource(camera);
-            auto accessController = systemContext->accessController();
-            return accessController->hasPermissions(camera, Qn::ViewContentPermission);
+            // Assuming the rights are checked before sending the notification.
+            if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::cross_system))
+                return true;
+
+            return QnWorkbenchAccessController::checkPermissions(
+                camera,
+                Qn::ViewContentPermission,
+                {});
         });
 }
 
