@@ -66,6 +66,7 @@ public:
     virtual QVariantMap details(common::SystemContext* context) const override
     {
         auto result = base_type::details(context);
+        result[utils::kSourceNameDetailName] = "Test resource";
         nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::calculated);
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";

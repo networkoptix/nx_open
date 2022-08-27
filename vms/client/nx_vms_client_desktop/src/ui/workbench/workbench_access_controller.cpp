@@ -128,6 +128,27 @@ bool QnWorkbenchAccessController::hasGlobalPermission(GlobalPermission requiredP
     return m_globalPermissions.testFlag(requiredPermission);
 }
 
+bool QnWorkbenchAccessController::hasGlobalPermissions(GlobalPermissions requiredPermissions) const
+{
+    return (m_globalPermissions & requiredPermissions) == requiredPermissions;
+}
+
+bool QnWorkbenchAccessController::checkPermissions(const QnResourcePtr& resource,
+    Qn::Permissions requiredPermissions,
+    GlobalPermissions requiredGlobalPermissions)
+{
+    const auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    const auto accessController = systemContext->accessController();
+    if (!NX_ASSERT(accessController))
+        return false;
+
+    return accessController->hasPermissions(resource, requiredPermissions)
+        && accessController->hasGlobalPermissions(requiredGlobalPermissions);
+}
+
 QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr& resource) const
 {
     NX_ASSERT(m_dataByResource.contains(resource));

@@ -610,7 +610,13 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
         .filtered<QnVirtualCameraResource>(
             [this, requiredPermission](const QnVirtualCameraResourcePtr& camera)
             {
-                return accessController()->hasPermissions(camera, requiredPermission);
+                if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::fake))
+                    return false;
+                
+                return QnWorkbenchAccessController::checkPermissions(
+                    camera,
+                    requiredPermission,
+                    {});
             });
 
     if (cameras.size() < 2)

@@ -398,12 +398,20 @@ struct CloudCrossSystemContext::Private
                 if (crossSystemResourceSystemId(item.resource) != systemDescription->id())
                     continue;
 
-                const auto camera = CrossSystemCameraResourcePtr(
-                    new CrossSystemCameraResource(q, item.resource));
-
-                systemContext->resourcePool()->addResource(camera);
+                createThumbCameraResource(item.resource);
             }
         }
+    }
+
+    QnVirtualCameraResourcePtr createThumbCameraResource(
+        const nx::vms::common::ResourceDescriptor& descriptor)
+    {
+        const auto camera = CrossSystemCameraResourcePtr(
+            new CrossSystemCameraResource(q, descriptor));
+
+        systemContext->resourcePool()->addResource(camera);
+        
+        return camera;
     }
 };
 
@@ -458,9 +466,20 @@ QString CloudCrossSystemContext::toString() const
 
 void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
 {
+    if (d->connectionProcess && d->connectionProcess->context->logonData.userInteractionAllowed)
+    {
+        NX_DEBUG(this, "Connection with user interaction is already in progress");
+        return;
+    }
+   
     d->connectionProcess.reset();
     d->updateStatus(Status::connecting);
     d->ensureConnection(/*allowUserInteraction*/ true);
+}
+
+QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(QnUuid id)
+{
+    return d->createThumbCameraResource(descriptor(id, d->systemDescription->id()));
 }
 
 void CloudCrossSystemContext::update(UpdateReason reason)

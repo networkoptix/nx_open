@@ -35,6 +35,7 @@ public:
     int indexOf(const QnUuid& id) const;
 
     bool updateEvent(const EventData& data);
+    bool updateEvent(QnUuid id);
 
     const EventData& getEvent(int index) const;
 

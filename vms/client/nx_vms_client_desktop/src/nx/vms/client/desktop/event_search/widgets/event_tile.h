@@ -2,22 +2,12 @@
 
 #pragma once
 
-#include <chrono>
-
-#include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/scoped_connections.h>
-#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-
-class QModelIndex;
-class QPushButton;
-class QnElidedLabel;
 
 namespace Ui { class EventTile; }
 
@@ -34,12 +24,6 @@ class EventTile: public QWidget
 
 public:
     explicit EventTile(QWidget* parent = nullptr);
-    explicit EventTile(
-        const QString& title,
-        const QPixmap& icon,
-        const QString& timestamp = QString(),
-        const QString& description = QString(),
-        QWidget* parent = nullptr);
 
     virtual ~EventTile() override;
 
@@ -70,6 +54,8 @@ public:
     // Does not take ownership.
     ImageProvider* preview() const;
     void setPreview(ImageProvider* value, bool forceUpdate);
+
+    void setPlaceholder(const QString& text);
 
     QRectF previewHighlightRect() const;
     void setPreviewHighlightRect(const QRectF& relativeRect);
