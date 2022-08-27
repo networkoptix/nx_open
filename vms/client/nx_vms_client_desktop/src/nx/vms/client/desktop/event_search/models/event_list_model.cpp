@@ -78,7 +78,12 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
 
         case Qn::DisplayedResourceListRole:
-            return event.source ? QVariant::fromValue<QnResourceList>({event.source}) : QVariant();
+            if (event.source)
+                return QVariant::fromValue<QnResourceList>({event.source});
+            else if (!event.sourceName.isEmpty())
+                return QVariant::fromValue<QStringList>({event.sourceName});
+            else
+                return QVariant();
 
         case Qn::RemovableRole:
             return event.removable;
@@ -116,6 +121,11 @@ bool EventListModel::addEvent(const EventData& event, Position where)
 bool EventListModel::updateEvent(const EventData& event)
 {
     return d->updateEvent(event);
+}
+
+bool EventListModel::updateEvent(QnUuid id)
+{
+    return d->updateEvent(id);
 }
 
 QModelIndex EventListModel::indexOf(const QnUuid& id) const

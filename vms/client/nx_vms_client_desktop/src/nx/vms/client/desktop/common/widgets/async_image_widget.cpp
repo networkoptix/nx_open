@@ -392,7 +392,12 @@ int AsyncImageWidget::heightForWidth(int width) const
 
 void AsyncImageWidget::retranslateUi()
 {
-    m_placeholder->setText(ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA"));
+    QString text = m_placeholderText;
+
+    if (text.isEmpty())
+        text = ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA");
+
+    m_placeholder->setText(text);
 }
 
 void AsyncImageWidget::invalidateGeometry()
@@ -437,15 +442,17 @@ void AsyncImageWidget::setReloadMode(ReloadMode value)
     }
 }
 
-void AsyncImageWidget::setNoDataMode(bool noData)
+void AsyncImageWidget::setPlaceholder(const QString& text)
 {
-    m_noDataMode = noData;
+    m_placeholderText = text;
+    
+    retranslateUi();
     updateThumbnailStatus(m_previousStatus);
 }
 
-void AsyncImageWidget::setNoDataModeBackgroundColor(QColor background)
+const QString& AsyncImageWidget::placeholder() const
 {
-    m_placeholderBackgroundColor = background;
+    return m_placeholderText;
 }
 
 void AsyncImageWidget::updateSizeHint() const
@@ -503,7 +510,7 @@ void AsyncImageWidget::updateCache()
 
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
-    if (m_noDataMode)
+    if (!m_placeholderText.isEmpty())
     {
         setLoadingIndicationVisible(false);
         m_placeholder->show();

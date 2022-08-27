@@ -425,21 +425,6 @@ EventTile::EventTile(QWidget* parent):
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
 }
 
-EventTile::EventTile(
-    const QString& title,
-    const QPixmap& icon,
-    const QString& timestamp,
-    const QString& description,
-    QWidget* parent)
-    :
-    EventTile(parent)
-{
-    setTitle(title);
-    setIcon(icon);
-    setTimestamp(timestamp);
-    setDescription(description);
-}
-
 EventTile::~EventTile()
 {
 }
@@ -599,7 +584,8 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
         preview()->disconnect(this);
 
     ui->previewWidget->setImageProvider(value);
-    ui->previewWidget->parentWidget()->setHidden(!value);
+    ui->previewWidget->parentWidget()->setVisible(
+        value || !ui->previewWidget->placeholder().isEmpty());
 
     d->isPreviewLoadNeeded = false;
     d->forceNextPreviewUpdate = forceUpdate;
@@ -623,6 +609,14 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
             if (ini().showDebugTimeInformationInRibbon)
                 d->showDebugPreviewTimestamp();
         });
+}
+
+void EventTile::setPlaceholder(const QString& text)
+{
+    ui->previewWidget->setPlaceholder(text);
+
+    if (!text.isEmpty())
+       setPreview(nullptr, /*forceUpdate*/ true);
 }
 
 QRectF EventTile::previewHighlightRect() const
@@ -972,6 +966,7 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setIcon({});
+    setPlaceholder({});
     setPreview({}, true);
     setPreviewHighlightRect({});
     setAction({});

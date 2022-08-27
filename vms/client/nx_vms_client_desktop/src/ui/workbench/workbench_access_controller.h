@@ -84,7 +84,13 @@ public:
      * \returns                         Whether actual global permissions
      *                                  include required permissions.
      */
-    bool hasGlobalPermission(GlobalPermission requiredPermissions) const;
+    bool hasGlobalPermission(GlobalPermission requiredPermission) const;
+    bool hasGlobalPermissions(GlobalPermissions requiredPermissions) const;
+
+    /* Check permissions using resource System context. */
+    static bool checkPermissions(const QnResourcePtr& resouce,
+        Qn::Permissions requiredPermissions,
+        GlobalPermissions requiredGlobalPermissions);
 
     /**
      * \param resource                  Resource to get permissions change notifier for.
@@ -110,7 +116,6 @@ public:
                 result.push_back(resource);
         return result;
     }
-
 
 signals:
     /**

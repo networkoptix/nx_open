@@ -235,9 +235,10 @@ bool EventFilter::matchFields(const EventPtr& event) const
             continue;
 
         const auto& value = event->property(name.toUtf8().data());
-        NX_VERBOSE(this, "Matching property: %1, null: %2", name, value.isNull());
+        NX_VERBOSE(this, "Matching property: %1, valid: %2, null: %3",
+            name, value.isValid(), value.isNull());
 
-        if (value.isNull())
+        if (!value.isValid())
             return false;
 
         if (!field->match(value))

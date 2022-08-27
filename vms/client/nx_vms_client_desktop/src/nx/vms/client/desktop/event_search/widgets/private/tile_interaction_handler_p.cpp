@@ -37,6 +37,8 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -117,11 +119,8 @@ TileInteractionHandler* TileInteractionHandler::doInstall(
     connect(tileInteractionSource, &T::clicked,
         handler, &TileInteractionHandler::handleClick);
 
-    connect(tileInteractionSource, &T::doubleClicked, handler,
-        [handler](const QModelIndex& index)
-        {
-            handler->openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
-        });
+    connect(tileInteractionSource, &T::doubleClicked, 
+        handler, &TileInteractionHandler::handleDoubleClick);
 
     connect(tileInteractionSource, &T::dragStarted,
         handler, &TileInteractionHandler::performDragAndDrop);
@@ -199,6 +198,11 @@ void TileInteractionHandler::handleClick(
     {
         openSource(index, /*inNewTab*/ true, /*fromDoubleClick*/ false);
     }
+}
+
+void TileInteractionHandler::handleDoubleClick(const QModelIndex& index)
+{
+    openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
 }
 
 void TileInteractionHandler::navigateToSource(
@@ -476,11 +480,21 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport(
     const QModelIndex& index)
 {
-    if (index.data(Qn::CloudSystemIdRole).toString().isEmpty())
+    const auto cloudSystemId = index.data(Qn::CloudSystemIdRole).toString();
+    if (cloudSystemId.isEmpty())
         return ActionSupport::supported;
 
+    if (const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        previewResource->hasFlags(Qn::ResourceFlag::fake))
+    {
+        if (auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
+            context->initializeConnectionWithUserInteraction();
+
+        return ActionSupport::cross_system;
+    }
+
     auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
-    if (actionType  == ui::action::BrowseUrlAction)
+    if (actionType == ui::action::BrowseUrlAction)
         return ActionSupport::cross_system;
 
     if (actionType != ui::action::NoAction)

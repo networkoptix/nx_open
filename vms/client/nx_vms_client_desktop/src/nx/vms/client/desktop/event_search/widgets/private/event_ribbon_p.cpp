@@ -383,6 +383,12 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!mediaResource)
         return;
 
+    if (previewResource->hasFlags(Qn::ResourceFlag::fake))
+    {
+        widget->setPlaceholder(tr("CLICK TO SHOW"));
+        return;
+    }
+
     const auto defaultThumbnailWidth = headersEnabled()
         ? kDefaultThumbnailWidth
         : kAlternativeThumbnailWidth;
@@ -441,6 +447,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     previewProvider->setProperty(kBypassVideoCachePropertyName,
         modelIndex.data(Qn::HasExternalBestShotRole).toBool());
 
+    widget->setPlaceholder({});
     widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewHighlightRect(previewCropRect);
 }
