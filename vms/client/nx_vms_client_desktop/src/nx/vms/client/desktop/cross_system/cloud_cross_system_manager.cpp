@@ -82,7 +82,7 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
         this,
         updateSystemStatus);
 
-    const auto systemsDescriptions = qnSystemsFinder->systems();
+    const auto systemsDescriptions = systemsFinder->systems();
     for (const auto& systemDescription: systemsDescriptions)
         handleSystemAdded(systemDescription);
 }

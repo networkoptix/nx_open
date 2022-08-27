@@ -44,12 +44,6 @@ struct TriggerInfo
     bool isValid() const { return !ruleId.isNull(); }
 };
 
-// TODO: #amalov Event property may not be empty. May be removed when trigger icon widget ready.
-QString notNullString(const QString& str)
-{
-    return str.isNull() ? "" : str;
-}
-
 } // namespace
 
 struct SoftwareTriggersController::Private : public SystemContextAware
@@ -166,7 +160,7 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
         resourceId,
         systemContext()->userWatcher()->user()->getId(),
         nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
-        notNullString(iconField->value()));
+        iconField->value());
 
     systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
 

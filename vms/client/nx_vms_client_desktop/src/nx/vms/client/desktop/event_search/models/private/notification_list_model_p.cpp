@@ -13,6 +13,9 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -89,6 +92,38 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
         });
 }
 
+QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
+{
+    if (resourceId.isNull())
+        return {};
+
+    const auto resourceDescriptor = cloudSystemId.isEmpty()
+        ? nx::vms::common::ResourceDescriptor{.id = resourceId}
+        : descriptor(resourceId, cloudSystemId);
+
+    return getResourceByDescriptor(resourceDescriptor);
+}
+
+QnVirtualCameraResourcePtr getCameraResource(
+    QnUuid resourceId,
+    const QString& cloudSystemId,
+    const QString& name)
+{
+    auto result = getResource(resourceId, cloudSystemId);
+
+    if (!result && !resourceId.isNull() && !cloudSystemId.isEmpty())
+    {
+        if (const auto context = 
+            appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
+        {
+            result = context->createThumbCameraResource(resourceId);
+            result->setName(name);
+        }
+    }
+
+    return result.dynamicCast<QnVirtualCameraResource>();
+}
+
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
@@ -110,28 +145,11 @@ NotificationListModel::Private::Private(NotificationListModel* q):
             m_uuidHashes.clear();
             m_itemsByLoadingSound.clear();
             m_players.clear();
+            m_itemsByCloudSystem.clear();
         });
 
-    connect(q, &EventListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
-        {
-            for (int row = first; row <= last; ++row)
-            {
-                const auto& event = this->q->getEvent(row);
-                const auto extraData = Private::extraData(event);
-                m_uuidHashes[extraData.first][extraData.second].remove(event.id);
-                m_players.remove(event.id);
-
-                for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
-                {
-                    if (it.value() == event.id)
-                    {
-                        m_itemsByLoadingSound.erase(it);
-                        break;
-                    }
-                }
-            }
-        });
+    connect(q, &EventListModel::rowsAboutToBeRemoved,
+        this, &Private::onRowsAboutToBeRemoved);
 
     connect(context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded, this,
@@ -152,24 +170,77 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(context()->instance<QnWorkbenchNotificationsHandler>(),
         &QnWorkbenchNotificationsHandler::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationAction);
+
+    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemFound, this,
+        [this](const QString& systemId)
+        {
+            connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
+                &CloudCrossSystemContext::statusChanged, this, 
+                [this, systemId]
+                {
+                    updateCloudItems(systemId);
+                });
+        });
+
+    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemLost, this,
+        [this](const QString& systemId)
+        {
+            updateCloudItems(systemId);
+            m_itemsByCloudSystem.remove(systemId);
+        });
 }
 
 NotificationListModel::Private::~Private()
 {
 }
 
-NotificationListModel::Private::ExtraData NotificationListModel::Private::extraData(
-    const EventData& event)
+void NotificationListModel::Private::updateCloudItems(const QString& systemId)
 {
-    NX_ASSERT(event.extraData.canConvert<ExtraData>());
-    return event.extraData.value<ExtraData>();
+    for (auto it = m_itemsByCloudSystem.find(systemId);
+        it != m_itemsByCloudSystem.end() && it.key() == systemId;
+        ++it)
+    {
+        q->updateEvent(it.value());
+    }
+}
+
+void NotificationListModel::Private::onRowsAboutToBeRemoved(
+    const QModelIndex& parent,
+    int first,
+    int last)
+{
+    for (int row = first; row <= last; ++row)
+    {
+        const auto& event = this->q->getEvent(row);
+        m_uuidHashes[event.ruleId][event.source].remove(event.id);
+        m_players.remove(event.id);
+
+        for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
+        {
+            if (it.value() == event.id)
+            {
+                m_itemsByLoadingSound.erase(it);
+                break;
+            }
+        }
+
+        if (!event.cloudSystemId.isEmpty() && event.previewCamera)
+            m_itemsByCloudSystem.remove(event.cloudSystemId, event.id);
+    }
 }
 
 void NotificationListModel::Private::onNotificationAction(
-    const QSharedPointer<nx::vms::rules::NotificationAction>& action, QString cloudSystemId)
+    const QSharedPointer<nx::vms::rules::NotificationAction>& action,
+    QString cloudSystemId)
 {
     NX_VERBOSE(this, "Received action: %1, id: %2, system: %3",
         action->type(), action->id(), cloudSystemId);
+
+    if (!cloudSystemId.isEmpty() && !appContext()->systemContextByCloudSystemId(cloudSystemId))
+    {
+        NX_VERBOSE(this, "Unknown cloud system, skipping notification");
+        return;
+    }
 
     EventData eventData;
     eventData.id = action->id();
@@ -183,6 +254,7 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
+    eventData.sourceName = action->sourceName();
 
     eventData.objectTrackId = action->objectTrackId();
     eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
@@ -194,18 +266,10 @@ void NotificationListModel::Private::onNotificationAction(
     if (!this->q->addEvent(eventData))
         return;
 
+    if (!cloudSystemId.isEmpty() && eventData.previewCamera)
+        m_itemsByCloudSystem.insert(cloudSystemId, eventData.id);
+
     truncateToMaximumCount();
-}
-
-QnResourcePtr NotificationListModel::Private::getResource(
-    QnUuid resourceId,
-    const QString& cloudSystemId) const
-{
-    const auto resourceDescriptor = cloudSystemId.isEmpty()
-        ? nx::vms::common::ResourceDescriptor{.id = resourceId}
-        : descriptor(resourceId, cloudSystemId);
-
-    return getResourceByDescriptor(resourceDescriptor);
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
@@ -272,7 +336,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.level = QnNotificationLevel::valueOf(action);
     eventData.timestamp = timestamp;
     eventData.removable = true;
-    eventData.extraData = QVariant::fromValue(ExtraData(action->getRuleId(), resource));
+    eventData.ruleId = action->getRuleId();
     eventData.source = resource;
     eventData.objectTrackId = params.objectTrackId;
 
@@ -410,13 +474,13 @@ void NotificationListModel::Private::setupClientAction(
 {
     using nx::vms::rules::ClientAction;
 
-    const auto camera = getResource(action->cameraId(), eventData.cloudSystemId)
-        .dynamicCast<QnVirtualCameraResource>();
     const auto server = getResource(action->serverId(), eventData.cloudSystemId)
         .dynamicCast<QnMediaServerResource>();
+    const auto camera = 
+        getCameraResource(action->cameraId(), eventData.cloudSystemId, eventData.sourceName);
 
     eventData.source = camera ? camera.staticCast<QnResource>() : server.staticCast<QnResource>();
-    eventData.extraData = QVariant::fromValue(ExtraData(action->ruleId(), eventData.source));
+    eventData.ruleId = action->ruleId();
 
     switch (action->clientAction())
     {
@@ -749,7 +813,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
         case Icon::resource:
         {
-            const auto resource = getResource(action->cameraId(), cloudSystemId);
+            const auto resource = getCameraResource(action->cameraId(), cloudSystemId, {});
             return toPixmap(resource
                 ? qnResIconCache->icon(resource)
                 : qnResIconCache->icon(QnResourceIconCache::Camera));

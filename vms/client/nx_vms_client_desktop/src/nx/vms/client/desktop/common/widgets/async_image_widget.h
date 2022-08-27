@@ -105,14 +105,9 @@ public:
     ReloadMode reloadMode() const;
     void setReloadMode(ReloadMode value);
 
-    // If set to true, widget shows "NO DATA" until reset to false.
-    void setNoDataMode(bool noData);
-
-    /**
-     * Use only if the widget or its parent is embedded into QGraphicsProxyWidget and
-     * background required is semitransparent. Otherwise set QPalette::Window color.
-     */
-    void setNoDataModeBackgroundColor(QColor background);
+    // Shows custom text placeholder until reset to empty string.
+    void setPlaceholder(const QString& text);
+    const QString& placeholder() const;
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -150,8 +145,8 @@ private:
     bool m_autoScaleUp = false;
     ReloadMode m_reloadMode = ReloadMode::showLoadingIndicator;
     Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
-    // Show "NO DATA" no matter what.
-    bool m_noDataMode = false;
+    // Show placeholder if not empty.
+    QString m_placeholderText;
     bool m_applyBlurEffect = false;
     QColor m_placeholderBackgroundColor;
     // Force no crop and no highlight for frames potentially pre-cropped by analytics plugin.

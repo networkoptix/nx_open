@@ -38,6 +38,7 @@ const ItemDescriptor& NotificationAction::manifest()
                     { "text", "{@EventTooltip}" }
                 }),
 
+            utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
             utils::makeExtractDetailFieldDescriptor("icon", utils::kIconDetailName),
             utils::makeExtractDetailFieldDescriptor("customIcon", utils::kCustomIconDetailName),

@@ -66,6 +66,8 @@ public:
      */
     void initializeConnectionWithUserInteraction();
 
+    QnVirtualCameraResourcePtr createThumbCameraResource(QnUuid id);
+
     enum class UpdateReason
     {
         new_,

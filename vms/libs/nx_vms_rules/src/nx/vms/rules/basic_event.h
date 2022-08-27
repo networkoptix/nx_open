@@ -33,7 +33,6 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
 
 public:
-    explicit BasicEvent(const nx::vms::api::rules::EventInfo& info);
     explicit BasicEvent(
         std::chrono::microseconds timestamp,
         State state = State::instant);
@@ -99,7 +98,6 @@ protected:
     QnUuid sourceId() const;
 
 private:
-    QString m_type;
     std::chrono::microseconds m_timestamp;
     State m_state = State::none;
 };
