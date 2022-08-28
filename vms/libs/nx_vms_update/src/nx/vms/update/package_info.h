@@ -16,8 +16,8 @@ namespace nx::vms::update {
 struct NX_VMS_UPDATE_API PlatformVariant
 {
     QString name;
-    QString minimumVersion;
-    QString maximumVersion;
+    QString minimumVersion = {};
+    QString maximumVersion = {};
 
     bool operator==(const PlatformVariant& other) const = default;
 };
