@@ -67,6 +67,9 @@ function(nx_go_build_test target working_dir package_path)
     set(target_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_exe})
 
     set(compile_command ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe})
+
+    file(GLOB_RECURSE test_source_files FOLLOW_SYMLINKS "${package_path}/*.go")
+
     if(WIN32)
         list(PREPEND compile_command ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin")
     endif()
@@ -74,7 +77,7 @@ function(nx_go_build_test target working_dir package_path)
     add_custom_command(
         OUTPUT ${target_path}
         WORKING_DIRECTORY ${working_dir}
-        DEPENDS ${GO_BUILD_TEST_DEPENDS}
+        DEPENDS ${test_source_files} ${GO_BUILD_TEST_DEPENDS}
         COMMAND ${compile_command}
         COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${target_path}
         COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
