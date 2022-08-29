@@ -70,14 +70,13 @@ uint8_t* FrameQueue::getFreeFrame()
         if (m_frames.size() >= kMaxFrameQueue)
             return nullptr;
 
-        NX_DEBUG(this, "Alloc frame, m_emptyFrames: %1, m_readyFrames: %2 overall: %3",
-            m_emptyFrames.size(), m_readyFrames.size(), m_frames.size());
-
         auto frame = allocFrame();
         if (frame == nullptr)
             return nullptr;
         m_readyFrames.push_back(frame);
         m_frames.push_back(frame);
+        NX_DEBUG(this, "Alloc frame, m_emptyFrames: %1, m_readyFrames: %2 overall: %3",
+            m_emptyFrames.size(), m_readyFrames.size(), m_frames.size());
         return frame;
     }
 
@@ -95,15 +94,13 @@ uint8_t* FrameQueue::getNextFrame()
 
     uint8_t* frame = m_readyFrames.front();
     m_readyFrames.pop_front();
-    getCount++;
     return frame;
 }
 
 void FrameQueue::releaseFrame(uint8_t* frame)
 {
-    releaseCount++;
-    NX_DEBUG(this, "Release frame, m_emptyFrames: %1, m_readyFrames: %2 overall: %3, releaseCount - getCount: %4-%5",
-        m_emptyFrames.size(), m_readyFrames.size(), m_frames.size(), releaseCount, getCount);
+    NX_VERBOSE(this, "Release frame, m_emptyFrames: %1, m_readyFrames: %2 overall: %3",
+        m_emptyFrames.size(), m_readyFrames.size(), m_frames.size());
     std::scoped_lock lock(m_mutex);
     if(m_otherSizeFrames.find(frame) != m_otherSizeFrames.end())
     {

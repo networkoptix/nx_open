@@ -242,7 +242,9 @@ copyLibs()
             libva.so.2 \
             libva-x11.so.2 \
             libmfxhw64.so.1 \
-            libmfx.so.1
+            libmfx.so.1 \
+            libcolor_conversion.so \
+            libcudart.so.11.0
     fi
 }
 

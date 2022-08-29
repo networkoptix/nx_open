@@ -20,12 +20,19 @@ enum class MemoryType
     VideoMemory,
 };
 
+enum class SurfaceType
+{
+    Intel,
+    Nvidia,
+};
+
 class AbstractVideoSurface
 {
 public:
     virtual ~AbstractVideoSurface() {}
     virtual AVFrame lockFrame() = 0;
     virtual void unlockFrame() = 0;
+    virtual SurfaceType type() = 0;
 };
 
 class CLVideoDecoderOutput;

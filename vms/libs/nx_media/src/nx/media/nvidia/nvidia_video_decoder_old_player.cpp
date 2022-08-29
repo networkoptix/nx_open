@@ -10,44 +10,21 @@
 
 bool NvidiaVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
-  /*  QSize size = nx::media::getFrameSize(data.get());
-    if (!size.isValid())
-    {
-        NX_ERROR(NX_SCOPE_TAG, "Failed to check compatibility, frame size unknown");
-        return false;
-    }
-
-    if (!nx::media::quick_sync::QuickSyncVideoDecoderImpl::isCompatible(
-        data, data->compressionType, size.width(), size.height()))
-    {
-        return false;
-    }
-
-    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-    {
-        NX_ERROR(NX_SCOPE_TAG,
-            "Failed to check QuickSync compatibility, input frame is not a key frame");
-        return false;
-    }
-*/
-    return true;
+    return nx::media::nvidia::NvidiaVideoDecoder::isCompatible(
+        data, data->compressionType, data->height, data->width);
 }
-
-int NvidiaVideoDecoderOldPlayer::m_instanceCount = 0;
 
 int NvidiaVideoDecoderOldPlayer::instanceCount()
 {
-    return m_instanceCount;
+    return nx::media::nvidia::NvidiaVideoDecoder::instanceCount();
 }
 
 NvidiaVideoDecoderOldPlayer::NvidiaVideoDecoderOldPlayer()
 {
-    m_instanceCount++;
 }
 
 NvidiaVideoDecoderOldPlayer::~NvidiaVideoDecoderOldPlayer()
 {
-    m_instanceCount--;
 }
 
 bool NvidiaVideoDecoderOldPlayer::decode(
@@ -65,7 +42,7 @@ bool NvidiaVideoDecoderOldPlayer::decode(
         if (!m_impl)
         {
             m_resolution = nx::media::getFrameSize(data.get());
-            NX_DEBUG(this, "Create QuickSync video decoder: %1", m_resolution);
+            NX_DEBUG(this, "Create Nvidia video decoder: %1", m_resolution);
             m_impl = std::make_shared<nx::media::nvidia::NvidiaVideoDecoder>();
         }
     }
@@ -85,8 +62,6 @@ bool NvidiaVideoDecoderOldPlayer::decode(
         return false;
     }
     m_lastStatus = 0;
-    //if (!result)
-     //   return false;
 
     outFrame->format = AV_PIX_FMT_NV12;
     outFrame->flags = m_lastFlags | QnAbstractMediaData::MediaFlags_HWDecodingUsed;
@@ -96,7 +71,6 @@ bool NvidiaVideoDecoderOldPlayer::decode(
     outFrame->pkt_dts = frame->timestamp;
     outFrame->width = frame->width;
     outFrame->height = frame->height;
-    NX_DEBUG(this, "QQQ decoded new frame: %1", frame->timestamp);
     outFrame->attachVideoSurface(std::move(frame));
     return true;
 }
@@ -105,7 +79,7 @@ bool NvidiaVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataP
 {
     NX_DEBUG(this, "Reset decoder");
     if (m_impl)
-        m_impl->resetDecoder();
+        m_impl.reset();
     return true;
 }
 

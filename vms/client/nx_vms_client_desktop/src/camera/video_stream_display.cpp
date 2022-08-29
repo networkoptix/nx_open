@@ -29,9 +29,12 @@ extern "C" {
 
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+#ifndef WIN32
+    #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+#endif
 #endif // __QSV_SUPPORTED__
 
-#include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+
 
 #include "buffered_frame_displayer.h"
 #include "gl_renderer.h"
@@ -387,21 +390,27 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
-    QnAbstractVideoDecoder* decoder;
-
-    decoder = new NvidiaVideoDecoderOldPlayer();
-    return decoder;
+    QnAbstractVideoDecoder* decoder = nullptr;
 
 #ifdef __QSV_SUPPORTED__
-    if (qnSettings->isHardwareDecodingEnabled()
-        && !m_reverseMode
-        && QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
-        && QuickSyncVideoDecoderOldPlayer::isSupported(data))
+    if (qnSettings->isHardwareDecodingEnabled() && !m_reverseMode)
     {
-        decoder = new QuickSyncVideoDecoderOldPlayer();
+    #ifndef WIN32
+        if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
+            && NvidiaVideoDecoderOldPlayer::isSupported(data))
+        {
+            decoder = new NvidiaVideoDecoderOldPlayer();
+        }
+        else
+    #endif // WIN32
+        if (QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
+            && QuickSyncVideoDecoderOldPlayer::isSupported(data))
+        {
+            decoder = new QuickSyncVideoDecoderOldPlayer();
+        }
     }
-    else
 #endif // __QSV_SUPPORTED__
+    if (!decoder)
     {
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(mtDecoding);

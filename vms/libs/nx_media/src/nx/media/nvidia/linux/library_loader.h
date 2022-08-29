@@ -17,6 +17,6 @@ private:
     void* m_libraryHandle = nullptr;
 };
 
-} // nx::media::quick_sync::linux
+} // nx::media::nvidia::linux
 
 #endif // __linux__
