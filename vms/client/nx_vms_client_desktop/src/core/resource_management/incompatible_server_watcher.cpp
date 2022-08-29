@@ -242,12 +242,11 @@ struct QnIncompatibleServerWatcher::Private
     QnMediaServerResourcePtr makeResource(
         const nx::vms::api::DiscoveredServerData& serverData) const
     {
-        auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
         QnFakeMediaServerResourcePtr fakeServer(new QnFakeMediaServerResource());
         fakeServer->setFakeServerModuleInformation(serverData);
         if (auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id))
             fakeServer->setOsInfo(server->getOsInfo());
-        return server;
+        return fakeServer;
     }
 
     void createInitialServers(
