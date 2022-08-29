@@ -35,5 +35,4 @@ private:
     QSize m_resolution;
     int m_lastStatus = 0;
     QnAbstractMediaData::MediaFlags m_lastFlags {};
-    static int m_instanceCount;
 };

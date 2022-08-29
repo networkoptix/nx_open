@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "nvidia_video_decoder.h"
-#include "NvDecoder.h"
+#include <NvCodec/NvDecoder.h>
 
 #include <nx/media/nvidia/linux/renderer.h>
 #include <nx/utils/log/log.h>
@@ -12,6 +12,8 @@
 #include <nx/media/nvidia/nvidia_driver_proxy.h>
 
 namespace {
+
+static constexpr int kMaxDecoderCount = 2;
 
 inline cudaVideoCodec FFmpeg2NvCodecId(AVCodecID id) {
     switch (id) {
@@ -42,25 +44,50 @@ struct NvidiaVideoDecoderImpl
         if (context)
             NvidiaDriverApiProxy::instance().cuCtxDestroy(context);
     }
+
     CUcontext context = nullptr;
     std::unique_ptr<NvDecoder> decoder;
     std::unique_ptr<linux::Renderer> renderer;
     H2645Mp4ToAnnexB filterAnnexB;
 };
 
+int NvidiaVideoDecoder::m_instanceCount = 0;
+
 bool NvidiaVideoDecoder::isCompatible(
     const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID /*codec*/, int /*width*/, int /*height*/)
 {
+    if (m_instanceCount >= kMaxDecoderCount)
+        return false;
+
+    if (!NvidiaDriverApiProxy::instance().load())
+        return false;
+
+    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
+    if (status != CUDA_SUCCESS)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to init nvidia decoder: %1", toString(status));
+        return false;
+    }
+
+    CUdevice device = 0;
+    status = NvidiaDriverApiProxy::instance().cuDeviceGet(&device, 0/*gpu*/);
+    if (status != CUDA_SUCCESS)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to get device: %1", toString(status));
+        return false;
+    }
     return true;
 }
 
 NvidiaVideoDecoder::NvidiaVideoDecoder()
 {
     m_impl = std::make_unique<NvidiaVideoDecoderImpl>();
+    m_instanceCount++;
 }
 
 NvidiaVideoDecoder::~NvidiaVideoDecoder()
 {
+    m_instanceCount--;
 }
 
 bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
@@ -89,16 +116,22 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
         NX_WARNING(this, "Failed to create context: %1", toString(status));
         return false;
     }
-
-    m_impl->decoder =
-        std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType), /*bLowLatency*/false);
+    try
+    {
+        m_impl->decoder =
+            std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType), /*bLowLatency*/false);
+    }
+    catch(NVDECException& e)
+    {
+        NX_WARNING(this, "Failed to create Nvidia decoder: %1", e.what());
+        return false;
+    }
 
     return true;
 }
 
 int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
 {
-    NX_DEBUG(this, "decode: %1", packet->timestamp);
     if (!m_impl->decoder && !initialize(packet))
     {
         NX_ERROR(this, "Failed to initialize nvidia decoder");
@@ -107,44 +140,58 @@ int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
 
     auto packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
 
-    m_impl->decoder->Decode(
-        (const uint8_t*)packetAnnexB->data(), packetAnnexB->dataSize(), 0, packetAnnexB->timestamp);
+    try
+    {
+        m_impl->decoder->Decode(
+            (const uint8_t*)packetAnnexB->data(),
+            packetAnnexB->dataSize(),
+            0,
+            packetAnnexB->timestamp);
+    }
+    catch(NVDECException& e)
+    {
+        NX_WARNING(this, "Failed to decode frame: %1", e.what());
+        return false;
+    }
     return 1;
 }
 
 std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
 {
-    auto& nvDecoder = m_impl->decoder;
-    int64_t timestamp = 0;
-    auto frameData = nvDecoder->GetFrame(&timestamp);
-    if (!frameData)
+    try
+    {
+        auto& nvDecoder = m_impl->decoder;
+        int64_t timestamp = 0;
+        auto frameData = nvDecoder->GetFrame(&timestamp);
+        if (!frameData)
+            return nullptr;
+
+        if (!m_impl->renderer)
+            m_impl->renderer = std::make_unique<linux::Renderer>();
+
+        auto frame = std::make_unique<NvidiaVideoFrame>();
+        frame->decoder = weak_from_this();
+        frame->height = nvDecoder->GetHeight();
+        frame->width = nvDecoder->GetWidth();
+        frame->pitch = nvDecoder->GetDeviceFramePitch();
+        frame->frameData = frameData;
+        frame->timestamp = timestamp;
+        frame->bitDepth = nvDecoder->GetBitDepth();
+        frame->format = nvDecoder->GetOutputFormat();
+        frame->matrix = nvDecoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
+        frame->bufferSize = nvDecoder->GetFrameSize();
+        return frame;
+    }
+    catch(NVDECException& e)
+    {
+        NX_WARNING(this, "Failed to get frame: %1", e.what());
         return nullptr;
-
-    if (!m_impl->renderer)
-        m_impl->renderer = std::make_unique<linux::Renderer>();
-
-    auto frame = std::make_unique<NvidiaVideoFrame>();
-    frame->decoder = weak_from_this();
-    frame->height = nvDecoder->GetHeight();
-    frame->width = nvDecoder->GetWidth();
-    frame->pitch = nvDecoder->GetDeviceFramePitch();
-    frame->frameData = frameData;
-    frame->timestamp = timestamp;
-    frame->bitDepth = nvDecoder->GetBitDepth();
-    frame->format = nvDecoder->GetOutputFormat();
-    frame->matrix = nvDecoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
-    frame->bufferSize = nvDecoder->GetFrameSize();
-    return frame;
+    }
 }
 
 void NvidiaVideoDecoder::releaseFrame(uint8_t* frame)
 {
     m_impl->decoder->releaseFrame(frame);
-}
-
-void NvidiaVideoDecoder::resetDecoder()
-{
-
 }
 
 linux::Renderer& NvidiaVideoDecoder::getRenderer()

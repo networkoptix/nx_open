@@ -44,6 +44,6 @@ void* LibraryLoader::getFunction(const char* name)
     return result;
 }
 
-} // nx::media::quick_sync::linux
+} // nx::media::nvidia::linux
 
 #endif // __linux__

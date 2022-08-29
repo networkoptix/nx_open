@@ -14,6 +14,7 @@ public:
     ~NvidiaVideoFrame();
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
+    virtual SurfaceType type() override { return SurfaceType::Nvidia; };
 
 public:
     int width = 0;
