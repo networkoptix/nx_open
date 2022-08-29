@@ -12,10 +12,14 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_merge_data.h>
 
-namespace nx::vms::client::desktop {
+namespace rest {
 
 template<typename Data>
-using RestResultOrData = std::variant<nx::network::rest::Result, Data>;
+using ErrorOrData = std::variant<nx::network::rest::Result, Data>;
+
+} // namespace rest
+
+namespace nx::vms::client::desktop {
 
 /**
  * Helper class for sending requests related to system merge process.
@@ -24,7 +28,7 @@ using RestResultOrData = std::variant<nx::network::rest::Result, Data>;
 class MergeSystemRequestsManager
 {
     template<typename Data>
-    using Callback = std::function<void(const RestResultOrData<Data>& data)>;
+    using Callback = std::function<void(const rest::ErrorOrData<Data>& data)>;
 
 public:
     MergeSystemRequestsManager(QObject* parent, const std::string& locale);

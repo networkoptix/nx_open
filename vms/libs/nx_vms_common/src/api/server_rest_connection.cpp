@@ -150,10 +150,10 @@ nx::network::rest::Result parseMessageBody(
     return result;
 }
 
-// Response deserialization for RestResultOrData objects
+// Response deserialization for ErrorOrData objects
 template<typename T>
-rest::RestResultOrData<T> parseMessageBody(
-    Type<rest::RestResultOrData<T>>,
+rest::ErrorOrData<T> parseMessageBody(
+    Type<rest::ErrorOrData<T>>,
     Qn::SerializationFormat format,
     nx::ConstBufferRefType messageBody,
     nx::network::http::StatusCode::Value httpStatusCode,
@@ -171,9 +171,17 @@ rest::RestResultOrData<T> parseMessageBody(
     if (httpStatusCode == nx::network::http::StatusCode::ok)
     {
         T data;
-        if (*success = nx::reflect::json::deserialize(messageBody, &data))
+        if constexpr (std::is_same_v<T, rest::Empty>)
+        {
+            *success = true;
             return data;
-        return nx::network::rest::Result::notImplemented();
+        }
+        else
+        {
+            if (*success = nx::reflect::json::deserialize(messageBody, &data))
+                return data;
+            return nx::network::rest::Result::notImplemented();
+        }
     }
 
     return parseMessageBody(
@@ -465,7 +473,7 @@ Handle ServerConnection::getMediaServers(
 }
 
 Handle ServerConnection::getServersInfo(
-    Result<RestResultOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+    Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
     QThread* targetThread)
 {
     return executeGet("/rest/v1/servers/*/info", {}, std::move(callback), targetThread);
@@ -476,7 +484,7 @@ Handle ServerConnection::bindSystemToCloud(
     const QString& cloudAuthKey,
     const QString& cloudAccountName,
     const std::string& ownerSessionToken,
-    Result<nx::network::rest::Result>::type callback,
+    Result<ErrorOrEmpty>::type callback,
     QThread* targetThread,
     std::optional<QnUuid> proxyToServer)
 {
@@ -487,8 +495,7 @@ Handle ServerConnection::bindSystemToCloud(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/cloudBind",
-        /*params*/ {}),
+        prepareUrl("/rest/v1/system/cloudBind", /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
@@ -507,7 +514,7 @@ Handle ServerConnection::bindSystemToCloud(
 Handle ServerConnection::unbindSystemFromCloud(
     const QString& password,
     const std::string& ownerSessionToken,
-    Result<nx::network::rest::Result>::type callback,
+    Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
     nx::vms::api::LocalSystemAuth data;
@@ -530,7 +537,7 @@ Handle ServerConnection::unbindSystemFromCloud(
 
 Handle ServerConnection::dumpDatabase(
     const std::string& ownerSessionToken,
-    Result<RestResultOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+    Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
@@ -549,7 +556,7 @@ Handle ServerConnection::dumpDatabase(
 Handle ServerConnection::restoreDatabase(
     const nx::vms::api::DatabaseDumpData& data,
     const std::string& ownerSessionToken,
-    Result<nx::network::rest::Result>::type callback,
+    Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
@@ -1115,7 +1122,7 @@ Handle ServerConnection::getCameraCredentials(
 Handle ServerConnection::changeCameraPassword(
     const QnVirtualCameraResourcePtr& camera,
     const QAuthenticator& auth,
-    Result<nx::network::rest::Result>::type callback,
+    Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
     if (!camera || camera->getParentId().isNull())
@@ -1580,7 +1587,7 @@ Handle ServerConnection::testLdapSettingsAsync(
 
 Handle ServerConnection::loginAsync(
     const nx::vms::api::LoginSessionRequest& data,
-    Result<RestResultOrData<nx::vms::api::LoginSession>>::type callback,
+    Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
     QThread* targetThread)
 {
     return executePost(
@@ -1863,7 +1870,10 @@ Handle ServerConnection::executeRequest(
     if (callback)
     {
         if constexpr (std::is_base_of_v<nx::network::rest::Result, ResultType>)
-            NX_ASSERT(!request.url.path().startsWith("/rest/"));
+        {
+            NX_ASSERT(!request.url.path().startsWith("/rest/"),
+                "/rest handler responses with Result if request is failed, use ErrorOrData");
+        }
         const QString serverId = d->serverId.toString();
         return sendRequest(request,
             [this, callback = std::move(callback), serverId](ContextPtr context)

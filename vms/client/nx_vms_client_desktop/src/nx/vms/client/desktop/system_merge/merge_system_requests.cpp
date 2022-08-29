@@ -34,7 +34,7 @@ struct Request
 };
 
 template<typename Data>
-nx::vms::client::desktop::RestResultOrData<Data> parseResultOrData(
+rest::ErrorOrData<Data> parseResultOrData(
     const NetworkManager::Response& response)
 {
     if (response.statusLine.statusCode == nx::network::http::StatusCode::ok)

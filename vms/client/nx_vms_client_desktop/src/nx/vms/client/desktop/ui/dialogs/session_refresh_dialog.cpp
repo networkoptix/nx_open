@@ -122,9 +122,9 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
         [this](
             bool success,
             int reqId,
-            rest::RestResultOrData<nx::vms::api::LoginSession> resultOrData)
+            rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
         {
-            if (auto session = std::get_if<nx::vms::api::LoginSession>(&resultOrData))
+            if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
 
@@ -142,9 +142,9 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
             }
             else
             {
-                auto result = std::get_if<nx::network::rest::Result>(&resultOrData);
-                NX_INFO(this, "Can't receive token: %1", QJson::serialized(*result));
-                m_validationResult = ValidationResult(QValidator::Invalid, result->errorString);
+                auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                NX_INFO(this, "Can't receive token: %1", QJson::serialized(*error));
+                m_validationResult = ValidationResult(QValidator::Invalid, error->errorString);
             }
 
             validationResultReady();

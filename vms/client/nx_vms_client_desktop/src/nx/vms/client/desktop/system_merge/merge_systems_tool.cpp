@@ -102,10 +102,10 @@ QnUuid MergeSystemsTool::pingSystem(
     NX_DEBUG(this, "Starting ping server at address %1", ctx.target);
 
     auto onTargetInfo =
-        [this, ctxId](RestResultOrData<nx::vms::api::ServerInformation> resultOrData)
+        [this, ctxId](rest::ErrorOrData<nx::vms::api::ServerInformation> errorOrData)
         {
             if (auto ctx = findContext(ctxId))
-                at_serverInfoReceived(*ctx, resultOrData);
+                at_serverInfoReceived(*ctx, errorOrData);
         };
 
     auto certificateSaveFunc =
@@ -155,10 +155,10 @@ bool MergeSystemsTool::mergeSystem(
         : ctx->targetInfo.userProvidedCertificatePem;
 
     auto onMergeStarted =
-        [this, ctxId](const RestResultOrData<nx::vms::api::MergeStatusReply>& resultOrData)
+        [this, ctxId](const rest::ErrorOrData<nx::vms::api::MergeStatusReply>& errorOrData)
         {
             if (auto ctx = findContext(ctxId))
-                at_mergeStarted(*ctx, resultOrData);
+                at_mergeStarted(*ctx, errorOrData);
         };
 
     m_requestManager->mergeSystem(
@@ -204,9 +204,9 @@ void MergeSystemsTool::reportSystemFound(
 
 void MergeSystemsTool::at_serverInfoReceived(
     Context& ctx,
-    const RestResultOrData<nx::vms::api::ServerInformation>& resultOrData)
+    const rest::ErrorOrData<nx::vms::api::ServerInformation>& errorOrData)
 {
-    if (auto serverInfo = std::get_if<nx::vms::api::ServerInformation>(&resultOrData))
+    if (auto serverInfo = std::get_if<nx::vms::api::ServerInformation>(&errorOrData))
     {
         ctx.targetInfo = std::move(*serverInfo);
 
@@ -218,10 +218,10 @@ void MergeSystemsTool::at_serverInfoReceived(
 
         auto onSessionCreated =
             [this, ctxId = ctx.id](
-                RestResultOrData<nx::vms::api::LoginSession> resultOrData)
+                rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
             {
                 if (auto ctx = findContext(ctxId))
-                    at_sessionCreated(*ctx, resultOrData);
+                    at_sessionCreated(*ctx, errorOrData);
             };
 
         nx::vms::api::LoginSessionRequest request;
@@ -236,29 +236,29 @@ void MergeSystemsTool::at_serverInfoReceived(
             request,
             nx::utils::guarded(this, std::move(onSessionCreated)));
     }
-    else if (auto restResult = std::get_if<nx::network::rest::Result>(&resultOrData))
+    else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
     {
-        NX_WARNING(this, "Can't get server info, rest result: %1", QJson::serialized(*restResult));
+        NX_WARNING(this, "Can't get server info, rest result: %1", QJson::serialized(*error));
         // Older versions responds with {"error" : 404 } special processing is required.
-        if ((static_cast<nx::network::http::StatusCode::Value>(restResult->error)
+        if ((static_cast<nx::network::http::StatusCode::Value>(error->error)
             == nx::network::http::StatusCode::notFound)
-            || (restResult->error == nx::network::rest::Result::NotFound))
+            || (error->error == nx::network::rest::Result::NotFound))
         {
             reportSystemFound(ctx, MergeSystemsStatus::incompatibleInternal, QString(), true);
         }
         else
         {
             reportSystemFound(
-                ctx, mergeStatusFromResult(*restResult), restResult->errorString, true);
+                ctx, mergeStatusFromResult(*error), error->errorString, true);
         }
     }
 }
 
 void MergeSystemsTool::at_sessionCreated(
     Context& ctx,
-    const RestResultOrData<nx::vms::api::LoginSession>& resultOrData)
+    const rest::ErrorOrData<nx::vms::api::LoginSession>& errorOrData)
 {
-    if (auto loginSession = std::get_if<nx::vms::api::LoginSession>(&resultOrData))
+    if (auto loginSession = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
     {
         NX_ASSERT(!loginSession->token.empty());
         ctx.mergeData.remoteSessionToken = std::move(loginSession->token);
@@ -271,10 +271,10 @@ void MergeSystemsTool::at_sessionCreated(
 
         auto onLicenseReceived =
             [this, ctxId = ctx.id](
-                const RestResultOrData<nx::vms::api::LicenseDataList>& resultOrData)
+                const rest::ErrorOrData<nx::vms::api::LicenseDataList>& errorOrData)
         {
             if (auto ctx = findContext(ctxId))
-                at_licensesReceived(*ctx, resultOrData);
+                at_licensesReceived(*ctx, errorOrData);
         };
 
         m_requestManager->getTargetLicenses(
@@ -288,18 +288,18 @@ void MergeSystemsTool::at_sessionCreated(
 
         return;
     }
-    else if (auto restResult = std::get_if<nx::network::rest::Result>(&resultOrData))
+    else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
     {
-        NX_WARNING(this, "Can't create session, rest result: %1", QJson::serialized(*restResult));
-        reportSystemFound(ctx, mergeStatusFromResult(*restResult), restResult->errorString, true);
+        NX_WARNING(this, "Can't create session, rest result: %1", QJson::serialized(*error));
+        reportSystemFound(ctx, mergeStatusFromResult(*error), error->errorString, true);
     }
 }
 
 void MergeSystemsTool::at_licensesReceived(
     Context& ctx,
-    const RestResultOrData<nx::vms::api::LicenseDataList>& resultOrData)
+    const rest::ErrorOrData<nx::vms::api::LicenseDataList>& errorOrData)
 {
-    if (auto licenseDataList = std::get_if<nx::vms::api::LicenseDataList>(&resultOrData))
+    if (auto licenseDataList = std::get_if<nx::vms::api::LicenseDataList>(&errorOrData))
     {
         ec2::fromApiToResourceList(*licenseDataList, ctx.targetLicenses);
         auto status = nx::vms::license::remoteLicensesConflict(
@@ -308,28 +308,28 @@ void MergeSystemsTool::at_licensesReceived(
 
         reportSystemFound(ctx, status, {}, false);
     }
-    else if (auto restResult = std::get_if<nx::network::rest::Result>(&resultOrData))
+    else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
     {
-        NX_WARNING(this, "Can't get licenses, rest result: %1", QJson::serialized(*restResult));
-        reportSystemFound(ctx, mergeStatusFromResult(*restResult), restResult->errorString, true);
+        NX_WARNING(this, "Can't get licenses, rest result: %1", QJson::serialized(*error));
+        reportSystemFound(ctx, mergeStatusFromResult(*error), error->errorString, true);
     }
 }
 
 void MergeSystemsTool::at_mergeStarted(
     Context& ctx,
-    const RestResultOrData<nx::vms::api::MergeStatusReply>& resultOrData)
+    const rest::ErrorOrData<nx::vms::api::MergeStatusReply>& errorOrData)
 {
-    if (auto mergeStatus = std::get_if<nx::vms::api::MergeStatusReply>(&resultOrData))
+    if (auto mergeStatus = std::get_if<nx::vms::api::MergeStatusReply>(&errorOrData))
     {
         if (mergeStatus->mergeInProgress)
             reportMergeFinished(ctx, MergeSystemsStatus::ok);
         else
             reportMergeFinished(ctx, MergeSystemsStatus::unknownError);
     }
-    else if (auto restResult = std::get_if<nx::network::rest::Result>(&resultOrData))
+    else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
     {
-        NX_WARNING(this, "Can't merge systems, rest result: %1", QJson::serialized(*restResult));
-        reportMergeFinished(ctx, mergeStatusFromResult(*restResult), restResult->errorString);
+        NX_WARNING(this, "Can't merge systems, rest result: %1", QJson::serialized(*error));
+        reportMergeFinished(ctx, mergeStatusFromResult(*error), error->errorString);
     }
 }
 

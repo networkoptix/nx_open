@@ -110,20 +110,16 @@ private:
         bool removeCtx = true);
 
     void at_serverInfoReceived(
-        Context& ctx,
-        const RestResultOrData<nx::vms::api::ServerInformation>& resultOrData);
+        Context& ctx, const rest::ErrorOrData<nx::vms::api::ServerInformation>& errorOrData);
 
     void at_sessionCreated(
-        Context& ctx,
-        const RestResultOrData<nx::vms::api::LoginSession>& resultOrData);
+        Context& ctx, const rest::ErrorOrData<nx::vms::api::LoginSession>& errorOrData);
 
     void at_licensesReceived(
-        Context& ctx,
-        const RestResultOrData<nx::vms::api::LicenseDataList>& resultOrData);
+        Context& ctx, const rest::ErrorOrData<nx::vms::api::LicenseDataList>& errorOrData);
 
     void at_mergeStarted(
-        Context& ctx,
-        const RestResultOrData<nx::vms::api::MergeStatusReply>& resultOrData);
+        Context& ctx, const rest::ErrorOrData<nx::vms::api::MergeStatusReply>& errorOrData);
 
 private:
     std::unique_ptr<MergeSystemRequestsManager> m_requestManager;
