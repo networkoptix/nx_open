@@ -795,19 +795,13 @@ void ActionHandler::changeDefaultPasswords(
 
         const auto resultCallback =
             [completionGuard, camera, errorResultsStorage]
-                (bool success, rest::Handle /*handle*/, nx::network::rest::Result result)
+                (bool, rest::Handle, rest::ErrorOrEmpty reply)
             {
-                if (!success)
-                {
-                    errorResultsStorage->append(
-                        PasswordChangeResult(
-                            camera,
-                            nx::network::rest::Result::serviceUnavailable()));
-                }
-                else if (result.error != nx::network::rest::Result::NoError)
-                {
-                    errorResultsStorage->append(PasswordChangeResult(camera, result));
-                }
+                if (std::holds_alternative<rest::Empty>(reply))
+                    return;
+
+                errorResultsStorage->append(
+                    PasswordChangeResult(camera, std::get<nx::network::rest::Result>(reply)));
             };
 
         connectedServerApi()->changeCameraPassword(camera, auth,

@@ -98,10 +98,10 @@ void QnDatabaseManagementWidget::backupDb()
         [this, dialog, fileName](
             bool success,
             rest::Handle,
-            rest::RestResultOrData<nx::vms::api::DatabaseDumpData> resultOrData)
+            rest::ErrorOrData<nx::vms::api::DatabaseDumpData> errorOrData)
         {
             success = false;
-            if (auto data = std::get_if<nx::vms::api::DatabaseDumpData>(&resultOrData))
+            if (auto data = std::get_if<nx::vms::api::DatabaseDumpData>(&errorOrData))
             {
                 QFile file(fileName);
                 success = file.open(QIODevice::WriteOnly)
@@ -117,10 +117,10 @@ void QnDatabaseManagementWidget::backupDb()
             }
             else
             {
-                if (auto result = std::get_if<nx::network::rest::Result>(&resultOrData))
+                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
                     NX_ERROR(
-                        this, "Failed to dump Server database: %1", QJson::serialized(*result));
+                        this, "Failed to dump Server database: %1", QJson::serialized(*error));
                 }
                 QnSessionAwareMessageBox::critical(this, tr("Failed to back up database"));
             }
@@ -192,28 +192,23 @@ void QnDatabaseManagementWidget::restoreDb()
     dialog->setModal(true);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-    auto restoreDatabaseHandler = nx::utils::guarded(
-        dialog,
-        [this, dialog, fileName](bool success, rest::Handle, nx::network::rest::Result result)
+    auto restoreDatabaseHandler = nx::utils::guarded(dialog,
+        [this, dialog, fileName](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
             dialog->accept();
-            if (result.error == nx::network::rest::Result::NoError)
+            if (std::holds_alternative<rest::Empty>(reply))
             {
-                QnSessionAwareMessageBox::success(
-                    this,
+                QnSessionAwareMessageBox::success(this,
                     tr("Database successfully restored"),
                     tr("Server application will restart shortly."));
+                return;
             }
-            else
-            {
-                NX_ERROR(
-                    this,
-                    "Failed to restore Server database from file '%1'. %2",
-                    fileName,
-                    result.error);
 
-                QnSessionAwareMessageBox::critical(this, tr("Failed to restore database"));
-            }
+            NX_ERROR(this,
+                "Failed to restore Server database from file '%1'. %2",
+                fileName,
+                std::get<nx::network::rest::Result>(reply).errorString);
+            QnSessionAwareMessageBox::critical(this, tr("Failed to restore database"));
         });
 
     dialog->open();

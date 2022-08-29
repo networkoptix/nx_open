@@ -82,7 +82,7 @@ struct CloudCrossSystemContextDataLoader::Private
             [this](
                 bool success,
                 ::rest::Handle requestId,
-                ::rest::RestResultOrData<ServerInformationList> response)
+                ::rest::ErrorOrData<ServerInformationList> response)
             {
                 NX_ASSERT(currentRequest && *currentRequest == requestId);
                 currentRequest = std::nullopt;
