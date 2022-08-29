@@ -178,27 +178,26 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
     auto handler = nx::utils::guarded(
         this,
-        [this](bool success, rest::Handle, nx::network::rest::Result result)
+        [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
-            NX_DEBUG(
-                this,
-                "Cloud unbind finished, error: %1, string: %2",
-                result.error,
-                result.errorString);
-
-            if (result.error == nx::network::rest::Result::NoError)
+            if (std::holds_alternative<rest::Empty>(reply))
             {
+                NX_DEBUG(this, "Cloud unbind succeded");
                 onDisconnectSuccess();
+                return;
             }
-            else
-            {
-                QnSessionAwareMessageBox::critical(
-                    this,
-                    tr("Cannot disconnect the System from %1",
-                        "%1 is the cloud name (like Nx Cloud)")
-                            .arg(nx::branding::cloudName()),
-                    result.errorString);
-            }
+
+            const auto& error = std::get<nx::network::rest::Result>(reply);
+            NX_DEBUG(this,
+                "Cloud unbind failed, error: %1, string: %2",
+                error.error,
+                error.errorString);
+
+            QnSessionAwareMessageBox::critical(this,
+                tr("Cannot disconnect the System from %1",
+                    "%1 is the cloud name (like Nx Cloud)")
+                    .arg(nx::branding::cloudName()),
+                error.errorString);
         });
 
     connectedServerApi()->unbindSystemFromCloud(

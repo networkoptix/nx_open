@@ -268,28 +268,26 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
 
     auto handleReply = nx::utils::guarded(
         this,
-        [this](
-            bool success, rest::Handle, nx::network::rest::Result reply)
+        [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
-            NX_DEBUG(
-                this,
-                "Server bind finished, error: %1, string: %2",
-                reply.error,
-                reply.errorString);
-
-            if (!success || (reply.error != nx::network::rest::Result::NoError))
+            if (std::holds_alternative<rest::Empty>(reply))
             {
-                QString errorMessage = tr("Internal server error. Please try again later.");
-                if (ini().developerMode)
-                    errorMessage += '\n' + reply.errorString;
-
-                showFailure(errorMessage);
+                NX_DEBUG(this, "Server bind succeded");
+                qnCloudStatusWatcher->setAuthData(m_cloudAuthData);
+                showSuccess(QString::fromStdString(m_cloudAuthData.credentials.username));
                 return;
             }
 
-            qnCloudStatusWatcher->setAuthData(m_cloudAuthData);
+            const auto& error = std::get<nx::network::rest::Result>(reply);
+            NX_DEBUG(this,
+                "Server bind failed, error: %1, string: %2",
+                error.error,
+                error.errorString);
 
-            showSuccess(QString::fromStdString(m_cloudAuthData.credentials.username));
+            QString errorMessage = tr("Internal error. Please try again later.");
+            if (ini().developerMode)
+                errorMessage += '\n' + error.errorString;
+            showFailure(errorMessage);
         });
 
     std::optional<QnUuid> proxyServerId;
