@@ -343,6 +343,25 @@ EventPanel::Private::Private(EventPanel* q):
                 this, &Private::rebuildTabs);
         }
 
+        connect(
+            workbench(),
+            &QnWorkbench::currentLayoutChanged,
+            this,
+            [this]
+            {
+                const bool isCurrentLayoutCrossSystem
+                    = isCrossSystemLayout(workbench()->currentLayout());
+
+                // Bookmarks, analytics and events are not supported for the cross systems at the moment.
+                const auto appearance = isCurrentLayoutCrossSystem
+                    ? OverlappableSearchWidget::Appearance::overlay
+                    : OverlappableSearchWidget::Appearance::searchWidget;
+
+                m_bookmarksTab->setAppearance(appearance);
+                m_eventsTab->setAppearance(appearance);
+                m_analyticsTab->setAppearance(appearance);
+            });
+
         rebuildTabs();
     }
 
@@ -358,24 +377,6 @@ EventPanel::Private::Private(EventPanel* q):
 
     appContext()->clientStateHandler()->registerDelegate(
         kEventPanelStorageKey, std::make_unique<StateDelegate>(this));
-
-    connect(
-        workbench(),
-        &QnWorkbench::currentLayoutChanged,
-        this,
-        [this]
-        {
-            const bool isCurrentLayoutCrossSystem = isCrossSystemLayout(workbench()->currentLayout());
-
-            // Bookmarks, analytics and events are not supported for the cross systems at the moment.
-            const auto appearance = isCurrentLayoutCrossSystem
-                ? OverlappableSearchWidget::Appearance::overlay
-                : OverlappableSearchWidget::Appearance::searchWidget;
-
-            m_bookmarksTab->setAppearance(appearance);
-            m_eventsTab->setAppearance(appearance);
-            m_analyticsTab->setAppearance(appearance);
-        });
 }
 
 EventPanel::Private::~Private()
@@ -612,7 +613,7 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
             {
                 if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::fake))
                     return false;
-                
+
                 return QnWorkbenchAccessController::checkPermissions(
                     camera,
                     requiredPermission,
