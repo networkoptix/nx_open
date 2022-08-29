@@ -60,7 +60,6 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(
         emit nameChanged(toSharedPointer(this));
 
     setVersion(serverData.version);
-    setOsInfo(serverData.osInfo);
 }
 
 nx::vms::api::ModuleInformation QnFakeMediaServerResource::getModuleInformation() const

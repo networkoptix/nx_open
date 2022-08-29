@@ -622,7 +622,6 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
-    moduleInformation.osInfo = getOsInfo();
     moduleInformation.serverFlags = getServerFlags();
     if (moduleInformation.isNewSystem())
         moduleInformation.serverFlags |= nx::vms::api::SF_NewSystem; //< Legacy API compatibility.
