@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <variant>
+
 #include <QtCore/QThread>
 
 #include <analytics/db/analytics_db_types.h>
@@ -77,7 +79,7 @@ struct RestResultWithData
 };
 
 template<typename Data>
-using RestResultOrData = std::variant<nx::network::rest::Result, Data>;
+using ErrorOrData = std::variant<nx::network::rest::Result, Data>;
 
 using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
@@ -171,6 +173,8 @@ public:
 
     using ContextPtr = nx::network::http::ClientPool::ContextPtr;
 
+    using ErrorOrEmpty = ErrorOrData<EmptyResponseType>;
+
     /**
     * Load information about cross-server archive
     * @return value > 0 on success or <= 0 if it isn't started.
@@ -239,7 +243,7 @@ public:
         const QString& cloudAuthKey,
         const QString& cloudAccountName,
         const std::string& ownerSessionToken,
-        Result<nx::network::rest::Result>::type callback,
+        Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});
 
@@ -249,18 +253,18 @@ public:
     Handle unbindSystemFromCloud(
         const QString& password,
         const std::string& ownerSessionToken,
-        Result<nx::network::rest::Result>::type callback,
+        Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 
     Handle dumpDatabase(
         const std::string& ownerSessionToken,
-        Result<RestResultOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+        Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
         QThread* targetThread);
 
     Handle restoreDatabase(
         const nx::vms::api::DatabaseDumpData& data,
         const std::string& ownerSessionToken,
-        Result<nx::network::rest::Result>::type callback,
+        Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
 
     /* DistributedFileDownloader API */
@@ -375,7 +379,7 @@ public:
     Handle changeCameraPassword(
         const QnVirtualCameraResourcePtr& camera,
         const QAuthenticator& auth,
-        Result<nx::network::rest::Result>::type callback,
+        Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -549,7 +553,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getServersInfo(
-        Result<RestResultOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+        Result<ErrorOrData<nx::vms::api::ServerInformationList>>::type&& callback,
         QThread* targetThread);
 
     Handle getEngineAnalyticsSettings(
@@ -669,7 +673,7 @@ public:
 
     Handle loginAsync(
         const nx::vms::api::LoginSessionRequest& data,
-        Result<RestResultOrData<nx::vms::api::LoginSession>>::type callback,
+        Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
         QThread* targetThread);
 
     Handle replaceDevice(
@@ -912,5 +916,8 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerConnection::DebugFlags);
+
+using Empty = ServerConnection::EmptyResponseType;
+using ErrorOrEmpty = ServerConnection::ErrorOrEmpty;
 
 } // namespace rest
