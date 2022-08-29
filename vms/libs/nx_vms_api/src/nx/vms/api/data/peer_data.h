@@ -68,13 +68,23 @@ struct NX_VMS_API PeerData: PersistentIdData
     static bool isMobileClient(PeerType peerType);
     static bool isCloudServer(PeerType peerType);
 
-    /** Unique running instance ID of the peer. */
+    /**%apidoc Unique running instance ID of the peer. */
     QnUuid instanceId;
 
-    /** Type of the peer. */
+    /**%apidoc Type of the peer. */
     PeerType peerType{PeerType::notDefined};
 
-    /** Preferred client data serialization format */
+    /**%apidoc[opt]:enum
+     * Preferred client data serialization format
+     * %value JsonFormat
+     * %value UbjsonFormat
+     * %value CsvFormat
+     * %value XmlFormat
+     * %value CompressedPeriodsFormat
+     * %value UrlQueryFormat
+     * %value UrlEncodedFormat
+     * %value UnsupportedFormat
+     */
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
 };
 #define PeerData_Fields \

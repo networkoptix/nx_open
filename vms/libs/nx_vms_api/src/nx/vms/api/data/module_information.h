@@ -15,6 +15,7 @@
 
 #include "data_macros.h"
 #include "os_information.h"
+#include "runtime_data.h"
 #include "software_version.h"
 #include "timestamp.h"
 
@@ -41,7 +42,6 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     QString customization;
     QString brand;
     SoftwareVersion version; /**<%apidoc:string */
-    nx::utils::OsInfo osInfo;
     QString systemName;
     QString name;
     bool sslAllowed = true;
@@ -76,7 +76,6 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     (type) \
     (customization) \
     (version) \
-    (osInfo) \
     (systemName) \
     (name) \
     (port) \
@@ -148,7 +147,26 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
 
     std::chrono::milliseconds systemIdentityTimeMs{0};
     TransactionLogTime transactionLogTime;
-    QStringList hardwareIds;
+
+    ServerInformation() = default;
+    ServerInformation(const ServerInformation& rhs) = default;
+    ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
+
+    QnUuid getId() const { return id; }
+};
+
+#define ServerInformation_Fields ModuleInformationWithAddresses_Fields \
+    (userProvidedCertificatePem) \
+    (certificatePem) \
+    (systemIdentityTimeMs) \
+    (transactionLogTime) \
+
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
+NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
+
+struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
+{
+    nx::utils::OsInfo osInfo;
 
     /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
     milliseconds osTimeMs = 0ms;
@@ -159,27 +177,19 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     /**%apidoc Identification of the time zone in the text form. */
     QString timeZoneId;
 
-    ServerInformation() = default;
-    ServerInformation(const ServerInformation& rhs) = default;
-    ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
+    RuntimeData runtimeData;
 
-    bool operator==(const ServerInformation& other) const = default;
+    ServerRuntimeInformation() = default;
+    ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
 
     QnUuid getId() const { return id; }
 };
 
-#define ServerInformation_Fields ModuleInformationWithAddresses_Fields \
-    (userProvidedCertificatePem) \
-    (certificatePem) \
-    (systemIdentityTimeMs) \
-    (transactionLogTime) \
-    (hardwareIds) \
-    (osTimeMs) \
-    (timeZoneOffsetMs) \
-    (timeZoneId)
+#define ServerRuntimeInformation_Fields \
+    (port)(id)(osInfo)(osTimeMs)(timeZoneOffsetMs)(timeZoneId)(runtimeData)
 
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
-NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
+NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
+NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);
 
 } // namespace nx::vms::api
 
