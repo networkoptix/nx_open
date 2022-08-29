@@ -28,11 +28,15 @@ extern "C"
 #include <nx/vms/client/core/graphics/shader_helper.h>
 
 #include <nx/media/quick_sync/qsv_supported.h>
+
 #ifdef __QSV_SUPPORTED__
-//#include <nx/media/quick_sync/quick_sync_video_frame.h>
+#include <nx/media/quick_sync/quick_sync_video_frame.h>
+#ifndef WIN32
+#include <nx/media/nvidia/nvidia_renderer.h>
+#endif
 #endif //__QSV_SUPPORTED__
 
-#include <nx/media/nvidia/nvidia_renderer.h>
+
 
 namespace
 {
@@ -1174,8 +1178,10 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const CLConstVideoDecoderOutputPtr& frame)
 {
+#ifdef __QSV_SUPPORTED__
     emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
     emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
+
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
     QSize displaySize = emptyPictureBuf->displaySize();
     QSize frameSize = frame->size();
@@ -1185,49 +1191,40 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
         displaySize = frameSize;
 
     displaySize = alignSize(displaySize, 8, 8);
-    //displaySize = QSize((displaySize.width() / 8 + 1) * 8, (displaySize.height() / 8 + 1) * 8);
-
-    texture->ensureInitialized(
-        displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
-
-    if (!nx::media::nvidia::renderToRgb(frame->getVideoSurface(), texture->m_id, displaySize))
-    {
-        NX_ERROR(this, "Failed to render video memory to OpenGL texture");
-        return false;
-    }
-    return true;
-
-#ifdef __QSV_SUPPORTED__
-  /*  emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
-    emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
-    QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
-    QSize displaySize = emptyPictureBuf->displaySize();
-    QSize frameSize = frame->size();
-    if (!displaySize.isEmpty())
-        displaySize = displaySize.boundedTo(frameSize);
-    else
-        displaySize = frameSize;
 
     bool isNewTexture = texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
-    float cropWidth = 1;
-    float cropHeight = 1;
-
-    if (!renderToRgb(
-        frame->getVideoSurface(),
-        isNewTexture,
-        texture->m_id,
-        m_initializedContext,
-        frame->scaleFactor,
-        &cropWidth,
-        &cropHeight))
+#ifndef WIN32
+    if (frame->getVideoSurface()->type() == SurfaceType::Nvidia)
     {
-        NX_ERROR(this, "Failed to render video memory to OpenGL texture");
-        return false;
+        if (!nx::media::nvidia::renderToRgb(frame->getVideoSurface(), texture->m_id, displaySize))
+        {
+            NX_ERROR(this, "Failed to render video memory to OpenGL texture");
+            return false;
+        }
     }
-    texture->m_texCoords = QVector2D(cropWidth, cropHeight);
-    return true;*/
+    else
+#endif
+    {
+        float cropWidth = 1;
+        float cropHeight = 1;
+        if (!renderToRgb(
+            frame->getVideoSurface(),
+            isNewTexture,
+            texture->m_id,
+            m_initializedContext,
+            frame->scaleFactor,
+            &cropWidth,
+            &cropHeight))
+        {
+            NX_ERROR(this, "Failed to render video memory to OpenGL texture");
+            return false;
+        }
+        texture->m_texCoords = QVector2D(cropWidth, cropHeight);
+    }
+    return true;
+
 #else //__QSV_SUPPORTED__
     return false;
 #endif //__QSV_SUPPORTED__

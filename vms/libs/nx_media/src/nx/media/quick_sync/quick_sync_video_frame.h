@@ -21,6 +21,7 @@ public:
         float* cropHeight);
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
+    virtual SurfaceType type() override { return SurfaceType::Intel; };
 
 private:
     // Contain video surface

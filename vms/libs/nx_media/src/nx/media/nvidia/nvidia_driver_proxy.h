@@ -20,7 +20,6 @@ public:
         return proxy;
     }
 
-
 public:
     using cuvidCreateDecoderType = CUresult (*)(CUvideodecoder*, CUVIDDECODECREATEINFO*);
     using cuvidReconfigureDecoderType = CUresult (*)(CUvideodecoder, CUVIDRECONFIGUREDECODERINFO*);
@@ -60,7 +59,6 @@ public:
 private:
     linux::LibraryLoader m_loader;
 };
-
 
 class NvidiaDriverApiProxy
 {
@@ -116,35 +114,3 @@ private:
 };
 
 } // namespace nx::media::nvidia
-
-
-
-/*CUresult CUDAAPI cuvidCreateVideoSource(CUvideosource *pObj, const char *pszFileName, CUVIDSOURCEPARAMS *pParams);
-
-CUresult CUDAAPI cuvidCreateVideoSourceW(CUvideosource *pObj, const wchar_t *pwszFileName, CUVIDSOURCEPARAMS *pParams);
-
-CUresult CUDAAPI cuvidDestroyVideoSource(CUvideosource obj);
-
-CUresult CUDAAPI cuvidSetVideoSourceState(CUvideosource obj, cudaVideoState state);
-
-cudaVideoState CUDAAPI cuvidGetVideoSourceState(CUvideosource obj);
-
-CUresult CUDAAPI cuvidGetSourceVideoFormat(CUvideosource obj, CUVIDEOFORMAT *pvidfmt, unsigned int flags);
-
-CUresult CUDAAPI cuvidGetSourceAudioFormat(CUvideosource obj, CUAUDIOFORMAT *paudfmt, unsigned int flags);
-
-
-
-
-#if !defined(__CUVID_DEVPTR64) || defined(__CUVID_INTERNAL)
-extern CUresult CUDAAPI cuvidMapVideoFrame(CUvideodecoder hDecoder, int nPicIdx,
-                                           unsigned int *pDevPtr, unsigned int *pPitch,
-                                           CUVIDPROCPARAMS *pVPP);
-extern CUresult CUDAAPI cuvidUnmapVideoFrame(CUvideodecoder hDecoder, unsigned int DevPtr);
-
-
-
-extern CUresult CUDAAPI cuvidCtxLock(CUvideoctxlock lck, unsigned int reserved_flags);
-extern CUresult CUDAAPI cuvidCtxUnlock(CUvideoctxlock lck, unsigned int reserved_flags);
-
-*/
