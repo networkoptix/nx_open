@@ -153,8 +153,10 @@ struct QnIncompatibleServerWatcher::Private
     void addResource(
         const nx::vms::api::DiscoveredServerData& serverData)
     {
+        auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
+
         // Setting '!compatible' flag for original server.
-        if (auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id))
+        if (server)
             server->setCompatible(false);
 
         QnUuid id = getFakeId(serverData.id);
@@ -183,15 +185,17 @@ struct QnIncompatibleServerWatcher::Private
         else
         {
             // update the resource
-            auto server = q->resourcePool()->getIncompatibleServerById(id)
+            auto fakeServer = q->resourcePool()->getIncompatibleServerById(id)
                 .dynamicCast<QnFakeMediaServerResource>();
 
-            NX_ASSERT(server, "There must be a resource in the resource pool.");
+            NX_ASSERT(fakeServer, "There must be a resource in the resource pool.");
 
-            if (!server)
+            if (!fakeServer)
                 return;
 
-            server->setFakeServerModuleInformation(serverData);
+            fakeServer->setFakeServerModuleInformation(serverData);
+            if (server)
+                fakeServer->setOsInfo(server->getOsInfo());
 
             NX_DEBUG(this, lit("Update incompatible server %1 at %2 [%3]")
                 .arg(serverData.id.toString())
@@ -238,8 +242,11 @@ struct QnIncompatibleServerWatcher::Private
     QnMediaServerResourcePtr makeResource(
         const nx::vms::api::DiscoveredServerData& serverData) const
     {
-        QnFakeMediaServerResourcePtr server(new QnFakeMediaServerResource());
-        server->setFakeServerModuleInformation(serverData);
+        auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
+        QnFakeMediaServerResourcePtr fakeServer(new QnFakeMediaServerResource());
+        fakeServer->setFakeServerModuleInformation(serverData);
+        if (auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id))
+            fakeServer->setOsInfo(server->getOsInfo());
         return server;
     }
 

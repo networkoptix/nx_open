@@ -14,13 +14,9 @@
 #include "data_macros.h"
 #include "peer_data.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
-/**
- * This structure contains all runtime data per peer. Runtime data is absent in a DB.
- */
+/**%apidoc All runtime data of the peer. Runtime data is absent in a DB. */
 struct NX_VMS_API RuntimeData
 {
     int version = 0;
@@ -34,10 +30,10 @@ struct NX_VMS_API RuntimeData
     QString publicIP;
     qint64 prematureLicenseExperationDate = 0;
 
-    /** Guid of the videowall instance for the running videowall clients. */
+    /**%apidoc Guid of the videowall instance for the running videowall clients. */
     QnUuid videoWallInstanceGuid;
 
-    /** Videowall layout id, governed by the current client instance's control session. */
+    /**%apidoc Videowall layout id, governed by the current client instance's control session. */
     QnUuid videoWallControlSession;
 
     QVector<QString> hardwareIds;
@@ -47,11 +43,12 @@ struct NX_VMS_API RuntimeData
 
     bool updateStarted = false;
 
-    /** Id of the user, under which peer is logged in (for client peers only) */
+    /**%apidoc Id of the user, under which peer is logged in (for client peers only). */
     QnUuid userId;
 
     RuntimeFlags flags = {};
 
+    /**%apidoc:uuidArray */
     QSet<QnUuid> activeAnalyticsEngines;
 
     qint64 prematureVideoWallLicenseExpirationDate = 0;
@@ -85,8 +82,6 @@ struct NX_VMS_API RuntimeData
     (prematureVideoWallLicenseExpirationDate)
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
 
 Q_DECLARE_METATYPE(nx::vms::api::RuntimeData)

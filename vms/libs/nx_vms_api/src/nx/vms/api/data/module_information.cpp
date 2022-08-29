@@ -65,6 +65,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ModuleInformationWithAddresses,
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionLogTime, (json), TransactionLogTime_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformation, (json), ServerInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerRuntimeInformation, (json), ServerRuntimeInformation_Fields)
 
 } // namespace api
 } // namespace vms
