@@ -90,16 +90,16 @@ __device__ static T Clamp(T x, T lower, T upper) {
 
 template<class Rgb, class YuvUnit>
 __device__ inline Rgb YuvToRgbForPixel(YuvUnit y, YuvUnit u, YuvUnit v) {
-    const int 
+    const int
         low = 1 << (sizeof(YuvUnit) * 8 - 4),
         mid = 1 << (sizeof(YuvUnit) * 8 - 1);
     float fy = (int)y - low, fu = (int)u - mid, fv = (int)v - mid;
     const float maxf = (1 << sizeof(YuvUnit) * 8) - 1.0f;
-    YuvUnit 
+    YuvUnit
         r = (YuvUnit)Clamp(matYuv2Rgb[0][0] * fy + matYuv2Rgb[0][1] * fu + matYuv2Rgb[0][2] * fv, 0.0f, maxf),
         g = (YuvUnit)Clamp(matYuv2Rgb[1][0] * fy + matYuv2Rgb[1][1] * fu + matYuv2Rgb[1][2] * fv, 0.0f, maxf),
         b = (YuvUnit)Clamp(matYuv2Rgb[2][0] * fy + matYuv2Rgb[2][1] * fu + matYuv2Rgb[2][2] * fv, 0.0f, maxf);
-    
+
     Rgb rgb{};
     const int nShift = abs((int)sizeof(YuvUnit) - (int)sizeof(rgb.c.r)) * 8;
     if (sizeof(YuvUnit) >= sizeof(rgb.c.r)) {
@@ -134,7 +134,7 @@ __global__ static void YuvToRgbKernel(uint8_t *pYuv, int nYuvPitch, uint8_t *pRg
         YuvToRgbForPixel<Rgb>(l0.y, ch.x, ch.y).d,
     };
     *(RgbIntx2 *)(pDst + nRgbPitch) = RgbIntx2 {
-        YuvToRgbForPixel<Rgb>(l1.x, ch.x, ch.y).d, 
+        YuvToRgbForPixel<Rgb>(l1.x, ch.x, ch.y).d,
         YuvToRgbForPixel<Rgb>(l1.y, ch.x, ch.y).d,
     };
 }
@@ -386,7 +386,7 @@ __global__ static void RgbToYuvKernel(uint8_t *pRgb, int nRgbPitch, uint8_t *pYu
         RgbToY<decltype(YuvUnitx2::x)>(rgb[3].c.r, rgb[3].c.g, rgb[3].c.b),
     };
     *(YuvUnitx2 *)(pDst + (nHeight - y / 2) * nYuvPitch) = YuvUnitx2 {
-        RgbToU<decltype(YuvUnitx2::x)>(r, g, b), 
+        RgbToU<decltype(YuvUnitx2::x)>(r, g, b),
         RgbToV<decltype(YuvUnitx2::x)>(r, g, b),
     };
 }

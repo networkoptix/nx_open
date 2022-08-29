@@ -1,21 +1,15 @@
-/*
-* Copyright 2017-2021 NVIDIA Corporation.  All rights reserved.
-*
-* Please refer to the NVIDIA end user license agreement (EULA) associated
-* with this source code for terms and conditions that govern your use of
-* this software. Any use, reproduction, disclosure, or distribution of
-* this software and related documentation outside the terms of the EULA
-* is strictly prohibited.
-*
-*/
 
 #include <iostream>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 
-#include "../../../Interface/nvcuvid.h"
-#include "NvDecoder/NvDecoder.h"
+#include "NvDecoder.h"
+#include <nx/utils/log/log.h>
+
+#include <nx/media/nvidia/nvidia_driver_proxy.h>
+
+using namespace nx::media::nvidia;
 
 #define START_TIMER auto start = std::chrono::high_resolution_clock::now();
 
@@ -32,7 +26,7 @@
         if (err__ != CUDA_SUCCESS)                                                                                               \
         {                                                                                                                        \
             const char *szErrName = NULL;                                                                                        \
-            cuGetErrorName(err__, &szErrName);                                                                                   \
+            NvidiaDriverApiProxy::instance().cuGetErrorName(err__, &szErrName);                                                                                   \
             std::ostringstream errorLog;                                                                                         \
             errorLog << "CUDA driver API error " << szErrName ;                                                                  \
             throw NVDECException::makeNVDECException(errorLog.str(), err__, __FUNCTION__, __FILE__, __LINE__);                   \
@@ -68,7 +62,7 @@ static const char * GetVideoCodecString(cudaVideoCodec eCodec) {
     if (eCodec >= 0 && eCodec <= cudaVideoCodec_NumCodecs) {
         return aCodecName[eCodec].name;
     }
-    for (int i = cudaVideoCodec_NumCodecs + 1; i < sizeof(aCodecName) / sizeof(aCodecName[0]); i++) {
+    for (int i = cudaVideoCodec_NumCodecs + 1; i < (int)sizeof(aCodecName) / sizeof(aCodecName[0]); i++) {
         if (eCodec == aCodecName[i].eCodec) {
             return aCodecName[eCodec].name;
         }
@@ -87,7 +81,7 @@ static const char * GetVideoChromaFormatString(cudaVideoChromaFormat eChromaForm
         { cudaVideoChromaFormat_444,        "YUV 444"              },
     };
 
-    if (eChromaFormat >= 0 && eChromaFormat < sizeof(aChromaFormatName) / sizeof(aChromaFormatName[0])) {
+    if (eChromaFormat >= 0 && eChromaFormat < (int)sizeof(aChromaFormatName) / sizeof(aChromaFormatName[0])) {
         return aChromaFormatName[eChromaFormat].name;
     }
     return "Unknown";
@@ -130,14 +124,6 @@ static int GetChromaPlaneCount(cudaVideoSurfaceFormat eSurfaceFormat)
 }
 
 std::map<int, int64_t> NvDecoder::sessionOverHead = { {0,0}, {1,0} };
-
-/**
-*   @brief  This function is used to get codec string from codec id
-*/
-const char *NvDecoder::GetCodecString(cudaVideoCodec eCodec)
-{
-    return GetVideoCodecString(eCodec);
-}
 
 /* Called when the parser encounters sequence header for AV1 SVC content
 *  return value interpretation:
@@ -191,9 +177,9 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     decodecaps.eChromaFormat = pVideoFormat->chroma_format;
     decodecaps.nBitDepthMinus8 = pVideoFormat->bit_depth_luma_minus8;
 
-    CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-    NVDEC_API_CALL(cuvidGetDecoderCaps(&decodecaps));
-    CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidGetDecoderCaps(&decodecaps));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL));
 
     if(!decodecaps.bIsSupported){
         NVDEC_THROW_ERROR("Codec not supported on this GPU", CUDA_ERROR_NOT_SUPPORTED);
@@ -258,7 +244,7 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
             m_eOutputFormat = cudaVideoSurfaceFormat_YUV444;
         else if (decodecaps.nOutputFormatMask & (1 << cudaVideoSurfaceFormat_YUV444_16Bit))
             m_eOutputFormat = cudaVideoSurfaceFormat_YUV444_16Bit;
-        else 
+        else
             NVDEC_THROW_ERROR("No supported output format found", CUDA_ERROR_NOT_SUPPORTED);
     }
     m_videoFormat = *pVideoFormat;
@@ -342,9 +328,11 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     ;
     m_videoInfo << std::endl;
 
-    CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-    NVDEC_API_CALL(cuvidCreateDecoder(&m_hDecoder, &videoDecodeCreateInfo));
-    CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
+    m_frameQueue.configure(GetWidth() * m_nBPP, m_nLumaHeight + m_nChromaHeight * m_nNumChromaPlanes);
+
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidCreateDecoder(&m_hDecoder, &videoDecodeCreateInfo));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL));
     STOP_TIMER("Session Initialization Time: ");
     NvDecoder::addDecoderSessionOverHead(getDecoderSessionID(), elapsedTime);
     return nDecodeSurface;
@@ -453,55 +441,12 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
     reconfigParams.ulNumDecodeSurfaces = nDecodeSurface;
 
     START_TIMER
-    CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-    NVDEC_API_CALL(cuvidReconfigureDecoder(m_hDecoder, &reconfigParams));
-    CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidReconfigureDecoder(m_hDecoder, &reconfigParams));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL));
     STOP_TIMER("Session Reconfigure Time: ");
 
     return nDecodeSurface;
-}
-
-int NvDecoder::setReconfigParams(const Rect *pCropRect, const Dim *pResizeDim)
-{
-    m_bReconfigExternal = true;
-    m_bReconfigExtPPChange = false;
-    if (pCropRect)
-    {
-        if (!((pCropRect->t == m_cropRect.t) && (pCropRect->l == m_cropRect.l) &&
-            (pCropRect->b == m_cropRect.b) && (pCropRect->r == m_cropRect.r)))
-        {
-            m_bReconfigExtPPChange = true;
-            m_cropRect = *pCropRect;
-        }
-    }
-    if (pResizeDim)
-    {
-        if (!((pResizeDim->w == m_resizeDim.w) && (pResizeDim->h == m_resizeDim.h)))
-        {
-            m_bReconfigExtPPChange = true;
-            m_resizeDim = *pResizeDim;
-        }
-    }
-
-    // Clear existing output buffers of different size
-    uint8_t *pFrame = NULL;
-    while (!m_vpFrame.empty())
-    {
-        pFrame = m_vpFrame.back();
-        m_vpFrame.pop_back();
-        if (m_bUseDeviceFrame)
-        {
-            CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-            CUDA_DRVAPI_CALL(cuMemFree((CUdeviceptr)pFrame));
-            CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
-        }
-        else
-        {
-            delete pFrame;
-        }
-    }
-
-    return 1;
 }
 
 /* Return value from HandlePictureDecode() are interpreted as:
@@ -514,8 +459,8 @@ int NvDecoder::HandlePictureDecode(CUVIDPICPARAMS *pPicParams) {
         return false;
     }
     m_nPicNumInDecodeOrder[pPicParams->CurrPicIdx] = m_nDecodePicCnt++;
-    CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-    NVDEC_API_CALL(cuvidDecodePicture(m_hDecoder, pPicParams));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidDecodePicture(m_hDecoder, pPicParams));
     if (m_bForce_zero_latency && ((!pPicParams->field_pic_flag) || (pPicParams->second_field)))
     {
         CUVIDPARSERDISPINFO dispInfo;
@@ -525,7 +470,7 @@ int NvDecoder::HandlePictureDecode(CUVIDPICPARAMS *pPicParams) {
         dispInfo.top_field_first = pPicParams->bottom_field_flag ^ 1;
         HandlePictureDisplay(&dispInfo);
     }
-    CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL));
     return 1;
 }
 
@@ -542,44 +487,24 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
 
     CUdeviceptr dpSrcFrame = 0;
     unsigned int nSrcPitch = 0;
-    CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-    NVDEC_API_CALL(cuvidMapVideoFrame(m_hDecoder, pDispInfo->picture_index, &dpSrcFrame,
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
+
+    uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
+    if (pDecodedFrame == nullptr)
+    {
+        NX_WARNING(this, "Not enought frame buffers!");
+        return 1;
+    }
+
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidMapVideoFrame(m_hDecoder, pDispInfo->picture_index, &dpSrcFrame,
         &nSrcPitch, &videoProcessingParameters));
 
     CUVIDGETDECODESTATUS DecodeStatus;
     memset(&DecodeStatus, 0, sizeof(DecodeStatus));
-    CUresult result = cuvidGetDecodeStatus(m_hDecoder, pDispInfo->picture_index, &DecodeStatus);
+    CUresult result = NvidiaDriverDecoderProxy::instance().cuvidGetDecodeStatus(m_hDecoder, pDispInfo->picture_index, &DecodeStatus);
     if (result == CUDA_SUCCESS && (DecodeStatus.decodeStatus == cuvidDecodeStatus_Error || DecodeStatus.decodeStatus == cuvidDecodeStatus_Error_Concealed))
     {
         printf("Decode Error occurred for picture %d\n", m_nPicNumInDecodeOrder[pDispInfo->picture_index]);
-    }
-
-    uint8_t *pDecodedFrame = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        if ((unsigned)++m_nDecodedFrame > m_vpFrame.size())
-        {
-            // Not enough frames in stock
-            m_nFrameAlloc++;
-            uint8_t *pFrame = NULL;
-            if (m_bUseDeviceFrame)
-            {
-                if (m_bDeviceFramePitched)
-                {
-                    CUDA_DRVAPI_CALL(cuMemAllocPitch((CUdeviceptr *)&pFrame, &m_nDeviceFramePitch, GetWidth() * m_nBPP, m_nLumaHeight + (m_nChromaHeight * m_nNumChromaPlanes), 16));
-                }
-                else
-                {
-                    CUDA_DRVAPI_CALL(cuMemAlloc((CUdeviceptr *)&pFrame, GetFrameSize()));
-                }
-            }
-            else
-            {
-                pFrame = new uint8_t[GetFrameSize()];
-            }
-            m_vpFrame.push_back(pFrame);
-        }
-        pDecodedFrame = m_vpFrame[m_nDecodedFrame - 1];
     }
 
     // Copy luma plane
@@ -589,47 +514,46 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     m.srcPitch = nSrcPitch;
     m.dstMemoryType = m_bUseDeviceFrame ? CU_MEMORYTYPE_DEVICE : CU_MEMORYTYPE_HOST;
     m.dstDevice = (CUdeviceptr)(m.dstHost = pDecodedFrame);
-    m.dstPitch = m_nDeviceFramePitch ? m_nDeviceFramePitch : GetWidth() * m_nBPP;
+    m.dstPitch = GetDeviceFramePitch();
     m.WidthInBytes = GetWidth() * m_nBPP;
     m.Height = m_nLumaHeight;
-    CUDA_DRVAPI_CALL(cuMemcpy2DAsync(&m, m_cuvidStream));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuMemcpy2DAsync(&m, m_cuvidStream));
 
     // Copy chroma plane
     // NVDEC output has luma height aligned by 2. Adjust chroma offset by aligning height
     m.srcDevice = (CUdeviceptr)((uint8_t *)dpSrcFrame + m.srcPitch * ((m_nSurfaceHeight + 1) & ~1));
     m.dstDevice = (CUdeviceptr)(m.dstHost = pDecodedFrame + m.dstPitch * m_nLumaHeight);
     m.Height = m_nChromaHeight;
-    CUDA_DRVAPI_CALL(cuMemcpy2DAsync(&m, m_cuvidStream));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuMemcpy2DAsync(&m, m_cuvidStream));
 
     if (m_nNumChromaPlanes == 2)
     {
         m.srcDevice = (CUdeviceptr)((uint8_t *)dpSrcFrame + m.srcPitch * ((m_nSurfaceHeight + 1) & ~1) * 2);
         m.dstDevice = (CUdeviceptr)(m.dstHost = pDecodedFrame + m.dstPitch * m_nLumaHeight * 2);
         m.Height = m_nChromaHeight;
-        CUDA_DRVAPI_CALL(cuMemcpy2DAsync(&m, m_cuvidStream));
+        CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuMemcpy2DAsync(&m, m_cuvidStream));
     }
-    CUDA_DRVAPI_CALL(cuStreamSynchronize(m_cuvidStream));
-    CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuStreamSynchronize(m_cuvidStream));
+    CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL));
 
-    if ((int)m_vTimestamp.size() < m_nDecodedFrame) {
-        m_vTimestamp.resize(m_vpFrame.size());
-    }
-    m_vTimestamp[m_nDecodedFrame - 1] = pDispInfo->timestamp;
-
-    NVDEC_API_CALL(cuvidUnmapVideoFrame(m_hDecoder, dpSrcFrame));
+    m_timestamps.push_back(pDispInfo->timestamp);
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidUnmapVideoFrame(m_hDecoder, dpSrcFrame));
     return 1;
 }
 
-NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency, 
-    bool bDeviceFramePitched, const Rect *pCropRect, const Dim *pResizeDim, int maxWidth, int maxHeight, unsigned int clkRate,
+NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency,
+    const Rect *pCropRect, const Dim *pResizeDim, int maxWidth, int maxHeight, unsigned int clkRate,
     bool force_zero_latency) :
-    m_cuContext(cuContext), m_bUseDeviceFrame(bUseDeviceFrame), m_eCodec(eCodec), m_bDeviceFramePitched(bDeviceFramePitched),
+    m_cuContext(cuContext), m_bUseDeviceFrame(bUseDeviceFrame), m_eCodec(eCodec),
     m_nMaxWidth (maxWidth), m_nMaxHeight(maxHeight), m_bForce_zero_latency(force_zero_latency)
 {
+    if (!NvidiaDriverDecoderProxy::instance().load() || !NvidiaDriverApiProxy::instance().load())
+        throw NVDECException::makeNVDECException("Failed to load driver library", CUDA_SUCCESS, __FUNCTION__, __FILE__, __LINE__);
+
     if (pCropRect) m_cropRect = *pCropRect;
     if (pResizeDim) m_resizeDim = *pResizeDim;
 
-    NVDEC_API_CALL(cuvidCtxLockCreate(&m_ctxLock, cuContext));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidCtxLockCreate(&m_ctxLock, cuContext));
 
     decoderSessionID = 0;
 
@@ -643,47 +567,31 @@ NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec e
     videoParserParameters.pfnDecodePicture = HandlePictureDecodeProc;
     videoParserParameters.pfnDisplayPicture = m_bForce_zero_latency ? NULL : HandlePictureDisplayProc;
     videoParserParameters.pfnGetOperatingPoint = HandleOperatingPointProc;
-    NVDEC_API_CALL(cuvidCreateVideoParser(&m_hParser, &videoParserParameters));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidCreateVideoParser(&m_hParser, &videoParserParameters));
 }
 
 NvDecoder::~NvDecoder() {
 
     START_TIMER
 
-    if (m_hParser) {
-        cuvidDestroyVideoParser(m_hParser);
-    }
-    cuCtxPushCurrent(m_cuContext);
-    if (m_hDecoder) {
-        cuvidDestroyDecoder(m_hDecoder);
-    }
+    if (m_hParser)
+        NvidiaDriverDecoderProxy::instance().cuvidDestroyVideoParser(m_hParser);
 
-    std::lock_guard<std::mutex> lock(m_mtxVPFrame);
+    NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext);
+    if (m_hDecoder)
+        NvidiaDriverDecoderProxy::instance().cuvidDestroyDecoder(m_hDecoder);
 
-    for (uint8_t *pFrame : m_vpFrame)
-    {
-        if (m_bUseDeviceFrame)
-        {
-            cuMemFree((CUdeviceptr)pFrame);
-        }
-        else
-        {
-            delete[] pFrame;
-        }
-    }
-    cuCtxPopCurrent(NULL);
-
-    cuvidCtxLockDestroy(m_ctxLock);
+    m_frameQueue.clear();
+    NvidiaDriverApiProxy::instance().cuCtxPopCurrent(NULL);
+    NvidiaDriverDecoderProxy::instance().cuvidCtxLockDestroy(m_ctxLock);
 
     STOP_TIMER("Session Deinitialization Time: ");
 
     NvDecoder::addDecoderSessionOverHead(getDecoderSessionID(), elapsedTime);
 }
 
-int NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTimestamp)
+void  NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTimestamp)
 {
-    m_nDecodedFrame = 0;
-    m_nDecodedFrameReturned = 0;
     CUVIDSOURCEDATAPACKET packet = { 0 };
     packet.payload = pData;
     packet.payload_size = nSize;
@@ -692,54 +600,23 @@ int NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTime
     if (!pData || nSize == 0) {
         packet.flags |= CUVID_PKT_ENDOFSTREAM;
     }
-    NVDEC_API_CALL(cuvidParseVideoData(m_hParser, &packet));
+    NVDEC_API_CALL(NvidiaDriverDecoderProxy::instance().cuvidParseVideoData(m_hParser, &packet));
     m_cuvidStream = 0;
-
-    return m_nDecodedFrame;
 }
 
 uint8_t* NvDecoder::GetFrame(int64_t* pTimestamp)
 {
-    if (m_nDecodedFrame > 0)
+    auto frame = m_frameQueue.getNextFrame();
+    if (frame && pTimestamp)
     {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        m_nDecodedFrame--;
-        if (pTimestamp)
-            *pTimestamp = m_vTimestamp[m_nDecodedFrameReturned];
-        return m_vpFrame[m_nDecodedFrameReturned++];
+        *pTimestamp = m_timestamps.front();
+        m_timestamps.pop_front();
     }
 
-    return NULL;
+    return frame;
 }
 
-uint8_t* NvDecoder::GetLockedFrame(int64_t* pTimestamp)
+void NvDecoder::releaseFrame(uint8_t* frame)
 {
-    uint8_t *pFrame;
-    uint64_t timestamp;
-    if (m_nDecodedFrame > 0) {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        m_nDecodedFrame--;
-        pFrame = m_vpFrame[0];
-        m_vpFrame.erase(m_vpFrame.begin(), m_vpFrame.begin() + 1);
-        
-        timestamp = m_vTimestamp[0];
-        m_vTimestamp.erase(m_vTimestamp.begin(), m_vTimestamp.begin() + 1);
-        
-        if (pTimestamp)
-            *pTimestamp = timestamp;
-        
-        return pFrame;
-    }
-
-    return NULL;
-}
-
-void NvDecoder::UnlockFrame(uint8_t **pFrame)
-{
-    std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-    m_vpFrame.insert(m_vpFrame.end(), &pFrame[0], &pFrame[1]);
-    
-    // add a dummy entry for timestamp
-    uint64_t timestamp[2] = {0};
-    m_vTimestamp.insert(m_vTimestamp.end(), &timestamp[0], &timestamp[1]);
+    m_frameQueue.releaseFrame(frame);
 }

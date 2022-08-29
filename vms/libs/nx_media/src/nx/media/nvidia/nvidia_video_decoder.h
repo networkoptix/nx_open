@@ -9,7 +9,6 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/media/abstract_video_decoder.h>
 
-
 namespace nx::media::nvidia {
 
 namespace linux{
@@ -32,11 +31,12 @@ public:
     static bool isCompatible(
         const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height);
 
+    static int instanceCount() { return m_instanceCount; }
+
 //    bool scaleFrame(
   //      mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize);
 
     linux::Renderer& getRenderer();
-    void resetDecoder();
 
     void pushContext();
     void popContext();
@@ -45,6 +45,7 @@ private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
 
 private:
+    static int m_instanceCount;
     std::unique_ptr<NvidiaVideoDecoderImpl> m_impl;
 };
 

@@ -3,13 +3,10 @@
 set(additional_sources)
 set(additional_sources_include_dirs)
 
-set(artifacts_dir ${CMAKE_CURRENT_LIST_DIR}/../../../artifacts)
+set(artifacts_dir ${open_source_root}/artifacts)
 
-#find_package(CUDA)
-#message("CUDA_CUDA_LIBRARY: ${CUDA_CUDA_LIBRARY}")
-#message("CUDA_TOOLKIT_ROOT_DIR: ${CUDA_TOOLKIT_ROOT_DIR}")
-
-list(APPEND additional_sources_include_dirs /home/lbusygin/develop/Video_Codec_SDK_11.1.5/Interface)
+list(APPEND additional_sources_include_dirs ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Interface)
+list(APPEND additional_sources_include_dirs ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples)
 
 # QuickSync: Add additional sources for the supported platforms (Windows x64 and Linux x64).
 if(NOT APPLE AND arch STREQUAL "x64")
@@ -22,11 +19,36 @@ if(NOT APPLE AND arch STREQUAL "x64")
         ${intel_media_sdk_dir}/src/base_allocator.cpp
         ${intel_media_sdk_dir}/src/sysmem_allocator.cpp
     )
+    # Add Nvidia decoder sources
+    list(APPEND additional_sources
+        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/NvCodec/NvDecoder.cpp
+    )
+
     if(LINUX)
         list(APPEND additional_sources
             ${intel_media_sdk_dir}/include/vaapi_allocator.h
             ${intel_media_sdk_dir}/src/vaapi_allocator.cpp
         )
+
+        set(libcolor_conversion_path ${CMAKE_BINARY_DIR}/lib/libcolor_conversion.so)
+        set(cudart_library_path ${CMAKE_BINARY_DIR}/lib/libcudart.so)
+        set(libcolor_conversion_src_path ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/Utils)
+        set(NVCC_COMMAND ${CONAN_CUDA-TOOLKIT_ROOT}/cuda-toolkit/usr/local/cuda-11.7/bin/nvcc
+            --compiler-bindir ${CMAKE_CXX_COMPILER}
+            --shared -o ${libcolor_conversion_path}
+            ${libcolor_conversion_src_path}/ColorSpace.cu
+            ${libcolor_conversion_src_path}/Resize.cu
+            -gencode arch=compute_50,code=\\"sm_50,compute_50\\" -std=c++11  --compiler-options -fPIC)
+        add_custom_command(
+            OUTPUT ${libcolor_conversion_path}
+            DEPENDS
+                ${libcolor_conversion_src_path}/ColorSpace.cu
+                ${libcolor_conversion_src_path}/Resize.cu
+                ${libcolor_conversion_src_path}/ColorSpace.h
+            COMMAND ${NVCC_COMMAND}
+        )
+        add_custom_target(libcolor_conversion DEPENDS ${libcolor_conversion_path})
+
     endif()
     if(WINDOWS)
         list(APPEND additional_sources
@@ -59,18 +81,22 @@ nx_add_target(nx_media
         nx_vms_common
         nx_fusion
         nx_utils
-        /usr/local/cuda-11.7/targets/x86_64-linux/lib/libcudart.so
-        /home/lbusygin/tmp/1/color_space/libcolor_conversion.so
+        ${cudart_library_path}
+        ${libcolor_conversion_path}
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
 )
 
+if(LINUX AND arch STREQUAL "x64")
+    add_dependencies(nx_media libcolor_conversion)
+endif()
+
 target_include_directories(nx_media
     PRIVATE
         ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS}
         ${additional_sources_include_dirs}
-        /usr/local/cuda/include
+        ${CONAN_CUDA-TOOLKIT_ROOT}/cuda-toolkit/usr/local/cuda-11.7/include
 )
 
 if(ANDROID OR IOS)
@@ -78,8 +104,13 @@ if(ANDROID OR IOS)
     target_link_libraries(nx_media PRIVATE libjpeg-turbo::libjpeg-turbo)
 endif()
 
+if(APPLE OR WINDOWS OR NOT arch STREQUAL "x64")
+    nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)
+endif()
+
 if(APPLE OR NOT arch STREQUAL "x64")
     nx_exclude_sources_from_target(nx_media src/nx/media/quick_sync)
+
 else()
     if(LINUX)
         find_package(libva REQUIRED)

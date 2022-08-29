@@ -39,6 +39,6 @@ private:
     GLuint m_pbo = 0; //< Buffer object to upload texture data
 };
 
-} // nx::media::quick_sync::linux
+} // nx::media::nvidia::linux
 
 #endif // __linux__

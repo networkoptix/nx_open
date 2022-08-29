@@ -9,8 +9,8 @@
 #include <cudaGL.h>
 
 #include <nx/media/nvidia/nvidia_utils.h>
-#include <nx/media/nvidia/NvCodecUtils.h>
-#include <nx/media/nvidia/ColorSpace.h>
+#include <Utils/NvCodecUtils.h>
+#include <Utils/ColorSpace.h>
 #include <nx/media/nvidia/nvidia_driver_proxy.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
 

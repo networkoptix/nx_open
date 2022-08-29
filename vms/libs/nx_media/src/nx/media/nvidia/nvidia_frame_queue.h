@@ -37,9 +37,6 @@ private:
 
     std::set<uint8_t*> m_otherSizeFrames; // Frames that allocated before buffer size changed.
     std::mutex m_mutex;
-
-    int releaseCount = 0;
-    int getCount = 0;
 };
 
 } // namespace nx::media::nvidia

@@ -7,7 +7,7 @@ struct AVIOContext;
 
 namespace nx::media::ffmpeg {
 
-class IoContext
+class NX_VMS_COMMON_API IoContext
 {
 public:
     IoContext(uint32_t bufferSize, bool writable);
@@ -27,6 +27,6 @@ private:
 
 using IoContextPtr = std::unique_ptr<IoContext>;
 
-IoContextPtr openFile(const std::string& fileName);
+IoContextPtr NX_VMS_COMMON_API openFile(const std::string& fileName);
 
 } // namespace nx::media::ffmpeg
