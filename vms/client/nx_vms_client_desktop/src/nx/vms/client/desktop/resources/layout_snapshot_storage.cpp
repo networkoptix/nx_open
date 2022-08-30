@@ -7,46 +7,42 @@
 
 namespace nx::vms::client::desktop {
 
-LayoutSnapshotStorage::LayoutSnapshotStorage(QObject* parent):
-    QObject(parent)
+bool LayoutSnapshotStorage::hasSnapshot(const QnLayoutResourcePtr& layout) const
 {
+    if (!NX_ASSERT(layout, "An attempt to check snapshot availability for null layout"))
+        return false;
+
+    return m_snapshotByLayoutId.contains(layout->getId());
 }
 
-LayoutSnapshotStorage::~LayoutSnapshotStorage()
-{
-}
-
-const nx::vms::api::LayoutData& LayoutSnapshotStorage::snapshot(
+const nx::vms::api::LayoutData LayoutSnapshotStorage::snapshot(
     const QnLayoutResourcePtr& layout) const
 {
-    static nx::vms::api::LayoutData emptyResult;
+    if (!NX_ASSERT(layout, "An attempt to get snapshot for null layout"))
+        return {};
 
-    auto pos = m_snapshotByLayoutId.find(layout->getId());
-    if (pos == m_snapshotByLayoutId.end())
-    {
-        NX_ASSERT(false, "No saved snapshot exists for layout '%1'.", layout);
-        return emptyResult;
-    }
+    NX_ASSERT(hasSnapshot(layout), "No saved snapshot exists for layout '%1'", layout);
 
-    return *pos;
+    return m_snapshotByLayoutId.value(layout->getId(), nx::vms::api::LayoutData());
 }
 
-void LayoutSnapshotStorage::store(const QnLayoutResourcePtr& layout)
+void LayoutSnapshotStorage::storeSnapshot(const QnLayoutResourcePtr& layout)
 {
+    if (!NX_ASSERT(layout, "An attempt to store snapshot for null layout"))
+        return;
+
     nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    m_snapshotByLayoutId[layout->getId()] = apiLayout;
+    m_snapshotByLayoutId.insert(layout->getId(), apiLayout);
 }
 
-void LayoutSnapshotStorage::remove(const QnLayoutResourcePtr& layout)
+void LayoutSnapshotStorage::removeSnapshot(const QnLayoutResourcePtr& layout)
 {
+    if (!NX_ASSERT(layout, "An attempt to remove snapshot for null layout"))
+        return;
+        
     m_snapshotByLayoutId.remove(layout->getId());
-}
-
-void LayoutSnapshotStorage::clear()
-{
-    m_snapshotByLayoutId.clear();
 }
 
 } // namespace nx::vms::client::desktop

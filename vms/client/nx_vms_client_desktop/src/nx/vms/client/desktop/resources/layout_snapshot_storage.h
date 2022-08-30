@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QHash>
-#include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/layout_data.h>
@@ -13,19 +12,15 @@ namespace nx::vms::client::desktop {
 /**
  * This class provides easy access to snapshots of workbench layouts.
  */
-class LayoutSnapshotStorage: public QObject
+class LayoutSnapshotStorage
 {
-    Q_OBJECT
-
 public:
-    LayoutSnapshotStorage(QObject* parent = nullptr);
-    virtual ~LayoutSnapshotStorage();
+    LayoutSnapshotStorage() = default;
 
-    const nx::vms::api::LayoutData& snapshot(const QnLayoutResourcePtr& layout) const;
-
-    void store(const QnLayoutResourcePtr& layout);
-    void remove(const QnLayoutResourcePtr& layout);
-    void clear();
+    bool hasSnapshot(const QnLayoutResourcePtr& layout) const;
+    const nx::vms::api::LayoutData snapshot(const QnLayoutResourcePtr& layout) const;
+    void storeSnapshot(const QnLayoutResourcePtr& layout);
+    void removeSnapshot(const QnLayoutResourcePtr& layout);
 
 private:
     QHash<QnUuid, nx::vms::api::LayoutData> m_snapshotByLayoutId;
