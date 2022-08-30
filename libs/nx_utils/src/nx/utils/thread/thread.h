@@ -24,6 +24,13 @@ class NX_UTILS_API Thread:
     Q_OBJECT
 
 public:
+    /**
+     * Allows to reduce the thread stack size (from the default 8 MB on Linux) to save memory on
+     * low-profile devices like ARM. The value is effective for newly created threads. The value
+     * 0 means the default.
+     */
+    static void setThreadStackSize(int value) { s_threadStackSize = value; }
+
     Thread();
     virtual ~Thread();
 
@@ -73,6 +80,9 @@ protected:
     #if defined(_DEBUG)
         const std::type_info* m_type = nullptr;
     #endif
+
+private:
+    static int s_threadStackSize /*= 0*/;
 };
 
 } // namespace utils
