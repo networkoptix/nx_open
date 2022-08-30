@@ -26,11 +26,15 @@ public:
     }
 
     void setCredentials(
-        const std::string& userName,
+        const std::string& username,
         const std::string& password)
     {
-        m_userName = userName;
-        m_password = password;
+        m_credentials = nx::network::http::PasswordCredentials(username, password);
+    }
+
+    void setCredentials(nx::network::http::Credentials credentials)
+    {
+        m_credentials = std::move(credentials);
     }
 
     api::AccountManager* accountManager()
@@ -64,16 +68,18 @@ public:
 private:
     nx::cloud::db::api::ConnectionFactory* m_connectionFactory;
     std::unique_ptr<api::Connection> m_connection;
-    std::string m_userName;
-    std::string m_password;
+    std::optional<nx::network::http::Credentials> m_credentials;
 
     bool createConnectionIfNeeded()
     {
         if (!m_connection)
         {
-            m_connection = m_connectionFactory->createConnection(
-                nx::network::http::PasswordCredentials(m_userName, m_password));
+            if (m_credentials)
+                m_connection = m_connectionFactory->createConnection(*m_credentials);
+            else
+                m_connection = m_connectionFactory->createConnection();
         }
+
         return m_connection != nullptr;
     }
 };

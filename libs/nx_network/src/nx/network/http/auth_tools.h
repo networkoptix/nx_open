@@ -273,4 +273,27 @@ NX_NETWORK_API header::WWWAuthenticate generateWwwAuthenticateDigestHeader(
 
 NX_NETWORK_API std::string digestUri(const Method& method, const nx::utils::Url& url);
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Interface of a class-source of HTTP credentials.
+ */
+class NX_NETWORK_API AbstractCredentialsProvider
+{
+public:
+    struct Result
+    {
+        Credentials credentials;
+        std::optional<std::chrono::system_clock::time_point> expirationTime;
+    };
+
+    virtual ~AbstractCredentialsProvider() = default;
+
+    /**
+     * Returns the credentials or std::nullopt if there are no credentials at this moment.
+     * It is recommended that the implementation is thread-safe.
+     */
+    virtual std::optional<Result> get() const = 0;
+};
+
 } // namespace nx::network::http
