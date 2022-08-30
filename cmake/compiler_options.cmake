@@ -56,7 +56,6 @@ add_definitions(
 )
 
 set(enableSpeechSynthesizer "true")
-set(isEdgeServer "false")
 
 set(enabledSanitizers "" CACHE STRING "A semicolon-separated list of enabled sanitizers")
 
@@ -164,7 +163,6 @@ endif()
 
 if(targetDevice STREQUAL "edge1")
     set(enableAllVendors OFF)
-    set(isEdgeServer "true")
     set(enableSpeechSynthesizer "false")
 endif()
 
