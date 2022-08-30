@@ -1475,7 +1475,7 @@ Player::TranscodingSupportStatus Player::transcodingStatus() const
 
     const auto& camera = d->resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
-        return TranscodingDisabled;
+        return TranscodingNotSupported;
 
     return media_player_quality_chooser::transcodingSupportStatus(
         camera, d->positionMs, d->liveMode);

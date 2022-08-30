@@ -184,11 +184,12 @@ static QSize transcodingResolution(
  */
 static Result applyTranscodingIfPossible(const QSize& desiredResolution, const Params& input)
 {
-    if (transcodingSupportStatus(
-        input.camera, input.positionMs, input.liveMode, TranscodingRequestType::simple)
-            != Player::TranscodingSupported)
+    if (const Player::TranscodingSupportStatus status =
+        transcodingSupportStatus(input.camera, input.positionMs, input.liveMode);
+        status != Player::TranscodingSupported)
     {
-        NX_DEBUG(kLogTag, "Transcoding is not supported for the camera.");
+        NX_DEBUG(kLogTag,
+            "Transcoding is not supported for the camera (TranscodingSupportStatus %1).", status);
         return {};
     }
 
@@ -373,12 +374,8 @@ Result chooseVideoQuality(const int videoQuality, const Params& input)
 Player::TranscodingSupportStatus transcodingSupportStatus(
     const QnVirtualCameraResourcePtr& camera,
     qint64 positionMs,
-    bool liveMode,
-    TranscodingRequestType requestType)
+    bool liveMode)
 {
-    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
-        return Player::TranscodingDisabled;
-
     const QnMediaServerResourcePtr& server = liveMode
         ? camera->getParentServer()
         : camera->systemContext()->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
@@ -389,16 +386,10 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     if (server->getServerFlags().testFlag(vms::api::SF_SupportsTranscoding))
         return Player::TranscodingSupported;
 
-    if (requestType == TranscodingRequestType::detailed)
-    {
-        if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
-            return Player::TranscodingNotSupportedForServersOlder30;
+    if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
+        return Player::TranscodingNotSupportedForServersOlder30;
 
-        if (server->getServerFlags().testFlag(vms::api::ServerFlag::SF_ArmServer))
-            return Player::TranscodingNotSupportedForArmServers;
-    }
-
-    return Player::TranscodingNotSupported;
+    return Player::TranscodingDisabled;
 }
 
 Result::Result(Player::VideoQuality quality, const QSize& frameSize):
