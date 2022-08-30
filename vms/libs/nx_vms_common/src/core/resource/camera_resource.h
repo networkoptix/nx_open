@@ -83,23 +83,6 @@ public:
     /** @return frame aspect ratio of a single channel. Accounts for default rotation. */
     virtual QnAspectRatio aspectRatioRotated() const;
 
-    // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
-    // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
-
-    /** @return true if mediaStreamInfo differs from existing and has been saved. */
-    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
-    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
-
-    /** @return true if bitrateInfo.encoderIndex is not already saved. */
-    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
-
-    // TODO: Move to nx::vms::server::resource::Camera, it should be used only on server cameras!
-    /**
-     * Returns advanced live stream parameters. These parameters are configured on advanced tab.
-     * For primary stream this parameters are merged with parameters on record schedule.
-     */
-    virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
-
     /**
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
      *     the user and active (running on the current server). Includes device-dependent Engines.
@@ -268,8 +251,6 @@ private:
         std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
 
 private:
-    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
-
     QSet<QnUuid> calculateUserEnabledAnalyticsEngines() const;
 
     QSet<QnUuid> calculateCompatibleAnalyticsEngines() const;
@@ -287,7 +268,6 @@ private:
 
 private:
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
-    nx::Mutex m_mediaStreamsMutex;
 
     nx::utils::CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
     nx::utils::CachedValue<QSet<QnUuid>> m_cachedCompatibleAnalyticsEngines;
