@@ -13,10 +13,6 @@ set(buildNumber "0" CACHE STRING "Build number")
 
 set(withDesktopClient ON CACHE STRING "Enable desktop client")
 
-# Values for variables not used in open source libraries but needed by cmake scripts common with
-# the main project.
-set(isEdgeServer "false")
-
 set(statisticsServerUrl "" CACHE STRING "Default statistics server URL")
 set(statisticsServerUser "" CACHE STRING "Default statistics server user")
 set(statisticsServerPassword "" CACHE STRING "Default statistics server password")

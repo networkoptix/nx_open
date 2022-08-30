@@ -5,15 +5,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/build_info.h>
 
-namespace {
-
-static const unsigned int kMaxValidCapacityMB =
-    nx::build_info::isEdgeServer() ? 10 : 256;
-
-static const unsigned int kMaxValidCapacity = kMaxValidCapacityMB * 1024 * 1024;
-
-} // namespace
-
 ////////////////////////////////////////////////////////////
 //// class QnCompressedAudioData
 ////////////////////////////////////////////////////////////
@@ -55,7 +46,6 @@ QnWritableCompressedAudioData::QnWritableCompressedAudioData(
     QnCompressedAudioData(ctx),
     m_data(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE)
 {
-    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone() const
