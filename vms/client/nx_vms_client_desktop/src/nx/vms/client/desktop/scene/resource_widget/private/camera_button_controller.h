@@ -4,25 +4,51 @@
 
 #include "button_controller.h"
 
+#include <api/model/api_ioport_data.h>
+
 class QnTwoWayAudioWidget;
 class QnMediaResourceWidget;
+class IntercomMuteWidget;
 
 namespace nx::vms::client::desktop {
+
+class SoftwareTriggerButton;
+class TwoWayAudioManager;
 
 class CameraButtonController: public ButtonController
 {
     Q_OBJECT
     using base_type = ButtonController;
 
+    enum class IntercomButtonState
+    {
+        unmute,
+        mute
+    };
+
+    struct IntercomMuteButtonData
+    {
+        SoftwareTriggerButton* button = nullptr;
+        QnUuid id;
+        IntercomButtonState state = IntercomButtonState::unmute;
+
+        std::unique_ptr<TwoWayAudioManager> twoWayAudioManager;
+    };
+
 public:
     explicit CameraButtonController(QnMediaResourceWidget* mediaResourceWidget);
+    virtual ~CameraButtonController() override;
 
     virtual void createButtons() override;
     virtual void removeButtons() override;
 
     QnVirtualCameraResourcePtr getAudioOutputDevice() const;
-    void createTwoAudioButton();
-    void removeTwoAudioButton();
+
+    void createTwoWayAudioButton();
+    void removeTwoWayAudioButton();
+
+    void createIntercomButtons();
+    void removeIntercomButtons();
 
 signals:
     void ioStateChanged(const QnIOStateData& value);
@@ -37,8 +63,28 @@ protected:
         nx::network::rest::JsonResult& result) override;
 
 private:
+    void handleButtonClick(
+        SoftwareTriggerButton* button,
+        nx::vms::api::ExtendedCameraOutput outputPort);
+
+    QString getDesktopUniqueId() const;
+
+    void createIntercomMuteButton();
+    void removeIntercomMuteButton();
+
+    void createOpenDoorButton();
+    void removeOpenDoorButton();
+
+    void createHangUpButton();
+    void removeHangUpButton();
+
+private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
     QnUuid m_twoWayAudioWidgetId;
+
+    std::optional<IntercomMuteButtonData> m_intercomMuteButtonData;
+
+    QnUuid m_intercomOpenDoorId;
 };
 
 } // namespace nx::vms::client::desktop

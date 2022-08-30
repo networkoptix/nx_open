@@ -80,6 +80,7 @@
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
@@ -1222,6 +1223,50 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     return result;
 }
 
+bool QnMediaResourceWidget::capabilityButtonsAreVisible() const
+{
+    return !d->isPreviewSearchLayout
+        && !qnRuntime->isVideoWallMode() //< Video wall has userInput permission but no actual user.
+        && d->camera
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
+}
+
+void QnMediaResourceWidget::updateCapabilityButtons() const
+{
+    if (capabilityButtonsAreVisible())
+    {
+        m_objectTrackingButtonController->createButtons();
+        m_buttonController->createButtons();
+    }
+    else
+    {
+        m_objectTrackingButtonController->removeButtons();
+        m_buttonController->removeButtons();
+    }
+}
+
+void QnMediaResourceWidget::updateTwoWayAudioButton() const
+{
+    const bool twoWayAudioButtonVisible =
+        capabilityButtonsAreVisible()
+        && m_buttonController->getAudioOutputDevice()->hasTwoWayAudio()
+        && d->camera->isTwoWayAudioEnabled()
+        && !nx::vms::common::isIntercom(d->camera);
+
+    if (twoWayAudioButtonVisible)
+        m_buttonController->createTwoWayAudioButton();
+    else
+        m_buttonController->removeTwoWayAudioButton();
+}
+
+void QnMediaResourceWidget::updateIntercomButtons()
+{
+    if (capabilityButtonsAreVisible() && nx::vms::common::isIntercom(d->camera))
+        m_buttonController->createIntercomButtons();
+    else
+        m_buttonController->removeIntercomButtons();
+}
+
 void QnMediaResourceWidget::setupHud()
 {
     static const int kScrollLineHeight = 8;
@@ -1322,32 +1367,9 @@ void QnMediaResourceWidget::updateHud(bool animate)
 
 void QnMediaResourceWidget::updateCameraButtons()
 {
-    const auto user = context()->user();
-    const bool capabilityButtonsVisible = !d->isPreviewSearchLayout
-        && user //< Video wall has userInput permission but no actual user.
-        && d->camera
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
-
-    if (capabilityButtonsVisible)
-    {
-        m_objectTrackingButtonController->createButtons();
-        m_buttonController->createButtons();
-    }
-    else
-    {
-        m_objectTrackingButtonController->removeButtons();
-        m_buttonController->removeButtons();
-    }
-
-    const bool twoWayAudioButtonVisible =
-        capabilityButtonsVisible
-        && m_buttonController->getAudioOutputDevice()->hasTwoWayAudio()
-        && d->camera->isTwoWayAudioEnabled();
-
-    if (twoWayAudioButtonVisible)
-        m_buttonController->createTwoAudioButton();
-    else
-        m_buttonController->removeTwoAudioButton();
+    updateCapabilityButtons();
+    updateTwoWayAudioButton();
+    updateIntercomButtons();
 }
 
 bool QnMediaResourceWidget::animationAllowed() const

@@ -20,7 +20,8 @@ NX_REFLECTION_ENUM_CLASS(ExtendedCameraOutput,
     fan,
     wiper,
     autoTracking,
-    powerRelay
+    powerRelay,
+    hangUp
 );
 Q_DECLARE_FLAGS(ExtendedCameraOutputs, ExtendedCameraOutput)
 
