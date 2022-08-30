@@ -11,23 +11,17 @@
 namespace nx {
 namespace utils {
 
+/*static*/ int Thread::s_threadStackSize = 0;
+
 Thread::Thread()
 {
     connect(this, &QThread::started, this, &Thread::at_started, Qt::DirectConnection);
     connect(this, &QThread::finished, this, &Thread::at_finished, Qt::DirectConnection);
 
-#if !defined(Q_OS_ANDROID) //< Not supported on Android.
-    if (nx::build_info::isEdgeServer())
-    {
-        // Thread stack size reduced (from default 8MB on Linux) to save memory on edge devices.
-        // If this is not enough consider using heap.
-
-        // This value is not platform-dependent to be able to catch stack overflow error on every
-        // platform.
-        constexpr size_t kDefaultThreadStackSize = 128 * 1024;
-        setStackSize(kDefaultThreadStackSize);
-    }
-#endif
+    #if !defined(Q_OS_ANDROID) //< Not supported on Android.
+        if (s_threadStackSize > 0)
+            setStackSize(s_threadStackSize);
+    #endif
 }
 
 Thread::~Thread()
