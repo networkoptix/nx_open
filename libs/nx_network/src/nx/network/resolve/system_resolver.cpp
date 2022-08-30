@@ -2,14 +2,14 @@
 
 #include "system_resolver.h"
 
+#include <atomic>
+
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
-
-#include <nx/build_info.h>
 
 namespace nx::network {
 
@@ -64,6 +64,8 @@ static void convertAddrInfo(
 
 } // namespace
 
+/*static*/ std::atomic<bool> SystemResolver::s_resolveLocalhost{false};
+
 static constexpr auto kMaxCachePeriod = std::chrono::minutes(1);
 
 SystemError::ErrorCode SystemResolver::resolve(
@@ -71,10 +73,8 @@ SystemError::ErrorCode SystemResolver::resolve(
     int ipVersion,
     ResolveResult* resolveResult)
 {
-    // This is a workaround for operating systems where /etc/hosts does not work, thus localhost is
-    // inaccessible, like certain Busybox-based systems.
     // TODO: Make the proper workaround: manual /etc/hosts parsing.
-    if (nx::build_info::isEdgeServer())
+    if (s_resolveLocalhost)
     {
         if (hostNameOriginal == HostAddress::localhost.toString())
         {
