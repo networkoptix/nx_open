@@ -22,9 +22,13 @@ namespace nx {
 namespace common {
 namespace metadata {
 
+/**%apidoc Analytics object attribute. */
 struct NX_VMS_COMMON_API Attribute
 {
+    /**%apidoc Attribute name. */
     QString name;
+
+    /**%apidoc Attribute value. */
     QString value;
 
     Attribute() = default;
@@ -112,10 +116,21 @@ NX_VMS_COMMON_API GroupedAttributes groupAttributes(
 static constexpr int kCoordinateDecimalDigits = 4;
 
 NX_REFLECTION_ENUM_CLASS(ObjectMetadataType,
-    undefined,
+    /**%apidoc Undefined analytics object. */
+    undefined, 
+    
+    /**%apidoc Regular analytics object. It represents a rectangle where object was detected. */
     regular,
+
+    /**%apidoc It points to the best recognized rectangle of the whole track.
+     * This time `boundingBox` can be used to represent track thumbnail.
+     */
     bestShot,
-    externalBestShot //< Best shot provided as a blob.
+
+    /**%apidoc same as `bestShot` but such metadata has explicitly loaded image from a Device.
+     * The API request /ec2/analyticsTrackBestShot uses this data. 
+     */
+    externalBestShot
 )
 
 // TODO: #rvasilenko: This struct should NOT be used bot best shots, because it was originally
@@ -123,14 +138,26 @@ NX_REFLECTION_ENUM_CLASS(ObjectMetadataType,
 // IObjectTrackBestShotPacket which has no relation to IObjectMetadata.
 struct NX_VMS_COMMON_API ObjectMetadata
 {
+    /**%apidoc
+     * Object type.
+     * %example car
+     */
     QString typeId;
+
+    /**%apidoc Unique track Id. */
     QnUuid trackId;
-    /**
-     * Coordinates are in range [0;1].
+    
+    /**%apidoc Bounding box of the object. JSON object containing top-left corner (fields `x`
+     * and `y`), `width` and `height`. Relative coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    Attributes attributes;
+
+    std::vector<Attribute> attributes;
+
+    /**%apidoc Kind of the object. */
     ObjectMetadataType objectMetadataType;
+
+    /**%apidoc Unique Id of the analytics engine. */
     QnUuid analyticsEngineId;
 
     bool isBestShot() const
@@ -161,12 +188,21 @@ NX_REFLECTION_INSTRUMENT(ObjectMetadata, ObjectMetadata_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
+/**%apidoc Analytics metadata packet. */
 struct NX_VMS_COMMON_API ObjectMetadataPacket
 {
+    /**%apidoc Device id. */
     QnUuid deviceId;
+
+    /**%apidoc UTC timestamp in microseconds. */
     qint64 timestampUs = 0;
+
+    /**%apidoc[opt] Duration of the object in microseconds. */
     qint64 durationUs = 0;
+
     std::vector<ObjectMetadata> objectMetadataList;
+
+    /**%apidoc[opt] Video stream from which analytics data was received. */
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
 
     bool containsBestShotMetadata() const
