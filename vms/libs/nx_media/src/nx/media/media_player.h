@@ -178,7 +178,6 @@ public:
         TranscodingSupported,
         TranscodingNotSupported,
         TranscodingNotSupportedForServersOlder30,
-        TranscodingNotSupportedForArmServers,
     };
     Q_ENUM(TranscodingSupportStatus)
 

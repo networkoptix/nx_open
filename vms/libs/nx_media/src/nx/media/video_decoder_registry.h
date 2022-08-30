@@ -51,15 +51,6 @@ public:
     QSize maxResolution(const AVCodecID codec);
 
     /**
-     * @return Whether transcoding is not explicitly disabled by the client due to some reason,
-     * e.g. by resetting this flag to false, Mobile Client in Lite Mode may prefer requesting low
-     * stream instead of requesting transcoding.
-     */
-    bool isTranscodingEnabled() const;
-
-    void setTranscodingEnabled(bool transcodingEnabled);
-
-    /**
      * Register video decoder plugin.
      */
     template<class Decoder>
@@ -108,9 +99,6 @@ private:
 
 private:
     std::vector<Metadata> m_plugins;
-
-    bool m_isTranscodingEnabled;
-
     RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer = nullptr;
 };
 

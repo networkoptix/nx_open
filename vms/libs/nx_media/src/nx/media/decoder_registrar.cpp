@@ -28,8 +28,6 @@ namespace media {
 
 void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions)
 {
-    VideoDecoderRegistry::instance()->setTranscodingEnabled(true);
-
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 
     #if defined(Q_OS_ANDROID)

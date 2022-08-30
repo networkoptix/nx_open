@@ -126,16 +126,6 @@ QSize VideoDecoderRegistry::maxResolution(const AVCodecID codec)
     return result;
 }
 
-bool VideoDecoderRegistry::isTranscodingEnabled() const
-{
-    return m_isTranscodingEnabled;
-}
-
-void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
-{
-    m_isTranscodingEnabled = transcodingEnabled;
-}
-
 RenderContextSynchronizerPtr VideoDecoderRegistry::defaultRenderContextSynchronizer() const
 {
     return m_defaultRenderContextSynchronizer;
@@ -149,7 +139,6 @@ void VideoDecoderRegistry::setDefaultRenderContextSynchronizer(RenderContextSync
 void VideoDecoderRegistry::reinitialize()
 {
     m_plugins.clear();
-    m_isTranscodingEnabled = false;
     m_defaultRenderContextSynchronizer = RenderContextSynchronizerPtr();
 }
 

@@ -26,17 +26,10 @@ class AbstractVideoDecoder;
  */
 namespace media_player_quality_chooser {
 
-enum class TranscodingRequestType
-{
-    detailed, //< Return status explaining why transcoding is not supported.
-    simple //< Return only TranscodingSupported or TranscodingNotSupported or TranscodingDisabled.
-};
-
 Player::TranscodingSupportStatus transcodingSupportStatus(
     const QnVirtualCameraResourcePtr& camera,
     qint64 positionMs,
-    bool liveMode,
-    TranscodingRequestType requestType = TranscodingRequestType::detailed);
+    bool liveMode);
 
 struct Params
 {
