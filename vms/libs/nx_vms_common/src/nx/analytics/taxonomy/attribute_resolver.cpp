@@ -120,6 +120,7 @@ void AttributeResolver::fillAttributeCandidateList(
 void AttributeResolver::resolveOwnAttributes()
 {
     std::set<QString> uniqueAttributeNames;
+    std::set<QString> conditionalAttributeNames;
     std::vector<AttributeDescription> ownAttributes;
 
     std::vector<AttributeDescription> attributeCandidates;
@@ -141,7 +142,12 @@ void AttributeResolver::resolveOwnAttributes()
             continue;
         }
 
-        if (contains(uniqueAttributeNames, attribute.name))
+        if (!attribute.condition.isEmpty())
+            conditionalAttributeNames.insert(attribute.name);
+
+        if (uniqueAttributeNames.contains(attribute.name)
+            && (!conditionalAttributeNames.contains(attribute.name)
+                || attribute.condition.isEmpty()))
         {
             m_errorHandler->handleError(
                 ProcessingError{NX_FMT(
@@ -155,6 +161,15 @@ void AttributeResolver::resolveOwnAttributes()
         AbstractAttribute* baseAttribute =
             (baseAttributeItr != m_baseAttributeByName.cend()) ? baseAttributeItr->second : nullptr;
 
+        if (baseAttribute && !baseAttribute->condition().isEmpty())
+        {
+            m_errorHandler->handleError(
+                ProcessingError{NX_FMT(
+                    "%1 %2: using conditional Attribute as base (%3)",
+                    m_context.typeName, m_context.typeId, attribute.name)});
+
+            continue;
+        }
 
         if (Attribute* resolvedAttribute = resolveOwnAttribute(&attribute, baseAttribute);
             resolvedAttribute)

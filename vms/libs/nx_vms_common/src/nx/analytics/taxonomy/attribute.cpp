@@ -159,6 +159,11 @@ bool Attribute::isSupported(QnUuid engineId, QnUuid deviceId) const
     return false;
 }
 
+QString Attribute::condition() const
+{
+    return m_attributeDescription.condition;
+}
+
 void Attribute::setBaseAttribute(AbstractAttribute* attribute)
 {
     m_base = attribute;

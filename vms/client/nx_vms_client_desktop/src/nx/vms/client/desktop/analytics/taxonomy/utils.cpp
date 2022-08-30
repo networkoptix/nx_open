@@ -129,6 +129,7 @@ AbstractAttribute* mergeEnumTypeAttributes(
 
 AbstractAttribute* mergeObjectTypeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
+    const AbstractStateViewFilter* filter,
     QObject* parent)
 {
     if (!NX_ASSERT(!taxonomyAttributes.empty()) || !NX_ASSERT(taxonomyAttributes[0]))
@@ -138,7 +139,7 @@ AbstractAttribute* mergeObjectTypeAttributes(
     attribute->setName(taxonomyAttributes[0]->name());
     attribute->setType(AbstractAttribute::Type::attributeSet);
 
-    auto attributeSet = new AttributeSet(parent);
+    auto attributeSet = new AttributeSet(filter, parent);
     for (const nx::analytics::taxonomy::AbstractAttribute* taxonomyAttribute: taxonomyAttributes)
     {
         if (!NX_ASSERT(taxonomyAttribute->type() ==
@@ -197,6 +198,7 @@ AbstractAttribute* wrapAttribute(
 
 AbstractAttribute* mergeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
+    const AbstractStateViewFilter* filter,
     QObject* parent)
 {
     if (!NX_ASSERT(!taxonomyAttributes.empty()) || !NX_ASSERT(taxonomyAttributes[0]))
@@ -211,7 +213,7 @@ AbstractAttribute* mergeAttributes(
         case nx::analytics::taxonomy::AbstractAttribute::Type::color:
             return mergeColorTypeAttributes(taxonomyAttributes, parent);
         case nx::analytics::taxonomy::AbstractAttribute::Type::object:
-            return mergeObjectTypeAttributes(taxonomyAttributes, parent);
+            return mergeObjectTypeAttributes(taxonomyAttributes, filter, parent);
         case nx::analytics::taxonomy::AbstractAttribute::Type::boolean:
         case nx::analytics::taxonomy::AbstractAttribute::Type::string:
             return wrapAttribute(taxonomyAttributes[0], parent);
@@ -222,6 +224,7 @@ AbstractAttribute* mergeAttributes(
 
 std::vector<AbstractAttribute*> resolveAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractObjectType*>& objectTypes,
+    const AbstractStateViewFilter* filter,
     QObject* parent)
 {
     std::map<
@@ -235,6 +238,9 @@ std::vector<AbstractAttribute*> resolveAttributes(
         for (const nx::analytics::taxonomy::AbstractAttribute* attribute:
             objectType->supportedAttributes())
         {
+            if (filter && !filter->matches(attribute))
+                continue;
+
             const QString attributeName = attribute->name();
             if (attributesToMerge.find(attributeName) == attributesToMerge.cend())
                 orderedAttributeNames.push_back(attributeName);
@@ -244,7 +250,7 @@ std::vector<AbstractAttribute*> resolveAttributes(
     }
 
     for (const QString& attributeName: orderedAttributeNames)
-        result.push_back(mergeAttributes(attributesToMerge[attributeName], parent));
+        result.push_back(mergeAttributes(attributesToMerge[attributeName], filter, parent));
 
     return result;
 }

@@ -86,6 +86,13 @@ struct AttributeDescription
     std::optional<double> maxValue; //< Only for Number.
     QString attributeList; //< If not empty, all other fields are ignored.
 
+    /**
+     * Condition string that defines whether this Attribute makes sense for the Object or Event
+     * Type depending on values of the other Attributes. Uses the same syntax as in the Object
+     * Search panel.
+     */
+    QString condition;
+
     bool operator==(const AttributeDescription& other) const = default;
 };
 #define AttributeDescription_Fields \
@@ -96,7 +103,8 @@ struct AttributeDescription
     (unit)\
     (minValue)\
     (maxValue)\
-    (attributeList)
+    (attributeList)\
+    (condition)
 
 NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 

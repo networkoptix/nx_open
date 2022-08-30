@@ -346,6 +346,10 @@ containing the following fields:
 - `"attributeList"`: String
     Id of an Attribute List. If present, all other fields are ignored.
 
+- `"condition"`: String
+    Condition string that defines whether this Attribute makes sense for the Object or Event Type
+    depending on values of the other Attributes. Uses the same syntax as in the Object Search panel.
+
 Other fields depend on the particular attribute type.
 
 Attributes that are inherited from the base type can be "re-defined" as follows:

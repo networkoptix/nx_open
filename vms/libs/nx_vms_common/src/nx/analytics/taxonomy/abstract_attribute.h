@@ -64,6 +64,8 @@ public:
 
     virtual QVariant maxValue() const = 0;
 
+    virtual QString condition() const = 0;
+
     Q_INVOKABLE virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const = 0;
 };
 
