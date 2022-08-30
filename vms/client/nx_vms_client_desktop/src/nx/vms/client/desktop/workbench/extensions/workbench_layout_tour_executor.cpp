@@ -233,7 +233,6 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
             | QnLayoutFlag::NoTimeline
             | QnLayoutFlag::FillViewport
         ));
-        layout->setData(Qn::IsSpecialLayoutRole, true);
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 
         m_tour.items.push_back(QnLayoutTourItem(layout, item.delayMs));

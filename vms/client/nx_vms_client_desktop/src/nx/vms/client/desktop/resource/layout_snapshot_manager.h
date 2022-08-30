@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/utils/save_state_manager.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -35,7 +37,8 @@ public:
     bool save(const QnLayoutResourcePtr& resource,
         SaveLayoutResultFunction callback = SaveLayoutResultFunction());
 
-    const nx::vms::api::LayoutData& snapshot(const QnLayoutResourcePtr& layout) const;
+    bool hasSnapshot(const QnLayoutResourcePtr& layout) const;
+    const nx::vms::api::LayoutData snapshot(const QnLayoutResourcePtr& layout) const;
 
     void store(const QnLayoutResourcePtr& resource);
     void restore(const QnLayoutResourcePtr& resource);
@@ -65,7 +68,7 @@ private:
 
 private:
     /** Layout state storage that this object manages. */
-    LayoutSnapshotStorage* const m_storage;
+    std::unique_ptr<LayoutSnapshotStorage> m_storage;
 };
 
 } // namespace nx::vms::client::desktop
