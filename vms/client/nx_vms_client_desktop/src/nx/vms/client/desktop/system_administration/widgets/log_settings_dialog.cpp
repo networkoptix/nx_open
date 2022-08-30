@@ -27,6 +27,8 @@ const std::chrono::seconds kMinute = std::chrono::minutes(1);
 const std::chrono::seconds kHour = std::chrono::hours(1);
 const std::chrono::seconds kDay = std::chrono::days(1);
 
+const std::chrono::seconds kDontSplitByTime{0};
+
 bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* combo)
 {
     for (int index = combo->count() - 1; index >= 0; --index)
@@ -41,6 +43,11 @@ bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* 
     }
 
     return false;
+}
+
+unsigned long long valueFromGuiElements(QSpinBox* spin, QComboBox* combo)
+{
+    return spin->value() * combo->currentData().toULongLong();
 }
 
 } // namespace
@@ -164,6 +171,17 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         ui->loggingLevel, QnComboboxCurrentIndexChanged,
         this, &LogSettingsDialog::updateWarnings);
 
+    auto updateTimeControls =
+        [this]
+        {
+            const auto enabled = ui->splitByTimeChechBox->isChecked();
+            ui->splitByTimeValue->setEnabled(enabled);
+            ui->splitByTimeUnits->setEnabled(enabled);
+        };
+
+    connect(ui->splitByTimeChechBox, &QCheckBox::toggled, this, updateTimeControls);
+    updateTimeControls();
+
     init({});
 }
 
@@ -274,7 +292,10 @@ void LogSettingsDialog::setLoggingLevel(ConfigurableLogSettings::Level level)
 
 ConfigurableLogSettings::Size LogSettingsDialog::maxVolumeSize() const
 {
-    return ui->maxVolumeValue->value() * ui->maxVolumeUnits->currentData().toULongLong();
+    if (auto value = valueFromGuiElements(ui->maxVolumeValue, ui->maxVolumeUnits))
+        return value;
+
+    return {}; //< Keep the original value.
 }
 
 void LogSettingsDialog::setMaxVolumeSize(ConfigurableLogSettings::Size size)
@@ -288,7 +309,10 @@ void LogSettingsDialog::setMaxVolumeSize(ConfigurableLogSettings::Size size)
 
 ConfigurableLogSettings::Size LogSettingsDialog::maxFileSize() const
 {
-    return ui->splitBySizeValue->value() * ui->splitBySizeUnits->currentData().toULongLong();
+    if (auto value = valueFromGuiElements(ui->splitBySizeValue, ui->splitBySizeUnits))
+        return value;
+
+    return {}; //< Keep the original value.
 }
 
 void LogSettingsDialog::setMaxFileSize(ConfigurableLogSettings::Size size)
@@ -302,13 +326,13 @@ void LogSettingsDialog::setMaxFileSize(ConfigurableLogSettings::Size size)
 
 ConfigurableLogSettings::Time LogSettingsDialog::maxFileTime() const
 {
-    if (ui->splitByTimeChechBox->isChecked())
-    {
-        return std::chrono::seconds(
-            ui->splitByTimeValue->value() * ui->splitByTimeUnits->currentData().toULongLong());
-    }
+    if (!ui->splitByTimeChechBox->isChecked())
+        return kDontSplitByTime;
 
-    return {};
+    if (auto value = valueFromGuiElements(ui->splitByTimeValue, ui->splitByTimeUnits))
+        return std::chrono::seconds(value);
+
+    return {}; //< Keep the original value.
 }
 
 void LogSettingsDialog::setMaxFileTime(ConfigurableLogSettings::Time time)
@@ -317,9 +341,12 @@ void LogSettingsDialog::setMaxFileTime(ConfigurableLogSettings::Time time)
     ui->splitByTimeUnits->setCurrentIndex(0);
 
     if (time)
-        setValueToGuiElements(time->count(), ui->splitByTimeValue, ui->splitByTimeUnits);
+    {
+        setValueToGuiElements(
+            std::chrono::seconds(*time).count(), ui->splitByTimeValue, ui->splitByTimeUnits);
+    }
 
-    ui->splitByTimeChechBox->setChecked(time.has_value());
+    ui->splitByTimeChechBox->setChecked(time != kDontSplitByTime);
 }
 
 } // namespace nx::vms::client::desktop
