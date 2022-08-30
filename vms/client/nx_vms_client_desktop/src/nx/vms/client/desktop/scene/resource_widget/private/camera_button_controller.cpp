@@ -2,6 +2,8 @@
 
 #include "camera_button_controller.h"
 
+#include "two_way_audio_manager.h"
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -11,6 +13,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -28,6 +31,18 @@ namespace {
 
 static constexpr int kTriggerButtonHeight = 40;
 
+void setMuteState(SoftwareTriggerButton* button)
+{
+    button->setIcon("mute_call");
+    button->setToolTip(CameraButtonController::tr("Mute"));
+}
+
+void setUnmuteStata(SoftwareTriggerButton* button)
+{
+    button->setIcon("unmute_call");
+    button->setToolTip(CameraButtonController::tr("Unmute"));
+}
+
 } // namespace
 
 CameraButtonController::CameraButtonController(QnMediaResourceWidget* mediaResourceWidget):
@@ -36,9 +51,15 @@ CameraButtonController::CameraButtonController(QnMediaResourceWidget* mediaResou
 {
 }
 
+CameraButtonController::~CameraButtonController()
+{
+    if (m_intercomMuteButtonData && m_intercomMuteButtonData->twoWayAudioManager)
+        m_intercomMuteButtonData->twoWayAudioManager->disconnect();
+}
+
 void CameraButtonController::createButtons()
 {
-    if (m_camera.isNull())
+    if (!m_camera)
         return;
 
     ensureButtonState(ExtendedCameraOutput::heater,
@@ -51,17 +72,7 @@ void CameraButtonController::createButtons()
             connect(heaterButton, &SoftwareTriggerButton::clicked,
                 [this, heaterButton]
                 {
-                    if (!heaterButton->isLive())
-                    {
-                        menu()->trigger(ui::action::JumpToLiveAction, m_parentWidget);
-                        return;
-                    }
-
-                    heaterButton->setState(SoftwareTriggerButton::State::Waiting);
-                    buttonClickHandler(
-                        heaterButton,
-                        ExtendedCameraOutput::heater,
-                        nx::vms::api::EventState::active);
+                    handleButtonClick(heaterButton, ExtendedCameraOutput::heater);
                 });
 
             return heaterButton;
@@ -77,17 +88,7 @@ void CameraButtonController::createButtons()
             connect(wiperButton, &SoftwareTriggerButton::clicked,
                 [this, wiperButton]
                 {
-                    if (!wiperButton->isLive())
-                    {
-                        menu()->trigger(ui::action::JumpToLiveAction, m_parentWidget);
-                        return;
-                    }
-
-                    wiperButton->setState(SoftwareTriggerButton::State::Waiting);
-                    buttonClickHandler(
-                        wiperButton,
-                        ExtendedCameraOutput::wiper,
-                        nx::vms::api::EventState::active);
+                    handleButtonClick(wiperButton, ExtendedCameraOutput::wiper);
                 });
 
             return wiperButton;
@@ -96,22 +97,19 @@ void CameraButtonController::createButtons()
 
 void CameraButtonController::removeButtons()
 {
-    ButtonController::removeButtons();
+    removeButton(ExtendedCameraOutput::heater);
+    removeButton(ExtendedCameraOutput::wiper);
 }
 
-void CameraButtonController::createTwoAudioButton()
+void CameraButtonController::createTwoWayAudioButton()
 {
     if (!m_camera)
         return;
 
     if (!m_twoWayAudioWidget)
     {
-        auto systemContext = SystemContext::fromResource(m_camera);
-        const QString desktopResourceUniqueId = QnDesktopResource::calculateUniqueId(
-            systemContext->peerId(),
-            workbench()->context()->user()->getId());
         m_twoWayAudioWidget =
-            new QnTwoWayAudioWidget(desktopResourceUniqueId, m_parentWidget);
+            new QnTwoWayAudioWidget(getDesktopUniqueId(), m_parentWidget);
         m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
         statisticsModule()->controls()->registerButton(
@@ -137,7 +135,7 @@ void CameraButtonController::createTwoAudioButton()
     }
 }
 
-void CameraButtonController::removeTwoAudioButton()
+void CameraButtonController::removeTwoWayAudioButton()
 {
     if (m_twoWayAudioWidgetId.isNull())
         return;
@@ -145,6 +143,20 @@ void CameraButtonController::removeTwoAudioButton()
     m_buttonsContainer->deleteItem(m_twoWayAudioWidgetId);
     m_twoWayAudioWidget = nullptr;
     m_twoWayAudioWidgetId = QnUuid();
+}
+
+void CameraButtonController::createIntercomButtons()
+{
+    createIntercomMuteButton();
+    createOpenDoorButton();
+    createHangUpButton();
+}
+
+void CameraButtonController::removeIntercomButtons()
+{
+    removeIntercomMuteButton();
+    removeOpenDoorButton();
+    removeHangUpButton();
 }
 
 void CameraButtonController::handleChangedIOState(const QnIOStateData& value)
@@ -166,6 +178,155 @@ void CameraButtonController::handleApiReply(
     triggerButton->setState(success
         ? SoftwareTriggerButton::State::Success
         : SoftwareTriggerButton::State::Failure);
+}
+
+void CameraButtonController::handleButtonClick(
+    SoftwareTriggerButton* button,
+    ExtendedCameraOutput outputPort)
+{
+    if (!button->isLive())
+    {
+        menu()->trigger(ui::action::JumpToLiveAction, m_parentWidget);
+        return;
+    }
+
+    button->setState(SoftwareTriggerButton::State::Waiting);
+    buttonClickHandler(button, outputPort, nx::vms::api::EventState::active);
+}
+
+QString CameraButtonController::getDesktopUniqueId() const
+{
+    if (!NX_ASSERT(m_camera))
+        return "";
+
+    const auto systemContext = SystemContext::fromResource(m_camera);
+    if (!NX_ASSERT(systemContext))
+        return "";
+
+    if (!NX_ASSERT(workbench()->context()->user()))
+        return "";
+
+    return QnDesktopResource::calculateUniqueId(
+        systemContext->peerId(),
+        workbench()->context()->user()->getId());
+}
+
+void CameraButtonController::createIntercomMuteButton()
+{
+    if (!m_camera)
+        return;
+
+    if (!m_intercomMuteButtonData)
+        return;
+
+    m_intercomMuteButtonData->button = new SoftwareTriggerButton(m_parentWidget);
+    m_intercomMuteButtonData->id = m_buttonsContainer->addItem(m_intercomMuteButtonData->button);
+    m_intercomMuteButtonData->twoWayAudioManager.reset(
+        new TwoWayAudioManager(getDesktopUniqueId(), m_camera));
+
+    connect(m_intercomMuteButtonData->button, &SoftwareTriggerButton::clicked,
+        [this]
+        {
+            if (!m_intercomMuteButtonData->button->isLive())
+            {
+                menu()->trigger(ui::action::JumpToLiveAction, m_parentWidget);
+                return;
+            }
+
+            if (m_intercomMuteButtonData->state == IntercomButtonState::unmute)
+                m_intercomMuteButtonData->twoWayAudioManager->startStreaming();
+            else
+                m_intercomMuteButtonData->twoWayAudioManager->stopStreaming();
+        });
+
+    connect(m_intercomMuteButtonData->twoWayAudioManager.get(),
+        &TwoWayAudioManager::streamingStateChanged,
+        [this](TwoWayAudioManager::StreamingState state)
+        {
+            if (state == TwoWayAudioManager::StreamingState::active)
+            {
+                setMuteState(m_intercomMuteButtonData->button);
+            }
+            else if (state == TwoWayAudioManager::StreamingState::disabled
+                || (state == TwoWayAudioManager::StreamingState::error
+                    && m_intercomMuteButtonData->state == IntercomButtonState::mute))
+            {
+                setUnmuteStata(m_intercomMuteButtonData->button);
+            }
+
+            m_intercomMuteButtonData->state = (state == TwoWayAudioManager::StreamingState::active)
+                ? IntercomButtonState::mute
+                : IntercomButtonState::unmute;
+
+            if (state == TwoWayAudioManager::StreamingState::error)
+                m_intercomMuteButtonData->button->setState(SoftwareTriggerButton::State::Failure);
+        });
+
+    NX_ASSERT(m_intercomMuteButtonData->state == IntercomButtonState::unmute);
+    setUnmuteStata(m_intercomMuteButtonData->button);
+}
+
+void CameraButtonController::removeIntercomMuteButton()
+{
+    if (m_intercomMuteButtonData)
+        m_buttonsContainer->deleteItem(m_intercomMuteButtonData->id);
+
+    m_intercomMuteButtonData.reset();
+
+}
+
+void CameraButtonController::createOpenDoorButton()
+{
+    if (!m_camera)
+        return;
+
+    ensureButtonState(ExtendedCameraOutput::powerRelay,
+        [this]
+        {
+            auto openDoorButton = new SoftwareTriggerButton(m_parentWidget);
+            openDoorButton->setIcon("_door_opened");
+            openDoorButton->setToolTip(tr("Open door"));
+
+            connect(openDoorButton, &SoftwareTriggerButton::clicked,
+                [this, openDoorButton]
+                {
+                    handleButtonClick(openDoorButton, ExtendedCameraOutput::powerRelay);
+                });
+
+            return openDoorButton;
+        });
+}
+
+void CameraButtonController::removeOpenDoorButton()
+{
+    removeButton(ExtendedCameraOutput::powerRelay);
+}
+
+void CameraButtonController::createHangUpButton()
+{
+    if (!m_camera)
+        return;
+
+    ensureButtonState(ExtendedCameraOutput::hangUp,
+        [this]
+        {
+            auto hangUpButton = new SoftwareTriggerButton(m_parentWidget);
+            hangUpButton->setIcon("hang_up");
+            hangUpButton->setToolTip(tr("Drop"));
+
+            connect(hangUpButton, &SoftwareTriggerButton::clicked,
+                [this, hangUpButton]
+                {
+                    handleButtonClick(hangUpButton, ExtendedCameraOutput::hangUp);
+                });
+
+            return hangUpButton;
+        });
+}
+
+void CameraButtonController::removeHangUpButton()
+{
+    removeButton(ExtendedCameraOutput::hangUp);
 }
 
 } // namespace nx::vms::client::desktop
