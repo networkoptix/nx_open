@@ -272,7 +272,9 @@ private:
             std::is_same_v<T, nx::vms::api::MediaServerDataList> ||
             std::is_same_v<T, nx::vms::api::MediaServerUserAttributesDataList> ||
             std::is_same_v<T, nx::vms::api::ResourceStatusDataList> ||
-            std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList>);
+            std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList> ||
+            std::is_same_v<T, nx::vms::api::AnalyticsPluginDataList> ||
+            std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileDataList>)
             return ApiCommand::Value::getStoredFiles;
         if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsDataList>)
@@ -305,6 +307,10 @@ private:
             return ApiCommand::Value::getStatusList;
         if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList>)
             return ApiCommand::Value::getResourceParams;
+        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsPluginDataList>)
+            return ApiCommand::Value::getAnalyticsPlugins;
+        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>)
+            return ApiCommand::Value::getAnalyticsEngines;
         return ApiCommand::NotDefined;
     }
 
@@ -327,7 +333,9 @@ private:
             std::is_same_v<T, nx::vms::api::MediaServerData> ||
             std::is_same_v<T, nx::vms::api::MediaServerUserAttributesData> ||
             std::is_same_v<T, nx::vms::api::ResourceStatusData> ||
-            std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>);
+            std::is_same_v<T, nx::vms::api::ResourceParamWithRefData> ||
+            std::is_same_v<T, nx::vms::api::AnalyticsPluginData> ||
+            std::is_same_v<T, nx::vms::api::AnalyticsEngineData>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileData>)
             return ApiCommand::Value::updateStoredFile;
         if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsData>)
@@ -360,6 +368,10 @@ private:
             return ApiCommand::Value::setResourceStatus;
         if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
             return ApiCommand::Value::setResourceParam;
+        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsPluginData>)
+            return ApiCommand::Value::saveAnalyticsPlugin;
+        if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
+            return ApiCommand::Value::saveAnalyticsEngine;
         return ApiCommand::NotDefined;
     }
 
@@ -409,6 +421,12 @@ private:
                         break;
                     case ApiCommand::removeWebPage:
                         requiredType = ApiObject_WebPage;
+                        break;
+                    case ApiCommand::removeAnalyticsPlugin:
+                        requiredType = ApiObject_AnalyticsPlugin;
+                        break;
+                    case ApiCommand::removeAnalyticsEngine:
+                        requiredType = ApiObject_AnalyticsEngine;
                         break;
                     default:
                         return ErrorCode::ok;
