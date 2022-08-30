@@ -5,15 +5,6 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 
-namespace {
-
-static const unsigned int kMaxValidCapacityMB =
-    nx::build_info::isEdgeServer() ? 10 : 256;
-
-static const unsigned int kMaxValidCapacity = kMaxValidCapacityMB * 1024 * 1024;
-
-} // namespace
-
 QnCompressedVideoData::QnCompressedVideoData( CodecParametersConstPtr ctx )
 :
     QnAbstractMediaData( VIDEO ),
@@ -43,7 +34,6 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData(ctx),
     m_data(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE)
 {
-    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 //!Implementation of QnAbstractMediaData::clone
