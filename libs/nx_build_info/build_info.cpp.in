@@ -98,11 +98,6 @@ QString usedMetaVersion()
     return "${usedMetaVersion}";
 }
 
-bool isEdgeServer()
-{
-    return ${isEdgeServer};
-}
-
 bool isArm()
 {
     #if defined(__arm__) || defined(__aarch64__)

@@ -62,7 +62,6 @@ NX_BUILD_INFO_API QString boostVersion();
 /** Addition to the version string for MetaVMS, or an empty string for non-MetaVMS builds. */
 NX_BUILD_INFO_API QString usedMetaVersion();
 
-NX_BUILD_INFO_API bool isEdgeServer();
 NX_BUILD_INFO_API bool isArm();
 
 NX_BUILD_INFO_API bool isAndroid();

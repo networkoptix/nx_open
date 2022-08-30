@@ -21,7 +21,6 @@
 #include <core/resource_management/resource_management_ini.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_searcher.h>
-#include <nx/build_info.h>
 #include <nx/network/nettools.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/analytics_data.h>
@@ -445,7 +444,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             if( existingCamRes && existingCamRes->isManuallyAdded() 
                 && !existingCamRes->getUrl().isEmpty())
             {
-                if (nx::build_info::isEdgeServer())
+                if (isEdgeServer())
                 {
                     /* Speed optimization for ARM servers. --akolesnikov */
                     char mac[nx::network::MAC_ADDR_LEN];
@@ -656,7 +655,7 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
         // TODO: #akolesnikov Edge server MUST always discover edge camera despite disabledVendors
         //     setting, but MUST check disabledVendors for all other vendors (if they enabled on
         //     edge server).
-        if (!nx::build_info::isEdgeServer())
+        if (!isEdgeServer())
             disabledVendorsForAutoSearch = systemSettings()->disabledVendorsSet();
 
         //no lower_bound, since QSet is built on top of hash

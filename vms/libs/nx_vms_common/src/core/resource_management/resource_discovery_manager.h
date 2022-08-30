@@ -139,6 +139,9 @@ signals:
         const QStringList& macAddrList);
 
 protected:
+    /** Allows Server's descendant to trigger specific behavior on Edge devices. */
+    virtual bool isEdgeServer() const { return false; }
+
     enum class SearchType
     {
         Full,
