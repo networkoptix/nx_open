@@ -145,7 +145,6 @@ protected:
         Partial
     };
     virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType);
-    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 
     virtual nx::vms::common::AnalyticsPluginResourcePtr
         createAnalyticsPluginResource(const QnResourceParams& params);
