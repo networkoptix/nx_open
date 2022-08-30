@@ -314,7 +314,6 @@ class TestCase
 public:
     int lineNumber = 0;
     int channelCount = 1;
-    bool clientSupportsTranscoding = true;
     bool serverSupportsTranscoding = true;
     QSize maxTranscodingResolution;
     QSize maxDecoderResolution;
@@ -361,22 +360,9 @@ public:
         return *this;
     }
 
-    TestCase& noClientTrans()
-    {
-        clientSupportsTranscoding = false;
-        return *this;
-    }
-
-    TestCase& noServerTrans()
-    {
-        serverSupportsTranscoding = false;
-        return *this;
-    }
-
     TestCase& noTrans()
     {
         serverSupportsTranscoding = false;
-        clientSupportsTranscoding = false;
         return *this;
     }
 
@@ -439,7 +425,6 @@ public:
     {
         return nx::format("Line %1: ", lineNumber).toQString()
             + nx::format("\nChannels: %1", channelCount)
-            + nx::format("\nClient transcoding: %1", clientSupportsTranscoding)
             + nx::format("\nServer transcoding: %1", serverSupportsTranscoding)
             + nx::format("\nMax transcoding resolution: %1",
                 qSizeToString(maxTranscodingResolution))
@@ -469,8 +454,6 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     NX_INFO(this, "\n=====================================================================");
     NX_VERBOSE(this, "%1\n", testCase);
 
-    VideoDecoderRegistry::instance()->setTranscodingEnabled(
-        testCase.clientSupportsTranscoding);
     m_server->setSupportsTranscoding(testCase.serverSupportsTranscoding);
     MockVideoDecoder::s_maxResolution = testCase.maxDecoderResolution;
     MockVideoDecoder::s_transcodingCodec =
@@ -554,11 +537,6 @@ TEST_F(NxMediaPlayerTest, SetQuality)
 
     // Transcoding requested but is not available.
     T.noTrans().low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
-    T.noClientTrans()
-               .low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
-    T.noServerTrans()
-               .low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
-
     T.noTrans()              .high(1920, 1080).max(1920, 1080).req(360)  >> high;
     T.noTrans()              .high(2560, 1440).max(1920, 1080).req(360)  >> unknown;
     T.noTrans().low(320, 240).high(2560, 1440).max(1920, 1080).req(360)  >> low;
