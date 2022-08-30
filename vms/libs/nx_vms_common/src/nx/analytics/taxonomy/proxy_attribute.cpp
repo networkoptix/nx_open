@@ -133,4 +133,12 @@ bool ProxyAttribute::isSupported(QnUuid engineId, QnUuid deviceId) const
     return false;
 }
 
+QString ProxyAttribute::condition() const
+{
+    if (NX_ASSERT(m_proxiedAttribute))
+        return m_proxiedAttribute->condition();
+
+    return QString();
+}
+
 } // namespace nx::analytics::taxonomy

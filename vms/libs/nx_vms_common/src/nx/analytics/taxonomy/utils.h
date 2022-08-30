@@ -19,8 +19,8 @@ bool contains(const Container& container, const Item& item)
 
 struct AttributeSupportInfoTree
 {
-    std::map<QnUuid, std::set<QnUuid>> ownSupportInfo;
-    std::map<QString, AttributeSupportInfoTree> nestedAttributeSupportInfo;
+    std::map<QnUuid /*engineId*/, std::set<QnUuid> /*deviceIds*/> ownSupportInfo;
+    std::map<QString /*attributeName*/, AttributeSupportInfoTree> nestedAttributeSupportInfo;
 };
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(

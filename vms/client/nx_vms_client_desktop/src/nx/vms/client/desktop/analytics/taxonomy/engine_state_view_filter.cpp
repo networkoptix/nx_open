@@ -2,6 +2,7 @@
 
 #include "engine_state_view_filter.h"
 
+#include <analytics/db/text_search_utils.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_scope.h>
@@ -62,8 +63,7 @@ bool EngineStateViewFilter::matches(
 bool EngineStateViewFilter::matches(
     const nx::analytics::taxonomy::AbstractAttribute* attribute) const
 {
-    // TODO: implement this when Taxonomy supports attributeSupportInfo.
-    return true;
+    return NX_ASSERT(attribute);
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

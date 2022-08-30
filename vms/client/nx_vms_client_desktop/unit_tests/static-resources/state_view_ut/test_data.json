@@ -709,6 +709,32 @@
                     "type": "String"
                 }
             ]
+        },
+        "object.type.with.conditional.attributes": {
+            "id": "object.type.with.conditional.attributes",
+            "name": "Object Type with conditional Attributes",
+            "attributes": [
+                {
+                    "name": "Show conditional Attribute 1",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "Show conditional Attribute 2 if more than 5",
+                    "type": "Number",
+                    "subtype": "integer"
+                },
+                {
+                    "name": "Conditional Attribute 1",
+                    "type": "String",
+                    "condition": "\"Show conditional Attribute 1\" = true"
+                },
+                {
+                    "name": "Conditional Attribute 2",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "condition": "\"Show conditional Attribute 2 if more than 5\" > 5"
+                }
+            ]
         }
     }
 },
@@ -2432,6 +2458,212 @@
                         {
                             "name": "Hidden Derived Type 2, String Attribute 1",
                             "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "conditionalAttributes_1": {
+        "input": {
+            "objectTypes": [
+                "object.type.with.conditional.attributes"
+            ],
+            "attributeSupportInfo": {
+                "object.type.with.conditional.attributes": {
+                    "Show conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Show conditional Attribute 2 if more than 5": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
+                }
+            },
+            "attributeValues": {
+                "Show conditional Attribute 1": "false",
+                "Show conditional Attribute 2 if more than 5": "1"
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Object Type with conditional Attributes",
+                    "typeIds": ["object.type.with.conditional.attributes"],
+                    "fullSubtreeTypeIds": ["object.type.with.conditional.attributes"],
+                    "attributes": [
+                        {
+                            "name": "Show conditional Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Show conditional Attribute 2 if more than 5",
+                            "type": "number",
+                            "subtype": "integer"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "conditionalAttributes_2": {
+        "input": {
+            "objectTypes": [
+                "object.type.with.conditional.attributes"
+            ],
+            "attributeSupportInfo": {
+                "object.type.with.conditional.attributes": {
+                    "Show conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Show conditional Attribute 2 if more than 5": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
+                }
+            },
+            "attributeValues": {
+                "Show conditional Attribute 1": "true",
+                "Show conditional Attribute 2 if more than 5": "1"
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Object Type with conditional Attributes",
+                    "typeIds": ["object.type.with.conditional.attributes"],
+                    "fullSubtreeTypeIds": ["object.type.with.conditional.attributes"],
+                    "attributes": [
+                        {
+                            "name": "Show conditional Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Show conditional Attribute 2 if more than 5",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Conditional Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "conditionalAttributes_3": {
+        "input": {
+            "objectTypes": [
+                "object.type.with.conditional.attributes"
+            ],
+            "attributeSupportInfo": {
+                "object.type.with.conditional.attributes": {
+                    "Show conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Show conditional Attribute 2 if more than 5": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
+                }
+            },
+            "attributeValues": {
+                "Show conditional Attribute 1": "false",
+                "Show conditional Attribute 2 if more than 5": "6"
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Object Type with conditional Attributes",
+                    "typeIds": ["object.type.with.conditional.attributes"],
+                    "fullSubtreeTypeIds": ["object.type.with.conditional.attributes"],
+                    "attributes": [
+                        {
+                            "name": "Show conditional Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Show conditional Attribute 2 if more than 5",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Conditional Attribute 2",
+                            "type": "number",
+                            "subtype": "integer"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "conditionalAttributes_4": {
+        "input": {
+            "objectTypes": [
+                "object.type.with.conditional.attributes"
+            ],
+            "attributeSupportInfo": {
+                "object.type.with.conditional.attributes": {
+                    "Show conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Show conditional Attribute 2 if more than 5": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Conditional Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
+                }
+            },
+            "attributeValues": {
+                "Show conditional Attribute 1": "true",
+                "Show conditional Attribute 2 if more than 5": "6"
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Object Type with conditional Attributes",
+                    "typeIds": ["object.type.with.conditional.attributes"],
+                    "fullSubtreeTypeIds": ["object.type.with.conditional.attributes"],
+                    "attributes": [
+                        {
+                            "name": "Show conditional Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Show conditional Attribute 2 if more than 5",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Conditional Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Conditional Attribute 2",
+                            "type": "number",
+                            "subtype": "integer"
                         }
                     ]
                 }

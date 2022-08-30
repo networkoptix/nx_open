@@ -42,6 +42,8 @@ public:
 
     virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
 
+    virtual QString condition() const override;
+
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
     AbstractObjectType* m_proxyObjectType = nullptr;

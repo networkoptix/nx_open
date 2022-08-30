@@ -142,7 +142,7 @@ void Node::resolveAttributes()
             objectTypes.push_back(objectType);
     }
 
-    d->attributes = taxonomy::resolveAttributes(objectTypes, this);
+    d->attributes = taxonomy::resolveAttributes(objectTypes, d->filter, this);
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

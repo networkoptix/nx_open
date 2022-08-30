@@ -51,6 +51,8 @@ public:
 
     virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
 
+    virtual QString condition() const override;
+
     void setBaseAttribute(AbstractAttribute* attribute);
 
 private:

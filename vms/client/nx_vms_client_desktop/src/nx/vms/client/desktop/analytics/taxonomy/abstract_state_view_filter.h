@@ -17,14 +17,14 @@ namespace nx::vms::client::desktop::analytics::taxonomy {
  * A filter to build a state view. The resulting view is built only from such Object types
  * that passes the filter. Attributes that don't pass the filter are not present in the state view.
  */
-class AbstractStateViewFilter: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AbstractStateViewFilter: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString id READ id CONSTANT)
     Q_PROPERTY(QString name READ name CONSTANT)
 
 public:
-    AbstractStateViewFilter(QObject* parent): QObject(parent) {}
+    AbstractStateViewFilter(QObject* parent = nullptr): QObject(parent) {}
 
     virtual ~AbstractStateViewFilter() {}
 

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
@@ -78,8 +79,9 @@ struct InputData
 
     std::vector<QString> objectTypes;
     std::map<QString, AttributeSupportInfo> attributeSupportInfo;
+    std::optional<std::map<QString, QString>> attributeValues;
 };
-#define InputData_Fields (objectTypes)(attributeSupportInfo)
+#define InputData_Fields (objectTypes)(attributeSupportInfo)(attributeValues)
 NX_REFLECTION_INSTRUMENT(InputData, InputData_Fields);
 
 struct TestCase
@@ -146,6 +148,7 @@ protected:
 
         m_testCase = itr->second;
         m_descriptors = prepareDescriptors(m_testCase.input, s_testData->descriptors);
+        m_attributeValues = m_testCase.input.attributeValues;
     }
 
     void givenMultiengineDescriptors(const QString& testCaseName)
@@ -167,7 +170,19 @@ protected:
 
     void makeSureStateViewIsCorrect()
     {
-        const AbstractStateView* stateView = m_stateViewBuilder->stateView();
+        std::unique_ptr<AbstractStateViewFilter> filter;
+        if (m_attributeValues)
+        {
+            nx::common::metadata::Attributes attributes;
+            for (const auto& [attributeName, attributeValue]: *m_attributeValues)
+            {
+                attributes.push_back(
+                    nx::common::metadata::Attribute{attributeName, attributeValue});
+            }
+            filter = std::make_unique<AttributeConditionStateViewFilter>(
+                /*baseFilter*/ nullptr, std::move(attributes));
+        }
+        const AbstractStateView* stateView = m_stateViewBuilder->stateView(filter.get());
         std::vector<AbstractNode*> rootNodes = stateView->rootNodes();
 
         validateNodes(rootNodes, m_testCase.expected.nodes);
@@ -392,6 +407,7 @@ private:
     TestCase m_testCase;
     MultiengineTestCase m_multiengineTestCase;
     nx::vms::api::analytics::Descriptors m_descriptors;
+    std::optional<std::map<QString, QString>> m_attributeValues;
     std::unique_ptr<AbstractStateViewBuilder> m_stateViewBuilder;
 };
 
@@ -491,6 +507,34 @@ TEST_F(StateViewTest, multipleHiddenTypes_clashingBooleanAttribute)
 TEST_F(StateViewTest, multipleHiddenTypes_clashingStringAttribute)
 {
     givenDescriptors("multipleHiddenTypes_clashingStringAttribute");
+    afterStateViewIsBuilt();
+    makeSureStateViewIsCorrect();
+}
+
+TEST_F(StateViewTest, conditionalAttributes_1)
+{
+    givenDescriptors("conditionalAttributes_1");
+    afterStateViewIsBuilt();
+    makeSureStateViewIsCorrect();
+}
+
+TEST_F(StateViewTest, conditionalAttributes_2)
+{
+    givenDescriptors("conditionalAttributes_2");
+    afterStateViewIsBuilt();
+    makeSureStateViewIsCorrect();
+}
+
+TEST_F(StateViewTest, conditionalAttributes_3)
+{
+    givenDescriptors("conditionalAttributes_3");
+    afterStateViewIsBuilt();
+    makeSureStateViewIsCorrect();
+}
+
+TEST_F(StateViewTest, conditionalAttributes_4)
+{
+    givenDescriptors("conditionalAttributes_4");
     afterStateViewIsBuilt();
     makeSureStateViewIsCorrect();
 }
