@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -44,6 +43,7 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
 
@@ -173,7 +173,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
 
     NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
     connect(qnCloudStatusWatcher,
-        &nx::vms::client::core::CloudStatusWatcher::cloudSystemsChanged,
+        &QnCloudStatusWatcher::cloudSystemsChanged,
         this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
