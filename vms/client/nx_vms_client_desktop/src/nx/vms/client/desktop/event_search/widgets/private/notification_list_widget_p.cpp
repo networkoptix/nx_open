@@ -16,9 +16,12 @@
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -27,6 +30,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -55,6 +59,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     q(q),
     m_mainLayout(new QVBoxLayout(q)),
     m_headerWidget(new QWidget(q)),
+    m_separatorLine(new QFrame(q)),
     m_itemCounterLabel(new QLabel(q)),
     m_ribbonContainer(new QWidget(q)),
     m_filterSystemsButton(new SelectableTextButton(q)),
@@ -71,17 +76,16 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
 
     m_ribbonContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    auto separatorLine = new QFrame(q);
-    separatorLine->setFrameShape(QFrame::HLine);
-    separatorLine->setFrameShadow(QFrame::Plain);
-    separatorLine->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    separatorLine->setMinimumSize({0, 1});
-    setPaletteColor(separatorLine, QPalette::Shadow, colorTheme()->color("dark6"));
+    m_separatorLine->setFrameShape(QFrame::HLine);
+    m_separatorLine->setFrameShadow(QFrame::Plain);
+    m_separatorLine->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    m_separatorLine->setMinimumSize({0, 1});
+    setPaletteColor(m_separatorLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     m_mainLayout->setContentsMargins({});
     m_mainLayout->setSpacing(0);
     m_mainLayout->addWidget(m_headerWidget);
-    m_mainLayout->addWidget(separatorLine);
+    m_mainLayout->addWidget(m_separatorLine);
     m_mainLayout->addWidget(m_ribbonContainer);
 
     auto headerLayout = new QVBoxLayout(m_headerWidget);
@@ -152,7 +156,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         q,
         &NotificationListWidget::unreadCountChanged);
 
-
     const auto updatePlaceholderVisibility =
         [this](int count)
         {
@@ -165,7 +168,20 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     connect(m_eventRibbon, &EventRibbon::countChanged, this, updatePlaceholderVisibility);
     updatePlaceholderVisibility(m_eventRibbon->count());
 
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this] { changeFilterVisibilityIfNeeded(); });
+
+    NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
+    connect(qnCloudStatusWatcher,
+        &nx::vms::client::core::CloudStatusWatcher::cloudSystemsChanged,
+        this,
+        [this] { changeFilterVisibilityIfNeeded(); });
+
+    updatePlaceholderVisibility(m_eventRibbon->count());
+
     TileInteractionHandler::install(m_eventRibbon);
+
+    changeFilterVisibilityIfNeeded();
 }
 
 NotificationListWidget::Private::~Private()
@@ -225,6 +241,21 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
 
     m_systemSelectionActions[RightPanel::SystemSelection::current]->trigger();
     m_filterSystemsButton->setMenu(menu);
+}
+
+void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
+{
+    if (auto user = context()->user();
+        user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1)
+    {
+        m_headerWidget->show();
+        m_separatorLine->show();
+    }
+    else
+    {
+        m_headerWidget->hide();
+        m_separatorLine->hide();
+    }
 }
 
 } // namespace nx::vms::client::desktop

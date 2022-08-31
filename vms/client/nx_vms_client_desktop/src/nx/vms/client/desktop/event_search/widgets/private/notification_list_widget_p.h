@@ -33,11 +33,13 @@ public:
 
 private:
     void setupFilterSystemsButton();
+    void changeFilterVisibilityIfNeeded();
 
 private:
     NotificationListWidget* const q;
     QVBoxLayout* const m_mainLayout;
     QWidget* const m_headerWidget;
+    QFrame* const m_separatorLine;
     QLabel* const m_itemCounterLabel;
     QWidget* const m_ribbonContainer;
     SelectableTextButton* const m_filterSystemsButton;
