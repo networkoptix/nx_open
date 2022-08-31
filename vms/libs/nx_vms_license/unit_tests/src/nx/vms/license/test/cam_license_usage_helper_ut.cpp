@@ -28,8 +28,6 @@ protected:
     virtual void SetUp()
     {
         m_server = addServer();
-        m_armServer = addServer(nx::vms::api::SF_ArmServer);
-
         m_licenses.reset(new QnLicensePoolScaffold(systemContext()->licensePool()));
         m_helper.reset(new CamLicenseUsageHelper(systemContext()));
         m_helper->setCustomValidator(std::make_unique<QLicenseStubValidator>(systemContext()));
@@ -72,11 +70,6 @@ protected:
         return addRecordingCamera(kDefaultLicenseType, /* licenseRequired */ false);
     }
 
-    void setArmMode(bool isArm = true)
-    {
-        m_licenses->setArmMode(isArm);
-    }
-
     void addLicense(Qn::LicenseType licenseType)
     {
         m_licenses->addLicense(licenseType);
@@ -93,7 +86,6 @@ protected:
     }
 
     QnMediaServerResourcePtr m_server;
-    QnMediaServerResourcePtr m_armServer;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<CamLicenseUsageHelper> m_helper;
 };
@@ -552,41 +544,6 @@ TEST_F(QnCamLicenseUsageHelperTest, checkNvrLicenseOverlapping)
     ASSERT_TRUE(m_helper->isValid());
 }
 
-TEST_F(QnCamLicenseUsageHelperTest, checkEdgeLicensesArmActivating)
-{
-    setArmMode();
-    addLicenses(Qn::LC_Edge, 1);
-
-    addRecordingCameras(Qn::LC_Professional, 1, true);
-    ASSERT_TRUE(m_helper->isValid());
-}
-
-TEST_F(QnCamLicenseUsageHelperTest, checkStartLicensesArmActivating)
-{
-    setArmMode();
-    addLicenses(Qn::LC_Start, 8);
-
-    addRecordingCameras(Qn::LC_Professional, 1, true);
-    ASSERT_TRUE(m_helper->isValid());
-}
-
-TEST_F(QnCamLicenseUsageHelperTest, checkProLicensesArmActivating)
-{
-    setArmMode();
-    addLicenses(Qn::LC_Professional, 8);
-
-    addRecordingCameras(Qn::LC_Professional, 1, true);
-    ASSERT_TRUE(m_helper->isValid());
-}
-
-TEST_F(QnCamLicenseUsageHelperTest, checkIoLicensesArmActivating)
-{
-    setArmMode();
-    addLicenses(Qn::LC_IO, 8);
-    addRecordingCameras(Qn::LC_IO, 8, true);
-    ASSERT_TRUE(m_helper->isValid());
-}
-
 TEST_F(QnCamLicenseUsageHelperTest, checkVmaxInitLicense)
 {
     addLicenses(Qn::LC_VMAX, 1);
@@ -746,30 +703,6 @@ TEST_F(QnCamLicenseUsageHelperTest, licenseTypeChanged)
 
     camera.dynamicCast<nx::CameraResourceStub>()->setLicenseType(Qn::LC_Edge);
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
-}
-
-TEST_F(QnCamLicenseUsageHelperTest, moveProfessionalCameraToArmServer)
-{
-    auto camera = addDefaultRecordingCamera();
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
-
-    addLicense(Qn::LC_Professional);
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-
-    camera->setParentId(m_armServer->getId());
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-}
-
-TEST_F(QnCamLicenseUsageHelperTest, moveArmCameraToArmServer)
-{
-    auto camera = addDefaultRecordingCamera();
-    ASSERT_FALSE(m_helper->canEnableRecording(camera));
-
-    addLicense(Qn::LC_Edge);
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
-
-    camera->setParentId(m_armServer->getId());
-    ASSERT_TRUE(m_helper->canEnableRecording(camera));
 }
 
 } // namespace nx::vms::license::test
