@@ -2548,7 +2548,8 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
 
     /*
      * We are displaying notifications in the two use cases:
-     * on ShowOnAlarmLayoutAction and on ShowPopupAction (including prolonged PlaySoundAction as its subtype).
+     * on ShowOnAlarmLayoutAction and on ShowPopupAction (including prolonged PlaySoundAction
+     * as its subtype) / ShowIntercomInformer.
      * In first case we got at_notificationsHandler_businessActionAdded called once for each camera, that
      * should be displayed on the alarm layout (including source cameras and custom cameras if required).
      * In second case we should manually collect resources from event sources.
@@ -2563,7 +2564,8 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     else
     {
         NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction);
+            || actionType == vms::api::ActionType::playSoundAction
+            || actionType == vms::api::ActionType::showIntercomInformer);
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);

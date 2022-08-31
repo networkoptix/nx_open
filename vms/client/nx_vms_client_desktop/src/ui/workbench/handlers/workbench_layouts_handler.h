@@ -35,6 +35,7 @@ private:
     void at_closeAllButThisLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
     void at_openNewTabAction_triggered();
+    void at_openIntercomLayoutAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
     void at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction);
