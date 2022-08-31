@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
 
@@ -131,8 +132,34 @@ void LogsManagementWidget::setupUi()
             header->setCheckState(state);
         });
 
+    auto requestTokenIfNeeded =
+        [this]() -> std::optional<std::string>
+        {
+            if (!NX_ASSERT(m_watcher))
+                return {};
+
+            auto items = m_watcher->checkedItems();
+            if (std::any_of(
+                items.begin(), items.end(),
+                [](LogsManagementUnitPtr unit){ return unit->server(); }))
+            {
+                const auto token = FreshSessionTokenHelper(this).getToken(
+                    tr("Apply settings"),
+                    tr("Enter your account password"),
+                    tr("Apply"),
+                    FreshSessionTokenHelper::ActionType::updateSettings);
+
+                if (token.empty())
+                    return {};
+
+                return token.value;
+            }
+
+            return ""; //< We don't need a token if only client settings are being updated.
+        };
+
     connect(ui->settingsButton, &QPushButton::clicked, this,
-        [this]
+        [this, requestTokenIfNeeded]
         {
             if (!NX_ASSERT(m_watcher))
                 return;
@@ -146,14 +173,18 @@ void LogsManagementWidget::setupUi()
             if (!dialog->hasChanges())
                 return;
 
-            m_watcher->applySettings(dialog->changes());
+            if (auto token = requestTokenIfNeeded())
+                m_watcher->applySettings(token.value(), dialog->changes());
         });
 
     connect(ui->resetButton, &QPushButton::clicked, this,
-        [this]
+        [this, requestTokenIfNeeded]
         {
-            if (NX_ASSERT(m_watcher))
-                m_watcher->applySettings(ConfigurableLogSettings::defaults());
+            if (!NX_ASSERT(m_watcher))
+                return;
+
+            if (auto token = requestTokenIfNeeded())
+                m_watcher->applySettings(token.value(), ConfigurableLogSettings::defaults());
         });
 
     connect(ui->downloadButton, &QPushButton::clicked, this,

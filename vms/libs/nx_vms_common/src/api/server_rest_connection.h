@@ -36,6 +36,7 @@
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/device_replacement.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/log_settings.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
@@ -264,6 +265,13 @@ public:
     Handle restoreDatabase(
         const nx::vms::api::DatabaseDumpData& data,
         const std::string& ownerSessionToken,
+        Result<ErrorOrEmpty>::type callback,
+        QThread* targetThread);
+
+    Handle putServerLogSettings(
+        const QnUuid& serverId,
+        const std::string& ownerSessionToken,
+        const nx::vms::api::ServerLogSettings& settings,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
 
