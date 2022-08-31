@@ -4,7 +4,6 @@
 
 #include <algorithm>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
 #include <nx/network/connection_server/server_statistics.h>
@@ -27,8 +26,6 @@ struct CloudConnectStatistics
     (totalConnectionsEstablishedPerMinute)(totalConnectionsFailedPerMinute) \
     (establishedConnectionsPerType)(failedConnectionsPerResultCode)
 
-QN_FUSION_DECLARE_FUNCTIONS(CloudConnectStatistics, (json))
-
 NX_REFLECTION_INSTRUMENT(CloudConnectStatistics, CloudConnectStatistics_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -42,8 +39,6 @@ struct Country
 
 #define Country_mediator_Fields (total)(city)(subdivision)
 
-QN_FUSION_DECLARE_FUNCTIONS(Country, (json), NX_NETWORK_API)
-
 NX_REFLECTION_INSTRUMENT(Country, Country_mediator_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -56,8 +51,6 @@ struct Continent
 
 #define Continent_mediator_Fields (total)(country)
 
-QN_FUSION_DECLARE_FUNCTIONS(Continent, (json), NX_NETWORK_API)
-
 NX_REFLECTION_INSTRUMENT(Continent, Continent_mediator_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -68,8 +61,6 @@ struct Location
 };
 
 #define Location_mediator_Fields (continent)
-
-QN_FUSION_DECLARE_FUNCTIONS(Location, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(Location, Location_mediator_Fields)
 
@@ -93,8 +84,6 @@ struct ListeningPeerStatistics
 
 #define ListeningPeerStatistics_mediator_Fields (location)
 
-QN_FUSION_DECLARE_FUNCTIONS(ListeningPeerStatistics, (json), NX_NETWORK_API)
-
 NX_REFLECTION_INSTRUMENT(ListeningPeerStatistics, ListeningPeerStatistics_mediator_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -107,8 +96,6 @@ struct Statistics
 };
 
 #define Statistics_mediator_Fields (http)(stun)(cloudConnect)
-
-QN_FUSION_DECLARE_FUNCTIONS(Statistics, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(Statistics, Statistics_mediator_Fields)
 

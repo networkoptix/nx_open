@@ -9,7 +9,7 @@ namespace detail {
 
 StatisticsCalculator::StatisticsCalculator():
     m_connectionsPerMinuteCalculator(std::chrono::minutes(1)),
-    m_requestsServedPerMinuteCalculator(std::chrono::minutes(1)),
+    m_requestsReceivedPerMinuteCalculator(std::chrono::minutes(1)),
     m_requestsAveragePerConnectionCalculator(std::chrono::minutes(1))
 {
 }
@@ -24,8 +24,8 @@ Statistics StatisticsCalculator::statistics(int aliveConnectionCount) const
         m_connectionsPerMinuteCalculator.getSumPerLastPeriod();
     result.requestsAveragePerConnection =
         m_requestsAveragePerConnectionCalculator.getAveragePerLastPeriod();
-    result.requestsServedPerMinute =
-        m_requestsServedPerMinuteCalculator.getSumPerLastPeriod();
+    result.requestsReceivedPerMinute =
+        m_requestsReceivedPerMinuteCalculator.getSumPerLastPeriod();
     return result;
 }
 
@@ -33,7 +33,7 @@ void StatisticsCalculator::messageReceived()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_requestsServedPerMinuteCalculator.add(1);
+    m_requestsReceivedPerMinuteCalculator.add(1);
     m_requestsAveragePerConnectionCalculator.add(1);
 }
 

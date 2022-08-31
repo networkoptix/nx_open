@@ -29,7 +29,7 @@ public:
 
 private:
     nx::utils::math::SumPerPeriod<int> m_connectionsPerMinuteCalculator;
-    nx::utils::math::SumPerPeriod<int> m_requestsServedPerMinuteCalculator;
+    nx::utils::math::SumPerPeriod<int> m_requestsReceivedPerMinuteCalculator;
     nx::utils::math::AveragePerPeriod<int> m_requestsAveragePerConnectionCalculator;
     mutable nx::Mutex m_mutex;
 };

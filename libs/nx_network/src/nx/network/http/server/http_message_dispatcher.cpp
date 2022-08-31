@@ -77,14 +77,14 @@ int AbstractMessageDispatcher::dispatchFailures() const
     return m_dispatchFailures.getSumPerLastPeriod();
 }
 
-std::map<std::string, server::RequestPathStatistics>
+std::map<std::string, server::RequestStatistics>
     AbstractMessageDispatcher::requestPathStatistics() const
 {
-    std::map</*path*/ std::string, server::RequestPathStatistics> stats;
+    std::map</*path*/ std::string, server::RequestStatistics> stats;
     m_requestPathStatsCalculators.forEach(
         [&stats](const auto& value)
         {
-            auto requestPathStats = value.second.requestPathStatistics();
+            auto requestPathStats = value.second.requestStatistics();
             if (requestPathStats.requestsServedPerMinute > 0)
                 stats.emplace(value.first, std::move(requestPathStats));
         });
@@ -102,15 +102,6 @@ void AbstractMessageDispatcher::incrementDispatchFailures() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const_cast<AbstractMessageDispatcher*>(this)->m_dispatchFailures.add(1);
-}
-
-void AbstractMessageDispatcher::startUpdatingRequestPathStatistics(
-    const std::string& requestPathTemplate) const
-{
-    m_requestPathStatsCalculators.emplace();
-    m_requestPathStatsCalculators.modify(
-        requestPathTemplate,
-        [](auto& val) { val.processingRequest(); });
 }
 
 void AbstractMessageDispatcher::finishUpdatingRequestPathStatistics(

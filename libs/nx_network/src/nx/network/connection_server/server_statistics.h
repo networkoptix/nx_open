@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <compare>
+#include <vector>
+
 #include <nx/reflect/instrument.h>
 
 namespace nx {
@@ -13,22 +15,22 @@ struct NX_NETWORK_API Statistics
 {
     int connectionCount = 0;
     int connectionsAcceptedPerMinute = 0;
-    int requestsServedPerMinute = 0;
+    int requestsReceivedPerMinute = 0;
     /**
      * Calculated for connections closed in the last minute.
      */
     int requestsAveragePerConnection = 0;
 
+    /**
+     * Sums up *this and right statistics.
+     */
     void add(const Statistics& right);
 
-    bool operator==(const Statistics& right) const;
+    auto operator<=>(const Statistics&) const = default;
 };
 
 #define Statistics_server_Fields (connectionCount)(connectionsAcceptedPerMinute) \
-    (requestsServedPerMinute)(requestsAveragePerConnection)
-
-bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, Statistics*);
-void NX_NETWORK_API serialize(QnJsonContext*, const Statistics&, class QJsonValue*);
+    (requestsReceivedPerMinute)(requestsAveragePerConnection)
 
 NX_REFLECTION_INSTRUMENT(Statistics, Statistics_server_Fields)
 

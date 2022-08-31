@@ -46,7 +46,7 @@ private:
 
 } //namespace
 
-class AggregateHttpStatisticsProvider:
+class SummingStatisticsProvider:
     public testing::Test
 {
 protected:
@@ -114,7 +114,7 @@ protected:
         std::vector<const AbstractHttpStatisticsProvider*> abstractProviders;
         for (const auto& provider: providers)
             abstractProviders.emplace_back(&provider);
-        return server::AggregateHttpStatisticsProvider(
+        return server::SummingStatisticsProvider(
             std::move(abstractProviders)).httpStatistics();
     }
 
@@ -156,7 +156,7 @@ protected:
         all.connectionCount = (int) providers.size();
         all.connectionsAcceptedPerMinute = (int) providers.size();
         all.requestsServedPerMinute = (int) providers.size();
-        all.requestsAveragePerConnection = (int) providers.size();
+        all.requestsAveragePerConnection = 1;
         all.averageRequestProcessingTimeUsec =
             m_averageRequestProcessingTimeSum / (int) providers.size();
         all.maxRequestProcessingTimeUsec = std::chrono::microseconds((int) providers.size());
@@ -190,21 +190,17 @@ private:
     std::chrono::microseconds m_averageRequestProcessingTimeSum{0};
 };
 
-TEST_F(AggregateHttpStatisticsProvider, aggregates_statistics)
+TEST_F(SummingStatisticsProvider, aggregates_statistics)
 {
     const auto providers = givenStatisticsProviders();
-
     const auto statistics = whenRequestAggregateStatistics(providers);
-
     thenStatisticsHaveExpectedValues(expectedStatistics(providers), statistics);
 }
 
-TEST_F(AggregateHttpStatisticsProvider, merges_request_path_statistics)
+TEST_F(SummingStatisticsProvider, merges_request_path_statistics)
 {
     const auto providers = givenStastisticsProvidersWithOverlappingRequestPaths();
-
     const auto statistics = whenRequestAggregateStatistics(providers);
-
     thenStatisticsHaveExpectedValues(expectedStatistics(providers), statistics);
 }
 
@@ -369,8 +365,8 @@ TEST_F(
     for (const auto& requestPathStats: stats.requests)
         requestPathStatsRequestsServedPerMinute += requestPathStats.second.requestsServedPerMinute;
 
-    ASSERT_EQ(200, stats.requestsServedPerMinute);
-    ASSERT_EQ(stats.requestsServedPerMinute, requestPathStatsRequestsServedPerMinute);
+    ASSERT_EQ(200, stats.requestsReceivedPerMinute);
+    ASSERT_EQ(stats.requestsReceivedPerMinute, requestPathStatsRequestsServedPerMinute);
 
     // Sockets must be closed after statistics are taken, because we must report correct values
     // while sockets are still alive.
