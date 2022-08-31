@@ -398,6 +398,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ::setReadOnly(ui->checkBoxPrimaryRecorder, state.readOnly);
     ::setReadOnly(ui->checkBoxSecondaryRecorder, state.readOnly);
 
+    ui->checkBoxPrimaryRecorder->setEnabled(!remoteArchiveMdSupported);
+    ui->checkBoxSecondaryRecorder->setEnabled(!remoteArchiveMdSupported);
+
     // Media Streaming.
 
     if (state.devicesDescription.isUdpMulticastTransportAllowed == CombinedValue::All)
