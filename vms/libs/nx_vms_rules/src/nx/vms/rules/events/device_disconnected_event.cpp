@@ -39,6 +39,7 @@ QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) con
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
@@ -71,6 +72,15 @@ QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context)
             tr("Camera %1 was disconnected"),
             tr("I/O Module %1 was disconnected")),
         camera).arg(resourceName);
+}
+
+QString DeviceDisconnectedEvent::name(common::SystemContext* context) const
+{
+    // TODO: #amalov The number of devices in translation should be corrected in 5.1+
+    return QnDeviceDependentStrings::getDefaultNameFromSet(
+        context->resourcePool(),
+        tr("Device Disconnected", "", 1),
+        tr("Camera Disconnected", "", 1));
 }
 
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()
