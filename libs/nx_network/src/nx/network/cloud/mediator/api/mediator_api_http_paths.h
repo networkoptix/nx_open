@@ -15,7 +15,7 @@ static constexpr char kStatisticsMetricsPath[] = "/statistics/metrics/";
 static constexpr char kStatisticsListeningPeersPath[] = "/statistics/listening-peers/";
 static constexpr char kStatisticsSystemPeersPath[] = "/statistics/system/{systemId}/servers/";
 
-static constexpr char kStunOverHttpTunnelPath[] = "/stun_tunnel";
+static constexpr char kStunOverHttpTunnelPath[] = "/stun_tunnel_auth";
 
 static constexpr char kServerSessionsPath[] = "/server/{hostname}/sessions/";
 
