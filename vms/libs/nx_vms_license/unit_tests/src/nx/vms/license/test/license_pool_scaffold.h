@@ -20,11 +20,8 @@ public:
 
     void addFutureLicenses(int count);
 
-    void setArmMode(bool isArm = true);
 private:
     QnLicensePool* const m_licensePool {nullptr};
-    /** Are we emulating the arm server. */
-    bool m_arm {false};
 };
 
 } // namespace nx::vms::license::test

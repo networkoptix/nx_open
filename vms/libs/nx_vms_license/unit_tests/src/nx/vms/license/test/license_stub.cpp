@@ -11,8 +11,7 @@ static QUuid initialKey = QUuid::createUuid();
 namespace nx::vms::license::test {
 
 QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
-    m_type(licenseType),
-    m_armServer(false)
+    m_type(licenseType)
 {
     ++initialKey.data1;
     setKey(initialKey.toByteArray());
@@ -22,16 +21,6 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
 Qn::LicenseType QnLicenseStub::type() const
 {
     return m_type;
-}
-
-bool QnLicenseStub::isArmServer() const
-{
-    return m_armServer;
-}
-
-void QnLicenseStub::setArmServer(bool value)
-{
-    m_armServer = value;
 }
 
 QnFutureLicenseStub::QnFutureLicenseStub(int count)
