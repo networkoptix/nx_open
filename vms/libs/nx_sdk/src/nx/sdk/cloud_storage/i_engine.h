@@ -24,6 +24,12 @@ enum class MetadataType
     bookmark,
 };
 
+struct StorageSpace
+{
+    int64_t totalSpace = -1;
+    int64_t freeSpace = -1;
+};
+
 /**
  * Engine is an abstraction of a backend communication entity. It's something that knows how to
  * interact with the particular backend endpoint. Currently, Server won't ask plugin for
@@ -124,6 +130,17 @@ public:
      * function has been called.
      */
     public: virtual void startNotifications() = 0;
+
+    /**
+     * Check if plugin backend is operational. This function will be periodically called by
+     * Server.
+     */
+    public: virtual bool isOnline() const = 0;
+
+    /**
+     * Get backend storage space information.
+     */
+    public: virtual ErrorCode storageSpace(StorageSpace* storageSpace) const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage
