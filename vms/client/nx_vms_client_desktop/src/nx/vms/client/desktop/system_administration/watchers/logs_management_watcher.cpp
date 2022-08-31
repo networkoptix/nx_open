@@ -734,11 +734,17 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
                 d->path = "";
                 d->state = State::empty;
 
+                // Reinit client unit.
+                d->client->data()->setChecked(false);
+
                 d->initNotificationManager();
                 d->updateClientLogLevelWarning();
                 d->updateServerLogLevelWarning();
             }
 
+            emit stateChanged(State::empty);
+            emit selectionChanged(Qt::Unchecked);
+            emit itemListChanged();
             d->api->loadInitialSettings();
         });
 
