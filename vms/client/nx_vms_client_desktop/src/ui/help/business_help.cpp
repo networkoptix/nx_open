@@ -78,6 +78,8 @@ int actionHelpId(ActionType type)
             return Qn::EventsActions_Diagnostics_Help;
         case ActionType::showOnAlarmLayoutAction:
             return Qn::EventsActions_ShowOnAlarmLayout_Help;
+        case ActionType::showIntercomInformer:
+            return Qn::EventsActions_ShowIntercomInformer_Help;
         case ActionType::bookmarkAction:
             return Qn::EventsActions_Bookmark_Help;
         case ActionType::executePtzPresetAction:

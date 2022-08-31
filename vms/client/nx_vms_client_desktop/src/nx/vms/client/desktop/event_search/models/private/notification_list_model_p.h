@@ -44,6 +44,11 @@ private:
     void setupAcknowledgeAction(EventData& eventData, const QnUuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);
 
+    void setupIntercomAcknowledgeAction(
+        EventData& eventData,
+        const QnUuid& cameraId,
+        const nx::vms::event::AbstractActionPtr& action);
+
     QString caption(const nx::vms::event::EventParameters& parameters,
         const QnVirtualCameraResourcePtr& camera) const;
     QString description(const nx::vms::event::EventParameters& parameters) const;

@@ -69,6 +69,7 @@ enum HelpTopic
     EventsActions_SendMobileNotification_Help,
     EventsActions_ShowDesktopNotification_Help,
     EventsActions_ShowOnAlarmLayout_Help,
+    EventsActions_ShowIntercomInformer_Help,
     EventsActions_ShowTextOverlay_Help,
     EventsActions_SoftTrigger_Help,
     EventsActions_Speech_Help,

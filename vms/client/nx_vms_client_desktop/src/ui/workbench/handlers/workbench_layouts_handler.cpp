@@ -46,6 +46,10 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/actions/common_action.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -234,6 +238,9 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
 
     connect(action(action::OpenInNewTabAction), &QAction::triggered, this,
         &LayoutsHandler::at_openInNewTabAction_triggered);
+
+    connect(action(action::OpenIntercomLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_openIntercomLayoutAction_triggered);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -1408,6 +1415,28 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     }
 
     menu()->trigger(action::DropResourcesAction, parameters);
+}
+
+void LayoutsHandler::at_openIntercomLayoutAction_triggered()
+{
+    at_openInNewTabAction_triggered();
+
+    const ui::action::Parameters parameters = menu()->currentParameters(sender());
+
+    const auto businessAction =
+        parameters.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
+
+    const auto broadcastAction = nx::vms::event::CommonAction::createBroadcastAction(
+        nx::vms::api::ActionType::showIntercomInformer, businessAction->getParams());
+    broadcastAction->setToggleState(nx::vms::api::EventState::inactive);
+
+    if (const auto connection = messageBusConnection())
+    {
+        const auto manager = connection->getEventRulesManager(Qn::kSystemAccess);
+        nx::vms::api::EventActionData actionData;
+        ec2::fromResourceToApi(broadcastAction, actionData);
+        manager->broadcastEventAction(actionData, [](int /*handle*/, ec2::ErrorCode) {});
+    }
 }
 
 bool LayoutsHandler::tryClose(bool force)
