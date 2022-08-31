@@ -67,9 +67,8 @@ TEST( QnTimePeriodsListTest, mergeBigData )
 
     QnTimePeriodList resultPeriods;
 
-    const auto totalLengthMs = nx::build_info::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < totalLengthMs)
+    while (start < kTwoMonthMs)
     {
         for (int i = 0; i < kMergingListsCount; ++i)
             lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
@@ -84,9 +83,8 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     const qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
-    if (!nx::build_info::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled()) {
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, kBigDataTestsLimitMs);
-    }
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
@@ -97,9 +95,8 @@ TEST( QnTimePeriodsListTest, unionBigData )
 
     QnTimePeriodList resultPeriods;
 
-    const auto totalLengthMs = nx::build_info::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < totalLengthMs)
+    while (start < kTwoMonthMs)
     {
         for (int i = 0; i < kMergingListsCount; ++i)
             lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
@@ -115,10 +112,8 @@ TEST( QnTimePeriodsListTest, unionBigData )
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    if (!nx::build_info::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
-    {
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, kBigDataTestsLimitMs);
-    }
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )
