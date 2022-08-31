@@ -15,7 +15,11 @@ static constexpr char kStatisticsMetricsPath[] = "/statistics/metrics/";
 static constexpr char kStatisticsListeningPeersPath[] = "/statistics/listening-peers/";
 static constexpr char kStatisticsSystemPeersPath[] = "/statistics/system/{systemId}/servers/";
 
-static constexpr char kStunOverHttpTunnelPath[] = "/stun_tunnel";
+/**
+ * This path requires HTTP authentication. So, each STUN request does not have to provide
+ * any signature.
+ */
+static constexpr char kStunOverHttpTunnelPath[] = "/stun_tunnel_auth";
 
 static constexpr char kServerSessionsPath[] = "/server/{hostname}/sessions/";
 
@@ -24,5 +28,15 @@ static constexpr char kConnectionSpeedUplinkPathV2[] =
     "/system/{systemId}/server/{serverId}/connection-speed/uplink";
 
 static constexpr char kApiDocPrefix[] = "/mediator/docs/api";
+
+namespace deprecated {
+
+/**
+ * This path does not require HTTP authentication. But, each STUN request has to provide
+ * valid signature.
+ */
+static constexpr char kStunOverHttpTunnelPath[] = "/stun_tunnel";
+
+} // namespace deprecated
 
 } // namespace nx::hpm::api
