@@ -616,14 +616,14 @@ void SystemHealthListModel::Private::doAddItem(
     if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
         || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
     {
-        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, params);
+        removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, resource);
     }
 
     if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress
         || message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
         || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
     {
-        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncAvailable, params);
+        removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncAvailable, resource);
     }
 
     Item item(message, resource);
@@ -659,26 +659,35 @@ void SystemHealthListModel::Private::removeItem(
     QnSystemHealth::MessageType message,
     const QVariant& params)
 {
-    NX_VERBOSE(this, "Removing a system health message %1", toString(message));
-
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
     if (resource)
     {
-        const Item item(message, resource);
-        const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
-        if (position != m_items.cend() && *position == item)
-            q->removeRows(std::distance(m_items.cbegin(), position), 1);
+        removeItemForResource(message, resource);
     }
     else
     {
+        NX_VERBOSE(this, "Removing a system health message %1", toString(message));
+
         const auto range = std::equal_range(m_items.cbegin(), m_items.cend(), message);
         const auto count = std::distance(range.first, range.second);
         if (count > 0)
             q->removeRows(std::distance(m_items.cbegin(), range.first), count);
     }
+}
+
+void SystemHealthListModel::Private::removeItemForResource(
+    QnSystemHealth::MessageType message,
+    const QnResourcePtr& resource)
+{
+    NX_VERBOSE(this, "Removing a system health message %1", toString(message));
+
+    const Item item(message, resource);
+    const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
+    if (position != m_items.cend() && *position == item)
+        q->removeRows(std::distance(m_items.cbegin(), position), 1);
 }
 
 void SystemHealthListModel::Private::toggleItem(QnSystemHealth::MessageType message, bool isOn)
