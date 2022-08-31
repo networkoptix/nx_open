@@ -21,6 +21,7 @@ public:
         unbind,
         backup,
         restore,
+        updateSettings,
     };
 
 public:

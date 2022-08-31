@@ -575,6 +575,30 @@ Handle ServerConnection::restoreDatabase(
     return handle;
 }
 
+Handle ServerConnection::putServerLogSettings(
+    const QnUuid& serverId,
+    const std::string& ownerSessionToken,
+    const nx::vms::api::ServerLogSettings& settings,
+    Result<ErrorOrEmpty>::type callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::put,
+        prepareUrl(
+            QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(settings));
+    request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(callback), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::addFileDownload(
     const QString& fileName,
     qint64 size,

@@ -75,7 +75,9 @@ public:
 
     void setUpdatesEnabled(bool enabled);
 
-    void applySettings(const ConfigurableLogSettings& settings);
+    void applySettings(
+        const std::string& token,
+        const ConfigurableLogSettings& settings);
 
     static const nx::utils::log::Level defaultLogLevel();
 
