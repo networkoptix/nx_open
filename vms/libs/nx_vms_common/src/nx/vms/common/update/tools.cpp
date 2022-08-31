@@ -62,20 +62,4 @@ QString passwordForBuild(const QString& build)
     return password;
 }
 
-qint64 reservedSpacePadding()
-{
-    // Reasoning for such constant values: QA team asked to make them so.
-    constexpr qint64 kDefaultReservedSpace = 100 * 1024 * 1024;
-    constexpr qint64 kWindowsReservedSpace = 500 * 1024 * 1024;
-    constexpr qint64 kArmReservedSpace = 5 * 1024 * 1024;
-
-    if (nx::build_info::isWindows())
-        return kWindowsReservedSpace;
-
-    if (nx::build_info::isArm())
-        return kArmReservedSpace;
-
-    return kDefaultReservedSpace;
-}
-
 } // namespace nx::vms::common::update

@@ -462,13 +462,30 @@ QDir ServerUpdateTool::getDownloadDir() const
     return m_outputDir;
 }
 
+static qint64 reservedStorageBytesForUpdate()
+{
+    // NOTE: The same values are specified in the Server setting reservedStorageBytesForUpdate.
+    // Reasoning for such constant values: QA team asked to make them so.
+    constexpr qint64 kDefaultReservedSpace = 100 * 1024 * 1024;
+    constexpr qint64 kWindowsReservedSpace = 500 * 1024 * 1024;
+    constexpr qint64 kArmReservedSpace = 5 * 1024 * 1024;
+
+    if (nx::build_info::isWindows())
+        return kWindowsReservedSpace;
+
+    if (nx::build_info::isArm())
+        return kArmReservedSpace;
+
+    return kDefaultReservedSpace;
+}
+
 uint64_t ServerUpdateTool::getAvailableSpace() const
 {
     auto downloadDir = getDownloadDir();
     QStorageInfo storageInfo(downloadDir);
-    uint64_t space = storageInfo.bytesAvailable();
-    uint64_t spaceReserved = common::update::reservedSpacePadding();
-    return spaceReserved > space ? 0 : space - spaceReserved;
+    uint64_t bytesAvailable = storageInfo.bytesAvailable();
+    uint64_t bytesReserved = reservedStorageBytesForUpdate();
+    return bytesReserved > bytesAvailable ? 0 : (bytesAvailable - bytesReserved);
 }
 
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
