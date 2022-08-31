@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
@@ -35,6 +36,9 @@ namespace nx::network::rest {
  */
 struct NX_VMS_COMMON_API Result
 {
+    Q_DECLARE_TR_FUNCTIONS(Result)
+
+public:
     // TODO: Move out and use NX_REFLECTION_ENUM.
     enum Error
     {
@@ -125,22 +129,23 @@ struct NX_VMS_COMMON_API Result
     Result(Error error = Error::NoError, QString errorString = "");
 
     static Result missingParameter(const QString& name);
-    static Result cantProcessRequest(QString message = "Failed to process request");
-    static Result forbidden(QString message = "Forbidden");
-    static Result conflict(QString message = "Conflict");
-    static Result badRequest(QString message = "Bad request");
-    static Result notImplemented(QString message = "Not implemented");
-    static Result notFound(QString message = "Not found");
-    static Result internalServerError(QString message = "Internal server error");
-    static Result unsupportedMediaType(QString message = "Unsupported media type");
-    static Result serviceUnavailable(QString message = "Service unavailable");
-    static Result unauthorized(QString message = "Unauthorized");
-    static Result sessionExpired(QString message = "Session is expired");
+    static Result cantProcessRequest(std::optional<QString> customMessage = std::nullopt);
+    static Result forbidden(std::optional<QString> customMessage = std::nullopt);
+    static Result conflict(std::optional<QString> customMessage = std::nullopt);
+    static Result badRequest(std::optional<QString> customMessage = std::nullopt);
+    static Result notImplemented(std::optional<QString> customMessage = std::nullopt);
+    static Result notFound(std::optional<QString> customMessage = std::nullopt);
+    static Result internalServerError(std::optional<QString> customMessage = std::nullopt);
+    static Result unsupportedMediaType(std::optional<QString> customMessage = std::nullopt);
+    static Result serviceUnavailable(std::optional<QString> customMessage = std::nullopt);
+    static Result unauthorized(std::optional<QString> customMessage = std::nullopt);
+    static Result sessionExpired(std::optional<QString> customMessage = std::nullopt);
 
     template<typename Value>
     static Result invalidParameter(const QString& name, const Value& value)
     {
-        return Result{InvalidParameter, NX_FMT("Invalid parameter '%1': %2", name, value)};
+        return Result{InvalidParameter, format(
+            tr("Invalid parameter `%1`: %2.", /*comment*/ "%1 is name, %2 is value."), name, value)};
     }
 };
 
