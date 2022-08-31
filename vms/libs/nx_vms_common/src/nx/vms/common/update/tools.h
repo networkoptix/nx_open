@@ -11,6 +11,5 @@ namespace nx::vms::common::update {
 NX_VMS_COMMON_API QString updateFeedUrl();
 NX_VMS_COMMON_API QString updateGeneratorUrl();
 NX_VMS_COMMON_API QString passwordForBuild(const QString& build);
-NX_VMS_COMMON_API qint64 reservedSpacePadding();
 
 } // namespace nx::vms::common::update
