@@ -120,62 +120,76 @@ Result::Result(Error error, QString errorString):
 
 Result Result::missingParameter(const QString& name)
 {
-    return Result{MissingParameter, NX_FMT("Missing required parameter: %1", name)};
+    return Result{MissingParameter, tr("Missing required parameter: %1.").arg(name)};
 }
 
-Result Result::cantProcessRequest(QString message)
+Result Result::cantProcessRequest(std::optional<QString> customMessage)
 {
-    return Result{CantProcessRequest, std::move(message)};
+    return Result{CantProcessRequest, customMessage
+        ? *customMessage
+        : tr("Failed to process request.")};
 }
 
-Result Result::forbidden(QString message)
+Result Result::forbidden(std::optional<QString> customMessage)
 {
-    return Result{Forbidden, std::move(message)};
+    return Result{
+        Forbidden,
+        customMessage ? *customMessage : tr("Forbidden.", /*comment*/ "Generic HTTP response")};
 }
 
-Result Result::conflict(QString message)
+Result Result::conflict(std::optional<QString> customMessage)
 {
-    return Result{Conflict, std::move(message)};
+    return Result{Conflict,
+        customMessage ? *customMessage : tr("Conflict.", /*comment*/ "Generic HTTP response")};
 }
 
-Result Result::badRequest(QString message)
+Result Result::badRequest(std::optional<QString> customMessage)
 {
-    return Result{BadRequest, std::move(message)};
+    return Result{
+        BadRequest,
+        customMessage ? *customMessage : tr("Bad request.",/*comment*/ "Generic HTTP response")};
 }
 
-Result Result::notImplemented(QString message)
+Result Result::notImplemented(std::optional<QString> customMessage)
 {
-    return Result{NotImplemented, std::move(message)};
+    return Result{NotImplemented,
+        customMessage ? *customMessage : tr("Not implemented.",/*comment*/ "Generic HTTP response")};
 }
 
-Result Result::notFound(QString message)
+Result Result::notFound(std::optional<QString> customMessage)
 {
-    return Result{NotFound, std::move(message)};
+    return Result{
+        NotFound,
+        customMessage ? *customMessage : tr("Not found.",/*comment*/ "Generic HTTP response")};
 }
 
-Result Result::internalServerError(QString message)
+Result Result::internalServerError(std::optional<QString> customMessage)
 {
-    return Result{InternalServerError, std::move(message)};
+    return Result{InternalServerError, customMessage
+        ? *customMessage
+        : tr("Internal error.")};
 }
 
-Result Result::unsupportedMediaType(QString message)
+Result Result::unsupportedMediaType(std::optional<QString> customMessage)
 {
-    return Result{UnsupportedMediaType, std::move(message)};
+    return Result{UnsupportedMediaType, customMessage
+        ? *customMessage
+        : tr("Unsupported media type.")};
 }
 
-Result Result::serviceUnavailable(QString message)
+Result Result::serviceUnavailable(std::optional<QString> customMessage)
 {
-    return Result{ServiceUnavailable, std::move(message)};
+    return Result{ServiceUnavailable, customMessage ? *customMessage : tr("Service unavailable.")};
 }
 
-Result Result::unauthorized(QString message)
+Result Result::unauthorized(std::optional<QString> customMessage)
 {
-    return Result{Unauthorized, std::move(message)};
+    return Result{Unauthorized, customMessage ? *customMessage : tr("Unauthorized.")};
 }
 
-Result Result::sessionExpired(QString message)
+Result Result::sessionExpired(std::optional<QString> customMessage)
 {
-    return Result{SessionExpired, std::move(message)};
+    return Result{SessionExpired, customMessage ? *customMessage : tr("Session expired.")};
 }
 
 void serialize(const Result::Error& value, QString* target)
