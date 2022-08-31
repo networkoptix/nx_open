@@ -19,7 +19,6 @@ QnLicensePoolScaffold::~QnLicensePoolScaffold()
 void QnLicensePoolScaffold::addLicenses(Qn::LicenseType licenseType, int count)
 {
     auto stub = new QnLicenseStub(licenseType, count);
-    stub->setArmServer(m_arm);
     m_licensePool->addLicense(QnLicensePtr(stub));
 }
 
@@ -32,11 +31,6 @@ void QnLicensePoolScaffold::addFutureLicenses(int count)
 {
     auto stub = new QnFutureLicenseStub(count);
     m_licensePool->addLicense(QnLicensePtr(stub));
-}
-
-void QnLicensePoolScaffold::setArmMode(bool isArm)
-{
-    m_arm = isArm;
 }
 
 } // namespace nx::vms::license::test
