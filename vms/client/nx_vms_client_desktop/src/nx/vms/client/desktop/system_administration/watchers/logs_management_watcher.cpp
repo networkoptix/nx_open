@@ -215,7 +215,12 @@ struct LogsManagementWatcher::Unit::Private
         NX_MUTEX_LOCKER lock(&m_mutex);
 
         if (m_downloader)
+        {
+            // Downloader can receive some data and try to lock the mutex before it actually stops.
+            lock.unlock();
             m_downloader->pleaseStopSync();
+            lock.relock();
+        }
         m_downloader.reset();
         m_state = DownloadState::none;
     }
