@@ -1068,6 +1068,11 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(Qn::server, MatchMode::all))
         .condition(new OpenInNewEntityCondition());
 
+    factory(OpenIntercomLayoutAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .condition(new OpenInNewEntityCondition());
+
     factory(OpenInAlarmLayoutAction)
         .mode(DesktopMode)
         .flags(SingleTarget | MultiTarget | ResourceTarget)
