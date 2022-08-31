@@ -667,9 +667,13 @@ struct LogsManagementWatcher::Private
         }
 
         bool storeServerSettings(
+            const std::string& token,
             LogsManagementUnitPtr server,
             const ConfigurableLogSettings& settings)
         {
+            if (token.empty())
+                return false;
+
             auto existing = server->settings();
             if (!existing)
                 return false; //TODO: #spanasenko Report an error.
@@ -682,7 +686,7 @@ struct LogsManagementWatcher::Private
                 [this, server, oldSettings](
                     bool success,
                     rest::Handle requestId,
-                    rest::ServerConnection::EmptyResponseType result)
+                    rest::ServerConnection::ErrorOrEmpty result)
                 {
                     if (!success)
                         server->data()->setSettings(oldSettings);
@@ -690,14 +694,10 @@ struct LogsManagementWatcher::Private
                     //TODO: #spanasenko Report an error.
                 });
 
-            QByteArray serializedSettings;
-            QnJsonContext ctx;
-            ctx.setChronoSerializedAsDouble(true);
-            QJson::serialize(&ctx, newSettings, &serializedSettings);
-            q->connection()->serverApi()->putEmptyResult(
-                QString("/rest/v2/servers/%1/logSettings").arg(server->id().toString()),
-                {},
-                serializedSettings,
+            q->connection()->serverApi()->putServerLogSettings(
+                server->id(),
+                token,
+                newSettings,
                 callback,
                 q->thread()
             );
@@ -997,7 +997,9 @@ void LogsManagementWatcher::setUpdatesEnabled(bool enabled)
         d->api->loadInitialSettings();
 }
 
-void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& settings)
+void LogsManagementWatcher::applySettings(
+    const std::string& token,
+    const ConfigurableLogSettings& settings)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::hasSelection);
@@ -1025,7 +1027,7 @@ void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& setting
     lock.unlock();
     for (auto server: serversToStore)
     {
-        d->api->storeServerSettings(server, settings);
+        d->api->storeServerSettings(token, server, settings);
     }
 }
 
