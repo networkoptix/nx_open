@@ -539,6 +539,12 @@ enum IDType
     OpenInNewTabAction,
 
     /**
+     * Opens Intercom Layout when clicking on a notification tile.
+     * Closes the notification on all clients.
+     */
+    OpenIntercomLayoutAction,
+
+    /**
      * Opens selected resources in the Alarm Layout.
      */
     OpenInAlarmLayoutAction,

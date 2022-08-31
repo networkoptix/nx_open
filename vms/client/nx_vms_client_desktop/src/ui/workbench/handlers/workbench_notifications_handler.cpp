@@ -268,6 +268,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     switch (action->actionType())
     {
         case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::showIntercomInformer:
         case vms::api::ActionType::playSoundAction:
             //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
@@ -385,8 +386,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     if (!QnBusiness::actionAllowedForUser(action, user))
     {
-        NX_VERBOSE(
-            this, "The action is not allowed for the user %1", user->getName());
+        NX_VERBOSE(this, "The action is not allowed for the user %1", user->getName());
 
         return;
     }
@@ -416,6 +416,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
         case vms::api::ActionType::showPopupAction: //< Fallthrough
         case vms::api::ActionType::playSoundAction:
+        case vms::api::ActionType::showIntercomInformer:
         {
             switch (action->getToggleState())
             {

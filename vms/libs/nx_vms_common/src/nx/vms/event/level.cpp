@@ -14,6 +14,9 @@ Level levelOf(const AbstractActionPtr& action)
     if (action->actionType() == ActionType::showOnAlarmLayoutAction)
         return Level::critical;
 
+    if (action->actionType() == ActionType::showIntercomInformer)
+        return Level::success;
+
     return levelOf(action->getRuntimeParams());
 }
 
