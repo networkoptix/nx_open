@@ -117,9 +117,8 @@ public:
             return false;
         }
 
-        const auto statisticsKey = requestContext.request.requestLine.method.toString() + " " +
+        auto statisticsKey = requestContext.request.requestLine.method.toString() + " " +
             handlerContext->pathTemplate;
-        startUpdatingRequestPathStatistics(statisticsKey);
 
         // NOTE: Cannot capture scoped increment in lambda since the capture variable
         // destruction order is unspecified.
@@ -163,7 +162,7 @@ public:
 
     // NOTE: RequestPathStatistics values that have requestsServedPerMinute == 0 are not
     // included to avoid empty values in statistics reports.
-    std::map<std::string, server::RequestPathStatistics> requestPathStatistics() const;
+    std::map<std::string, server::RequestStatistics> requestPathStatistics() const;
 
     static constexpr auto kDefaultLinger = std::chrono::seconds(17);
 
@@ -193,7 +192,6 @@ protected:
 
 private:
     void incrementDispatchFailures() const;
-    void startUpdatingRequestPathStatistics(const std::string& requestPathTemplate) const;
 
     void finishUpdatingRequestPathStatistics(
         const std::string& requestPathTemplate,
@@ -210,7 +208,7 @@ private:
     nx::utils::math::SumPerMinute<int> m_dispatchFailures;
 
     mutable nx::utils::PartitionedConcurrentHashMap<
-        std::string, server::RequestPathStatisticsCalculator
+        std::string, server::RequestStatisticsCalculator
     > m_requestPathStatsCalculators;
 
     mutable nx::utils::PartitionedConcurrentHashMap<int /*sequence*/, std::string> m_activeRequests;

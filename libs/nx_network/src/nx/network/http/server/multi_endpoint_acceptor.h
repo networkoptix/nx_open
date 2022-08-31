@@ -45,7 +45,7 @@ private:
     std::vector<SocketAddress> m_endpoints;
     std::vector<SocketAddress> m_sslEndpoints;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
-    std::unique_ptr<AggregateHttpStatisticsProvider> m_httpStatsProvider;
+    std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
 
     std::unique_ptr<MultiHttpServer> startHttpServer(
         const std::vector<network::SocketAddress>& endpoints);

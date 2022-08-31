@@ -184,8 +184,8 @@ private:
             cumulativeStatistics->connectionCount += statistics.connectionCount;
             cumulativeStatistics->connectionsAcceptedPerMinute +=
                 statistics.connectionsAcceptedPerMinute;
-            cumulativeStatistics->requestsServedPerMinute +=
-                statistics.requestsServedPerMinute;
+            cumulativeStatistics->requestsReceivedPerMinute +=
+                statistics.requestsReceivedPerMinute;
             cumulativeStatistics->requestsAveragePerConnection +=
                 statistics.requestsAveragePerConnection;
         }

@@ -138,7 +138,7 @@ void MultiEndpointAcceptor::initializeHttpStatisticsProvider()
             providers.emplace_back(listener);
         });
 
-    m_httpStatsProvider = std::make_unique<AggregateHttpStatisticsProvider>(std::move(providers));
+    m_httpStatsProvider = std::make_unique<SummingStatisticsProvider>(std::move(providers));
 }
 
 } // namespace nx::network::http::server

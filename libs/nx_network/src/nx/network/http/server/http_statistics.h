@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/network/connection_server/server_statistics.h>
 #include <nx/utils/math/average_per_period.h>
@@ -16,33 +15,16 @@ struct NX_NETWORK_API RequestStatistics
     std::chrono::microseconds maxRequestProcessingTimeUsec{0};
     std::chrono::microseconds averageRequestProcessingTimeUsec{0};
     std::map<std::string /* percent */, std::chrono::microseconds> requestProcessingTimePercentilesUsec;
+    int requestsServedPerMinute = 0;
 };
 
 #define RequestStatistics_server_Fields\
     (maxRequestProcessingTimeUsec)\
     (averageRequestProcessingTimeUsec)\
-    (requestProcessingTimePercentilesUsec)
-
-QN_FUSION_DECLARE_FUNCTIONS(RequestStatistics, (json), NX_NETWORK_API)
-
-NX_REFLECTION_INSTRUMENT(RequestStatistics, RequestStatistics_server_Fields)
-
-//-------------------------------------------------------------------------------------------------
-
-struct NX_NETWORK_API RequestPathStatistics: public RequestStatistics
-{
-    int requestsServedPerMinute = 0;
-
-    using RequestStatistics::operator=;
-};
-
-#define RequestPathStatistics_server_Fields\
-    RequestStatistics_server_Fields\
+    (requestProcessingTimePercentilesUsec)\
     (requestsServedPerMinute)
 
-QN_FUSION_DECLARE_FUNCTIONS(RequestPathStatistics, (json), NX_NETWORK_API)
-
-NX_REFLECTION_INSTRUMENT(RequestPathStatistics, RequestPathStatistics_server_Fields)
+NX_REFLECTION_INSTRUMENT(RequestStatistics, RequestStatistics_server_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -53,7 +35,7 @@ struct NX_NETWORK_API HttpStatistics:
     // Inherited fields are aggregate statistics
 
     int notFound404 = 0;
-    std::map<std::string/*requestPathTemplate*/, RequestPathStatistics> requests;
+    std::map<std::string /*requestPathTemplate*/, RequestStatistics> requests;
 
     using network::server::Statistics::operator=;
     using RequestStatistics::operator=;
@@ -63,8 +45,6 @@ struct NX_NETWORK_API HttpStatistics:
     Statistics_server_Fields\
     RequestStatistics_server_Fields\
     (notFound404)(requests)
-
-QN_FUSION_DECLARE_FUNCTIONS(HttpStatistics, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(HttpStatistics, HttpStatistics_server_Fields)
 
@@ -92,40 +72,28 @@ public:
     RequestStatistics requestStatistics() const;
 
 private:
-    // AveragePerPeriod does not compile when std::chrono::milliseconds is used directly
-    nx::utils::math::AveragePerPeriod<std::chrono::microseconds::rep>
-        m_averageRequestProcessingTime;
-    nx::utils::math::MaxPerMinute<std::chrono::microseconds> m_maxRequestProcessingTime;
-
-
     using PercentilePerPeriod = nx::utils::math::PercentilePerPeriod<std::chrono::microseconds>;
 
+    // AveragePerPeriod does not compile when std::chrono::microseconds is used directly.
+    nx::utils::math::AveragePerPeriod<std::chrono::microseconds::rep>
+        m_averageRequestProcessingTime;
+
+    nx::utils::math::MaxPerMinute<std::chrono::microseconds> m_maxRequestProcessingTime;
     std::map<double, PercentilePerPeriod> m_requestProcessingTimePercentiles;
+    nx::utils::math::SumPerMinute<int> m_requestsServedPerMinute;
 };
 
 //-------------------------------------------------------------------------------------------------
-// RequestPathStatsCalculator
+// SummingStatisticsProvider
 
-class NX_NETWORK_API RequestPathStatisticsCalculator
+/**
+ * Sums up statistics from multiple sources.
+ */
+class NX_NETWORK_API SummingStatisticsProvider:
+    public AbstractHttpStatisticsProvider
 {
 public:
-    void processingRequest();
-    void processedRequest(std::chrono::microseconds duration);
-
-    RequestPathStatistics requestPathStatistics() const;
-
-private:
-    RequestStatisticsCalculator m_requestStatsCalculator;
-    nx::utils::math::SumPerMinute<int> m_requestsPerMinute;
-};
-
-//-------------------------------------------------------------------------------------------------
-// AggregateHttpStatisticsProvider
-
-class NX_NETWORK_API AggregateHttpStatisticsProvider: public AbstractHttpStatisticsProvider
-{
-public:
-    AggregateHttpStatisticsProvider(std::vector<const AbstractHttpStatisticsProvider*> providers);
+    SummingStatisticsProvider(std::vector<const AbstractHttpStatisticsProvider*> providers);
 
     virtual HttpStatistics httpStatistics() const override;
 

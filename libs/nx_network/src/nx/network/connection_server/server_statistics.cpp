@@ -2,29 +2,27 @@
 
 #include "server_statistics.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx {
 namespace network {
 namespace server {
 
 void Statistics::add(const Statistics& right)
 {
+    // To sum up averages we need to calculate each value's weight first.
+    const double thisWeight = connectionCount /
+        double(std::max(connectionCount + right.connectionCount, 1));
+
+    const double rightWeight = right.connectionCount /
+        double(std::max(connectionCount + right.connectionCount, 1));
+
     connectionCount += right.connectionCount;
     connectionsAcceptedPerMinute += right.connectionsAcceptedPerMinute;
-    requestsServedPerMinute += right.requestsServedPerMinute;
-    requestsAveragePerConnection += right.requestsAveragePerConnection;
-}
+    requestsReceivedPerMinute += right.requestsReceivedPerMinute;
 
-bool Statistics::operator==(const Statistics& right) const
-{
-    return connectionCount == right.connectionCount
-        && connectionsAcceptedPerMinute == right.connectionsAcceptedPerMinute
-        && requestsServedPerMinute == right.requestsServedPerMinute
-        && requestsAveragePerConnection == right.requestsAveragePerConnection;
+    requestsAveragePerConnection =
+        thisWeight * requestsAveragePerConnection +
+        rightWeight * right.requestsAveragePerConnection;
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Statistics, (json), Statistics_server_Fields)
 
 //-------------------------------------------------------------------------------------------------
 

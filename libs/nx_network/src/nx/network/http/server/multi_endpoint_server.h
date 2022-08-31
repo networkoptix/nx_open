@@ -96,7 +96,7 @@ public:
 private:
     int m_tcpBackLogSize = Settings::kDefaultTcpBacklogSize;
     std::vector<nx::utils::Url> m_urls;
-    std::unique_ptr<AggregateHttpStatisticsProvider> m_httpStatsProvider;
+    std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
 
     void initializeHttpStatisticsProvider()
     {
@@ -108,7 +108,7 @@ private:
             });
 
         m_httpStatsProvider =
-            std::make_unique<AggregateHttpStatisticsProvider>(std::move(providers));
+            std::make_unique<SummingStatisticsProvider>(std::move(providers));
     }
 };
 

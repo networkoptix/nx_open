@@ -4,14 +4,7 @@
 
 #include <iomanip>
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx::network::http::server {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestStatistics, (json), RequestStatistics_server_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    RequestPathStatistics, (json), RequestPathStatistics_server_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(HttpStatistics, (json), HttpStatistics_server_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // RequestStatisticsCalculator
@@ -34,6 +27,7 @@ void RequestStatisticsCalculator::processedRequest(std::chrono::microseconds dur
     m_maxRequestProcessingTime.add(duration);
     for (auto& p: m_requestProcessingTimePercentiles)
         p.second.add(duration);
+    m_requestsServedPerMinute.add(1);
 }
 
 RequestStatistics RequestStatisticsCalculator::requestStatistics() const
@@ -57,41 +51,22 @@ RequestStatistics RequestStatisticsCalculator::requestStatistics() const
         stats.requestProcessingTimePercentilesUsec[std::move(k)] = calculator.get();
     }
 
+    stats.requestsServedPerMinute = m_requestsServedPerMinute.getSumPerLastPeriod();
+
     return stats;
 }
 
 //-------------------------------------------------------------------------------------------------
-// RequestPathStatisticsCalculator
+// SummingStatisticsProvider
 
-void RequestPathStatisticsCalculator::processingRequest()
-{
-    m_requestsPerMinute.add(1);
-}
-
-void RequestPathStatisticsCalculator::processedRequest(std::chrono::microseconds duration)
-{
-    m_requestStatsCalculator.processedRequest(duration);
-}
-
-RequestPathStatistics RequestPathStatisticsCalculator::requestPathStatistics() const
-{
-    RequestPathStatistics stats;
-    stats.requestsServedPerMinute = m_requestsPerMinute.getSumPerLastPeriod();
-    stats.operator=(m_requestStatsCalculator.requestStatistics());
-    return stats;
-}
-
-//-------------------------------------------------------------------------------------------------
-// AggregateHttpStatisticsProvider
-
-AggregateHttpStatisticsProvider::AggregateHttpStatisticsProvider(
+SummingStatisticsProvider::SummingStatisticsProvider(
     std::vector<const AbstractHttpStatisticsProvider*> providers)
     :
     m_providers(std::move(providers))
 {
 }
 
-HttpStatistics AggregateHttpStatisticsProvider::httpStatistics() const
+HttpStatistics SummingStatisticsProvider::httpStatistics() const
 {
     std::chrono::microseconds requestAverageProcessingTimeSum(0);
     HttpStatistics accumulatedStats;
@@ -114,6 +89,7 @@ HttpStatistics AggregateHttpStatisticsProvider::httpStatistics() const
             accumulatedStats.maxRequestProcessingTimeUsec,
             httpStats.maxRequestProcessingTimeUsec);
         accumulatedStats.notFound404 += httpStats.notFound404;
+        accumulatedStats.requestsServedPerMinute += httpStats.requestsServedPerMinute;
 
         for (const auto& [key, value]: httpStats.requestProcessingTimePercentilesUsec)
         {
@@ -134,6 +110,8 @@ HttpStatistics AggregateHttpStatisticsProvider::httpStatistics() const
             averageContext.second += stats.averageRequestProcessingTimeUsec;
         }
     }
+
+    // TODO: #akolesnikov Averages should be summed up taking into account each value's weight.
 
     for (const auto& [path, averageContext]: pathToAverageContext)
     {
