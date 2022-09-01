@@ -71,7 +71,7 @@ public:
     Parameters(const QnWorkbenchLayoutList& layouts,
         const ArgumentHash& arguments = ArgumentHash());
 
-    Parameters(const QnLayoutItemIndexList& layoutItems,
+    Parameters(const LayoutItemIndexList& layoutItems,
         const ArgumentHash& arguments = ArgumentHash());
 
     Parameters(const QnVideoWallItemIndexList& videoWallItems,
@@ -97,7 +97,7 @@ public:
 
     QnResourcePtr resource(int key = -1) const;
 
-    QnLayoutItemIndexList layoutItems(int key = -1) const;
+    LayoutItemIndexList layoutItems(int key = -1) const;
 
     QnVideoWallItemIndexList videoWallItems(int key = -1) const;
 

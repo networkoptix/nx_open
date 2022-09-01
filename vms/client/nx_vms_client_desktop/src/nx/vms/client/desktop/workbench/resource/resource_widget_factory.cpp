@@ -56,8 +56,8 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     auto windowContext = appContext()->mainWindowContext();
 
     auto layout = item->layout();
-    const bool isLayoutTourReview = layout && layout->isLayoutTourReview();
-    if (isLayoutTourReview)
+    const bool isShowreelReviewLayout = layout && layout->isShowreelReviewLayout();
+    if (isShowreelReviewLayout)
         return new LayoutTourItemWidget(systemContext, windowContext, item);
 
     if (resource->hasFlags(Qn::server))

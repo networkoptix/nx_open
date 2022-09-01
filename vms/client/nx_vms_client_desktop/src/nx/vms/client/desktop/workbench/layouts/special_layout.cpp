@@ -2,16 +2,15 @@
 
 #include "special_layout.h"
 
-#include <core/resource/layout_resource.h>
-
-#include <ui/workbench/workbench_layout.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel_widget.h>
+#include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent):
+SpecialLayout::SpecialLayout(const LayoutResourcePtr& resource, QObject* parent):
     base_type(resource, parent),
     m_panelWidget(new SpecialLayoutPanelWidget(resource, this))
 {

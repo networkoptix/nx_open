@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_store.h>
@@ -143,7 +143,7 @@ QImage makeImage(qreal aspectRatio)
 // Emulates loading a new image into a clean layout.
 State makeImageState(qreal imageAspectRatio, qreal cellAspectRatio)
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new LayoutResource());
     layout->setCellAspectRatio(cellAspectRatio);
     layout->setCellSpacing(0);
 
@@ -215,7 +215,7 @@ protected:
 
     QnLayoutResourcePtr addLayout(const QString& name, int logicalId = 0)
     {
-        auto layout = QnLayoutResourcePtr(new QnLayoutResource());
+        auto layout = QnLayoutResourcePtr(new LayoutResource());
         layout->setIdUnsafe(QnUuid::createUuid());
         layout->setName(name);
         layout->setLogicalId(logicalId);
@@ -317,7 +317,7 @@ TEST_F(LayoutSettingsDialogStateReducerTest, checkLimitsOnKeepArChange)
 
 TEST_F(LayoutSettingsDialogStateReducerTest, checkFixMinimumBackgroundSize)
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new LayoutResource());
     layout->setBackgroundSize({1, 1});
 
     ASSERT_EQ(backgroundSize(Reducer::loadLayout(State(), layout)),
@@ -369,7 +369,7 @@ TEST_F(LayoutSettingsDialogStateReducerTest, keepAreaOnImageChange)
 {
     static const QSize kExampleBackgroundSize(10, 10);
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new LayoutResource());
     layout->setCellAspectRatio(1.0);
     layout->setBackgroundSize(kExampleBackgroundSize);
     layout->setBackgroundImageFilename("test.jpg");

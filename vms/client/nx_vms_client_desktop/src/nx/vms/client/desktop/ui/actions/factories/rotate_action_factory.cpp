@@ -7,10 +7,11 @@
 
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
+#include <nx/utils/algorithm/same.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/utils/math/fuzzy.h>
-#include <nx/utils/algorithm/same.h>
 
 namespace {
 

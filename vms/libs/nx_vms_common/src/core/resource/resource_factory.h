@@ -30,6 +30,8 @@ public:
 
     virtual QnMediaServerResourcePtr createServer() const;
 
+    virtual QnLayoutResourcePtr createLayout() const;
+
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;
 };

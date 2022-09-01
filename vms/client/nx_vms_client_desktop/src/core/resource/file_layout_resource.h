@@ -4,16 +4,16 @@
 
 #include <common/common_globals.h>
 #include <core/resource/client_resource_fwd.h>
-#include <core/resource/layout_resource.h>
 #include <utils/crypt/encryptable.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 class NX_VMS_CLIENT_DESKTOP_API QnFileLayoutResource:
-    public QnLayoutResource,
+    public nx::vms::client::desktop::LayoutResource,
     public nx::utils::Encryptable
 {
     Q_OBJECT
 
-    using base_type = QnLayoutResource;
+    using base_type = nx::vms::client::desktop::LayoutResource;
 public:
     QnFileLayoutResource();
 

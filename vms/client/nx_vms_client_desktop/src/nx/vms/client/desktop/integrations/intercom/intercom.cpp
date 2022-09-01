@@ -347,8 +347,11 @@ void IntercomIntegration::connectionEstablished(
 {
     d->currentUser = currentUser;
 
-    const auto cameras = currentUser->resourcePool()->getAllCameras();
-    d->tryCreateRules(cameras);
+    if (NX_ASSERT(currentUser))
+    {
+        const auto cameras = currentUser->resourcePool()->getAllCameras();
+        d->tryCreateRules(cameras);
+    }
 }
 
 } // namespace nx::vms::client::desktop::integrations

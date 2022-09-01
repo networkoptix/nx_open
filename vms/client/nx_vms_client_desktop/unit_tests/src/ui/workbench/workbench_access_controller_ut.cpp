@@ -8,17 +8,16 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource/file_layout_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 const QString userName1 = QStringLiteral("unit_test_user_1");
@@ -57,7 +56,7 @@ protected:
         if (flags.testFlag(Qn::exported_layout))
             layout.reset(new QnFileLayoutResource());
         else
-            layout.reset(new QnLayoutResource());
+            layout.reset(new LayoutResource());
         layout->setIdUnsafe(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);

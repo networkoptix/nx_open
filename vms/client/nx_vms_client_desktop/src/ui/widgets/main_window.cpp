@@ -18,7 +18,6 @@
 #include <client/self_updater.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/file_processor.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -35,6 +34,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -95,7 +95,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/workbench_synchronizer.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
@@ -211,19 +210,28 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]() {
-        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
-            if (QnLayoutResourcePtr resource = layout->resource())
-                disconnect(resource.data(), nullptr, this, nullptr);
-        }
-    });
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
-        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
-            if (QnLayoutResourcePtr resource = layout->resource())
-                connect(resource.data(), &QnLayoutResource::backgroundImageChanged, this, &MainWindow::updateHelpTopic);
-        }
-        updateHelpTopic();
-    });
+    connect(workbench(),
+        &QnWorkbench::currentLayoutAboutToBeChanged,
+        this,
+        [this]()
+        {
+            if (auto resource = workbench()->currentLayoutResource())
+                resource->disconnect(this);
+        });
+    connect(workbench(),
+        &QnWorkbench::currentLayoutChanged,
+        this,
+        [this]()
+        {
+            if (auto resource = workbench()->currentLayoutResource())
+            {
+                connect(resource.data(),
+                    &QnLayoutResource::backgroundImageChanged,
+                    this,
+                    &MainWindow::updateHelpTopic);
+            }
+            updateHelpTopic();
+        });
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
@@ -577,8 +585,8 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
     m_welcomeScreenVisible = visible;
     // m_titleBar is visible while windowed mode or Welcome Screen is active.
     // m_ui is visible in full-screen mode but not on Welcome Screen.
-    // If we switch system tab bar to Home Tab in full-screen mode, we click on m_ui which 
-    // disappears right after that and unswitched m_titleBar appears instead. To synchronize home 
+    // If we switch system tab bar to Home Tab in full-screen mode, we click on m_ui which
+    // disappears right after that and unswitched m_titleBar appears instead. To synchronize home
     // tabs we should call activateHomeTab().
     // If we switch back to system tab, we should call activatePreviousSystemTab() on m_ui to
     // synchronize its tabs with m_titleBar.
@@ -688,10 +696,10 @@ std::pair<int, bool> MainWindow::calculateHelpTopic() const
         if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             return {Qn::Videowall_Display_Help, false};
 
-        if (layout->isSearchLayout())
+        if (layout->isPreviewSearchLayout())
             return {Qn::MainWindow_Scene_PreviewSearch_Help, true};
 
-        if (layout->isLayoutTourReview())
+        if (layout->isShowreelReviewLayout())
             return {Qn::Showreel_Help, true};
 
         if (QnLayoutResourcePtr resource = layout->resource())

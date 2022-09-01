@@ -366,28 +366,6 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     }
 }
 
-template<class List>
-void fromApiToResourceList(const LayoutDataList& src, List& dst, const overload_tag&)
-{
-    dst.reserve(dst.size() + (int)src.size());
-    for (const LayoutData& srcLayout: src)
-    {
-        QnLayoutResourcePtr dstLayout(new QnLayoutResource());
-        fromApiToResource(srcLayout, dstLayout);
-        dst.push_back(dstLayout);
-    }
-}
-
-void fromApiToResourceList(const LayoutDataList& src, QnResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-void fromApiToResourceList(const LayoutDataList& src, QnLayoutResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
 void fromResourceListToApi(const QnLayoutResourceList& src, LayoutDataList& dst)
 {
     dst.reserve(dst.size() + src.size());
@@ -762,29 +740,6 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, VideowallData& dst)
     }
 }
 
-template<class List>
-void fromApiToResourceList(const VideowallDataList& src, List& dst, const overload_tag&)
-{
-    dst.reserve(dst.size() + (int)src.size());
-
-    for (const VideowallData& srcVideowall: src)
-    {
-        QnVideoWallResourcePtr dstVideowall(new QnVideoWallResource());
-        fromApiToResource(srcVideowall, dstVideowall);
-        dst.push_back(std::move(dstVideowall));
-    }
-}
-
-void fromApiToResourceList(const VideowallDataList& src, QnResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-void fromApiToResourceList(const VideowallDataList& src, QnVideoWallResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
 void fromApiToResource(const VideowallControlMessageData& data, QnVideoWallControlMessage& message)
 {
     message.operation = static_cast<QnVideoWallControlMessage::Operation>(data.operation);
@@ -820,30 +775,6 @@ void fromResourceToApi(const QnWebPageResourcePtr& src, WebPageData& dst)
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 }
 
-template<class List>
-void fromApiToResourceList(const WebPageDataList& src, List& dst, const overload_tag&)
-{
-    dst.reserve(dst.size() + (int)src.size());
-
-    for (const auto& srcPage: src)
-    {
-        QnWebPageResourcePtr dstPage(new QnWebPageResource());
-        fromApiToResource(srcPage, dstPage);
-        dst.push_back(std::move(dstPage));
-    }
-}
-
-void fromApiToResourceList(const WebPageDataList& src, QnResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-
 void fromApiToResource(
     const AnalyticsPluginData& src,
     nx::vms::common::AnalyticsPluginResourcePtr& dst)
@@ -858,34 +789,6 @@ void fromResourceToApi(
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
 }
 
-template<class List>
-void fromApiToResourceList(const AnalyticsPluginDataList& src, List& dst, const overload_tag&)
-{
-    using namespace nx::vms::common;
-    dst.reserve(dst.size() + (int) src.size());
-
-    for (const auto& srcPlugin: src)
-    {
-        nx::vms::common::AnalyticsPluginResourcePtr dstPlugin(new AnalyticsPluginResource());
-        fromApiToResource(srcPlugin, dstPlugin);
-        dst.push_back(std::move(dstPlugin));
-    }
-}
-
-void fromApiToResourceList(
-    const nx::vms::api::AnalyticsPluginDataList& src,
-    QnResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-void fromApiToResourceList(
-    const nx::vms::api::AnalyticsPluginDataList& src,
-    nx::vms::common::AnalyticsPluginResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
 void fromApiToResource(
     const AnalyticsEngineData& src,
     nx::vms::common::AnalyticsEngineResourcePtr& dst)
@@ -898,35 +801,6 @@ void fromResourceToApi(
     nx::vms::api::AnalyticsEngineData& dst)
 {
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
-}
-
-template<class List>
-void fromApiToResourceList(const AnalyticsEngineDataList& src, List& dst, const overload_tag&)
-{
-    using namespace nx::vms::common;
-    dst.reserve(dst.size() + (int) src.size());
-
-    for (const auto& srcEngine: src)
-    {
-        nx::vms::common::AnalyticsEngineResourcePtr dstEngine(
-            new AnalyticsEngineResource());
-        fromApiToResource(srcEngine, dstEngine);
-        dst.push_back(std::move(dstEngine));
-    }
-}
-
-void fromApiToResourceList(
-    const nx::vms::api::AnalyticsEngineDataList& src,
-    QnResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
-}
-
-void fromApiToResourceList(
-    const nx::vms::api::AnalyticsEngineDataList& src,
-    nx::vms::common::AnalyticsEngineResourceList& dst)
-{
-    fromApiToResourceList(src, dst, overload_tag());
 }
 
 QList<nx::network::SocketAddress> moduleInformationEndpoints(

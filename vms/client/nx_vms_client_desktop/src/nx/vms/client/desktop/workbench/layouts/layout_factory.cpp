@@ -25,13 +25,8 @@ LayoutsFactory::LayoutsFactory(QObject* parent):
 {
 }
 
-QnWorkbenchLayout* LayoutsFactory::create(QObject* parent)
-{
-    return create(QnLayoutResourcePtr(), parent);
-}
-
 QnWorkbenchLayout* LayoutsFactory::create(
-    const QnLayoutResourcePtr& resource,
+    const LayoutResourcePtr& resource,
     QObject* parent)
 {
     for (const auto& creator: m_creators)

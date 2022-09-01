@@ -53,7 +53,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         // Layout-based.
         IDR_ITEM(LayoutCellSpacingRole),
         IDR_ITEM(LayoutCellAspectRatioRole),
-        IDR_ITEM(LayoutBoundingRectRole),
         IDR_ITEM(LayoutMinimalBoundingRectRole),
         IDR_ITEM(LayoutSyncStateRole),
         IDR_ITEM(LayoutSearchStateRole),

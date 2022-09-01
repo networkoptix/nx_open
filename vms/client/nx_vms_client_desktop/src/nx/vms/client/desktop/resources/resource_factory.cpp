@@ -2,13 +2,13 @@
 
 #include "resource_factory.h"
 
-#include <core/resource/client_storage_resource.h>
 #include <core/resource/client_camera.h>
-
+#include <core/resource/client_storage_resource.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +32,11 @@ QnResourcePtr ResourceFactory::createResource(
         return AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
 
     return QnResourcePtr(new QnClientCameraResource(resourceTypeId));
+}
+
+QnLayoutResourcePtr ResourceFactory::createLayout() const
+{
+    return QnLayoutResourcePtr(new LayoutResource());
 }
 
 } // namespace nx::vms::client::desktop

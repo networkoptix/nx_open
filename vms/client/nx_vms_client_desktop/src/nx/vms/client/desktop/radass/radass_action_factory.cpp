@@ -5,12 +5,11 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QActionGroup>
 
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
-#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
-
+#include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -33,7 +32,7 @@ QList<QAction*> RadassActionFactory::newActions(const ui::action::Parameters& pa
     // If no layout items are provided, using current layout.
     auto items = parameters.layoutItems();
     const auto currentMode = items.empty()
-        ? manager->mode(workbench()->currentLayout()->resource())
+        ? manager->mode(workbench()->currentLayoutResource())
         : manager->mode(items);
 
     auto addAction =

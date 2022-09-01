@@ -9,6 +9,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -63,13 +64,13 @@ public:
     ExportLayoutSettings exportLayoutSettings() const;
 
     QnMediaResourcePtr mediaResource() const;
-    QnLayoutResourcePtr layout() const;
+    LayoutResourcePtr layout() const;
 
     virtual void accept() override;
 
     // Making this methods private causes pointless code bloat
     void disableTab(Mode mode, const QString& reason);
-    void setLayout(const QnLayoutResourcePtr& layout);
+    void setLayout(const LayoutResourcePtr& layout);
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
     void setBookmarks(const QnCameraBookmarkList& bookmarks);

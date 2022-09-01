@@ -10,7 +10,6 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
@@ -20,6 +19,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_dialogs/copy_schedule_camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>

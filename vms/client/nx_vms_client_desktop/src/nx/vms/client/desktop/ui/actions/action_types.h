@@ -38,7 +38,7 @@ Q_DECLARE_FLAGS(ActionScopes, ActionScope)
 enum ActionParameterType
 {
     ResourceType = 0x00000100,          /**< Resource, <tt>QnResourcePtr</tt>. */
-    LayoutItemType = 0x00000200,        /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */
+    LayoutItemType = 0x00000200,        /**< Layout item, <tt>LayoutItemIndex</tt>. Convertible to resource. */
     WidgetType = 0x00000400,            /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
     LayoutType = 0x00000800,            /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
     VideoWallItemType = 0x00001000,     /**< Videowall item, <tt>QnVideoWallItemIndex</tt>. Convertible to resource. */

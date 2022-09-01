@@ -20,7 +20,6 @@
 #include <client/client_runtime_settings.h>
 #include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
@@ -38,6 +37,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -1280,12 +1280,16 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if (item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
         if (mediaWidget->display()->archiveReader())
         {
-            if (item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
-                mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
+            auto layout = item->layout()->resource();
+            if (NX_ASSERT(layout) && !layout->localRange().isEmpty())
+            {
+                mediaWidget->display()->archiveReader()->setPlaybackRange(
+                    item->layout()->resource()->localRange());
+            }
 
             if (startDisplay)
             {
@@ -2292,11 +2296,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     connect(workbenchLayout, &QnWorkbenchLayout::boundingRectChanged,
         this, &QnWorkbenchDisplay::at_layout_boundingRectChanged);
 
-    connect(workbenchLayout, &QnWorkbenchLayout::lockedChanged,
-        this, &QnWorkbenchDisplay::layoutAccessChanged);
-
-    if (const auto layoutResource = workbenchLayout->resource())
+    const auto layoutResource = workbenchLayout->resource();
+    if (NX_ASSERT(layoutResource))
     {
+        connect(layoutResource.get(), &QnLayoutResource::lockedChanged,
+            this, &QnWorkbenchDisplay::layoutAccessChanged);
+
         connect(layoutResource.get(), &QnLayoutResource::backgroundImageChanged,
             this, &QnWorkbenchDisplay::updateBackground);
 
@@ -2540,10 +2545,10 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    if (workbench()->currentLayout()->isSearchLayout())
+    if (workbench()->currentLayout()->isPreviewSearchLayout())
         return;
 
-    if (workbench()->currentLayout()->isLayoutTourReview())
+    if (workbench()->currentLayout()->isShowreelReviewLayout())
         return;
 
     /*

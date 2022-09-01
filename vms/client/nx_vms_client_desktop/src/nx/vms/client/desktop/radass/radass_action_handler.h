@@ -3,10 +3,9 @@
 #pragma once
 
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
-
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnLayoutItemIndex;
 class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop {
@@ -22,7 +21,7 @@ public:
 
 private:
     void at_radassAction_triggered();
-    void handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode);
+    void handleItemModeChanged(const LayoutItemIndex& item, RadassMode mode);
     void handleCurrentLayoutAboutToBeChanged();
     void handleCurrentLayoutChanged();
     void handleLocalSystemIdChanged();

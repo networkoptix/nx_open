@@ -6,10 +6,9 @@
 #include <QtWidgets/QAbstractButton>
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-
 
 namespace Ui{
 class SpecialLayoutPanelWidget;
@@ -27,7 +26,7 @@ class SpecialLayoutPanelWidget:
     using base_type = QnMaskedProxyWidget;
 
 public:
-    SpecialLayoutPanelWidget(const QnLayoutResourcePtr& layoutResource, QObject* parent = nullptr);
+    SpecialLayoutPanelWidget(const LayoutResourcePtr& layoutResource, QObject* parent = nullptr);
 
     virtual ~SpecialLayoutPanelWidget();
 
@@ -39,7 +38,7 @@ private:
 
 private:
     QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;
-    QnLayoutResourcePtr m_layoutResource;
+    LayoutResourcePtr m_layoutResource;
 
     using ButtonPtr = QAbstractButton*;
     QHash<nx::vms::client::desktop::ui::action::IDType, ButtonPtr> m_actionButtons;

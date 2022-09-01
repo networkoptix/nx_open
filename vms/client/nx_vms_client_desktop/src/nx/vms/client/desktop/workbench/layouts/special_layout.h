@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_layout.h>
 
 class QGraphicsWidget;
@@ -21,7 +21,7 @@ class SpecialLayout: public QnWorkbenchLayout
     using base_type = QnWorkbenchLayout;
 
 public:
-    SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
+    SpecialLayout(const LayoutResourcePtr& resource, QObject* parent = nullptr);
     virtual ~SpecialLayout();
 
     void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership under widget

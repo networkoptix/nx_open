@@ -2,20 +2,20 @@
 
 #include "resource_tree_drag_drop_decorator_model.h"
 
-#include <nx/utils/qset.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <client/client_globals.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource/webpage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
-#include <nx/vms/client/desktop/utils/mime_data.h>
+#include <core/resource/webpage_resource.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 
 namespace {
@@ -414,7 +414,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     if (hasResourceFlags(index, Qn::layout))
     {
         const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        const auto layout = resource.staticCast<QnLayoutResource>();
+        const auto layout = resource.staticCast<LayoutResource>();
 
         const auto droppable =
             data.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);

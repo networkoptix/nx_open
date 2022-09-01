@@ -2,18 +2,17 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <QtCore/QSet>
 #include <QtCore/QVariant>
-#include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/layout_item_index.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {

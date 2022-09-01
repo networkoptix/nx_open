@@ -2,20 +2,17 @@
 
 #pragma once
 
+#include <qt_graphics_items/graphics_widget.h>
+
 #include <client/client_globals.h>
+#include <core/resource/layout_item_data.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
-#include <core/resource/layout_item_data.h>
 #include <core/resource/videowall_item_index.h>
-
 #include <ui/animation/animated.h>
-#include <qt_graphics_items/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/overlays/overlayed.h>
 #include <ui/processors/drag_process_handler.h>
-
-#include <ui/workbench/workbench_context_aware.h>
-
 
 class DragProcessor;
 class VariantAnimator;
@@ -39,8 +36,7 @@ class LayoutThumbnailLoader;
 
 class QnVideowallItemWidget:
     public Overlayed<Animated<QnClickableWidget>>,
-    protected DragProcessHandler,
-    public QnWorkbenchContextAware
+    protected DragProcessHandler
 {
     typedef Overlayed<Animated<QnClickableWidget>> base_type;
     Q_OBJECT
@@ -86,7 +82,6 @@ private:
     void updateHud(bool animate);
 
     bool isDragValid() const;
-
 
 private:
     friend class QnVideowallScreenWidget;

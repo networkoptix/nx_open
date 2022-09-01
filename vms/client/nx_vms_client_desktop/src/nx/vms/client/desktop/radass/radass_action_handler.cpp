@@ -9,22 +9,22 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench.h>
 
 namespace {
 
@@ -99,7 +99,7 @@ void RadassActionHandler::at_radassAction_triggered()
     // If empty, means apply to the current layout.
     auto layoutItems = parameters.layoutItems();
     if (layoutItems.empty())
-        d->manager->setMode(workbench()->currentLayout()->resource(), mode);
+        d->manager->setMode(workbench()->currentLayoutResource(), mode);
     else
         d->manager->setMode(layoutItems, mode);
 
@@ -107,7 +107,7 @@ void RadassActionHandler::at_radassAction_triggered()
         d->manager->saveData(globalSettings()->localSystemId(), resourcePool());
 }
 
-void RadassActionHandler::handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode)
+void RadassActionHandler::handleItemModeChanged(const LayoutItemIndex& item, RadassMode mode)
 {
     NX_ASSERT(item.layout());
     if (!item.layout())
@@ -144,7 +144,7 @@ void RadassActionHandler::handleCurrentLayoutChanged()
 
     for (const auto& item: currentLayout->items())
     {
-        QnLayoutItemIndex index(layout, item->uuid());
+        LayoutItemIndex index(layout, item->uuid());
         if (!isRadassSupported(index))
             continue;
 
@@ -184,7 +184,7 @@ void RadassActionHandler::notifyAboutPerformanceLoss()
 
 void RadassActionHandler::handleItemAdded(QnWorkbenchItem *item)
 {
-    QnLayoutItemIndex index(item->layout()->resource(), item->uuid());
+    LayoutItemIndex index(item->layout()->resource(), item->uuid());
     QnResourceWidget* widget = display()->widget(index.uuid());
     if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
     {

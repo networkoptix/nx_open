@@ -8,28 +8,24 @@
 #include <QtCore/QObject>
 #include <QtCore/QQueue>
 #include <QtCore/QUrl>
-
 #include <QtWidgets/QDialogButtonBox>
 
+#include <api/model/camera_list_reply.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/core/common/data/motion_selection.h>
-#include <nx/vms/client/desktop/state/shared_memory_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/dialogs/event_log_dialog.h>
-#include <ui/dialogs/camera_list_dialog.h>
-#include <ui/dialogs/search_bookmarks_dialog.h>
-#include "ui/dialogs/audit_log_dialog.h"
-
-#include "api/model/camera_list_reply.h"
 #include <nx/network/http/async_http_client_reply.h>
-
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
+#include <nx/vms/client/core/common/data/motion_selection.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <ui/dialogs/audit_log_dialog.h>
+#include <ui/dialogs/camera_list_dialog.h>
+#include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/search_bookmarks_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QAction;
 class QMenu;
@@ -38,7 +34,6 @@ class QnProgressDialog;
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
-class QnWorkbenchSynchronizer;
 class ActionHandler;
 class QnBusinessRulesDialog;
 class QnPopupCollectionWidget;
@@ -113,10 +108,22 @@ protected:
         bool displayAnalyticsObjects = false;
     };
 
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params);
-    void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, const AddToLayoutParams &params);
-    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QnMediaResourcePtr>& resources, const AddToLayoutParams &params);
-    void addToLayout(const QnLayoutResourcePtr &layout, const QList<QString> &files, const AddToLayoutParams &params);
+    void addToLayout(
+        const LayoutResourcePtr& layout,
+        const QnResourcePtr& resource,
+        const AddToLayoutParams& params);
+    void addToLayout(
+        const LayoutResourcePtr& layout,
+        const QnResourceList& resources,
+        const AddToLayoutParams& params);
+    void addToLayout(
+        const LayoutResourcePtr& layout,
+        const QList<QnMediaResourcePtr>& resources,
+        const AddToLayoutParams& params);
+    void addToLayout(
+        const LayoutResourcePtr& layout,
+        const QList<QString>& files,
+        const AddToLayoutParams& params);
 
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
