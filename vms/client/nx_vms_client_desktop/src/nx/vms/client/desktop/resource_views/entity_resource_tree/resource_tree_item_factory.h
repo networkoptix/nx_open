@@ -42,6 +42,8 @@ public:
     AbstractItemPtr createUsersItem() const;
     AbstractItemPtr createOtherSystemsItem() const;
     AbstractItemPtr createLocalFilesItem() const;
+    AbstractItemPtr createHealthMonitorsItem() const;
+    AbstractItemPtr createVideoWallsItem(QString customName = QString()) const;
 
     // Resource Tree childless disabled user resources placeholders.
     AbstractItemPtr createAllCamerasAndResourcesItem() const;

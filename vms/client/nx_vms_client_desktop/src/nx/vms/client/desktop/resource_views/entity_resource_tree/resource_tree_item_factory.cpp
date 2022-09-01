@@ -352,6 +352,24 @@ AbstractItemPtr ResourceTreeItemFactory::createServersItem() const
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Servers_Help));
 }
 
+AbstractItemPtr ResourceTreeItemFactory::createHealthMonitorsItem() const
+{
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, tr("Health Monitors"))
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Servers))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::servers));
+}
+
+AbstractItemPtr ResourceTreeItemFactory::createVideoWallsItem(QString customName) const
+{
+    const QString name = customName.isEmpty() ? tr("Video Walls") : customName;
+
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, name)
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::VideoWall))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::videoWalls));
+}
+
 AbstractItemPtr ResourceTreeItemFactory::createCamerasAndDevicesItem(Qt::ItemFlags itemFlags) const
 {
     return GenericItemBuilder()

@@ -17,7 +17,6 @@
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
@@ -411,7 +410,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
     return camerasGroupingEntity;
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesEntity() const
+AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesEntity(
+    bool withProxiedWebPages) const
 {
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
@@ -444,10 +444,20 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesE
         serverResourcesOrder(),
         groupingRuleStack);
 
-    camerasGroupingEntity->installItemSource(
-        m_itemKeySourcePool->devicesAndProxiedWebPagesSource(
-        QnMediaServerResourcePtr(),
-        user()));
+    if (withProxiedWebPages)
+    {
+        camerasGroupingEntity->installItemSource(
+            m_itemKeySourcePool->devicesAndProxiedWebPagesSource(
+                QnMediaServerResourcePtr(),
+                user()));
+    }
+    else
+    {
+        camerasGroupingEntity->installItemSource(
+            m_itemKeySourcePool->devicesSource(user(),
+                QnMediaServerResourcePtr(),
+                /*resourceFilter*/ nullptr));
+    }
 
     return camerasGroupingEntity;
 }
@@ -1050,6 +1060,109 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
         m_itemKeySourcePool->sharedAndOwnLayoutsSource(subject));
 
     return layoutsList;
+}
+
+AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
+    ResourceTree::ResourceFilters resourceTypes) const
+{
+    std::vector<AbstractEntityPtr> entities;
+
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::camerasAndDevices))
+    {
+        auto entity = createDialogAllCamerasAndResourcesEntity(/*withProxiedWebPages*/ false);
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::camerasAndDevices)
+            return entity; //< Only cameras and devices, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createCamerasAndDevicesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            std::move(entity),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::layouts))
+    {
+        auto layoutsList = makeKeyList<QnResourcePtr>(
+            simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
+
+        layoutsList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::layouts)
+            return layoutsList; //< Only layouts, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createLayoutsItem(),
+            std::move(layoutsList),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
+    {
+        auto webPagesList = makeKeyList<QnResourcePtr>(
+            simpleResourceItemCreator(m_itemFactory.get()),
+            numericOrder());
+
+        webPagesList->installItemSource(
+            m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
+
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
+            return webPagesList; //< Only web pages, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            std::move(webPagesList),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::healthMonitors))
+    {
+        const auto healthMonitorItemCreator =
+            [this](const QnResourcePtr& resource)
+            {
+                return std::make_unique<HealthMonitorResourceItemDecorator>(
+                    m_itemFactory->createResourceItem(resource));
+            };
+
+        auto healthMonitorsList = makeKeyList<QnResourcePtr>(
+            healthMonitorItemCreator,
+            serversOrder());
+
+        healthMonitorsList->installItemSource(
+            m_itemKeySourcePool->serversSource(user(), /*showReducedEdgeServers*/ false));
+
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::healthMonitors)
+            return healthMonitorsList; //< Only health monitors, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createHealthMonitorsItem(),
+            std::move(healthMonitorsList),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::videoWalls))
+    {
+        auto videoWallList = makeKeyList<QnResourcePtr>(
+            simpleResourceItemCreator(m_itemFactory.get()),
+            numericOrder());
+
+        videoWallList->installItemSource(
+            m_itemKeySourcePool->videoWallsSource(user()));
+
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::videoWalls)
+            return videoWallList; //< Only videowalls, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createVideoWallsItem(),
+            std::move(videoWallList),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
+    auto composition =
+        std::make_unique<entity_item_model::CompositionEntity>();
+
+    for (int i = 0; i < (int)entities.size(); ++i)
+        composition->addSubEntity(std::move(entities[i]));
+
+    return composition;
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::addPinnedItem(

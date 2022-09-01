@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -61,7 +62,8 @@ public:
         bool showServers,
         const std::function<bool(const QnResourcePtr&)>& resourceFilter) const;
 
-    AbstractEntityPtr createDialogAllCamerasAndResourcesEntity() const;
+    AbstractEntityPtr createDialogAllCamerasAndResourcesEntity(
+        bool withProxiedWebPages = true) const;
 
     AbstractEntityPtr createDialogServerCamerasEntity(
         const QnMediaServerResourcePtr& server,
@@ -82,6 +84,8 @@ public:
     AbstractEntityPtr createSubjectResourcesEntity(const QnResourceAccessSubject& subject) const;
     AbstractEntityPtr createSubjectDevicesEntity(const QnResourceAccessSubject& subject) const;
     AbstractEntityPtr createSubjectLayoutsEntity(const QnResourceAccessSubject& subject) const;
+
+    AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes) const;
 
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
 
