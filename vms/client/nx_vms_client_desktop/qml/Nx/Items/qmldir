@@ -9,6 +9,8 @@ Line 1.0 Line.qml
 RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
 ResourceBrowser 1.0 ResourceBrowser.qml
 ResourcePreview 1.0 ResourcePreview.qml
+ResourceSelectionDelegate 1.0 ResourceSelectionDelegate.qml
+ResourceSelectionTree 1.0 ResourceSelectionTree.qml
 SelectionMouseArea 1.0 SelectionMouseArea.qml
 Timeline 1.0 Timeline.qml
 TimelineCalendar 1.0 TimelineCalendar.qml

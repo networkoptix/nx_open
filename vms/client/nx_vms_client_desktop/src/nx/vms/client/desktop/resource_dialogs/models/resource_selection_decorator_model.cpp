@@ -34,9 +34,9 @@ QSet<QnResourcePtr> getResources(const QModelIndexList& indexes)
 namespace nx::vms::client::desktop {
 
 ResourceSelectionDecoratorModel::ResourceSelectionDecoratorModel(
-    ResourceSelectionMode selectionMode)
+    ResourceSelectionMode selectionMode, QObject* parent)
     :
-    base_type(),
+    base_type(parent),
     m_resourceSelectionMode(selectionMode)
 {
     const auto onModelReset =
@@ -150,6 +150,13 @@ QVariant ResourceSelectionDecoratorModel::data(const QModelIndex& index, int rol
     return base_type::data(index, role);
 }
 
+QHash<int, QByteArray> ResourceSelectionDecoratorModel::roleNames() const
+{
+    auto roleNames = base_type::roleNames();
+    roleNames.insert(Qt::CheckStateRole, "checkState");
+    return roleNames;
+}
+
 QSet<QnResourcePtr> ResourceSelectionDecoratorModel::selectedResources() const
 {
     return m_selectedResources;
@@ -159,6 +166,7 @@ void ResourceSelectionDecoratorModel::setSelectedResources(const QSet<QnResource
 {
     m_selectedResources = resources;
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+    emit selectedResourcesChanged();
 }
 
 QnUuidSet ResourceSelectionDecoratorModel::selectedResourcesIds() const
@@ -203,7 +211,7 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
                     continue;
                 childResources.insert(childResource);
             }
-            QSet<QPersistentModelIndex> affectedParents;
+
             if (m_selectedResources.contains(childResources))
             {
                 childResources.intersect(m_selectedResources);
@@ -214,9 +222,13 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
                 childResources.subtract(m_selectedResources);
                 m_selectedResources.unite(childResources);
             }
+
+            emit selectedResourcesChanged();
+
+            QSet<QPersistentModelIndex> affectedParents;
             for (const auto& resource: childResources)
             {
-                const QModelIndex toggledIndex = m_resourceMapping.value(resource);
+                const QModelIndex toggledIndex = resourceIndex(resource);
                 if (toggledIndex.isValid())
                 {
                     emit dataChanged(
@@ -226,10 +238,12 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
                     affectedParents.insert(toggledIndex.parent());
                 }
             }
+
             for (const auto& affectedParent: affectedParents)
                 invalidateIndexAndParents(affectedParent);
             if (childResources.size() > 0)
                 invalidateIndexAndParents(index);
+
             return true;
         };
 
@@ -249,31 +263,34 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
             }
             else
             {
+                QModelIndex removedIndex;
                 if (m_resourceSelectionMode != ResourceSelectionMode::MultiSelection)
                 {
                     if (!m_selectedResources.empty())
-                    {
-                        const QModelIndex removedIndex = m_resourceMapping.value(*m_selectedResources.begin());
-                        if (removedIndex.isValid())
-                        {
-                            emit dataChanged(
-                                removedIndex.siblingAtColumn(kResourceColumn),
-                                removedIndex.siblingAtColumn(checkBoxColumn(this)),
-                                {Qt::CheckStateRole});
-                        }
-                    }
+                        removedIndex = resourceIndex(*m_selectedResources.begin());
+
                     m_selectedResources.clear();
                 }
+
                 m_selectedResources.insert(resource);
+                emit selectedResourcesChanged();
+
+                if (removedIndex.isValid())
+                {
+                    emit dataChanged(
+                        removedIndex.siblingAtColumn(0),
+                        removedIndex.siblingAtColumn(columnCount(removedIndex.parent()) - 1),
+                        {Qt::CheckStateRole});
+                }
             }
 
             invalidateIndexAndParents(index);
             return true;
         };
 
-    if (rowCount(index) > 0)
-        return toggleGroupSelection(index);
-    return toggleLeafSelection(index);
+    return rowCount(index) > 0
+        ? toggleGroupSelection(index)
+        : toggleLeafSelection(index);
 }
 
 bool ResourceSelectionDecoratorModel::toggleSelection(
@@ -335,6 +352,11 @@ void ResourceSelectionDecoratorModel::setSelectionMode(ResourceSelectionMode mod
         return;
 
     m_resourceSelectionMode = mode;
+}
+
+QModelIndex ResourceSelectionDecoratorModel::resourceIndex(const QnResourcePtr& resource) const
+{
+    return m_resourceMapping.value(resource);
 }
 
 } // namespace nx::vms::client::desktop

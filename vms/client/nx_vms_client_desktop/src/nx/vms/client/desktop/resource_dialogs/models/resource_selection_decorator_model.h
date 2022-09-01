@@ -21,7 +21,6 @@ class ResourceSelectionDecoratorModel: public QIdentityProxyModel
     using base_type = QIdentityProxyModel;
 
 public:
-
     /**
      * Proxy model which will additionally provide check state data accessible by the
      * <tt>Qt::CheckStateRole<tt> role at the last column. For resource rows this data corresponds
@@ -30,9 +29,11 @@ public:
      * @param selectionMode defines selection behavior, see <tt>ResourceSelectionMode</tt>.
      */
     ResourceSelectionDecoratorModel(
-        ResourceSelectionMode selectionMode = ResourceSelectionMode::MultiSelection);
+        ResourceSelectionMode selectionMode = ResourceSelectionMode::MultiSelection,
+        QObject* parent = nullptr);
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
     /**
      * Flips check state provided by the index, if it provides non-null check state data. If
@@ -68,6 +69,11 @@ public:
 
     ResourceSelectionMode selectionMode() const;
     void setSelectionMode(ResourceSelectionMode mode);
+
+    QModelIndex resourceIndex(const QnResourcePtr& resource) const;
+
+signals:
+    void selectedResourcesChanged();
 
 private:
     QSet<QnResourcePtr> m_selectedResources;

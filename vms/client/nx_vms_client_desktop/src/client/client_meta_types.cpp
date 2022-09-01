@@ -75,6 +75,7 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -234,6 +235,7 @@ void QnClientMetaTypes::registerQmlTypes()
     IndexListModel::registerQmlType();
     QmlClientStateDelegate::registerQmlType();
     RightPanelModelsAdapter::registerQmlTypes();
+    ResourceSelectionModelAdapter::registerQmlType();
     ResourceTreeModelAdapter::registerQmlType();
     ResourceStatusHelper::registerQmlType();
     RightPanel::registerQmlType();

@@ -119,6 +119,27 @@ enum class ActivationType
 };
 Q_ENUM_NS(ActivationType);
 
+enum class ResourceSelection
+{
+    single,
+    multiple,
+    exclusive
+};
+Q_ENUM_NS(ResourceSelection);
+
+enum class ResourceFilter
+{
+    camerasAndDevices = 0x01,
+    layouts = 0x02,
+    webPages = 0x04,
+    healthMonitors = 0x08,
+    videoWalls = 0x10
+};
+Q_DECLARE_FLAGS(ResourceFilters, ResourceFilter)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFilters)
+Q_ENUM_NS(ResourceFilter);
+Q_FLAG_NS(ResourceFilters);
+
 bool isSeparatorNode(NodeType nodeType);
 
 struct ShortcutHint
