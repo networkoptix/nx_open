@@ -38,20 +38,14 @@ RadioButton
 
     baselineOffset: text.baselineOffset
 
-    indicator: Image
+    indicator: RadioButtonImage
     {
-        y: topPadding
-        opacity: enabled ? 1.0 : 0.3
+        id: radioIndicator
 
-        source:
-        {
-            var source = "qrc:///skin/theme/radiobutton"
-            if (control.checked)
-                source += "_checked"
-            if (control.hovered)
-                source += "_hover"
-            return source + ".png"
-        }
+        anchors.baseline: control.baseline
+        checked: control.checked
+        enabled: control.enabled
+        hovered: control.hovered
     }
 
     contentItem: Row

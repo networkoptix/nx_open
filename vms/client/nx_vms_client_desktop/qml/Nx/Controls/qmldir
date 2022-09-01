@@ -50,6 +50,7 @@ ProgressBar 1.0 ProgressBar.qml
 PromoPage 1.0 PromoPage.qml
 PromoPages 1.0 PromoPages.qml
 RadioButton 1.0 RadioButton.qml
+RadioButtonImage 1.0 RadioButtonImage.qml
 RectangularMask 1.0 RectangularMask.qml
 Resizer 1.0 Resizer.qml
 ScaleAdjuster 1.0 ScaleAdjuster.qml
