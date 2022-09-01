@@ -33,6 +33,9 @@ public:
     Q_INVOKABLE QModelIndex invalidModelIndex() const;
     Q_INVOKABLE QPersistentModelIndex toPersistent(const QModelIndex& index) const;
 
+    Q_INVOKABLE bool hasChildren(const QModelIndex& index) const;
+    Q_INVOKABLE Qt::ItemFlags itemFlags(const QModelIndex& index) const;
+
     /** Operations with QModelIndexList in QML are incredibly slow, pass QVariantList instead. */
     Q_INVOKABLE QVariantList toVariantList(const QModelIndexList& indexList) const;
 
