@@ -94,8 +94,9 @@ void BaseTunnelClient::cleanUpFailedTunnel()
 void BaseTunnelClient::cleanUpFailedTunnel(AsyncClient* httpClient)
 {
     OpenTunnelResult result;
-    result.resultCode = ResultCode::ioError;
     result.sysError = httpClient->lastSysErrorCode();
+    result.resultCode = result.sysError == SystemError::noError
+        ? ResultCode::httpUpgradeFailed : ResultCode::ioError;
     if (httpClient->response())
     {
         result.httpStatus =

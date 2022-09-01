@@ -116,9 +116,9 @@ void ClientOverHttpTunnel::processServerTunnelResult(
     const network::http::tunneling::Client& tunnelingClient,
     network::http::tunneling::OpenTunnelResult result)
 {
-    const auto resultCode = getResultCode(result, tunnelingClient);
+    NX_VERBOSE(this, "Tunnel to %1 completed with result %2", url(), result);
 
-    NX_VERBOSE(this, "Tunnel to %1 completed with result %2", url(), resultCode);
+    const auto resultCode = getResultCode(result, tunnelingClient);
 
     if (resultCode != api::ResultCode::ok)
         return completionHandler(resultCode, BeginListeningResponse(), nullptr);
@@ -174,12 +174,21 @@ api::ResultCode ClientOverHttpTunnel::getResultCode(
         return api::ResultCode::ok;
 
     if (tunnelResult.sysError != SystemError::noError)
-        return toUpgradeResultCode(tunnelResult.sysError, &tunnelingClient.response());
+    {
+        if (auto rc = toUpgradeResultCode(tunnelResult.sysError, &tunnelingClient.response());
+            rc != api::ResultCode::ok)
+        {
+            return rc;
+        }
+    }
 
     if (tunnelResult.httpStatus)
-        return fromHttpStatusCode(*tunnelResult.httpStatus);
+    {
+        if (auto rc = fromHttpStatusCode(*tunnelResult.httpStatus); rc != api::ResultCode::ok)
+            return rc;
+    }
 
-    return api::ResultCode::networkError;
+    return api::ResultCode::unknownError;
 }
 
 } // namespace nx::cloud::relay::api::detail
