@@ -25,12 +25,15 @@ FocusScope
     property real indentation: 24 //< Horizontal indent of next tree level, in pixels.
     property bool rootIsDecorated: true
     property bool keyNavigationEnabled: true
+    property bool selectionEnabled: true
     property alias itemHeightHint: listView.itemHeightHint
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
 
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
     property color dropHighlightColor: "blue"
+
+    property bool editable: true
 
     readonly property bool empty: !listView.count
 
@@ -325,8 +328,11 @@ FocusScope
 
                 opacity: enabled ? 1.0 : 0.3
 
-                readonly property bool isSelectable: itemFlags & Qt.ItemIsSelectable
-                readonly property bool isEditable: itemFlags & Qt.ItemIsEditable
+                readonly property bool isSelectable: treeView.selectionEnabled
+                    && (itemFlags & Qt.ItemIsSelectable)
+
+                readonly property bool isEditable: treeView.editable
+                    && (itemFlags & Qt.ItemIsEditable)
 
                 readonly property var modelData: model
 

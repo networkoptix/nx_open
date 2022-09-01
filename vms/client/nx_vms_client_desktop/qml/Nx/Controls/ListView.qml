@@ -31,8 +31,8 @@ ListView
         parent: listView.contentItem
         color: listView.hoverHighlightColor
 
-        visible: hoveredItem
-            && (!hoveredItem.hasOwnProperty("isSelectable") || hoveredItem.isSelectable)
+        visible: hoveredItem && (!hoveredItem.hasOwnProperty("itemFlags")
+            || (hoveredItem.itemFlags & Qt.ItemIsSelectable))
 
         Connections
         {

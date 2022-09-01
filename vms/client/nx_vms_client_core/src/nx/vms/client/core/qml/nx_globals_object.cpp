@@ -83,6 +83,18 @@ QPersistentModelIndex NxGlobalsObject::toPersistent(const QModelIndex& index) co
     return QPersistentModelIndex(index);
 }
 
+Q_INVOKABLE bool NxGlobalsObject::hasChildren(const QModelIndex& index) const
+{
+    return index.isValid() && index.model()->hasChildren(index);
+}
+
+Q_INVOKABLE Qt::ItemFlags NxGlobalsObject::itemFlags(const QModelIndex& index) const
+{
+    return index.isValid()
+        ? index.model()->flags(index)
+        : Qt::ItemFlags{};
+}
+
 QVariantList NxGlobalsObject::toVariantList(const QModelIndexList& indexList) const
 {
     QVariantList result;
