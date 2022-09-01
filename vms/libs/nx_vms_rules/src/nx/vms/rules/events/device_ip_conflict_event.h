@@ -37,6 +37,7 @@ private:
     QString caption(common::SystemContext* context) const;
     QStringList detailing() const;
     QString extendedCaption(common::SystemContext* context) const;
+    QString name(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules
