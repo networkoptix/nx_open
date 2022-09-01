@@ -175,13 +175,13 @@ void Client::stopWhileInAioThread()
 
 void Client::handleOpenTunnelCompletion(ClientContext* ctx, OpenTunnelResult result)
 {
-    if (result.resultCode == ResultCode::ok)
+    if (result.ok())
         ctx->response = ctx->client->response();
 
-    if (result.resultCode != ResultCode::ok || !m_validatorFactory)
+    if (!result.ok() || !m_validatorFactory)
     {
         ++m_completedClients;
-        if (result.resultCode != ResultCode::ok && m_completedClients < m_actualClients.size())
+        if (!result.ok() && m_completedClients < m_actualClients.size())
             return; //< Waiting for other clients to complete.
         return reportResult(ctx, std::move(result));
     }
@@ -230,7 +230,7 @@ void Client::handleTunnelValidationResult(ClientContext* ctx, ResultCode resultC
 
 void Client::reportResult(ClientContext* ctx, OpenTunnelResult result)
 {
-    if (result.resultCode == ResultCode::ok && result.connection)
+    if (result.ok())
     {
         if (m_isConsideringSilentConnectionATunnelFailure)
         {
