@@ -78,6 +78,13 @@ def get_go_unit_tests_list(tests_directory: str):
         "nx_service_authorizer_ut_functional_ut",
         "nx_service_authorizer_ut_jsondb_ut",
         "nx_bookmarks_service_ut_test_ut",
+        "nx_chunk_log_ut_api_ut",
+        "nx_chunk_log_ut_manager_ut",
+        "nx_chunk_log_ut_memmodel_ut",
+        "nx_chunk_log_ut_service_ut",
+        "nx_chunk_log_ut_sqlmodel_ut",
+        "nx_chunk_log_ut_yugabytemodel_ut",
+        
     ]
     for test_name in GO_UNIT_TEST_NAMES:
         test_full_name = f"{test_name}{extension}"
