@@ -82,8 +82,7 @@ namespace Qn
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
-        LayoutMinimalBoundingRectRole,              /**< Role for layout's minimal bounding rect. Value of type QRect. */
+        LayoutMinimalBoundingRectRole = 279,        /**< Role for layout's minimal bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
         LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */

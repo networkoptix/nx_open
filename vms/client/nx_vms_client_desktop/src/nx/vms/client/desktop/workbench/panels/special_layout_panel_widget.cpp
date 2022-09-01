@@ -3,34 +3,34 @@
 #include "special_layout_panel_widget.h"
 #include "ui_special_layout_panel_widget.h"
 
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
-
-#include <core/resource/layout_resource.h>
-
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
+
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
-QString getString(int role, const QnLayoutResourcePtr& resource)
+QString getString(Qn::ItemDataRole role, const LayoutResourcePtr& resource)
 {
     return resource->data(role).toString();
 }
 
 } // namespace
 
-namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
 SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
-    const QnLayoutResourcePtr& layoutResource,
+    const LayoutResourcePtr& layoutResource,
     QObject* parent)
     :
     base_type(),
@@ -52,7 +52,7 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     setWidget(body);
 
-    connect(m_layoutResource.get(), &QnLayoutResource::dataChanged,
+    connect(m_layoutResource.get(), &LayoutResource::dataChanged,
         this, &SpecialLayoutPanelWidget::handleResourceDataChanged);
     connect(m_layoutResource.get(), &QnResource::nameChanged, this,
         &SpecialLayoutPanelWidget::updateTitle);

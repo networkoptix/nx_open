@@ -5,10 +5,10 @@
 #include <QtQml/QQmlEngine>
 
 #include <client/client_runtime_settings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -52,17 +52,17 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* p
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
         [this]()
         {
-             workbench()->currentLayout()->disconnect(this);
+             workbench()->currentLayoutResource()->disconnect(this);
              m_controlledVideoWall = {};
         });
 
-    connect(workbench()->currentLayout(), &QnWorkbenchLayout::lockedChanged,
+    connect(workbench()->currentLayoutResource().get(), &QnLayoutResource::lockedChanged,
         this, &WorkbenchLayoutInfo::isLockedChanged);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         [this]()
         {
-            connect(workbench()->currentLayout(), &QnWorkbenchLayout::lockedChanged,
+            connect(workbench()->currentLayoutResource().get(), &QnLayoutResource::lockedChanged,
                 this, &WorkbenchLayoutInfo::isLockedChanged);
 
             emit currentLayoutChanged();
@@ -84,7 +84,7 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* p
 
 QnLayoutResource* WorkbenchLayoutInfo::currentLayout() const
 {
-    return withCppOwnership(workbench()->currentLayout()->resource().get());
+    return withCppOwnership(workbench()->currentLayoutResource().get());
 }
 
 QnResource* WorkbenchLayoutInfo::currentResource() const
@@ -146,14 +146,14 @@ bool WorkbenchLayoutInfo::isLocked() const
     return workbench()->currentLayout()->locked();
 }
 
-bool WorkbenchLayoutInfo::isSearchLayout() const
+bool WorkbenchLayoutInfo::isPreviewSearchLayout() const
 {
-    return workbench()->currentLayout()->isSearchLayout();
+    return workbench()->currentLayoutResource()->isPreviewSearchLayout();
 }
 
-bool WorkbenchLayoutInfo::isLayoutTourReview() const
+bool WorkbenchLayoutInfo::isShowreelReviewLayout() const
 {
-    return workbench()->currentLayout()->isLayoutTourReview();
+    return workbench()->currentLayoutResource()->isShowreelReviewLayout();
 }
 
 } // namespace nx::vms::client::desktop

@@ -12,17 +12,17 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_data.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/vms/client/desktop/export/widgets/export_password_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -475,7 +475,7 @@ QnMediaResourcePtr ExportSettingsDialog::mediaResource() const
     return d->mediaResource();
 }
 
-QnLayoutResourcePtr ExportSettingsDialog::layout() const
+LayoutResourcePtr ExportSettingsDialog::layout() const
 {
     return d->layout();
 }
@@ -714,7 +714,7 @@ void ExportSettingsDialog::setBookmarks(const QnCameraBookmarkList& bookmarks)
     d->dispatch(Reducer::setBookmarks, bookmarks);
 }
 
-void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
+void ExportSettingsDialog::setLayout(const LayoutResourcePtr& layout)
 {
     d->dispatch(Reducer::enableTab, Mode::Layout);
     const auto palette = ui->layoutPreviewWidget->palette();

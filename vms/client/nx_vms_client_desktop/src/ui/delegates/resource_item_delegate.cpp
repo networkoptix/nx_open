@@ -13,14 +13,13 @@
 #include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -627,8 +626,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     if (!centralItem || uuid.isNull())
         return ItemState::selected;
 
-    auto layoutContext = SystemContext::fromResource(layout->resource());
-    auto indices = layoutContext->resourceRuntimeDataManager()->layoutItemData(
+    auto layoutResource = layout->resource();
+    auto indices = layoutResource->itemData(
         centralItem->uuid(),
         Qn::VideoWallItemIndicesRole).value<QnVideoWallItemIndexList>();
 

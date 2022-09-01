@@ -13,7 +13,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -23,6 +22,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -75,10 +75,10 @@ struct ExportLayoutTool::Private
     bool exportedAnyData = false;
 
     /** Source layout. */
-    QnLayoutResourcePtr originalLayout;
+    LayoutResourcePtr originalLayout;
 
     /** Copy of the provided layout. */
-    QnLayoutResourcePtr layout;
+    LayoutResourcePtr layout;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -147,7 +147,7 @@ ExportLayoutTool::ItemInfo::ItemInfo(const QString& name, qint64 timezone):
 
 ExportLayoutTool::ExportLayoutTool(
     ExportLayoutSettings settings,
-    QnLayoutResourcePtr layout,
+    LayoutResourcePtr layout,
     QObject* parent)
     :
     base_type(parent),
@@ -155,9 +155,9 @@ ExportLayoutTool::ExportLayoutTool(
 {
     d->originalLayout = layout;
     // Make d->layout a deep exact copy of original layout.
-    d->layout.reset(settings.mode == ExportLayoutSettings::Mode::LocalSave
-        ? new QnFileLayoutResource()
-        : new QnLayoutResource());
+    d->layout = (settings.mode == ExportLayoutSettings::Mode::LocalSave
+        ? LayoutResourcePtr(new QnFileLayoutResource())
+        : LayoutResourcePtr(new LayoutResource()));
     d->layout->setIdUnsafe(layout->getId()); //before update() uuid's must be the same
     d->layout->update(layout);
 

@@ -2,45 +2,39 @@
 
 #include "action_factories.h"
 
+#include <QtQuick/QQuickItem>
+#include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtQuick/QQuickItem>
-
-#include <nx/utils/string.h>
-#include <utils/resource_property_adaptors.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
-
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/radass/radass_resource_manager.h>
-#include <nx/vms/client/desktop/ini.h>
-
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/radass/radass_resource_manager.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench.h>
+#include <utils/resource_property_adaptors.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -71,11 +65,11 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
-    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<QnLayoutResource>();
+    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<LayoutResource>();
     if (context()->user())
     {
         layouts.append(resourcePool()->getResourcesByParentId(context()->user()->getId())
-            .filtered<QnLayoutResource>());
+            .filtered<LayoutResource>());
     }
 
     std::sort(layouts.begin(), layouts.end(),
@@ -99,7 +93,7 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
             continue;
 
         // TODO: #sivanov Do not add preview search layouts to the resource pool.
-        if (layout->data().contains(Qn::LayoutSearchStateRole))
+        if (layout->isPreviewSearchLayout())
         {
             if (!QnWorkbenchLayout::instance(layout))
                 continue; /* Not opened. */
@@ -256,7 +250,7 @@ Factory::ActionList AspectRatioFactory::newActions(const Parameters& /*parameter
         connect(action, &QAction::triggered, this,
             [this, ar = aspectRatio.toFloat()]
             {
-                workbench()->currentLayout()->setCellAspectRatio(ar);
+                workbench()->currentLayoutResource()->setCellAspectRatio(ar);
             });
         actionGroup->addAction(action);
     }
@@ -277,7 +271,7 @@ Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& para
 
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
     const bool isCurrentTour = id.isNull();
-    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isLayoutTourReview());
+    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isShowreelReviewLayout());
 
     if (isCurrentTour)
         id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();

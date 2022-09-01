@@ -5,13 +5,12 @@
 #include <QtCore/QCollator>
 
 #include <common/common_meta_types.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "workbench_layout.h"
@@ -62,6 +61,24 @@ QnWorkbenchItem::~QnWorkbenchItem()
 {
     if (m_layout)
         m_layout->removeItem(this);
+}
+
+void QnWorkbenchItem::setLayout(QnWorkbenchLayout* value)
+{
+    if (m_layout)
+        m_layout->resource()->disconnect(this);
+
+    m_layout = value;
+
+    if (m_layout)
+    {
+        connect(m_layout->resource().get(), &LayoutResource::itemDataChanged, this,
+            [this](const QnUuid& itemId, Qn::ItemDataRole role, const QVariant& /*value*/)
+            {
+                if (itemId == m_uuid)
+                    emit dataChanged(role);
+            });
+    }
 }
 
 QnLayoutItemData QnWorkbenchItem::data() const
@@ -395,23 +412,25 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
             break;
     }
 
-    // FIXME: #sivanov Workaround destruction issue order.
-    auto layoutContext = layout()
-        ? SystemContext::fromResource(layout()->resource())
-        : appContext()->currentSystemContext();
-    return layoutContext->resourceRuntimeDataManager()->layoutItemData(m_uuid, role);
+    LayoutResourcePtr currentLayout;
+    if (NX_ASSERT(layout()))
+        currentLayout = layout()->resource();
+
+    if (!NX_ASSERT(currentLayout))
+        return QVariant();
+
+    return currentLayout->itemData(m_uuid, role);
 }
 
 void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
 {
-    // FIXME: #sivanov Workaround destruction issue order.
-    auto layoutContext = layout()
-        ? SystemContext::fromResource(layout()->resource())
-        : appContext()->currentSystemContext();
+    LayoutResourcePtr currentLayout;
+    if (NX_ASSERT(layout()))
+        currentLayout = layout()->resource();
 
-    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+    if (!NX_ASSERT(currentLayout))
+        return;
 
-    QVariant localValue = resourceRuntimeDataManager->layoutItemData(m_uuid, role);
     switch (role)
     {
         case Qn::ItemUuidRole:
@@ -459,22 +478,23 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
         }
         case Qn::ItemFlipRole:
         {
-            /* Avoiding unnecessary dataChanged calls */
+            // Avoiding unnecessary dataChanged calls.
             bool flip = value.toBool();
-            if (localValue.toBool() != flip)
+            bool localValue = currentLayout->itemData(m_uuid, role).toBool();
+            if (localValue != flip)
             {
-                resourceRuntimeDataManager->setLayoutItemData(m_uuid, role, flip);
+                currentLayout->setItemData(m_uuid, role, flip);
                 emit dataChanged(Qn::ItemFlipRole);
             }
             break;
         }
         default:
         {
+            auto localValue = currentLayout->itemData(m_uuid, role);
             if (localValue == value)
                 return;
 
-            resourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
-            emit dataChanged(role);
+            currentLayout->setItemData(m_uuid, role, value);
             break;
         }
     }

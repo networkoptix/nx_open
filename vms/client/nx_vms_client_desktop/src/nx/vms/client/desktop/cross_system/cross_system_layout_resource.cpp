@@ -14,10 +14,15 @@ CrossSystemLayoutResource::CrossSystemLayoutResource()
 
 void CrossSystemLayoutResource::update(const nx::vms::api::LayoutData& layoutData)
 {
-    QnLayoutResourcePtr copy(new QnLayoutResource());
+    QnLayoutResourcePtr copy(new CrossSystemLayoutResource());
     copy->setFlags(flags()); //< Do not update current resource flags.
     ec2::fromApiToResource(layoutData, copy);
     QnResource::update(copy);
+}
+
+LayoutResourcePtr CrossSystemLayoutResource::createClonedInstance() const
+{
+    return LayoutResourcePtr(new CrossSystemLayoutResource());
 }
 
 } // namespace nx::vms::client::desktop

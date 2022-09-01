@@ -6,21 +6,17 @@
 #include <QtCore/QFile>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/layout_item_index.h>
-
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/radass/radass_support.h>
-
 #include <nx/fusion/model_functions.h>
-
-#include <nx/utils/algorithm/same.h>
-#include <nx/utils/uuid.h>
-#include <nx/utils/qset.h>
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/enum_string_conversion.h>
+#include <nx/utils/algorithm/same.h>
+#include <nx/utils/qset.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/radass/radass_support.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -52,12 +48,12 @@ ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
 
 struct RadassResourceManager::Private
 {
-    RadassMode mode(const QnLayoutItemIndex& index) const
+    RadassMode mode(const LayoutItemIndex& index) const
     {
         return m_modes.value(index.uuid(), kDefaultResolution);
     }
 
-    void setMode(const QnLayoutItemIndex& index, RadassMode value)
+    void setMode(const LayoutItemIndex& index, RadassMode value)
     {
         NX_ASSERT(value != RadassMode::Custom);
         if (value == RadassMode::Auto && kDefaultResolution == RadassMode::Auto)
@@ -116,19 +112,19 @@ RadassResourceManager::~RadassResourceManager()
 {
 }
 
-RadassMode RadassResourceManager::mode(const QnLayoutResourcePtr& layout) const
+RadassMode RadassResourceManager::mode(const LayoutResourcePtr& layout) const
 {
     if (!layout)
         return RadassMode::Auto;
 
-    QnLayoutItemIndexList items;
+    LayoutItemIndexList items;
     for (const auto item: layout->getItems())
-        items << QnLayoutItemIndex(layout, item.uuid);
+        items << LayoutItemIndex(layout, item.uuid);
 
     return mode(items);
 }
 
-void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMode value)
+void RadassResourceManager::setMode(const LayoutResourcePtr& layout, RadassMode value)
 {
     if (!layout)
         return;
@@ -137,26 +133,26 @@ void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMod
     if (value == RadassMode::Custom)
         return;
 
-    QnLayoutItemIndexList items;
+    LayoutItemIndexList items;
     for (const auto item: layout->getItems())
-        items << QnLayoutItemIndex(layout, item.uuid);
+        items << LayoutItemIndex(layout, item.uuid);
 
     setMode(items, value);
 }
 
-RadassMode RadassResourceManager::mode(const QnLayoutItemIndex& item) const
+RadassMode RadassResourceManager::mode(const LayoutItemIndex& item) const
 {
-    return mode(QnLayoutItemIndexList() << item);
+    return mode(LayoutItemIndexList() << item);
 }
 
-void RadassResourceManager::setMode(const QnLayoutItemIndex& item, RadassMode value)
+void RadassResourceManager::setMode(const LayoutItemIndex& item, RadassMode value)
 {
-    setMode(QnLayoutItemIndexList() << item, value);
+    setMode(LayoutItemIndexList() << item, value);
 }
 
-RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
+RadassMode RadassResourceManager::mode(const LayoutItemIndexList& items) const
 {
-    QnLayoutItemIndexList validItems;
+    LayoutItemIndexList validItems;
     for (const auto& item: items)
     {
         if (isRadassSupported(item))
@@ -165,7 +161,7 @@ RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
 
     auto value = RadassMode::Auto;
     if (nx::utils::algorithm::same(validItems.cbegin(), validItems.cend(),
-        [this](const QnLayoutItemIndex& index)
+        [this](const LayoutItemIndex& index)
         {
             return d->mode(index);
         },
@@ -177,7 +173,7 @@ RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
     return RadassMode::Custom;
 }
 
-void RadassResourceManager::setMode(const QnLayoutItemIndexList& items, RadassMode value)
+void RadassResourceManager::setMode(const LayoutItemIndexList& items, RadassMode value)
 {
     // Custom mode is not to be set directly.
     if (value == RadassMode::Custom)

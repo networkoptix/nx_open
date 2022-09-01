@@ -35,11 +35,9 @@ extern "C" {
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/pending_operation.h>
@@ -48,6 +46,7 @@ extern "C" {
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -889,20 +888,36 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
         return;
 
     QnWorkbenchItem* item = widget->item();
+    if (!NX_ASSERT(item))
+        return;
 
-    QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    auto layout = workbench()->currentLayoutResource();
+
+    QnTimePeriod window(m_timeSlider->windowStart(),
+        m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+
     // TODO: #sivanov Check that widget supports live.
     if (m_timeSlider->windowEnd() == m_timeSlider->maximum())
         window.durationMs = QnTimePeriod::kInfiniteDuration;
-    item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
 
-    if (workbench()->currentLayout()->isSearchLayout())
+    layout->setItemData(
+        item->uuid(),
+        Qn::ItemSliderWindowRole,
+        QVariant::fromValue<QnTimePeriod>(window));
+
+    if (layout->isPreviewSearchLayout())
         return;
 
     QnTimePeriod selection;
     if (m_timeSlider->isSelectionValid())
-        selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
-    item->setData(Qn::ItemSliderSelectionRole, QVariant::fromValue<QnTimePeriod>(selection));
+    {
+        selection = QnTimePeriod(m_timeSlider->selectionStart(),
+            m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
+    }
+    layout->setItemData(
+        item->uuid(),
+        Qn::ItemSliderSelectionRole,
+        QVariant::fromValue<QnTimePeriod>(selection));
 }
 
 void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget)
@@ -1313,10 +1328,12 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
     {
         flags = calculateResourceWidgetFlags(m_currentWidget->resource());
 
-        if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
+        if (workbench()->currentLayout()->isPreviewSearchLayout())
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
 
-        QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
+        QnTimePeriod period = workbench()->currentLayout()->resource()
+            ? workbench()->currentLayout()->resource()->localRange()
+            : QnTimePeriod();
         if (!period.isNull())
             flags &= ~WidgetSupportsLive;
     }
@@ -1338,7 +1355,7 @@ void QnWorkbenchNavigator::updateSliderOptions()
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
     m_timeSlider->setOption(QnTimeSlider::ClearSelectionOnClick,
-        !workbench()->currentLayout()->isSearchLayout());
+        !workbench()->currentLayout()->isPreviewSearchLayout());
 
     bool selectionEditable = (bool) workbench()->currentLayout()->resource();
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
@@ -1851,9 +1868,9 @@ void QnWorkbenchNavigator::updateLines()
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
 
-    QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
+    LayoutResourcePtr currentLayoutResource = workbench()->currentLayoutResource();
     if (currentLayoutResource
-        && (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty()))
+        && (currentLayoutResource->isFile() || !currentLayoutResource->localRange().isEmpty()))
     {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
@@ -1868,7 +1885,7 @@ void QnWorkbenchNavigator::updateLines()
                     && !widget->resource()->hasFlags(Qn::virtual_camera);
             };
 
-        bool isSearch = workbench()->currentLayout()->isSearchLayout();
+        bool isSearch = workbench()->currentLayout()->isPreviewSearchLayout();
         bool currentIsNormal = isNormalCamera(m_currentWidget);
 
         bool haveNormal = currentIsNormal;
@@ -2069,7 +2086,7 @@ bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
 
     return isRecording()
         || hasArchive()
-        || workbench()->currentLayout()->isSearchLayout();
+        || workbench()->currentLayout()->isPreviewSearchLayout();
 }
 
 void QnWorkbenchNavigator::updateTimelineRelevancy()

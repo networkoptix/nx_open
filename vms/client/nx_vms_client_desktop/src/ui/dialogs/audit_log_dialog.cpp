@@ -13,12 +13,10 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -28,6 +26,7 @@
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -681,7 +680,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         params.setArgument(Qn::TimePeriodRole, period);
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->addFlags(Qn::local);
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(tr("Audit trail replay"));
@@ -713,15 +712,13 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * resList.size() / desiredCellAspectRatio)));
 
-    auto resourceRuntimeDataManager = appContext()->currentSystemContext()
-        ->resourceRuntimeDataManager();
     for(int i = 0; i < resList.size(); i++)
     {
         auto resource = resList[i];
 
         QnLayoutItemData item = layoutItemFromResource(resource);
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        resourceRuntimeDataManager->setLayoutItemData(
+        layout->setItemData(
             item.uuid,
             Qn::ItemTimeRole,
             period.startTimeMs);

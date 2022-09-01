@@ -7,16 +7,15 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -232,31 +231,9 @@ QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
     return icon(key(resource));
 }
 
-void QnResourceIconCache::setKey(const QnResourcePtr& resource, Key key)
-{
-    SystemContext::fromResource(resource)->resourceRuntimeDataManager()
-        ->setResourceData(resource, Qn::ResourceIconKeyRole, (int)key);
-}
-
-void QnResourceIconCache::clearKey(const QnResourcePtr& resource)
-{
-    SystemContext::fromResource(resource)->resourceRuntimeDataManager()
-        ->cleanupResourceData(resource, Qn::ResourceIconKeyRole);
-}
-
 QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 {
     Key key = Unknown;
-
-    // #vbreus There is no client module in the testing environment.
-    // But it seems that there nothing interesting regarding Resource Tree model.
-    if (auto context = SystemContext::fromResource(resource))
-    {
-        auto customIconKey = context->resourceRuntimeDataManager()
-            ->resourceData(resource, Qn::ResourceIconKeyRole);
-        if (customIconKey.isValid())
-            return static_cast<Key>(customIconKey.toInt());
-    }
 
     Qn::ResourceFlags flags = resource->flags();
     if (flags.testFlag(Qn::local_server))
@@ -337,12 +314,11 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             ? Incompatible
             : Online;
     }
-    else if (const auto layout = resource.dynamicCast<QnLayoutResource>())
+    else if (const auto layout = resource.dynamicCast<LayoutResource>())
     {
-        const bool videowall = !layout->data().value(Qn::VideoWallResourceRole)
-            .value<QnVideoWallResourcePtr>().isNull();
+        const bool isVideoWallReviewLayout = layout->isVideoWallReviewLayout();
 
-        if (videowall)
+        if (isVideoWallReviewLayout)
             key = VideoWall;
         else if (layout->isShared())
             key = SharedLayout;
@@ -353,7 +329,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         else
             key = Layout;
 
-        status = (layout->locked() && !videowall)
+        status = (layout->locked() && !isVideoWallReviewLayout)
             ? Locked
             : Unknown;
     }

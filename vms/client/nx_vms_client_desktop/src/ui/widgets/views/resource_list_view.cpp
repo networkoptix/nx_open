@@ -129,6 +129,11 @@ QnResourcePtr QnResourceListView::selectedResource() const
     return index.data(Qn::ResourceRole).value<QnResourcePtr>();
 }
 
+QnResourceListModel* QnResourceListView::model() const
+{
+    return m_model;
+}
+
 QSize QnResourceListView::sizeHint() const
 {
     return QSize(kRecommendedWidth,

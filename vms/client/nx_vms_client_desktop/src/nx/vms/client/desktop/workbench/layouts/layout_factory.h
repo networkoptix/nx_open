@@ -4,9 +4,9 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
 #include <common/common_globals.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 class QnWorkbench;
 class QnWorkbenchLayout;
@@ -24,16 +24,14 @@ class LayoutsFactory:
 
 public:
     using LayoutCreator =
-        std::function<QnWorkbenchLayout* (const QnLayoutResourcePtr& resource, QObject* parent)>;
+        std::function<QnWorkbenchLayout* (const LayoutResourcePtr& resource, QObject* parent)>;
 
     static LayoutsFactory* instance(QnWorkbench* workbench);
 
     LayoutsFactory(QObject* parent = nullptr);
 
-    QnWorkbenchLayout* create(QObject* parent = nullptr);
-
     QnWorkbenchLayout* create(
-        const QnLayoutResourcePtr& resource,
+        const LayoutResourcePtr& resource,
         QObject* parent = nullptr);
 
     /**

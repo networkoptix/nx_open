@@ -25,7 +25,6 @@ public:
         nx::vms::client::desktop::ui::action::ActionScope scope) const override;
 
 signals:
-    void closeRequested(QnWorkbenchLayout *layout);
     void tabTextChanged();
 
 protected:
@@ -49,8 +48,7 @@ protected:
     void updateTabText(QnWorkbenchLayout *layout);
     void updateTabIcon(QnWorkbenchLayout *layout);
 
-private slots:
-    void at_tabCloseRequested(int index);
+private:
     void at_currentChanged(int index);
     void at_tabMoved(int from, int to);
 

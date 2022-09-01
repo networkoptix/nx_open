@@ -2,10 +2,10 @@
 
 #include "user_layouts_source.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
 #include <client/client_globals.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/layout_resource_index.h>
 
 namespace nx::vms::client::desktop {
@@ -77,9 +77,9 @@ void UserLayoutsSource::processLayout(
     const QnResourcePtr& layoutResource,
     std::function<void()> successHandler)
 {
-    const auto layout = layoutResource.staticCast<QnLayoutResource>();
+    const auto layout = layoutResource.staticCast<LayoutResource>();
 
-    if (layout->data().contains(Qn::LayoutSearchStateRole))
+    if (layout->isPreviewSearchLayout())
         return;
 
     if (layout->hasFlags(Qn::local))

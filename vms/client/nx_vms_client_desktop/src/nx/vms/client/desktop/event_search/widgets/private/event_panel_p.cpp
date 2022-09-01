@@ -14,7 +14,6 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
@@ -36,6 +35,7 @@
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>

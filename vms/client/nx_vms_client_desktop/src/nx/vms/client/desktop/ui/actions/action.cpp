@@ -8,12 +8,12 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
@@ -279,7 +279,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
             }
             else if (key == Qn::CurrentLayoutResourceRole)
             {
-                if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
+                if (LayoutResourcePtr layout = context()->workbench()->currentLayoutResource())
                     resources.push_back(layout);
             }
 

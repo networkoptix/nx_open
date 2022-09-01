@@ -42,7 +42,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_synchronizer.h>
 
 #if defined(Q_OS_LINUX)
     #include <ui/workaround/x11_launcher_workaround.h>
@@ -84,8 +83,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         });
 
     /* Create dependent objects. */
-    m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
-
     m_menu.reset(new ui::action::Manager(this));
     m_joystickManager.reset(joystick::Manager::create(this));
     m_display.reset(new QnWorkbenchDisplay(this));
@@ -142,7 +139,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_navigator.reset();
     m_display.reset();
     m_menu.reset();
-    m_synchronizer.reset();
     m_workbench.reset();
 }
 

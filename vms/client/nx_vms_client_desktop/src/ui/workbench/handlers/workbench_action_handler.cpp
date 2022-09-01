@@ -37,7 +37,6 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/layout_item_data.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_directory_browser.h>
@@ -51,7 +50,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/authutil.h>
@@ -82,6 +80,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
@@ -157,7 +156,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/workbench_synchronizer.h>
 #include <utils/applauncher_utils.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
@@ -425,7 +423,7 @@ ActionHandler::~ActionHandler()
 }
 
 void ActionHandler::addToLayout(
-    const QnLayoutResourcePtr& layout,
+    const LayoutResourcePtr& layout,
     const QnResourcePtr& resource,
     const AddToLayoutParams& params)
 {
@@ -469,44 +467,43 @@ void ActionHandler::addToLayout(
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
 
-    auto layoutContext = SystemContext::fromResource(layout);
-    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
-
     if (params.timelineWindow.isValid())
     {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemSliderWindowRole, params.timelineWindow);
+        layout->setItemData(
+            data.uuid,
+            Qn::ItemSliderWindowRole,
+            QVariant::fromValue(params.timelineWindow));
     }
 
     if (params.timelineSelection.isValid())
     {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemSliderSelectionRole, params.timelineSelection);
+        layout->setItemData(
+            data.uuid,
+            Qn::ItemSliderSelectionRole,
+            QVariant::fromValue(params.timelineSelection));
     }
 
     if (!params.motionSelection.empty())
     {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemMotionSelectionRole, params.motionSelection);
+        layout->setItemData(
+            data.uuid,
+            Qn::ItemMotionSelectionRole,
+            QVariant::fromValue(params.motionSelection));
     }
 
     if (params.analyticsSelection.isValid())
-    {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemAnalyticsSelectionRole, params.analyticsSelection);
-    }
+        layout->setItemData(data.uuid, Qn::ItemAnalyticsSelectionRole, params.analyticsSelection);
 
     if (params.frameDistinctionColor.isValid())
     {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+        layout->setItemData(
+            data.uuid,
+            Qn::ItemFrameDistinctionColorRole,
+            params.frameDistinctionColor);
     }
 
     if (!params.zoomWindowRectangleVisible)
-    {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
-    }
+        layout->setItemData(data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
 
     if (params.usePosition)
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
@@ -517,23 +514,23 @@ void ActionHandler::addToLayout(
     if (resource.dynamicCast<QnAviResource>() && layoutSize == 0)
     {
         // Rewind local files to the beginning on an empty layout.
-        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, 0);
-        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemPausedRole, false);
-        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemSpeedRole, 1);
+        layout->setItemData(data.uuid, Qn::ItemTimeRole, 0);
+        layout->setItemData(data.uuid, Qn::ItemPausedRole, false);
+        layout->setItemData(data.uuid, Qn::ItemSpeedRole, 1);
     }
     else if (params.time > 0ms)
     {
-        resourceRuntimeDataManager->setLayoutItemData(
-            data.uuid, Qn::ItemTimeRole, params.time.count());
-        resourceRuntimeDataManager->setLayoutItemData(
+        layout->setItemData(
+            data.uuid, Qn::ItemTimeRole, QVariant::fromValue<qint64>(params.time.count()));
+        layout->setItemData(
             data.uuid, Qn::ItemPausedRole, params.paused);
-        resourceRuntimeDataManager->setLayoutItemData(
+        layout->setItemData(
             data.uuid, Qn::ItemSpeedRole, params.speed);
     }
 }
 
 void ActionHandler::addToLayout(
-    const QnLayoutResourcePtr& layout,
+    const LayoutResourcePtr& layout,
     const QnResourceList& resources,
     const AddToLayoutParams& params)
 {
@@ -542,7 +539,7 @@ void ActionHandler::addToLayout(
 }
 
 void ActionHandler::addToLayout(
-    const QnLayoutResourcePtr& layout,
+    const LayoutResourcePtr& layout,
     const QList<QnMediaResourcePtr>& resources,
     const AddToLayoutParams& params)
 {
@@ -551,7 +548,7 @@ void ActionHandler::addToLayout(
 }
 
 void ActionHandler::addToLayout(
-    const QnLayoutResourcePtr& layout,
+    const LayoutResourcePtr& layout,
     const QList<QString>& files,
     const AddToLayoutParams& params)
 {
@@ -618,9 +615,9 @@ void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
             return action::SetCurrentLayoutItemSpacingSmallAction;
         };
 
-    if (auto layout = workbench()->currentLayout()->resource())
+    if (auto layout = workbench()->currentLayoutResource(); NX_ASSERT(layout))
     {
-        layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(spacing));
+        layout->setPredefinedCellSpacing(spacing);
         action(actionId())->setChecked(true);
     }
 }
@@ -657,9 +654,9 @@ void ActionHandler::at_workbench_cellSpacingChanged()
 
     if (qFuzzyIsNull(value))
         action(action::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
-    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium), value))
+    else if (qFuzzyCompare(LayoutResource::cellSpacingValue(Qn::CellSpacing::Medium), value))
         action(action::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
-    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large), value))
+    else if (qFuzzyCompare(LayoutResource::cellSpacingValue(Qn::CellSpacing::Large), value))
         action(action::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
         action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
@@ -829,7 +826,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
+    LayoutResourcePtr layout = parameters.argument<LayoutResourcePtr>(Qn::LayoutResourceRole);
     if (!NX_ASSERT(layout))
         return;
 
@@ -883,9 +880,6 @@ void ActionHandler::at_openInLayoutAction_triggered()
         return;
     }
 
-    auto layoutContext = SystemContext::fromResource(layout);
-    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
-
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
     const int maxItems = qnRuntime->maxSceneItems();
@@ -920,8 +914,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
             for (const auto extraItemRole: kExtraItemRoles)
             {
-                const auto value =
-                    resourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
+                const QVariant value = layout->itemData(oldUuid, extraItemRole);
                 if (value.isValid())
                     extraItemRoleValues[data.uuid].insert(extraItemRole, value);
             }
@@ -944,7 +937,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
             const auto values = extraItemRoleValues[data.uuid];
             for (auto it = values.begin(); it != values.end(); ++it)
-                resourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
+                layout->setItemData(data.uuid, it.key(), it.value());
         }
     }
     else if (!resources.isEmpty())
@@ -1453,7 +1446,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
 void ActionHandler::at_dropResourcesAction_triggered()
 {
     // Layout Tour Handler will process this action itself
-    if (context()->workbench()->currentLayout()->isLayoutTourReview())
+    if (context()->workbench()->currentLayout()->isShowreelReviewLayout())
         return;
 
     // This method can be called only from the GUI thread.
@@ -1911,13 +1904,14 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     if (!widget)
         return;
 
-    bool isSearchLayout = workbench()->currentLayout()->isSearchLayout();
+    bool isPreviewSearchLayout = workbench()->currentLayout()->isPreviewSearchLayout();
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
-    if (period.isEmpty()) {
-        if (!isSearchLayout)
+    if (period.isEmpty()) 
+    {
+        if (!isPreviewSearchLayout)
             return;
 
         period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
@@ -2064,15 +2058,11 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid());
-    layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if (context()->user())
         layout->setParentId(context()->user()->getId());
-
-    auto resourceRuntimeDataManager = appContext()->currentSystemContext()
-        ->resourceRuntimeDataManager();
 
     qint64 time = period.startTimeMs;
     for (int i = 0; i < itemCount; i++) {
@@ -2088,13 +2078,16 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, localPeriod);
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole, period);
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, localTime);
-        // set aspect ratio to make thumbnails load in all cases, see #2619
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemAspectRatioRole, desiredItemAspectRatio);
-        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::TimePeriodsRole, localPeriods);
+        layout->setItemData(item.uuid, Qn::ItemPausedRole, true);
+        layout->setItemData(
+            item.uuid,
+            Qn::ItemSliderSelectionRole,
+            QVariant::fromValue(localPeriod));
+        layout->setItemData(item.uuid, Qn::ItemSliderWindowRole, QVariant::fromValue(period));
+        layout->setItemData(item.uuid, Qn::ItemTimeRole, localTime);
+        // Set aspect ratio to make thumbnails load in all cases.
+        layout->setItemData(item.uuid, Qn::ItemAspectRatioRole, desiredItemAspectRatio);
+        layout->setItemData(item.uuid, Qn::TimePeriodsRole, QVariant::fromValue(localPeriods));
 
         layout->addItem(item);
 
@@ -2108,6 +2101,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
+    NX_ASSERT(layout->isPreviewSearchLayout());
 
     // TODO: #sivanov Adding layout to the resource pool is not needed, moreover it requires to add
     // a lot of additional checks in different places. But to remove this line we need to implement
@@ -2401,7 +2395,7 @@ void ActionHandler::at_renameAction_triggered()
     if (name == oldName)
         return;
 
-    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+    if (auto layout = resource.dynamicCast<LayoutResource>())
     {
         if (layout->isFile())
             renameLocalFile(layout, name);
@@ -2605,22 +2599,29 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.rotation = widget->item()->rotation();
     addParams.displayRoi = widget->item()->displayRoi();
     addParams.displayAnalyticsObjects = widget->item()->displayAnalyticsObjects();
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
+    addToLayout(
+        workbench()->currentLayoutResource(),
+        widget->resource()->toResourcePtr(),
+        addParams);
 }
 
 void ActionHandler::at_setAsBackgroundAction_triggered() {
 
-    auto checkCondition = [this]() {
-        if (!context()->user() || !workbench()->currentLayout() || !workbench()->currentLayout()->resource())
-            return false; // action should not be triggered while we are not connected
+    auto checkCondition =
+        [this]()
+        {
+            auto layout = workbench()->currentLayoutResource();
+            if (!context()->user() || !NX_ASSERT(layout))
+                return false; // action should not be triggered while we are not connected
 
-        if (!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
-            return false;
+            if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
+                return false;
 
-        if (workbench()->currentLayout()->resource()->locked())
-            return false;
-        return true;
-    };
+            if (layout->locked())
+                return false;
+
+            return true;
+        };
 
     if (!checkCondition())
         return;

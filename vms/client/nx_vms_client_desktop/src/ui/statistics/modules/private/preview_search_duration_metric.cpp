@@ -25,7 +25,7 @@ PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
 
         const auto layout = workbenchGuard->currentLayout();
         const bool isPreviewSearchLayout = (layout
-            && layout->isSearchLayout());
+            && layout->isPreviewSearchLayout());
 
         setCounterActive(isPreviewSearchLayout);
     };

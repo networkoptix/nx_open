@@ -8,7 +8,6 @@
 #include <client/client_message_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
@@ -43,7 +42,6 @@ struct SystemContext::Private
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
     std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
     std::unique_ptr<QnCameraDataManager> cameraDataManager;
-    std::unique_ptr<QnResourceRuntimeDataManager> resourceRuntimeDataManager;
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<VideoCache> videoCache;
@@ -74,7 +72,6 @@ SystemContext::SystemContext(
     d(new Private{.q = this})
 {
     d->accessController = std::make_unique<QnWorkbenchAccessController>(this);
-    d->resourceRuntimeDataManager = std::make_unique<QnResourceRuntimeDataManager>(this);
 
     switch (mode)
     {
@@ -88,7 +85,6 @@ SystemContext::SystemContext(
             d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
-            d->resourceRuntimeDataManager = std::make_unique<QnResourceRuntimeDataManager>(this);
             d->statisticsSender = std::make_unique<StatisticsSender>(this);
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
@@ -151,11 +147,6 @@ QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
 QnCameraDataManager* SystemContext::cameraDataManager() const
 {
     return d->cameraDataManager.get();
-}
-
-QnResourceRuntimeDataManager* SystemContext::resourceRuntimeDataManager() const
-{
-    return d->resourceRuntimeDataManager.get();
 }
 
 VirtualCameraManager* SystemContext::virtualCameraManager() const

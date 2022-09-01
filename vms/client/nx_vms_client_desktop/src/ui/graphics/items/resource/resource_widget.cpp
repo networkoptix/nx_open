@@ -17,16 +17,15 @@
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -108,14 +107,6 @@ void splitFormat(const QString &format, QString *left, QString *right)
     }
 }
 
-bool itemBelongsToValidLayout(QnWorkbenchItem *item)
-{
-    return (item
-            && item->layout()
-            && item->layout()->resource()
-            && item->layout()->resource()->systemContext());
-}
-
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -176,20 +167,6 @@ QnResourceWidget::QnResourceWidget(
 
     executeLater([this]() { updateHud(false); }, this);
 
-    // TODO: #sivanov Remove outdated check.
-    if (NX_ASSERT(itemBelongsToValidLayout(item)))
-    {
-        auto layoutSystemContext = SystemContext::fromResource(item->layout()->resource());
-        if (NX_ASSERT(layoutSystemContext))
-        {
-            connect(
-                layoutSystemContext->accessController()->notifier(item->layout()->resource()),
-                &QnWorkbenchPermissionsNotifier::permissionsChanged,
-                this,
-                &QnResourceWidget::updateButtonsVisibility);
-        }
-    }
-
     /* Status overlay. */
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
@@ -201,15 +178,17 @@ QnResourceWidget::QnResourceWidget(
 
     m_aspectRatio = defaultAspectRatio();
 
-    auto layoutContext = SystemContext::fromResource(item->layout()->resource());
-    connect(layoutContext->resourceRuntimeDataManager(),
-        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+    auto layoutResource = item->layout()->resource();
+    NX_ASSERT(layoutResource);
+    connect(layoutResource.get(),
+        &LayoutResource::itemDataChanged,
         this,
         [this, itemId = item->uuid()](
             const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
         {
             if (id != itemId)
                 return;
+
             at_itemDataChanged(role);
         });
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
@@ -998,7 +977,8 @@ int QnResourceWidget::calculateButtonsVisibility() const
 
     const auto layout = layoutResource();
     auto layoutSystemContext = SystemContext::fromResource(layout);
-    const Qn::Permissions permissions = NX_ASSERT(layoutSystemContext)
+    // Layout context can be absent for temporary layouts like showreel.
+    const Qn::Permissions permissions = layoutSystemContext
         ? layoutSystemContext->accessController()->permissions(layout)
         : Qn::AllPermissions;
     const bool fullscreenMode = options().testFlag(FullScreenMode);

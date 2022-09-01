@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 struct QnLayoutItemData;
 
@@ -12,7 +13,7 @@ namespace nx::vms::client::desktop {
 QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource);
 
 /** Create a new layout resource with a given resource on it. */
-QnLayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
+LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
 
 /** Get all resources placed on the layout. WARNING: method is SLOW! */
 QSet<QnResourcePtr> layoutResources(const QnLayoutResourcePtr& layout);

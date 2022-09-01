@@ -12,12 +12,11 @@
 #include <qt_graphics_items/graphics_pixmap.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -269,10 +268,11 @@ void LayoutTourItemWidget::initOverlay()
             menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 
-    auto layoutContext = SystemContext::fromResource(item()->layout()->resource());
+    auto layoutResource = item()->layout()->resource();
+    NX_ASSERT(layoutResource);
 
-    connect(layoutContext->resourceRuntimeDataManager(),
-        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+    connect(layoutResource.get(),
+        &LayoutResource::itemDataChanged,
         this,
         [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
         {

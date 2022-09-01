@@ -39,8 +39,8 @@ class WorkbenchLayoutInfo:
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
     Q_PROPERTY(int maximumItemCount READ maximumItemCount CONSTANT)
     Q_PROPERTY(bool isLocked READ isLocked NOTIFY isLockedChanged)
-    Q_PROPERTY(bool isSearchLayout READ isSearchLayout NOTIFY currentLayoutChanged)
-    Q_PROPERTY(bool isLayoutTourReview READ isLayoutTourReview NOTIFY currentLayoutChanged)
+    Q_PROPERTY(bool isPreviewSearchLayout READ isPreviewSearchLayout CONSTANT)
+    Q_PROPERTY(bool isShowreelReviewLayout READ isShowreelReviewLayout CONSTANT)
 
 public:
     WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* parent = nullptr);
@@ -56,8 +56,8 @@ public:
     int itemCount() const;
     int maximumItemCount() const;
     bool isLocked() const;
-    bool isSearchLayout() const;
-    bool isLayoutTourReview() const;
+    bool isPreviewSearchLayout() const;
+    bool isShowreelReviewLayout() const;
 
 signals:
     void currentLayoutChanged();

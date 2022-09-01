@@ -10,10 +10,8 @@
 #include <analytics/db/analytics_db_types.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
 #include <nx/analytics/metadata_logger.h>
@@ -28,6 +26,7 @@
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/box.h>

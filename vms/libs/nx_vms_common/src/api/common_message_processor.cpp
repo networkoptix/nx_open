@@ -1087,7 +1087,7 @@ void QnCommonMessageProcessor::updateResource(
     const LayoutData& layout,
     ec2::NotificationSource source)
 {
-    QnLayoutResourcePtr qnLayout(new QnLayoutResource());
+    QnLayoutResourcePtr qnLayout = getResourceFactory()->createLayout();
     if (!layout.url.isEmpty())
     {
         NX_WARNING(this, lit("Invalid server layout with url %1").arg(layout.url));

@@ -25,7 +25,6 @@ class QnGraphicsView;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchController;
-class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;

@@ -4,8 +4,8 @@
 
 #include <set>
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
@@ -13,6 +13,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/license/license_usage_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -99,7 +100,8 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    QnLayoutResourcePtr constructLayout(const QnResourceList& resources) const;
+    nx::vms::client::desktop::LayoutResourcePtr constructLayout(
+        const QnResourceList& resources) const;
     void cleanupUnusedLayouts();
 
     void setItemOnline(const QnUuid& instanceGuid, bool online);
@@ -202,7 +204,7 @@ private:
     void at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
     void at_workbenchLayout_zoomLinkRemoved(
         QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
-    void at_workbenchLayout_dataChanged(int role);
+    void at_workbenchLayout_dataChanged(Qn::ItemDataRole role);
 
     void at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role);
 

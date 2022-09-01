@@ -5,10 +5,9 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/desktop/radass/radass_fwd.h>
-
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/radass/radass_fwd.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,14 +24,14 @@ public:
     RadassResourceManager(QObject* parent = nullptr);
     virtual ~RadassResourceManager() override;
 
-    RadassMode mode(const QnLayoutResourcePtr& layout) const;
-    void setMode(const QnLayoutResourcePtr& layout, RadassMode value);
+    RadassMode mode(const LayoutResourcePtr& layout) const;
+    void setMode(const LayoutResourcePtr& layout, RadassMode value);
 
-    RadassMode mode(const QnLayoutItemIndex& item) const;
-    void setMode(const QnLayoutItemIndex& item, RadassMode value);
+    RadassMode mode(const LayoutItemIndex& item) const;
+    void setMode(const LayoutItemIndex& item, RadassMode value);
 
-    RadassMode mode(const QnLayoutItemIndexList& items) const;
-    void setMode(const QnLayoutItemIndexList& items, RadassMode value);
+    RadassMode mode(const LayoutItemIndexList& items) const;
+    void setMode(const LayoutItemIndexList& items, RadassMode value);
 
 
     QString cacheDirectory() const;
@@ -45,7 +44,7 @@ public:
     void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool) const;
 
 signals:
-    void modeChanged(const QnLayoutItemIndex& item, RadassMode value);
+    void modeChanged(const LayoutItemIndex& item, RadassMode value);
 
 private:
     struct Private;

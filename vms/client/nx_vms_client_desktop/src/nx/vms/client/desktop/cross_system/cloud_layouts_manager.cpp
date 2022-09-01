@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -256,9 +257,9 @@ struct CloudLayoutsManager::Private
                 }));
     }
 
-    QnLayoutResourcePtr convertLocalLayout(const QnLayoutResourcePtr& layout)
+    LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout)
     {
-        auto existingLayouts = systemContext->resourcePool()->getResources<QnLayoutResource>();
+        auto existingLayouts = systemContext->resourcePool()->getResources<LayoutResource>();
         QStringList usedNames;
         std::transform(
             existingLayouts.cbegin(), existingLayouts.cend(),
@@ -362,7 +363,7 @@ CloudLayoutsManager::~CloudLayoutsManager()
     d->networkManager->pleaseStopSync();
 }
 
-QnLayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const QnLayoutResourcePtr& layout)
+LayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const LayoutResourcePtr& layout)
 {
     return d->convertLocalLayout(layout);
 }

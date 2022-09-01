@@ -3,9 +3,9 @@
 #include "layout_data_helper.h"
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
@@ -23,13 +23,13 @@ QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource)
     return data;
 }
 
-QnLayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
+LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
 {
     NX_ASSERT(QnResourceAccessFilter::isOpenableInLayout(resource));
     if (!resource)
-        return QnLayoutResourcePtr();
+        return LayoutResourcePtr();
 
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    LayoutResourcePtr layout(new LayoutResource());
     layout->setCellSpacing(0);
     layout->setName(resource->getName());
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())

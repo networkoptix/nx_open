@@ -175,7 +175,7 @@ void Manager::trigger(IDType id, const Parameters& parameters)
     if (triggerIfPossible(id, parameters))
         return;
 
-    NX_DEBUG(this,
+    NX_WARNING(this,
         "Action %1 was triggered with a parameter that does not meet its requirements:\n%2",
         id,
         parameters);
