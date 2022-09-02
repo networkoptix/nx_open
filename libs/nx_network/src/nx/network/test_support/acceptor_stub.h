@@ -47,6 +47,27 @@ private:
     void deliverConnectionIfAvailable();
 };
 
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API AcceptorDelegate:
+    public cloud::AbstractConnectionAcceptor
+{
+    using base_type = cloud::AbstractConnectionAcceptor;
+
+public:
+    AcceptorDelegate(std::shared_ptr<cloud::AbstractConnectionAcceptor> target);
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
+
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
+    virtual void cancelIOSync() override;
+    virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
+
+private:
+    std::shared_ptr<cloud::AbstractConnectionAcceptor> m_target;
+};
+
 } // namespace test
 } // namespace network
 } // namespace nx

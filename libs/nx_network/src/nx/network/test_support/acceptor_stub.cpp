@@ -22,6 +22,8 @@ AcceptorStub::~AcceptorStub()
 {
     --instanceCount;
     m_removedAcceptorsQueue->push(this);
+
+    pleaseStopSync();
 }
 
 void AcceptorStub::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -77,6 +79,41 @@ void AcceptorStub::deliverConnectionIfAvailable()
 
     m_repetitiveTimer.cancelSync();
     nx::utils::swapAndCall(m_acceptHandler, SystemError::noError, std::move(*connection));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+AcceptorDelegate::AcceptorDelegate(std::shared_ptr<cloud::AbstractConnectionAcceptor> target):
+    m_target(target)
+{
+    bindToAioThread(m_target->getAioThread());
+}
+
+void AcceptorDelegate::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_target->bindToAioThread(aioThread);
+}
+
+void AcceptorDelegate::stopWhileInAioThread()
+{
+    base_type::stopWhileInAioThread();
+    m_target->pleaseStopSync();
+}
+
+void AcceptorDelegate::acceptAsync(AcceptCompletionHandler handler)
+{
+    m_target->acceptAsync(std::move(handler));
+}
+
+void AcceptorDelegate::cancelIOSync()
+{
+    m_target->cancelIOSync();
+}
+
+std::unique_ptr<AbstractStreamSocket> AcceptorDelegate::getNextSocketIfAny()
+{
+    return m_target->getNextSocketIfAny();
 }
 
 } // namespace test
