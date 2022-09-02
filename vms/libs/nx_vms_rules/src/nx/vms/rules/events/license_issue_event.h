@@ -13,7 +13,7 @@ class NX_VMS_RULES_API LicenseIssueEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.licenseIssue")
 
     FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuidSet, cameras, setCameras)
+    FIELD(QnUuidList, deviceIds, deviceIds)
 
 public:
     LicenseIssueEvent() = default;
@@ -29,7 +29,7 @@ public:
 
 private:
     QString extendedCaption(common::SystemContext* context) const;
-    QString reason(nx::vms::common::SystemContext* context) const;
+    QStringList reason(nx::vms::common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

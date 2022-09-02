@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
+#include <nx/vms/rules/icon.h>
 
 #include "../data_macros.h"
 #include "described_event.h"
@@ -16,6 +16,7 @@ class NX_VMS_RULES_API GenericEvent: public DescribedEvent
     Q_CLASSINFO("type", "nx.events.generic")
 
     FIELD(QString, source, setSource)
+    FIELD(QnUuidList, deviceIds, setDeviceIds)
 
 public:
     GenericEvent() = default;
@@ -24,7 +25,8 @@ public:
         State state,
         const QString& caption,
         const QString& description,
-        const QString& source);
+        const QString& source,
+        const QnUuidList& deviceIds);
 
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
@@ -33,6 +35,7 @@ public:
 
 private:
     QString extendedCaption() const;
+    Icon icon() const;
 };
 
 } // namespace nx::vms::rules

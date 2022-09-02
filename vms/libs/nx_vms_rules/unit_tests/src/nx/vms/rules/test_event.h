@@ -20,6 +20,7 @@ class TestEvent: public nx::vms::rules::BasicEvent
 
     Q_PROPERTY(QnUuid serverId MEMBER m_serverId)
     Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
 
     Q_PROPERTY(int intField MEMBER m_intField)
     Q_PROPERTY(QString text MEMBER m_text)
@@ -78,6 +79,7 @@ public:
 
     QnUuid m_serverId;
     QnUuid m_cameraId;
+    QnUuidList m_deviceIds;
 
     int m_intField{};
     QString m_text;

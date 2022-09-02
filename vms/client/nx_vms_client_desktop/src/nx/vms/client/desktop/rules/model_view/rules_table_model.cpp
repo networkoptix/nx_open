@@ -273,7 +273,7 @@ void SimplifiedRule::watchOn(QObject* object) const
     for (const auto propertyName: propertyNames)
     {
         const auto metaProperty =
-            metaObject->property(metaObject->indexOfProperty(propertyName.toUtf8()));
+            metaObject->property(metaObject->indexOfProperty(propertyName));
 
         if (!metaProperty.hasNotifySignal())
             continue;

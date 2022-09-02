@@ -65,7 +65,7 @@ QStringList ServerConflictEvent::detailing() const
 
 QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add resource id to the event.
+    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" Conflict").arg(resourceName);
 }
 

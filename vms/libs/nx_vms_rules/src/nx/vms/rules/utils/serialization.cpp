@@ -8,7 +8,7 @@
 
 namespace nx::vms::rules {
 
-QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<QString>& names)
+QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<QByteArray>& names)
 {
     if (!NX_ASSERT(object))
         return {};
@@ -18,7 +18,7 @@ QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<
 
     for (const auto& propName: names)
     {
-        int index = meta->indexOfProperty(propName.toUtf8().data());
+        int index = meta->indexOfProperty(propName.constData());
         if (!NX_ASSERT(index >= 0, "Property not found: %1", propName))
             continue;
 

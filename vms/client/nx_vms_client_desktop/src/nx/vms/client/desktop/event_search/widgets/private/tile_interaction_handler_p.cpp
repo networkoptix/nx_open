@@ -119,7 +119,7 @@ TileInteractionHandler* TileInteractionHandler::doInstall(
     connect(tileInteractionSource, &T::clicked,
         handler, &TileInteractionHandler::handleClick);
 
-    connect(tileInteractionSource, &T::doubleClicked, 
+    connect(tileInteractionSource, &T::doubleClicked,
         handler, &TileInteractionHandler::handleDoubleClick);
 
     connect(tileInteractionSource, &T::dragStarted,
@@ -485,7 +485,7 @@ TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport
         return ActionSupport::supported;
 
     if (const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        previewResource->hasFlags(Qn::ResourceFlag::fake))
+        previewResource && previewResource->hasFlags(Qn::ResourceFlag::fake))
     {
         if (auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
             context->initializeConnectionWithUserInteraction();
