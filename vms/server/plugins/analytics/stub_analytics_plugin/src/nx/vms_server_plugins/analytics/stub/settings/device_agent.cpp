@@ -186,7 +186,6 @@ void DeviceAgent::processActiveSettings(
     nx::kit::Json* inOutSettingsModel,
     std::map<std::string, std::string>* inOutSettingsValues)
 {
-
     Json::array sections = (*inOutSettingsModel)[kSections].array_items();
     auto activeSettingsSectionIt = std::find_if(sections.begin(), sections.end(),
         [](Json& section)

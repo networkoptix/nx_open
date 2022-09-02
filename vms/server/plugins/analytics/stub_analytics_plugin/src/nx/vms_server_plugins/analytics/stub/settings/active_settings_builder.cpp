@@ -29,7 +29,7 @@ void ActiveSettingsBuilder::addDefaultRule(
 void ActiveSettingsBuilder::updateSettings(
     const std::string& activeSettingId,
     nx::kit::Json* inOutSettingsModel,
-    std::map<std::string, std::string>* inOutSettingsValues)
+    std::map<std::string, std::string>* inOutSettingsValues) const
 {
     ActiveSettingKey key{activeSettingId, (*inOutSettingsValues)[activeSettingId]};
 

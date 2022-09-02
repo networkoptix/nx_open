@@ -13,9 +13,6 @@ namespace analytics {
 namespace stub {
 namespace settings {
 
-static const std::string kEnginePluginSideSetting = "testPluginSideSpinBox";
-static const std::string kEnginePluginSideSettingValue = "42";
-
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
@@ -40,6 +37,12 @@ protected:
     virtual void doGetSettingsOnActiveSettingChange(
         nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
         const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) override;
+
+private:
+    bool processActiveSettings(
+        nx::kit::Json::object* model,
+        std::map<std::string, std::string>* values,
+        const std::vector<std::string>& settingIdsToUpdate = {}) const;
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;

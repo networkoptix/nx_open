@@ -47,7 +47,7 @@ static const std::string kDefaultActiveRadioButtonGroupValue = "Some value";
 
 static const std::string kShowMessageButtonId = "showMessageButton";
 static const std::string kShowUrlButtonId = "showUrlButton";
-static const std::string kParametersModel = /*suppress newline*/ 1 + (const char*) R"json(
+static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 {
     "type": "Settings",
     "items":
@@ -62,6 +62,144 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + (const char
 )json";
 
 // ------------------------------------------------------------------------------------------------
+static const std::string kEnginePluginSideSetting = "testPluginSideSpinBox";
+static const std::string kEnginePluginSideSettingValue = "42";
+static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json("
+{
+    "type": "Settings",
+    "items":
+    [
+        {
+            "type": "GroupBox",
+            "caption": "Example Stub Engine settings",
+            "items":
+            [
+                {
+                    "type": "TextField",
+                    "name": "text",
+                    "caption": "Text Field",
+                    "description": "A text field",
+                    "defaultValue": "a text"
+                },
+                {
+                    "type": "PasswordField",
+                    "name": "passwordField1",
+                    "caption": "Password Field",
+                    "description": "A password field",
+                    "defaultValue": "1234",
+                    "validationErrorMessage": "Password must contain only digits",
+                    "validationRegex": "^[0-9]+$",
+                    "validationRegexFlags": "i"
+                },
+                {
+                    "type": "SpinBox",
+                    "name": "testSpinBox",
+                    "caption": "Spin Box",
+                    "defaultValue": 42,
+                    "minValue": 0,
+                    "maxValue": 100
+                },
+                {
+                    "type": "SpinBox",
+                    "name": ")json" + kEnginePluginSideSetting + R"json(",
+                    "caption": "Spin Box (plugin side)",
+                    "defaultValue": 42,
+                    "minValue": 0,
+                    "maxValue": 100
+                },
+                {
+                    "type": "DoubleSpinBox",
+                    "name": "testDoubleSpinBox",
+                    "caption": "Double Spin Box",
+                    "defaultValue": 3.1415,
+                    "minValue": 0.0,
+                    "maxValue": 100.0
+                },
+                {
+                    "type": "ComboBox",
+                    "name": "testComboBox",
+                    "caption": "Combo Box",
+                    "defaultValue": "value2",
+                    "range": ["value1", "value2", "value3"]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "testCheckBox",
+                    "caption": "Check Box",
+                    "defaultValue": true
+                },
+                {
+                    "type": "Link",
+                    "caption": "Customer Support",
+                    "url": "https://example.com/"
+                },
+                {
+                    "type": "Banner",
+                    "icon": "info",
+                    "text": "Some text"
+                },
+                {
+                    "type": "Placeholder",
+                    "header": "Header",
+                    "description": "Description",
+                    "icon": "default"
+                }
+            ]
+        },
+        {
+            "type": "GroupBox",
+            "caption": ")json" + kActiveSettingsGroupBoxCaption + R"json(",
+            "items":
+            [
+                {
+                    "type": "ComboBox",
+                    "name": ")json" + kActiveComboBoxId + R"json(",
+                    "caption": "Active ComboBox",
+                    "defaultValue": "Some value",
+                    "isActive": true,
+                    "range":
+                    [
+                        "Some value",
+                        ")json" + kShowAdditionalComboBoxValue + R"json("
+                    ]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": ")json" + kActiveCheckBoxId + R"json(",
+                    "caption": "Active CheckBox",
+                    "defaultValue": false,
+                    "isActive": true
+                },
+                {
+                    "type": "RadioButtonGroup",
+                    "name": ")json" + kActiveRadioButtonGroupId + R"json(",
+                    "caption": "Active RadioButton Group",
+                    "defaultValue": "Some value",
+                    "isActive": true,
+                    "range":
+                    [
+                        "Some value",
+                        ")json" + kShowAdditionalRadioButtonValue + R"json("
+                    ]
+                },
+                {
+                    "type": "Button",
+                    "name": ")json" + kShowMessageButtonId + R"json(",
+                    "caption": "Show Message...",
+                    "isActive": true,
+                    "parametersModel": )json" + kParametersModel + R"json(
+                },
+                {
+                    "type": "Button",
+                    "name": ")json" + kShowUrlButtonId + R"json(",
+                    "caption": "Show Webpage...",
+                    "isActive": true
+                }
+            ]
+        }
+    ]
+}
+)json";
 
 static const std::string kAlternativeSettingsModel =
     /*suppress newline*/ 1 + (const char*) R"json("

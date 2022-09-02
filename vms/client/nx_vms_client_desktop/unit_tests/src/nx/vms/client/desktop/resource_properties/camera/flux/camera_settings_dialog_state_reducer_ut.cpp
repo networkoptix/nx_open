@@ -4,6 +4,10 @@
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
@@ -765,6 +769,48 @@ TEST_F(CameraSettingsDialogStateReducerTest, cameraRotationSaveLoad)
     EXPECT_TRUE(third.imageControl.rotationAvailable);
     EXPECT_TRUE(third.imageControl.rotation.hasValue());
     EXPECT_EQ(third.imageControl.rotation.get(), StandardRotation::rotate90);
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, resetDeviceAgentData)
+{
+    const auto engineId = QnUuid::createUuid();
+
+    const State::AnalyticsSettings::EngineSettings initialSettings = {
+        .model = {{"name", "base model"}},
+        .values = {
+            .base = QJsonObject{{"name", "base value"}},
+            .user = QJsonObject{{"name", "user value"}}
+        }
+    };
+
+    auto initial =
+        [&]{ return State{ .analytics = { .settingsByEngineId = {{engineId, initialSettings}}}}; };
+
+    const QJsonObject newBaseValues = {{"name", "new base value"}};
+    const QJsonObject newUserValues = {{"name", "new user value"}};
+    const QJsonObject newModel = {{"name", "new model"}};
+
+    auto [result1, baseReset]  = Reducer::resetDeviceAgentData(
+        initial(),
+        engineId,
+        {.model = newModel, .values = newBaseValues},
+        /*replaceUser*/ false);
+
+    const auto& baseResetSettings = baseReset.analytics.settingsByEngineId[engineId];
+    EXPECT_EQ(baseResetSettings.values.base, newBaseValues);
+    EXPECT_FALSE(baseResetSettings.values.user.has_value());
+    EXPECT_EQ(baseResetSettings.model, newModel);
+
+    auto [result2, userReplace] = Reducer::resetDeviceAgentData(
+        initial(),
+        engineId,
+        {.model = newModel, .values = newUserValues},
+        /*replaceUser*/ true);
+
+    const auto& userReplaceSettings = userReplace.analytics.settingsByEngineId[engineId];
+    EXPECT_EQ(userReplaceSettings.values.base, initialSettings.values.base);
+    EXPECT_EQ(userReplaceSettings.values.user, newUserValues);
+    EXPECT_EQ(userReplaceSettings.model, newModel);
 }
 
 } // namespace test
