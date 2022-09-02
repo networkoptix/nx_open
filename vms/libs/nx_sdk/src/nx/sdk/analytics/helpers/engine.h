@@ -64,6 +64,16 @@ protected:
     std::string settingValue(const std::string& settingName) const;
 
     /**
+     * Provides access to the Engine global settings stored by the Server.
+     *
+     * ATTENTION: If settingsReceived() has not been called yet, it means that the Engine has not
+     * received its settings from the Server yet, and thus this method will yield empty values.
+     *
+     * @return Current settings.
+     */
+    std::map<std::string, std::string> currentSettings() const;
+
+    /**
      * Action handler. Called when some Action defined by this Engine is triggered by the Server.
      * @param actionId Id of the Action being triggered.
      * @param objectTrackId Id of an Object Track for which the Action has been triggered.

@@ -166,8 +166,19 @@ public:
 
     static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
 
+    /**
+     * Resets Analytics Device Agent Data.
+     * @param state State.
+     * @param engineId Engine id.
+     * @param values New Device Agent Data.
+     * @param replaceUser Replaces user values if true, otherwise resets user and base values.
+     * @return Updated state.
+     */
     static std::pair<bool, State> resetDeviceAgentData(
-        State state, const QnUuid& engineId, const DeviceAgentData& values, bool resetUser = true);
+        State state,
+        const QnUuid& engineId,
+        const DeviceAgentData& values,
+        bool replaceUser = false);
 
     static State setVirtualCameraIgnoreTimeZone(State state, bool value);
     static State setVirtualCameraMotionDetectionEnabled(State state, bool value);
