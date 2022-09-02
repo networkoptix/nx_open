@@ -516,12 +516,16 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         QnNetworkResourcePtr existingRes = resPool->getNetworkResourceByPhysicalId( camRes->getPhysicalId() );
         if( existingRes )
         {
-            /* Speed optimization for ARM servers. --akolesnikov */
+
+            // Existing camera resource could has empty url in case of Undo camera replacement. At this case allow
+            // to find new camera and change 'manual' flag from true to false.
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
-            if( existingCamRes && existingCamRes->isManuallyAdded() )
+            if( existingCamRes && existingCamRes->isManuallyAdded() 
+                && !existingCamRes->getUrl().isEmpty())
             {
                 if (nx::build_info::isEdgeServer())
                 {
+                    /* Speed optimization for ARM servers. --akolesnikov */
                     char mac[nx::network::MAC_ADDR_LEN];
                     char* host = nullptr;
                     nx::network::getMacFromPrimaryIF(mac, &host);
