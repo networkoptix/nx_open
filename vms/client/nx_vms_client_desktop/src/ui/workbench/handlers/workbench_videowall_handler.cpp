@@ -251,6 +251,15 @@ LayoutSnapshotManager* snapshotManager()
     return appContext()->currentSystemContext()->layoutSnapshotManager();
 }
 
+// Main window geometry should have position in physical coordinates and size - in logical.
+QRect mainWindowGeometry(const QnScreenSnaps& snaps)
+{
+    if (!snaps.isValid())
+        return {};
+
+    return snaps.geometry(nx::gui::Screens::logicalGeometries());
+}
+
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
@@ -732,8 +741,6 @@ void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, const QnVide
         << videoWallId.toString()
         << "--videowall-instance"
         << item.uuid.toString()
-        << "--screen"
-        << QString::number(leftmostScreen)
         << "--auth"
         << QnStartupParameters::createAuthenticationString(logonData);
 
@@ -3204,53 +3211,25 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
 
 void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps& screenSnaps)
 {
-    const QRect targetGeometry = screenSnaps.geometry(nx::gui::Screens::geometries());
+    if (!NX_ASSERT(screenSnaps.isValid()))
+        return;
+
+    // Target geometry will be used in QWidget::setGeometry(), so it expects physical coordinates
+    // for window position and logical coordinates for it's size.
+    const QRect targetGeometry = mainWindowGeometry(screenSnaps);
+
+    if (!NX_ASSERT(targetGeometry.isValid()))
+        return;
+
     if (!m_geometrySetter)
         m_geometrySetter.reset(new GeometrySetter(mainWindowWidget()));
 
-    QRect actualGeometry = targetGeometry;
-    if (ini().videoWallHiDpiMode == 1)
-    {
-        if (qApp->devicePixelRatio() > 1.0)
-        {
-            actualGeometry = QRect(
-                targetGeometry.x() / 2,
-                targetGeometry.y() / 2,
-                targetGeometry.width() / 2,
-                targetGeometry.height() / 2);
-        }
-    }
-    else if (ini().videoWallHiDpiMode == 2)
-    {
-        static constexpr int kErrorValue = std::numeric_limits<int>::min();
-        auto askCoord =
-            [this](QString question, int value) -> int
-            {
-                bool ok = true;
-                auto result = QInputDialog::getInt(
-                    mainWindowWidget(), question, question, value, -10000, 10000, 1, &ok);
-                if (!ok)
-                    return kErrorValue;
-                return result;
-            };
-
-        int x = askCoord("X", targetGeometry.x());
-        if (x == kErrorValue)
-            return;
-        int y = askCoord("Y", targetGeometry.y());
-        if (y == kErrorValue)
-            return;
-        int w = askCoord("Width", targetGeometry.width());
-        if (w == kErrorValue)
-            return;
-        int h = askCoord("Height", targetGeometry.height());
-        if (h == kErrorValue)
-            return;
-
-        actualGeometry = QRect(x, y, w, h);
-    }
-
-    m_geometrySetter->changeGeometry(actualGeometry);
+    // Geometry must be changed twice: after the first time window screen is updated correctly, so
+    // on the second time it is correctly used for QWidget internal dpi-aware calculations.
+    m_geometrySetter->changeGeometry(targetGeometry);
+    executeDelayedParented(
+        [this, targetGeometry]{ m_geometrySetter->changeGeometry(targetGeometry); },
+        this);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(
