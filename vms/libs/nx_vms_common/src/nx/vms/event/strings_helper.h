@@ -50,6 +50,7 @@ public:
 
     /**
      * @brief eventDescription      Form full event description, split to lines.
+     * Used as notification tooltip only.
      * @param action                Action that describes the event.
      * @param aggregationInfo       Aggregation details if events were aggregated.
      * @param detailLevel           Format of resource names.

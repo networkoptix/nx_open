@@ -3,13 +3,10 @@
 #pragma once
 
 #include <chrono>
-#include <unordered_map>
 
 #include <QtCore/QObject>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QString>
 
-#include <nx/vms/api/rules/event_info.h>
+#include <nx/utils/uuid.h>
 
 #include "manifest.h"
 #include "rules_fwd.h"

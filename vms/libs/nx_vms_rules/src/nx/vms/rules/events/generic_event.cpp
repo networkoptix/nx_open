@@ -15,10 +15,12 @@ GenericEvent::GenericEvent(
     State state,
     const QString& caption,
     const QString& description,
-    const QString& source)
+    const QString& source,
+    const QnUuidList& deviceIds)
     :
     base_type(timestamp, caption, description),
-    m_source(source)
+    m_source(source),
+    m_deviceIds(deviceIds)
 {
     setState(state);
 }
@@ -38,6 +40,8 @@ QVariantMap GenericEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kSourceNameDetailName, source());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
+    utils::insertIcon(result, icon());
+    utils::insertClientAction(result, ClientAction::previewCameraOnTime);
 
     return result;
 }
@@ -47,6 +51,11 @@ QString GenericEvent::extendedCaption() const
     return m_source.isEmpty()
         ? tr("Generic Event")
         : tr("Generic Event at %1").arg(m_source);
+}
+
+Icon GenericEvent::icon() const
+{
+    return deviceIds().isEmpty() ? Icon::alert : Icon::camera;
 }
 
 const ItemDescriptor& GenericEvent::manifest()

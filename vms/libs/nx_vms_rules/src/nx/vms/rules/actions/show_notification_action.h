@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 #include <analytics/common/object_metadata.h>
 #include <nx/vms/event/level.h>
 #include <nx/vms/rules/client_action.h>
@@ -28,6 +30,7 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(bool, acknowledge, setAcknowledge)
     FIELD(QnUuid, serverId, setServerId)
     FIELD(QnUuid, cameraId, setCameraId)
+    FIELD(QnUuidList, deviceIds, setDeviceIds)
 
     // Analytics data fields.
     FIELD(QString, objectTypeId, setObjectTypeId)

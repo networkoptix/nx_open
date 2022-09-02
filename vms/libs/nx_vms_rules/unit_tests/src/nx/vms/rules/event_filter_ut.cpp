@@ -62,7 +62,8 @@ protected:
             State::instant,
             source,
             caption,
-            description);
+            description,
+            QnUuidList());
     }
 
     std::unique_ptr<EventFilter> filter;

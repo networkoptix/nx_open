@@ -17,15 +17,72 @@
 #include <nx/vms/common/system_context.h>
 
 #include "action_field.h"
+#include "action_fields/optional_time_field.h"
 #include "action_fields/target_user_field.h"
 #include "aggregated_event.h"
 #include "aggregator.h"
 #include "basic_action.h"
 #include "basic_event.h"
+#include "engine.h"
 #include "utils/field.h"
 #include "utils/type.h"
 
 namespace nx::vms::rules {
+
+namespace {
+
+EventPtr permissionFilter(
+    const EventPtr& event,
+    const QnUserResourcePtr& user,
+    const nx::vms::common::SystemContext* context)
+{
+    const auto cameraResource =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+            utils::getField<QnUuid>(event, utils::kCameraIdFieldName));
+
+    if (cameraResource
+        && !context->resourceAccessManager()->hasPermission(
+            user,
+            cameraResource,
+            Qn::Permission::ViewContentPermission))
+    {
+        return {};
+    }
+
+    const auto deviceIds = utils::getField<QnUuidList>(event, utils::kDeviceIdsFieldName);
+    if (deviceIds.isEmpty())
+        return event;
+
+    QnUuidList filteredDeviceIds;
+
+    for (const auto deviceId : deviceIds)
+    {
+        const auto deviceResource =
+            context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+        if (deviceResource
+            && context->resourceAccessManager()->hasPermission(
+                user,
+                deviceResource,
+                Qn::Permission::ViewContentPermission))
+        {
+            filteredDeviceIds << deviceId;
+        }
+    }
+
+    if (filteredDeviceIds.isEmpty())
+        return {};
+
+    if (filteredDeviceIds.size() != deviceIds.size())
+    {
+        auto clone = Engine::instance()->cloneEvent(event);
+        clone->setProperty(utils::kDeviceIdsFieldName, QVariant::fromValue(filteredDeviceIds));
+        return clone;
+    }
+
+    return event;
+}
+
+} // namespace
 
 using namespace std::chrono;
 
@@ -261,21 +318,7 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
         const auto filter =
             [&user, context = targetUsersField->systemContext()](const EventPtr& event)
             {
-                auto cameraIdProperty = event->property(utils::kCameraIdFieldName);
-                if (!cameraIdProperty.isValid() || !cameraIdProperty.canConvert<QnUuid>())
-                    return true;
-
-                QnUuid cameraId = cameraIdProperty.value<QnUuid>();
-
-                const auto cameraResource =
-                    context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
-                if (!cameraResource)
-                    return true;
-
-                return context->resourceAccessManager()->hasPermission(
-                    user,
-                    cameraResource,
-                    Qn::Permission::ViewContentPermission);
+                return permissionFilter(event, user, context);
             };
 
         auto filteredAggregatedEvent = aggregatedEvent->filtered(filter);
@@ -308,21 +351,19 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);
     for (const auto& propertyName: propertyNames)
     {
-        const auto propertyNameUtf8 = propertyName.toUtf8();
-
         if (m_fields.contains(propertyName))
         {
             auto& field = m_fields.at(propertyName);
             const auto value = field->build(aggregatedEvent);
-            action->setProperty(propertyNameUtf8, value);
+            action->setProperty(propertyName, value);
         }
         else
         {
             // Set property value only if it exists.
-            if (action->property(propertyNameUtf8).isValid()
-                && aggregatedEvent->property(propertyNameUtf8).isValid())
+            if (action->property(propertyName).isValid()
+                && aggregatedEvent->property(propertyName).isValid())
             {
-                action->setProperty(propertyNameUtf8, aggregatedEvent->property(propertyNameUtf8));
+                action->setProperty(propertyName, aggregatedEvent->property(propertyName));
             }
         }
     }

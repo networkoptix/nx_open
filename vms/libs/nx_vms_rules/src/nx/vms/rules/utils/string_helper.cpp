@@ -94,11 +94,14 @@ QString StringHelper::plugin(QnUuid pluginId) const
 
 QString StringHelper::resource(QnUuid resourceId, Qn::ResourceInfoLevel detailLevel) const
 {
-    auto resource = systemContext()->resourcePool()->getResourceById(resourceId);
-    if (!resource)
-        return {};
+    return resource(systemContext()->resourcePool()->getResourceById(resourceId), detailLevel);
+}
 
-    return QnResourceDisplayInfo(resource).toString(detailLevel);
+QString StringHelper::resource(
+    const QnResourcePtr& resource,
+    Qn::ResourceInfoLevel detailLevel) const
+{
+    return resource ? QnResourceDisplayInfo(resource).toString(detailLevel) : QString();
 }
 
 QString StringHelper::resourceIp(QnUuid resourceId) const

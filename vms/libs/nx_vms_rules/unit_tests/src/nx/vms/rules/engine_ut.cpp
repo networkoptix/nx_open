@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
@@ -336,6 +337,39 @@ TEST_F(EngineTest, resetRules)
     EXPECT_CALL(mockEvents, onRulesReset());
     EXPECT_TRUE(engine->updateRule(ruleData1));
     engine->resetRules({});
+}
+
+TEST_F(EngineTest, cloneEvent)
+{
+    ASSERT_TRUE(engine->registerEvent(TestEvent::manifest(), testEventConstructor));
+
+    const auto original = TestEventPtr::create(
+        std::chrono::microseconds(123456),
+        State::instant);
+
+    original->m_cameraId = QnUuid::createUuid();
+    original->m_text = "Test text";
+    original->m_intField = 42;
+    original->m_floatField = 3.14f;
+
+    const auto basicCopy = engine->cloneEvent(original);
+    ASSERT_TRUE(basicCopy);
+
+    const auto copy = basicCopy.dynamicCast<TestEvent>();
+    EXPECT_TRUE(copy);
+    EXPECT_EQ(original->type(), copy->type());
+    EXPECT_NE(original, copy);
+
+    for (const auto propName :
+        nx::utils::propertyNames(original.get(), nx::utils::PropertyAccess::readable))
+    {
+        static const QSet<QString> kNoComparator = {"attributes"};
+        if (kNoComparator.contains(propName))
+            continue;
+
+        SCOPED_TRACE(nx::format("Prop name: %1", propName).toStdString());
+        EXPECT_EQ(original->property(propName), copy->property(propName));
+    }
 }
 
 } // nx::vms::rules::test

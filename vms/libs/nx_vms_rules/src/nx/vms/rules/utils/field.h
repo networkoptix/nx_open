@@ -2,14 +2,16 @@
 
 #pragma once
 
-#include "../action_fields/extract_detail_field.h"
-#include "../action_fields/optional_time_field.h"
-#include "../event_fields/state_field.h"
+#include "../basic_event.h"
 #include "../manifest.h"
+#include "../rules_fwd.h"
+
+#include <nx/utils/log/assert.h>
 
 namespace nx::vms::rules::utils {
 
 static constexpr auto kCameraIdFieldName = "cameraId";
+static constexpr auto kDeviceIdsFieldName = "deviceIds";
 static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
@@ -17,37 +19,29 @@ static constexpr auto kServerIdFieldName = "serverId";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kUsersFieldName = "users";
 
-inline FieldDescriptor makeIntervalFieldDescriptor(
+FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
-    const QString& description = {})
-{
-    return makeFieldDescriptor<OptionalTimeField>(
-        kIntervalFieldName,
-        displayName,
-        description,
-        {});
-}
+    const QString& description = {});
 
-inline FieldDescriptor makeStateFieldDescriptor(
+FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
-    const QString& description = {})
-{
-    return makeFieldDescriptor<StateField>(
-        kStateFieldName,
-        displayName,
-        description,
-        {});
-}
+    const QString& description = {});
 
-inline FieldDescriptor makeExtractDetailFieldDescriptor(
+FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
-    const QString& detailName)
+    const QString& detailName);
+
+template <class T>
+T getField(const EventPtr& event, const char* fieldName, T&& defaultValue = T())
 {
-    return makeFieldDescriptor<ExtractDetailField>(
-        fieldName,
-        fieldName,
-        {},
-        {{ "detailName", detailName }});
+    if (!NX_ASSERT(event))
+        return std::forward<T>(defaultValue);
+
+    const auto value = event->property(fieldName);
+    if (!value.isValid() || !value.canConvert<T>())
+        return std::forward<T>(defaultValue);
+
+    return value.value<T>();
 }
 
 } // namespace nx::vms::rules::utils

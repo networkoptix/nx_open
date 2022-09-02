@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
+#include "../basic_event.h"
+#include "../data_macros.h"
 
 namespace nx::vms::rules {
 
@@ -11,10 +12,11 @@ class NX_VMS_RULES_API BackupFinishedEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.archiveBackupFinished")
 
+    FIELD(QnUuid, serverId, setServerId)
+
 public:
     virtual QVariantMap details(common::SystemContext* context) const override;
 
-    static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
 
 private:

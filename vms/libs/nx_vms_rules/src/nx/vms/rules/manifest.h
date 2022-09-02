@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QMap>
+#include <QtCore/QString>
 #include <QtCore/QVariant>
 
 #include "field.h"
