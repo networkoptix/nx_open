@@ -337,12 +337,16 @@ void HttpServerConnection::prepareAndSendResponse(
     if (responseMessageContext->msgBody && responseMessageContext->msgBody->contentLength())
         responseContentLengthStr = std::to_string(*responseMessageContext->msgBody->contentLength());
 
-    NX_VERBOSE(this, nx::format("%1 - %2 [%3] \"%4\" %5 %6")
-        .args(getForeignAddress().address, "?" /*username*/, // TODO: #akolesnikov Fetch username.
+    const auto requestProcessedIn = std::chrono::floor<std::chrono::milliseconds>(
+        clock_type::now() - responseMessageContext->requestReceivedTime);
+
+    NX_VERBOSE(this, "%1 - %2 [%3] \"%4\" %5 %6 %7",
+            getForeignAddress().address, "?" /*username*/, // TODO: #akolesnikov Fetch username.
             nx::utils::timestampToRfc2822(nx::utils::utcTime()),
             requestDescriptor.requestLine.toString(),
             responseMessageContext->msg.response->statusLine.statusCode,
-            responseContentLengthStr));
+            responseContentLengthStr,
+            requestProcessedIn.count());
 
     addResponseHeaders(
         requestDescriptor,
