@@ -10,7 +10,7 @@
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>

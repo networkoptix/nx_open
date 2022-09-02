@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "resource_list_sorted_model.h"
-#include <nx/vms/client/desktop/resources/search_helper.h>
+#include <nx/vms/client/desktop/resource/search_helper.h>
 #include <ui/models/resource/resource_compare_helper.h>
 #include <core/resource/resource.h>
 #include <client/client_globals.h>

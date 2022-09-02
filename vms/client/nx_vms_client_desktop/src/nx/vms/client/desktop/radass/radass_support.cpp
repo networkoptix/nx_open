@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 

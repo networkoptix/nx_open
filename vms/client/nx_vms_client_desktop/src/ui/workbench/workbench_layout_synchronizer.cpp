@@ -3,7 +3,7 @@
 #include "workbench_layout_synchronizer.h"
 
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>

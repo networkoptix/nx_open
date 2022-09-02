@@ -16,7 +16,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
 
 namespace nx::vms::client::desktop {
 

@@ -80,6 +80,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
@@ -90,7 +91,6 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
@@ -1909,7 +1909,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
-    if (period.isEmpty()) 
+    if (period.isEmpty())
     {
         if (!isPreviewSearchLayout)
             return;

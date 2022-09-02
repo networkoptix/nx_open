@@ -25,8 +25,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>

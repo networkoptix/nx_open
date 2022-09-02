@@ -17,6 +17,7 @@
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
@@ -40,7 +41,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 
 using namespace nx::vms::client::desktop;
 
