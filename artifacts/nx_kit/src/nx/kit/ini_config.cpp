@@ -30,67 +30,11 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // Utils
 
-static bool isWhitespace(char c)
-{
-    // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do.
-    return (((unsigned char) c) <= 32) || (c == 127);
-}
-
-static void skipWhitespace(const char** const pp)
-{
-    while (**pp != '\0' && isWhitespace(**pp))
-        ++(*pp);
-}
-
 template<typename Value> struct TypeId {};
 template<> struct TypeId<bool> { static constexpr auto value = IniConfig::ParamType::boolean; };
 template<> struct TypeId<int> { static constexpr auto value = IniConfig::ParamType::integer; };
 template<> struct TypeId<float> { static constexpr auto value = IniConfig::ParamType::float_; };
 template<> struct TypeId<const char*> { static constexpr auto value = IniConfig::ParamType::string; };
-
-struct ParsedNameValue
-{
-    std::string name; //< Empty if the line must be ignored.
-    std::string value;
-    std::string error; //< Empty on success.
-};
-
-static ParsedNameValue parseNameValue(const std::string& lineStr)
-{
-    ParsedNameValue result;
-
-    const char* p = lineStr.c_str();
-
-    skipWhitespace(&p);
-    if (*p == '\0' || *p == '#') //< Empty or comment line.
-        return result;
-    while (*p != '\0' && *p != '=' && !isWhitespace(*p))
-        result.name += *(p++);
-    if (result.name.empty())
-    {
-        result.error = "The name part (before \"=\") is empty.";
-        return result;
-    }
-    skipWhitespace(&p);
-
-    if (*(p++) != '=')
-    {
-        result.error = "Missing \"=\" after the name " + result.name + ".";
-        return result;
-    }
-    skipWhitespace(&p);
-
-    while (*p != '\0')
-        result.value += *(p++);
-
-    // Trim trailing whitespace in the value.
-    int i = (int) result.value.size() - 1;
-    while (i >= 0 && isWhitespace(result.value[i]))
-        --i;
-    result.value = result.value.substr(0, i + 1);
-
-    return result;
-}
 
 static std::string getEnv(const char* envVar)
 {
@@ -386,7 +330,6 @@ public:
 
 private:
     static std::string validateIniFile(const char* iniFile);
-    bool parseIniFile(std::ostream* output, bool* outputIsNeeded);
     void createDefaultIniFile(std::ostream* output);
     void reloadParams(std::ostream* output, bool* outputIsNeeded) const;
 
@@ -444,42 +387,6 @@ std::string IniConfig::Impl::validateIniFile(const char* iniFile)
     }
 
     return std::string(iniFile);
-}
-
-/**
- * @return Whether the file was not empty.
- */
-bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
-{
-    m_iniMap.clear();
-
-    std::ifstream file(iniFilePath());
-    if (!file.good())
-        return true;
-
-    std::string lineStr;
-    int line = 0;
-    while (std::getline(file, lineStr))
-    {
-        ++line;
-        const ParsedNameValue parsed = parseNameValue(lineStr);
-        if (!parsed.error.empty())
-        {
-            if (output)
-            {
-                *output << iniFile << " ERROR: " << parsed.error << " Line " << line
-                    << ", file " << iniFilePath() << std::endl;
-                if (outputIsNeeded != nullptr)
-                    *outputIsNeeded = true;
-            }
-            continue;
-        }
-
-        if (!parsed.name.empty())
-            m_iniMap[parsed.name] = parsed.value;
-    }
-
-    return line > 0;
 }
 
 void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
@@ -546,39 +453,36 @@ void IniConfig::Impl::reload()
 
     const std::lock_guard<std::mutex> lock(m_reloadMutex);
 
-    std::ostringstream outputString;
-    std::ostream* out = output() ? &outputString : nullptr;
-
+    std::ostringstream out;
     bool outputIsNeeded = m_firstTimeReload;
 
     if (iniFileExists)
     {
-        if (out)
-            *out << iniFile << " [" << iniFilePath() << "]" << std::endl;
-        if (!parseIniFile(out, &outputIsNeeded))
+        out << iniFile << " [" << iniFilePath() << "]" << std::endl;
+
+        bool iniFileIsEmpty = false;
+        if (!nx::kit::utils::parseNameValueFile(
+            iniFilePath(), &m_iniMap, /*errorPrefix*/ iniFile + " ", &out, &iniFileIsEmpty))
         {
-            if (out)
-            {
-                *out << "    ATTENTION: .ini file is empty; filling in defaults." << std::endl;
-                outputIsNeeded = true;
-            }
-            createDefaultIniFile(out);
+            outputIsNeeded = true;
+        }
+        if (iniFileIsEmpty)
+        {
+            out << "    ATTENTION: .ini file is empty; filling in defaults." << std::endl;
+            outputIsNeeded = true;
+            createDefaultIniFile(&out);
         }
     }
     else
     {
-        if (out)
-        {
-            *out << iniFile << " (absent) To fill in defaults, touch " << iniFilePath()
-                << std::endl;
-        }
+        out << iniFile << " (absent) To fill in defaults, touch " << iniFilePath() << std::endl;
         m_iniMap.clear();
     }
 
-    reloadParams(iniFileExists ? out : nullptr, &outputIsNeeded);
+    reloadParams(iniFileExists ? &out : nullptr, &outputIsNeeded);
 
-    if (out && outputIsNeeded)
-        *Impl::output() << outputString.str();
+    if (output() && outputIsNeeded)
+        *output() << out.str();
 
     if (m_firstTimeReload)
         m_firstTimeReload = false;

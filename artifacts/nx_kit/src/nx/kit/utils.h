@@ -17,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 #if defined(QT_CORE_LIB)
     // To be supported in toString().
@@ -261,6 +262,16 @@ std::string toString(P* ptr)
 {
     return toString((const void*) ptr);
 }
+
+//-------------------------------------------------------------------------------------------------
+// Configuration file parsing.
+
+NX_KIT_API bool parseNameValueFile(
+    const std::string& nameValueFilePath,
+    std::map<std::string, std::string>* nameValueMap,
+    const std::string& errorPrefix,
+    std::ostream* out,
+    bool* isFileEmpty);
 
 } // namespace utils
 } // namespace kit
