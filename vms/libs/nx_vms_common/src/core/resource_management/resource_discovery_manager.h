@@ -189,7 +189,9 @@ protected:
 
     QScopedPointer<QTimer> m_timer;
     State m_state;
-    QSet<QString> m_recentlyDeleted;
+
+    // Ignore resources for 1 discovery loop.
+    QSet<QString> m_resourcesToIgnore;
 
     QHash<QnUuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
     QHash<QnUuid, QnManualResourceSearchEntryList> m_searchProcessResults; // TODO: #virtualCamera unused!!!
