@@ -459,7 +459,9 @@ void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem* item,
 
 void QnWorkbenchLayout::clear()
 {
-    qDeleteAll(d->items);
+    // QnWorkbenchItem destructor will remove an item from d->items, so iterating over copy.
+    foreach(QnWorkbenchItem *item, d->items)
+        delete item;
     d->items.clear();
 }
 
