@@ -24,6 +24,7 @@ namespace settings {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::kit;
 
 Engine::Engine(Plugin* plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT, plugin->instanceId()),
@@ -86,10 +87,63 @@ std::string Engine::manifestString() const
     return result;
 }
 
+bool Engine::processActiveSettings(
+    Json::object* model,
+    std::map<std::string, std::string>* values,
+    const std::vector<std::string>& settingIdsToUpdate) const
+{
+    Json::array items = (*model)[kItems].array_items();
+
+    auto activeSettingsGroupBoxIt = std::find_if(items.begin(), items.end(),
+        [](Json& item)
+        {
+            return item[kCaption].string_value() == kActiveSettingsGroupBoxCaption;
+        });
+
+    if (activeSettingsGroupBoxIt == items.cend())
+        return false;
+
+    Json activeSettingsItems = (*activeSettingsGroupBoxIt)[kItems];
+
+    std::vector<std::string> activeSettingIds = settingIdsToUpdate;
+    if (activeSettingIds.empty())
+    {
+        for (const auto item : activeSettingsItems.array_items())
+        {
+            if (item["type"].string_value() == "Button")
+                continue;
+
+            std::string name = item[kName].string_value();
+            activeSettingIds.push_back(name);
+        }
+    }
+
+    for (const auto& settingId: activeSettingIds)
+        m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, values);
+
+    Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();
+    Json::object updatedActiveGroupBox = activeSettingsGroupBoxIt->object_items();
+    updatedActiveGroupBox[kItems] = updatedActiveSettingsItems;
+    *activeSettingsGroupBoxIt = updatedActiveGroupBox;
+    (*model)[kItems] = items;
+
+    return true;
+}
+
 Result<const ISettingsResponse*> Engine::settingsReceived()
 {
+    std::string parseError;
+    Json::object model = Json::parse(kEngineSettingsModel, parseError).object_items();
+
+    std::map<std::string, std::string> values = currentSettings();
+    values[kEnginePluginSideSetting] = kEnginePluginSideSettingValue;
+
+    if (!processActiveSettings(&model, &values))
+        return error(ErrorCode::internalError, "Unable to process the active settings section");
+
     auto settingsResponse = new SettingsResponse();
-    settingsResponse->setValue(kEnginePluginSideSetting, kEnginePluginSideSettingValue);
+    settingsResponse->setModel(makePtr<String>(Json(model).dump()));
+    settingsResponse->setValues(makePtr<StringMap>(values));
 
     return settingsResponse;
 }
@@ -106,37 +160,22 @@ void Engine::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* outResult,
     const IActiveSettingChangedAction* activeSettingChangeAction)
 {
-    using namespace nx::kit;
-
     std::string parseError;
     Json::object model = Json::parse(
         activeSettingChangeAction->settingsModel(), parseError).object_items();
-    Json::array items = model[kItems].array_items();
-
-    auto activeSettingsGroupBoxIt = std::find_if(items.begin(), items.end(),
-        [](Json& item)
-        {
-            return item[kCaption].string_value() == kActiveSettingsGroupBoxCaption;
-        });
-
-    if (activeSettingsGroupBoxIt == items.cend())
-    {
-        *outResult = error(ErrorCode::internalError, "Unable to find the active settings section");
-        return;
-    }
 
     const std::string settingId(activeSettingChangeAction->activeSettingId());
-    Json activeSettingsItems = (*activeSettingsGroupBoxIt)[kItems];
+
     std::map<std::string, std::string> values = toStdMap(shareToPtr(
         activeSettingChangeAction->settingsValues()));
 
-    m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, &values);
+    if (!processActiveSettings(&model, &values, {settingId}))
+    {
+        *outResult =
+            error(ErrorCode::internalError, "Unable to process the active settings section");
 
-    Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();
-    Json::object updatedActiveGroupBox = activeSettingsGroupBoxIt->object_items();
-    updatedActiveGroupBox[kItems] = updatedActiveSettingsItems;
-    *activeSettingsGroupBoxIt = updatedActiveGroupBox;
-    model[kItems] = items;
+        return;
+    }
 
     const auto settingsResponse = makePtr<SettingsResponse>();
     settingsResponse->setValues(makePtr<StringMap>(values));

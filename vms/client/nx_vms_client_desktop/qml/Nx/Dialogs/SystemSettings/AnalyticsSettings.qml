@@ -49,6 +49,7 @@ Item
     {
         id: settingsView
 
+        enabled: !!store && !store.loading
         scrollBarParent: scrollBarParent
 
         anchors.top: parent.top

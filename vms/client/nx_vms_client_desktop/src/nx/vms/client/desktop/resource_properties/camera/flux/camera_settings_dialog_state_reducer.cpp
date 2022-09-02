@@ -2642,13 +2642,24 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
-    State state, const QnUuid& engineId, const DeviceAgentData& data, bool resetUser)
+    State state,
+    const QnUuid& engineId,
+    const DeviceAgentData& data,
+    bool replaceUser)
 {
     auto& settings = state.analytics.settingsByEngineId[engineId];
     settings.model = data.model;
-    settings.values.setBase(data.values);
-    if (resetUser)
+
+    if (replaceUser)
+    {
+        settings.values.setUser(data.values);
+    }
+    else
+    {
+        settings.values.setBase(data.values);
         settings.values.resetUser();
+    }
+
     settings.errors = data.errors;
     settings.loading = data.status != DeviceAgentData::Status::ok;
 

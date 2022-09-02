@@ -47,7 +47,7 @@ public:
     void updateSettings(
         const std::string& activeSettingId,
         nx::kit::Json* inOutSettingsModel,
-        std::map<std::string, std::string>* inOutSettingsValues);
+        std::map<std::string, std::string>* inOutSettingsValues) const;
 
 private:
     std::map<ActiveSettingKey, ActiveSettingHandler> m_rules;
