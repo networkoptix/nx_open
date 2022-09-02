@@ -10,6 +10,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <map>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -149,6 +150,11 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         while (std::getline(inputStream, arg, '\0'))
             args.push_back(arg);
     #endif
+
+    // Ensure at least one element in the return value since we rely on the fact that this
+    // function returns non-empty vector.
+    if (args.empty())
+        args.push_back("");
 
     return args;
 }
@@ -578,6 +584,110 @@ std::string trimString(const std::string& s)
     if (end < start)
         return "";
     return s.substr(start, end - start + 1);
+}
+
+namespace {
+
+//-------------------------------------------------------------------------------------------------
+// Parsing utils.
+
+static bool isWhitespace(char c)
+{
+    // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do.
+    return (((unsigned char) c) <= 32) || (c == 127);
+}
+
+static void skipWhitespace(const char** const pp)
+{
+    while (**pp != '\0' && isWhitespace(**pp))
+        ++(*pp);
+}
+
+struct ParsedNameValue
+{
+    std::string name; //< Empty if the line must be ignored.
+    std::string value;
+    std::string error; //< Empty on success.
+};
+
+static ParsedNameValue parseNameValue(const std::string& lineStr)
+{
+    ParsedNameValue result;
+
+    const char* p = lineStr.c_str();
+
+    skipWhitespace(&p);
+    if (*p == '\0' || *p == '#') //< Empty or comment line.
+        return result;
+    while (*p != '\0' && *p != '=' && !isWhitespace(*p))
+        result.name += *(p++);
+    if (result.name.empty())
+    {
+        result.error = "The name part (before \"=\") is empty.";
+        return result;
+    }
+    skipWhitespace(&p);
+
+    if (*(p++) != '=')
+    {
+        result.error = "Missing \"=\" after the name " + result.name + ".";
+        return result;
+    }
+    skipWhitespace(&p);
+
+    while (*p != '\0')
+        result.value += *(p++);
+
+    // Trim trailing whitespace in the value.
+    int i = (int) result.value.size() - 1;
+    while (i >= 0 && isWhitespace(result.value[i]))
+        --i;
+    result.value = result.value.substr(0, i + 1);
+
+    return result;
+}
+
+} // namespace
+
+bool parseNameValueFile(
+    const std::string& nameValueFilePath,
+    std::map<std::string, std::string>* nameValueMap,
+    const std::string& errorPrefix,
+    std::ostream* output,
+    bool* isFileEmpty)
+{
+    nameValueMap->clear();
+
+    std::ifstream file(nameValueFilePath);
+    if (!file.good())
+        return false;
+
+    bool result = true;
+
+    std::string lineStr;
+    int line = 0;
+    while (std::getline(file, lineStr))
+    {
+        ++line;
+        const ParsedNameValue parsed = parseNameValue(lineStr);
+        if (!parsed.error.empty())
+        {
+            if (output)
+            {
+                *output << errorPrefix << "ERROR: " << parsed.error << " Line " << line
+                    << ", file " << nameValueFilePath << std::endl;
+            }
+            result = false;
+            continue;
+        }
+
+        if (!parsed.name.empty())
+            (*nameValueMap)[parsed.name] = parsed.value;
+    }
+
+    if (isFileEmpty != nullptr)
+        *isFileEmpty = line == 0;
+    return result;
 }
 
 } // namespace utils
