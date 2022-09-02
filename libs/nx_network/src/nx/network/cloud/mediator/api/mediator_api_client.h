@@ -75,6 +75,8 @@ public:
         nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeerStatistics)> completionHandler);
 
     std::tuple<ResultCode, ListeningPeerStatistics> getListeningPeersStatistics();
+
+    using base_type::makeAsyncCall;
 };
 
 } // namespace nx::hpm::api
