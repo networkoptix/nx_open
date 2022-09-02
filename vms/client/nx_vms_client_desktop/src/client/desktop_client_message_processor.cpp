@@ -5,8 +5,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
-#include <nx/vms/client/desktop/resources/resource_factory.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;

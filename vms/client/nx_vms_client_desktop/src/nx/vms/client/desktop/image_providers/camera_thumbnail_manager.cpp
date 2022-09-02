@@ -10,7 +10,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>

@@ -7,7 +7,7 @@
 #include <core/resource/videowall_matrix.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 

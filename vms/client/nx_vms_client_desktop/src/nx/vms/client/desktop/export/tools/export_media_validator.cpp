@@ -14,7 +14,7 @@
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
