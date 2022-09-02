@@ -9845,7 +9845,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>使用者連線時間最大值建議設置為 %1(或更低)</translation>
     </message>
   </context>
   <context>
@@ -9905,11 +9905,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Nx 自動建立的自簽憑證</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>此憑證為Nx自動建立、且綁定至%1的自簽憑證</translation>
     </message>
   </context>
   <context>

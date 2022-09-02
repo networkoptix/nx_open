@@ -1701,7 +1701,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>檔案備份失敗 %1</translation>
     </message>
   </context>
   <context>
