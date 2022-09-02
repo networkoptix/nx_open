@@ -53,6 +53,11 @@ std::string Engine::settingValue(const std::string& settingName) const
     return "";
 }
 
+std::map<std::string, std::string> Engine::currentSettings() const
+{
+    return m_settings;
+}
+
 Result<IAction::Result> Engine::executeAction(
     const std::string& /*actionId*/,
     Uuid /*objectTrackId*/,

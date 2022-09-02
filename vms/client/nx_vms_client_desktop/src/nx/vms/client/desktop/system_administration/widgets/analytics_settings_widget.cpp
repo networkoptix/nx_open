@@ -79,9 +79,6 @@ public:
 
     Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId)
     {
-        if (m_previewSettingsModel[engineId])
-            return *m_previewSettingsModel[engineId];
-
         return settingsModelByEngineId.value(engineId);
     }
 
@@ -125,6 +122,12 @@ private:
     void removeEngine(const QnUuid& engineId);
     void updateEngine(const QnUuid& engineId);
     void setErrors(const QnUuid& engineId, const QJsonObject& errors);
+    void resetSettings(
+        const QnUuid& engineId,
+        const QJsonObject& model,
+        const QJsonObject& values,
+        const QJsonObject& errors,
+        bool changed);
 
 public:
     const QScopedPointer<QQuickWidget> view;
@@ -134,7 +137,6 @@ public:
     bool settingsLoading = false;
     QList<rest::Handle> pendingRefreshRequests;
     QList<rest::Handle> pendingApplyRequests;
-    QHash<QnUuid, std::optional<QJsonObject>> m_previewSettingsModel;
     QHash<QnUuid, QJsonObject> m_errors;
 
     QmlProperty<QnUuid> currentEngineId{view.data(), "currentEngineId"};
@@ -257,6 +259,22 @@ void AnalyticsSettingsWidget::Private::setErrors(const QnUuid& engineId, const Q
     emit errorsChanged(engineId);
 }
 
+void AnalyticsSettingsWidget::Private::resetSettings(
+    const QnUuid& engineId,
+    const QJsonObject& model,
+    const QJsonObject& values,
+    const QJsonObject& errors,
+    bool changed)
+{
+    settingsValuesByEngineId[engineId] = SettingsValues{values, changed};
+    settingsModelByEngineId[engineId] = model;
+
+    emit settingsModelChanged(engineId);
+    emit settingsValuesChanged(engineId);
+
+    setErrors(engineId, errors);
+}
+
 void AnalyticsSettingsWidget::Private::activateEngine(const QnUuid& engineId)
 {
     if (enginesWatcher->engineInfo(engineId).id.isNull())
@@ -280,8 +298,6 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
 
-    m_previewSettingsModel[engineId].reset();
-
     const auto engine = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId);
     if (!NX_ASSERT(engine))
         return;
@@ -302,10 +318,12 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
                 if (!success)
                     return;
 
-                settingsValuesByEngineId[engineId] = SettingsValues{result.settingsValues, false};
-                settingsModelByEngineId[engineId] = result.settingsModel;
-                emit settingsModelChanged(engineId);
-                emit settingsValuesChanged(engineId);
+                resetSettings(
+                    engineId,
+                    result.settingsModel,
+                    result.settingsValues,
+                    result.settingsErrors,
+                    /*changed*/ false);
             }),
         thread());
 
@@ -350,9 +368,12 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
                     if (!success)
                         return;
 
-                    settingsValuesByEngineId[engineId] =
-                        SettingsValues{result.settingsValues, false};
-                    emit settingsValuesChanged(engineId);
+                    resetSettings(
+                        engineId,
+                        result.settingsModel,
+                        result.settingsValues,
+                        result.settingsErrors,
+                        /*changed*/ false);
                 }),
             thread());
 
@@ -406,12 +427,12 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
                 if (!success)
                     return;
 
-                settingsValuesByEngineId[engineId] =
-                    SettingsValues{ result.settingsValues, true };
-
-                m_previewSettingsModel[engineId] = result.settingsModel;
-                emit settingsModelChanged(engineId);
-                setErrors(engineId, result.settingsErrors);
+                resetSettings(
+                    engineId,
+                    result.settingsModel,
+                    result.settingsValues,
+                    result.settingsErrors,
+                    /*changed*/ true);
 
                 AnalyticsSettingsActionsHelper::processResult(
                     AnalyticsActionResult{
