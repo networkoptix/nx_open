@@ -45,13 +45,16 @@ struct ScreenManager::Private
 
     void storeScreens()
     {
-        localScreens = nx::gui::Screens::coveredBy(geometry);
+        using nx::gui::Screens;
+        localScreens = Screens::coveredBy(geometry, Screens::physicalGeometries());
         storeScreensOperation.requestOperation();
     }
 
     QPointer<SharedMemoryManager> memory;
     nx::utils::PendingOperation storeScreensOperation;
     QSet<int> localScreens;
+
+    /** Widget geometry converted to physical pixels. */
     QRect geometry;
 };
 

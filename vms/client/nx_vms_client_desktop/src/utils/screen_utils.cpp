@@ -4,16 +4,11 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
-
 #include <QtQml/QtQml>
 
-#include <core/misc/screen_snap.h>
-
-#include <nx/vms/client/core/utils/geometry.h>
-
-#include <nx/utils/log/assert.h>
-
 #include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/utils/geometry.h>
 
 namespace nx {
 namespace gui {
@@ -37,24 +32,23 @@ int Screens::count()
     return QGuiApplication::screens().size();
 }
 
-QList<QRect> Screens::geometries()
+QList<QRect> Screens::physicalGeometries()
 {
     QList<QRect> result;
+    for (const auto screen: QGuiApplication::screens())
+    {
+        const auto rect = screen->geometry();
+        const auto pixelRatio = screen->devicePixelRatio();
+        result.append(QRect(rect.topLeft(), rect.size() * pixelRatio));
+    }
+    return result;
+}
 
-    if (nx::build_info::isMacOsX())
-    {
-        for (const auto screen: QGuiApplication::screens())
-            result.append(screen->geometry());
-    }
-    else
-    {
-        for (const auto screen: QGuiApplication::screens())
-        {
-            const auto rect = screen->geometry();
-            const auto pixelRatio = screen->devicePixelRatio();
-            result.append(QRect(rect.topLeft(), rect.size() * pixelRatio));
-        }
-    }
+QList<QRect> Screens::logicalGeometries()
+{
+    QList<QRect> result;
+    for (const auto screen: QGuiApplication::screens())
+        result.append(screen->geometry());
     return result;
 }
 
@@ -63,9 +57,6 @@ QSet<int> Screens::coveredBy(
     QList<QRect> screenGeometries,
     qreal minAreaOverlapping)
 {
-    if (screenGeometries.empty())
-        screenGeometries = geometries();
-
     NX_ASSERT(!screenGeometries.empty());
     if (screenGeometries.empty())
         return {};
@@ -85,35 +76,10 @@ QSet<int> Screens::coveredBy(
     return result;
 }
 
-QSet<int> Screens::coveredBy(
-    const QnScreenSnaps& screenSnaps,
-    QList<QRect> screenGeometries,
-    qreal minAreaOverlapping)
-{
-    if (screenGeometries.empty())
-        screenGeometries = geometries();
-
-    NX_ASSERT(!screenGeometries.empty());
-    if (screenGeometries.empty())
-        return {};
-
-    const int maxIndex = screenGeometries.size() - 1;
-
-    QRect combinedRect;
-    for (const QnScreenSnap& snap: screenSnaps.values)
-    {
-        const int index = qBound(0, snap.screenIndex, maxIndex);
-        combinedRect = combinedRect.united(screenGeometries[index]);
-    }
-
-    return coveredBy(combinedRect, screenGeometries, minAreaOverlapping);
-}
-
 void Screens::registerQmlType()
 {
     qmlRegisterSingletonType<Screens>("nx.gui", 1, 0, "Screens", &createInstance);
 }
-
 
 } // namespace gui
 } // namespace nx

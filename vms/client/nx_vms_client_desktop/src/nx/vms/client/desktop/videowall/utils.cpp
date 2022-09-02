@@ -16,7 +16,8 @@ QSet<int> screensCoveredByItem(const QnVideoWallItem& item, const QnVideoWallRes
             screenGeometries << screen.desktopGeometry;
     }
 
-    return nx::gui::Screens::coveredBy(item.screenSnaps, screenGeometries);
+    const QRect itemGeometry = item.screenSnaps.geometry(screenGeometries);
+    return nx::gui::Screens::coveredBy(itemGeometry, screenGeometries);
 }
 
 } // namespace nx::vms::client::desktop

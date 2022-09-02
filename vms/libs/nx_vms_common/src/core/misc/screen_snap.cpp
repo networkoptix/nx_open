@@ -45,46 +45,35 @@ bool QnScreenSnaps::isValid() const
     return std::all_of(values.cbegin(), values.cend(), [](const QnScreenSnap &snap) { return snap.isValid(); });
 }
 
-QRect QnScreenSnaps::geometry(const QList<QRect>& screenGeometries) const
+QRect QnScreenSnaps::geometry(const QList<QRect>& screens) const
 {
     if (!isValid())
         return {};
 
-    int maxIndex = screenGeometries.size() - 1;
+    if (!NX_ASSERT(!screens.empty()))
+        return {};
 
-    auto leftCoord =
-        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
-        {
-            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
-            return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
+    auto screen =
+        [&screens](int i) { return i >= 0 && i < screens.size() ? screens[i] : screens[0]; };
 
-    auto topCoord =
-        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
-        {
-            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
-            return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
+    const QRect leftScreen = screen(left().screenIndex);
+    const int x1 = leftScreen.x()
+        + (leftScreen.width() / QnScreenSnap::snapsPerScreen()) * left().snapIndex;
 
-    auto rightCoord =
-        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
-        {
-            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
-            return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
+    const QRect topScreen = screen(top().screenIndex);
+    const int y1 = topScreen.y()
+        + (topScreen.height() / QnScreenSnap::snapsPerScreen()) * top().snapIndex;
 
-    auto bottomCoord =
-        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
-        {
-            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
-            return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
+    const QRect rightScreen = screen(right().screenIndex);
+    const int x2 = rightScreen.right()
+        - (rightScreen.width() / QnScreenSnap::snapsPerScreen()) * right().snapIndex;
 
-    return QRect(
-        QPoint(leftCoord(left()), topCoord(top())),
-        QPoint(rightCoord(right()), bottomCoord(bottom()))
-    ).normalized(); //swap coordinates if screens were moved
+    const QRect bottomScreen = screen(bottom().screenIndex);
+    const int y2 = bottomScreen.bottom()
+        - (bottomScreen.height() / QnScreenSnap::snapsPerScreen()) * bottom().snapIndex;
 
+    // Swap coordinates if screens were moved.
+    return QRect(QPoint(x1, y1), QPoint(x2, y2)).normalized();
 }
 
 QDebug operator<<(QDebug dbg, const QnScreenSnap& snap)

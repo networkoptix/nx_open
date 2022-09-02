@@ -79,9 +79,25 @@ TEST_F(QnLexicalTextFixture, QRect)
     ASSERT_EQ(value, result);
 }
 
+TEST_F(QnLexicalTextFixture, negativeQRect)
+{
+    const QRect value(-1, -2, 5, 17);
+    const auto data = QnLexical::serialized(value);
+    const QRect result = QnLexical::deserialized<QRect>(data);
+    ASSERT_EQ(value, result);
+}
+
 TEST_F(QnLexicalTextFixture, QRectF)
 {
     const QRectF value(1, 2, 5.5, 17.2);
+    const auto data = QnLexical::serialized(value);
+    const QRectF result = QnLexical::deserialized<QRectF>(data);
+    ASSERT_EQ(value, result);
+}
+
+TEST_F(QnLexicalTextFixture, negativeQRectF)
+{
+    const QRectF value(-1, -2, 5.5, 17.2);
     const auto data = QnLexical::serialized(value);
     const QRectF result = QnLexical::deserialized<QRectF>(data);
     ASSERT_EQ(value, result);

@@ -269,7 +269,7 @@ bool serialize(const QRect& value, QString* target)
 
 bool deserialize(const QString& value, QRect* target)
 {
-    std::regex re("^(\\d+),(\\d+),(\\d+)x(\\d+)$");
+    std::regex re("^(-?\\d+),(-?\\d+),(\\d+)x(\\d+)$");
     std::smatch match;
 
     const auto str = value.toStdString();
