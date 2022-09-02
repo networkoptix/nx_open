@@ -6,23 +6,18 @@
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-
 #include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/widgets/videowall_manage_widget.h>
-#include <ui/dialogs/common/message_box.h>
-
+#include <nx/build_info.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/widgets/videowall_manage_widget.h>
 #include <utils/common/scoped_painter_rollback.h>
-
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
-#include <nx/vms/client/core/utils/geometry.h>
 #include <utils/screen_utils.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-
-#include <nx/build_info.h>
 
 using nx::vms::client::core::Geometry;
 using nx::gui::Screens;
@@ -687,7 +682,8 @@ QRect QnVideowallManageWidgetPrivate::targetRect(const QRect& rect) const
 
 void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps& snaps, bool value)
 {
-    QSet<int> screenIdxs = Screens::coveredBy(snaps, q->screenGeometries());
+    const QRect itemRect = snaps.geometry(q->screenGeometries());
+    QSet<int> screenIdxs = Screens::coveredBy(itemRect, q->screenGeometries());
     // if the item takes some screens, it should take them fully
     if (screenIdxs.size() > 1)
     {
@@ -1136,7 +1132,8 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(
 {
     QRect geometry = item.geometry;
 
-    const int screenCount = Screens::coveredBy(item.snaps, q->screenGeometries()).size();
+    const QRect itemRect = item.snaps.geometry(q->screenGeometries());
+    const int screenCount = Screens::coveredBy(itemRect, q->screenGeometries()).size();
     if (multiScreen)
         *multiScreen = screenCount > 1;
 

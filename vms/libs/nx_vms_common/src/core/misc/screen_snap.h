@@ -50,7 +50,7 @@ struct NX_VMS_COMMON_API QnScreenSnaps
 
     bool isValid() const;
 
-    QRect geometry(const QList<QRect>& screenGeometries) const;
+    QRect geometry(const QList<QRect>& screens) const;
 
     bool operator==(const QnScreenSnaps& other) const
     {

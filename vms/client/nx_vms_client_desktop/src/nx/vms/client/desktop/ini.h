@@ -110,9 +110,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "[Dev] Override detected OS variant version value (e.g. \"16.04\").");
 
-    NX_INI_INT(0, videoWallHiDpiMode,
-        "[Dev] Videowall hidpi mode. 0 - old, 1 - new, 2 - manual");
-
     NX_INI_FLAG(false, forceJsonConnection,
         "[Dev] Force desktop client use json data encoding");
 

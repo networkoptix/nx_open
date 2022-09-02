@@ -19,7 +19,10 @@ public:
         /** Index of the screen in the Virtual Desktop. */
         int index;
 
-        /** Position and size of the screen in the Virtual Desktop coordinate system. */
+        /**
+         * Position and size of the screen in the Virtual Desktop coordinate system. Screen size in
+         * physical pixels is used to display relative screen sizes.
+         */
         QRect desktopGeometry;
 
         /**

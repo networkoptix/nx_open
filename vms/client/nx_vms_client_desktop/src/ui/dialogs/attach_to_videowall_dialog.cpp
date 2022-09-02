@@ -31,7 +31,7 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget* parent) :
     ui->setupUi(this);
     setHelpTopic(this, Qn::Videowall_Attach_Help);
 
-    ui->manageWidget->setScreenGeometries(nx::gui::Screens::geometries());
+    ui->manageWidget->setScreenGeometries(nx::gui::Screens::physicalGeometries());
 
     connect(
         ui->manageWidget,
