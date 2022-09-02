@@ -39,8 +39,6 @@ using AggregatedEventPtr = QSharedPointer<AggregatedEvent>;
 
 using EventData = QMap<QString, QJsonValue>; // TODO: #spanasenko Move to separate class?
 
-using FilterManifest = QMap<QString, QString>; //< Field name to field type mapping.
-
 using State = nx::vms::api::rules::State;
 
 } // namespace nx::vms::rules

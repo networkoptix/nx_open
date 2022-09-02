@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>

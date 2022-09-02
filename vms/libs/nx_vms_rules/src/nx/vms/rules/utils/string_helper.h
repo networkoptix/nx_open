@@ -3,8 +3,10 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 
 #include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -27,8 +29,12 @@ public:
     QString timestampDate(std::chrono::microseconds eventTimestamp) const;
     QString timestampTime(std::chrono::microseconds eventTimestamp) const;
     QString plugin(QnUuid pluginId) const;
+
     QString resource(
         QnUuid resourceId,
+        Qn::ResourceInfoLevel detailLevel = Qn::ResourceInfoLevel::RI_NameOnly) const;
+    QString resource(
+        const QnResourcePtr& resource,
         Qn::ResourceInfoLevel detailLevel = Qn::ResourceInfoLevel::RI_NameOnly) const;
     QString resourceIp(QnUuid resourceId) const;
 

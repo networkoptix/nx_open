@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::rules {
@@ -16,7 +18,7 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     camera,
     motion,
     resource,
-    custom);
+    custom)
 
 } // namespace nx::vms::api::rules
 

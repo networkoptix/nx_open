@@ -36,10 +36,12 @@ class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
     Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
 
 public:
     nx::vms::rules::UuidSelection m_users;
     QnUuid m_cameraId;
+    QnUuidList m_deviceIds;
 };
 
 } // namespace nx::vms::rules::test

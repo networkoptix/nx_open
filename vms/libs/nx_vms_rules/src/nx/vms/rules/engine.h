@@ -76,6 +76,12 @@ public:
 
     void resetRules(const std::vector<api::Rule>& rulesData);
 
+    /**
+    * Add rule to the engine or overwrite the existing one.
+    * @return Whether rule added or overwritten successfully.
+    */
+    bool addRule(const api::Rule& serialized);
+
     /** Returns true if rule was added, false otherwise. */
     bool updateRule(const api::Rule& ruleData);
     bool updateRule(std::unique_ptr<Rule> rule);
@@ -141,12 +147,6 @@ public:
     bool isActionFieldRegistered(const QString& fieldId) const;
     bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
 
-    /**
-     * Add rule to the engine or overwrite the existing one.
-     * @return Whether rule added or overwritten successfully.
-     */
-    bool addRule(const api::Rule& serialized);
-
 public:
     /**
      * Builds an event from the eventData and returns it.
@@ -154,6 +154,8 @@ public:
      * for such a type nullptr is returned.
      */
     EventPtr buildEvent(const EventData& eventData) const;
+
+    EventPtr cloneEvent(const EventPtr& event) const;
 
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
     api::EventFilter serialize(const EventFilter* filter) const;

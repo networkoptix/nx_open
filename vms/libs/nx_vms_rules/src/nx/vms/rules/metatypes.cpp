@@ -64,6 +64,9 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::rules::NetworkIssueInfo>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::NetworkIssueInfo>();
 
+    qRegisterMetaType<QnUuidList>("QnUuidList");
+    QnJsonSerializer::registerSerializer<QnUuidList>();
+
     qRegisterMetaType<QnUuidSet>("QnUuidSet");
     QnJsonSerializer::registerSerializer<QnUuidSet>();
 

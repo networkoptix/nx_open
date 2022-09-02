@@ -5,10 +5,10 @@
 #include <chrono>
 
 #include <QtCore/QObject>
-#include <QtCore/QSharedPointer>
 
 #include "field_types.h"
 #include "manifest.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

@@ -27,6 +27,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/aggregation_info.h>
+#include <nx/vms/event/events/license_issue_event.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -103,24 +104,41 @@ QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
     return getResourceByDescriptor(resourceDescriptor);
 }
 
-QnVirtualCameraResourcePtr getCameraResource(
-    QnUuid resourceId,
-    const QString& cloudSystemId,
-    const QString& name)
+// TODO: #amalov Simplify device transfer logic using list only.
+QnVirtualCameraResourceList getActionDevices(
+    const nx::vms::rules::NotificationAction* action,
+    const QString& cloudSystemId)
 {
-    auto result = getResource(resourceId, cloudSystemId);
+    auto deviceIds = action->deviceIds();
+    if (deviceIds.isEmpty())
+        deviceIds << action->cameraId();
 
-    if (!result && !resourceId.isNull() && !cloudSystemId.isEmpty())
+    deviceIds.removeAll(QnUuid());
+
+    if (deviceIds.isEmpty())
+        return {};
+
+    auto context = cloudSystemId.isEmpty()
+        ? nullptr
+        : appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
+
+    QnVirtualCameraResourceList result;
+    for (const auto deviceId : deviceIds)
     {
-        if (const auto context = 
-            appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
+        auto device = getResource(deviceId, cloudSystemId).dynamicCast<QnVirtualCameraResource>();
+
+        if (!device && context)
         {
-            result = context->createThumbCameraResource(resourceId);
-            result->setName(name);
+            device = context->createThumbCameraResource(deviceId);
+            if (deviceIds.count() == 1)
+                device->setName(action->sourceName());
         }
+
+        if (device)
+            result << device;
     }
 
-    return result.dynamicCast<QnVirtualCameraResource>();
+    return result;
 }
 
 } // namespace
@@ -253,7 +271,7 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
-    eventData.sourceName = action->sourceName();
+    eventData.ruleId = action->ruleId();
 
     eventData.objectTrackId = action->objectTrackId();
     eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
@@ -475,11 +493,12 @@ void NotificationListModel::Private::setupClientAction(
 
     const auto server = getResource(action->serverId(), eventData.cloudSystemId)
         .dynamicCast<QnMediaServerResource>();
-    const auto camera = 
-        getCameraResource(action->cameraId(), eventData.cloudSystemId, eventData.sourceName);
+    const auto devices = getActionDevices(action, eventData.cloudSystemId);
+    const auto camera = (devices.count() == 1) ? devices.front() : QnVirtualCameraResourcePtr();
 
     eventData.source = camera ? camera.staticCast<QnResource>() : server.staticCast<QnResource>();
-    eventData.ruleId = action->ruleId();
+    if (eventData.source || !action->serverId().isNull())
+        eventData.sourceName = action->sourceName();
 
     switch (action->clientAction())
     {
@@ -509,12 +528,12 @@ void NotificationListModel::Private::setupClientAction(
             break;
 
         case ClientAction::previewCamera:
-            eventData.cameras = {camera};
+            eventData.cameras = devices;
             eventData.previewCamera = camera;
             break;
 
         case ClientAction::previewCameraOnTime:
-            eventData.cameras = {camera};
+            eventData.cameras = devices;
             eventData.previewCamera = camera;
             eventData.previewTime = action->timestamp();
             break;
@@ -670,10 +689,8 @@ QString NotificationListModel::Private::tooltip(const vms::event::AbstractAction
     if (params.eventType == EventType::licenseIssueEvent
         && params.reasonCode == vms::api::EventReason::licenseRemoved)
     {
-        QStringList disabledCameras;
-        for (const auto& stringId: params.description.split(';'))
+        for (const auto id: nx::vms::event::LicenseIssueEvent::decodeCameras(params))
         {
-            QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
             if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
             {
@@ -715,10 +732,10 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     if (params.eventType >= EventType::userDefinedEvent)
     {
         const auto camList = camera_id_helper::findCamerasByFlexibleId(
-                    resourcePool(),
-                    params.metadata.cameraRefs);
+            resourcePool(),
+            params.metadata.cameraRefs);
         return camList.isEmpty()
-            ? QPixmap()
+            ? qnSkin->pixmap("events/alert.png")
             : toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));
     }
 
@@ -805,16 +822,16 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             return qnSkin->pixmap("events/server.png");
 
         case Icon::camera:
-            return qnSkin->pixmap("events/camera.png");
+            return toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));
 
         case Icon::motion:
             return qnSkin->pixmap("events/motion.svg");
 
         case Icon::resource:
         {
-            const auto resource = getCameraResource(action->cameraId(), cloudSystemId, {});
-            return toPixmap(resource
-                ? qnResIconCache->icon(resource)
+            const auto devices = getActionDevices(action, cloudSystemId);
+            return toPixmap(!devices.isEmpty()
+                ? qnResIconCache->icon(devices.front())
                 : qnResIconCache->icon(QnResourceIconCache::Camera));
         }
 
