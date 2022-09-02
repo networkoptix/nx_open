@@ -544,17 +544,17 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
     {
         NX_MUTEX_LOCKER lock( &m_searchersListMutex );
-        if (!m_recentlyDeleted.empty())
+        if (!m_resourcesToIgnore.empty())
         {
             for (int i = resources.size() - 1; i >= 0; --i)
             {
                 if (auto networkResource = resources[i].dynamicCast<QnNetworkResource>())
                 {
-                    if (m_recentlyDeleted.contains(networkResource->getPhysicalId()))
+                    if (m_resourcesToIgnore.contains(networkResource->getPhysicalId()))
                         resources.removeAt(i);
                 }
             }
-            m_recentlyDeleted.clear();
+            m_resourcesToIgnore.clear();
         }
     }
 
