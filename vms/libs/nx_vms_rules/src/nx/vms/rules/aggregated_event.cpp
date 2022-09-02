@@ -4,6 +4,8 @@
 
 #include <QtCore/QVariant>
 
+#include <nx/utils/log/assert.h>
+
 #include "utils/event_details.h"
 
 namespace nx::vms::rules {
@@ -59,7 +61,7 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
     return eventDetails;
 }
 
-AggregatedEventPtr AggregatedEvent::filtered(const std::function<bool(const EventPtr&)>& filter) const
+AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
 {
     if(uniqueCount() == 0)
         return {};
@@ -67,17 +69,14 @@ AggregatedEventPtr AggregatedEvent::filtered(const std::function<bool(const Even
     AggregationInfoList filteredList;
     for (const auto& aggregationInfo: m_aggregationInfoList)
     {
-        if (filter(aggregationInfo.event))
-            filteredList.push_back(aggregationInfo);
+        if (auto event = filter(aggregationInfo.event))
+            filteredList.push_back(AggregationInfo{event, aggregationInfo.count});
     }
 
     if (filteredList.empty())
         return {};
 
-    AggregatedEventPtr filteredEventAggregator(new AggregatedEvent);
-    filteredEventAggregator->m_aggregationInfoList = filteredList;
-
-    return filteredEventAggregator;
+    return AggregatedEventPtr::create(filteredList);
 }
 
 size_t AggregatedEvent::totalCount() const

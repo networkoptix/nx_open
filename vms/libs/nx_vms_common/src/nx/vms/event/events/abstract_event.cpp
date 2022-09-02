@@ -399,7 +399,7 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
     const auto resources = sourceResources(params, context->resourcePool());
     if (!resources)
     {
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source");
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source", user);
         return true;
     }
 
@@ -415,7 +415,6 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
     NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from %2",
         user, containerString(*resources));
     return false;
-
 }
 
 AbstractEvent::AbstractEvent(

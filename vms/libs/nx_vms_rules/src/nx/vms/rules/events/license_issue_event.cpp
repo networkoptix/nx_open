@@ -20,7 +20,7 @@ LicenseIssueEvent::LicenseIssueEvent(
     :
     BasicEvent(timestamp),
     m_serverId(serverId),
-    m_cameras(disabledCameras)
+    m_deviceIds(disabledCameras.toList())
 {
 }
 
@@ -59,10 +59,10 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
     return kDescriptor;
 }
 
-QString LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) const
+QStringList LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) const
 {
     QnVirtualCameraResourceList disabledCameras =
-        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameras());
+        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds());
 
     if (!NX_ASSERT(!disabledCameras.isEmpty(),
         "At least one camera should be disabled on this event"))
@@ -70,13 +70,20 @@ QString LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) const
         return {};
     }
 
-    return QnDeviceDependentStrings::getNameFromSet(
+    QStringList result;
+    result << QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
         QnCameraDeviceStringSet(
             tr("Not enough licenses. Recording has been disabled on following devices:"),
             tr("Not enough licenses. Recording has been disabled on following cameras:"),
             tr("Not enough licenses. Recording has been disabled on following I/O modules:")),
         disabledCameras);
+
+    const auto stringHelper = utils::StringHelper(context);
+    for(const auto& camera: disabledCameras)
+        result << stringHelper.resource(camera);
+
+    return result;
 }
 
 } // namespace nx::vms::rules

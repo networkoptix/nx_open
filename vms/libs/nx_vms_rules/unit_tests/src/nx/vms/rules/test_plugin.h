@@ -14,9 +14,10 @@ namespace nx::vms::rules::test {
 class TestPlugin: public nx::vms::rules::Plugin
 {
 public:
-    TestPlugin(Engine* engine)
+    TestPlugin(Engine* engine = nullptr)
     {
-        initialize(engine);
+        if (engine)
+            initialize(engine);
     };
 
     virtual void registerFields() const override
@@ -25,12 +26,12 @@ public:
         registerEventField<TestEventField>();
     }
 
-    void registerEvents() const
+    virtual void registerEvents() const override
     {
         registerEvent<TestEvent>();
     }
 
-    void registerActions() const
+    virtual void registerActions() const override
     {
         registerAction<TestProlongedAction>();
     }

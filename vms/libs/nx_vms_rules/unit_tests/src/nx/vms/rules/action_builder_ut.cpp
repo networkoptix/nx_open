@@ -22,7 +22,8 @@
 
 #include "mock_action_builder_events.h"
 #include "test_action.h"
-#include "test_event.h"
+#include "test_plugin.h"
+#include "test_router.h"
 
 namespace nx::vms::rules::test {
 
@@ -41,9 +42,14 @@ public:
     using ActionBuilder::handleAggregatedEvents;
 };
 
-class ActionBuilderTest: public common::test::ContextBasedTest
+class ActionBuilderTest:
+    public common::test::ContextBasedTest,
+    public TestEngineHolder,
+    public TestPlugin
 {
 public:
+    ActionBuilderTest() : TestPlugin(engine.get()) {}
+
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
     {
         return QSharedPointer<ActionBuilder>::create(
@@ -88,16 +94,29 @@ public:
         return builder;
     }
 
-    EventPtr makeSimpleEvent() const
+    TestEventPtr makeSimpleEvent() const
     {
         return TestEventPtr::create(syncTime.currentTimePoint());
     }
 
-    EventPtr makeEventWithCameraId(const QnUuid& cameraId) const
+    TestEventPtr makeEventWithCameraId(const QnUuid& cameraId) const
     {
-        auto event = QSharedPointer<TestEvent>::create(syncTime.currentTimePoint());
+        auto event = makeSimpleEvent();
         event->m_cameraId = cameraId;
         return event;
+    }
+
+    TestEventPtr makeEventWithDeviceIds(const QnUuidList& deviceIds) const
+    {
+        auto event = makeSimpleEvent();
+        event->m_deviceIds = deviceIds;
+        return event;
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        //m_engine = std::make_uni
     }
 
 private:
@@ -316,6 +335,68 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
     auto eventAggregator = AggregatedEventPtr::create(aggregationInfoList);
 
     EXPECT_EQ(eventAggregator->uniqueCount(), 2);
+
+    builder->process(eventAggregator);
+}
+
+TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
+{
+    auto user1 = addUser(GlobalPermission::none);
+    auto cameraOfUser1 = addCamera();
+    sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
+
+    auto user2 = addUser(GlobalPermission::none);
+    auto cameraOfUser2 = addCamera();
+    sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
+
+    UuidSelection selection{
+        .ids = {user1->getId(), user2->getId()},
+        .all = false};
+
+    auto builder = makeBuilderWithTargetUserField(selection);
+
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(2);
+
+    UuidSelection expectedSelection1{
+        .ids = {user1->getId()},
+        .all = false};
+    EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
+    EXPECT_CALL(mock, targetedDeviceIds(QnUuidList{cameraOfUser1->getId()})).Times(1);
+
+    UuidSelection expectedSelection2{
+        .ids = {user2->getId()},
+        .all = false};
+    EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
+    EXPECT_CALL(mock, targetedDeviceIds(QnUuidList{cameraOfUser2->getId()})).Times(1);
+
+    auto eventAggregator = AggregatedEventPtr::create(
+        makeEventWithDeviceIds({cameraOfUser1->getId(), cameraOfUser2->getId()}));
+
+    EXPECT_EQ(eventAggregator->uniqueCount(), 1);
+
+    builder->process(eventAggregator);
+}
+
+TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
+{
+    auto user1 = addUser(GlobalPermission::none);
+
+    UuidSelection selection{ .all = true };
+    auto builder = makeBuilderWithTargetUserField(selection);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(1);
+
+    UuidSelection expectedSelection1{
+        .ids = {user1->getId()},
+        .all = false};
+    EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
+
+    auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
+
+    EXPECT_EQ(eventAggregator->uniqueCount(), 1);
 
     builder->process(eventAggregator);
 }

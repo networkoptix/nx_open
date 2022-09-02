@@ -452,6 +452,21 @@ EventPtr Engine::buildEvent(const EventData& eventData) const
     return event;
 }
 
+EventPtr Engine::cloneEvent(const EventPtr& event) const
+{
+    if (!NX_ASSERT(event))
+        return {};
+
+    auto result = EventPtr(m_eventTypes[event->type()]());
+    for (const auto& propName:
+        nx::utils::propertyNames(event.get(), nx::utils::PropertyAccess::fullAccess))
+    {
+        result->setProperty(propName.constData(), event->property(propName.constData()));
+    }
+
+    return result;
+}
+
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
     if (serialized.eventType.isEmpty())
@@ -697,7 +712,7 @@ void Engine::processEvent(const EventPtr& event)
     NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
     EventData eventData;
-    QSet<QString> eventFields; // TODO: #spanasenko Cache data.
+    QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
     QSet<QnUuid> ruleIds, resources;
 
     // TODO: #spanasenko Add filters-by-type maps?

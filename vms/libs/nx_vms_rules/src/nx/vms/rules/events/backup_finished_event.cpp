@@ -22,13 +22,8 @@ QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
 
 QString BackupFinishedEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add server id to the event
+    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
-}
-
-FilterManifest BackupFinishedEvent::filterManifest()
-{
-    return {};
 }
 
 const ItemDescriptor& BackupFinishedEvent::manifest()

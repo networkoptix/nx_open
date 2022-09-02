@@ -21,6 +21,23 @@ using FormatFunction = std::function<QString(const AggregatedEventPtr&, common::
 
 static const QChar kFunctionPrefix = '@';
 
+QStringList toStringList(const QVariant& value)
+{
+    return value.canConvert<QStringList>() ? value.toStringList() : QStringList();
+}
+
+QString detailToString(const QVariantMap& details, const QString& key)
+{
+    const auto value = details.value(key);
+    return value.canConvert<QString>() ? value.toString() : QString();
+}
+
+QString propertyToString(const AggregatedEventPtr& event, const char* key)
+{
+    const auto value = event->property(key);
+    return value.canConvert<QString>() ? value.toString() : QString();
+}
+
 QString createGuid(const AggregatedEventPtr&, common::SystemContext* context = nullptr)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
@@ -42,14 +59,16 @@ QString eventName(const AggregatedEventPtr& eventAggregator, common::SystemConte
 
 QString eventCaption(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
-    const auto caption = eventAggregator->details(context).value(utils::kCaptionDetailName);
-    if (caption.canConvert<QString>())
-        return caption.toString();
+    auto result = detailToString(eventAggregator->details(context), utils::kCaptionDetailName);
 
-    if (const auto value = eventAggregator->property("caption"); value.canConvert<QString>())
-        return value.toString();
+    if (result.isEmpty())
+        result = propertyToString(eventAggregator, "caption");
 
-    return eventName(eventAggregator, context);
+    if (result.isEmpty())
+        result = eventName(eventAggregator, context);
+
+    NX_ASSERT(!result.isEmpty(), "An event should have a caption");
+    return result;
 }
 
 QString eventDescription(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
@@ -101,17 +120,17 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
         result << TextWithFields::tr("Caption: %1").arg(caption);
     }
 
-    const auto reason = details.value(utils::kReasonDetailName).toString();
-    if (!reason.isEmpty())
-        result << TextWithFields::tr("Reason: %1").arg(reason);
-
     const auto count = details.value(utils::kCountDetailName);
     if (count.canConvert<size_t>())
         result << stringsHelper.timestamp(eventAggregator->timestamp(), count.value<size_t>());
 
-    const auto detailing = details.value(utils::kDetailingDetailName);
-    if (detailing.canConvert<QStringList>())
-        result << detailing.toStringList();
+    if (auto reason = toStringList(details.value(utils::kReasonDetailName)); !reason.isEmpty())
+    {
+        reason.front() = TextWithFields::tr("Reason: %1").arg(reason.front());
+        result << reason;
+    }
+
+    result << toStringList(details.value(utils::kDetailingDetailName));
 
     return result.join(common::html::kLineBreak);
 }

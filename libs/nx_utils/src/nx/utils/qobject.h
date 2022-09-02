@@ -34,7 +34,7 @@ Q_DECLARE_FLAGS(PropertyAccessFlags, PropertyAccess)
  * nullptr. By default QObject properties are excluded, set includeBaseProperties to true to include.
  */
 template<class Base = QObject>
-inline QSet<QString> propertyNames(
+inline QSet<QByteArray> propertyNames(
     const QObject* object,
     PropertyAccessFlags propertyAccessFlags = PropertyAccess::anyAccess,
     bool includeBaseProperties = false)
@@ -49,7 +49,7 @@ inline QSet<QString> propertyNames(
     if (!NX_ASSERT(metaObject->inherits(baseMetaObject)))
         return {};
 
-    QSet<QString> result;
+    QSet<QByteArray> result;
     const int offset = includeBaseProperties
         ? baseMetaObject->propertyOffset()
         : baseMetaObject->propertyOffset() + baseMetaObject->propertyCount();

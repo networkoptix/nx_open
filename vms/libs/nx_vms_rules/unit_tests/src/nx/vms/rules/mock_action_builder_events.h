@@ -19,6 +19,7 @@ public:
     MOCK_METHOD(void, actionReceived, ());
     MOCK_METHOD(void, targetedUsers, (const UuidSelection& selection));
     MOCK_METHOD(void, targetedCameraId, (QnUuid id));
+    MOCK_METHOD(void, targetedDeviceIds, (QnUuidList ids));
 
     MockActionBuilderEvents(ActionBuilder* builder):
         m_builder(builder)
@@ -36,8 +37,12 @@ private:
         if (auto targetedAction = action.dynamicCast<TestActionWithTargetUsers>())
         {
             targetedUsers(targetedAction->m_users);
+
             if (!targetedAction->m_cameraId.isNull())
                 targetedCameraId(targetedAction->m_cameraId);
+
+            if (!targetedAction->m_deviceIds.empty())
+                targetedDeviceIds(targetedAction->m_deviceIds);
         }
     }
 };

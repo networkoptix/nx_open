@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QHash>
+#include <functional>
 
 #include "aggregator.h"
 #include "basic_event.h"
@@ -13,6 +13,9 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API AggregatedEvent: public QObject
 {
     Q_OBJECT
+
+public:
+    using Filter = std::function<EventPtr(const EventPtr&)>;
 
 public:
     explicit AggregatedEvent(const EventPtr& event);
@@ -39,7 +42,7 @@ public:
      * Filters aggregated events by the given filter condition. If there is no appropriate events
      * nullptr returned.
      */
-    AggregatedEventPtr filtered(const std::function<bool(const EventPtr&)>& filter) const;
+    AggregatedEventPtr filtered(const Filter& filter) const;
 
     size_t totalCount() const;
     size_t uniqueCount() const;
