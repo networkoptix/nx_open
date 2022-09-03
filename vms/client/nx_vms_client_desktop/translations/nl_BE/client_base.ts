@@ -9990,7 +9990,7 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>De aanbevolen maximale levensduur van een gebruikerssessie is %1</translation>
     </message>
   </context>
   <context>
@@ -10050,11 +10050,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Automatisch gegenereerd certificaat</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Het certificaat wordt automatisch gegenereerd en vastgezet op %1</translation>
     </message>
   </context>
   <context>
