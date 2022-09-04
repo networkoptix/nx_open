@@ -9,6 +9,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/utils/algorithm/diff_sorted_lists.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::core::access {
@@ -196,8 +197,8 @@ void SharedLayoutItemAccessProvider::handleSubjectRemoved(const QnResourceAccess
 
 void SharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& oldValues,
-    const QSet<QnUuid>& newValues)
+    const std::map<QnUuid, nx::vms::api::AccessRights>& oldValues,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& newValues)
 {
     NX_ASSERT(mode() == Mode::cached);
 
@@ -209,8 +210,16 @@ void SharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     if (!aggregator)
         return;
 
-    const auto added = (newValues - oldValues);
-    const auto removed = (oldValues - newValues);
+    std::vector<QnUuid> removed;
+    std::vector<QnUuid> added;
+    nx::utils::algorithm::full_difference(
+        oldValues.begin(),
+        oldValues.end(),
+        newValues.begin(),
+        newValues.end(),
+        [&removed](auto value) { removed.push_back(value.first); },
+        [&added](auto value) { added.push_back(value.first); },
+        [](auto&&...) {});
 
     const auto resourcePool = m_context->resourcePool();
 
@@ -240,7 +249,8 @@ void SharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResource
     const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
     for (const auto& subject: allSubjects)
     {
-        const auto sharedResources = m_context->sharedResourcesManager()->sharedResources(subject);
+        const auto sharedResources =
+            m_context->sharedResourcesManager()->sharedResourceRights(subject);
         if (!sharedResources.contains(layoutId))
             continue;
 

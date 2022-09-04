@@ -301,6 +301,8 @@ namespace QJsonDetail {
     {
         if constexpr (std::is_same_v<String, std::string>)
             return str.toStdString();
+        else if constexpr (std::is_same_v<String, QnUuid>)
+            return QnUuid(str);
         else
             return str;
     }
@@ -310,6 +312,8 @@ namespace QJsonDetail {
     {
         if constexpr (std::is_same_v<std::decay_t<String>, std::string>)
             return QString::fromStdString(str);
+        else if constexpr (std::is_same_v<std::decay_t<String>, QnUuid>)
+            return str.toString();
         else
             return str;
     }
@@ -333,7 +337,7 @@ namespace QJsonDetail {
             ctx->addTypeToProcessed<Item>();
             QJson::serialize(ctx, std::decay_t<typename Item::second_type>(), &jsonValue);
             ctx->removeTypeFromProcessed<Item>();
-            result.insert(toQString(std::decay_t<typename Item::first_type>()), jsonValue);
+            result.insert(QString(), jsonValue);
         }
         *target = result;
     }
@@ -561,6 +565,9 @@ inline bool deserialize(
     const QJsonValue& value,
     std::optional<T>* target)
 {
+    if (!ctx->doesDeserializeReplaceExistingOptional() && *target)
+        return true;
+
     *target = T();
     return QJson::deserialize<T>(ctx, value, &**target);
 }
@@ -682,6 +689,12 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(
     std::map,
     (class T, class Predicate, class Allocator),
     (std::string, T, Predicate, Allocator),
+    string_map);
+
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(
+    std::map,
+    (class T, class Predicate, class Allocator),
+    (QnUuid, T, Predicate, Allocator),
     string_map);
 
 #undef QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS

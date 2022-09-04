@@ -22,23 +22,40 @@ public:
 
     void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);
 
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
+    /**
+     * List of Resources ids with their access rights, the given User or Role has access to (only
+     * given directly).
+     */
+    std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights(
+        const QnResourceAccessSubject& subject) const;
+
     bool hasSharedResource(const QnResourceAccessSubject& subject, const QnUuid& resourceId) const;
-    void setSharedResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
+
+    void setSharedResourceRights(
+        const QnResourceAccessSubject& subject,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights);
 
     /**
      * Expliticly set shared resources without checks for subject existance and without signals
      * sending. Actual as workaround the situation when saveAccessRights transaction is received
      * before the saveUser / saveRole transaction.
      */
-    void setSharedResourcesById(const QnUuid& subjectId, const QSet<QnUuid>& resources);
+    void setSharedResourceRights(const nx::vms::api::AccessRightsData& accessRights);
 
-    void setSharedResourcesInternal(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& resources);
-    QSet<QnUuid> sharedResourcesInternal(const QnResourceAccessSubject& subject) const;
+    // TODO: Remove this method when only sharedResourceRights will be used.
+    QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
+
+    // TODO: Remove this method when only setSharedResourceRights will be used.
+    void setSharedResources(
+        const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& resources,
+        nx::vms::api::AccessRights accessRights = nx::vms::api::AccessRight::viewLive);
 
 private:
+    void setSharedResourceRightsInternal(
+        const QnResourceAccessSubject& subject,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights);
+
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
 
@@ -47,10 +64,12 @@ private:
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
 signals:
-    void sharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
+    void sharedResourcesChanged(
+        const QnResourceAccessSubject& subject,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& oldValues,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& newValues);
 
 private:
     mutable nx::Mutex m_mutex;
-    QHash<QnUuid, QSet<QnUuid> > m_sharedResources;
+    QHash<QnUuid, std::map<QnUuid, nx::vms::api::AccessRights>> m_sharedResources;
 };

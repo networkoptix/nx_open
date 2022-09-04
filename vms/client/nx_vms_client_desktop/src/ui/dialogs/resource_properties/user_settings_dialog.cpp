@@ -108,7 +108,7 @@ public:
             const QnResourceAccessSubject& subject, bool currentUserIsAdmin)
     {
         auto allResources = resourcePool()->getResources();
-        auto accessibleResources = sharedResourcesManager()->sharedResources(subject);
+        auto accessibleResources = sharedResourcesManager()->sharedResourceRights(subject);
         auto permissions = resourceAccessManager()->globalPermissions(subject);
 
         int count = 0;
@@ -697,7 +697,8 @@ void QnUserSettingsDialog::applyChanges()
                     actionManager->trigger(action::ShareLayoutAction,
                         action::Parameters(layout).withArgument(Qn::UserResourceRole, user));
                 }
-                qnResourcesChangesManager->saveAccessibleResources(user, **customUserResources);
+                qnResourcesChangesManager->saveAccessibleResources(
+                    user, **customUserResources, user->getRawPermissions());
             }
 
             if (mode == QnUserSettingsModel::NewUser)
@@ -708,7 +709,7 @@ void QnUserSettingsDialog::applyChanges()
         m_user, m_model->digestSupport(), applyChangesFunction, callbackFunction);
 
     if (!isCustomUser(m_user) && (m_model->mode() != QnUserSettingsModel::NewUser))
-        qnResourcesChangesManager->saveAccessibleResources(m_user, QSet<QnUuid>());
+        qnResourcesChangesManager->saveAccessibleResources(m_user, QSet<QnUuid>(), GlobalPermission::none);
 
     // We may fill password field to change current user password.
     m_user->resetPassword();

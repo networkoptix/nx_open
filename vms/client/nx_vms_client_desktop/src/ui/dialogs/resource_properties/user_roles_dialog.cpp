@@ -182,16 +182,22 @@ bool QnUserRolesDialog::hasChanges() const
         if (existing != userRole)
             return true;
 
-        const auto modelResources = m_model->accessibleResources(userRole);
         // Checking whether a changes were applied.
         if (m_sharedResourcesQueuedToSave.contains(userRole.id))
         {
-            if(m_sharedResourcesQueuedToSave.value(userRole.id) != modelResources)
+            const auto modelResources = m_model->accessibleResources(userRole);
+            if (m_sharedResourcesQueuedToSave.value(userRole.id) != modelResources)
                 return true; //< User has changed something while changes are still applying.
         }
-        else if (sharedResourcesManager()->sharedResources(userRole) != modelResources)
+        else
         {
-            return true;
+            std::map<QnUuid, nx::vms::api::AccessRights> resourceAccessRights;
+            const auto accessRights =
+                nx::vms::api::globalPermissionsToAccessRights(userRole.permissions);
+            for (const auto& id: m_model->accessibleResources(userRole))
+                resourceAccessRights[id] = accessRights;
+            if (sharedResourcesManager()->sharedResourceRights(userRole) != resourceAccessRights)
+                return true;
         }
     }
 
@@ -232,7 +238,7 @@ void QnUserRolesDialog::applyChanges()
                     actionManager->trigger(action::ShareLayoutAction,
                         action::Parameters(layout).withArgument(Qn::UuidRole, role.id));
                 }
-                qnResourcesChangesManager->saveAccessibleResources(role, accessibleResources);
+                qnResourcesChangesManager->saveAccessibleResources(role, accessibleResources, role.permissions);
             });
 
         if (existing != userRole)
@@ -294,7 +300,10 @@ void QnUserRolesDialog::applyChanges()
                     user, QnUserResource::DigestSupport::keep, applyChanges, handleUserSaved);
 
                 if (replacement.permissions == GlobalPermissions(GlobalPermission::customUser))
-                    qnResourcesChangesManager->saveAccessibleResources(user, QSet<QnUuid>());
+                {
+                    qnResourcesChangesManager->saveAccessibleResources(
+                        user, QSet<QnUuid>(), GlobalPermission::none);
+                }
             }
         }
     }

@@ -541,18 +541,26 @@ void ResourcesChangesManager::saveUsers(
     connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, replyProcessor, this);
 }
 
-void ResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& accessibleResources)
+void ResourcesChangesManager::saveAccessibleResources(
+    const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& accessibleResources,
+    GlobalPermissions permissions)
 {
     auto connection = messageBusConnection();
     if (!connection)
         return;
 
-    auto backup = sharedResourcesManager()->sharedResourcesInternal(subject);
-    if (backup == accessibleResources)
+    vms::api::AccessRightsData accessRights;
+    accessRights.userId = subject.id();
+    const auto resourceRights = nx::vms::api::globalPermissionsToAccessRights(permissions);
+    for (const auto& id: accessibleResources)
+        accessRights.resourceRights[id] = resourceRights;
+
+    auto backup = sharedResourcesManager()->sharedResourceRights(subject);
+    if (backup == accessRights.resourceRights)
         return;
 
-    sharedResourcesManager()->setSharedResources(subject, accessibleResources);
+    sharedResourcesManager()->setSharedResourceRights(subject, accessRights.resourceRights);
 
     auto handler =
         [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
@@ -560,13 +568,9 @@ void ResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubj
             const bool success = errorCode == ec2::ErrorCode::ok;
             // Ignore setSharedResources() constraints here since we are just reverting the change.
             if (!success)
-                sharedResourcesManager()->setSharedResourcesInternal(subject, backup);
+                sharedResourcesManager()->setSharedResourceRights(subject, backup);
         };
 
-    vms::api::AccessRightsData accessRights;
-    accessRights.userId = subject.id();
-    for (const auto& id: accessibleResources)
-        accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(
         accessRights, makeReplyProcessor(this, handler), this);
 }

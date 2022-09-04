@@ -988,7 +988,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     auto accessible = sharedResourcesManager()->sharedResources(subject);
     for (const auto& toShare : calculateResourcesToShare(change.added, user))
         accessible << toShare->getId();
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
+    qnResourcesChangesManager->saveAccessibleResources(subject, accessible, user->getRawPermissions());
 }
 
 bool LayoutsHandler::canRemoveLayouts(const LayoutResourceList &layouts)

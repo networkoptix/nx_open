@@ -114,7 +114,8 @@ void PermissionsHandler::shareResourceWith(const QnUuid& resourceId,
         return;
 
     accessible << resourceId;
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
+    qnResourcesChangesManager->saveAccessibleResources(
+        subject, accessible, resourceAccessManager()->globalPermissions(subject));
 }
 
 bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -218,7 +219,8 @@ void PermissionsHandler::at_stopSharingLayoutAction_triggered()
         NX_ASSERT(!layout->isFile());
         accessible.remove(layout->getId());
     }
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
+    qnResourcesChangesManager->saveAccessibleResources(
+        subject, accessible, resourceAccessManager()->globalPermissions(subject));
 }
 
 void PermissionsHandler::at_shareCameraAction_triggered()

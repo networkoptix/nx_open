@@ -1384,7 +1384,7 @@ struct ModifyAccessRightsChecker
             return Result();
 
         auto user = commonModule->systemContext()->resourcePool()->getResourceById<QnUserResource>(param.userId);
-        if (!param.resourceIds.empty())
+        if (!param.resourceRights.empty())
         {
             if ((param.checkResourceExists == nx::vms::api::CheckResourceExists::customRole)
                 || ((param.checkResourceExists == nx::vms::api::CheckResourceExists::yes) && user
@@ -1398,10 +1398,11 @@ struct ModifyAccessRightsChecker
         auto accessManager = commonModule->systemContext()->resourceAccessManager();
 
         // CRUD API PATCH merges with existing shared resources so they can be not changed.
-        QSet<QnUuid> sharedResources;
+        std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights;
         if (user)
         {
-            sharedResources = commonModule->systemContext()->sharedResourcesManager()->sharedResources(user);
+            sharedResourceRights =
+                commonModule->systemContext()->sharedResourcesManager()->sharedResourceRights(user);
         }
         else
         {
@@ -1409,7 +1410,7 @@ struct ModifyAccessRightsChecker
             if (role.id.isNull())
             {
                 // We can clear shared Resources even after the User or Role is deleted.
-                if (!param.resourceIds.empty()
+                if (!param.resourceRights.empty()
                     && (param.checkResourceExists == nx::vms::api::CheckResourceExists::yes))
                 {
                     return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
@@ -1419,10 +1420,11 @@ struct ModifyAccessRightsChecker
             }
             else
             {
-                sharedResources = commonModule->systemContext()->sharedResourcesManager()->sharedResources(role);
+                sharedResourceRights =
+                    commonModule->systemContext()->sharedResourcesManager()->sharedResourceRights(role);
             }
         }
-        if (sharedResources == QSet<QnUuid>(param.resourceIds.begin(), param.resourceIds.end()))
+        if (sharedResourceRights == param.resourceRights)
             return Result();
 
         return accessManager->hasGlobalPermission(accessData, GlobalPermission::admin)

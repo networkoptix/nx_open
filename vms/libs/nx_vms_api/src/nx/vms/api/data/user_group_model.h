@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <tuple>
+#include <map>
 #include <optional>
-#include <type_traits>
+#include <tuple>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -41,11 +41,11 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
+    /**%apidoc Resource ids with access rights for the Group. */
+    std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
+
     /**%apidoc[readonly] Whether this Role comes with the System. */
     bool isPredefined = false;
-
-    /**%apidoc[opt] List of accessible resource ids for this User Group. */
-    std::optional<std::vector<QnUuid>> accessibleResources;
 
     bool operator==(const UserGroupModel& other) const = default;
 
@@ -62,7 +62,6 @@ struct NX_VMS_API UserGroupModel
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserGroupModel> fromDbTypes(DbListTypes data);
 };
-
 #define UserGroupModel_Fields \
     (id) \
     (name) \
@@ -70,7 +69,7 @@ struct NX_VMS_API UserGroupModel
     (type) \
     (permissions) \
     (parentGroupIds) \
-    (accessibleResources) \
+    (resourceAccessRights) \
     (isPredefined) \
     (externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)

@@ -11,7 +11,7 @@
 
 namespace {
 
-static const QSet<QnUuid> kEmpty;
+static const std::map<QnUuid, nx::vms::api::AccessRights> kEmpty;
 
 } // namespace
 
@@ -43,51 +43,51 @@ QnSharedResourcesManager::~QnSharedResourcesManager()
 
 void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& accessibleResourcesList)
 {
-    QHash<QnUuid, QSet<QnUuid> > oldValuesMap;
+    decltype(m_sharedResources) oldValuesMap;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         oldValuesMap = m_sharedResources;
         m_sharedResources.clear();
         for (const auto& item: accessibleResourcesList)
         {
-            auto& resources = m_sharedResources[item.userId];
-            for (const auto& id: item.resourceIds)
-                resources << id;
+            m_sharedResources[item.userId].insert(
+                item.resourceRights.begin(), item.resourceRights.end());
         }
     }
 
     for (const auto& subject: m_context->resourceAccessSubjectsCache()->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
-        auto newValues = sharedResources(subject);
+        auto newValues = sharedResourceRights(subject);
         if (oldValues != newValues)
             emit sharedResourcesChanged(subject, oldValues, newValues);
     }
 }
 
-QSet<QnUuid> QnSharedResourcesManager::sharedResources(
+std::map<QnUuid, nx::vms::api::AccessRights> QnSharedResourcesManager::sharedResourceRights(
     const QnResourceAccessSubject& subject) const
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
-        return QSet<QnUuid>();
+        return {};
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    QSet<QnUuid> result;
+    std::map<QnUuid, nx::vms::api::AccessRights> result;
     for (const auto& id: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
-        result.unite(m_sharedResources[id]);
+    {
+        const auto& resources = m_sharedResources[id];
+        result.insert(resources.begin(), resources.end());
+    }
     return result;
 }
 
-QSet<QnUuid> QnSharedResourcesManager::sharedResourcesInternal(
+QSet<QnUuid> QnSharedResourcesManager::sharedResources(
     const QnResourceAccessSubject& subject) const
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
-        return QSet<QnUuid>();
-
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    return m_sharedResources[subject.id()];
+    QSet<QnUuid> result;
+    for (const auto& [id, _]: sharedResourceRights(subject))
+        result.insert(id);
+    return result;
 }
 
 bool QnSharedResourcesManager::hasSharedResource(
@@ -103,48 +103,57 @@ bool QnSharedResourcesManager::hasSharedResource(
     return false;
 }
 
-void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& resources)
+void QnSharedResourcesManager::setSharedResourceRights(
+    const QnResourceAccessSubject& subject,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights)
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
-        return;
-
-    setSharedResourcesInternal(subject, resources);
+    setSharedResourceRightsInternal(subject, resourceRights);
 }
 
-void QnSharedResourcesManager::setSharedResourcesById(const QnUuid& subjectId,
-    const QSet<QnUuid>& resources)
+void QnSharedResourcesManager::setSharedResourceRights(
+    const nx::vms::api::AccessRightsData& accessRights)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    m_sharedResources.insert(subjectId, resources);
+    m_sharedResources.insert(accessRights.userId, accessRights.resourceRights);
 }
 
-void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& resources)
+void QnSharedResourcesManager::setSharedResources(
+    const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& resources,
+    nx::vms::api::AccessRights accessRights)
+{
+    std::map<QnUuid, nx::vms::api::AccessRights> resourceAccessRights;
+    for (const auto& r: resources)
+        resourceAccessRights[r] = accessRights;
+    setSharedResourceRights(subject, resourceAccessRights);
+}
+
+void QnSharedResourcesManager::setSharedResourceRightsInternal(
+    const QnResourceAccessSubject& subject,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights)
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
 
-    QSet<QnUuid> oldValue;
+    std::map<QnUuid, nx::vms::api::AccessRights> oldValue;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         auto& value = m_sharedResources[subject.id()];
-        if (value == resources)
+        if (value == resourceRights)
             return;
         oldValue = value;
-        value = resources;
+        value = resourceRights;
     }
-    emit sharedResourcesChanged(subject, oldValue, resources);
+    emit sharedResourcesChanged(subject, oldValue, resourceRights);
 }
 
 void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource)
 {
     if (auto user = resource.dynamicCast<QnUserResource>())
     {
-        auto resources = sharedResources(user);
-        if (!resources.isEmpty())
+        auto resources = sharedResourceRights(user);
+        if (!resources.empty())
             emit sharedResourcesChanged(user, kEmpty, resources);
     }
 }
@@ -157,8 +166,8 @@ void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resour
 
 void QnSharedResourcesManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
-    auto resources = sharedResources(userRole);
-    if (!resources.isEmpty())
+    auto resources = sharedResourceRights(userRole);
+    if (!resources.empty())
         emit sharedResourcesChanged(userRole, kEmpty, resources);
 }
 
@@ -166,12 +175,12 @@ void QnSharedResourcesManager::handleRoleRemoved(const nx::vms::api::UserRoleDat
 {
     handleSubjectRemoved(userRole);
     for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
-        setSharedResourcesInternal(subject, kEmpty);
+        setSharedResourceRightsInternal(subject, kEmpty);
 }
 
 void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
-    QSet<QnUuid> oldValue;
+    std::map<QnUuid, nx::vms::api::AccessRights> oldValue;
     auto id = subject.id();
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
@@ -181,6 +190,6 @@ void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubjec
         m_sharedResources.remove(id);
     }
 
-    if (!oldValue.isEmpty())
+    if (!oldValue.empty())
         emit sharedResourcesChanged(subject, oldValue, kEmpty);
 }
