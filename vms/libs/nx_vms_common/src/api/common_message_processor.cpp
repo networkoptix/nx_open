@@ -734,23 +734,20 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
 
 void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& accessRights)
 {
-    QSet<QnUuid> accessibleResources;
-    for (const QnUuid& id : accessRights.resourceIds)
-        accessibleResources << id;
-
     if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
-        m_context->sharedResourcesManager()->setSharedResources(user, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResourceRights(
+            user, accessRights.resourceRights);
     }
     else if (auto role = m_context->userRolesManager()->userRole(accessRights.userId);
              !role.id.isNull())
     {
-        m_context->sharedResourcesManager()->setSharedResources(role, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResourceRights(
+            role, accessRights.resourceRights);
     }
     else
     {
-        m_context->sharedResourcesManager()->setSharedResourcesById(
-            accessRights.userId, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResourceRights(accessRights);
     }
 }
 

@@ -43,8 +43,10 @@ protected:
     virtual void handleSubjectRemoved(const QnResourceAccessSubject& subject) override;
 
 private:
-    void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
+    void handleSharedResourcesChanged(
+        const QnResourceAccessSubject& subject,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& oldValues,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& newValues);
 
     void updateAccessToLayout(const QnLayoutResourcePtr& layout);
 

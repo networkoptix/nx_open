@@ -86,8 +86,10 @@ public:
         QnUserResource::DigestSupport digestSupport = QnUserResource::DigestSupport::keep);
 
     /** Save accessible resources for the given user. */
-    void saveAccessibleResources(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& accessibleResources);
+    void saveAccessibleResources(
+        const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& accessibleResources,
+        GlobalPermissions permissions);
 
     void saveUserRole(const nx::vms::api::UserRoleData& role,
         RoleCallbackFunction callback = RoleCallbackFunction());

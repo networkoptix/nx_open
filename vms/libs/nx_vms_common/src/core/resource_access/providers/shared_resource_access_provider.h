@@ -31,8 +31,10 @@ protected:
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
 
 private:
-    void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
+    void handleSharedResourcesChanged(
+        const QnResourceAccessSubject& subject,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& oldValues,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& newValues);
 };
 
 } // namespace nx::core::access

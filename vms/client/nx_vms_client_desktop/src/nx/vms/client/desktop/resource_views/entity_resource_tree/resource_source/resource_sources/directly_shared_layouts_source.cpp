@@ -6,6 +6,7 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/algorithm/diff_sorted_lists.h>
 
 namespace {
 
@@ -43,20 +44,30 @@ DirectlySharedLayoutsSource::DirectlySharedLayoutsSource(
     m_accessSubject(accessSubject)
 {
     connect(m_sharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QSet<QnUuid>& oldValues,
-            const QSet<QnUuid>& newValues)
+        [this](const QnResourceAccessSubject& subject, auto oldValues, auto newValues)
         {
             if (subject != m_accessSubject)
                 return;
 
-            const auto rejectedResources = m_resourcePool->getResourcesByIds(oldValues - newValues);
+            std::vector<QnUuid> removed;
+            std::vector<QnUuid> added;
+            nx::utils::algorithm::full_difference(
+                oldValues.begin(),
+                oldValues.end(),
+                newValues.begin(),
+                newValues.end(),
+                [&removed](auto value) { removed.push_back(value.first); },
+                [&added](auto value) { added.push_back(value.first); },
+                [](auto&&...) {});
+
+            const auto rejectedResources = m_resourcePool->getResourcesByIds(removed);
             for (const auto& resource: rejectedResources)
             {
                 if (filter(resource))
                     emit resourceRemoved(resource);
             }
 
-            const auto newResources = m_resourcePool->getResourcesByIds(newValues - oldValues);
+            const auto newResources = m_resourcePool->getResourcesByIds(added);
             for (const auto& resource: newResources)
             {
                 if (filter(resource))

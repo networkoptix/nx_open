@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 #include <tuple>
-#include <type_traits>
+#include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -44,9 +45,6 @@ struct NX_VMS_API UserModelBase
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
 
-    /**%apidoc List of accessible resource ids for the user. */
-    std::optional<std::vector<QnUuid>> accessibleResources;
-
     /**%apidoc[opt] Disabled users can not login. */
     bool isEnabled = true;
 
@@ -65,49 +63,58 @@ struct NX_VMS_API UserModelBase
     std::optional<QnLatin1Array> cryptSha512Hash; /**<%apidoc[unused] */
     std::optional<QString> realm; /**<%apidoc[unused] */
 
-    using DbReadTypes = std::tuple<UserData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserDataEx, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserDataList, AccessRightsDataList>;
-
     bool operator==(const UserModelBase& other) const = default;
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }
 
-    DbUpdateTypes toDbTypesBase() &&;
-    static UserModelBase fromDbTypesBase(
-        UserData&& baseData, AccessRightsDataList&& allAccessRights);
+    UserDataEx toUserData() &&;
+    static UserModelBase fromUserData(UserData&& baseData);
 };
 #define UserModelBase_Fields \
-    (id)(name)(type)(fullName)(email) \
-    (isOwner)(permissions)(accessibleResources) \
-    (isEnabled)(isHttpDigestEnabled)(password) \
-    (digest)(hash)(cryptSha512Hash)(realm)
-
+    (id) \
+    (name) \
+    (type) \
+    (fullName) \
+    (email) \
+    (isOwner) \
+    (permissions) \
+    (isEnabled) \
+    (isHttpDigestEnabled) \
+    (password) \
+    (digest) \
+    (hash) \
+    (cryptSha512Hash) \
+    (realm)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
 
-struct NX_VMS_API UserModelV3: public UserModelBase
+struct NX_VMS_API UserModelV1: public UserModelBase
 {
-    /**%apidoc[opt] User role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
+    /**%apidoc[opt] User Role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
-    /**%apidoc[readonly]
-     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
+    /**%apidoc
+     * List of accessible Resource ids for the User. The access rights are calculated from the
+     * `permissions` value when the User accesses a Resource.
      */
-    QString externalId;
+    std::optional<std::vector<QnUuid>> accessibleResources;
 
-    bool operator==(const UserModelV3& other) const = default;
+    bool operator==(const UserModelV1& other) const = default;
+
+    using DbReadTypes = std::tuple<UserData, AccessRightsData>;
+    using DbUpdateTypes = std::tuple<UserDataEx, std::optional<AccessRightsData>>;
+    using DbListTypes = std::tuple<UserDataList, AccessRightsDataList>;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
+    static std::vector<UserModelV1> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelV3>);
-    static_assert(isUpdateModelV<UserModelV3>);
+    static_assert(isCreateModelV<UserModelV1>);
+    static_assert(isUpdateModelV<UserModelV1>);
 };
-#define UserModelV3_Fields UserModelBase_Fields(userRoleId)(externalId)
-QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+#define UserModelV1_Fields UserModelBase_Fields(userRoleId)(accessibleResources)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -115,9 +122,9 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS
  * This is for the new expiremental API which was supposed to be introduced in /rest/v2 but is
  * going to be delayed for the future API versions.
  */
-struct NX_VMS_API UserModelVX: public UserModelBase
+struct NX_VMS_API UserModelV3: public UserModelBase
 {
-    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/exp_userGroups`. */
+    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<QnUuid> userGroupIds;
 
     /**%apidoc[readonly]
@@ -125,17 +132,24 @@ struct NX_VMS_API UserModelVX: public UserModelBase
      */
     QString externalId;
 
-    bool operator==(const UserModelVX& other) const = default;
+    /**%apidoc Resource ids with access rights for the User. */
+    std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
+
+    bool operator==(const UserModelV3& other) const = default;
+
+    using DbReadTypes = std::tuple<UserData, AccessRightsData>;
+    using DbUpdateTypes = std::tuple<UserDataEx, std::optional<AccessRightsData>>;
+    using DbListTypes = std::tuple<UserDataList, AccessRightsDataList>;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<UserModelVX> fromDbTypes(DbListTypes data);
+    static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelVX>);
-    static_assert(isUpdateModelV<UserModelVX>);
+    static_assert(isCreateModelV<UserModelV3>);
+    static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelVX_Fields UserModelBase_Fields(userGroupIds)(externalId)
+#define UserModelV3_Fields UserModelBase_Fields(userGroupIds)(externalId)(resourceAccessRights)
 
-QN_FUSION_DECLARE_FUNCTIONS(UserModelVX, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 using UserModel = UserModelV3;
 

@@ -5,6 +5,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/algorithm/diff_sorted_lists.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
 
@@ -83,8 +84,8 @@ void SharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
 void SharedResourceAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& oldValues,
-    const QSet<QnUuid>& newValues)
+    const std::map<QnUuid, nx::vms::api::AccessRights>& oldValues,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& newValues)
 {
     NX_ASSERT(mode() == Mode::cached);
 
@@ -92,7 +93,15 @@ void SharedResourceAccessProvider::handleSharedResourcesChanged(
     if (!subject.isValid())
         return;
 
-    auto changed = (newValues | oldValues) - (newValues & oldValues);
+    std::vector<QnUuid> changed;
+    nx::utils::algorithm::full_difference(
+        oldValues.begin(),
+        oldValues.end(),
+        newValues.begin(),
+        newValues.end(),
+        [&changed](auto value) { changed.push_back(value.first); },
+        [&changed](auto value) { changed.push_back(value.first); },
+        [](auto&&...) {});
 
     const auto changedResources = m_context->resourcePool()->getResourcesByIds(changed);
     for (const auto& resource: changedResources)

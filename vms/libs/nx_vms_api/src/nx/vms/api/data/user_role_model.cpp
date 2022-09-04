@@ -1,62 +1,61 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "user_group_model.h"
+#include "user_role_model.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
 
-QN_FUSION_ADAPT_STRUCT(UserGroupModel, UserGroupModel_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_ADAPT_STRUCT(UserRoleModel, UserRoleModel_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml))
 
-UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
+UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
 {
     UserRoleData userRole;
     userRole.id = std::move(id);
     userRole.name = std::move(name);
     userRole.description = std::move(description);
-    userRole.isPredefined = isPredefined;
-    userRole.isLdap = (type == UserType::ldap);
-    userRole.externalId = std::move(externalId);
     userRole.permissions = std::move(permissions);
-    userRole.parentRoleIds = std::move(parentGroupIds);
 
     std::optional<AccessRightsData> accessRights;
-    if (resourceAccessRights)
+    if (accessibleResources)
     {
         AccessRightsData data;
         data.userId = userRole.id;
-        data.resourceRights = *std::move(resourceAccessRights);
+        const auto resourceAccessRights = globalPermissionsToAccessRights(userRole.permissions);
+        for (auto& id: *accessibleResources)
+            data.resourceRights[std::move(id)] = resourceAccessRights;
         data.checkResourceExists = CheckResourceExists::no;
         accessRights = std::move(data);
     }
-
     return {std::move(userRole), std::move(accessRights)};
 }
 
-std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
+std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
 {
     auto& baseList = std::get<UserRoleDataList>(all);
-    std::vector<UserGroupModel> result;
+    std::vector<UserRoleModel> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
-        UserGroupModel model;
+        UserRoleModel model;
         model.id = std::move(baseData.id);
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
-        model.type = baseData.isLdap ? UserType::ldap : UserType::local;
-        model.externalId = std::move(baseData.externalId);
         model.permissions = std::move(baseData.permissions);
-        model.isPredefined = baseData.isPredefined;
-        model.parentGroupIds = std::move(baseData.parentRoleIds);
 
         auto accessRights = nx::utils::find_if(
             std::get<AccessRightsDataList>(all),
             [&](const auto& accessRights) { return accessRights.userId == model.id; });
         if (accessRights)
-            model.resourceAccessRights = std::move(accessRights->resourceRights);
+        {
+            std::vector<QnUuid> resources;
+            resources.reserve(accessRights->resourceRights.size());
+            for (const auto& [id, _]: accessRights->resourceRights)
+                resources.push_back(id);
+            model.accessibleResources = std::move(resources);
+        }
 
         result.emplace_back(std::move(model));
     }

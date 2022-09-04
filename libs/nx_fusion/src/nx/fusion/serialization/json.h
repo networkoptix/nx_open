@@ -87,6 +87,16 @@ public:
         m_optionalDefaultSerialization = value;
     }
 
+    bool doesDeserializeReplaceExistingOptional() const
+    {
+        return m_deserializeReplacesExistingOptional;
+    }
+
+    void deserializeReplacesExistingOptional(bool value)
+    {
+        m_deserializeReplacesExistingOptional = value;
+    }
+
     bool isStrictMode() const { return m_strictMode; }
     void setStrictMode(bool value) { m_strictMode = value; }
 
@@ -109,6 +119,7 @@ private:
     bool m_allowStringConversions{false};
     bool m_optionalDefaultSerialization = false;
     bool m_strictMode = false;
+    bool m_deserializeReplacesExistingOptional = true;
 
     // TODO: Make `m_chronoSerializedAsDouble = true` after version 4.0 support is dropped.
     bool m_chronoSerializedAsDouble = false;

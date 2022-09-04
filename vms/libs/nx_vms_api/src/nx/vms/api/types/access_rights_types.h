@@ -189,9 +189,9 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 
+// Stored in the database. QFlags uses int internally, so we are limited to 32 bits.
 /**%apidoc
- * Flags describing user access rights towards particular resources. Stored in the database.
- * QFlags uses int internally, so we are limited to 32 bits.
+ * Flags describing User access rights towards particular Resources.
  */
 NX_REFLECTION_ENUM_CLASS(AccessRight,
 
@@ -248,6 +248,26 @@ NX_REFLECTION_ENUM_CLASS(AccessRight,
 
 Q_DECLARE_FLAGS(AccessRights, AccessRight)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AccessRights)
+
+inline AccessRights globalPermissionsToAccessRights(GlobalPermissions permissions)
+{
+    AccessRights result = AccessRight::viewLive | AccessRight::listenToAudio;
+    if (permissions.testFlag(GlobalPermission::editCameras))
+        result |= AccessRight::editSettings;
+    if (permissions.testFlag(GlobalPermission::controlVideowall))
+        result |= AccessRight::controlVideowall;
+    if (permissions.testFlag(GlobalPermission::viewArchive))
+        result |= AccessRight::viewArchive;
+    if (permissions.testFlag(GlobalPermission::exportArchive))
+        result |= AccessRight::exportArchive;
+    if (permissions.testFlag(GlobalPermission::viewBookmarks))
+        result |= AccessRight::viewBookmarks;
+    if (permissions.testFlag(GlobalPermission::manageBookmarks))
+        result |= AccessRight::manageBookmarks;
+    if (permissions.testFlag(GlobalPermission::userInput))
+        result |= AccessRight::userInput;
+    return result;
+}
 
 } // namespace nx::vms::api
 
