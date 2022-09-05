@@ -131,7 +131,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::EventsActions_ShowOnAlarmLayout_Help:
             return "showing_cameras_on_alarm_layou.html";
         case Qn::HelpTopic::EventsActions_ShowIntercomInformer_Help:
-            return "showing_cameras_on_alarm_layou.html";
+            return "Working-With-Intercoms.html";
         case Qn::HelpTopic::EventsActions_ShowTextOverlay_Help:
             return "display_text_on_cameras.html";
         case Qn::HelpTopic::EventsActions_SoftTrigger_Help:
