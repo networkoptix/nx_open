@@ -569,10 +569,14 @@ struct ModifyResourceAccess
 
         if (!result)
         {
-            QString errorMessage = NX_FMT(
-                "User %1 is not permitted to modify %2",
-                userResource ? userResource->getId().toSimpleString() : QString(),
-                target ? target->getId().toSimpleString() : QString());
+            QString errorMessage = target
+                ? NX_FMT(
+                    "User %1 is not permitted to modify %2",
+                    userResource ? userResource->getId().toSimpleString() : QString(),
+                    target->getId().toSimpleString())
+                : NX_FMT(
+                    "User %1 is not permitted to create new resource",
+                    userResource ? userResource->getId().toSimpleString() : QString());
             return Result(ErrorCode::forbidden, std::move(errorMessage));
         }
 
@@ -696,17 +700,20 @@ struct SaveUserAccess
         if (!existingUser && param.name.isEmpty())
             return Result(ErrorCode::badRequest, "Won't save new user with empty name.");
 
-        auto r = ModifyResourceAccess()(commonModule, accessData, param);
-        if (r)
-            return r;
+        if (!existingUser && param.isAdmin)
+            return Result(ErrorCode::forbidden, "Creating an owner user is not allowed.");
 
-        // Correct error message if this is a cloud full name save attempt.
+        if (!param.userRoleId.isNull() && !commonModule->userRolesManager()->hasRole(param.userRoleId))
+            return Result(ErrorCode::badRequest, "User Role does not exist.");
+
         if (param.isCloud
             && ((existingUser && param.fullName != existingUser->fullName())
                 || (!existingUser && !param.fullName.isEmpty())))
         {
-            r.message = "Cloud user full name is controlled by the Cloud";
+            return Result(ErrorCode::forbidden, "Cloud user full name is controlled by the Cloud");
         }
+
+        auto r = ModifyResourceAccess()(commonModule, accessData, param);
         return r;
     }
 };
