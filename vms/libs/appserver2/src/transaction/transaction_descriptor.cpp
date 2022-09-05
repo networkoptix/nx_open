@@ -584,10 +584,13 @@ struct ModifyResourceAccess
 
         if (!result)
         {
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "User '%1' is not permitted to modify %2."),
-                userResource ? userResource->getName() : QString(),
-                target ? target->getId().toSimpleString() : QString()));
+            QString errorMessage = target
+                ? nx::format(ServerApiErrors::tr("User '%1' is not permitted to modify %2."),
+                    userResource ? userResource->getName() : QString(),
+                    target->getId().toSimpleString())
+                : nx::format(ServerApiErrors::tr("User '%1' is not permitted to create new resource."),
+                    userResource ? userResource->getName() : QString());
+            return Result(ErrorCode::forbidden, std::move(errorMessage));
         }
 
         auto typeDescriptor = qnResTypePool->getResourceType(param.typeId);
@@ -727,19 +730,34 @@ struct SaveUserAccess
             }
         }
 
-        auto r = ModifyResourceAccess()(commonModule, accessData, param);
-        if (r)
-            return r;
+        if (!existingUser && param.name.isEmpty())
+        {
+            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "Won't save new user with empty name.")));
+        }
 
-        // Correct error message if this is a cloud full name save attempt.
+        if (!existingUser && param.isAdmin)
+        {
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Creating an owner user is not allowed.")));
+        }
+
+        if (!commonModule->userRolesManager()->hasRoles(param.userRoleIds))
+        {
+            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "User Role does not exist.")));
+        }
+
         if (param.isCloud
             && ((existingUser && param.fullName != existingUser->fullName())
                 || (!existingUser && !param.fullName.isEmpty())))
         {
-            r.message = nx::format(ServerApiErrors::tr(
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User full name is controlled by the %1.", /*comment*/ "%1 is the short Cloud name"),
-                nx::branding::shortCloudName());
+                nx::branding::shortCloudName()));
         }
+
+        auto r = ModifyResourceAccess()(commonModule, accessData, param);
         return r;
     }
 };
