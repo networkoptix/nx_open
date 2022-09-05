@@ -670,6 +670,7 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
 
     // Convert common layout to cloud one.
     auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+    cloudLayout->setName(name);
     saveLayout(cloudLayout);
 
     // Replace opened layout with the cloud one.
@@ -702,9 +703,6 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     // User press "Save As" and enters the same name as this layout already has.
     if (name == proposedName)
     {
-        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
-            return;
-
         saveLayout(layout);
         return;
     }
