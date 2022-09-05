@@ -358,8 +358,15 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     if (state.devicesCount == 0)
         return;
 
-    // Disable unactual controls leaving only Logical Id for dts, virtual cameras or i/o modules.
-    ui->leftWidget->setEnabled(state.supportsVideoStreamControl());
+    // Disable irrelevant controls leaving only Logical Id and Media Streaming for DTS, Virtual
+    // Cameras or I/O Modules.
+    const bool supportsVideoStreamControl = state.supportsVideoStreamControl();
+    ui->groupBoxMotionDetection->setEnabled(supportsVideoStreamControl);
+    ui->remoteArchiveAutoExportGroupBox->setEnabled(supportsVideoStreamControl);
+    ui->settingsGroupBox->setEnabled(supportsVideoStreamControl);
+    ui->timeSettingsGroupBox->setEnabled(supportsVideoStreamControl);
+    ui->useMedia2ToFetchProfilesGroupBox->setEnabled(supportsVideoStreamControl);
+
     ui->groupBoxRTP->setEnabled(state.supportsSchedule() /*has video and/or audio stream(s)*/);
 
     const bool hasDualStreaming =
