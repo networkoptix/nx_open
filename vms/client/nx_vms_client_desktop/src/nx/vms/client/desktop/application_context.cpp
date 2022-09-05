@@ -624,6 +624,9 @@ ApplicationContext::~ApplicationContext()
     if (d->mainSystemContext && d->mainSystemContext->messageProcessor())
         d->mainSystemContext->deleteMessageProcessor();
 
+    // Remote session must be fully destroyed while application context still exists.
+    d->mainSystemContext.reset();
+
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
 }
