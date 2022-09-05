@@ -4,6 +4,7 @@
 
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 
@@ -164,6 +165,32 @@ TEST_F(ResourceAccessSubjectsCacheTest, CustomRoles)
     EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 2 + 2);
     EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 2);
     EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 2 + 2);
+}
+
+TEST_F(ResourceAccessSubjectsCacheTest, UpdateUserResource)
+{
+    const auto user = addUser(GlobalPermission::none, "user");
+    user->setUserRoleIds({kAdminRoleId});
+
+    EXPECT_EQ(cache()->allSubjects().size(), 1);
+    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
+    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
+    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 0);
+    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 0);
+
+    nx::vms::api::UserData userData;
+    ec2::fromResourceToApi(user, userData);
+
+    QnUserResourcePtr userCopy(new QnUserResource(user->userType(), user->externalId()));
+    ec2::fromApiToResource(userData, userCopy);
+    userCopy->setUserRoleIds({kViewerRoleId});
+    user->update(userCopy);
+
+    EXPECT_EQ(cache()->allSubjects().size(), 1);
+    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 0);
+    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 0);
+    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
+    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
 }
 
 } // namespace nx::vms::common::test
