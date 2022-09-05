@@ -559,12 +559,13 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         }
         m_cryptSha512Hash = localOther->m_cryptSha512Hash;
 
+        const auto oldPredefinedRole = userRole();
         const auto newPermissions = localOther->m_permissions.load();
         const auto oldPermissions = m_permissions.exchange(newPermissions);
         if (oldPermissions != newPermissions)
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
 
-        if (m_userRoleIds != localOther->m_userRoleIds)
+        if (m_userRoleIds != localOther->m_userRoleIds || oldPredefinedRole != userRole())
         {
             const auto previousRoleIds = m_userRoleIds;
             m_userRoleIds = localOther->m_userRoleIds;
