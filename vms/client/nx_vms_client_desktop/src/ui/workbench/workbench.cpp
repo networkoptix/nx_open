@@ -181,13 +181,14 @@ QnWorkbench::QnWorkbench(QObject *parent):
 
 QnWorkbench::~QnWorkbench()
 {
-    bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
-    blockSignals(signalsBlocked);
 
+    QSignalBlocker blocker(this);
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
+    delete m_dummyLayout;
     m_dummyLayout = nullptr;
-    clear();
+    qDeleteAll(m_layouts);
+    m_layouts.clear();
 }
 
 nx::vms::client::desktop::WindowContext* QnWorkbench::windowContext() const
