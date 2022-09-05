@@ -300,7 +300,8 @@ struct CloudLayoutsManager::Private
                     layout->removeFlags(Qn::local);
                     layout->addFlags(Qn::remote);
                 }
-                callback(success);
+                if (callback)
+                    callback(success);
             };
 
         nx::vms::api::LayoutData layoutData;
