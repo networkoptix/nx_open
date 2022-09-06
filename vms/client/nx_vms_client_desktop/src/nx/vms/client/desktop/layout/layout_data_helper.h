@@ -9,8 +9,11 @@ struct QnLayoutItemData;
 
 namespace nx::vms::client::desktop {
 
-/** Implements common client logic for creating layout item from resource. */
-QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource);
+/**
+ * Create layout item from resource.
+ * @param forceCloud Generates cloud path even for resources from the current system.
+ */
+QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource, bool forceCloud = false);
 
 /** Create a new layout resource with a given resource on it. */
 LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
