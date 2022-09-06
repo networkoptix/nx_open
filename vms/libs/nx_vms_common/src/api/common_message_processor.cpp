@@ -765,7 +765,7 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
     for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
         auto roles = user->userRoleIds();
-        if (nx::utils::remove_if(roles, [&userRoleId](const auto& id) { return id == userRoleId; }))
+        if (nx::utils::erase_if(roles, [&userRoleId](const auto& id) { return id == userRoleId; }))
             user->setUserRoleIds(roles);
     }
 }

@@ -171,7 +171,7 @@ bool contains_if(const Container& container, UnaryPredicate p)
 //-------------------------------------------------------------------------------------------------
 
 template<typename Container, typename UnaryPredicate>
-size_t remove_if(Container& container, UnaryPredicate p)
+size_t erase_if(Container& container, UnaryPredicate p)
 {
     const auto removed = std::remove_if(container.begin(), container.end(), p);
     const auto count = std::distance(removed, container.end());
@@ -179,36 +179,18 @@ size_t remove_if(Container& container, UnaryPredicate p)
     return count;
 }
 
-template<typename Key, typename Value, typename UnaryPredicate>
-size_t remove_if(std::map<Key, Value>& container, UnaryPredicate predicate)
-{
-    size_t count = 0;
-    for (auto it = container.begin(); it != container.end();)
-    {
-        if (predicate(it->first, it->second))
-        {
-            it = container.erase(it);
-            ++count;
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    return count;
-}
-
 template<typename Container, typename UnaryPredicate>
 Container copy_if(Container values, UnaryPredicate filter)
 {
-    remove_if(values, [&filter](const auto& v) { return !filter(v); });
+    erase_if(values, [&filter](const auto& v) { return !filter(v); });
     return values;
 }
 
 template<typename Key, typename Value, typename UnaryPredicate>
 std::map<Key, Value> copy_if(std::map<Key, Value> values, UnaryPredicate filter)
 {
-    remove_if(values, [&filter](const auto& k, const auto& v) { return !filter(k, v); });
+    std::erase_if(values,
+        [&filter](const auto& item) { auto const& [k, v] = item; return !filter(k, v); });
     return values;
 }
 

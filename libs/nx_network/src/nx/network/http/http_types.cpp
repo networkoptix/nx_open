@@ -736,7 +736,7 @@ void Request::removeCookie(const std::string_view& name)
     std::vector<std::pair<std::string_view, std::string_view>> params;
     nx::utils::splitNameValuePairs(cookie, ';', '=', std::back_inserter(params));
 
-    nx::utils::remove_if(
+    nx::utils::erase_if(
         params,
         [&name](const auto& nameValue) { return nameValue.first == name; });
 

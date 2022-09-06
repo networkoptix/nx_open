@@ -75,7 +75,7 @@ std::pair<api::metrics::ValueGroupAlarms, Scope> ValueGroupMonitor::alarmsWithSc
                 // warnings by errors by conditions.
                 if (alarm->level == api::metrics::AlarmLevel::error)
                 {
-                    nx::utils::remove_if(alarms[id],
+                    nx::utils::erase_if(alarms[id],
                         [](const auto& a) { return a.level != api::metrics::AlarmLevel::error; });
                 }
 
