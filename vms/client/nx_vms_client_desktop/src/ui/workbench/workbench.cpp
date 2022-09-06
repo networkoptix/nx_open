@@ -187,6 +187,8 @@ QnWorkbench::~QnWorkbench()
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
     delete m_dummyLayout;
     m_dummyLayout = nullptr;
+    for (const auto layout: qAsConst(m_layouts))
+        layout->disconnect(this); //< Avoid processing aboutToBeDestroyed signal.
     qDeleteAll(m_layouts);
     m_layouts.clear();
 }
@@ -271,7 +273,8 @@ void QnWorkbench::insertLayout(QnWorkbenchLayout *layout, int index)
     index = qBound(0, index, m_layouts.size());
 
     m_layouts.insert(index, layout);
-    connect(layout, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_layout_aboutToBeDestroyed()));
+    connect(layout, &QnWorkbenchLayout::aboutToBeDestroyed, this,
+        [this] { removeLayout(checked_cast<QnWorkbenchLayout*>(sender())); });
 
     emit layoutsChanged();
 }
@@ -764,10 +767,6 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem* item)
     }
 
     emit currentLayoutItemsChanged();
-}
-
-void QnWorkbench::at_layout_aboutToBeDestroyed() {
-    removeLayout(checked_cast<QnWorkbenchLayout *>(sender()));
 }
 
 void QnWorkbench::at_layout_cellAspectRatioChanged() {
