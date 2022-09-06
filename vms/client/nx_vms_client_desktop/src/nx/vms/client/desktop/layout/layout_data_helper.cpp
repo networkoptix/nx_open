@@ -10,12 +10,12 @@
 
 namespace nx::vms::client::desktop {
 
-QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource)
+QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource, bool forceCloud)
 {
     QnLayoutItemData data;
 
     data.uuid = QnUuid::createUuid();
-    data.resource = descriptor(resource);
+    data.resource = descriptor(resource, forceCloud);
 
     if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
         data.rotation = mediaResource->forcedRotation().value_or(0);

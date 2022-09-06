@@ -5,6 +5,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -18,14 +19,15 @@ namespace nx::vms::client::desktop {
 CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     QObject(parent)
 {
+    auto cloudLayoutsResourcePool = appContext()->cloudLayoutsSystemContext()->resourcePool();
+
     auto processLayouts =
-        [](CloudCrossSystemContext* context, const QString& systemId)
+        [cloudLayoutsResourcePool](CloudCrossSystemContext* context, const QString& systemId)
         {
             const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
                 ->layoutSnapshotManager();
 
-            for (const auto& layout: appContext()->cloudLayoutsSystemContext()->resourcePool()
-                ->getResources<QnLayoutResource>())
+            for (const auto& layout: cloudLayoutsResourcePool->getResources<QnLayoutResource>())
             {
                 const bool wasModifiedByUser = snapshotManager->isModified(layout);
                 const auto items = layout->getItems(); //< Iterate over local copy.
@@ -66,6 +68,40 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                         processLayouts(context, systemId);
                 });
         });
+
+    if (ini().validateCloudLayouts)
+    {
+        auto validate = [](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+            {
+                auto resource = getResourceByDescriptor(item.resource);
+                if (resource && resource->hasFlags(Qn::local_media))
+                    return;
+
+                NX_ASSERT(!crossSystemResourceSystemId(item.resource).isEmpty(),
+                    "Disable `validateCloudLayouts` in the `nx_vms_client_desktop.ini` if get "
+                    "this assert on the client start, then delete misconstructed cloud layouts");
+            };
+
+        // Validation mechanism to ensure cloud layouts contain only cross-system resources.
+        connect(cloudLayoutsResourcePool, &QnResourcePool::resourceAdded, this,
+            [this, validate](const QnResourcePtr& resource)
+            {
+                if (auto layout = resource.dynamicCast<LayoutResource>())
+                {
+                    connect(layout.data(), &LayoutResource::itemAdded, this, validate);
+                    connect(layout.data(), &LayoutResource::itemChanged, this, validate);
+                    for (const auto& item: layout->getItems())
+                        validate(layout, item);
+                }
+            });
+
+        connect(cloudLayoutsResourcePool, &QnResourcePool::resourceRemoved, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (auto layout = resource.dynamicCast<LayoutResource>())
+                    layout->disconnect(this);
+            });
+    }
 }
 
 } // namespace nx::vms::client::desktop
