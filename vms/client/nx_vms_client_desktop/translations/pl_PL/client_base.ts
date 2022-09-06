@@ -10338,11 +10338,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Certyfikat wygenerowany automatycznie</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Certyfikat jest automatycznie wygenerowany i przypięty do %1</translation>
     </message>
   </context>
   <context>
