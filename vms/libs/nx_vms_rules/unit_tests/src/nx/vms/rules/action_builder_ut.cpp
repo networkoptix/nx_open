@@ -113,12 +113,6 @@ public:
         return event;
     }
 
-protected:
-    virtual void SetUp() override
-    {
-        //m_engine = std::make_uni
-    }
-
 private:
     QnSyncTime syncTime;
 };
@@ -163,7 +157,7 @@ TEST_F(ActionBuilderTest, builderWithOneTargetUserProducedOnceAction)
     builder->process(makeSimpleEvent());
 }
 
-TEST_F(ActionBuilderTest, builderWithTwoTargetUserProducedTwoAction)
+TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 {
     const auto user1 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
     const auto user2 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
@@ -176,17 +170,12 @@ TEST_F(ActionBuilderTest, builderWithTwoTargetUserProducedTwoAction)
 
     MockActionBuilderEvents mock{builder.get()};
 
-    EXPECT_CALL(mock, actionReceived()).Times(2);
+    EXPECT_CALL(mock, actionReceived()).Times(1);
 
     UuidSelection expectedSelection1{
-        .ids = {user1->getId()},
+        .ids = {user1->getId(), user2->getId()},
         .all = false};
     EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
-
-    UuidSelection expectedSelection2{
-        .ids = {user2->getId()},
-        .all = false};
-    EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
 
     builder->process(makeSimpleEvent());
 }
@@ -204,17 +193,12 @@ TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 
     MockActionBuilderEvents mock{builder.get()};
 
-    EXPECT_CALL(mock, actionReceived()).Times(2);
+    EXPECT_CALL(mock, actionReceived()).Times(1);
 
-    UuidSelection expectedSelection1{
-        .ids = {user1->getId()},
+    UuidSelection expectedSelection{
+        .ids = {user1->getId(), user2->getId()},
         .all = false};
-    EXPECT_CALL(mock, targetedUsers(expectedSelection1)).Times(1);
-
-    UuidSelection expectedSelection2{
-        .ids = {user2->getId()},
-        .all = false};
-    EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
+    EXPECT_CALL(mock, targetedUsers(expectedSelection)).Times(1);
 
     builder->process(makeSimpleEvent());
 }

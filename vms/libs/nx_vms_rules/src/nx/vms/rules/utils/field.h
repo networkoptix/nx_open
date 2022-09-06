@@ -31,13 +31,13 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
     const QString& detailName);
 
-template <class T>
-T getField(const EventPtr& event, const char* fieldName, T&& defaultValue = T())
+template <class T, class E>
+T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
 {
     if (!NX_ASSERT(event))
         return std::forward<T>(defaultValue);
 
-    const auto value = event->property(fieldName);
+    const QVariant value = event->property(fieldName);
     if (!value.isValid() || !value.canConvert<T>())
         return std::forward<T>(defaultValue);
 
