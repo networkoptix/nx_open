@@ -217,7 +217,7 @@ public:
     void setAutoDiscoveryResponseEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
-    void setEmailSettings(const QnEmailSettings& settings);
+    void setEmailSettings(const QnEmailSettings& settings, bool savePassword = true);
 
     QnLdapSettings ldapSettings() const;
     void setLdapSettings(const QnLdapSettings& settings);
@@ -591,8 +591,6 @@ private:
     QnResourcePropertyAdaptor<QnEmail::ConnectionType>* m_connectionTypeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_portAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_timeoutAdaptor = nullptr;
-    /** Flag that we are using simple smtp settings set */
-    QnResourcePropertyAdaptor<bool>* m_simpleAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_smtpNameAdaptor = nullptr;
 
     // set of ldap settings adaptors

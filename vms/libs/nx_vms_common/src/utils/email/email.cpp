@@ -2,15 +2,15 @@
 
 #include "email.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
-#include <QtCore/QRegularExpression>
-#include <QtCore/QHash>
 #include <QtCore/QFile>
+#include <QtCore/QHash>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QThread>
 
-#include <QtCore/QCoreApplication>
-
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/url.h>
 
 namespace {
 
@@ -23,11 +23,12 @@ static const QString kEmailPattern =
 /* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
 static const QString kFullNamePattern = "^(?<fullname>.*)<(?<email>.+)>$";
 
-const int tlsPort = 587;
-const int sslPort = 465;
-const int unsecurePort = 25;
+static constexpr int kTlsPort = 587;
+static constexpr int kSslPort = 465;
+static constexpr int kUnsecurePort = 25;
+static constexpr int kAutoPort = 0;
 
-const int defaultSmtpTimeout = 300; //seconds, 5 min
+static constexpr int kDefaultSmtpTimeout = 300; //< Seconds, 5 min.
 
 } // namespace
 
@@ -46,27 +47,30 @@ bool nx::email::isValidAddress(const QString& address)
 static QnSmtpPresets smtpServerPresetPresets;
 static bool smtpInitialized = false;
 
-QnEmailSmtpServerPreset::QnEmailSmtpServerPreset() :
+QnEmailSmtpServerPreset::QnEmailSmtpServerPreset():
     connectionType(QnEmail::ConnectionType::unsecure),
-    port(0)
+    port(kAutoPort)
 {}
 
-QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType /* = Tls*/, int port /* = 0*/) :
+QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(
+    const QString& server,
+    QnEmail::ConnectionType connectionType,
+    int port)
+    :
     server(server),
     connectionType(connectionType),
     port(port)
 {}
 
-QnEmailSettings::QnEmailSettings() :
+QnEmailSettings::QnEmailSettings():
     connectionType(QnEmail::ConnectionType::unsecure),
-    port(0),
-    timeout(defaultSmtpTimeout),
-    simple(true)
+    port(kAutoPort),
+    timeout(kDefaultSmtpTimeout)
 {}
 
 int QnEmailSettings::defaultTimeoutSec()
 {
-    return defaultSmtpTimeout;
+    return kDefaultSmtpTimeout;
 }
 
 int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
@@ -74,50 +78,20 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
     switch (connectionType)
     {
         case QnEmail::ConnectionType::ssl:
-            return sslPort;
+            return kSslPort;
         case QnEmail::ConnectionType::tls:
-            return tlsPort;
+            return kTlsPort;
         default:
-            return unsecurePort;
+            return kUnsecurePort;
     }
-}
-
-bool QnEmailSettings::isEmpty() const
-{
-    return equals({});
 }
 
 bool QnEmailSettings::isValid() const
 {
-    return !email.isEmpty() && !server.isEmpty();
+    return QnEmailAddress(email).isValid() && nx::utils::Url::fromUserInput(server).isValid();
 }
 
-bool QnEmailSettings::equals(
-    const QnEmailSettings& other, bool compareView, bool comparePassword) const
-{
-    if (email != other.email)
-        return false;
-    if (server != other.server)
-        return false;
-    if (user != other.user)
-        return false;
-    if (comparePassword && password != other.password)
-        return false;
-    if (signature != other.signature)
-        return false;
-    if (supportEmail != other.supportEmail)
-        return false;
-    if (connectionType != other.connectionType)
-        return false;
-    if (port != other.port)
-        return false;
-    if (timeout != other.timeout)
-        return false;
-
-    return !compareView || (simple == other.simple);
-}
-
-QnEmailAddress::QnEmailAddress(const QString &email):
+QnEmailAddress::QnEmailAddress(const QString& email):
     m_email(email.trimmed())
 {
     QRegularExpression re(kFullNamePattern);
