@@ -201,9 +201,9 @@ public:
             case cameraInvalidParams:
             {
                 QnCameraDeviceStringSet details(
-                    tr("Invalid data was received from the device %1.").arg(p1),
-                    tr("Invalid data was received from the camera %1.").arg(p1),
-                    tr("Invalid data was received from the I/O module %1.").arg(p1)
+                    tr("Invalid data was received from the device. Details: \"%1\".").arg(p1),
+                    tr("Invalid data was received from the camera. Details: \"%1\".").arg(p1),
+                    tr("Invalid data was received from the I/O module. Details: \"%1\".").arg(p1)
                 );
 
                 errorMessageParts
