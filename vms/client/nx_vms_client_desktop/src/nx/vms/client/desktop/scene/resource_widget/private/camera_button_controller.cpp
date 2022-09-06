@@ -216,8 +216,10 @@ void CameraButtonController::createIntercomMuteButton()
     if (!m_camera)
         return;
 
-    if (!m_intercomMuteButtonData)
+    if (m_intercomMuteButtonData)
         return;
+
+    m_intercomMuteButtonData.emplace(IntercomMuteButtonData());
 
     m_intercomMuteButtonData->button = new SoftwareTriggerButton(m_parentWidget);
     m_intercomMuteButtonData->id = m_buttonsContainer->addItem(m_intercomMuteButtonData->button);
@@ -272,7 +274,6 @@ void CameraButtonController::removeIntercomMuteButton()
         m_buttonsContainer->deleteItem(m_intercomMuteButtonData->id);
 
     m_intercomMuteButtonData.reset();
-
 }
 
 void CameraButtonController::createOpenDoorButton()
