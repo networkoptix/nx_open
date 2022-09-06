@@ -453,7 +453,9 @@ void ActionHandler::addToLayout(
         return;
     }
 
-    QnLayoutItemData data = layoutItemFromResource(resource);
+    // Force cloud resource descriptor for cloud layouts.
+    QnLayoutItemData data = layoutItemFromResource(resource,
+        /*forceCloud*/ layout->hasFlags(Qn::cross_system));
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
@@ -1909,7 +1911,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
-    if (period.isEmpty()) 
+    if (period.isEmpty())
     {
         if (!isPreviewSearchLayout)
             return;

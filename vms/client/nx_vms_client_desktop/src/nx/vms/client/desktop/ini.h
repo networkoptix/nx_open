@@ -136,6 +136,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", cloudLayoutsEndpointOverride,
         "[Dev] Override url to cloud layouts endpoint (e.g. \"localhost::8000\").");
 
+    NX_INI_FLAG(true, validateCloudLayouts, "[Dev] Additional cloud layouts validation.");
+
     NX_INI_FLAG(false, crossSystemLayoutsExtendedDebug, "[Dev] Cross-system layouts debug info.");
 
     NX_INI_FLAG(false,

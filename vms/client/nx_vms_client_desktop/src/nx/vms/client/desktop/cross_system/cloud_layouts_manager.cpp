@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -279,6 +280,15 @@ struct CloudLayoutsManager::Private
             tr("%1 (Copy %2)", "Original name will be substituted as %1, counter as %2")
                 .arg(cloudLayout->getName())));
 
+        // Convert resource paths to cloud.
+        auto items = cloudLayout->getItems();
+        for (auto& item: items)
+        {
+            item.resource = descriptor(
+                getResourceByDescriptor(item.resource),
+                /*forceCloud*/ true);
+        }
+        cloudLayout->setItems(items);
         systemContext->resourcePool()->addResource(cloudLayout);
 
         return std::move(cloudLayout);

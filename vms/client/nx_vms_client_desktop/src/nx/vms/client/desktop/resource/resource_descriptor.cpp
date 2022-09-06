@@ -28,12 +28,12 @@ QString resourcePath(const QnUuid& resourceId, const QString& cloudSystemId)
     return {};
 }
 
-QString resourcePath(const QnResourcePtr& resource)
+QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
 {
     if (resource->hasFlags(Qn::exported_layout))
         return resource->getUrl();
 
-    if (resource->hasFlags(Qn::local_video))
+    if (resource->hasFlags(Qn::local_media))
         return resource->getUrl();
 
     if (resource.dynamicCast<CrossSystemLayoutResource>())
@@ -42,11 +42,12 @@ QString resourcePath(const QnResourcePtr& resource)
     if (const auto camera = resource.dynamicCast<CrossSystemCameraResource>())
         return camera->descriptor().path;
 
-    auto systemContext = SystemContext::fromResource(resource);
-    if (NX_ASSERT(systemContext) && systemContext != appContext()->currentSystemContext())
+    const auto systemContext = SystemContext::fromResource(resource);
+    const bool belongsToOtherContext = (systemContext != appContext()->currentSystemContext());
+    if (NX_ASSERT(systemContext) && (forceCloud || belongsToOtherContext))
     {
         if (auto cloudSystemId = systemContext->moduleInformation().cloudSystemId;
-            !cloudSystemId.isEmpty())
+            NX_ASSERT(!cloudSystemId.isEmpty()))
         {
             return resourcePath(resource->getId(), cloudSystemId);
         }
@@ -57,16 +58,14 @@ QString resourcePath(const QnResourcePtr& resource)
 
 } // namespace
 
-/** Create resource descriptor for storing in layout item or passing to another client instance. */
-nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource)
+nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource, bool forceCloud)
 {
     if (!NX_ASSERT(resource))
         return {};
 
-    return {resource->getId(), resourcePath(resource)};
+    return {resource->getId(), resourcePath(resource, forceCloud)};
 }
 
-/** Create resource descriptor for cloud resource. Works only for cloud resources.*/
 nx::vms::common::ResourceDescriptor descriptor(
     const QnUuid& resourceId, const QString& cloudSystemId)
 {
