@@ -83,10 +83,10 @@ void QnWorkbenchItem::setLayout(QnWorkbenchLayout* value)
 
 QnLayoutItemData QnWorkbenchItem::data() const
 {
-    NX_ASSERT(m_resource);
+    if (!NX_ASSERT(m_resource) || !NX_ASSERT(m_layout))
+        return {};
 
-    QnLayoutItemData data = layoutItemFromResource(m_resource);
-    data.uuid = m_uuid;
+    QnLayoutItemData data = m_layout->resource()->getItem(m_uuid);
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();

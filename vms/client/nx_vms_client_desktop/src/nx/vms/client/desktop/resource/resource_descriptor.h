@@ -7,8 +7,13 @@
 
 namespace nx::vms::client::desktop {
 
-/** Create resource descriptor for storing in layout item or passing to another client instance. */
-nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource);
+/**
+ * Create resource descriptor for storing in layout item or passing to another client instance.
+ * @param forceCloud Generates cloud path even for resources from the current system.
+ */
+nx::vms::common::ResourceDescriptor descriptor(
+    const QnResourcePtr& resource,
+    bool forceCloud = false);
 
 /** Create resource descriptor for cloud resource. Works only for cloud resources.*/
 nx::vms::common::ResourceDescriptor descriptor(
