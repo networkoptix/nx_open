@@ -699,7 +699,7 @@ QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) 
         getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
 
     if (type != Qn::PT_Unknown)
-        nx::utils::remove_if(ports, [&](auto p) { return p.portType != type; });
+        nx::utils::erase_if(ports, [&](auto p) { return p.portType != type; });
 
     return ports;
 }
