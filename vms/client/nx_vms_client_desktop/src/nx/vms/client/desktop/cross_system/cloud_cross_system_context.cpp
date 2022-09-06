@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/delayed.h>
 
 #include "cloud_cross_system_context_data_loader.h"
 #include "cloud_layouts_manager.h"
@@ -410,7 +411,7 @@ struct CloudCrossSystemContext::Private
             new CrossSystemCameraResource(q, descriptor));
 
         systemContext->resourcePool()->addResource(camera);
-        
+
         return camera;
     }
 };
@@ -422,6 +423,16 @@ CloudCrossSystemContext::CloudCrossSystemContext(
     base_type(parent),
     d(new Private(this, systemDescription))
 {
+    executeDelayedParented(
+        [this]
+        {
+            // The method below is called with the delay due to thumb camera resources accept
+            // the context in the constructor, so it is required the context to be created first.
+            d->createThumbCameraResources(appContext()->cloudLayoutsSystemContext()
+                ->resourcePool()->getResources<CrossSystemLayoutResource>());
+        },
+        this
+    );
 }
 
 CloudCrossSystemContext::~CloudCrossSystemContext() = default;
@@ -436,9 +447,19 @@ bool CloudCrossSystemContext::isConnected() const
     return d->status == Status::connected;
 }
 
+bool CloudCrossSystemContext::isOnline() const
+{
+    return d->systemDescription->isOnline();
+}
+
 QString CloudCrossSystemContext::systemId() const
 {
     return d->systemDescription->id();
+}
+
+QnBaseSystemDescription* CloudCrossSystemContext::systemDescription() const
+{
+    return d->systemDescription.get();
 }
 
 SystemContext* CloudCrossSystemContext::systemContext() const
@@ -471,7 +492,7 @@ void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
         NX_DEBUG(this, "Connection with user interaction is already in progress");
         return;
     }
-   
+
     d->connectionProcess.reset();
     d->updateStatus(Status::connecting);
     d->ensureConnection(/*allowUserInteraction*/ true);
@@ -480,34 +501,6 @@ void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
 QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(QnUuid id)
 {
     return d->createThumbCameraResource(descriptor(id, d->systemDescription->id()));
-}
-
-void CloudCrossSystemContext::update(UpdateReason reason)
-{
-    switch (reason)
-    {
-        case UpdateReason::new_:
-        {
-            if (ini().crossSystemLayouts)
-            {
-                d->createThumbCameraResources(appContext()->cloudLayoutsSystemContext()
-                    ->resourcePool()->getResources<CrossSystemLayoutResource>());
-            }
-            break;
-        }
-        case UpdateReason::found:
-        {
-            d->ensureConnection();
-            break;
-        }
-        case UpdateReason::lost:
-        {
-            if (d->status != Status::unsupported)
-                d->updateStatus(Status::uninitialized);
-
-            break;
-        }
-    }
 }
 
 QString toString(CloudCrossSystemContext::Status status)

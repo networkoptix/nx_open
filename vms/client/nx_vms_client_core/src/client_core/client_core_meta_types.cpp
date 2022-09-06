@@ -49,6 +49,7 @@
 #include <nx/vms/client/core/ui/frame_section.h>
 #include <nx/vms/client/core/utils/file_io.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/core/utils/model_item_flags_watcher.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/utils/persistent_index_watcher.h>
 #include <nx/vms/client/core/utils/quick_item_mouse_tracker.h>
@@ -120,6 +121,7 @@ void initializeMetaTypes()
     QuickItemMouseTracker::registerQmlType();
     CameraMotionHelper::registerQmlType();
     MediaPlayerMotionProvider::registerQmlType();
+    ModelItemFlagsWatcher::registerQmlType();
     MotionMaskItem::registerQmlType();
     PropertiesSync::registerQmlTypes();
     PropertyUpdateFilter::registerQmlType();
