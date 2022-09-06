@@ -2,6 +2,7 @@
 
 #include "cross_system_camera_resource.h"
 
+#include <network/base_system_description.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>
@@ -21,32 +22,20 @@ struct CrossSystemCameraResource::Private
     CrossSystemCameraResource* const q;
     std::optional<nx::vms::api::CameraDataEx> source;
     QPointer<CloudCrossSystemContext> crossSystemContext;
-    CloudCrossSystemContext::Status cachedStatus = CloudCrossSystemContext::Status::uninitialized;
 
     QString calculateName() const
     {
-        return crossSystemContext->isConnected()
-            ? NX_ASSERT(source) ? source->name : toString(cachedStatus)
-            : toString(cachedStatus);
-    }
+        if (crossSystemContext->isConnected() && crossSystemContext->isOnline() && NX_ASSERT(source))
+            return source->name;
 
-    api::ResourceStatus calculateResourceStatus() const
-    {
-        switch (cachedStatus)
+        const auto crossSystemContextStatus = crossSystemContext->status();
+        if (crossSystemContextStatus == CloudCrossSystemContext::Status::connecting
+            || crossSystemContextStatus == CloudCrossSystemContext::Status::connectionFailure)
         {
-            case CloudCrossSystemContext::Status::uninitialized:
-                return api::ResourceStatus::offline;
-            case CloudCrossSystemContext::Status::connecting:
-                return api::ResourceStatus::undefined;
-            case CloudCrossSystemContext::Status::connectionFailure:
-                return api::ResourceStatus::unauthorized;
-            case CloudCrossSystemContext::Status::unsupported:
-                return api::ResourceStatus::incompatible; //< Debug purposes.
-            case CloudCrossSystemContext::Status::connected:
-                return api::ResourceStatus::online; //< Debug purposes.
-            default:
-                return api::ResourceStatus::undefined;
+            return toString(crossSystemContextStatus);
         }
+
+        return toString(CloudCrossSystemContext::Status::uninitialized);
     }
 };
 
@@ -90,8 +79,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     QnClientCameraResource(kThumbCameraTypeId),
     d(new Private{
         .q = this,
-        .crossSystemContext = crossSystemContext,
-        .cachedStatus = crossSystemContext->status()
+        .crossSystemContext = crossSystemContext
     })
 {
     setIdUnsafe(descriptor.id);
@@ -165,9 +153,17 @@ api::ResourceStatus CrossSystemCameraResource::getStatus() const
 {
     // Returns resource status only is the system contains it is connected, otherwise calculate
     // status from the system status.
-    return d->crossSystemContext->isConnected()
-        ? QnClientCameraResource::getStatus()
-        : d->calculateResourceStatus();
+    if (d->crossSystemContext->isConnected() && d->crossSystemContext->isOnline())
+        return QnClientCameraResource::getStatus();
+
+    const auto crossSystemContextStatus = d->crossSystemContext->status();
+    if (crossSystemContextStatus == CloudCrossSystemContext::Status::connecting)
+        return api::ResourceStatus::undefined;
+
+    if (crossSystemContextStatus == CloudCrossSystemContext::Status::connectionFailure)
+        return api::ResourceStatus::unauthorized;
+
+    return api::ResourceStatus::offline;
 }
 
 CloudCrossSystemContext* CrossSystemCameraResource::crossSystemContext() const
@@ -185,14 +181,8 @@ void CrossSystemCameraResource::watchOnCrossSystemContext()
     const auto update =
         [this]
         {
-            const auto newStatus = d->crossSystemContext->status();
-            if (d->cachedStatus == newStatus)
-                return;
-
-            d->cachedStatus = newStatus;
-
             QnResource::setName(d->calculateName());
-            if (d->crossSystemContext->isConnected())
+            if (d->crossSystemContext->isConnected() && d->crossSystemContext->isOnline())
                 removeFlags(Qn::fake);
             else
                 addFlags(Qn::fake);
@@ -203,6 +193,12 @@ void CrossSystemCameraResource::watchOnCrossSystemContext()
     connect(
         d->crossSystemContext,
         &CloudCrossSystemContext::statusChanged,
+        this,
+        update);
+
+    connect(
+        d->crossSystemContext->systemDescription(),
+        &QnBaseSystemDescription::onlineStateChanged,
         this,
         update);
 }
