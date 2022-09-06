@@ -153,9 +153,6 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "smtpTimeout", QnEmailSettings::defaultTimeoutSec(), this, [] { return tr("SMTP timeout (seconds)"); });
 
-    m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "smtpSimple", true, this, [] { return tr("SMTP use simple settings view in Client"); });
-
     m_smtpNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "smtpName", QString(), this, [] { return tr("SMTP name"); });
 
@@ -170,9 +167,7 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
         << m_connectionTypeAdaptor
         << m_portAdaptor
         << m_timeoutAdaptor
-        << m_simpleAdaptor
-        << m_smtpNameAdaptor
-        ;
+        << m_smtpNameAdaptor;
 
     for (auto adaptor: result)
     {
@@ -1382,23 +1377,24 @@ QnEmailSettings SystemSettings::emailSettings() const
     result.connectionType = m_connectionTypeAdaptor->value();
     result.signature = m_signatureAdaptor->value();
     result.supportEmail = m_supportLinkAdaptor->value();
-    result.simple = m_simpleAdaptor->value();
     result.timeout = m_timeoutAdaptor->value();
     result.name = m_smtpNameAdaptor->value();
     return result;
 }
 
-void SystemSettings::setEmailSettings(const QnEmailSettings& settings)
+void SystemSettings::setEmailSettings(const QnEmailSettings& settings, bool savePassword)
 {
     m_serverAdaptor->setValue(settings.server);
     m_fromAdaptor->setValue(settings.email);
     m_portAdaptor->setValue(settings.port);
     m_userAdaptor->setValue(settings.user);
-    m_smtpPasswordAdaptor->setValue(settings.isValid() ? settings.password : QString());
+    if (!settings.isValid())
+        m_smtpPasswordAdaptor->setValue(QString());
+    else if (savePassword)
+        m_smtpPasswordAdaptor->setValue(settings.password);
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);
     m_supportLinkAdaptor->setValue(settings.supportEmail);
-    m_simpleAdaptor->setValue(settings.simple);
     m_timeoutAdaptor->setValue(settings.timeout);
     m_smtpNameAdaptor->setValue(settings.name);
 }
