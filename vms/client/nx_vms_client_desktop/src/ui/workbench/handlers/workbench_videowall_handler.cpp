@@ -37,6 +37,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/videowall_data.h>
@@ -2041,6 +2042,9 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     {
         targetResources = parameters.resources();
     }
+
+    nx::utils::remove_if(targetResources,
+        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
     if (targetResources.isEmpty())
         return;
