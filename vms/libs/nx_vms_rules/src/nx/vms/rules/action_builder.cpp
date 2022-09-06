@@ -38,7 +38,7 @@ EventPtr permissionFilter(
 {
     const auto cameraResource =
         context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-            utils::getField<QnUuid>(event, utils::kCameraIdFieldName));
+            utils::getFieldValue<QnUuid>(event, utils::kCameraIdFieldName));
 
     if (cameraResource
         && !context->resourceAccessManager()->hasPermission(
@@ -49,7 +49,7 @@ EventPtr permissionFilter(
         return {};
     }
 
-    const auto deviceIds = utils::getField<QnUuidList>(event, utils::kDeviceIdsFieldName);
+    const auto deviceIds = utils::getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
     if (deviceIds.isEmpty())
         return event;
 
@@ -80,6 +80,27 @@ EventPtr permissionFilter(
     }
 
     return event;
+}
+
+QnUuidList getDeviceIds(const AggregatedEventPtr& event)
+{
+    QnUuidList result;
+    result << utils::getFieldValue<QnUuid>(event, utils::kCameraIdFieldName);
+    result << utils::getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
+    result.removeAll(QnUuid());
+
+    return result;
+}
+
+QByteArray getUuidsHash(const QnUuidList& ids)
+{
+    QByteArray result;
+    result.reserve(16 * ids.size());
+
+    for(auto id: ids)
+        result.push_back(id.toRfc4122());
+
+    return result;
 }
 
 } // namespace
@@ -307,32 +328,51 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
         .ids = targetUsersField->ids(),
         .all = targetUsersField->acceptAll()
     };
+
+    struct EventUsers
+    {
+        AggregatedEventPtr event;
+        QnUuidSet userIds;
+    };
+
+    std::unordered_map<QByteArray, EventUsers> eventUsersMap;
+
     QSignalBlocker signalBlocker{targetUsersField};
 
     // If the action should be shown to some users it is required to check if the user has
     // appropriate rights to see the event details.
-    for (const auto& user: targetUsersField->users()) //< TODO: Unite users with the same access rights.
+    for (const auto& user: targetUsersField->users())
     {
         // Checks whether the user has rights to view the event. At the moment only cameras are
         // required to be checked.
-        const auto filter =
+        auto filteredAggregatedEvent = aggregatedEvent->filtered(
             [&user, context = targetUsersField->systemContext()](const EventPtr& event)
             {
                 return permissionFilter(event, user, context);
-            };
-
-        auto filteredAggregatedEvent = aggregatedEvent->filtered(filter);
+            });
 
         if (!filteredAggregatedEvent)
             continue;
 
+        auto hash = getUuidsHash(getDeviceIds(filteredAggregatedEvent));
+        auto it = eventUsersMap.find(hash);
+
+        if (it == eventUsersMap.end())
+            eventUsersMap.emplace(hash, EventUsers{filteredAggregatedEvent, {user->getId()}});
+        else
+            it->second.userIds << user->getId();
+    }
+
+    for (auto& [key, value]: eventUsersMap)
+    {
+        NX_VERBOSE(this, "Building action for users: %1", value.userIds);
+
         // Substitute the initial target users with the user the aggregated event has been filtered.
         targetUsersField->setSelection({
-            .ids = {user->getId()},
+            .ids = std::move(value.userIds),
             .all = false});
 
-        NX_VERBOSE(this, "Building action for user: %1", user->getName());
-        emit action(buildAction(filteredAggregatedEvent));
+        emit action(buildAction(value.event));
     }
 
     // Recover initial target users selection.
