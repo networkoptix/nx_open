@@ -2920,7 +2920,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
             const auto serverName = server->getName();
             auto storages = server->getStorages();
 
-            nx::utils::remove_if(
+            nx::utils::erase_if(
                 storages,
                 [](const auto& s)
                 { return !(s->statusFlag() & nx::vms::api::StorageStatus::dbReady); });

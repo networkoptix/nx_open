@@ -99,7 +99,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                 model.status = status->status;
             }
 
-            nx::utils::remove_if(
+            nx::utils::erase_if(
                 allStorages,
                 [&model](const auto& storage)
                 {

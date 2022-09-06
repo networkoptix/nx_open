@@ -55,7 +55,7 @@ void ResourceWithParameters::setFromList(const ResourceParamWithRefDataList& lis
 
 void ResourceWithParameters::extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list)
 {
-    nx::utils::remove_if(
+    nx::utils::erase_if(
         *list,
         [this, id](const auto& parameter)
         {

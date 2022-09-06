@@ -745,7 +745,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType
         for (int i = 0; i < resList.size(); ++i)
             resList[i] = resList[i]->getParentResource();
     }
-    nx::utils::remove_if(resList, [](const QnResourcePtr& res) { return !res; });
+    nx::utils::erase_if(resList, [](const QnResourcePtr& res) { return !res; });
 
     if (resList.isEmpty())
     {

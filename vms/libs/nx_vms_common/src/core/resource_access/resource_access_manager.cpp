@@ -359,7 +359,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
     auto resources = resourcePool()->getResources();
     auto subjects = m_context->resourceAccessSubjectsCache()->allSubjects();
 
-    nx::utils::remove_if(resources,
+    nx::utils::erase_if(resources,
         [this](const auto& resource)
         {
             return resource->resourcePool() == nullptr;
