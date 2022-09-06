@@ -15,24 +15,23 @@ struct QnCrossSystemCameraWidget::Private
 {
     CrossSystemCameraResourcePtr crossSystemCamera;
 
-    int calculateButtonsVisibility() const
-    {
-        return Qn::WidgetButtons::CloseButton;
-    }
-
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
-        switch (crossSystemCamera->crossSystemContext()->status())
+        const auto crossSystemContext = crossSystemCamera->crossSystemContext();
+        const auto status = crossSystemContext->status();
+        if (status == CloudCrossSystemContext::Status::uninitialized
+            || (crossSystemContext->isConnected() && !crossSystemContext->isOnline()))
         {
-            case CloudCrossSystemContext::Status::uninitialized:
-                return Qn::ResourceStatusOverlay::OfflineOverlay;
-            case CloudCrossSystemContext::Status::connecting:
-                return Qn::ResourceStatusOverlay::LoadingOverlay;
-            case CloudCrossSystemContext::Status::connectionFailure:
-                return Qn::InformationRequiredOverlay;
-            default:
-                return Qn::EmptyOverlay;
+            return Qn::ResourceStatusOverlay::OfflineOverlay;
         }
+
+        if (status == CloudCrossSystemContext::Status::connecting)
+            return Qn::ResourceStatusOverlay::LoadingOverlay;
+
+        if (status == CloudCrossSystemContext::Status::connectionFailure)
+            return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
+
+        return Qn::EmptyOverlay;
     }
 };
 
@@ -72,7 +71,7 @@ QnCrossSystemCameraWidget::~QnCrossSystemCameraWidget() = default;
 int QnCrossSystemCameraWidget::calculateButtonsVisibility() const
 {
     if (d->crossSystemCamera && d->crossSystemCamera->hasFlags(Qn::fake))
-        return d->calculateButtonsVisibility();
+        return Qn::WidgetButtons::CloseButton;
 
     return QnMediaResourceWidget::calculateButtonsVisibility();
 }

@@ -336,7 +336,7 @@ FocusScope
                 readonly property var sourceIndex: NxGlobals.toPersistent(
                     linearizationListModel.mapToSource(modelIndex))
 
-                readonly property int itemFlags: linearizationListModel.flags(modelIndex)
+                readonly property alias itemFlags: itemFlagsWatcher.itemFlags
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property alias isSelected: selectionHighlight.isItemSelected
 
@@ -356,6 +356,12 @@ FocusScope
                 }
 
                 ContextHelp.topicId: (model && model.helpTopicId) || 0
+
+                ModelItemFlagsWatcher
+                {
+                    id: itemFlagsWatcher
+                    index: listItem.modelIndex
+                }
 
                 Rectangle
                 {

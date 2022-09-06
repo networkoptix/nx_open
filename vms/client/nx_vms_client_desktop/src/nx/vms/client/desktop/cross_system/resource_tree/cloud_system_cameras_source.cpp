@@ -5,6 +5,7 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/camera_resource.h>
+#include <network/base_system_description.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -40,7 +41,7 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
 
-                if (!systemContext->isConnected())
+                if (!systemContext->isConnected() || !systemContext->isOnline())
                     return;
 
                 auto handler = q->addKeyHandler;
@@ -54,7 +55,7 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
 
-                if (!systemContext->isConnected())
+                if (!systemContext->isConnected() || !systemContext->isOnline())
                     return;
 
                 auto handler = q->removeKeyHandler;
@@ -62,11 +63,10 @@ struct CloudSystemCamerasSource::Private
                     (*handler)(camera);
             });
 
-        connections << QObject::connect(systemContext,
-            &CloudCrossSystemContext::statusChanged,
+        const auto handleSystemStateChanges =
             [this]
             {
-                if (systemContext->isConnected())
+                if (systemContext->isConnected() && systemContext->isOnline())
                 {
                     auto cameras = systemContext->cameras();
                     q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
@@ -75,10 +75,20 @@ struct CloudSystemCamerasSource::Private
                 {
                     q->setKeysHandler({});
                 }
-            });
+            };
+
+        connections << QObject::connect(
+            systemContext->systemDescription(),
+            &QnBaseSystemDescription::onlineStateChanged,
+            handleSystemStateChanges);
+
+        connections << QObject::connect(
+            systemContext,
+            &CloudCrossSystemContext::statusChanged,
+            handleSystemStateChanges);
 
         auto cameras = systemContext->cameras();
-        if (systemContext->isConnected())
+        if (systemContext->isConnected() && systemContext->isOnline())
         {
             NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
             q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
