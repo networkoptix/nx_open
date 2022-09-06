@@ -2043,7 +2043,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         targetResources = parameters.resources();
     }
 
-    nx::utils::remove_if(targetResources,
+    nx::utils::erase_if(targetResources,
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
     if (targetResources.isEmpty())

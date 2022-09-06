@@ -314,7 +314,7 @@ void MessageBus::createOutgoingConnections(
 
             // Connection to this peer have been closed recently
 
-            nx::utils::remove_if(
+            nx::utils::erase_if(
                 remoteConnection.disconnectTimes,
                 [this](const auto& timer)
                 {
@@ -1236,7 +1236,7 @@ void MessageBus::gotUnicastTransaction(
 }
 
 bool MessageBus::handlePushTransactionList(
-    const P2pConnectionPtr& connection, 
+    const P2pConnectionPtr& connection,
     const QByteArray& data,
     nx::Locker<nx::Mutex>* lock)
 {

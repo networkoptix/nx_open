@@ -160,7 +160,7 @@ NodePtr removeEmptyGroupsRecursive(NodePtr node)
         removeEmptyGroupsRecursive(child);
 
     // Cleanup empty subgroups.
-    nx::utils::remove_if(node->children,
+    nx::utils::erase_if(node->children,
         [](const auto& child)
         {
             return child->nodeType == NodeType::group && child->children.empty();
@@ -173,7 +173,7 @@ NodePtr removeEmptyGroupsRecursive(NodePtr node)
 NodePtr filterNodeExclusiveRecursive(NodePtr node, NodeFilter excludeNode)
 {
     // Remove immediate children if they should be filtered out.
-    nx::utils::remove_if(node->children, excludeNode);
+    nx::utils::erase_if(node->children, excludeNode);
 
     // Remove event types in groups.
     for (auto child: node->children)
@@ -246,7 +246,7 @@ NodePtr AnalyticsEntitiesTreeBuilder::cleanupTree(NodePtr root)
         removeEmptyGroupsRecursive(engine);
 
     // Cleanup empty engines.
-    nx::utils::remove_if(engines, [](const auto& engine) { return engine->children.empty(); });
+    nx::utils::erase_if(engines, [](const auto& engine) { return engine->children.empty(); });
 
     // Make the single engine the root if possible.
     if (engines.size() == 1)
