@@ -5,7 +5,9 @@
 #include <map>
 
 #include <finders/systems_finder.h>
+#include <network/system_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include "cloud_cross_system_context.h"
 
@@ -22,69 +24,62 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
     QObject(parent),
     d(new Private())
 {
-    const auto systemsFinder = QnSystemsFinder::instance();
-    if (!systemsFinder) //< Systems finder won't be available in the test environment.
-        return;
-
-    NX_VERBOSE(this, "Initialized");
-    auto updateSystemStatus =
-        [this](const QString& systemId)
+    const auto setCloudSystems =
+        [this](const QnCloudSystemList& currentCloudSystems)
         {
-            auto systemDescription = QnSystemsFinder::instance()->getSystem(systemId);
-            auto existing = d->cloudSystems.find(systemId);
-            if (systemDescription && systemDescription->isCloudSystem())
-            {
-                if (existing != d->cloudSystems.end())
-                {
-                    NX_VERBOSE(this, "System %1 became online again", systemDescription->name());
-                    existing->second->update(CloudCrossSystemContext::UpdateReason::found);
-                }
-                else
-                {
-                    NX_VERBOSE(this, "Found new cloud system %1", systemDescription->name());
-                    d->cloudSystems[systemId] =
-                        std::make_unique<CloudCrossSystemContext>(systemDescription);
-                    d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::new_);
-                }
+            QSet<QString> newCloudSystemsIds;
+            for (const auto& cloudSystem: currentCloudSystems)
+                newCloudSystemsIds.insert(helpers::getTargetSystemId(cloudSystem));
 
+            QSet<QString> currentCloudSystemsIds;
+            for (const auto& [id, _]: d->cloudSystems)
+                currentCloudSystemsIds.insert(id);
+
+            const auto addedCloudIds = newCloudSystemsIds - currentCloudSystemsIds;
+            const auto removedCloudIds = currentCloudSystemsIds - newCloudSystemsIds;
+
+            for (const auto& systemId: addedCloudIds)
+            {
+                auto systemDescription = QnSystemsFinder::instance()->getSystem(systemId);
+                NX_VERBOSE(this, "Found new cloud system %1", systemDescription->name());
+                d->cloudSystems[systemId] =
+                    std::make_unique<CloudCrossSystemContext>(systemDescription);
                 emit systemFound(systemId);
             }
-            else if (existing != d->cloudSystems.end()) //< System is lost or not cloud anymore.
+
+            for (const auto& systemId: removedCloudIds)
             {
-                NX_VERBOSE(this, "Cloud system %1 lost", existing->second.get());
-                //d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::lost);
-                d->cloudSystems.erase(existing);
+                NX_VERBOSE(this, "Cloud system %1 is lost", d->cloudSystems[systemId].get());
+                d->cloudSystems.erase(systemId);
                 emit systemLost(systemId);
             }
         };
 
-    auto handleSystemAdded =
-        [this, updateSystemStatus](const QnSystemDescriptionPtr& systemDescription)
+    connect(
+        qnCloudStatusWatcher,
+        &QnCloudStatusWatcher::statusChanged,
+        this,
+        [this, setCloudSystems](auto status)
         {
-            updateSystemStatus(systemDescription->id());
-            connect(systemDescription.get(), &QnBaseSystemDescription::isCloudSystemChanged,
-                this, [this, updateSystemStatus,
-                    systemId = systemDescription->id(),
-                    name = systemDescription->name()]()
-                {
-                    NX_VERBOSE(this, "Cloud status is changed for %1", name);
-                    updateSystemStatus(systemId);
-                });
-        };
+            NX_VERBOSE(this, "Cloud status changed to %1", status);
+            setCloudSystems(status == QnCloudStatusWatcher::Online
+                ? qnCloudStatusWatcher->cloudSystems()
+                : QnCloudSystemList());
+        });
 
-    connect(systemsFinder,
-        &QnSystemsFinder::systemDiscovered,
+    connect(
+        qnCloudStatusWatcher,
+        &QnCloudStatusWatcher::cloudSystemsChanged,
         this,
-        handleSystemAdded);
+        [this, setCloudSystems](const auto& currentCloudSystems)
+        {
+            NX_VERBOSE(this, "Cloud systems changed");
+            setCloudSystems(currentCloudSystems);
+        });
 
-    connect(systemsFinder,
-        &QnSystemsFinder::systemLost,
-        this,
-        updateSystemStatus);
+    setCloudSystems(qnCloudStatusWatcher->cloudSystems());
 
-    const auto systemsDescriptions = systemsFinder->systems();
-    for (const auto& systemDescription: systemsDescriptions)
-        handleSystemAdded(systemDescription);
+    NX_VERBOSE(this, "Initialized");
 }
 
 CloudCrossSystemManager::~CloudCrossSystemManager() = default;

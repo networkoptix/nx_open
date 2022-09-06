@@ -45,7 +45,12 @@ public:
 
     bool isConnected() const;
 
+    /** Returns whether the system the context belongs is online. */
+    bool isOnline() const;
+
     QString systemId() const;
+
+    QnBaseSystemDescription* systemDescription() const;
 
     SystemContext* systemContext() const;
 
@@ -67,14 +72,6 @@ public:
     void initializeConnectionWithUserInteraction();
 
     QnVirtualCameraResourcePtr createThumbCameraResource(QnUuid id);
-
-    enum class UpdateReason
-    {
-        new_,
-        found,
-        lost
-    };
-    void update(UpdateReason reason);
 
 signals:
     void statusChanged();
