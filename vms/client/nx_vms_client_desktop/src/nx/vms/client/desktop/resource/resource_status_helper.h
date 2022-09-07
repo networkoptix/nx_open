@@ -51,6 +51,7 @@ public:
         videowallLicenseRequired = 0x0800,
         noVideoData = 0x1000,
         mismatchedCertificate = 0x2000,
+        accessDenied = 0x4000,
     };
     Q_ENUM(StatusFlag)
     Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
