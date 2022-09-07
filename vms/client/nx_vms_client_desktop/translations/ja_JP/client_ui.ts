@@ -1829,7 +1829,7 @@
     </message>
     <message>
       <source>Play to users</source>
-      <translation>ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2386,7 +2386,7 @@
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴有効</translation>
+      <translation>操作履歴を有効にする</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2446,7 +2446,7 @@
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化</translation>
+      <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化する</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation>クライアントAPIの使用を許可</translation>
+      <translation>クライアント API の使用を許可する</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>

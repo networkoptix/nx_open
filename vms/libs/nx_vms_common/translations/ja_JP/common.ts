@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation>パスワードの有効期限が切れています。システム管理者に連絡してください。</translation>
+      <translation>パスワードの有効期限が切れています。システム管理者に依賴してください。</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>内部サーバーエラー (%1) 。システム管理者に連絡してください。</translation>
+      <translation>内部サーバーエラー (%1) 。システム管理者に依賴してください。</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -998,7 +998,7 @@
     </message>
     <message>
       <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <translation>管理者</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -1697,7 +1697,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation>インターホン通知者</translation>
+      <translation>インターホン通知</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>
