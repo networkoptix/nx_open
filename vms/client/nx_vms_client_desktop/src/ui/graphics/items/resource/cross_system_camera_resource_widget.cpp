@@ -20,7 +20,8 @@ struct QnCrossSystemCameraWidget::Private
         const auto crossSystemContext = crossSystemCamera->crossSystemContext();
         const auto status = crossSystemContext->status();
         if (status == CloudCrossSystemContext::Status::uninitialized
-            || (crossSystemContext->isConnected() && !crossSystemContext->isOnline()))
+            || (status == CloudCrossSystemContext::Status::connected
+                && !crossSystemContext->isSystemReadyToUse()))
         {
             return Qn::ResourceStatusOverlay::OfflineOverlay;
         }

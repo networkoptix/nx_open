@@ -13,6 +13,9 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_system_status_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/resource_item.h>
@@ -125,27 +128,48 @@ InvalidatorPtr userRoleNameInvalidator(QnUserRolesManager* rolesManager, const Q
 //-------------------------------------------------------------------------------------------------
 // Icon data provider / invalidator and flags provider factory functions for the cloud system item.
 //-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider cloudSystemIconProvider(const QnSystemDescriptionPtr& systemDescription)
+GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
 {
     return
-        [weakSystemDescription = systemDescription.toWeakRef()]
+        [systemId]
         {
-            if (auto systemDescription = weakSystemDescription.lock())
+            namespace desktop = nx::vms::client::desktop;
+            auto context = desktop::appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            if (NX_ASSERT(context))
             {
-                if (systemDescription->isReachable() && systemDescription->isOnline())
-                    return static_cast<int>(QnResourceIconCache::CloudSystem);
+                const auto status = context->status();
+                if (status == desktop::CloudCrossSystemContext::Status::connectionFailure)
+                {
+                    return static_cast<int>(
+                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
+                }
+
+                if (status == desktop::CloudCrossSystemContext::Status::unsupportedPermanently
+                    || status == desktop::CloudCrossSystemContext::Status::unsupportedTemporary)
+                {
+                    return static_cast<int>(
+                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
+                }
             }
-            return static_cast<int>(QnResourceIconCache::CloudSystem | QnResourceIconCache::ReadOnly);
+
+            return static_cast<int>(QnResourceIconCache::CloudSystem);
         };
 }
 
-InvalidatorPtr cloudSystemIconInvalidator(const QnSystemDescriptionPtr& systemDescription)
+InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
 {
     auto result = std::make_shared<Invalidator>();
 
+    const auto context = nx::vms::client::desktop::appContext()->cloudCrossSystemManager()
+        ->systemContext(systemId);
+
+    if (!NX_ASSERT(context))
+        return result;
+
     result->connections()->add(QObject::connect(
-        systemDescription.get(),
-        &QnBaseSystemDescription::onlineStateChanged,
+        context,
+        &nx::vms::client::desktop::CloudCrossSystemContext::statusChanged,
         [invalidator = result.get()]
         {
             invalidator->invalidate();
@@ -464,8 +488,8 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
     if (!NX_ASSERT(systemDescription && systemDescription->isCloudSystem()))
         return {};
 
-    const auto iconProvider = cloudSystemIconProvider(systemDescription);
-    const auto iconInvalidator = cloudSystemIconInvalidator(systemDescription);
+    const auto iconProvider = cloudSystemIconProvider(systemId);
+    const auto iconInvalidator = cloudSystemIconInvalidator(systemId);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, systemDescription->name())
