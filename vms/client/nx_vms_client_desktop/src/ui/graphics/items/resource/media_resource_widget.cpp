@@ -1982,6 +1982,9 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::UnauthorizedOverlay)
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
 
+    if (statusOverlay == Qn::AccessDeniedOverlay)
+        return Qn::MainWindow_MediaItem_AccessDenied_Help;
+
     if (statusOverlay == Qn::IoModuleDisabledOverlay)
         return Qn::IOModules_Help;
 
@@ -2368,6 +2371,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (qnRuntime->isVideoWallMode() && !isVideoWallLicenseValid())
         return Qn::VideowallWithoutLicenseOverlay;
+
+    if (!d->hasAccess())
+        return Qn::AccessDeniedOverlay;
 
     // TODO: #sivanov This requires a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF.
@@ -2785,6 +2791,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenseStatus);
     const bool correctState = (!d->isOffline()
         && !d->isUnauthorized()
+        && d->hasAccess()
         && d->isPlayingLive());
     const OverlayVisibility visibility = (m_ioCouldBeShown && correctState ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility, animate);
@@ -3088,6 +3095,11 @@ void QnMediaResourceWidget::at_itemDataChanged(int role)
         updateAnalyticsVisibility(false);
     if (role == Qn::ItemDisplayRoiRole)
         updateHud(false);
+}
+
+QnClientCameraResourcePtr QnMediaResourceWidget::camera() const
+{
+    return d->camera;
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr

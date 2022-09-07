@@ -230,6 +230,9 @@ Item
             if (helper.status & ResourceStatusHelper.StatusFlag.videowallLicenseRequired)
                 return StatusOverlay.VideowallWithoutLicenseOverlay
 
+            if (helper.status & ResourceStatusHelper.StatusFlag.accessDenied)
+                return StatusOverlay.AccessDenied
+
             if (helper.resourceType == ResourceStatusHelper.ResourceType.localMedia)
             {
                 if (helper.status & ResourceStatusHelper.StatusFlag.offline)
@@ -254,7 +257,7 @@ Item
                     return StatusOverlay.OfflineOverlay
 
                 if (helper.status & ResourceStatusHelper.StatusFlag.unauthorized)
-                        return StatusOverlay.UnauthorizedOverlay
+                    return StatusOverlay.UnauthorizedOverlay
 
                 if (helper.status & ResourceStatusHelper.StatusFlag.defaultPassword)
                     return StatusOverlay.PasswordRequiredOverlay
@@ -349,6 +352,11 @@ Item
                     return makeErrorOverlayData(qsTr("Unauthorized"),
                         "qrc:///skin/item_placeholders/unauthorized.png",
                         qsTr("Please check authentication information"))
+
+                case StatusOverlay.AccessDenied:
+                    return makeErrorOverlayData(qsTr("Access denied"),
+                        "qrc:///skin/item_placeholders/access_denied.png",
+                        qsTr("Access denied, please contact system administrator"))
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
