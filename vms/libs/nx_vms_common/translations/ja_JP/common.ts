@@ -2157,7 +2157,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation>インターホン通知者</translation>
+      <translation>インターホン通知</translation>
     </message>
     <message>
       <source>Failed to backup file</source>
