@@ -64,6 +64,7 @@ private:
     nx::utils::ScopedConnections m_resourceConnections;
     StatusFlags m_status{};
     LicenseUsage m_licenseUsage = LicenseUsage::notUsed;
+    QPointer<QnWorkbenchAccessController> m_cameraAccessController;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -71,6 +72,7 @@ private:
 
 ResourceStatusHelper::ResourceStatusHelper(QObject* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
 }
@@ -240,6 +242,8 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
 
         if (m_camera)
         {
+            m_cameraAccessController = q->accessController();
+
             using namespace nx::vms::license;
             m_licenseHelper.reset(new SingleCamLicenseStatusHelper(m_camera));
             connect(m_licenseHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
@@ -285,6 +289,9 @@ void ResourceStatusHelper::Private::updateStatus()
             && !m_context->action(ui::action::ToggleLayoutTourModeAction)->isChecked());
 
         status.setFlag(StatusFlag::dts, m_camera->isDtsBased());
+
+        status.setFlag(StatusFlag::accessDenied,
+            !m_cameraAccessController->hasPermissions(m_camera, Qn::ViewContentPermission));
     }
 
     status.setFlag(StatusFlag::canChangePasswords, qnRuntime->isDesktopMode()

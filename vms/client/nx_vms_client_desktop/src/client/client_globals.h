@@ -372,6 +372,7 @@ namespace Qn
         NoDataOverlay,
         NoVideoDataOverlay,
         UnauthorizedOverlay,
+        AccessDeniedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
         VideowallWithoutLicenseOverlay,

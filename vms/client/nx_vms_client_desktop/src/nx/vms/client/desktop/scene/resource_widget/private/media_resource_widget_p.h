@@ -79,6 +79,7 @@ public:
     bool isPlayingLive() const;
     bool isOffline() const;
     bool isUnauthorized() const;
+    bool hasAccess() const;
     bool supportsBasicPtz() const; //< Camera supports Pan, Tilt and Zoom.
     bool supportsPtzCapabilities(Ptz::Capabilities capabilities) const;
 
@@ -114,6 +115,9 @@ private:
     void updateIsUnauthorized();
     void setIsUnauthorized(bool value);
 
+    void updateAccess();
+    void setHasAccess(bool value);
+
     bool calculateIsAnalyticsSupported() const;
     void updateIsAnalyticsSupported();
 
@@ -134,6 +138,7 @@ private:
     bool m_isPlayingLive = false;
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
+    bool m_hasAccess = true;
     bool m_analyticsObjectsFound = false;
     bool m_forceDisabledAnalytics = false;
 

@@ -13,6 +13,7 @@
 #include <client/client_globals.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -334,6 +335,8 @@ protected:
     void setAnalyticsModeEnabled(bool enabled, bool animate);
 
     virtual void at_itemDataChanged(int role) override;
+
+    QnClientCameraResourcePtr camera() const;
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);

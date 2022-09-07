@@ -7,12 +7,13 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/impl_ptr.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class ResourceStatusHelper: public QObject
+class ResourceStatusHelper: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnWorkbenchContext* context READ context WRITE setContext NOTIFY contextChanged)
@@ -51,6 +52,7 @@ public:
         videowallLicenseRequired = 0x0800,
         noVideoData = 0x1000,
         mismatchedCertificate = 0x2000,
+        accessDenied = 0x4000,
     };
     Q_ENUM(StatusFlag)
     Q_DECLARE_FLAGS(StatusFlags, StatusFlag)

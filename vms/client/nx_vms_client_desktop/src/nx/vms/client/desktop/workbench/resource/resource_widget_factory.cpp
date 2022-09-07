@@ -2,11 +2,12 @@
 
 #include "resource_widget_factory.h"
 
+#include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
-
+#include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
@@ -44,11 +45,16 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
     if (!resource)
         return nullptr;
 
+    const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
+        && nx::vms::common::isIntercomLayout(item->layout()->resource());
+
     const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
         ? Qn::ViewContentPermission
         : Qn::ReadPermission;
 
-    if (!context->accessController()->hasPermissions(resource, requiredPermission))
+    // Intercom cameras can be placed on layout even if there are no permissions.
+    if (!itemIsIntercomLayout
+            && !context->accessController()->hasPermissions(resource, requiredPermission))
     {
         NX_DEBUG(typeid(ResourceWidgetFactory), lit("ResourceWidgetFactory: insufficient permissions"));
         return nullptr;
@@ -64,6 +70,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
 
     if (resource->hasFlags(Qn::videowall))
         return new QnVideowallScreenWidget(context, item);
+
+    if (itemIsIntercomLayout && nx::vms::common::isIntercom(resource))
+        return new IntercomResourceWidget(context, item);
 
     if (resource->hasFlags(Qn::media))
         return new QnMediaResourceWidget(context, item);

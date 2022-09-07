@@ -9,6 +9,7 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client_core/client_core_module.h>
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/motion_window.h>
@@ -153,6 +154,16 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     connect(resource, &QnResource::statusChanged, this,
         &MediaResourceWidgetPrivate::updateIsUnauthorized);
 
+    connect(m_accessController, &QnWorkbenchAccessController::globalPermissionsChanged,
+        this, &MediaResourceWidgetPrivate::updateAccess);
+
+    connect(m_accessController, &QnWorkbenchAccessController::permissionsChanged, this,
+        [this](const QnResourcePtr& updatedResource)
+        {
+            if (updatedResource == this->resource)
+                updateAccess();
+        });
+
     if (camera)
     {
         using namespace nx::vms::license;
@@ -171,6 +182,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
         connect(camera, &QnVirtualCameraResource::motionRegionChanged, this,
             [this] { m_motionSkipMaskCache.reset(); } );
 
+        updateAccess();
         updateIsAnalyticsSupported();
         requestAnalyticsObjectsExistence();
 
@@ -246,6 +258,11 @@ bool MediaResourceWidgetPrivate::isOffline() const
 bool MediaResourceWidgetPrivate::isUnauthorized() const
 {
     return m_isUnauthorized;
+}
+
+bool MediaResourceWidgetPrivate::hasAccess() const
+{
+    return m_hasAccess;
 }
 
 bool MediaResourceWidgetPrivate::supportsBasicPtz() const
@@ -400,6 +417,24 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
         return;
 
     m_isUnauthorized = value;
+    emit stateChanged();
+}
+
+void MediaResourceWidgetPrivate::updateAccess()
+{
+    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
+    setHasAccess(m_accessController->hasPermissions(resource, requiredPermission));
+}
+
+void MediaResourceWidgetPrivate::setHasAccess(bool value)
+{
+    if (m_hasAccess == value)
+        return;
+
+    m_hasAccess = value;
     emit stateChanged();
 }
 
