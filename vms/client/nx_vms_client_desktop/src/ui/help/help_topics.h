@@ -102,6 +102,7 @@ enum HelpTopic
     MainWindow_MediaItem_Screenshot_Help,
     MainWindow_MediaItem_SmartSearch_Help,
     MainWindow_MediaItem_Unauthorized_Help,
+    MainWindow_MediaItem_AccessDenied_Help,
     MainWindow_MediaItem_ZoomWindows_Help,
     MainWindow_MonitoringItem_Help,
     MainWindow_MonitoringItem_Log_Help,
