@@ -196,6 +196,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "performing_smart_search.html";
         case Qn::HelpTopic::MainWindow_MediaItem_Unauthorized_Help:
             return "configuring_camera_authentication_(admin_only).html";
+        case Qn::HelpTopic::MainWindow_MediaItem_AccessDenied_Help:
+            return "configuring_camera_authentication_(admin_only).html";
         case Qn::HelpTopic::MainWindow_MediaItem_ZoomWindows_Help:
             return "zoom_windows.html";
         case Qn::HelpTopic::MainWindow_MonitoringItem_Help:

@@ -257,6 +257,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
     {
         { Qn::NoDataOverlay, tr("NO DATA") },
         { Qn::UnauthorizedOverlay, tr("UNAUTHORIZED") },
+        { Qn::AccessDeniedOverlay, tr("ACCESS DENIED") },
         { Qn::OfflineOverlay, tr("OFFLINE") },
         { Qn::AnalogWithoutLicenseOverlay, kNotEnoughLicenses },
         { Qn::VideowallWithoutLicenseOverlay, kNotEnoughLicenses },
@@ -275,9 +276,16 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
 
 QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay overlay)
 {
-    return (overlay == Qn::UnauthorizedOverlay
-        ? tr("Please check authentication information")
-        : QString());
+    switch (overlay)
+    {
+        case Qn::UnauthorizedOverlay:
+            return tr("Please check authentication information");
+        case Qn::AccessDeniedOverlay:
+            return tr("Access denied, please contact system administrator");
+        default:
+            break;
+    }
+    return QString();
 }
 
 QString QnStatusOverlayController::suggestionText(Qn::ResourceStatusOverlay overlay,
@@ -303,6 +311,7 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
     static const IntStringHash kIconPaths
     {
         { Qn::UnauthorizedOverlay, lit("item_placeholders/unauthorized.png") },
+        { Qn::AccessDeniedOverlay, lit("item_placeholders/access_denied.png") },
         { Qn::OfflineOverlay, lit("item_placeholders/no_signal.png") },
         { Qn::AnalogWithoutLicenseOverlay, kLicenceIconPath },
         { Qn::VideowallWithoutLicenseOverlay, kLicenceIconPath },

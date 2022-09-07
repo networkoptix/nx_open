@@ -2,14 +2,17 @@
 
 #include "resource_widget_factory.h"
 
-#include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/resource/layout_tour_item_widget.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <ui/graphics/items/resource/cross_system_camera_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
@@ -42,18 +45,23 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
 
     auto systemContext = SystemContext::fromResource(resource);
 
+    // TODO: #sivanov Take Window Context from the workbench item.
+    auto windowContext = appContext()->mainWindowContext();
+
+    const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
+        && nx::vms::common::isIntercomLayout(item->layout()->resource());
+
     const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
         ? Qn::ViewContentPermission
         : Qn::ReadPermission;
 
-    if (!systemContext->accessController()->hasPermissions(resource, requiredPermission))
+    // Intercom cameras can be placed on layout even if there are no permissions.
+    if (!itemIsIntercomLayout
+            && !systemContext->accessController()->hasPermissions(resource, requiredPermission))
     {
         NX_DEBUG(typeid(ResourceWidgetFactory), lit("ResourceWidgetFactory: insufficient permissions"));
         return nullptr;
     }
-
-    // TODO: #sivanov Take Window Context from the workbench item.
-    auto windowContext = appContext()->mainWindowContext();
 
     auto layout = item->layout();
     const bool isShowreelReviewLayout = layout && layout->isShowreelReviewLayout();
@@ -68,6 +76,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
 
     if (resource->hasFlags(Qn::cross_system))
         return new QnCrossSystemCameraWidget(systemContext, windowContext, item);
+
+    if (itemIsIntercomLayout && nx::vms::common::isIntercom(resource))
+        return new IntercomResourceWidget(systemContext, windowContext, item);
 
     if (resource->hasFlags(Qn::media))
         return new QnMediaResourceWidget(systemContext, windowContext, item);
