@@ -24,10 +24,16 @@
 class QnAbstractResourcePropertyAdaptor;
 template<class T> class QnResourcePropertyAdaptor;
 class QSettings;
-struct QnWatermarkSettings;
-namespace nx::vms::api { struct ResourceParamWithRefData; }
-namespace nx::vms::api { struct BackupSettings; }
-namespace nx::vms::api { struct LdapSettings; }
+
+namespace nx::vms::api {
+
+struct BackupSettings;
+struct LdapSettings;
+struct ResourceParamWithRefData;
+struct SystemSettings;
+struct WatermarkSettings;
+
+} // nx::vms::api
 
 namespace nx::vms::common {
 
@@ -403,8 +409,8 @@ public:
     int maxVirtualCameraArchiveSynchronizationThreads() const;
     void setMaxVirtualCameraArchiveSynchronizationThreads(int newValue);
 
-    QnWatermarkSettings watermarkSettings() const;
-    void setWatermarkSettings(const QnWatermarkSettings& settings) const;
+    nx::vms::api::WatermarkSettings watermarkSettings() const;
+    void setWatermarkSettings(const nx::vms::api::WatermarkSettings& settings) const;
 
     std::optional<std::chrono::minutes> sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::optional<std::chrono::minutes> value);
@@ -480,6 +486,8 @@ public:
 
     bool showMouseTimelinePreview() const;
     void setShowMouseTimelinePreview(bool value);
+
+    void update(const vms::api::SystemSettings& value);
 
 signals:
     void initialized();
@@ -659,7 +667,7 @@ private:
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::common::api::ClientUpdateSettings>*
         m_clientUpdateSettingsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_sessionsLimitAdaptor = nullptr;

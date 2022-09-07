@@ -3,14 +3,14 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <utils/common/watermark_settings.h>
+#include <nx/vms/api/data/watermark_settings.h>
 
 namespace nx {
 namespace core {
 
 struct Watermark
 {
-    QnWatermarkSettings settings;
+    vms::api::WatermarkSettings settings;
     QString text;
 
     bool operator==(const Watermark& other) const = default;

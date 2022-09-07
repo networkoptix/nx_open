@@ -12,8 +12,9 @@
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/api/data/watermark_settings.h>
 #include <nx/vms/common/system_context.h>
-#include <utils/common/watermark_settings.h>
 #include <utils/email/email.h>
 
 static void serialize(QnJsonContext*, const QnOptionalBool& value, QJsonValue* outJson)
@@ -645,8 +646,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "maxVirtualCameraArchiveSynchronizationThreads", -1, this,
         [] { return tr("Thread count limit for Camera archive synchronization"); });
 
-    m_watermarkSettingsAdaptor = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
-        "watermarkSettings", QnWatermarkSettings(), this, [] { return tr("Watermark settings"); });
+    m_watermarkSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>(
+        "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
+        [] { return tr("Watermark settings"); });
 
     m_sessionTimeoutLimitMinutesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionLimitMinutes, 30 * 24 * 60, [](const int& value) { return value >= 0; }, this,
@@ -1951,12 +1953,12 @@ bool SystemSettings::cloudConnectRelayingOverSslForced() const
     return m_cloudConnectRelayingOverSslForcedAdaptor->value();
 }
 
-QnWatermarkSettings SystemSettings::watermarkSettings() const
+nx::vms::api::WatermarkSettings SystemSettings::watermarkSettings() const
 {
     return m_watermarkSettingsAdaptor->value();
 }
 
-void SystemSettings::setWatermarkSettings(const QnWatermarkSettings& settings) const
+void SystemSettings::setWatermarkSettings(const nx::vms::api::WatermarkSettings& settings) const
 {
     m_watermarkSettingsAdaptor->setValue(settings);
 }
@@ -2258,6 +2260,17 @@ bool SystemSettings::isInsecureDeprecatedApiInUseEnabled() const
 void SystemSettings::enableInsecureDeprecatedApiInUse(bool value)
 {
     m_insecureDeprecatedApiInUseEnabledAdaptor->setValue(value);
+}
+
+void SystemSettings::update(const vms::api::SystemSettings& value)
+{
+    m_cloudAccountNameAdaptor->setValue(value.cloudAccountName);
+    m_cloudSystemIdAdaptor->setValue(value.cloudSystemID);
+    m_defaultExportVideoCodecAdaptor->setValue(value.defaultExportVideoCodec);
+    m_localSystemIdAdaptor->setValue(value.localSystemId);
+    m_systemNameAdaptor->setValue(value.systemName);
+    m_watermarkSettingsAdaptor->setValue(value.watermarkSettings);
+    m_webSocketEnabledAdaptor->setValue(value.webSocketEnabled);
 }
 
 } // namespace nx::vms::common
