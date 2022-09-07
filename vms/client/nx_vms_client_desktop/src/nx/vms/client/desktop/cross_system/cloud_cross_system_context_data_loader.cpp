@@ -11,6 +11,7 @@
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/reflect/json.h>
 
 using namespace std::chrono;
 using namespace nx::vms::api;
@@ -34,6 +35,7 @@ struct CloudCrossSystemContextDataLoader::Private
     std::optional<UserModel> user;
     std::optional<ServerInformationList> servers;
     std::optional<ServerFootageDataList> serverFootageData;
+    std::optional<SystemSettings> systemSettings;
     std::optional<CameraDataExList> cameras;
     QElapsedTimer camerasRefreshTimer;
 
@@ -146,6 +148,50 @@ struct CloudCrossSystemContextDataLoader::Private
             q->thread());
     }
 
+    rest::Handle requestSystemSettings()
+    {
+        NX_VERBOSE(this, "Updating system settings");
+        auto callback = nx::utils::guarded(q,
+            [this](
+                bool success,
+                ::rest::Handle requestId,
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
+            {
+                NX_ASSERT(currentRequest && *currentRequest == requestId);
+                currentRequest = std::nullopt;
+
+                if (!success)
+                {
+                     NX_WARNING(this, "System settings request failed");
+                     return;
+                }
+
+                auto [result, deserializationResult] =
+                    reflect::json::deserialize<SystemSettings>(data.data());
+                if (!deserializationResult.success)
+                {
+                    NX_WARNING(
+                        this,
+                        "Server settings cannot be deserialized, error: %1",
+                        deserializationResult.errorDescription);
+                    return;
+                }
+
+                NX_VERBOSE(this, "System settings received");
+
+                systemSettings = result;
+                requestData();
+            }
+        );
+
+        return connection->getRawResult(
+            "/rest/v1/system/settings",
+            {},
+            callback,
+            q->thread());
+    }
+
     rest::Handle requestCameras()
     {
         NX_VERBOSE(this, "Updating cameras");
@@ -207,6 +253,10 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             currentRequest = requestServerFootageData();
         }
+        else if (!systemSettings)
+        {
+            currentRequest = requestSystemSettings();
+        }
         else if (!cameras
             || camerasRefreshTimer.hasExpired(milliseconds(kCamerasRefreshPeriod).count()))
         {
@@ -256,6 +306,11 @@ ServerFootageDataList CloudCrossSystemContextDataLoader::serverFootageData() con
 CameraDataExList CloudCrossSystemContextDataLoader::cameras() const
 {
     return d->cameras.value_or(CameraDataExList());
+}
+
+SystemSettings CloudCrossSystemContextDataLoader::systemSettings() const
+{
+    return d->systemSettings.value_or(SystemSettings());
 }
 
 } // namespace nx::vms::client::desktop

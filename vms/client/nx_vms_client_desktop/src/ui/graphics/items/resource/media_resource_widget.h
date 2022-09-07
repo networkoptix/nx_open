@@ -16,6 +16,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/core/watermark/watermark.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/dewarping_data.h>

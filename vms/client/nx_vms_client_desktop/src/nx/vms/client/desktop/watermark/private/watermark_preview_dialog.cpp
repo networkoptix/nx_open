@@ -84,7 +84,7 @@ WatermarkPreviewDialog::~WatermarkPreviewDialog()
 {
 }
 
-bool WatermarkPreviewDialog::editSettings(QnWatermarkSettings& settings, QWidget* parent)
+bool WatermarkPreviewDialog::editSettings(api::WatermarkSettings& settings, QWidget* parent)
 {
     QScopedPointer<WatermarkPreviewDialog> dialog(new WatermarkPreviewDialog(parent));
     dialog->m_settings = settings;
@@ -136,7 +136,7 @@ void WatermarkPreviewDialog::drawPreview()
     ui->image->setPixmap(image);
 }
 
-bool editWatermarkSettings(QnWatermarkSettings& settings, QWidget* parent)
+bool editWatermarkSettings(api::WatermarkSettings& settings, QWidget* parent)
 {
     return WatermarkPreviewDialog::editSettings(settings, parent);
 }

@@ -2,10 +2,16 @@
 
 #include "cross_system_camera_resource_widget.h"
 
+#include <core/resource/user_resource.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <ui/graphics/items/overlays/status_overlay_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/system_settings.h>
+#include <ui/graphics/items/overlays/status_overlay_controller.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 
 using nx::vms::client::desktop::CloudCrossSystemContext;
 using nx::vms::client::desktop::CrossSystemCameraResource;

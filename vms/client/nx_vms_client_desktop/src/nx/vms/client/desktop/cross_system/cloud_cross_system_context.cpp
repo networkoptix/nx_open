@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/delayed.h>
 #include <watchers/cloud_status_watcher.h>
@@ -276,6 +277,7 @@ struct CloudCrossSystemContext::Private
                 {
                     systemContext->cameraHistoryPool()->resetServerFootageData(
                         dataLoader->serverFootageData());
+                    systemContext->globalSettings()->update(dataLoader->systemSettings());
                 }
                 addCamerasToResourcePool(dataLoader->cameras());
                 updateStatus(Status::connected);

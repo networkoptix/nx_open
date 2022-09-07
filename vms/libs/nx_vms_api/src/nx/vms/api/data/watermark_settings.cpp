@@ -5,9 +5,13 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/compare.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWatermarkSettings, (json), QnWatermarkSettings_Fields)
+namespace nx::vms::api {
 
-bool QnWatermarkSettings::operator==(const QnWatermarkSettings& other) const
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(WatermarkSettings, (json), WatermarkSettings_Fields)
+
+bool WatermarkSettings::operator==(const WatermarkSettings& other) const
 {
     return nx::reflect::equals(*this, other);
 }
+
+} // namespace nx::vms::api
