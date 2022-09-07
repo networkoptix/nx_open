@@ -10,6 +10,8 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
@@ -22,6 +24,9 @@
 #include <utils/crypt/symmetrical.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
+const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
+
+using nx::vms::api::analytics::IntegrationRequestData;
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -510,6 +515,35 @@ QString QnUserResource::externalId() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_externalId;
+}
+
+std::optional<IntegrationRequestData> QnUserResource::integrationRequestData() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    const QString serializedIntegrationRequestData = getProperty(kIntegrationRequestDataProperty);
+    const auto [integrationRequestData, deserializationResult] =
+        nx::reflect::json::deserialize<IntegrationRequestData>(
+            serializedIntegrationRequestData.toStdString());
+
+    if (!deserializationResult)
+        return std::nullopt;
+
+    return integrationRequestData;
+}
+
+void QnUserResource::setIntegrationRequestData(
+    std::optional<IntegrationRequestData> integrationRequestData)
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    if (!integrationRequestData)
+        setProperty(kIntegrationRequestDataProperty, QString());
+
+    const std::string serializedIntegrationRequestData =
+        nx::reflect::json::serialize(*integrationRequestData);
+
+    setProperty(
+        kIntegrationRequestDataProperty,
+        QString::fromStdString(serializedIntegrationRequestData));
 }
 
 void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
