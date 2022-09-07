@@ -41,7 +41,7 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
 
-                if (!systemContext->isConnected() || !systemContext->isOnline())
+                if (!systemContext->isSystemReadyToUse())
                     return;
 
                 auto handler = q->addKeyHandler;
@@ -55,7 +55,7 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
 
-                if (!systemContext->isConnected() || !systemContext->isOnline())
+                if (!systemContext->isSystemReadyToUse())
                     return;
 
                 auto handler = q->removeKeyHandler;
@@ -66,7 +66,7 @@ struct CloudSystemCamerasSource::Private
         const auto handleSystemStateChanges =
             [this]
             {
-                if (systemContext->isConnected() && systemContext->isOnline())
+                if (systemContext->isSystemReadyToUse())
                 {
                     auto cameras = systemContext->cameras();
                     q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
@@ -88,7 +88,7 @@ struct CloudSystemCamerasSource::Private
             handleSystemStateChanges);
 
         auto cameras = systemContext->cameras();
-        if (systemContext->isConnected() && systemContext->isOnline())
+        if (systemContext->isSystemReadyToUse())
         {
             NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
             q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));

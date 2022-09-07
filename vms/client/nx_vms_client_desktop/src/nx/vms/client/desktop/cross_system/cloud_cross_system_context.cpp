@@ -178,7 +178,7 @@ struct CloudCrossSystemContext::Private
         if (!ini().crossSystemLayouts)
             return;
 
-        if (status == Status::unsupported)
+        if (status == Status::unsupportedPermanently)
             return;
 
         if (systemContext->connection())
@@ -208,7 +208,15 @@ struct CloudCrossSystemContext::Private
                     else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
                     {
                         NX_WARNING(this, "Error while establishing connection %1", error->code);
-                        updateStatus(Status::connectionFailure);
+                        if (error->code == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
+                            || error->code == core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled)
+                        {
+                            updateStatus(Status::unsupportedTemporary);
+                        }
+                        else
+                        {
+                            updateStatus(Status::connectionFailure);
+                        }
                     }
 
                     connectionProcess.reset();
@@ -241,7 +249,7 @@ struct CloudCrossSystemContext::Private
         isRestApiSupported = (connection->moduleInformation().version >= kRestApiSupportedVersion);
         if (!isRestApiSupported)
         {
-            updateStatus(Status::unsupported);
+            updateStatus(Status::unsupportedPermanently);
             return;
         }
 
@@ -442,14 +450,14 @@ CloudCrossSystemContext::Status CloudCrossSystemContext::status() const
     return d->status;
 }
 
-bool CloudCrossSystemContext::isConnected() const
+bool CloudCrossSystemContext::isSystemReadyToUse() const
 {
-    return d->status == Status::connected;
-}
-
-bool CloudCrossSystemContext::isOnline() const
-{
-    return d->systemDescription->isOnline();
+    // For example let consider when a cloud system SysA is reachable and online. So we start
+    // the client, the context do it stuff and becomes connected. Then we switch off the SysA,
+    // so it becomes offline. In that case the context is still connected but the system is
+    // offline. When the system will be online again we could continue use connection from
+    // the context.
+    return d->status == Status::connected && d->systemDescription->isOnline();
 }
 
 QString CloudCrossSystemContext::systemId() const
@@ -513,8 +521,10 @@ QString toString(CloudCrossSystemContext::Status status)
             return CloudCrossSystemContext::tr("Loading...");
         case CloudCrossSystemContext::Status::connectionFailure:
             return CloudCrossSystemContext::tr("Information required");
-        case CloudCrossSystemContext::Status::unsupported:
-            return "UNSUPPORTED"; //< Debug purposes.
+        case CloudCrossSystemContext::Status::unsupportedPermanently:
+            return "UNSUPPORTED PERMANENTLY"; //< Debug purposes.
+        case CloudCrossSystemContext::Status::unsupportedTemporary:
+            return "UNSUPPORTED TEMPORARY"; //< Debug purposes.
         case CloudCrossSystemContext::Status::connected:
             return "CONNECTED"; //< Debug purposes.
         default:
