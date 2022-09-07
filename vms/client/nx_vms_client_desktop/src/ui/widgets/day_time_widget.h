@@ -6,7 +6,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/utils/widget_opacity_mixin.h>
 #include <recording/time_period_storage.h>
 
 class QLabel;
@@ -15,9 +14,9 @@ class QTableWidgetItem;
 class QnDayTimeTableWidget;
 class QnDayTimeItemDelegate;
 
-class QnDayTimeWidget: public WidgetOpacityMixin<QWidget> {
+class QnDayTimeWidget: public QWidget {
     Q_OBJECT
-    typedef WidgetOpacityMixin<QWidget> base_type;
+    typedef QWidget base_type;
 
 public:
     QnDayTimeWidget(QWidget* parent = nullptr);
