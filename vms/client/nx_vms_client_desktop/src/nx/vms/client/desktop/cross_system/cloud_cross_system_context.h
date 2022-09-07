@@ -36,17 +36,16 @@ public:
         uninitialized,
         connecting,
         connectionFailure,
-        unsupported,
+        unsupportedPermanently,
+        unsupportedTemporary,
         connected,
     };
     Q_ENUM(Status);
 
     Status status() const;
 
-    bool isConnected() const;
-
-    /** Returns whether the system the context belongs is online. */
-    bool isOnline() const;
+    /** Returns whether the system the context belongs is connected and online. */
+    bool isSystemReadyToUse() const;
 
     QString systemId() const;
 

@@ -64,7 +64,7 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                 [context, systemId, processLayouts]()
                 {
                     // Handle system went online and loaded all it's cameras.
-                    if (context->isConnected())
+                    if (context->status() == CloudCrossSystemContext::Status::connected)
                         processLayouts(context, systemId);
                 });
         });
