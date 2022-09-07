@@ -143,8 +143,6 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     setDate(QDate::currentDate());
     updateCurrentTime();
     updateEnabled();
-
-    initOpacityMixin();
 }
 
 QnDayTimeWidget::~QnDayTimeWidget() {

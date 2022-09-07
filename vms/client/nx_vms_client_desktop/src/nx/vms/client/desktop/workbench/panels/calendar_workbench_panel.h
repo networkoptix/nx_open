@@ -61,7 +61,7 @@ public:
 
     virtual void stopAnimations() override;
 
-    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+    void setDayTimeWidgetOpened(bool opened = true);
 
     // TODO: #sivanov Probably make this AbstractWorkbenchPanel interface function.
     QList<QWidget*> activeWidgets() const;

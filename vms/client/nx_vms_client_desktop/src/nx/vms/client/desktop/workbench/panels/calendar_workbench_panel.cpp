@@ -131,7 +131,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             if (isOpened())
             {
                 const bool shouldBeOpened = !sameDate || !m_dayTimeOpened;
-                setDayTimeWidgetOpened(shouldBeOpened, true);
+                setDayTimeWidgetOpened(shouldBeOpened);
             }
         });
 
@@ -202,7 +202,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     connect(action(action::MinimizeDayTimeViewAction), &QAction::triggered, this,
         [this]
         {
-            setDayTimeWidgetOpened(false, true);
+            setDayTimeWidgetOpened(false);
         });
 
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
@@ -258,7 +258,7 @@ void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
     else
     {
         setVisible(false, animated);
-        setDayTimeWidgetOpened(false, animated);
+        setDayTimeWidgetOpened(false);
     }
 }
 
@@ -320,7 +320,7 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 
     setVisible(opened && isEnabled(), animate);
     if (!opened)
-        setDayTimeWidgetOpened(false, animate);
+        setDayTimeWidgetOpened(false);
 
     emit openedChanged(opened, animate);
 }
@@ -400,25 +400,12 @@ void CalendarWorkbenchPanel::stopAnimations()
     m_widget->setY(m_yAnimator->targetValue().toInt());
 }
 
-void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
+void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened)
 {
     if (m_dayTimeOpened == opened)
         return;
 
     m_dayTimeOpened = opened;
-
-    ensureAnimationAllowed(&animate);
-    qreal opacity = opened ? kOpaque : kHidden;
-    if (animate)
-    {
-        widgetOpacityAnimator(m_dayTimeWidget, display()->instrumentManager()->animationTimer())
-            ->animateTo(opacity * masterOpacity());
-    }
-    else
-    {
-        m_dayTimeWidget->setOpacity(opacity * masterOpacity());
-    }
-
     m_dayTimeWidget->setVisible(opened);
 
     emit geometryChanged();
