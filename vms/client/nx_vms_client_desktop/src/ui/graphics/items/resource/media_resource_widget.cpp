@@ -445,8 +445,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         &nx::vms::common::SystemSettings::watermarkChanged,
         this,
         &QnMediaResourceWidget::updateWatermark);
-    connect(windowContext->workbenchContext(),
-        &QnWorkbenchContext::userChanged,
+    connect(systemContext->accessController(),
+        &QnWorkbenchAccessController::userChanged,
         this,
         &QnMediaResourceWidget::updateWatermark);
 
@@ -3117,8 +3117,19 @@ void QnMediaResourceWidget::setAnalyticsFilter(const nx::analytics::db::Filter& 
 
 void QnMediaResourceWidget::updateWatermark()
 {
+    const auto context = systemContext();
+    const auto accessController = context->accessController();
+    const auto user = accessController->user();
+    nx::core::Watermark watermark;
+
     // First create normal watermark according to current client state.
-    auto watermark = windowContext()->workbenchContext()->watermark();
+    if (context->globalSettings()->watermarkSettings().useWatermark
+        && !accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+        && user
+        && !user->getName().isEmpty())
+    {
+        watermark = {context->globalSettings()->watermarkSettings(), user->getName()};
+    }
 
     // Do not show watermark for local AVI resources.
     if (resource().dynamicCast<QnAviResource>())
@@ -3141,7 +3152,7 @@ void QnMediaResourceWidget::updateWatermark()
     }
 
     // Do not set watermark for admins but ONLY if it is not embedded in layout.
-    if (accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+    if (accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
         && !useLayoutWatermark)
     {
         return;
