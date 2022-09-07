@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <ui/dialogs/common/button_box_dialog.h>
-#include <utils/common/watermark_settings.h>
-
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/api/data/watermark_settings.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 class QPixmap;
 
@@ -22,7 +21,7 @@ public:
     ~WatermarkPreviewDialog();
 
     /** Returns true if settings were changed. */
-    static bool editSettings(QnWatermarkSettings& settings, QWidget* parent);
+    static bool editSettings(api::WatermarkSettings& settings, QWidget* parent);
 
 private:
     void loadDataToUi();
@@ -35,7 +34,7 @@ private:
 
     QScopedPointer<Ui::WatermarkPreviewDialog> ui;
 
-    QnWatermarkSettings m_settings;
+    api::WatermarkSettings m_settings;
     QPixmap m_baseImage;
     bool m_lockUpdate = false;
     nx::utils::PendingOperation m_repaintOperation;

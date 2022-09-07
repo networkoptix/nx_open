@@ -5,9 +5,9 @@
 #include <chrono>
 #include <optional>
 
+#include <nx/vms/api/data/watermark_settings.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/watermark_settings.h>
 
 namespace Ui { class SecuritySettingsWidget; }
 
@@ -59,7 +59,7 @@ private:
 
 private:
     QScopedPointer<Ui::SecuritySettingsWidget> ui;
-    QnWatermarkSettings m_watermarkSettings;
+    api::WatermarkSettings m_watermarkSettings;
     RepeatedPasswordDialog* const m_archiveEncryptionPasswordDialog;
     ArchivePasswordState m_archivePasswordState = ArchivePasswordState::notSet;
     bool m_archiveEncryptionPasswordDialogOpenedViaButton = false;

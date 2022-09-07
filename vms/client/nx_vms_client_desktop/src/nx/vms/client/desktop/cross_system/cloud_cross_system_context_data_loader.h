@@ -8,6 +8,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/user_model.h>
 
 namespace rest {
@@ -40,6 +41,7 @@ public:
     nx::vms::api::ServerInformationList servers() const;
     nx::vms::api::ServerFootageDataList serverFootageData() const;
     nx::vms::api::CameraDataExList cameras() const;
+    nx::vms::api::SystemSettings systemSettings() const;
 
 signals:
     void ready();
