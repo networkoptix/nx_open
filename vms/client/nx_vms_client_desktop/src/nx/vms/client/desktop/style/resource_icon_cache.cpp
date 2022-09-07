@@ -87,8 +87,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
 
     // Systems.
     m_cache.insert(CurrentSystem, loadIcon("tree/system.png"));
-    m_cache.insert(OtherSystem, loadIcon("tree/other_systems.png"));
-    m_cache.insert(OtherSystems, loadIcon("tree/other_systems.png"));
+    m_cache.insert(OtherSystem, loadIcon("tree/local_system.svg"));
+    m_cache.insert(OtherSystems, loadIcon("tree/other_systems.svg"));
 
     // Servers.
     m_cache.insert(Servers, loadIcon("tree/servers.png"));
@@ -172,8 +172,9 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Client, loadIcon("tree/client.svg"));
 
     // Cloud system.
-    m_cache.insert(CloudSystem, loadIcon("cloud/cloud_20.png"));
-    m_cache.insert(CloudSystem | ReadOnly, loadIcon("cloud/cloud_20_disabled.png"));
+    m_cache.insert(CloudSystem, loadIcon("tree/cloud_system.svg"));
+    m_cache.insert(CloudSystem | Locked, loadIcon("tree/cloud_system_warning.svg"));
+    m_cache.insert(CloudSystem | Incompatible, loadIcon("tree/cloud_system_incompatible.svg"));
 }
 
 QnResourceIconCache::~QnResourceIconCache()

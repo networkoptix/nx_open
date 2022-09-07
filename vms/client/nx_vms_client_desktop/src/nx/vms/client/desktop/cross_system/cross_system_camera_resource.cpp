@@ -25,7 +25,7 @@ struct CrossSystemCameraResource::Private
 
     QString calculateName() const
     {
-        if (crossSystemContext->isConnected() && crossSystemContext->isOnline() && NX_ASSERT(source))
+        if (crossSystemContext->isSystemReadyToUse() && NX_ASSERT(source))
             return source->name;
 
         const auto crossSystemContextStatus = crossSystemContext->status();
@@ -151,9 +151,9 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
 
 api::ResourceStatus CrossSystemCameraResource::getStatus() const
 {
-    // Returns resource status only is the system contains it is connected, otherwise calculate
-    // status from the system status.
-    if (d->crossSystemContext->isConnected() && d->crossSystemContext->isOnline())
+    // Returns resource status only if the system contains it is connected and online, otherwise
+    // calculate status from the system status.
+    if (d->crossSystemContext->isSystemReadyToUse())
         return QnClientCameraResource::getStatus();
 
     const auto crossSystemContextStatus = d->crossSystemContext->status();
@@ -182,7 +182,7 @@ void CrossSystemCameraResource::watchOnCrossSystemContext()
         [this]
         {
             QnResource::setName(d->calculateName());
-            if (d->crossSystemContext->isConnected() && d->crossSystemContext->isOnline())
+            if (d->crossSystemContext->isSystemReadyToUse())
                 removeFlags(Qn::fake);
             else
                 addFlags(Qn::fake);
