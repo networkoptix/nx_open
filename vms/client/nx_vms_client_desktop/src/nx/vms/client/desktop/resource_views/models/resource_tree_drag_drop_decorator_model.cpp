@@ -514,9 +514,22 @@ QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelInde
 {
     using NodeType = ResourceTree::NodeType;
 
-    // Dropping on group node have no other meaning.
+    // Dropping on custom resource group node have no other meaning.
     if (hasNodeType(dropIndex, NodeType::customResourceGroup))
         return dropIndex;
+
+    // Dropping on resource within custom resource group is the same as dropping on the parent
+    // custom resource group node.
+    if (hasNodeType(dropIndex.parent(), NodeType::customResourceGroup))
+        return dropIndex.parent();
+
+    // Dropping on recorder or multisensor camera resource that is within custom resource group is
+    // the same as dropping on the enclosing custom resource group node.
+    if (hasNodeType(dropIndex.parent(), NodeType::recorder)
+        && hasNodeType(dropIndex.parent().parent(), NodeType::customResourceGroup))
+    {
+        return dropIndex.parent().parent();
+    }
 
     // Dropping into an layout item is the same as dropping into a layout.
     if (hasNodeType(dropIndex, NodeType::layoutItem))
