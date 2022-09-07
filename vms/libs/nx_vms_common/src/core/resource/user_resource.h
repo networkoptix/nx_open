@@ -10,6 +10,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <nx/vms/api/analytics/integration_request.h>
 
 struct PasswordHashes;
 
@@ -81,6 +82,7 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
 
 public:
     static const QnUuid kAdminGuid;
+    static const QString kIntegrationRequestDataProperty;
 
     QnUserResource(nx::vms::api::UserType userType, QString externalId);
     virtual ~QnUserResource();
@@ -155,6 +157,10 @@ public:
     void setFullName(const QString& value);
 
     QString externalId() const;
+
+    std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData() const;
+    void setIntegrationRequestData(
+        std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
 
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
