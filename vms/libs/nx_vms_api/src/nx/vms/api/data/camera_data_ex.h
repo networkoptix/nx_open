@@ -26,6 +26,7 @@ struct NX_VMS_API CameraDataEx:
     CameraData_Fields CameraAttributesData_Fields_Short (status)(addParams)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraDataEx)
+NX_REFLECTION_INSTRUMENT(CameraDataEx, CameraDataEx_Fields)
 
 NX_VMS_API void serialize(
     QnJsonContext* ctx, const CameraDataEx& value, QJsonValue* target);
