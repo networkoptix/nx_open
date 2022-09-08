@@ -240,7 +240,8 @@ NX_REFLECTION_ENUM(ServerFlag,
     //SF_AutoSystemName = 0x020,
 
     SF_ArmServer = 0x040,
-    SF_Has_HDD = 0x080,
+
+    //SF_Has_HDD = 0x080, //< Removed in 5.1, was proprietary.
 
     /**
      * System is just installed, it has default admin password and is not linked to the cloud.
@@ -251,7 +252,7 @@ NX_REFLECTION_ENUM(ServerFlag,
 
     SF_SupportsTranscoding = 0x200,
     SF_P2pSyncDone = 0x1000000, //< For UT purpose only
-    SF_RequiresEdgeLicense = 0x2000000, //< Remove when we are sure EDGE only licenses are gone.
+    //SF_RequiresEdgeLicense = 0x2000000, //< Removed in 5.1 - Edge-only licenses are gone.
 
     // Server can provide information about built-in PoE block.
     SF_HasPoeManagementCapability = 0x4000000,

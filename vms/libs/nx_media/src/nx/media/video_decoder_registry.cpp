@@ -153,17 +153,5 @@ void VideoDecoderRegistry::reinitialize()
     m_defaultRenderContextSynchronizer = RenderContextSynchronizerPtr();
 }
 
-QSize VideoDecoderRegistry::platformMaxFfmpegResolution()
-{
-    if (nx::build_info::isArm())
-    {
-        return QSize(1920, 1080);
-    }
-
-    return nx::build_info::isMobile()
-        ? QSize(1920, 1080)
-        : QSize();
-}
-
 } // namespace media
 } // namespace nx
