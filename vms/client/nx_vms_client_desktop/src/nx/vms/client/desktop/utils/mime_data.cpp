@@ -171,7 +171,7 @@ struct MimeData::Private
     {
         // Resources.
         {
-            int resourcesCount = 0;
+            quint32 resourcesCount = 0;
             stream >> resourcesCount;
 
             // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
@@ -190,7 +190,9 @@ struct MimeData::Private
 
         // Entities.
         {
-            int entitiesCount = 0;
+            quint32 entitiesCount = 0;
+            stream >> entitiesCount;
+
             for (int i = 0; i < entitiesCount; i++)
             {
                 QnUuid id;
@@ -201,7 +203,7 @@ struct MimeData::Private
 
         // Arguments.
         {
-            int argumentsCount = 0;
+            quint32 argumentsCount = 0;
             stream >> argumentsCount;
 
             for (int i = 0; i < argumentsCount; i++)
