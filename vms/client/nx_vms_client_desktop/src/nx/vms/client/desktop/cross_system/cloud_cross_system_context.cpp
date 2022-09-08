@@ -238,6 +238,7 @@ struct CloudCrossSystemContext::Private
                     .address = endpoint->address,
                     .credentials = {},
                     .userType = nx::vms::api::UserType::cloud,
+                    .purpose = core::LogonData::Purpose::connectInCrossSystemMode,
                     .expectedServerId = endpoint->serverId,
                     .userInteractionAllowed = allowUserInteraction
                 },
