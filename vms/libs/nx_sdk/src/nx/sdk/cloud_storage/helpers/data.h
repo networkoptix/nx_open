@@ -174,7 +174,6 @@ struct BookmarkFilter
         creationTime,
         tags,
         description,
-        cameraThenStartTime,
     };
 
     BookmarkFilter(const char* jsonData);
