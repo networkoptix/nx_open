@@ -36,6 +36,7 @@ public:
         connect,
         merge,
         connectInCompatibilityMode,
+        connectInCrossSystemMode,
     };
 
     enum class Reason
