@@ -681,8 +681,7 @@ void QnWorkbenchNavigator::updateFootageState()
 
 void QnWorkbenchNavigator::updateHasArchive()
 {
-    bool newValue = accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
-        && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+    bool newValue = std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [this](const QnMediaResourcePtr& resource)
             {
                 return hasArchiveForCamera(resource.dynamicCast<QnSecurityCamResource>());
@@ -697,13 +696,26 @@ void QnWorkbenchNavigator::updateHasArchive()
 
 void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
 {
-    bool newValue = forceOn || (accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
-        && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+    bool newValue = forceOn ||
+        std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [](const QnMediaResourcePtr& resource)
             {
                 auto camera = resource.dynamicCast<QnSecurityCamResource>();
-                return camera && camera->getStatus() == nx::vms::api::ResourceStatus::recording;
-            }));
+                if (!camera)
+                    return false;
+
+                auto systemContext = SystemContext::fromResource(camera);
+                if (!NX_ASSERT(systemContext))
+                    return false;
+
+                if (!systemContext->accessController()->hasGlobalPermission(
+                    GlobalPermission::viewArchive))
+                {
+                    return false;
+                }
+
+                return camera->getStatus() == nx::vms::api::ResourceStatus::recording;
+            });
 
     if (m_isRecording == newValue)
         return;
@@ -2155,8 +2167,15 @@ void QnWorkbenchNavigator::updateThumbnailsLoader()
 
             if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
             {
-                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+                auto systemContext = SystemContext::fromResource(camera);
+                if (!NX_ASSERT(systemContext))
                     return false;
+
+                if (!systemContext->accessController()->hasPermissions(camera,
+                    Qn::ViewFootagePermission))
+                {
+                    return false;
+                }
 
                 // Thumbnails are disabled for I/O modules.
                 if (camera->isIOModule())
@@ -2367,6 +2386,9 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
 
     auto systemContext = SystemContext::fromResource(camera);
     if (!NX_ASSERT(systemContext))
+        return false;
+
+    if (!systemContext->accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
         return false;
 
     auto footageServers = systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);
