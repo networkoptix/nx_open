@@ -226,13 +226,6 @@ void sortAndLimitBookmarks(const BookmarkFilter& filter, std::vector<Bookmark>* 
             using Column = BookmarkFilter::SortColumn;
             switch (filter.column)
             {
-                case Column::cameraThenStartTime:
-                {
-                    if (b1.deviceId != b2.deviceId)
-                        return orderPred(isAsc, b1.deviceId, b2.deviceId);
-
-                    return orderPred(isAsc, b1.startTimestamp, b2.startTimestamp);
-                }
                 case Column::creationTime:
                     return orderPred(isAsc, b1.creationTimestamp, b2.creationTimestamp);
                 case Column::description:
