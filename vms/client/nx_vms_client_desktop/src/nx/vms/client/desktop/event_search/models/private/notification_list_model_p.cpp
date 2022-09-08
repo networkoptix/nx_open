@@ -515,7 +515,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     const vms::event::AbstractActionPtr& action, const QColor& color) const
 {
     if (action->actionType() == ActionType::showIntercomInformer)
-        return qnSkin->pixmap("events/call.png");
+        return qnSkin->pixmap("events/call.svg");
 
     switch (QnNotificationLevel::valueOf(action))
     {
