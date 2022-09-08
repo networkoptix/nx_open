@@ -125,7 +125,6 @@ protected slots:
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_doubleClicked(QnMediaResourceWidget *widget);
     void at_item_doubleClicked(QnResourceWidget *widget);
 
     void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
