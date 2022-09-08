@@ -179,7 +179,7 @@ Ptr<IObjectMetadataPacket> DeviceAgent::generateObjects()
         objectMetadata->setTrackId(trackContext.trackId);
         objectMetadata->setBoundingBox(trackContext.boundingBox);
 
-        objectMetadataPacket->addItem(objectMetadata.releasePtr());
+        objectMetadataPacket->addItem(objectMetadata.get());
     }
 
     return objectMetadataPacket;
