@@ -51,7 +51,6 @@ MediaServerDataEx serverDataEx()
     server.name = "some server";
     server.networkAddresses = "123.45.67.89";
     server.url = "http://" + server.networkAddresses;
-    server.flags = SF_Has_HDD;
     server.version = "2.4.0";
     server.systemInfo = "arm";
     server.authKey = "DFG";
