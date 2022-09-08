@@ -100,13 +100,6 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
 
-//#define QN_WORKBENCH_CONTROLLER_DEBUG
-#ifdef QN_WORKBENCH_CONTROLLER_DEBUG
-#   define TRACE(...) qDebug() << __VA_ARGS__;
-#else
-#   define TRACE(...)
-#endif
-
 namespace {
 
 QPoint invalidDragDelta()
@@ -127,6 +120,17 @@ const qreal raisedGeometryThreshold = 0.002;
 bool tourIsRunning(QnWorkbenchContext* context)
 {
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+}
+
+bool inViewportPtzMode(QnResourceWidget* resourceWidget, Qt::KeyboardModifiers keyboardModifiers)
+{
+    const auto mediaResourceWidget = qobject_cast<QnMediaResourceWidget*>(resourceWidget);
+    if (!mediaResourceWidget)
+        return false;
+
+    return mediaResourceWidget->item()->controlPtz()
+        && mediaResourceWidget->ptzController()->hasCapabilities(Ptz::ViewportPtzCapability)
+        && (qnSettings->isPtzAimOverlayEnabled() || keyboardModifiers.testFlag(Qt::ShiftModifier));
 }
 
 } // namespace
@@ -863,8 +867,6 @@ void QnWorkbenchController::at_scene_focusIn(QGraphicsScene* /*scene*/, QEvent* 
 }
 
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
-    TRACE("RESIZING STARTED");
-
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == nullptr)
         return;
@@ -952,8 +954,6 @@ void QnWorkbenchController::at_resizing(QGraphicsView* /*view*/, QGraphicsWidget
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView* /*view*/, QGraphicsWidget* item, ResizingInfo* /*info*/)
 {
-    TRACE("RESIZING FINISHED");
-
     opacityAnimator(display()->gridItem())->animateTo(0.0);
     if (m_resizedWidget)
         opacityAnimator(m_resizedWidget)->animateTo(1.0);
@@ -989,8 +989,6 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView* /*view*/, QGraphi
 
 void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items)
 {
-    TRACE("MOVE STARTED");
-
     /* Build item lists. */
     for (QGraphicsItem *item: items)
     {
@@ -1107,8 +1105,6 @@ void QnWorkbenchController::at_move(QGraphicsView*, const QPointF& totalDelta)
 
 void QnWorkbenchController::at_moveFinished(QGraphicsView* /*view*/, const QList<QGraphicsItem*>& /*items*/)
 {
-    TRACE("MOVE FINISHED");
-
     /* Hide grid. */
     opacityAnimator(display()->gridItem())->animateTo(0.0);
 
@@ -1157,15 +1153,11 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView* /*view*/, const QList
 
 void QnWorkbenchController::at_rotationStarted(QGraphicsView* /*view*/, QGraphicsWidget* widget)
 {
-    TRACE("ROTATION STARTED");
-
     display()->bringToFront(widget);
 }
 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView* /*view*/, QGraphicsWidget* widget)
 {
-    TRACE("ROTATION FINISHED");
-
     const auto resourceWidget = dynamic_cast<QnResourceWidget*>(widget);
     if(!resourceWidget)
         return; /* We may also get nullptr if the widget being rotated gets deleted. */
@@ -1240,8 +1232,6 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsIt
 {
     Q_UNUSED(view)
 
-    TRACE("ITEM LPRESSED");
-
     if (info.modifiers() != 0)
         return;
 
@@ -1260,15 +1250,23 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsIt
     workbench()->setItem(Qn::ActiveRole, workbenchItem);
 }
 
-void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info)
+void QnWorkbenchController::at_item_leftClicked(
+    QGraphicsView*,
+    QGraphicsItem* item,
+    const ClickInfo& info)
 {
-    TRACE("ITEM LCLICKED");
-
-    if (info.modifiers() != 0)
+    if (info.modifiers() != Qt::NoModifier)
         return;
 
-    if (item->isWidget())
-        toggleRaisedState(qobject_cast<QnResourceWidget *>(item->toGraphicsObject()));
+    const auto resourceWidget = qobject_cast<QnResourceWidget*>(item->toGraphicsObject());
+    if (!resourceWidget)
+        return;
+
+    // PTZ panning is performed, other modifications of resource widget are blocked.
+    if (inViewportPtzMode(resourceWidget, info.modifiers()))
+        return;
+
+    toggleRaisedState(resourceWidget);
 }
 
 void QnWorkbenchController::at_item_rightClicked(
@@ -1276,8 +1274,6 @@ void QnWorkbenchController::at_item_rightClicked(
     QGraphicsItem* item,
     const ClickInfo& /*info*/)
 {
-    TRACE("ITEM RCLICKED");
-
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
     if(widget == nullptr)
         return;
@@ -1293,8 +1289,6 @@ void QnWorkbenchController::at_item_rightClicked(
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView* /*view*/, QGraphicsItem* item, const ClickInfo& /*info*/)
 {
-    TRACE("ITEM MCLICKED");
-
     if (tourIsRunning(context()))
         return;
 
@@ -1310,26 +1304,22 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView* /*view*/, QGrap
 }
 
 void QnWorkbenchController::at_item_doubleClicked(
-    QGraphicsView* /*view*/,
+    QGraphicsView*,
     QGraphicsItem* item,
     const ClickInfo& info)
 {
-    NX_VERBOSE(this, "ITEM DOUBLECLICKED");
-
     if (info.modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
         return;
 
-    QnResourceWidget* widget = item->isWidget()
-        ? qobject_cast<QnResourceWidget*>(item->toGraphicsObject())
-        : nullptr;
+    const auto resourceWidget = qobject_cast<QnResourceWidget*>(item->toGraphicsObject());
+    if (!resourceWidget)
+        return;
 
-    if (widget)
-        at_item_doubleClicked(widget);
-}
+    // PTZ zoom out is performed, other modifications of resource widget are blocked.
+    if (inViewportPtzMode(resourceWidget, info.modifiers()))
+        return;
 
-void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget* widget)
-{
-    at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
+    at_item_doubleClicked(resourceWidget);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
@@ -1389,8 +1379,6 @@ void QnWorkbenchController::at_scene_clicked(QGraphicsView* view, const ClickInf
 
 void QnWorkbenchController::at_scene_leftClicked(QGraphicsView* /*view*/, const ClickInfo& /*info*/)
 {
-    TRACE("SCENE LCLICKED");
-
     if(workbench() == nullptr)
         return;
 
@@ -1399,8 +1387,6 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView* /*view*/, const 
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView* view, const ClickInfo& /*info*/)
 {
-    TRACE("SCENE RCLICKED");
-
     view->scene()->clearSelection(); /* Just to feel safe. */
 
     showContextMenuAt(QCursor::pos());
@@ -1408,8 +1394,6 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView* view, const Cli
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView* /*view*/, const ClickInfo& /*info*/)
 {
-    TRACE("SCENE DOUBLECLICKED");
-
     if(workbench() == nullptr)
         return;
 
