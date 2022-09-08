@@ -171,6 +171,9 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
     /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
     milliseconds osTimeMs = 0ms;
 
+    /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
+    std::chrono::milliseconds synchronizedTimeMs{0};
+
     /**%apidoc Time zone offset, in milliseconds. */
     milliseconds timeZoneOffsetMs = 0ms;
 
@@ -186,7 +189,7 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
 };
 
 #define ServerRuntimeInformation_Fields \
-    (port)(id)(osInfo)(osTimeMs)(timeZoneOffsetMs)(timeZoneId)(runtimeData)
+    (port)(id)(osInfo)(osTimeMs)(synchronizedTimeMs)(timeZoneOffsetMs)(timeZoneId)(runtimeData)
 
 NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);
