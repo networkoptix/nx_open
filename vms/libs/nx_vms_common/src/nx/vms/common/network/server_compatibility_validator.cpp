@@ -42,6 +42,7 @@ static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
     {Purpose::connect, {4, 0}},
     {Purpose::merge, {5, 0}},
     {Purpose::connectInCompatibilityMode, {4, 0}},
+    {Purpose::connectInCrossSystemMode, {5, 0}},
 };
 
 void ensureInitialized()
@@ -96,9 +97,11 @@ std::optional<ServerCompatibilityValidator::Reason> checkInternal(
         return ServerCompatibilityValidator::Reason::cloudHostDiffers;
 
     // Binary protocol requires the same protocol version.
-    const bool ensureProtocolVersion = (s_localProtocolType == Protocol::ubjson);
+    const bool ensureProtocolVersion = !compatibilityMode
+        && (s_localProtocolType == Protocol::ubjson)
+        && (purpose != Purpose::connectInCrossSystemMode);
 
-    if (!compatibilityMode && ensureProtocolVersion && protoVersion != protocolVersion())
+    if (ensureProtocolVersion && protoVersion != protocolVersion())
         return ServerCompatibilityValidator::Reason::binaryProtocolVersionDiffers;
 
     return std::nullopt;
