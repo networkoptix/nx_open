@@ -1218,7 +1218,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     {
         setState(LogicalState::connecting);
     }
-    else
+    else if (d->logicalState != LogicalState::disconnected)
     {
         setState(LogicalState::disconnected);
         if (auto welcomeScreen = mainWindow()->welcomeScreen())
