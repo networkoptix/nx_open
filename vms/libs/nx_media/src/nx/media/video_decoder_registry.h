@@ -74,8 +74,6 @@ public:
     RenderContextSynchronizerPtr defaultRenderContextSynchronizer() const;
     void setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value);
 
-    static QSize platformMaxFfmpegResolution();
-
 private:
     struct Metadata
     {
