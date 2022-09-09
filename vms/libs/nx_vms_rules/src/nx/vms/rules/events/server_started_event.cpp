@@ -48,7 +48,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerStartedEvent>(),
         .displayName = tr("Server Started"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"
     };
     return kDescriptor;

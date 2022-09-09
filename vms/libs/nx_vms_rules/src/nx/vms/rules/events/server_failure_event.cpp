@@ -72,7 +72,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.serverFailure",
         .displayName = tr("Server Failure"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
     };
     return kDescriptor;

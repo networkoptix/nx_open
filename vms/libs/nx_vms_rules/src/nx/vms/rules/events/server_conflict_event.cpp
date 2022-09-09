@@ -74,7 +74,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.serverConflict",
         .displayName = tr("Server Conflict"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"
     };
 
