@@ -122,7 +122,7 @@
          <widget class="nx::vms::client::desktop::NameValueTable" name="attributeTable" native="true"/>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="nameLabel">
+         <widget class="QnElidedLabel" name="nameLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -202,10 +202,16 @@
         <item row="0" column="2" alignment="Qt::AlignRight|Qt::AlignTop">
          <widget class="QWidget" name="primaryTimestampHolder" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <property name="leftMargin">
@@ -226,7 +232,7 @@
               <string notr="true">&lt;0:00:00&gt;</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <property name="margin">
               <number>1</number>
@@ -445,6 +451,11 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/name_value_table.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnElidedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">ui/widgets/common/elided_label.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
