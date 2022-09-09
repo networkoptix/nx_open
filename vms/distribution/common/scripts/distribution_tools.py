@@ -205,9 +205,12 @@ def zip_files_to(zip, files, rel_path, target_path='.'):
         zip.write(file, target_filename)
 
 
+def zip_all_files(zip, directory):
+    zip_files_to(zip, find_all_files(directory), directory)
+
+
 def zip_rdep_package_to(zip, package_directory):
-    bin_directory = os.path.join(package_directory, 'bin')
-    zip_files_to(zip, find_all_files(bin_directory), bin_directory)
+    zip_all_files(zip, os.path.join(package_directory, 'bin'))
 
 
 def shell_like_parse(infile):
