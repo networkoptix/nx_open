@@ -79,7 +79,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
-    connect(globalSettings(), &SystemSettings::emailSettingsChanged, this,
+    connect(systemSettings(), &SystemSettings::emailSettingsChanged, this,
         &QnAboutDialog::retranslateUi);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(),
         &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,
@@ -178,7 +178,7 @@ void QnAboutDialog::retranslateUi()
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     ui->gpuLabel->setText(gpu.join(html::kLineBreak));
 
-    CustomerSupport customerSupport(commonModule());
+    CustomerSupport customerSupport(systemContext());
 
     ui->customerSupportTitleLabel->setText(customerSupport.systemContact.company);
     const bool isValidLink = QUrl(customerSupport.systemContact.address.rawData).isValid();

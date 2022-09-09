@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -361,7 +362,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         {
             const auto fileName = exportContext.fileName();
             const auto resource = d->ensureResourceIsInPool(fileName, resourcePool());
-            if (const auto layout = resource.dynamicCast<QnLayoutResource>())
+            if (const auto layout = resource.dynamicCast<LayoutResource>())
             {
                 auto systemContext = SystemContext::fromResource(layout);
                 if (NX_ASSERT(systemContext))
@@ -421,7 +422,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
 
     const auto centralResource = widget ? widget->resource() : mediaResource;
 
-    const bool hasPermission = accessController()->hasPermissions(
+    const bool hasPermission = ResourceAccessManager::hasPermissions(
         centralResource->toResourcePtr(),
         Qn::ExportPermission);
 
@@ -437,7 +438,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
         static const QString reason =
             tr("Selected period cannot be exported for the current camera.");
         dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
-        dialog.setLayout(widget->item()->layout()->resource());
+        dialog.setLayout(widget->layoutResource());
     }
     else if (widget)
     {
@@ -449,7 +450,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
         const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         const bool layoutExportAllowed = periods.intersects(period);
         if (layoutExportAllowed)
-            dialog.setLayout(widget->item()->layout()->resource());
+            dialog.setLayout(widget->layoutResource());
     }
     else
     {
@@ -479,7 +480,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
     const auto widget = extractMediaWidget(display(), parameters);
     NX_ASSERT(!widget || widget->resource()->toResourcePtr() == camera);
 
-    const bool hasPermission = accessController()->hasPermissions(camera, Qn::ExportPermission);
+    const bool hasPermission = ResourceAccessManager::hasPermissions(camera, Qn::ExportPermission);
     NX_ASSERT(hasPermission);
     if (!hasPermission)
         return;
@@ -777,7 +778,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
             return; //< Reconfirm the password from user and exit if it is invalid.
     }
 
-    const bool readOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
+    const bool readOnly = !ResourceAccessManager::hasPermissions(layout, Qn::WritePermission);
 
     ExportLayoutSettings layoutSettings;
     layoutSettings.fileName = Filename::parse(layout->getUrl());

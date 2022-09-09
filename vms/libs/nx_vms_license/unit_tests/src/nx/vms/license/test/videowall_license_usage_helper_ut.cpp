@@ -5,6 +5,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/license/usage_helper.h>
 
@@ -20,7 +21,7 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
+        m_licenses.reset(new QnLicensePoolScaffold(systemContext()->licensePool()));
         m_helper.reset(new VideoWallLicenseUsageHelper(systemContext()));
         m_helper->setCustomValidator(
             std::make_unique<QLicenseStubValidator>(systemContext()));

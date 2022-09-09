@@ -6,17 +6,16 @@
 
 #include <QtGui/QValidator>
 
-#include <common/common_module_aware.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
-#include <ui/delegates/resource_item_delegate.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
-#include <ui/models/user_roles_model.h>
-#include <ui/models/resource/resource_list_model.h>
-#include <nx/vms/client/desktop/common/utils/validators.h>
-
 #include <nx/vms/client/desktop/common/models/column_remap_proxy_model.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
+#include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <ui/delegates/resource_item_delegate.h>
+#include <ui/models/resource/resource_list_model.h>
+#include <ui/models/user_roles_model.h>
 
 class QnUuid;
 
@@ -29,7 +28,7 @@ namespace subject_selection_dialog_private {
 
 class RoleListModel:
     public QnUserRolesModel,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = QnUserRolesModel;
@@ -66,7 +65,7 @@ private:
 
 class UserListModel:
     public NaturalStringSortProxyModel,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = NaturalStringSortProxyModel;
@@ -125,7 +124,7 @@ private:
 
 class RoleListDelegate:
     public QnResourceItemDelegate,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = QnResourceItemDelegate;

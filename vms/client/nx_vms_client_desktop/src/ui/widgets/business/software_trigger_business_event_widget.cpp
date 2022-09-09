@@ -3,20 +3,20 @@
 #include "software_trigger_business_event_widget.h"
 #include "ui_software_trigger_business_event_widget.h"
 
-#include <QtCore/QtMath>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QtMath>
 
 #include <business/business_resource_validation.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/event/strings_helper.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -28,10 +28,13 @@ static constexpr int kDropdownIconSize = 40;
 
 } // namespace
 
-QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent) :
-    base_type(parent),
+QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
-    m_helper(new vms::event::StringsHelper(systemContext())),
+    m_helper(new vms::event::StringsHelper(systemContext)),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
         GlobalPermission::userInput,
         tr("User Input")))

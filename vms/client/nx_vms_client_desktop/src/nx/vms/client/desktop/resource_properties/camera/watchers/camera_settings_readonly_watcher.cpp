@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -63,7 +64,11 @@ void CameraSettingsReadOnlyWatcher::updateReadOnly()
 
 bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const
 {
-    return !accessController()->combinedPermissions(m_cameras).testFlag(Qn::WritePermission);
+    return std::any_of(m_cameras.cbegin(), m_cameras.cend(),
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return !ResourceAccessManager::hasPermissions(camera, Qn::WritePermission);
+        });
 }
 
 } // namespace nx::vms::client::desktop

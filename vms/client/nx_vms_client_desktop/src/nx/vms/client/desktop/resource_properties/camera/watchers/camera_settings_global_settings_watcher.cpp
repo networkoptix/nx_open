@@ -20,7 +20,7 @@ namespace {
 
 SystemSettings* globalSettings()
 {
-    auto settings = qnClientCoreModule->commonModule()->systemContext()->globalSettings();
+    auto settings = qnClientCoreModule->commonModule()->globalSettings();
     NX_ASSERT(settings);
     return settings;
 }

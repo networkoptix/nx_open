@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_CAMERA_BOOKMARK_H
-#define QN_CAMERA_BOOKMARK_H
+#pragma once
 
 #include <chrono>
 
@@ -10,17 +9,15 @@
 #include <QtCore/QStringList>
 
 #include <common/common_globals.h>
-
-#include <nx/utils/uuid.h>
-
-#include "camera_bookmark_fwd.h"
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/json/value_or_array.h>
 
-class QnCommonModule;
+#include "camera_bookmark_fwd.h"
+
+namespace nx::vms::common { class SystemContext; }
 
 struct NX_VMS_COMMON_API QnBookmarkSortOrder
 {
@@ -106,12 +103,12 @@ struct NX_VMS_COMMON_API QnCameraBookmark
         const QnCameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));
 
     static void sortBookmarks(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         QnCameraBookmarkList& bookmarks,
         const QnBookmarkSortOrder orderBy);
 
     static QnCameraBookmarkList mergeCameraBookmarks(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         const QnMultiServerCameraBookmarkList& source,
         const QnBookmarkSortOrder& sortOrder = QnBookmarkSortOrder::defaultOrder,
         const std::optional<milliseconds>& minVisibleLength = std::nullopt,
@@ -230,5 +227,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag,
     (sql_record)(json)(ubjson)(xml)(csv_record)(metatype),
     NX_VMS_COMMON_API)
-
-#endif //QN_CAMERA_BOOKMARK_H

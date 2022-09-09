@@ -17,7 +17,9 @@ class AnalyticsSdkObjectDetectedWidget: public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit AnalyticsSdkObjectDetectedWidget(QWidget* parent = nullptr);
+    explicit AnalyticsSdkObjectDetectedWidget(
+        SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~AnalyticsSdkObjectDetectedWidget();
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

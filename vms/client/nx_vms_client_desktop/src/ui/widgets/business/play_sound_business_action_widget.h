@@ -5,21 +5,22 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/widgets/business/subject_target_action_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui {
-class PlaySoundBusinessActionWidget;
-} // namespace Ui
+namespace Ui { class PlaySoundBusinessActionWidget; }
+class QnWorkbenchContext;
+
+namespace nx::vms::client::desktop { class ServerNotificationCache; }
 
 class QnPlaySoundBusinessActionWidget:
-    public QnSubjectTargetActionWidget,
-    public QnWorkbenchContextAware
+    public QnSubjectTargetActionWidget
 {
     Q_OBJECT
     using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit QnPlaySoundBusinessActionWidget(QWidget* parent = nullptr);
+    explicit QnPlaySoundBusinessActionWidget(
+        QnWorkbenchContext* context,
+        QWidget* parent = nullptr);
     virtual ~QnPlaySoundBusinessActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
@@ -40,4 +41,5 @@ private slots:
 private:
     QScopedPointer<Ui::PlaySoundBusinessActionWidget> ui;
     QString m_filename;
+    nx::vms::client::desktop::ServerNotificationCache* const m_serverNotificationCache;
 };

@@ -6,6 +6,8 @@
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
 
+namespace nx::vms::common { class SystemContext; }
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -14,14 +16,14 @@ class NX_VMS_COMMON_API ActionFactory
 {
 public:
     static AbstractActionPtr instantiateAction(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,
         EventState state = EventState::undefined);
 
     static AbstractActionPtr instantiateAction(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,

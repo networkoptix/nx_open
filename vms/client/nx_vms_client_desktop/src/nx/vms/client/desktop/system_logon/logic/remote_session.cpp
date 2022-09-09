@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::core;
@@ -82,7 +83,7 @@ RemoteSession::~RemoteSession()
 std::shared_ptr<RemoteSession> RemoteSession::instance()
 {
     return std::dynamic_pointer_cast<RemoteSession>(
-        qnClientCoreModule->networkModule()->session());
+        appContext()->currentSystemContext()->session());
 }
 
 SessionId RemoteSession::sessionId() const

@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace QnBusiness {
 
@@ -226,7 +227,7 @@ class QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    QnLayoutAccessValidationPolicy(QnCommonModule* common);
+    QnLayoutAccessValidationPolicy(nx::vms::client::desktop::SystemContext* systemContext);
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;

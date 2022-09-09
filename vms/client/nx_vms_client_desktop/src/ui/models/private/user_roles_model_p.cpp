@@ -2,17 +2,13 @@
 
 #include "user_roles_model_p.h"
 
-#include <core/resource_access/resource_access_manager.h>
-
-#include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/user_resource.h>
-
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/utils/string.h>
-
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
 

@@ -4,17 +4,19 @@
 
 #include <QtCore/QPointer>
 
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 
-PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
+using namespace nx::vms::client::desktop;
+
+PreviewSearchDurationMetric::PreviewSearchDurationMetric(Workbench *workbench)
     : base_type()
     , QnTimeDurationMetric()
 {
     if (!workbench)
         return;
 
-    QPointer<QnWorkbench> workbenchGuard(workbench);
+    QPointer<Workbench> workbenchGuard(workbench);
     QPointer<PreviewSearchDurationMetric> guard(this);
 
     const auto layoutChangedHandler =
@@ -30,7 +32,7 @@ PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
         setCounterActive(isPreviewSearchLayout);
     };
 
-    connect(workbench, &QnWorkbench::currentLayoutChanged
+    connect(workbench, &Workbench::currentLayoutChanged
         , this, layoutChangedHandler);
 }
 

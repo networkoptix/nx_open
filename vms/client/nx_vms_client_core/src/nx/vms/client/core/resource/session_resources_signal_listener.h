@@ -70,7 +70,7 @@ public:
     SessionResourcesSignalListener(QObject* parent = nullptr):
         SessionResourcesSignalListener(
             qnClientCoreModule->resourcePool(),
-            qnClientCoreModule->commonModule()->systemContext()->messageProcessor(),
+            qnClientCoreModule->commonModule()->messageProcessor(),
             parent)
     {
     }

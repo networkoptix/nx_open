@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef CRASH_REPORTER_H
-#define CRASH_REPORTER_H
+#pragma once
 
 #include <optional>
 #include <set>
@@ -9,18 +8,18 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 
-#include <common/common_module_aware.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace ec2 {
 
-class CrashReporter: public /*mixin*/ QnCommonModuleAware
+class CrashReporter: public nx::vms::common::SystemContextAware
 {
 public:
-    CrashReporter(QnCommonModule* commonModule);
+    CrashReporter(nx::vms::common::SystemContext* systemContext);
     ~CrashReporter();
 
     /** Scans for local reports and sends them to the statistics server asynchronously
@@ -71,5 +70,3 @@ private:
 };
 
 } // namespace ec2
-
-#endif // CRASH_REPORTER_H

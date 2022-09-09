@@ -9,7 +9,7 @@
 
 #include <ui/common/text_pixmap_cache.h>
 
-class QnWorkbench;
+namespace nx::vms::client::desktop { class Workbench; }
 
 /**
  * Delegate for displaying resources in resource tree.
@@ -36,8 +36,8 @@ public:
 
     explicit QnResourceItemDelegate(QObject* parent = nullptr);
 
-    QnWorkbench* workbench() const;
-    void setWorkbench(QnWorkbench* workbench);
+    nx::vms::client::desktop::Workbench* workbench() const;
+    void setWorkbench(nx::vms::client::desktop::Workbench* workbench);
 
     /* If this value is non-zero, it is used as a fixed row height.
      * If zero, a minimal sufficient height is computed automatically. */
@@ -99,7 +99,7 @@ private:
     void paintExtraStatus(QPainter* painter, const QRect& iconRect, const QModelIndex& index) const;
 
 private:
-    QPointer<QnWorkbench> m_workbench;
+    QPointer<nx::vms::client::desktop::Workbench> m_workbench;
     QIcon m_recordingIcon;
     QIcon m_scheduledIcon;
     QIcon m_buggyIcon;

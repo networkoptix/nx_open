@@ -315,7 +315,7 @@ WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent):
 
 QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 {
-    return mediaResourceWidget->item()->layout()->resource();
+    return mediaResourceWidget->layoutResource();
 }
 
 ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(

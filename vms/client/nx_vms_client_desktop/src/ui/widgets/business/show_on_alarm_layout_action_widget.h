@@ -16,7 +16,9 @@ class QnShowOnAlarmLayoutActionWidget: public QnSubjectTargetActionWidget
     using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit QnShowOnAlarmLayoutActionWidget(QWidget* parent = nullptr);
+    explicit QnShowOnAlarmLayoutActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnShowOnAlarmLayoutActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

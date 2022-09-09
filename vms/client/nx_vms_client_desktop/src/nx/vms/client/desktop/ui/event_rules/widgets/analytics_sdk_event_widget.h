@@ -17,7 +17,9 @@ class AnalyticsSdkEventWidget: public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit AnalyticsSdkEventWidget(QWidget* parent = nullptr);
+    explicit AnalyticsSdkEventWidget(
+        SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~AnalyticsSdkEventWidget();
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

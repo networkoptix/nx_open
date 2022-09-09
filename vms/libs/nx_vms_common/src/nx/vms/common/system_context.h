@@ -10,18 +10,13 @@
 
 #include "system_context_aware.h"  //< Forward declarations.
 
-class QnGlobalPermissionsManager;
-class QnLayoutTourManager;
 class QnLicensePool;
 class QnResourceAccessSubjectsCache;
 class QnResourceDataPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnRouter;
-class QnRuntimeInfoManager;
-class QnSharedResourcesManager;
 class QnServerAdditionalAddressesDictionary;
-class QnUserRolesManager;
 
 namespace nx::analytics::taxonomy {
 class AbstractState;
@@ -29,7 +24,6 @@ class AbstractStateWatcher;
 class DescriptorContainer;
 } // namespace nx::analytics::taxonomy;
 
-namespace ec2 { class AbstractECConnection; }
 namespace nx::core::access { class ResourceAccessProvider; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
@@ -133,7 +127,13 @@ public:
     /**
      * Interface for the Message Bus connection.
      */
-    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
+
+    // FIXME: #sivanov Remove compatibility layer.
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const
+    {
+        return messageBusConnection();
+    }
 
     QnCommonMessageProcessor* messageProcessor() const;
 

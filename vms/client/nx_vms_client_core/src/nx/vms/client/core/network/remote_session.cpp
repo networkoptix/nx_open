@@ -263,13 +263,10 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
         d->connection = connection;
     }
 
-    if (d->connection)
-    {
-        connect(d->connection.get(),
-            &RemoteConnection::credentialsChanged,
-            this,
-            &RemoteSession::credentialsChanged);
-    }
+    connect(d->connection.get(),
+        &RemoteConnection::credentialsChanged,
+        this,
+        &RemoteSession::credentialsChanged);
 
     // Initialize cloud token updater.
     if (connection->userType() == nx::vms::api::UserType::cloud

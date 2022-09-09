@@ -5,7 +5,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/action_parameters.h>
 
-class QnCommonModule;
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
 
@@ -34,12 +34,12 @@ struct SubstitutionKeywords
  * @param actionType Type of the action.
  * @param sourceActionParameters Parameters that were used to setup the action in the rule.
  * @param eventRuntimeParameters Actual parameters event was triggered with.
- * @param commonModule Pointer to the QnCommonModule instance.
+ * @param systemContext Context of the System.
  */
 NX_VMS_COMMON_API ActionParameters actualActionParameters(
     ActionType actionType,
     const ActionParameters& sourceActionParameters,
     const EventParameters& eventRuntimeParameters,
-    const QnCommonModule* commonModule);
+    const nx::vms::common::SystemContext* systemContext);
 
 } // namespace nx::vms::rules

@@ -2,7 +2,6 @@
 
 #include "abstract_event.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
@@ -21,6 +20,7 @@
 #include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
+using namespace nx::vms::common;
 using nx::analytics::taxonomy::AbstractState;
 using nx::analytics::taxonomy::AbstractEventType;
 using nx::analytics::taxonomy::AbstractGroup;
@@ -197,7 +197,7 @@ bool isEventGroupContainsOnlyProlongedEvents(
 bool hasToggleState(
     EventType eventType,
     const EventParameters& runtimeParams,
-    QnCommonModule* commonModule)
+    SystemContext* systemContext)
 {
     switch (eventType)
     {
@@ -214,7 +214,7 @@ bool hasToggleState(
             return true;
 
         const std::shared_ptr<AbstractState> taxonomyState =
-            commonModule->systemContext()->analyticsTaxonomyState();
+            systemContext->analyticsTaxonomyState();
 
         if (!NX_ASSERT(taxonomyState))
             return false;
@@ -238,10 +238,10 @@ bool hasToggleState(
 QList<EventState> allowedEventStates(
     EventType eventType,
     const EventParameters& runtimeParams,
-    QnCommonModule* commonModule)
+    nx::vms::common::SystemContext* systemContext)
 {
     QList<EventState> result;
-    const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
+    const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, systemContext);
     if (!hasTooggleStateResult
         || eventType == EventType::userDefinedEvent
         || eventType == EventType::softwareTriggerEvent)

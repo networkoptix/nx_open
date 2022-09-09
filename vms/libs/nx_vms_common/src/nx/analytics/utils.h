@@ -4,14 +4,10 @@
 
 #include <QtCore/QList>
 
-#include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/api/analytics/device_agent_manifest.h>
-#include <nx/vms/api/analytics/descriptors.h>
-
+#include <core/resource/resource_fwd.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 
 namespace nx::analytics {
 
@@ -133,9 +129,7 @@ std::optional<Descriptor> fetchDescriptor(taxonomy::DescriptorContainer* contain
 /*
  * Return true if at least one analytics engine with objects detection is activated for server.
  */
-NX_VMS_COMMON_API bool serverHasActiveObjectEngines(
-    QnCommonModule* commonModule,
-    const QnUuid& serverId);
+NX_VMS_COMMON_API bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server);
 
 NX_VMS_COMMON_API std::set<QString> supportedObjectTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);

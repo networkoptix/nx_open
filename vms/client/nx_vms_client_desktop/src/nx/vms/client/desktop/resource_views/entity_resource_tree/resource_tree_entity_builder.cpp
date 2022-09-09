@@ -3,7 +3,6 @@
 #include "resource_tree_entity_builder.h"
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
@@ -41,6 +40,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -241,21 +241,21 @@ namespace entity_resource_tree {
 using namespace entity_item_model;
 using namespace nx::vms::api;
 
-ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(const QnCommonModule* commonModule):
+ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(SystemContext* systemContext):
     base_type(),
-    m_commonModule(commonModule),
-    m_cameraResourceIndex(new CameraResourceIndex(commonModule->resourcePool())),
-    m_userLayoutResourceIndex(new UserLayoutResourceIndex(commonModule->resourcePool())),
+    SystemContextAware(systemContext),
+    m_cameraResourceIndex(new CameraResourceIndex(resourcePool())),
+    m_userLayoutResourceIndex(new UserLayoutResourceIndex(resourcePool())),
     m_recorderItemDataHelper(new RecorderItemDataHelper(m_cameraResourceIndex.get())),
-    m_itemFactory(new ResourceTreeItemFactory(commonModule)),
+    m_itemFactory(new ResourceTreeItemFactory(systemContext)),
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
-        commonModule, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
+        systemContext, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
 {
     // Message processor does not exist in unit tests.
-    if (auto messageProcessor = m_commonModule->messageProcessor())
+    if (auto messageProcessor = this->messageProcessor())
     {
         auto userWatcher = new core::SessionResourcesSignalListener<QnUserResource>(
-            m_commonModule->resourcePool(),
+            resourcePool(),
             messageProcessor,
             this);
         userWatcher->setOnRemovedHandler(
@@ -285,7 +285,7 @@ void ResourceTreeEntityBuilder::setUser(const QnUserResourcePtr& user)
 GlobalPermissions ResourceTreeEntityBuilder::userGlobalPermissions() const
 {
     return !user().isNull()
-        ? m_commonModule->globalPermissionsManager()->globalPermissions(user())
+        ? systemContext()->globalPermissionsManager()->globalPermissions(user())
         : GlobalPermission::none;
 }
 
@@ -346,7 +346,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
     {
         groupingRuleStack.push_back(
             {parentServerIdGetter(),
-            parentServerItemCreator(m_commonModule->resourcePool(), m_itemFactory.get()),
+            parentServerItemCreator(resourcePool(), m_itemFactory.get()),
             Qn::ParentResourceRole,
             1,
             numericOrder()});
@@ -675,7 +675,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
     const auto showreelItemCreator =
         [this](const QnUuid& id) { return m_itemFactory->createShowreelItem(id); };
 
-    const auto showreelManager = m_commonModule->systemContext()->showreelManager();
+    const auto showreelManager = systemContext()->showreelManager();
 
     return makeFlatteningGroup(
         m_itemFactory->createShowreelsItem(),
@@ -748,7 +748,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createUsersGroupEntity() const
             roleUsersList->installItemSource(m_itemKeySourcePool->roleUsersSource(roleId));
 
             auto roleUsersResources = createSubjectResourcesEntity(
-                m_commonModule->userRolesManager()->userRole(roleId));
+                systemContext()->userRolesManager()->userRole(roleId));
 
             auto roleUsersComposition = std::make_unique<CompositionEntity>();
             roleUsersComposition->addSubEntity(std::move(roleUsersResources));
@@ -939,7 +939,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectDevicesEntity(
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
-    const auto globalPermissionsManager = m_commonModule->globalPermissionsManager();
+    const auto globalPermissionsManager = systemContext()->globalPermissionsManager();
     if (globalPermissionsManager->hasGlobalPermission(subject, GlobalPermission::accessAllMedia))
         return makeSingleItemEntity(m_itemFactory->createAllCamerasAndResourcesItem());
 
@@ -1002,7 +1002,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
             FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
     }
 
-    const auto globalPermissionsManager = m_commonModule->globalPermissionsManager();
+    const auto globalPermissionsManager = systemContext()->globalPermissionsManager();
     if (globalPermissionsManager->hasGlobalPermission(subject, GlobalPermission::admin))
     {
         layoutsList->installItemSource(m_itemKeySourcePool->userLayoutsSource(subject.user()));

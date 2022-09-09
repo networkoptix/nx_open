@@ -10,6 +10,7 @@
 #include <nx/core/access/access_types.h>
 #include <nx/core/resource/server_mock.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/event/action_parameters.h>
@@ -148,7 +149,7 @@ protected:
 
         // We need a whole Server just to make analytics descriptors work.
         QnMediaServerResourcePtr server(new nx::core::resource::ServerMock());
-        server->setIdUnsafe(commonModule()->peerId());
+        server->setIdUnsafe(systemContext()->peerId());
         resourcePool()->addResource(server);
 
         server->setProperty(nx::analytics::kDescriptorsProperty, QString(kSerializedDescriptors));
@@ -170,7 +171,7 @@ TEST_F(ActionParametersProcessingTest, genericEvent)
         ActionType::execHttpRequestAction,
         createActionParams(),
         createGenericEvent("S", "C", "D"),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text,
         createText({ {kSource, "S"}, {kCaption, "C"}, {kDescription, "D"} }));
@@ -183,7 +184,7 @@ TEST_F(ActionParametersProcessingTest, genericEventWithKeywords)
         ActionType::execHttpRequestAction,
         createActionParams(),
         createGenericEvent(Placeholder::description, Placeholder::source, Placeholder::caption),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text,
         createText({
@@ -199,7 +200,7 @@ TEST_F(ActionParametersProcessingTest, analyticsEvent)
         ActionType::execHttpRequestAction,
         createActionParams(),
         createAnalyticsEvent(id, "C", "D", kDummyEventType),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text,
         createText({
@@ -219,7 +220,7 @@ TEST_F(ActionParametersProcessingTest, analyticsEventWithKeywords)
         ActionType::execHttpRequestAction,
         createActionParams(),
         createAnalyticsEvent(id, Placeholder::description, Placeholder::eventType, Placeholder::caption),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text,
         createText({
@@ -238,7 +239,7 @@ TEST_F(ActionParametersProcessingTest, unsupportedEventType)
         ActionType::execHttpRequestAction,
         originalParameters,
         createUnsupportedEvent(),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text, originalParameters.text);
 }
@@ -258,7 +259,7 @@ TEST_F(ActionParametersProcessingTest, unsupportedActionType)
         actionType,
         originalParameters,
         createUnsupportedEvent(),
-        commonModule());
+        systemContext());
 
     EXPECT_EQ(actionParameters.text, originalParameters.text);
 }

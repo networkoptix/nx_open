@@ -22,7 +22,6 @@ class QToolButton;
 
 class QnLayoutTabBar;
 class QnGraphicsView;
-class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchController;
 class QnWorkbenchDisplay;

@@ -6,24 +6,20 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QSortFilterProxyModel>
 
-#include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-
-#include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
-    base_type(parent),
+AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(SystemContext* systemContext, QWidget* parent):
+    base_type(systemContext, parent),
     ui(new Ui::AnalyticsSdkEventWidget),
-    m_sdkEventModel(new AnalyticsSdkEventModel(this))
+    m_sdkEventModel(new AnalyticsSdkEventModel(systemContext, this))
 {
     ui->setupUi(this);
 

@@ -6,15 +6,12 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/core/access/access_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-
-class QnWorkbenchContext;
-class QnResourcePool;
 
 namespace nx::vms::api { struct LayoutData; }
 
@@ -32,7 +29,6 @@ private:
     friend class QnWorkbenchAccessController;
 };
 
-
 /**
  * This class implements access control.
  */
@@ -47,6 +43,7 @@ class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
 public:
     QnWorkbenchAccessController(
         nx::vms::client::desktop::SystemContext* systemContext,
+        nx::core::access::Mode resourceAccessMode,
         QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
 
@@ -68,12 +65,6 @@ public:
     bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
     /**
-     * \param resources                 List of resources to get combined permissions for.
-     * \returns                         Bitwise AND combination of permissions for the provided resources.
-     */
-    Qn::Permissions combinedPermissions(const QnResourceList& resources) const;
-
-    /**
      * \returns                         Global permissions of the current user,
      *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
@@ -87,11 +78,6 @@ public:
      */
     bool hasGlobalPermission(GlobalPermission requiredPermission) const;
     bool hasGlobalPermissions(GlobalPermissions requiredPermissions) const;
-
-    /* Check permissions using resource System context. */
-    static bool checkPermissions(const QnResourcePtr& resouce,
-        Qn::Permissions requiredPermissions,
-        GlobalPermissions requiredGlobalPermissions);
 
     /**
      * \param resource                  Resource to get permissions change notifier for.
@@ -152,6 +138,7 @@ private:
     GlobalPermissions calculateGlobalPermissions() const;
 
 private:
+    const nx::core::access::Mode m_mode;
     struct PermissionsData
     {
         Qn::Permissions permissions;

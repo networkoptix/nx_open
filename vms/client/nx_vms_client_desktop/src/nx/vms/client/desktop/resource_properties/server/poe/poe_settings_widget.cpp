@@ -40,7 +40,7 @@ struct PoeSettingsWidget::Private: public QObject
 
 PoeSettingsWidget::Private::Private(PoeSettingsWidget* owner):
     q(owner),
-    store(owner)
+    store(owner->resourcePool())
 {
     ui.setupUi(owner);
 

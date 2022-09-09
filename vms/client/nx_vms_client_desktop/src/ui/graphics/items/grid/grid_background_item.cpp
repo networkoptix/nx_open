@@ -2,20 +2,20 @@
 
 #include "grid_background_item.h"
 
-#include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QPainter>
 
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
@@ -58,7 +58,7 @@ enum class BackgroundType
     Special
 };
 
-BackgroundType backgroundTypeFromLayout(const QnLayoutResourcePtr& layout)
+BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
 {
     if (layout->backgroundImageFilename().isEmpty())
     {
@@ -208,9 +208,10 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
     const auto appServerImageCache = context->instance<ServerImageCache>();
     connect(appServerImageCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
 
-    connect(qnClientCoreModule->networkModule(),
-        &nx::vms::client::core::NetworkModule::remoteIdChanged,
-        this, &QnGridBackgroundItem::updateConnectedState);
+    connect(context,
+        &QnWorkbenchContext::userChanged,
+        this,
+        &QnGridBackgroundItem::updateConnectedState);
 
     const auto notifier = qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE);
     connect(notifier, &QnPropertyNotifier::valueChanged,
@@ -345,7 +346,7 @@ void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper* mapper)
     updateGeometry();
 }
 
-void QnGridBackgroundItem::update(const QnLayoutResourcePtr& layout)
+void QnGridBackgroundItem::update(const LayoutResourcePtr& layout)
 {
     Q_D(QnGridBackgroundItem);
 
@@ -417,7 +418,7 @@ void QnGridBackgroundItem::updateConnectedState()
 {
     Q_D(QnGridBackgroundItem);
 
-    d->connected = qnClientCoreModule->networkModule()->isConnected();
+    d->connected = !context()->user().isNull();
     updateDisplay();
 }
 

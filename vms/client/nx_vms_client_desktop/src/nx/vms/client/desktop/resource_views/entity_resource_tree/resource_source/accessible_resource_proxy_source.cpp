@@ -2,9 +2,9 @@
 
 #include "accessible_resource_proxy_source.h"
 
-#include <common/common_module.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -12,12 +12,13 @@ namespace entity_resource_tree {
 using namespace nx::core::access;
 
 AccessibleResourceProxySource::AccessibleResourceProxySource(
-    const QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const ResourceAccessProvider* accessProvider,
     const QnResourceAccessSubject& accessSubject,
     std::unique_ptr<AbstractResourceSource> baseResourceSource)
     :
     base_type(),
+    SystemContextAware(systemContext),
     m_accessProvider(accessProvider),
     m_accessSubject(accessSubject),
     m_baseResourceSource(std::move(baseResourceSource))
@@ -66,10 +67,10 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
         });
 
     // Message processor does not exist in unit tests.
-    if (auto messageProcessor = commonModule->messageProcessor())
+    if (auto messageProcessor = this->messageProcessor())
     {
         auto cachesCleaner = new core::SessionResourcesSignalListener<QnResource>(
-            commonModule->resourcePool(),
+            resourcePool(),
             messageProcessor,
             this);
         cachesCleaner->setOnRemovedHandler(

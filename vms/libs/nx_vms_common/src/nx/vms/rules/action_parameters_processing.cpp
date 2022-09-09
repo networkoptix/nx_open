@@ -76,7 +76,7 @@ ActionParameters actualActionParameters(
     ActionType actionType,
     const ActionParameters& sourceActionParameters,
     const EventParameters& eventRuntimeParameters,
-    const QnCommonModule* commonModule)
+    const nx::vms::common::SystemContext* systemContext)
 {
     ActionParameters result = sourceActionParameters;
 
@@ -85,7 +85,7 @@ ActionParameters actualActionParameters(
         processTextFieldSubstitutions(
             result.text,
             eventRuntimeParameters,
-            commonModule->systemContext());
+            systemContext);
     }
     return result;
 }

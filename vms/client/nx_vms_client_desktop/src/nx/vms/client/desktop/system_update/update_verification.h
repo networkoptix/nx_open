@@ -16,9 +16,9 @@
 #include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
 
-class QnCommonModule;
-
 namespace nx::vms::client::desktop {
+
+class SystemContext;
 
 namespace update_verification {
 // This property is used in unit tests to make update verification procedure think that a server is
@@ -43,7 +43,7 @@ public:
  * @return true if specified cloudUrl is compatible with our system
  */
 bool checkCloudHost(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     nx::utils::SoftwareVersion targetVersion,
     QString cloudUrl,
     const QSet<QnUuid>& peers);
@@ -68,7 +68,7 @@ struct VerificationOptions
     /** Forcing client to download all necessary packages. */
     bool downloadAllPackages = true;
     /** It is needed for cloud compatibility check. */
-    QnCommonModule* commonModule = nullptr;
+    SystemContext* systemContext = nullptr;
 };
 
 /**

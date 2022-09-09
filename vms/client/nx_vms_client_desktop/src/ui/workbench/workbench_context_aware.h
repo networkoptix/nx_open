@@ -3,21 +3,22 @@
 #pragma once
 
 #include <nx/core/watermark/watermark.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 
 class QnWorkbenchContext;
-class QnWorkbench;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchCustomizer;
 
 namespace nx::vms::client::desktop {
+
 class MainWindow;
 class SystemContext;
+class Workbench;
+
 } // namespace nx::vms::client::desktop
 
 /**
@@ -26,9 +27,7 @@ class SystemContext;
  * If some class needs access to workbench context, it can simply derive from
  * QnWorkbenchContextAware and pass its context-aware parent into constructor.
  */
-class QnWorkbenchContextAware:
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class QnWorkbenchContextAware: public nx::vms::client::desktop::SystemContextAware
 {
 public:
     static QString kQmlWorkbenchContextPropertyName;
@@ -80,7 +79,7 @@ protected:
 
     nx::vms::client::desktop::ui::action::Manager* menu() const;
 
-    QnWorkbench* workbench() const;
+    nx::vms::client::desktop::Workbench* workbench() const;
 
     QnWorkbenchAccessController* accessController() const;
 

@@ -5,18 +5,17 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
 #include <QtGui/private/qguiapplication_p.h>
-#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlError>
 #include <QtQuickWidgets/QQuickWidget>
-
-#include <ui/graphics/opengl/gl_functions.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_context.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

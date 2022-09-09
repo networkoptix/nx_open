@@ -345,11 +345,7 @@ void QnServerStorageManager::checkStoragesStatusInternal(const QnResourcePtr& re
 
 void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
 {
-    auto connection = this->connection();
-    if (!connection)
-        return;
-
-    auto messageBusConnection = connection->messageBusConnection();
+    auto messageBusConnection = systemContext()->messageBusConnection();
 
     if (!messageBusConnection)
         return;
@@ -377,11 +373,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
 
 void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids)
 {
-    auto connection = this->connection();
-    if (!connection)
-        return;
-
-    auto messageBusConnection = connection->messageBusConnection();
+    auto messageBusConnection = systemContext()->messageBusConnection();
 
     if (!messageBusConnection)
         return;

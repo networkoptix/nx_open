@@ -138,7 +138,7 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->setCurrentText(QString());
 
     const QString displayName = nx::utils::elideString(
-        globalSettings()->systemName(), kMaxSystemNameLength);
+        systemSettings()->systemName(), kMaxSystemNameLength);
 
     ui->currentSystemLabel->setText(
         tr("You are about to merge the current System %1 with System")
@@ -224,7 +224,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         return;
 
     const bool ownSettings = ui->currentSystemRadioButton->isChecked();
-    const QString currentSystemName = globalSettings()->systemName();
+    const QString currentSystemName = systemSettings()->systemName();
     const QString targetSystemName = ui->remoteSystemRadioButton->text();
 
     const auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(

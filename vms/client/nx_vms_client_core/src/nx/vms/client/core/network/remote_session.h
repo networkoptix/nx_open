@@ -55,7 +55,11 @@ public:
 
     State state() const;
 
-    /** Interface to the server we are currently connected to. */
+    /**
+     * Interface to the server we are currently connected to.
+     *
+     * Note: connection always exists, function never returns null pointer.
+     */
     RemoteConnectionPtr connection() const;
 
     /** Auto-terminate server session when destroying. */

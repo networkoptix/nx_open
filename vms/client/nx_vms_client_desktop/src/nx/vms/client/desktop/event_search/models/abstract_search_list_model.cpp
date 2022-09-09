@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/model_row_iterator.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -352,8 +353,9 @@ QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const
 
 bool AbstractSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
 {
-    return camera && !camera->flags().testFlag(Qn::desktop_camera)
-        && accessController()->hasPermissions(camera,
+    return camera
+        && !camera->flags().testFlag(Qn::desktop_camera)
+        && ResourceAccessManager::hasPermissions(camera,
             Qn::ReadPermission | Qn::ViewContentPermission);
 }
 

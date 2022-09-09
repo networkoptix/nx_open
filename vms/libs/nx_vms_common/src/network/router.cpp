@@ -45,7 +45,7 @@ QnRoute routeTo(
         return result;
     }
 
-    auto connection = systemContext->ec2Connection();
+    auto connection = systemContext->messageBusConnection();
     if (!connection)
         return result; //< No connection to the peer network, can't route.
 

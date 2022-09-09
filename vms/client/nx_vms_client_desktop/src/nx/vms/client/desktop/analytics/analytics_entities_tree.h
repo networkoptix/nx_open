@@ -4,20 +4,16 @@
 
 #include <functional>
 
-#include <QtCore/QString>
+#include <QtCore/QFuture>
+#include <QtCore/QMutex>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtCore/QMutex>
-#include <QtCore/QFuture>
-
-#include <common/common_module_aware.h>
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/reflect/enum_instrument.h>
-
-class QnCommonModule;
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -99,18 +95,21 @@ public:
      * Event types are intersected, empty Groups and Engines are removed from the output.
      */
     static NodePtr eventTypesForRulesPurposes(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const QnVirtualCameraResourceList& devices,
         const UnresolvedEntities& additionalUnresolvedEventTypes);
 };
 
-class AnalyticsEventsSearchTreeBuilder: public QObject, public QnCommonModuleAware
+// TODO: #sivanov Move to System Context.
+class AnalyticsEventsSearchTreeBuilder: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit AnalyticsEventsSearchTreeBuilder(QObject* parent = nullptr);
+    explicit AnalyticsEventsSearchTreeBuilder(
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
     ~AnalyticsEventsSearchTreeBuilder();
 
     /**
@@ -136,13 +135,15 @@ private:
     AnalyticsEntitiesTreeBuilder::NodePtr cachedEventTypesTree;
 };
 
-class AnalyticsObjectsSearchTreeBuilder : public QObject, public QnCommonModuleAware
+class AnalyticsObjectsSearchTreeBuilder: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit AnalyticsObjectsSearchTreeBuilder(QObject* parent = nullptr);
+    explicit AnalyticsObjectsSearchTreeBuilder(
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
 
     /**
      * Tree of the Object type ids. Root nodes are Engines, then Groups and Object types as leaves.

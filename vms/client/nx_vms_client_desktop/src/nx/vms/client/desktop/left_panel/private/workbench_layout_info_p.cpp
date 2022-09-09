@@ -9,7 +9,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -49,7 +49,7 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* p
     QnWorkbenchContextAware(context),
     m_resources(new ResourceContainer(this))
 {
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         [this]()
         {
              workbench()->currentLayoutResource()->disconnect(this);
@@ -59,7 +59,7 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* p
     connect(workbench()->currentLayoutResource().get(), &QnLayoutResource::lockedChanged,
         this, &WorkbenchLayoutInfo::isLockedChanged);
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         [this]()
         {
             connect(workbench()->currentLayoutResource().get(), &QnLayoutResource::lockedChanged,
@@ -71,7 +71,7 @@ WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* p
             emit isLockedChanged();
         });
 
-    connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this,
+    connect(workbench(), &Workbench::currentLayoutItemsChanged, this,
         [this]()
         {
             emit itemCountChanged();

@@ -1,30 +1,28 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "subject_selection_dialog.h"
-#include "private/subject_selection_dialog_p.h"
-#include <ui_subject_selection_dialog.h> //< generated file
+#include "ui_subject_selection_dialog.h"
 
 #include <QtGui/QStandardItemModel>
 
-#include <common/common_module_aware.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <ui/common/indents.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <nx/utils/string.h>
-
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <ui/common/palette.h>
-
-#include <nx/vms/client/desktop/common/utils/item_view_utils.h>
-#include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
-
-#include <nx/network/app_info.h>
 #include <nx/branding.h>
+#include <nx/network/app_info.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
+#include <nx/vms/client/desktop/common/utils/item_view_utils.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/indents.h>
+#include <ui/common/palette.h>
+#include <utils/common/scoped_painter_rollback.h>
+
+#include "private/subject_selection_dialog_p.h"
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -294,7 +292,7 @@ void SubjectSelectionDialog::setRoleValidator(RoleValidator roleValidator)
 void SubjectSelectionDialog::validateAllUsers()
 {
     const auto validationState = m_roles->validateUsers(
-        resourceAccessSubjectsCache()->allSubjects());
+        systemContext()->resourceAccessSubjectsCache()->allSubjects());
 
     QIcon icon = (validationState == QValidator::Acceptable
         ? qnSkin->icon(lit("tree/users.png"))
@@ -339,7 +337,7 @@ QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
         return m_users->checkedUsers().unite(m_roles->checkedUsers());
 
     QSet<QnUuid> allUserIds;
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
+    for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allSubjects())
     {
         if (const auto& user = subject.user())
             allUserIds.insert(user->getId());

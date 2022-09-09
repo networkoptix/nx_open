@@ -38,12 +38,15 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/animation/curtain_animator.h>
@@ -82,7 +85,6 @@
 #include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "workbench.h"
 #include "workbench_access_controller.h"
 #include "workbench_context.h"
 #include "workbench_grid_mapper.h"
@@ -331,11 +333,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(finished()), m_boundingInstrument, SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(finished()), this, SLOT(at_viewportAnimator_finished()));
 
-    /* Connect to context. */
+    // Connect to context.
+    connect(appContext()->unifiedResourcePool(), &UnifiedResourcePool::resourcesRemoved, this,
+        &QnWorkbenchDisplay::at_resourcePool_resourcesRemoved);
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchDisplay::at_context_permissionsChanged);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnWorkbenchDisplay::at_resourcePool_resourceRemoved);
 
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
@@ -510,10 +512,10 @@ void QnWorkbenchDisplay::deinitSceneView()
     workbench()->disconnect(this);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
-        at_workbench_itemChanged(static_cast<Qn::ItemRole>(i), nullptr);
+        clearWidget(static_cast<Qn::ItemRole>(i));
 
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
-        removeItemInternal(item, true, false);
+        removeItemInternal(item, /*destroyWidget*/ true, /*destroyItem*/ false);
 
     if (gridBackgroundItem())
         delete gridBackgroundItem();
@@ -701,9 +703,17 @@ void QnWorkbenchDisplay::initSceneView()
     }
 
     /* Connect to context. */
-    connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
+    connect(workbench(), &Workbench::itemChanged, this,
+        &QnWorkbenchDisplay::at_workbench_itemChanged);
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
+        &QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged);
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
+        &QnWorkbenchDisplay::at_workbench_currentLayoutChanged);
+    connect(workbench(), &Workbench::currentLayoutItemAdded, this,
+        &QnWorkbenchDisplay::at_layout_itemAdded);
+
+    connect(workbench(), &Workbench::currentLayoutItemRemoved, this,
+        &QnWorkbenchDisplay::at_layout_itemRemoved);
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = workbench()->mapper();
@@ -1028,7 +1038,62 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
     }
 }
 
-void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
+void QnWorkbenchDisplay::clearWidget(Qn::ItemRole role)
+{
+    const bool animate = animationAllowed();
+
+    QnResourceWidget* oldWidget = m_widgetByRole[role];
+    if (!oldWidget)
+        return;
+
+    emit widgetAboutToBeChanged(role);
+
+    m_widgetByRole[role] = nullptr;
+
+    if (role == Qn::ZoomedRole)
+    {
+        m_viewportAnimator->stop();
+        qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
+        m_viewportAnimator->moveTo(fitInViewGeometry(), animate);
+        m_curtainAnimator->uncurtain();
+
+        /* Sync scene geometry. */
+        synchronizeSceneBounds();
+        synchronizeSceneBoundsExtension();
+
+        /* Un-raise on un-zoom. */
+        workbench()->setItem(Qn::RaisedRole, nullptr);
+
+        /* Show other items when zoomed item is removed. */
+        auto setOpacity =
+            [animate](QGraphicsObject* item, qreal value)
+            {
+                if (animate)
+                {
+                    opacityAnimator(item)->animateTo(value);
+                }
+                else
+                {
+                    if (hasOpacityAnimator(item))
+                        opacityAnimator(item)->stop();
+                    item->setOpacity(value);
+                }
+            };
+
+        for (auto widget: m_widgets)
+        {
+            if (widget)
+                setOpacity(widget, 1.0);
+        }
+
+        /* Update margin flags. */
+        updateCurrentMarginFlags();
+    }
+
+    emit widgetChanged(role);
+}
+
+void QnWorkbenchDisplay::updateBackground(const LayoutResourcePtr& layout)
 {
     if (!layout)
         return;
@@ -1277,8 +1342,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     context()->menu()->trigger(action::WidgetAddedEvent, action::Parameters(widget));
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
+    {
         if (item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
+    }
 
     if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
@@ -1343,8 +1410,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     widget->disconnect(this);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
+    {
         if (widget == m_widgetByRole[i])
-            setWidget(static_cast<Qn::ItemRole>(i), nullptr);
+            clearWidget(static_cast<Qn::ItemRole>(i));
+    }
 
     emit widgetAboutToBeRemoved(widget);
 
@@ -1377,7 +1446,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     if (destroyWidget)
     {
         widget->hide();
-        qnDeleteLater(widget);
+        qnDeleteLater(widget); //FIXME: #sivanov Make sync delete.
     }
 
     if (destroyItem)
@@ -2030,9 +2099,7 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item)
 
 void QnWorkbenchDisplay::at_layout_itemRemoved(QnWorkbenchItem *item)
 {
-    static const bool kDestroyWidget = true;
-    static const bool kDestroyItem = false;
-    if (removeItemInternal(item, kDestroyWidget, kDestroyItem))
+    if (removeItemInternal(item, /*destroyWidget*/ true, /*destroyItem*/ false))
         synchronizeSceneBounds();
 }
 
@@ -2060,14 +2127,9 @@ void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, con
         fitInView(animationAllowed());
 }
 
-void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item)
-{
-    setWidget(role, widget(item));
-}
-
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role)
 {
-    at_workbench_itemChanged(role, workbench()->item(role));
+    setWidget(role, widget(workbench()->item(role)));
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
@@ -2281,12 +2343,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             resourceWidget->setSelected(true);
     }
 
-    connect(workbenchLayout, &QnWorkbenchLayout::itemAdded,
-        this, &QnWorkbenchDisplay::at_layout_itemAdded);
-
-    connect(workbenchLayout, &QnWorkbenchLayout::itemRemoved,
-        this, &QnWorkbenchDisplay::at_layout_itemRemoved);
-
     connect(workbenchLayout, &QnWorkbenchLayout::zoomLinkAdded,
         this, &QnWorkbenchDisplay::at_layout_zoomLinkAdded);
 
@@ -2297,19 +2353,27 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         this, &QnWorkbenchDisplay::at_layout_boundingRectChanged);
 
     const auto layoutResource = workbenchLayout->resource();
+    auto updateBackgroundCasted =
+        [this](const QnLayoutResourcePtr& resource)
+        {
+            auto layout = resource.dynamicCast<LayoutResource>();
+            if (NX_ASSERT(layout))
+                updateBackground(layout);
+        };
+
     if (NX_ASSERT(layoutResource))
     {
         connect(layoutResource.get(), &QnLayoutResource::lockedChanged,
             this, &QnWorkbenchDisplay::layoutAccessChanged);
 
-        connect(layoutResource.get(), &QnLayoutResource::backgroundImageChanged,
-            this, &QnWorkbenchDisplay::updateBackground);
+        connect(layoutResource.get(), &QnLayoutResource::backgroundImageChanged, this,
+            updateBackgroundCasted);
 
-        connect(layoutResource.get(), &QnLayoutResource::backgroundSizeChanged,
-            this, &QnWorkbenchDisplay::updateBackground);
+        connect(layoutResource.get(), &QnLayoutResource::backgroundSizeChanged, this,
+            updateBackgroundCasted);
 
-        connect(layoutResource.get(), &QnLayoutResource::backgroundOpacityChanged,
-            this, &QnWorkbenchDisplay::updateBackground);
+        connect(layoutResource.get(), &QnLayoutResource::backgroundOpacityChanged, this,
+            updateBackgroundCasted);
 
         connect(layoutResource.get(), &QnLayoutResource::fixedSizeChanged, this,
             [this]
@@ -2419,7 +2483,7 @@ void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed()
         {
             // We can get here only when the widget is destroyed directly (not by destroying or
             // removing its corresponding item. Therefore the widget's item must be destroyed.
-            removeItemInternal(widget->item(), false, true);
+            removeItemInternal(widget->item(), /*destroyWidget*/ false, /*destroyItem*/ true);
         }
     }
 }
@@ -2504,39 +2568,27 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
         ? Qn::ViewContentPermission
         : Qn::ReadPermission;
 
-    if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
-    {
-        if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
-        {
-            if (!accessController()->hasPermissions(resource, Qn::ReadPermission))
-                workbench()->removeLayout(layout);
-        }
-    }
-
-    if (accessController()->hasPermissions(resource, requiredPermission))
+    if (ResourceAccessManager::hasPermissions(resource, requiredPermission))
         return;
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
     for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
-        qnDeleteLater(widget);
+        qnDeleteLater(widget); //FIXME: #sivanov Make sync delete.
     }
 }
 
-void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
+void QnWorkbenchDisplay::at_resourcePool_resourcesRemoved(const QnResourceList& resources)
 {
-    if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
+    // Here aboutToBeDestroyed will be called with corresponding handling.
+    for (const auto& resource: resources)
     {
-        if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
-            workbench()->removeLayout(layout);
-    }
-
-    /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget: m_widgetsByResource.take(resource))
-    {
-        widget->hide();
-        qnDeleteLater(widget);
+        for (auto widget: m_widgetsByResource.take(resource))
+        {
+            widget->hide();
+            qnDeleteLater(widget); //FIXME: #sivanov Make sync delete.
+        }
     }
 }
 

@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/system_settings.h>
@@ -242,7 +243,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->actionAtLabel->setText(actionAtLabelText);
 
         const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
-            ? !globalSettings()->cloudSystemId().isNull()
+            ? !systemSettings()->cloudSystemId().isEmpty()
             : vms::event::allowsAggregation(m_model->actionType());
         ui->aggregationWidget->setVisible(aggregationIsVisible);
 
@@ -256,13 +257,14 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
             m_intervalOfActionUpdater.reset();
         }
         if (m_model->actionType() == ActionType::pushNotificationAction
-            && globalSettings()->cloudSystemId().isNull())
+            && systemSettings()->cloudSystemId().isEmpty())
         {
             m_intervalOfActionUpdater.emplace(
-                connect(globalSettings(), &SystemSettings::cloudCredentialsChanged, this,
+                connect(systemSettings(), &SystemSettings::cloudCredentialsChanged, this,
                     [this]()
                     {
-                        ui->aggregationWidget->setVisible(!globalSettings()->cloudSystemId().isNull());
+                        ui->aggregationWidget->setVisible(
+                            !systemSettings()->cloudSystemId().isEmpty());
                     }));
         }
 
@@ -284,7 +286,10 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         }
         else
         {
-            const bool isEventProlonged = vms::event::hasToggleState(m_model->eventType(), m_model->eventParams(), commonModule());
+            const bool isEventProlonged = vms::event::hasToggleState(
+                m_model->eventType(),
+                m_model->eventParams(),
+                systemContext());
             ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
         }
     }
@@ -327,7 +332,10 @@ void QnBusinessRuleWidget::initEventParameters()
     }
     else
     {
-        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(m_model->eventType(), this, context());
+        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(
+            m_model->eventType(),
+            systemContext(),
+            this);
         m_eventWidgetsByType[m_model->eventType()] = m_eventParameters;
     }
     if (m_eventParameters)
@@ -364,14 +372,17 @@ void QnBusinessRuleWidget::initActionParameters()
     }
     else
     {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this);
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(
+            m_model->actionType(),
+            context(),
+            this);
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
         const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
-            ? !globalSettings()->cloudSystemId().isNull()
+            ? !systemSettings()->cloudSystemId().isEmpty()
             : vms::event::allowsAggregation(m_model->actionType());
         if (aggregationIsVisible)
             return ui->aggregationWidget->lastTabItem();
@@ -476,8 +487,8 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    if (!vms::event::hasToggleState(m_model->eventType(), m_model->eventParams(), commonModule()) ||
-        m_model->isActionProlonged())
+    if (!vms::event::hasToggleState(m_model->eventType(), m_model->eventParams(), systemContext())
+        || m_model->isActionProlonged())
     {
         return;
     }

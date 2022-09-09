@@ -16,7 +16,9 @@ void CamerasActions::registerAction()
         "Cameras - Toggle default password",
         [](QnWorkbenchContext* context)
         {
-            const auto cameras = context->resourcePool()->getAllCameras(QnResourcePtr(), true);
+            const auto cameras = context->resourcePool()->getAllCameras(
+                QnResourcePtr(),
+                true);
             if (cameras.empty())
                 return;
 
@@ -51,7 +53,9 @@ void CamerasActions::registerAction()
             presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
                 | Ptz::AuxiliaryPtzCapability | Ptz::PresetsPtzCapability);
 
-            for (const auto& camera: context->resourcePool()->getAllCameras(QnResourcePtr(), true))
+            for (const auto& camera: context->resourcePool()->getAllCameras(
+                QnResourcePtr(),
+                true))
             {
                 int idx = presets.indexOf(camera->getPtzCapabilities());
                 if (idx < 0)

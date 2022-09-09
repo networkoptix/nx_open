@@ -79,9 +79,6 @@ void UserLayoutsSource::processLayout(
 {
     const auto layout = layoutResource.staticCast<LayoutResource>();
 
-    if (layout->isPreviewSearchLayout())
-        return;
-
     if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))
     {
         holdLocalLayout(layoutResource);

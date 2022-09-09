@@ -9,31 +9,23 @@
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
+extern "C" {
+#include <libavformat/avformat.h>
 }
 
-#include <nx/utils/cryptographic_hash.h>
-
+#include <core/resource/avi/avi_archive_metadata.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
-
-#include <core/resource/resource_fwd.h>
-#include <core/resource/resource_media_layout.h>
-
-#include <utils/color_space/image_correction.h>
-
-#include <recording/stream_recorder_data.h>
-
-#include <common/common_module_aware.h>
-#include <core/resource/avi/avi_archive_metadata.h>
+#include <nx/utils/cryptographic_hash.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <recording/abstract_recording_context.h>
 #include <recording/abstract_recording_context_callback.h>
-
-#include <nx/vms/api/data/dewarping_data.h>
+#include <recording/stream_recorder_data.h>
+#include <utils/color_space/image_correction.h>
 
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,

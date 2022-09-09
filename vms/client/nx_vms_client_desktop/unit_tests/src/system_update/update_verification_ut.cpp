@@ -371,26 +371,26 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
 
     static const QString kCloudSystemId = "cloud_system_id";
 
-    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
+    commonModule()->globalSettings()->setCloudSystemId({});
 
     VerificationOptions options;
-    options.commonModule = commonModule();
+    options.systemContext = systemContext();
 
     const Version kCurrentVersion("4.0.0.28000");
     makeServer(kCurrentVersion);
     const auto clientData = makeClientData(kCurrentVersion);
 
-    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
+    commonModule()->globalSettings()->setCloudSystemId({});
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::noError);
     EXPECT_TRUE(contents.cloudIsCompatible);
 
-    commonModule()->systemContext()->globalSettings()->setCloudSystemId(kCloudSystemId);
+    commonModule()->globalSettings()->setCloudSystemId(kCloudSystemId);
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::incompatibleCloudHost);
     EXPECT_FALSE(contents.cloudIsCompatible);
 
-    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
+    commonModule()->globalSettings()->setCloudSystemId({});
     const auto incompatibleServer = makeServer(kCurrentVersion, false, false);
     incompatibleServer->QObject::setProperty(
         update_verification::kServerIsLinkedToCloudTestProperty, true);

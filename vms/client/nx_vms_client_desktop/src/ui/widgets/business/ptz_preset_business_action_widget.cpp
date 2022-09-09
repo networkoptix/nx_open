@@ -23,8 +23,11 @@
 
 using namespace nx::vms::client::desktop;
 
-QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(QWidget *parent) :
-    base_type(parent),
+QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::ExecPtzPresetBusinessActionWidget)
 {
     ui->setupUi(this);

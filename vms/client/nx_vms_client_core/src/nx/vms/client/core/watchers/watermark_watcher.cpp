@@ -53,7 +53,7 @@ WatermarkWatcher::Private::Private(WatermarkWatcher* q):
     connect(userWatcher, &UserWatcher::userChanged, this, &Private::updateUser);
     updateUser();
 
-    connect(q->systemContext()->globalSettings(),
+    connect(q->systemSettings(),
         &common::SystemSettings::watermarkChanged,
         this,
         &Private::updateWatermark);
@@ -71,7 +71,7 @@ void WatermarkWatcher::Private::updateUser()
 
 void WatermarkWatcher::Private::updateWatermark()
 {
-    const auto settings = q->systemContext()->globalSettings()->watermarkSettings();
+    const auto settings = q->systemSettings()->watermarkSettings();
     const auto value = nx::core::Watermark{settings, user};
     if (watermark == value)
         return;

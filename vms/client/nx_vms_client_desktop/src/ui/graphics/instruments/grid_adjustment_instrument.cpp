@@ -6,11 +6,13 @@
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 
-GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
+using namespace nx::vms::client::desktop;
+
+GridAdjustmentInstrument::GridAdjustmentInstrument(Workbench *workbench, QObject *parent):
     Instrument(
         makeSet(QEvent::Wheel),
         makeSet(),
@@ -96,6 +98,7 @@ bool GridAdjustmentInstrument::wheelEvent(
     return false;
 }
 
-QnWorkbench *GridAdjustmentInstrument::workbench() const {
+Workbench* GridAdjustmentInstrument::workbench() const
+{
     return m_workbench.data();
 }

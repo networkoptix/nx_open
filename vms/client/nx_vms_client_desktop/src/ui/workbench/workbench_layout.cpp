@@ -23,11 +23,11 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "workbench.h"
 #include "workbench_context.h"
 #include "workbench_grid_walker.h"
 #include "workbench_item.h"
@@ -91,8 +91,7 @@ struct QnWorkbenchLayout::Private
     QIcon icon;
 };
 
-QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource, QObject* parent):
-    QObject(parent),
+QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
     d(new Private{.resource = resource})
 {
     // TODO: #sivanov This does not belong here.
@@ -137,11 +136,6 @@ QnWorkbenchLayout::~QnWorkbenchLayout()
 {
     // Synchronizer must be stopped here to avoid removing layout items.
     d->synchronizer.reset();
-
-    bool signalsBlocked = blockSignals(false);
-    emit aboutToBeDestroyed();
-    blockSignals(signalsBlocked);
-
     clear();
 }
 
@@ -180,30 +174,9 @@ QnLayoutResource* QnWorkbenchLayout::resourcePtr() const
     return resource().data();
 }
 
-QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnLayoutResourcePtr& resource)
-{
-    const auto layouts = 
-        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
-    for (const auto& layout: layouts)
-    {
-        if (layout->resource() == resource)
-            return layout;
-    }
-
-    return nullptr;
-}
-
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const LayoutResourcePtr& resource)
 {
-    const auto layouts = 
-        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
-    for (const auto& layout: layouts)
-    {
-        if (layout->resource() == resource)
-            return layout;
-    }
-
-    return nullptr;
+    return appContext()->mainWindowContext()->workbenchContext()->workbench()->layout(resource);
 }
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& videoWall)
@@ -212,7 +185,7 @@ QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& vid
     for (const auto& layout: resourcePool->getResources<LayoutResource>())
     {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
-            return QnWorkbenchLayout::instance(layout);
+            return instance(layout);
     }
     return nullptr;
 }

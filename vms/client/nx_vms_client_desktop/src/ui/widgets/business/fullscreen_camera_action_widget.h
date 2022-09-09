@@ -14,7 +14,9 @@ class QnFullscreenCameraActionWidget: public QnAbstractBusinessParamsWidget
     using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnFullscreenCameraActionWidget(QWidget* parent = nullptr);
+    explicit QnFullscreenCameraActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnFullscreenCameraActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

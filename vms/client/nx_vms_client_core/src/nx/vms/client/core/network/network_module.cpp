@@ -72,7 +72,7 @@ NetworkModule::NetworkModule(
         d->certificateVerifier.get());
 
     d->sessionTimeoutWatcher = std::make_unique<RemoteSessionTimeoutWatcher>(
-        commonModule->systemContext()->globalSettings());
+        commonModule->globalSettings());
 }
 
 NetworkModule::~NetworkModule()
@@ -107,8 +107,6 @@ void NetworkModule::setSession(std::shared_ptr<RemoteSession> session)
     }
     if (session)
         d->sessionTimeoutWatcher->sessionStarted(session);
-
-    emit remoteIdChanged(currentServerId());
 }
 
 QnUuid NetworkModule::currentServerId() const
@@ -118,15 +116,6 @@ QnUuid NetworkModule::currentServerId() const
         return d->session->connection()->moduleInformation().id;
 
     return QnUuid();
-}
-
-bool NetworkModule::isConnected() const
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    if (!d->session)
-        return false;
-
-    return NX_ASSERT(d->session->connection());
 }
 
 RemoteConnectionFactory* NetworkModule::connectionFactory() const

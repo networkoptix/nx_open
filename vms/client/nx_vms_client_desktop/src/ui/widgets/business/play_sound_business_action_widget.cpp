@@ -1,41 +1,40 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <core/resource/camera_resource.h>
 #include "play_sound_business_action_widget.h"
 #include "ui_play_sound_business_action_widget.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
-
-#include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/models/notification_sound_model.h>
-#include <ui/workbench/workbench_context.h>
-
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
-#include <utils/media/audio_player.h>
-
+#include <nx/vms/event/action_parameters.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/models/notification_sound_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <core/resource_management/resource_pool.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/media/audio_player.h>
 
 using namespace nx::vms::client::desktop;
 
-QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::PlaySoundBusinessActionWidget)
+QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(
+    QnWorkbenchContext* context,
+    QWidget* parent)
+    :
+    base_type(context->systemContext(), parent),
+    ui(new Ui::PlaySoundBusinessActionWidget),
+    m_serverNotificationCache(context->instance<ServerNotificationCache>())
 {
     ui->setupUi(this);
 
     ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
 
-    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = m_serverNotificationCache->persistentGuiModel();
     ui->pathComboBox->setModel(soundModel);
 
     connect(soundModel, &QnNotificationSoundModel::listLoaded,
@@ -93,8 +92,7 @@ void QnPlaySoundBusinessActionWidget::updateCurrentIndex()
 {
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    QnNotificationSoundModel* soundModel =
-        context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = m_serverNotificationCache->persistentGuiModel();
     ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
 }
 
@@ -111,8 +109,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (fields.testFlag(Field::actionParams))
     {
         m_filename = params.url;
-        QnNotificationSoundModel* soundModel =
-            context()->instance<ServerNotificationCache>()->persistentGuiModel();
+        QnNotificationSoundModel* soundModel = m_serverNotificationCache->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
         ui->playToClient->setChecked(params.playToClient);
     }
@@ -123,8 +120,7 @@ void QnPlaySoundBusinessActionWidget::paramsChanged()
     if (!model() || m_updating)
         return;
 
-    QnNotificationSoundModel* soundModel =
-        context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = m_serverNotificationCache->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -141,8 +137,7 @@ void QnPlaySoundBusinessActionWidget::enableTestButton()
 
 void QnPlaySoundBusinessActionWidget::at_testButton_clicked()
 {
-    QnNotificationSoundModel* soundModel =
-        context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = m_serverNotificationCache->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -151,7 +146,7 @@ void QnPlaySoundBusinessActionWidget::at_testButton_clicked()
     if (soundUrl.isEmpty())
         return;
 
-    QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
+    QString filePath = m_serverNotificationCache->getFullPath(soundUrl);
     if (!QFileInfo(filePath).exists())
         return;
 

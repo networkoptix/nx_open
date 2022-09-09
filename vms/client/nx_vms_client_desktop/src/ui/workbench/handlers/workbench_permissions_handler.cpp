@@ -5,7 +5,6 @@
 #include <QtWidgets/QAction>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -15,6 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -59,7 +59,7 @@ PermissionsHandler::~PermissionsHandler()
 {
 }
 
-void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr& layout,
+void PermissionsHandler::shareLayoutWith(const LayoutResourcePtr& layout,
     const QnResourceAccessSubject& subject)
 {
     if (!NX_ASSERT(layout
@@ -167,7 +167,7 @@ bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject
 void PermissionsHandler::at_shareLayoutAction_triggered()
 {
     const auto params = menu()->currentParameters(sender());
-    const auto layout = params.resource().dynamicCast<QnLayoutResource>();
+    const auto layout = params.resource().dynamicCast<LayoutResource>();
     const auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
     const auto roleId = params.argument<QnUuid>(Qn::UuidRole);
 

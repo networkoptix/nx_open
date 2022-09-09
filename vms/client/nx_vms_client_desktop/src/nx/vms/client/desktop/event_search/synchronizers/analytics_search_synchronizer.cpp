@@ -21,11 +21,11 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/rubber_band_instrument.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>

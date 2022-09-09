@@ -23,6 +23,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
@@ -63,10 +64,13 @@ private:
 
 namespace nx::vms::client::desktop {
 
-PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
+PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
+    QnWorkbenchContext* context,
+    QWidget* parent)
+    :
+    base_type(context->systemContext(), parent),
     ui(new Ui::PushNotificationBusinessActionWidget),
+    m_context(context),
     m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
@@ -87,7 +91,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
     connect(ui->languageButton, &QPushButton::clicked, this,
         [this]
         {
-            context()->menu()->trigger(ui::action::SystemAdministrationAction);
+            m_context->menu()->trigger(ui::action::SystemAdministrationAction);
         });
 
     m_aligner->addWidgets(
@@ -102,11 +106,11 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
     connect(
         ui->cloudSettingsButton,
         &QPushButton::clicked,
-        action(action::PreferencesCloudTabAction),
+        m_context->action(action::PreferencesCloudTabAction),
         &QAction::triggered);
 
     connect(
-        base_type::globalSettings(),
+        systemSettings(),
         &SystemSettings::cloudSettingsChanged,
         this,
         &PushNotificationBusinessActionWidget::updateCurrentTab);
@@ -206,8 +210,7 @@ void PushNotificationBusinessActionWidget::parametersChanged()
 
 void PushNotificationBusinessActionWidget::updateCurrentTab()
 {
-    ui->stackedWidget->setCurrentIndex(
-        base_type::globalSettings()->cloudSystemId().isEmpty() ? 0 : 1);
+    ui->stackedWidget->setCurrentIndex(systemSettings()->cloudSystemId().isEmpty() ? 0 : 1);
 }
 
 void PushNotificationBusinessActionWidget::updateLimitInfo(QWidget *textField)

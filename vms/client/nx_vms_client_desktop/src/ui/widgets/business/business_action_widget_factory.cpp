@@ -19,53 +19,57 @@
 #include <ui/widgets/business/fullscreen_camera_action_widget.h>
 #include <ui/widgets/business/exit_fullscreen_action_widget.h>
 #include <ui/widgets/business/buzzer_business_action_widget.h>
+#include <ui/workbench/workbench_context.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
     vms::api::ActionType actionType,
+    QnWorkbenchContext* context,
     QWidget* parent)
 {
+    SystemContext* systemContext = context->systemContext();
+
     switch (actionType)
     {
         case vms::api::ActionType::cameraOutputAction:
-            return new QnCameraOutputBusinessActionWidget(parent);
+            return new QnCameraOutputBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::cameraRecordingAction:
-            return new QnRecordingBusinessActionWidget(parent);
+            return new QnRecordingBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::sendMailAction:
-            return new QnSendmailBusinessActionWidget(parent);
+            return new QnSendmailBusinessActionWidget(context, parent);
         case vms::api::ActionType::showPopupAction:
-            return new QnPopupBusinessActionWidget(parent);
+            return new QnPopupBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::pushNotificationAction:
-            return new PushNotificationBusinessActionWidget(parent);
+            return new PushNotificationBusinessActionWidget(context, parent);
         case vms::api::ActionType::playSoundAction:
         case vms::api::ActionType::playSoundOnceAction:
-            return new QnPlaySoundBusinessActionWidget(parent);
+            return new QnPlaySoundBusinessActionWidget(context, parent);
         case vms::api::ActionType::sayTextAction:
-            return new QnSayTextBusinessActionWidget(parent);
+            return new QnSayTextBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::bookmarkAction:
-            return new QnBookmarkBusinessActionWidget(parent);
+            return new QnBookmarkBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::executePtzPresetAction:
-            return new QnExecPtzPresetBusinessActionWidget(parent);
+            return new QnExecPtzPresetBusinessActionWidget(systemContext, parent);
         case vms::api::ActionType::showTextOverlayAction:
-            return new QnShowTextOverlayActionWidget(parent);
+            return new QnShowTextOverlayActionWidget(systemContext, parent);
         case vms::api::ActionType::showOnAlarmLayoutAction:
-            return new QnShowOnAlarmLayoutActionWidget(parent);
+            return new QnShowOnAlarmLayoutActionWidget(systemContext, parent);
         case vms::api::ActionType::execHttpRequestAction:
-            return new QnExecHttpRequestActionWidget(parent);
+            return new QnExecHttpRequestActionWidget(systemContext, parent);
         case vms::api::ActionType::openLayoutAction:
-            return new OpenLayoutActionWidget(parent);
+            return new OpenLayoutActionWidget(systemContext, parent);
         case vms::api::ActionType::fullscreenCameraAction:
-            return new QnFullscreenCameraActionWidget(parent);
+            return new QnFullscreenCameraActionWidget(systemContext, parent);
         case vms::api::ActionType::exitFullscreenAction:
-            return new QnExitFullscreenActionWidget(parent);
+            return new QnExitFullscreenActionWidget(systemContext, parent);
         case vms::api::ActionType::buzzerAction:
-            return new BuzzerBusinessActionWidget(parent);
+            return new BuzzerBusinessActionWidget(systemContext, parent);
 
         default:
             break;
     }
 
-    return new QnEmptyBusinessActionWidget(actionType, parent);
+    return new QnEmptyBusinessActionWidget(systemContext, actionType, parent);
 }

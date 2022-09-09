@@ -16,7 +16,9 @@ class QnExecHttpRequestActionWidget : public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnExecHttpRequestActionWidget(QWidget *parent = 0);
+    explicit QnExecHttpRequestActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~QnExecHttpRequestActionWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;

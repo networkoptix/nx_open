@@ -4,9 +4,7 @@
 
 #include <business/business_resource_validation.h> //< TODO: #vkutin Move these to proper locations and namespaces
 #include <business/business_types_comparator.h>
-#include <client_core/client_core_module.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
@@ -23,6 +21,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
 #include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
@@ -31,6 +30,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
@@ -83,7 +83,7 @@ inline std::vector<QnUuid> toStdVector(const QList<QnUuid>& values)
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
+    auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
     if (vms::event::requiresCameraResource(eventType))
         return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
@@ -99,7 +99,7 @@ QSet<QnUuid> filterSubjectIds(const IDList& ids)
 {
     QnUserResourceList users;
     QList<QnUuid> roles;
-    qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(ids, users, roles);
+    appContext()->currentSystemContext()->userRolesManager()->usersAndRoles(ids, users, roles);
     return toIds(users).unite(nx::utils::toQSet(roles));
 }
 
@@ -108,7 +108,7 @@ QSet<QnUuid> filterActionResources(
     const QSet<QnUuid>& ids,
     vms::api::ActionType actionType)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
+    auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
     if (actionType == vms::api::ActionType::fullscreenCameraAction)
     {
@@ -554,11 +554,12 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 QnBusinessRuleViewModel::Fields QnBusinessRuleViewModel::updateEventClassRelatedParams()
 {
     Fields fields = Field::modified;
-    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()))
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, systemContext()))
     {
         if (!isActionProlonged())
         {
-            const auto allowedStates = allowedEventStates(m_eventType, m_eventParams, commonModule());
+            const auto allowedStates =
+                allowedEventStates(m_eventType, m_eventParams, systemContext());
             if (!allowedStates.contains(m_eventState))
             {
                 m_eventState = allowedStates.first();
@@ -825,13 +826,13 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
         }
     }
 
-    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, systemContext()) &&
         !isActionProlonged() && m_eventState == vms::api::EventState::undefined)
     {
-        m_eventState = allowedEventStates(m_eventType, m_eventParams, commonModule()).first();
+        m_eventState = allowedEventStates(m_eventType, m_eventParams, systemContext()).first();
         fields |= Field::eventState;
     }
-    else if (!vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+    else if (!vms::event::hasToggleState(m_eventType, m_eventParams, systemContext()) &&
         vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
     {
         m_actionParams.durationMs = defaultActionDurationMs;
@@ -1221,7 +1222,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 }
                 case ActionType::pushNotificationAction:
                 {
-                    if (globalSettings()->cloudSystemId().isEmpty())
+                    if (systemSettings()->cloudSystemId().isEmpty())
                         return false;
 
                     static const QnCloudUsersValidationPolicy cloudUsersPolicy;
@@ -1271,7 +1272,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (m_actionParams.allUsers)
                         return true;
 
-                    QnLayoutAccessValidationPolicy layoutAccessPolicy(commonModule());
+                    QnLayoutAccessValidationPolicy layoutAccessPolicy(systemContext());
                     layoutAccessPolicy.setLayout(layout);
 
                     // TODO: use iterator-based constructor after update to Qt 5.14.
@@ -1306,7 +1307,8 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 void QnBusinessRuleViewModel::updateEventStateModel()
 {
     m_eventStatesModel->clear();
-    foreach(vms::api::EventState val, vms::event::allowedEventStates(m_eventType, m_eventParams, commonModule()))
+    for (vms::api::EventState val:
+        vms::event::allowedEventStates(m_eventType, m_eventParams, systemContext()))
     {
         QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
         item->setData(int(val));
@@ -1323,7 +1325,8 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
         ProlongedActionRole, true, -1, Qt::MatchExactly);
 
     // what type of actions to show: prolonged or instant
-    bool enableProlongedActions = vms::event::hasToggleState(m_eventType, m_eventParams, commonModule());
+    bool enableProlongedActions =
+        vms::event::hasToggleState(m_eventType, m_eventParams, systemContext());
     foreach(QModelIndex idx, prolongedActions)
     {
         m_actionTypesModel->item(idx.row())->setEnabled(enableProlongedActions);

@@ -317,8 +317,7 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
     if (d->context)
     {
         d->resourceTreeComposer = std::make_unique<entity_resource_tree::ResourceTreeComposer>(
-            d->context->commonModule(),
-            d->context->accessController(),
+            d->context->systemContext(),
             d->context->resourceTreeSettings());
 
         connect(d->resourceTreeComposer.get(), &entity_resource_tree::ResourceTreeComposer::saveExpandedState,
@@ -473,7 +472,7 @@ bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) c
     {
         case ResourceTree::FilterType::servers:
             return d->context->accessController()->hasGlobalPermission(GlobalPermission::admin)
-                || d->context->globalSettings()->showServersInTreeForNonAdmins();
+                || d->context->systemSettings()->showServersInTreeForNonAdmins();
 
         default:
             return true;

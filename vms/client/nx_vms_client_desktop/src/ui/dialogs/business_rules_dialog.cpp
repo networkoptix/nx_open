@@ -3,6 +3,8 @@
 #include "business_rules_dialog.h"
 #include "ui_business_rules_dialog.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QEvent>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QKeyEvent>
@@ -11,15 +13,12 @@
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <api/server_rest_connection.h>
 // TODO: #vkutin Think of a better location and namespace.
 #include <business/business_types_comparator.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
@@ -37,6 +36,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
@@ -569,7 +569,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    if (auto connection = messageBusConnection())
+    if (auto connection = systemContext()->messageBusConnection())
     {
         connection->getEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
             [](int /*requestId*/, ec2::ErrorCode) {});
@@ -668,7 +668,7 @@ bool QnBusinessRulesDialog::hasChanges() const
 
 bool QnBusinessRulesDialog::saveAll()
 {
-    auto connection = messageBusConnection();
+    auto connection = systemContext()->messageBusConnection();
     if (!connection)
         return false;
 
@@ -757,7 +757,7 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
     auto eventType = ruleModel->eventType();
     const auto params = makeTestRuleParams(ruleModel, resourcePool());
 
-    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), commonModule()))
+    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), systemContext()))
     {
         sendRequest(params, nx::vms::api::EventState::active,
             [params, makeCallback, sendRequest](

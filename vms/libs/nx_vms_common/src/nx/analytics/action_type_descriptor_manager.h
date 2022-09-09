@@ -2,21 +2,18 @@
 
 #pragma once
 
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/device_agent_manifest.h>
-
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::analytics {
 
-class NX_VMS_COMMON_API ActionTypeDescriptorManager: public /*mixin*/ QnCommonModuleAware
+class NX_VMS_COMMON_API ActionTypeDescriptorManager: public nx::vms::common::SystemContextAware
 {
-    using base_type = QnCommonModuleAware;
-
 public:
-    ActionTypeDescriptorManager(QnCommonModule* commonModule);
+    ActionTypeDescriptorManager(nx::vms::common::SystemContext* systemContext);
 
     std::optional<nx::vms::api::analytics::ActionTypeDescriptor> descriptor(
         const nx::vms::api::analytics::ActionTypeId& actionTypeId) const;

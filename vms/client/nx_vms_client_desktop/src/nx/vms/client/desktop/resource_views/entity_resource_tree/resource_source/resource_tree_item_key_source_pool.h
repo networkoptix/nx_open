@@ -2,14 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
 #include <core/resource_access/resource_access_subject.h>
-
-class QnCommonModule;
-class QnResourcePool;
-class QnSharedResourcesManager;
-class QnGlobalPermissionsManager;
-namespace nx::core::access { class ResourceAccessProvider; }
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -19,7 +14,7 @@ class UserLayoutResourceIndex;
 class UserRolesProvider;
 class WebPageResourceIndex;
 
-class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool
+class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool: public SystemContextAware
 {
     using UniqueResourceSourcePtr = entity_item_model::UniqueResourceSourcePtr;
     using UniqueUuidSourcePtr = entity_item_model::UniqueUuidSourcePtr;
@@ -27,7 +22,7 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeItemKeySourcePool
 
 public:
     ResourceTreeItemKeySourcePool(
-        const QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const CameraResourceIndex* cameraResourceIndex,
         const UserLayoutResourceIndex* sharedLayoutResourceIndex);
 
@@ -164,13 +159,6 @@ public:
     UniqueUuidSourcePtr userRolesSource();
 
 private:
-    const QnResourcePool* resourcePool() const;
-    const nx::core::access::ResourceAccessProvider* accessProvider() const;
-    const QnGlobalPermissionsManager* globalPermissionsManager() const;
-    const QnSharedResourcesManager* sharedResourcesManager() const;
-
-private:
-    const QnCommonModule* m_commonModule;
     const CameraResourceIndex* m_cameraResourceIndex;
     const UserLayoutResourceIndex* m_userLayoutResourceIndex;
     QScopedPointer<UserRolesProvider> m_userRolesProvider;

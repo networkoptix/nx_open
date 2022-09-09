@@ -3,8 +3,13 @@
 #include "empty_business_event_widget.h"
 #include "ui_empty_business_event_widget.h"
 
-QnEmptyBusinessEventWidget::QnEmptyBusinessEventWidget(QWidget *parent) :
-    base_type(parent),
+using namespace nx::vms::client::desktop;
+
+QnEmptyBusinessEventWidget::QnEmptyBusinessEventWidget(
+    SystemContext* systemContext,
+    QWidget *parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::EmptyBusinessEventWidget)
 {
     ui->setupUi(this);

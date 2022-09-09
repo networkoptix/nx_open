@@ -25,8 +25,8 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/mac_utils.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <utils/common/delayed.h>

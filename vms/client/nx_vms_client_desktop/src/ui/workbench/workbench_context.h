@@ -11,15 +11,12 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/core/watermark/watermark.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <utils/common/instance_storage.h>
 
 struct QnStartupParameters;
-
-class QnWorkbench;
-class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchLayoutWatcher;
@@ -30,6 +27,7 @@ class ContextCurrentUserWatcher;
 class MainWindow;
 class ResourceTreeSettings;
 class IntercomManager;
+class Workbench;
 
 namespace joystick { class Manager; }
 
@@ -42,7 +40,7 @@ namespace joystick { class Manager; }
 class QnWorkbenchContext:
     public QObject,
     public QnInstanceStorage,
-    public nx::vms::client::core::CommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -50,15 +48,13 @@ class QnWorkbenchContext:
     Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget NOTIFY mainWindowChanged)
 
 public:
-    QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent = nullptr);
-
+    QnWorkbenchContext(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnWorkbenchContext();
 
-    QnWorkbench* workbench() const;
+    nx::vms::client::desktop::Workbench* workbench() const;
     nx::vms::client::desktop::ui::action::Manager* menu() const;
-
-    QnWorkbenchAccessController* accessController() const;
-    void setAccessController(QnWorkbenchAccessController* value);
 
     QnWorkbenchDisplay* display() const;
     QnWorkbenchNavigator* navigator() const;
@@ -115,7 +111,7 @@ private:
     void initWorkarounds();
 
 private:
-    QScopedPointer<QnWorkbench> m_workbench;
+    QScopedPointer<nx::vms::client::desktop::Workbench> m_workbench;
     QScopedPointer<nx::vms::client::desktop::ui::action::Manager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
@@ -127,9 +123,8 @@ private:
 
     QPointer<nx::vms::client::desktop::MainWindow> m_mainWindow;
 
-    QnWorkbenchAccessController* m_accessController;
-    nx::vms::client::desktop::ContextCurrentUserWatcher* m_userWatcher;
-    QnWorkbenchLayoutWatcher *m_layoutWatcher;
+    nx::vms::client::desktop::ContextCurrentUserWatcher* m_userWatcher = nullptr;
+    QnWorkbenchLayoutWatcher *m_layoutWatcher = nullptr;
 
-    bool m_closingDown;
+    bool m_closingDown = false;
 };

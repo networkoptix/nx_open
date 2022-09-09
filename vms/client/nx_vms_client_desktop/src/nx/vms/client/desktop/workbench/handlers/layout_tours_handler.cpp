@@ -17,11 +17,11 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_review_controller.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -247,7 +247,7 @@ void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& to
     NX_ASSERT(systemContext()->showreelManager()->tour(tour.id).isValid());
     auto stateManager = systemContext()->showreelStateManager();
 
-    if (const auto connection = messageBusConnection())
+    if (const auto connection = systemContext()->messageBusConnection())
     {
         int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(
             tour,
@@ -273,7 +273,7 @@ void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& to
 
 void LayoutToursHandler::removeTourFromServer(const QnUuid& tourId)
 {
-    if (const auto connection = messageBusConnection())
+    if (const auto connection = systemContext()->messageBusConnection())
     {
         connection->getLayoutTourManager(Qn::kSystemAccess)->remove(
             tourId, [](int /*reqId*/, ec2::ErrorCode) {});

@@ -4,19 +4,21 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/models/business_rules_view_model.h>
 
 class QnAbstractBusinessParamsWidget:
     public QWidget,
-    public nx::vms::client::core::CommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     typedef QWidget base_type;
 
 public:
-    explicit QnAbstractBusinessParamsWidget(QWidget *parent = 0);
+    explicit QnAbstractBusinessParamsWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnAbstractBusinessParamsWidget();
 
     QnBusinessRuleViewModelPtr model();

@@ -5,16 +5,14 @@
 #include <QtGui/QStandardItemModel>
 
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/event/event_parameters.h>
-
 #include <nx/utils/uuid.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/event/event_parameters.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class AnalyticsSdkEventModel: public QnCommonModuleAware, public QStandardItemModel
+class AnalyticsSdkEventModel: public QStandardItemModel, public SystemContextAware
 {
 public:
     enum DataRole
@@ -24,7 +22,7 @@ public:
         ValidEventRole,
     };
 
-    AnalyticsSdkEventModel(QObject* parent = nullptr);
+    AnalyticsSdkEventModel(SystemContext* systemContext, QObject* parent = nullptr);
     ~AnalyticsSdkEventModel();
 
     void loadFromCameras(

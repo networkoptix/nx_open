@@ -1,25 +1,25 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef CUSTOM_BUSINESS_EVENT_WIDGET_H
-#define CUSTOM_BUSINESS_EVENT_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
+
 #include <ui/widgets/business/abstract_business_params_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class CustomBusinessEventWidget;
+class CustomBusinessEventWidget;
 }
 
 class QnCustomBusinessEventWidget:
-    public QnAbstractBusinessParamsWidget,
-    public nx::vms::client::core::RemoteConnectionAware
+    public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnCustomBusinessEventWidget(QWidget *parent = 0);
+    explicit QnCustomBusinessEventWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = 0);
     ~QnCustomBusinessEventWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;
@@ -33,5 +33,3 @@ private slots:
 private:
     QScopedPointer<Ui::CustomBusinessEventWidget> ui;
 };
-
-#endif // CUSTOM_BUSINESS_EVENT_WIDGET_H

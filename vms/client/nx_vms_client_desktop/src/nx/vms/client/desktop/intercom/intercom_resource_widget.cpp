@@ -5,7 +5,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
-#include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/action_parameters.h>
@@ -32,17 +32,13 @@ IntercomResourceWidget::IntercomResourceWidget(
     for (const QnIOPortData& portData: camera()->ioPortDescriptions())
         m_outputNameToId[portData.outputName] = portData.id;
 
+    // TODO: #dfisenko Is this call really needed here?
     updateButtonsVisibility();
 
-    auto safeUpdateButtonsVisibility =
-        [this, item]
-        {
-            if (item->layout() && item->layout()->resource())
-                updateButtonsVisibility();
-        };
-
-    connect(item->layout(), &QnWorkbenchLayout::itemAdded, item, safeUpdateButtonsVisibility);
-    connect(item->layout(), &QnWorkbenchLayout::itemRemoved, item, safeUpdateButtonsVisibility);
+    connect(item->layout(), &QnWorkbenchLayout::itemAdded, this,
+        &IntercomResourceWidget::updateButtonsVisibility);
+    connect(item->layout(), &QnWorkbenchLayout::itemRemoved, this,
+        &IntercomResourceWidget::updateButtonsVisibility);
 }
 
 IntercomResourceWidget::~IntercomResourceWidget()
@@ -55,16 +51,15 @@ int IntercomResourceWidget::calculateButtonsVisibility() const
 {
     int result = base_type::calculateButtonsVisibility();
 
-    const auto intecomResource = resource()->toResourcePtr();
-    const auto layout = layoutResource();
+    const auto intecomResource = QnResourceWidget::resource();
 
-    if (nx::vms::common::isIntercomOnIntercomLayout(intecomResource, layout))
+    if (nx::vms::common::isIntercomOnIntercomLayout(intecomResource, layoutResource()))
     {
         const QnUuid intercomToDeleteId = intecomResource->getId();
 
         QSet<QnUuid> otherIntercomLayoutItemIds; // Other intercom item copies on the layout.
 
-        const auto intercomLayoutItems = layout->getItems();
+        const auto intercomLayoutItems = layoutResource()->getItems();
         for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
         {
             const auto itemResourceId = intercomLayoutItem.resource.id;

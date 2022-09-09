@@ -7,9 +7,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 
-utils::QnCameraNamesWatcher::QnCameraNamesWatcher(QnCommonModule* commonModule):
+using namespace nx::vms::common;
+
+utils::QnCameraNamesWatcher::QnCameraNamesWatcher(SystemContext* systemContext):
     base_type(nullptr),
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     m_names()
 {
 }

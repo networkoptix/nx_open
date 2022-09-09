@@ -33,12 +33,14 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/viewport_animator.h>
@@ -86,7 +88,6 @@
 #include <utils/common/util.h>
 
 #include "toggle.h"
-#include "workbench.h"
 #include "workbench_access_controller.h"
 #include "workbench_context.h"
 #include "workbench_display.h"
@@ -1651,15 +1652,8 @@ void QnWorkbenchController::updateCurrentLayoutInstruments()
 {
     const auto layout = workbench()->currentLayout();
     const auto resource = layout->resource();
-    if (!resource)
-    {
-        m_moveInstrument->setEnabled(false);
-        m_resizingInstrument->setEnabled(false);
-        m_wheelZoomInstrument->setEnabled(false);
-        return;
-    }
 
-    const auto permissions = accessController()->permissions(resource);
+    const auto permissions = ResourceAccessManager::permissions(resource);
     const auto writable = permissions.testFlag(Qn::WritePermission);
 
     m_moveInstrument->setEnabled(writable && !resource->locked());

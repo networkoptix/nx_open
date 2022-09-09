@@ -22,7 +22,7 @@ WindowContext* WindowContextAware::windowContext() const
     return m_windowContext.data();;
 }
 
-QnWorkbench* WindowContextAware::workbench() const
+Workbench* WindowContextAware::workbench() const
 {
     return m_windowContext->workbenchContext()->workbench();
 }

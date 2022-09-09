@@ -6,20 +6,20 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/uuid.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace utils {
 
 class NX_VMS_COMMON_API QnCameraNamesWatcher:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 
     typedef QObject base_type;
 
 public:
-    explicit QnCameraNamesWatcher(QnCommonModule* commonModule);
+    explicit QnCameraNamesWatcher(nx::vms::common::SystemContext* systemContext);
     ~QnCameraNamesWatcher();
     QString getCameraName(const QnUuid& cameraId);
 

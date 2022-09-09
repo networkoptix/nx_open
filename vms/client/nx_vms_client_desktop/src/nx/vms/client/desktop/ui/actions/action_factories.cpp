@@ -25,12 +25,13 @@
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -85,7 +86,7 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
     {
         if (layout->isFile())
         {
-            if (!QnWorkbenchLayout::instance(layout))
+            if (!workbench()->layout(layout))
                 continue; /* Not opened. */
         }
 
@@ -95,11 +96,11 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
         // TODO: #sivanov Do not add preview search layouts to the resource pool.
         if (layout->isPreviewSearchLayout())
         {
-            if (!QnWorkbenchLayout::instance(layout))
+            if (!workbench()->layout(layout))
                 continue; /* Not opened. */
         }
 
-        if (!accessController()->hasPermissions(layout, Qn::ReadPermission))
+        if (!ResourceAccessManager::hasPermissions(layout, Qn::ReadPermission))
             continue;
 
         auto action = new QAction(parent);

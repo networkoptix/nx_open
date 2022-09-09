@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QGraphicsWidget>
 
-#include <ui/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -49,7 +49,7 @@ SpecialLayoutPanelPrivate::SpecialLayoutPanelPrivate(
     m_parentWidget(parentWidget)
 {
     handleCurrentLayoutChanged(workbench()->currentLayout());
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         [this](){ handleCurrentLayoutChanged(workbench()->currentLayout());});
 }
 

@@ -35,8 +35,7 @@ bool contains(const QnMediaServerResourceList& servers, const QnMediaServerResou
 namespace nx::vms::client::desktop {
 
 CurrentSystemServers::CurrentSystemServers(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+    base_type(parent)
 {
     const auto pool = resourcePool();
     connect(pool, &QnResourcePool::resourceAdded, this, &CurrentSystemServers::tryAddServer);

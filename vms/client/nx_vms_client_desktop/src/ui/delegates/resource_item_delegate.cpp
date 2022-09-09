@@ -29,7 +29,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -67,12 +67,12 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
 {
 }
 
-QnWorkbench* QnResourceItemDelegate::workbench() const
+Workbench* QnResourceItemDelegate::workbench() const
 {
     return m_workbench.data();
 }
 
-void QnResourceItemDelegate::setWorkbench(QnWorkbench* workbench)
+void QnResourceItemDelegate::setWorkbench(Workbench* workbench)
 {
     m_workbench = workbench;
 }

@@ -1,18 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef BUSINESS_ACTION_WIDGET_FACTORY_H
-#define BUSINESS_ACTION_WIDGET_FACTORY_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
-#include <ui/widgets/business/abstract_business_params_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
+class QnAbstractBusinessParamsWidget;
+class QnWorkbenchContext;
 
 class QnBusinessActionWidgetFactory {
 public:
-    static QnAbstractBusinessParamsWidget* createWidget(nx::vms::api::ActionType actionType, QWidget* parent = 0);
+    static QnAbstractBusinessParamsWidget* createWidget(
+        nx::vms::api::ActionType actionType,
+        QnWorkbenchContext* context,
+        QWidget* parent = nullptr);
 };
-
-#endif // BUSINESS_ACTION_WIDGET_FACTORY_H

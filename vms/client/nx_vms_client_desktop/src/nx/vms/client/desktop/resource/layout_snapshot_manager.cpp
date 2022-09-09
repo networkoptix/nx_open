@@ -12,10 +12,10 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -36,12 +36,12 @@ LayoutSnapshotManager::LayoutSnapshotManager(SystemContext* systemContext, QObje
     connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
         &LayoutSnapshotManager::onResourcesRemoved);
 
-    onResourcesAdded(resourcePool()->getResources<QnLayoutResource>());
+    onResourcesAdded(resourcePool()->getResources<LayoutResource>());
 
     connect(this, &core::SaveStateManager::flagsChanged, this,
         [this](const QnUuid& id, SaveStateFlags /*flags*/)
         {
-            if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
+            if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
                 emit layoutFlagsChanged(layout);
         });
 }
@@ -51,7 +51,7 @@ LayoutSnapshotManager::~LayoutSnapshotManager()
 }
 
 core::SaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
-    const QnLayoutResourcePtr& layout) const
+    const LayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
     if (!layout)
@@ -69,7 +69,7 @@ core::SaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
     return flags(layout->resource());
 }
 
-void LayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layout,
+void LayoutSnapshotManager::setFlags(const LayoutResourcePtr& layout,
     SaveStateFlags flags)
 {
     NX_ASSERT(layout && layout->resourcePool(),
@@ -81,12 +81,12 @@ void LayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layout,
     base_type::setFlags(layout->getId(), flags);
 }
 
-bool LayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layout) const
+bool LayoutSnapshotManager::isChanged(const LayoutResourcePtr &layout) const
 {
     return base_type::isChanged(layout->getId());
 }
 
-bool LayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
+bool LayoutSnapshotManager::isSaveable(const LayoutResourcePtr &layout) const
 {
     if (layout->hasFlags(Qn::local))
         return true;
@@ -94,14 +94,14 @@ bool LayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
     return base_type::isSaveable(layout->getId());
 }
 
-bool LayoutSnapshotManager::isModified(const QnLayoutResourcePtr &layout) const
+bool LayoutSnapshotManager::isModified(const LayoutResourcePtr &layout) const
 {
     /* Changed and not being saved. */
     return base_type::isSaveable(layout->getId());
 }
 
 bool LayoutSnapshotManager::save(
-    const QnLayoutResourcePtr& layout,
+    const LayoutResourcePtr& layout,
     SaveLayoutResultFunction callback)
 {
     NX_ASSERT(!layout->isFile());
@@ -123,7 +123,8 @@ bool LayoutSnapshotManager::save(
                 callback(success, layout);
         });
 
-    /* Submit all changes from workbench to resource. */
+    // Submit all changes from workbench to resource.
+    // TODO: #sivanov system-context class should not depend on workbench.
     if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
         synchronizer->submit();
 
@@ -155,18 +156,18 @@ bool LayoutSnapshotManager::save(
     return success;
 }
 
-bool LayoutSnapshotManager::hasSnapshot(const QnLayoutResourcePtr& layout) const
+bool LayoutSnapshotManager::hasSnapshot(const LayoutResourcePtr& layout) const
 {
     return m_storage->hasSnapshot(layout);
 }
 
 const nx::vms::api::LayoutData LayoutSnapshotManager::snapshot(
-    const QnLayoutResourcePtr& layout) const
+    const LayoutResourcePtr& layout) const
 {
     return m_storage->snapshot(layout);
 }
 
-void LayoutSnapshotManager::store(const QnLayoutResourcePtr &resource)
+void LayoutSnapshotManager::store(const LayoutResourcePtr &resource)
 {
     if (!NX_ASSERT(resource))
         return;
@@ -179,7 +180,7 @@ void LayoutSnapshotManager::store(const QnLayoutResourcePtr &resource)
     markChanged(resource->getId(), false);
 }
 
-void LayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource)
+void LayoutSnapshotManager::restore(const LayoutResourcePtr &resource)
 {
     if (!NX_ASSERT(resource))
         return;
@@ -216,7 +217,7 @@ void LayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource)
     markChanged(resource->getId(), false);
 }
 
-void LayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource)
+void LayoutSnapshotManager::connectTo(const LayoutResourcePtr &resource)
 {
     connect(resource.get(), &QnResource::nameChanged, this,
         &LayoutSnapshotManager::at_resource_changed);
@@ -249,7 +250,7 @@ void LayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource)
         &LayoutSnapshotManager::at_layout_changed);
 }
 
-void LayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource)
+void LayoutSnapshotManager::disconnectFrom(const LayoutResourcePtr &resource)
 {
     resource->disconnect(this);
 }
@@ -259,7 +260,7 @@ void LayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource)
 // -------------------------------------------------------------------------- //
 void LayoutSnapshotManager::onResourcesAdded(const QnResourceList& resources)
 {
-    for (const auto& layout: resources.filtered<QnLayoutResource>())
+    for (const auto& layout: resources.filtered<LayoutResource>())
     {
         /* Consider it saved by default. */
         m_storage->storeSnapshot(layout);
@@ -273,7 +274,7 @@ void LayoutSnapshotManager::onResourcesAdded(const QnResourceList& resources)
 
 void LayoutSnapshotManager::onResourcesRemoved(const QnResourceList& resources)
 {
-    for (const auto& layout: resources.filtered<QnLayoutResource>())
+    for (const auto& layout: resources.filtered<LayoutResource>())
     {
         m_storage->removeSnapshot(layout);
         clean(layout->getId());
@@ -288,9 +289,8 @@ void LayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr& layout)
 
 void LayoutSnapshotManager::at_resource_changed(const QnResourcePtr &resource)
 {
-    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    NX_ASSERT(layoutResource);
-    if (layoutResource)
+    auto layoutResource = resource.dynamicCast<QnLayoutResource>();
+    if (NX_ASSERT(layoutResource))
         at_layout_changed(layoutResource);
 }
 

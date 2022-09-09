@@ -20,10 +20,8 @@ class AnalyticsEventModel::Private
     NodePtr rootNode;
 
 public:
-    Private(AnalyticsEventModel* q, QnCommonModule* commonModule): q(q)
+    Private(AnalyticsEventModel* q, AnalyticsEventsSearchTreeBuilder* builder): q(q)
     {
-        auto builder = commonModule->instance<AnalyticsEventsSearchTreeBuilder>();
-
         const auto updateModelOperation =
             [this, builder]
             {
@@ -54,9 +52,12 @@ public:
     }
 };
 
-AnalyticsEventModel::AnalyticsEventModel(QnCommonModule* commonModule, QObject* parent):
+AnalyticsEventModel::AnalyticsEventModel(
+    AnalyticsEventsSearchTreeBuilder* builder,
+    QObject* parent)
+    :
     base_type(parent),
-    d(new Private(this, commonModule))
+    d(new Private(this, builder))
 {
 }
 

@@ -35,7 +35,7 @@ Connection::Connection(
         remotePeerType,
         localPeer,
         remotePeerUrl,
-        commonModule->systemContext()->globalSettings()->aliveUpdateInterval(),
+        commonModule->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject),
         std::move(adapterFunc),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),

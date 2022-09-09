@@ -9,15 +9,16 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -630,7 +631,7 @@ void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
 bool TabApiBackend::Private::hasPermissions(
     const QnResourcePtr& resource, Qn::Permissions permissions)
 {
-    return context->accessController()->hasPermissions(resource, permissions);
+    return ResourceAccessManager::hasPermissions(resource, permissions);
 }
 
 //-------------------------------------------------------------------------------------------------

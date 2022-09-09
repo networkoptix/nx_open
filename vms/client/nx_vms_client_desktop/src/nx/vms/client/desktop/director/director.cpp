@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/from_string.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>

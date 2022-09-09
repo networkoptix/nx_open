@@ -16,8 +16,7 @@
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -312,12 +311,10 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
                 return;
             }
 
-            auto wbLayout = QnWorkbenchLayout::instance(layout);
+            auto wbLayout = workbench()->layout(layout);
             if (!wbLayout)
-            {
-                wbLayout = qnWorkbenchLayoutsFactory->create(layout, workbench());
-                workbench()->addLayout(wbLayout);
-            }
+                wbLayout = workbench()->addLayout(layout);
+
             if (isTimerRunning())
                 m_tour.elapsed.restart();
             workbench()->setCurrentLayout(wbLayout);

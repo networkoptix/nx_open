@@ -6,7 +6,6 @@
 
 #include <nx_ec/managers/abstract_discovery_manager.h>
 #include <transaction/transaction.h>
-#include <common/common_module_aware.h>
 
 namespace nx::vms::discovery { class Manager; }
 

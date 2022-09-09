@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/copy_schedule_camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_dialog.h>
@@ -28,13 +29,13 @@
 #include <nx/vms/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -194,7 +195,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()
 {
     const auto params = menu()->currentParameters(sender());
-    openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
+    openLayoutSettingsDialog(params.resource().dynamicCast<LayoutResource>());
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered()
@@ -308,12 +309,12 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
-    const QnLayoutResourcePtr& layout)
+    const LayoutResourcePtr& layout)
 {
     if (!layout || layout->hasFlags(Qn::removed))
         return;
 
-    if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
+    if (!ResourceAccessManager::hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
     QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindowWidget()));
@@ -327,7 +328,7 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
-        if (auto wlayout = QnWorkbenchLayout::instance(layout))
+        if (auto wlayout = workbench()->layout(layout))
             wlayout->centralizeItems();
     }
     menu()->triggerIfPossible(action::SaveLayoutAction, layout);

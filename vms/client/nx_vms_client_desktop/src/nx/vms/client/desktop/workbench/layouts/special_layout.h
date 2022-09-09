@@ -21,7 +21,7 @@ class SpecialLayout: public QnWorkbenchLayout
     using base_type = QnWorkbenchLayout;
 
 public:
-    SpecialLayout(const LayoutResourcePtr& resource, QObject* parent = nullptr);
+    SpecialLayout(const LayoutResourcePtr& resource);
     virtual ~SpecialLayout();
 
     void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership under widget

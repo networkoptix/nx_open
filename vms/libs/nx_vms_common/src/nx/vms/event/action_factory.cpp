@@ -2,12 +2,12 @@
 
 #include "action_factory.h"
 
-#include <common/common_module.h>
-
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/actions/actions.h>
+
+using namespace nx::vms::common;
 
 namespace nx {
 namespace vms {
@@ -23,7 +23,7 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
@@ -37,7 +37,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
     result->setParams(rule->actionParams());
     result->setResources(rule->actionResources());
 
-    if (hasToggleState(event->getEventType(), runtimeParams, commonModule) &&
+    if (hasToggleState(event->getEventType(), runtimeParams, systemContext) &&
         hasToggleState(rule->actionType()))
     {
         EventState value = state != EventState::undefined ? state : event->getToggleState();
@@ -49,13 +49,13 @@ AbstractActionPtr ActionFactory::instantiateAction(
 }
 
 AbstractActionPtr ActionFactory::instantiateAction(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
     const AggregationInfo& aggregationInfo)
 {
-    AbstractActionPtr result = instantiateAction(commonModule, rule, event, moduleGuid);
+    AbstractActionPtr result = instantiateAction(systemContext, rule, event, moduleGuid);
     if (!result)
         return result;
 

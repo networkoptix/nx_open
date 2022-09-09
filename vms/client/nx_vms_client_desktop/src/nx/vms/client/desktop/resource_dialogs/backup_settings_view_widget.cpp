@@ -81,7 +81,7 @@ using namespace nx::vms::api;
 
 BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
     base_type(backup_settings_view::ColumnCount, parent),
-    m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(commonModule())),
+    m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(systemContext())),
     m_viewItemDelegate(new BackupSettingsItemDelegate(resourceViewWidget()->itemViewHoverTracker()))
 {
     m_viewItemDelegate->setShowRecordingIndicator(true);
