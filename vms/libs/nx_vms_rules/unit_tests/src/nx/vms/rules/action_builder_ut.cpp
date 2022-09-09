@@ -27,6 +27,8 @@
 
 namespace nx::vms::rules::test {
 
+using nx::vms::api::GlobalPermission;
+
 class TestActionBuilder: public ActionBuilder
 {
 public:
@@ -139,9 +141,9 @@ TEST_F(ActionBuilderTest, builderWithTargetFieldButWithoutUserProducedNoAction)
     builder->process(makeSimpleEvent());
 }
 
-TEST_F(ActionBuilderTest, builderWithOneTargetUserProducedOnceAction)
+TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
+    const auto user = addUser(nx::vms::api::GlobalPermission::userInput);
 
     UuidSelection selection{
         .ids = {user->getId()},
@@ -159,8 +161,8 @@ TEST_F(ActionBuilderTest, builderWithOneTargetUserProducedOnceAction)
 
 TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
+    const auto user1 = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user2 = addUser(nx::vms::api::GlobalPermission::userInput);
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -182,8 +184,8 @@ TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
+    const auto user1 = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user2 = addUser(nx::vms::api::GlobalPermission::userInput);
 
     UuidSelection selection{
         .ids = {},
@@ -232,7 +234,7 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::none);
+    const auto user = addUser(nx::vms::api::GlobalPermission::userInput);
     const auto camera = addCamera();
 
     UuidSelection selection{
@@ -252,8 +254,9 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 {
     const auto camera = addCamera();
 
-    const auto accessAllMediaUser = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
-    const auto accessNoneUser = addUser(nx::vms::api::GlobalPermission::none);
+    const auto accessAllMediaUser = addUser(
+        {GlobalPermission::accessAllMedia, GlobalPermission::userInput});
+    const auto accessNoneUser = addUser(nx::vms::api::GlobalPermission::userInput);
 
     UuidSelection selection{
         .ids = {accessAllMediaUser->getId(), accessNoneUser->getId()},
@@ -276,11 +279,11 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 
 TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 {
-    auto user1 = addUser(GlobalPermission::none);
+    auto user1 = addUser(GlobalPermission::userInput);
     auto cameraOfUser1 = addCamera();
     sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
 
-    auto user2 = addUser(GlobalPermission::none);
+    auto user2 = addUser(GlobalPermission::userInput);
     auto cameraOfUser2 = addCamera();
     sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
 
@@ -325,11 +328,11 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 
 TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 {
-    auto user1 = addUser(GlobalPermission::none);
+    auto user1 = addUser(GlobalPermission::userInput);
     auto cameraOfUser1 = addCamera();
     sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
 
-    auto user2 = addUser(GlobalPermission::none);
+    auto user2 = addUser(GlobalPermission::userInput);
     auto cameraOfUser2 = addCamera();
     sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
 
@@ -365,7 +368,7 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 
 TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 {
-    auto user1 = addUser(GlobalPermission::none);
+    auto user1 = addUser(GlobalPermission::userInput);
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -382,6 +385,20 @@ TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 
     EXPECT_EQ(eventAggregator->uniqueCount(), 1);
 
+    builder->process(eventAggregator);
+}
+
+TEST_F(ActionBuilderTest, userWithoutPermissionsReceivesNoAction)
+{
+    auto user1 = addUser(GlobalPermission::none);
+
+    UuidSelection selection{.ids = {user1->getId()}};
+    auto builder = makeBuilderWithTargetUserField(selection);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(0);
+
+    auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
     builder->process(eventAggregator);
 }
 

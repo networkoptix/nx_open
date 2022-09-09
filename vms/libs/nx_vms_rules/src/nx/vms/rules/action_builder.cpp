@@ -12,7 +12,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/common/system_context.h>
 
@@ -31,51 +31,96 @@ namespace nx::vms::rules {
 
 namespace {
 
+/** Keep in sync with hasAccessToSource() in the old engine. */
 EventPtr permissionFilter(
     const EventPtr& event,
     const QnUserResourcePtr& user,
     const nx::vms::common::SystemContext* context)
 {
-    const auto cameraResource =
-        context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-            utils::getFieldValue<QnUuid>(event, utils::kCameraIdFieldName));
+    const auto manifest = Engine::instance()->eventDescriptor(event->type());
+    if (!NX_ASSERT(manifest))
+        return {};
 
-    if (cameraResource
-        && !context->resourceAccessManager()->hasPermission(
-            user,
-            cameraResource,
-            Qn::Permission::ViewContentPermission))
+    const auto& permissions = manifest->permissions;
+    if (permissions.globalPermission != nx::vms::api::GlobalPermission::none
+        && !context->resourceAccessManager()
+            ->hasGlobalPermission(user, permissions.globalPermission))
     {
+        NX_VERBOSE(NX_SCOPE_TAG,
+            "User %1 has no global permission %2 for the event %3",
+            user, permissions.globalPermission, event->type());
+
         return {};
     }
 
-    const auto deviceIds = utils::getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
-    if (deviceIds.isEmpty())
-        return event;
-
-    QnUuidList filteredDeviceIds;
-
-    for (const auto deviceId : deviceIds)
+    std::map<QByteArray, QnUuidList> filteredFields;
+    for (const auto& permission: permissions.resourcePermissions)
     {
-        const auto deviceResource =
-            context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
-        if (deviceResource
-            && context->resourceAccessManager()->hasPermission(
-                user,
-                deviceResource,
-                Qn::Permission::ViewContentPermission))
+        const QVariant value = event->property(permission.fieldName);
+
+        if (value.canConvert<QnUuid>())
         {
-            filteredDeviceIds << deviceId;
+            const auto resource = context->resourcePool()->getResourceById(value.value<QnUuid>());
+
+            if (resource && !context->resourceAccessManager()->hasPermission(
+                user,
+                resource,
+                permission.permissions))
+            {
+                NX_VERBOSE(NX_SCOPE_TAG,
+                    "User %1 has no permission for the event %2 with resource %3",
+                    user, event->type(), resource);
+
+                return {};
+            }
+        }
+        else if (value.canConvert<QnUuidList>())
+        {
+            const auto resourceIds = value.value<QnUuidList>();
+            if (resourceIds.isEmpty())
+                continue;
+
+            QnUuidList filteredResourceIds;
+
+            for (const auto resourceId: resourceIds)
+            {
+                const auto resource = context->resourcePool()->getResourceById(resourceId);
+                if (!resource
+                    || context->resourceAccessManager()->hasPermission(
+                        user,
+                        resource,
+                        permission.permissions))
+                {
+                    filteredResourceIds << resourceId;
+                }
+            }
+
+            if (filteredResourceIds.isEmpty())
+            {
+                NX_VERBOSE(NX_SCOPE_TAG,
+                    "User %1 has no permissions for any resource of the field %2 of event %3",
+                    user, permission.fieldName, event->type());
+
+                return {};
+            }
+
+            if (filteredResourceIds.size() != resourceIds.size())
+                filteredFields[permission.fieldName] = std::move(filteredResourceIds);
+        }
+        else
+        {
+            NX_ASSERT(false, "Unexpected field type: %1", value.typeName());
+            return {};
         }
     }
 
-    if (filteredDeviceIds.isEmpty())
-        return {};
 
-    if (filteredDeviceIds.size() != deviceIds.size())
+    if (!filteredFields.empty())
     {
         auto clone = Engine::instance()->cloneEvent(event);
-        clone->setProperty(utils::kDeviceIdsFieldName, QVariant::fromValue(filteredDeviceIds));
+        for (const auto& [key, value]: filteredFields)
+            clone->setProperty(key, QVariant::fromValue(value));
+
         return clone;
     }
 

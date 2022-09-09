@@ -11,6 +11,7 @@
 #include "../event_fields/analytics_object_type_field.h"
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -101,6 +102,11 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
             {fieldMetatype<SourceCameraField>(), "cameraId", tr("Camera")},
             {fieldMetatype<AnalyticsObjectTypeField>(), "objectTypeId", tr("Object Type")},
             {fieldMetatype<AnalyticsObjectAttributesField>(), "attributes", tr("Attributes")},
+        },
+        .permissions = {
+            .resourcePermissions = {
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+            }
         },
         .emailTemplatePath = ":/email_templates/analytics_object.mustache"
     };

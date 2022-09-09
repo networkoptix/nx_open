@@ -8,6 +8,7 @@
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -102,7 +103,10 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
             makeFieldDescriptor<KeywordsField>("description", tr("Description")),
             makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("Level")),
-        }
+        },
+        .permissions = {
+            .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
+        },
     };
 
     return kDescriptor;

@@ -104,7 +104,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.storageIssue",
         .displayName = tr("Storage Issue"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"
     };
     return kDescriptor;

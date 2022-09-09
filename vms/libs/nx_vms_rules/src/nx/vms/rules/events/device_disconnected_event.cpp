@@ -92,6 +92,9 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Device ID")),
         },
+        .permissions = {
+            .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
+        },
         .emailTemplatePath = ":/email_templates/camera_disconnect.mustache"
     };
     return kDescriptor;

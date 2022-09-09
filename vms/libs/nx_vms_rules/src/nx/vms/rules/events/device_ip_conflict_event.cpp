@@ -95,7 +95,7 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.deviceIpConflict",
         .displayName = tr("Device IP Conflict"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::editCameras},
         .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"
     };
     return kDescriptor;

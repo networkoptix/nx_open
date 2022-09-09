@@ -46,6 +46,11 @@ const ItemDescriptor& MotionEvent::manifest()
             utils::makeStateFieldDescriptor(tr("State")),
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
         },
+        .permissions = {
+            .resourcePermissions = {
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+            }
+        },
         .emailTemplatePath = ":/email_templates/camera_motion.mustache"
     };
     return kDescriptor;

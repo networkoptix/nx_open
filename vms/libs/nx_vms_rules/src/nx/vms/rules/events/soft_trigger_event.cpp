@@ -104,6 +104,11 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
             makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
             makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),
         },
+        .permissions = {
+            .resourcePermissions = {
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+            }
+        },
         .emailTemplatePath = ":/email_templates/software_trigger.mustache"
     };
     return kDescriptor;
