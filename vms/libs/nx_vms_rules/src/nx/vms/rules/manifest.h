@@ -6,6 +6,9 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
+#include <common/common_globals.h>
+#include <nx/vms/api/types/access_rights_types.h>
+
 #include "field.h"
 
 namespace nx::vms::rules {
@@ -17,6 +20,18 @@ enum class ItemFlag
 };
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
+
+struct ResourcePermission
+{
+    QByteArray fieldName;
+    Qn::Permissions permissions;
+};
+
+struct PermissionsDescriptor
+{
+    nx::vms::api::GlobalPermission globalPermission = nx::vms::api::GlobalPermission::none;
+    QList<ResourcePermission> resourcePermissions;
+};
 
 /** Description of event or action field. */
 struct FieldDescriptor
@@ -61,6 +76,9 @@ struct ItemDescriptor
 
     /** Item fields. */
     QList<FieldDescriptor> fields;
+
+    /** Permissions required for action recipient. */
+    PermissionsDescriptor permissions;
 
     /** Path to the mustache template file used to generate email. */
     QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.

@@ -607,8 +607,12 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
         .filtered<QnVirtualCameraResource>(
             [this, requiredPermission](const QnVirtualCameraResourcePtr& camera)
             {
-                if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::fake))
+                if (!NX_ASSERT(camera) || camera->hasFlags(Qn::ResourceFlag::fake))
                     return false;
+
+                // Assuming the rights were checked before sending the notification.
+                if (camera->hasFlags(Qn::ResourceFlag::cross_system))
+                    return true;
 
                 return QnWorkbenchAccessController::checkPermissions(
                     camera,

@@ -74,6 +74,30 @@ public:
         }
     }
 
+    template<class T>
+    void testPermissionsValidity()
+    {
+        const auto& manifest = T::manifest();
+        const auto& meta = T::staticMetaObject;
+
+        // Check all permission fields correspond to properties with the same name.
+        for (const auto& perm: manifest.permissions.resourcePermissions)
+        {
+            SCOPED_TRACE(nx::format("Resource permission field: %1", perm.fieldName).toStdString());
+            ASSERT_FALSE(perm.fieldName.isEmpty());
+            ASSERT_FALSE(!perm.permissions);
+
+
+            const auto propIndex = meta.indexOfProperty(perm.fieldName.data());
+            EXPECT_GE(propIndex, 0);
+
+            const auto prop = meta.property(propIndex);
+            EXPECT_TRUE(prop.isValid());
+            EXPECT_TRUE(prop.userType() == qMetaTypeId<QnUuid>()
+                || prop.userType() == qMetaTypeId<QnUuidList>());
+        }
+    }
+
     template<class T, class... Args>
     void testActionFieldRegistration(Args... args)
     {
@@ -106,6 +130,7 @@ public:
         SCOPED_TRACE(nx::format("Event id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
+        testPermissionsValidity<T>();
 
         ASSERT_TRUE(registerEvent<T>());
 

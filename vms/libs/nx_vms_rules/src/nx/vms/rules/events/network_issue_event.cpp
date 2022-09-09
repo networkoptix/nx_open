@@ -8,6 +8,7 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
@@ -137,7 +138,9 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.networkIssue",
         .displayName = tr("Network Issue"),
-        .description = "",
+        .permissions = {
+            .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
+        },
         .emailTemplatePath = ":/email_templates/network_issue.mustache"
     };
     return kDescriptor;

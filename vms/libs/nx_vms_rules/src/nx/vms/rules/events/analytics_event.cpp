@@ -110,6 +110,11 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             // TODO: #amalov Consider adding following fields in 5.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },
+        .permissions = {
+            .resourcePermissions = {
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+            }
+        },
         .emailTemplatePath = ":/email_templates/analytics_event.mustache"
     };
     return kDescriptor;

@@ -9,6 +9,7 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
@@ -53,7 +54,9 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.licenseIssue",
         .displayName = tr("License Issue"),
-        .description = "",
+        .permissions = {
+            .resourcePermissions = {{utils::kDeviceIdsFieldName, Qn::ViewContentPermission}}
+        },
         .emailTemplatePath = ":/email_templates/license_issue.mustache"
     };
     return kDescriptor;
