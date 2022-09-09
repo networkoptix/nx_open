@@ -31,7 +31,7 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.archiveBackupFinished",
         .displayName = tr("Backup Finished"),
-        .description = "",
+        .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"
     };
     return kDescriptor;

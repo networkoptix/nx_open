@@ -39,6 +39,13 @@ public:
             .id = utils::type<TestEvent>(),
             .displayName = "Test event",
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
+            .permissions = {
+                .globalPermission = nx::vms::api::GlobalPermission::userInput,
+                .resourcePermissions = {
+                    {"cameraId", Qn::ViewContentPermission},
+                    {"deviceIds", Qn::ViewContentPermission},
+                }
+            },
         };
     }
 

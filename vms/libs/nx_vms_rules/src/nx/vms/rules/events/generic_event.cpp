@@ -73,6 +73,11 @@ const ItemDescriptor& GenericEvent::manifest()
                 tr("Description"),
                 kKeywordFieldDescription),
         },
+        .permissions = {
+            .resourcePermissions = {
+                {utils::kDeviceIdsFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+            }
+        },
         .emailTemplatePath = ":/email_templates/generic_event.mustache"
     };
     return kDescriptor;
