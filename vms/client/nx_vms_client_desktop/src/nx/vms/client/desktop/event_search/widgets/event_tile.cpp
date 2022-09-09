@@ -297,6 +297,7 @@ EventTile::EventTile(QWidget* parent):
     ui(new Ui::EventTile())
 {
     ui->setupUi(this);
+    ui->nameLabel->setElideMode(Qt::ElideRight);
     setAttribute(Qt::WA_Hover);
 
     setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
