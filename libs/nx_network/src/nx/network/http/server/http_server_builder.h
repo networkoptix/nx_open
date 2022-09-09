@@ -41,6 +41,8 @@ public:
         AbstractRequestHandler* requestHandler);
 
 private:
+    struct Context;
+
     static std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> buildHttpServer(
         const Settings& settings,
         AbstractRequestHandler* requestHandler);
@@ -49,15 +51,11 @@ private:
         const Settings& settings,
         AbstractRequestHandler* requestHandler);
 
-    static bool applySettings(
-        const Settings& settings,
-        const std::vector<SocketAddress>& endpoints,
-        MultiEndpointServer* httpServer);
-
-    static void configureServerUrls(
-        const Settings& settings,
-        bool sslRequired,
-        MultiEndpointServer* httpServer);
+    static bool applySettings(Context* ctx, const std::vector<SocketAddress>& endpoints);
+    static bool bindServer(Context* ctx, const std::vector<SocketAddress>& endpoints);
+    static bool configureListener(Context* ctx, HttpStreamSocketServer* listener);
+    static bool reuseEndpointsForConcurrency(Context* ctx);
+    static void configureServerUrls(Context* ctx, bool sslRequired);
 };
 
 } // namespace nx::network::http::server

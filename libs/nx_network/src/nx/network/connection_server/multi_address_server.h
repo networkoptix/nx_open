@@ -53,28 +53,58 @@ public:
     }
 
     /**
+     * Binds additionally to addresses provided. If the listener was already bound to some
+     * address(-es), those are not affected.
      * @return true, if bind to every input endpoint succeeded.
      */
     template<template<typename, typename> class Dictionary, typename AllocatorType>
     bool bind(const Dictionary<SocketAddress, AllocatorType>& addrToListenList)
     {
-        m_endpoints.reserve(addrToListenList.size());
+        return bind(addrToListenList, [](auto&&...) { return true; });
+    }
+
+    /**
+     * Similar to the previous bind overload, but invokes configureListenerFunc on every created listener
+     * before invoking listener->bind.
+     * @param Configures listener. If false is returned, then this method fails.
+     */
+    template<
+        template<typename, typename> class Dictionary,
+        typename AllocatorType,
+        typename Func
+    >
+    requires std::is_invocable_v<Func, SocketServerType*>
+    bool bind(
+        const Dictionary<SocketAddress, AllocatorType>& addrToListenList,
+        Func configureListenerFunc)
+    {
+        decltype(m_listeners) listeners;
+        decltype(m_endpoints) endpoints;
 
         // Binding to address(es) to listen.
         for (const SocketAddress& addr: addrToListenList)
         {
             std::unique_ptr<SocketServerType> socketServer = m_socketServerFactory();
+            if (!configureListenerFunc(socketServer.get()))
+            {
+                NX_WARNING(this, "error configuring listener for address %1", addr);
+                return false;
+            }
+
             if (!socketServer->bind(addr))
             {
                 const auto osErrorCode = SystemError::getLastOSErrorCode();
-                NX_ERROR(this, nx::format("Failed to bind to address %1. %2")
-                    .arg(addr.toString()).arg(SystemError::toString(osErrorCode)));
-                m_listeners.clear();
+                NX_WARNING(this, "Failed to bind to address %1. %2",
+                    addr, SystemError::toString(osErrorCode));
                 return false;
             }
-            m_endpoints.push_back(socketServer->address());
-            m_listeners.push_back(std::move(socketServer));
+
+            endpoints.push_back(socketServer->address());
+            listeners.push_back(std::move(socketServer));
         }
+
+        std::move(listeners.begin(), listeners.end(), std::back_inserter(m_listeners));
+        std::move(endpoints.begin(), endpoints.end(), std::back_inserter(m_endpoints));
 
         return !m_listeners.empty();
     }

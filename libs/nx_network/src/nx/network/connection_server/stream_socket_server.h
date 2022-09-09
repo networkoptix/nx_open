@@ -260,6 +260,14 @@ public:
         m_acceptor->bindToAioThread(aioThread);
     }
 
+    /**
+     * Set to true to allow binding multiple StreamSocketServer to the same address:port.
+     */
+    bool setReusePort(bool val)
+    {
+        return m_serverSocket->setReuseAddrFlag(val) && m_serverSocket->setReusePortFlag(val);
+    }
+
     bool bind(const SocketAddress& socketAddress)
     {
         NX_CRITICAL(m_serverSocket);

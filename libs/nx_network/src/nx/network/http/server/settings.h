@@ -8,7 +8,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/network/socket_common.h>
 
-class QnSettings;
+class SettingsReader;
 
 namespace nx::network::http::server {
 
@@ -56,27 +56,44 @@ public:
     std::string serverName;
     bool redirectHttpToHttps = false;
 
+    /**
+     * Set "reusePort" flag on every listening socket.
+     */
+    bool reusePort = false;
+
+    /**
+     * Total number of listening sockets to create.
+     * E.g., if a single port was specified in Settings::endpoints and this was set to 3,
+     * then 3 listening sockets are created which share the specified port.
+     * All created sockets are assigned to different AIO threads when possible.
+     * So, if more than one listening socket is needed, then reusePort flag is set
+     * on each socket regardless of the Settings::reusePort value.
+     * If 0, then it is set to std::thread::hardware_concurrency().
+     */
+    unsigned int listeningConcurrency = 1;
+
     Ssl ssl;
 
     Settings(const char* groupName = "http");
 
-    void load(const QnSettings& settings);
+    void load(const SettingsReader& settings);
 
 private:
     std::string m_groupName;
 
     void loadEndpoints(
-        const QnSettings& settings,
-        const std::string_view& paramFullName,
+        const SettingsReader& settings,
+        const char* paramFullName,
         std::vector<SocketAddress>* endpoints);
 
-    void loadSsl(const QnSettings& settings);
+    void loadSsl(const SettingsReader& settings);
 };
 
 NX_REFLECTION_INSTRUMENT(Settings::Ssl,
     (endpoints)(certificatePath)(certificateMonitorTimeout)(allowedSslVersions))
 
 NX_REFLECTION_INSTRUMENT(Settings,
-    (tcpBacklogSize)(connectionInactivityPeriod)(endpoints)(serverName)(redirectHttpToHttps)(ssl))
+    (tcpBacklogSize)(connectionInactivityPeriod)(endpoints)(serverName)\
+    (redirectHttpToHttps)(reusePort)(listeningConcurrency)(ssl))
 
 } // namespace nx::network::http::server
