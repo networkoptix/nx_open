@@ -25,6 +25,8 @@ public:
     {
         m_settings.endpoints.push_back("127.0.0.1:0");
         m_settings.ssl.endpoints.push_back("127.0.0.1:0");
+
+        m_client.setTimeouts(http::AsyncClient::kInfiniteTimeouts);
     }
 
     void buildServer()
@@ -36,6 +38,7 @@ public:
     }
 
     MultiEndpointServer& server() { return *m_server; }
+    std::unique_ptr<MultiEndpointServer> takeServer() { return std::exchange(m_server, nullptr); }
 
 protected:
     Settings& settings() { return m_settings; }
@@ -51,6 +54,14 @@ protected:
             std::ios_base::binary | std::ios_base::trunc);
         ASSERT_TRUE(f.is_open());
         f << certData;
+    }
+
+    int allocateReusablePort()
+    {
+        settings().reusePort = true;
+        buildServer();
+        m_bakServers.push_back(takeServer());
+        return m_bakServers.front()->endpoints().front().port;
     }
 
     void whenEnableRedirectHttpToHttps()
@@ -71,6 +82,43 @@ protected:
     void thenContentLocationUrlIsHttps()
     {
         ASSERT_EQ(m_client.contentLocationUrl().scheme(), nx::network::http::kSecureUrlSchemeName);
+    }
+
+    void assertServerAcceptsHttpRequests()
+    {
+        whenMakeRequestOnHttp();
+
+        ASSERT_NE(nullptr, m_client.response());
+    }
+
+    void assertThereAreNListenersOnGivenPort(int expectedListenerCnt, int port)
+    {
+        int cnt = 0;
+        server().forEachListener(
+            [port, &cnt](nx::network::http::HttpStreamSocketServer* server)
+            {
+                if (server->address().port == port)
+                    ++cnt;
+            });
+
+        ASSERT_EQ(expectedListenerCnt, cnt);
+    }
+
+    void assertListenersAreDistributedAcrossAioThreadPool()
+    {
+        std::set<aio::AbstractAioThread*> usedAioThreads;
+        std::size_t listenerCnt = 0;
+        server().forEachListener(
+            [&usedAioThreads, &listenerCnt](nx::network::http::HttpStreamSocketServer* server)
+            {
+                usedAioThreads.insert(server->getAioThread());
+                ++listenerCnt;
+            });
+
+        const std::size_t aioThreadCnt =
+            SocketGlobals::instance().aioService().getAllAioThreads().size();
+
+        ASSERT_EQ(usedAioThreads.size(), std::min(listenerCnt, aioThreadCnt));
     }
 
     void assertServerUsesTheProvidedCertificate()
@@ -113,6 +161,7 @@ private:
     HttpClient m_client{ssl::kAcceptAnyCertificate};
     ssl::X509Name m_issuer;
     ssl::Certificate m_lastVerifiedCertificate;
+    std::vector<std::unique_ptr<MultiEndpointServer>> m_bakServers;
 };
 
 TEST_F(HttpServerBuilder, preferred_url_has_listening_endpoint)
@@ -164,6 +213,26 @@ TEST_F(HttpServerBuilder, ssl_certificate_is_loaded)
     ASSERT_TRUE(server().listen());
 
     assertServerUsesTheProvidedCertificate();
+}
+
+// Testing that it allows distribution of connection accept across multiple listeners.
+TEST_F(HttpServerBuilder, multiple_listeners_on_the_same_local_port)
+{
+    settings().ssl.endpoints.clear();
+
+    settings().endpoints.front().port = allocateReusablePort();
+    settings().reusePort = false;
+    // reusePort is expected to be applied automatically when concurrency is enabled.
+    settings().listeningConcurrency = 5;
+
+    buildServer();
+    ASSERT_TRUE(server().listen());
+
+    assertServerAcceptsHttpRequests();
+    // Checking that there are really multiple sockets listening for incoming connections.
+    assertThereAreNListenersOnGivenPort(
+        settings().listeningConcurrency, settings().endpoints.front().port);
+    assertListenersAreDistributedAcrossAioThreadPool();
 }
 
 } // namespace nx::network::http::server::test

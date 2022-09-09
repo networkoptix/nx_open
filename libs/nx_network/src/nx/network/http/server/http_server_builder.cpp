@@ -8,6 +8,18 @@
 
 namespace nx::network::http::server {
 
+struct Builder::Context
+{
+    const Settings& settings;
+    MultiEndpointServer* server = nullptr;
+    /** Effective concurrency. */
+    std::size_t listeningConcurrency = 0;
+    bool reusePort = false;
+
+    std::vector<aio::AbstractAioThread*> aioThreads;
+    std::vector<aio::AbstractAioThread*>::iterator nextAioThreadIt;
+};
+
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::build(
     const Settings& settings,
     AbstractRequestHandler* requestHandler)
@@ -77,9 +89,10 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
 {
     auto server = std::make_unique<MultiEndpointServer>(requestHandler);
 
-    if (!applySettings(settings, settings.endpoints, server.get()))
+    Context context{.settings = settings, .server = server.get(), .listeningConcurrency = 0};
+    if (!applySettings(&context, settings.endpoints))
         return {nullptr, SystemError::getLastOSErrorCode()};
-    configureServerUrls(settings, false, server.get());
+    configureServerUrls(&context, false);
 
     return {std::move(server), SystemError::noError};
 }
@@ -96,43 +109,109 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
         requestHandler,
         std::move(httpsContext));
 
-    if (!applySettings(settings, settings.ssl.endpoints, server.get()))
-        return { nullptr, SystemError::getLastOSErrorCode() };
-    configureServerUrls(settings, true, server.get());
+    Context context{.settings = settings, .server = server.get(), .listeningConcurrency = 0};
+    if (!applySettings(&context, settings.ssl.endpoints))
+        return {nullptr, SystemError::getLastOSErrorCode()};
+    configureServerUrls(&context, true);
 
     return {std::move(server), SystemError::noError};
 }
 
 bool Builder::applySettings(
-    const Settings& settings,
-    const std::vector<SocketAddress>& endpoints,
-    MultiEndpointServer* httpServer)
+    Context* ctx,
+    const std::vector<SocketAddress>& endpoints)
 {
-    if (!httpServer->bind(endpoints))
-        return false;
+    ctx->listeningConcurrency = ctx->settings.listeningConcurrency == 0
+        ? std::thread::hardware_concurrency() : ctx->settings.listeningConcurrency;
+    ctx->reusePort = ctx->settings.reusePort || ctx->listeningConcurrency > endpoints.size();
+    ctx->aioThreads = SocketGlobals::instance().aioService().getAllAioThreads();
+    ctx->nextAioThreadIt = ctx->aioThreads.begin();
 
-    if (settings.connectionInactivityPeriod > std::chrono::milliseconds::zero())
+    if (!bindServer(ctx, endpoints))
     {
-        httpServer->forEachListener(
-            [&settings](nx::network::http::HttpStreamSocketServer* server)
+        NX_WARNING(typeid(Builder), "error binding HTTP server to %1", endpoints);
+        return false;
+    }
+
+    if (ctx->listeningConcurrency > endpoints.size())
+    {
+        if (!reuseEndpointsForConcurrency(ctx))
+        {
+            NX_WARNING(typeid(Builder), "error reusing endpoints %1 for concurrency", endpoints);
+            return false;
+        }
+    }
+
+    if (ctx->settings.connectionInactivityPeriod > std::chrono::milliseconds::zero())
+    {
+        ctx->server->forEachListener(
+            [ctx](nx::network::http::HttpStreamSocketServer* server)
             {
                 server->setConnectionInactivityTimeout(
-                    settings.connectionInactivityPeriod);
+                    ctx->settings.connectionInactivityPeriod);
             });
     }
 
-    httpServer->setTcpBackLogSize(settings.tcpBacklogSize);
+    ctx->server->setTcpBackLogSize(ctx->settings.tcpBacklogSize);
 
     return true;
 }
 
-void Builder::configureServerUrls(
-    const Settings& settings,
-    bool sslRequired,
-    MultiEndpointServer* server)
+bool Builder::bindServer(Context* ctx, const std::vector<SocketAddress>& endpoints)
+{
+    if (!ctx->server->bind(
+            endpoints,
+            [ctx](auto* listener) { return configureListener(ctx, listener); }))
+    {
+        NX_WARNING(typeid(Builder), "error binding HTTP server to %1", endpoints);
+        return false;
+    }
+
+    return true;
+}
+
+bool Builder::configureListener(Context* ctx, HttpStreamSocketServer* listener)
+{
+    if (!listener->setReusePort(ctx->reusePort))
+    {
+        NX_WARNING(typeid(Builder), "could not set reuse port flag: %1. Proceeding further anyway...",
+            SystemError::getLastOSErrorText());
+    }
+
+    listener->bindToAioThread(*ctx->nextAioThreadIt);
+    if ((++ctx->nextAioThreadIt) == ctx->aioThreads.end())
+        ctx->nextAioThreadIt = ctx->aioThreads.begin();
+
+    return true;
+}
+
+bool Builder::reuseEndpointsForConcurrency(Context* ctx)
+{
+    std::vector<SocketAddress> endpoints;
+    ctx->server->forEachListener([&endpoints](HttpStreamSocketServer* listener) {
+        endpoints.push_back(listener->address());
+    });
+
+    auto endpointIt = endpoints.begin();
+    for (std::size_t i = 0; i + endpoints.size() < ctx->listeningConcurrency; ++i)
+    {
+        if (!bindServer(ctx, {*endpointIt}))
+        {
+            NX_WARNING(typeid(Builder), "error reusing endpoint %1 for concurrency", *endpointIt);
+            return false;
+        }
+
+        if ((++endpointIt) == endpoints.end())
+            endpointIt = endpoints.begin();
+    }
+
+    return true;
+}
+
+void Builder::configureServerUrls(Context* ctx, bool sslRequired)
 {
     std::vector<nx::utils::Url> urls;
-    server->forEachListener(
+    ctx->server->forEachListener(
         [sslRequired, &urls](auto listener)
         {
             urls.push_back(url::Builder()
@@ -140,9 +219,9 @@ void Builder::configureServerUrls(
                 .setEndpoint(listener->address()));
         });
 
-    if (!settings.serverName.empty())
+    if (!ctx->settings.serverName.empty())
     {
-        SocketAddress endpoint(settings.serverName);
+        SocketAddress endpoint(ctx->settings.serverName);
         std::for_each(
             urls.begin(), urls.end(),
             [&endpoint](auto& url)
@@ -155,7 +234,7 @@ void Builder::configureServerUrls(
             });
     }
 
-    server->setUrls(std::move(urls));
+    ctx->server->setUrls(std::move(urls));
 }
 
 } // namespace nx::network::http::server

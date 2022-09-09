@@ -15,6 +15,8 @@ static constexpr char kConnectionInactivityPeriod[] = "connectionInactivityPerio
 static constexpr char kEndpointsToListen[] = "endpoints";
 static constexpr char kServerName[] = "serverName";
 static constexpr char kRedirectHttpToHttps[] = "redirectHttpToHttps";
+static constexpr char kReusePort[] = "reusePort";
+static constexpr char kListeningConcurrency[] = "listeningConcurrency";
 
 static constexpr char kLegacySslEndpointsToListen[] = "sslEndpoints";
 static constexpr char kSslCertificatePath[] = "certificatePath";
@@ -26,39 +28,35 @@ Settings::Settings(const char* groupName):
 {
 }
 
-void Settings::load(const QnSettings& settings)
+void Settings::load(const SettingsReader& settings0)
 {
     using namespace std::chrono;
 
-    tcpBacklogSize = settings.value(
-        nx::format("%1/%2").args(m_groupName, kTcpBacklogSize),
-        tcpBacklogSize).toInt();
+    QnSettingsGroupReader settings(settings0, m_groupName.c_str());
 
-    if (auto name = nx::format("%1/%2").args(m_groupName, kConnectionInactivityPeriod);
-        settings.contains(name))
+    tcpBacklogSize = settings.value(kTcpBacklogSize, tcpBacklogSize).toInt();
+
+    if (settings.contains(kConnectionInactivityPeriod))
     {
-        if (auto val = nx::utils::parseDuration(settings.value(name).toString().toStdString()))
+        if (auto val = nx::utils::parseDuration(
+            settings.value(kConnectionInactivityPeriod).toString().toStdString()))
+        {
             connectionInactivityPeriod = *val;
+        }
     }
 
-    loadEndpoints(
-        settings,
-        nx::format("%1/%2").args(m_groupName, kEndpointsToListen).toStdString(),
-        &endpoints);
-
-    serverName = settings.value(
-        nx::format("%1/%2").args(m_groupName, kServerName)).toString().toStdString();
-
-    redirectHttpToHttps = settings.value(
-        nx::format("%1/%2").args(m_groupName, kRedirectHttpToHttps),
-        redirectHttpToHttps).toBool();
+    loadEndpoints(settings, kEndpointsToListen, &endpoints);
+    serverName = settings.value(kServerName).toString().toStdString();
+    redirectHttpToHttps = settings.value(kRedirectHttpToHttps, redirectHttpToHttps).toBool();
+    reusePort = settings.value(kReusePort, reusePort).toBool();
+    listeningConcurrency = settings.value(kListeningConcurrency, listeningConcurrency).toInt();
 
     loadSsl(settings);
 }
 
 void Settings::loadEndpoints(
-    const QnSettings& settings,
-    const std::string_view& paramFullName,
+    const SettingsReader& settings,
+    const char* paramFullName,
     std::vector<SocketAddress>* endpoints)
 {
     const auto endpointsStr = settings.value(paramFullName).toString().toStdString();
@@ -68,37 +66,30 @@ void Settings::loadEndpoints(
         [&endpoints](const auto& token) { endpoints->push_back(SocketAddress(token)); });
 }
 
-void Settings::loadSsl(const QnSettings& settings)
+void Settings::loadSsl(const SettingsReader& settings0)
 {
-    const auto groupName = m_groupName + "/ssl";
+    QnSettingsGroupReader settings(settings0, "ssl");
 
-    loadEndpoints(
-        settings,
-        nx::format("%1/%2").args(groupName, kEndpointsToListen).toStdString(),
-        &ssl.endpoints);
+    loadEndpoints(settings, kEndpointsToListen, &ssl.endpoints);
 
     if (ssl.endpoints.empty())
     {
         // Trying to use legacy setting name.
-        loadEndpoints(
-            settings,
-            nx::format("%1/%2").args(m_groupName, kLegacySslEndpointsToListen).toStdString(),
-            &ssl.endpoints);
+        loadEndpoints(settings, kLegacySslEndpointsToListen, &ssl.endpoints);
     }
 
     ssl.certificatePath = settings.value(
-        nx::format("%1/%2").args(groupName, kSslCertificatePath),
+        kSslCertificatePath,
         ssl.certificatePath.c_str()).toString().toStdString();
 
-    if (auto name = nx::format("%1/%2").args(groupName, kSslCertificateMonitorTimeout);
-        settings.contains(name))
+    if (settings.contains(kSslCertificateMonitorTimeout))
     {
         ssl.certificateMonitorTimeout = nx::utils::parseDuration(
-            settings.value(name).toString().toStdString());
+            settings.value(kSslCertificateMonitorTimeout).toString().toStdString());
     }
 
     ssl.allowedSslVersions = settings.value(
-        nx::format("%1/%2").args(groupName, kSslAllowedSslVersions),
+        kSslAllowedSslVersions,
         ssl.allowedSslVersions.c_str()).toString().toStdString();
 }
 
