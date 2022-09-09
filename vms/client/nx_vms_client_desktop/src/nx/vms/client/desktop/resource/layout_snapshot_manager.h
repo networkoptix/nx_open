@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/utils/save_state_manager.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnWorkbenchLayout;
@@ -33,33 +34,33 @@ public:
     LayoutSnapshotManager(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~LayoutSnapshotManager();
 
-    typedef std::function<void(bool, const QnLayoutResourcePtr&)> SaveLayoutResultFunction;
-    bool save(const QnLayoutResourcePtr& resource,
+    typedef std::function<void(bool, const LayoutResourcePtr&)> SaveLayoutResultFunction;
+    bool save(const LayoutResourcePtr& resource,
         SaveLayoutResultFunction callback = SaveLayoutResultFunction());
 
-    bool hasSnapshot(const QnLayoutResourcePtr& layout) const;
-    const nx::vms::api::LayoutData snapshot(const QnLayoutResourcePtr& layout) const;
+    bool hasSnapshot(const LayoutResourcePtr& layout) const;
+    const nx::vms::api::LayoutData snapshot(const LayoutResourcePtr& layout) const;
 
-    void store(const QnLayoutResourcePtr& resource);
-    void restore(const QnLayoutResourcePtr& resource);
+    void store(const LayoutResourcePtr& resource);
+    void restore(const LayoutResourcePtr& resource);
 
-    SaveStateFlags flags(const QnLayoutResourcePtr& resource) const;
+    SaveStateFlags flags(const LayoutResourcePtr& resource) const;
     SaveStateFlags flags(QnWorkbenchLayout* layout) const;
-    void setFlags(const QnLayoutResourcePtr& resource, SaveStateFlags flags);
+    void setFlags(const LayoutResourcePtr& resource, SaveStateFlags flags);
 
-    bool isChanged(const QnLayoutResourcePtr& layout) const;
-    bool isSaveable(const QnLayoutResourcePtr& layout) const;
+    bool isChanged(const LayoutResourcePtr& layout) const;
+    bool isSaveable(const LayoutResourcePtr& layout) const;
 
     // TODO: #sivanov Naming is not the best.
     /** Whether layout is changed and not is being saved. */
-    bool isModified(const QnLayoutResourcePtr& layout) const;
+    bool isModified(const LayoutResourcePtr& layout) const;
 
 signals:
-    void layoutFlagsChanged(const QnLayoutResourcePtr& resource);
+    void layoutFlagsChanged(const LayoutResourcePtr& resource);
 
 private:
-    void connectTo(const QnLayoutResourcePtr& resource);
-    void disconnectFrom(const QnLayoutResourcePtr& resource);
+    void connectTo(const LayoutResourcePtr& resource);
+    void disconnectFrom(const LayoutResourcePtr& resource);
 
     void onResourcesAdded(const QnResourceList& resources);
     void onResourcesRemoved(const QnResourceList& resources);

@@ -26,6 +26,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
@@ -286,11 +287,11 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicensesIfNeeded);
     connect(videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
-    connect(systemContext()->licensePool(), &QnLicensePool::licensesChanged, this,
+    connect(licensePool(), &QnLicensePool::licensesChanged, this,
         updateLicensesIfNeeded);
 
-    connect(qnClientCoreModule->networkModule(),
-        &nx::vms::client::core::NetworkModule::remoteIdChanged,
+    connect(context(),
+        &QnWorkbenchContext::userChanged,
         this,
         [this]() { m_deactivationReason = RequestInfo(); });
 }
@@ -399,6 +400,19 @@ void QnLicenseManagerWidget::updateLicenses()
     }
 
     updateButtons();
+}
+
+QnLicensePool* QnLicenseManagerWidget::licensePool() const
+{
+    return systemContext()->licensePool();
+}
+
+QnUuid QnLicenseManagerWidget::serverId() const
+{
+    if (auto connection = this->connection(); NX_ASSERT(connection))
+        return connection->moduleInformation().id;
+
+    return QnUuid();
 }
 
 void QnLicenseManagerWidget::updateFromServer(

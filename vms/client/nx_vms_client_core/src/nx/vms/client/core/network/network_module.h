@@ -50,13 +50,8 @@ public:
     void setSession(std::shared_ptr<RemoteSession> session);
     QnUuid currentServerId() const;
 
-    bool isConnected() const;
-
     void reinitializeCertificateStorage(
         ServerCertificateValidationLevel certificateValidationLevel);
-
-signals:
-    void remoteIdChanged(const QnUuid& id);
 
 private:
     struct Private;

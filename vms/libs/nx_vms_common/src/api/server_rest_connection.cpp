@@ -2059,7 +2059,7 @@ bool setupAuth(
 
     if (route.reverseConnect)
     {
-        auto connection = systemContext->ec2Connection();
+        auto connection = systemContext->messageBusConnection();
         if (!NX_ASSERT(connection))
             return false;
 
@@ -2085,7 +2085,7 @@ bool setupAuth(
     }
 
     // TODO: #sivanov Only client-side connection is actually used.
-    const auto connection = systemContext->ec2Connection();
+    const auto connection = systemContext->messageBusConnection();
     if (!connection)
         return false;
 

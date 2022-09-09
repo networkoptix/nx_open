@@ -4,24 +4,19 @@
 
 #include <array>
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
-
-#include <nx/vms/event/event_fwd.h>
+#include <QtCore/QObject>
 
 #include <client/client_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/desktop/camera/camera_fwd.h>
-#include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
-
-#include <ui/common/scene_transformations.h>
-#include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/uuid.h>
-
+#include <nx/vms/client/desktop/camera/camera_fwd.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
+#include <nx/vms/event/event_fwd.h>
+#include <ui/animation/animation_timer_listener.h>
+#include <ui/common/scene_transformations.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -36,7 +31,6 @@ class SelectionOverlayTuneInstrument;
 class FocusListenerInstrument;
 namespace nx::vms::client::desktop { class FrameTimePointsProviderInstrument; }
 
-class QnWorkbench;
 class QnWorkbenchItem;
 
 class QnWorkbenchLayout;
@@ -368,11 +362,14 @@ protected:
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
+    /** Clear role before widget is destroyed. */
+    void clearWidget(Qn::ItemRole role);
+
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
 
-    void updateBackground(const QnLayoutResourcePtr &layout);
+    void updateBackground(const nx::vms::client::desktop::LayoutResourcePtr &layout);
 
     /** Mark item on the scene selected as it was selected in the tree. */
     void updateSelectionFromTree();
@@ -382,7 +379,6 @@ protected slots:
 
     void at_viewportAnimator_finished();
 
-    void at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(Qn::ItemRole role);
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
@@ -394,7 +390,7 @@ protected slots:
     void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
+    void at_resourcePool_resourcesRemoved(const QnResourceList& resources);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();

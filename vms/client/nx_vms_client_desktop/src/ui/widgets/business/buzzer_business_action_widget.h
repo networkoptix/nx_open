@@ -14,7 +14,9 @@ class BuzzerBusinessActionWidget: public QnSubjectTargetActionWidget
     typedef QnSubjectTargetActionWidget base_type;
 
 public:
-    explicit BuzzerBusinessActionWidget(QWidget* parent = nullptr);
+    explicit BuzzerBusinessActionWidget(
+        SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~BuzzerBusinessActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

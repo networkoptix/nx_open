@@ -5,6 +5,7 @@
 #include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
 #include <ui/dialogs/common/session_aware_dialog.h>

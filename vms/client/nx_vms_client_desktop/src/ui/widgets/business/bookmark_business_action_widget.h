@@ -16,7 +16,9 @@ class QnBookmarkBusinessActionWidget : public QnSubjectTargetActionWidget
     typedef QnSubjectTargetActionWidget base_type;
 
 public:
-    explicit QnBookmarkBusinessActionWidget(QWidget *parent = 0);
+    explicit QnBookmarkBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~QnBookmarkBusinessActionWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;

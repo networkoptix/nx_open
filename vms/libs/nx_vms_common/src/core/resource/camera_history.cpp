@@ -212,8 +212,12 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
-bool QnCameraHistoryPool::isCameraHistoryValid(const QnSecurityCamResourcePtr &camera) const {
-    NX_MUTEX_LOCKER lock( &m_mutex );
+bool QnCameraHistoryPool::isCameraHistoryValid(const QnSecurityCamResourcePtr& camera) const
+{
+    if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
+        return false;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_historyValidCameras.contains(camera->getId());
 }
 
@@ -255,8 +259,10 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     const QnSecurityCamResourcePtr& camera,
     callbackFunction callback)
 {
-    NX_ASSERT(!camera.isNull(), "Camera resource is null!");
-    if (camera.isNull())
+    if (!NX_ASSERT(camera))
+        return StartResult::failed;
+
+    if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
         return StartResult::failed;
 
     if (!m_context->ec2Connection()) //< Reconnecting to the server after idle.
@@ -266,7 +272,10 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
         return StartResult::ommited;
 
     // TODO: #sivanov Resource context should have access to the corresponding rest connection.
-    const QnUuid serverId = m_context->ec2Connection()->moduleInformation().id;
+    // Message bus connection exists on the server side and in the main client context.
+    const QnUuid serverId = m_context->messageBusConnection()
+        ? m_context->messageBusConnection()->moduleInformation().id
+        : camera->getParentId();
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!NX_ASSERT(server))
         return StartResult::failed;

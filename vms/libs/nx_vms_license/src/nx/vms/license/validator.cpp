@@ -44,7 +44,7 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
         return QnLicenseErrorCode::InvalidSignature;
 
     QnUuid currentServerId;
-    auto connection = m_context->ec2Connection();
+    auto connection = messageBusConnection();
     if (connection)
         currentServerId = connection->moduleInformation().id;
 

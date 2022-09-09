@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <optional>
+
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
@@ -13,6 +15,14 @@
 class QnPtzControllerPool;
 class QQmlContext;
 
+namespace ec2 {
+
+class AbstractECConnection;
+using AbstractECConnectionPtr = std::shared_ptr<AbstractECConnection>;
+
+} // namespace ec2
+
+namespace nx::network::http { class Credentials; }
 namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::client::core {
@@ -91,8 +101,18 @@ public:
      */
     RemoteConnectionPtr connection() const;
 
+    /**
+     * Credentials we are using to authorize the connection.
+     */
+    nx::network::http::Credentials connectionCredentials() const;
+
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;
+
+    /**
+     * Established p2p connection (if any).
+     */
+    ec2::AbstractECConnectionPtr messageBusConnection() const;
 
     QnPtzControllerPool* ptzControllerPool() const;
 

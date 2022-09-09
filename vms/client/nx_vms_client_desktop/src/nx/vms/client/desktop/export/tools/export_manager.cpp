@@ -2,6 +2,8 @@
 
 #include "export_manager.h"
 
+#include <QtCore/QPointer>
+
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/export/tools/export_media_tool.h>
 #include "export_layout_tool.h"

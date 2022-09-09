@@ -8,9 +8,9 @@
 
 #include <licensing/license_fwd.h>
 
-class QnCommonModule;
-
 namespace nx::vms::client::desktop {
+
+class SystemContext;
 
 /**
  * Can contain an email, a web site url or a phone number.
@@ -36,7 +36,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ContactAddress
 struct NX_VMS_CLIENT_DESKTOP_API CustomerSupport
 {
     /** Get customer support contacts for the whole system. */
-    explicit CustomerSupport(QnCommonModule* commonModule);
+    explicit CustomerSupport(SystemContext* systemContext);
 
     /**
      * Get customer support contacts for the whole system.

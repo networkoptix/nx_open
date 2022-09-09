@@ -237,7 +237,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
             }
         });
 
-    const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
     if (NX_ASSERT(watcher))
     {
         connect(watcher, &nx::analytics::taxonomy::AbstractStateWatcher::stateChanged, this,
@@ -425,7 +425,7 @@ void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
     std::set<QString> relevantObjectTypes;
     if (!m_selectedObjectType.isEmpty())
     {
-        const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
+        const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
         if (NX_ASSERT(watcher))
         {
             relevantObjectTypes = nx::analytics::taxonomy::getAllDerivedTypeIds(
@@ -941,7 +941,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         filter.boundingBox = m_filterRect;
 
     const nx::analytics::taxonomy::ObjectTypeDictionary objectTypeDictionary(
-        q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+        q->systemContext()->analyticsTaxonomyStateWatcher());
 
     const int oldNewTrackCount = m_newTracks.size();
 
@@ -1173,7 +1173,7 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 const nx::analytics::taxonomy::AbstractObjectType*
     AnalyticsSearchListModel::Private::objectTypeById(const QString& objectTypeId) const
 {
-    const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
     if (!NX_ASSERT(watcher))
         return nullptr;
 
@@ -1228,7 +1228,7 @@ QString AnalyticsSearchListModel::Private::engineName(
         return {};
 
     const std::shared_ptr<AbstractState> taxonomyState =
-        q->commonModule()->systemContext()->analyticsTaxonomyState();
+        q->systemContext()->analyticsTaxonomyState();
 
     if (!taxonomyState)
         return QString();
@@ -1246,7 +1246,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     if (!camera)
         return {};
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->systemContext());
     const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
         track.objectTypeId,
         camera);

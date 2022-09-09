@@ -1,41 +1,39 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "search_bookmarks_dialog_p.h"
+#include "ui_search_bookmarks_dialog.h"
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include "ui_search_bookmarks_dialog.h"
-
-#include <nx/vms/client/desktop/ini.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-#include <recording/time_period.h>
-#include <ui/common/read_only.h>
-#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/models/search_bookmarks_model.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <utils/common/synctime.h>
-
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
+#include <recording/time_period.h>
+#include <ui/common/read_only.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/models/search_bookmarks_model.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <utils/common/synctime.h>
 
 namespace {
 

@@ -10,10 +10,7 @@
 #include <QtCore/QStorageInfo>
 #include <QtCore/QThread>
 
-#include <client/client_module.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -30,6 +27,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/requests.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
@@ -98,8 +96,9 @@ static constexpr auto kReadBufferSizeBytes = 1024 * 1024;
 
 namespace nx::vms::client::desktop {
 
-ServerUpdateTool::ServerUpdateTool(QObject* parent):
+ServerUpdateTool::ServerUpdateTool(SystemContext* systemContext, QObject* parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/offline"))
 {
     // Expecting paths like "/temp/nx_updates/offline/rand_file".
@@ -113,7 +112,7 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
 
     m_downloader.reset(new Downloader(
-        m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
+        m_outputDir, systemContext, {new InternetOnlyPeerManager()}));
 
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
@@ -546,7 +545,7 @@ QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const update::Package& packa
     if (package.component == update::Component::client)
     {
         const QList<QnUuid> persistentStorageServers =
-            globalSettings()->targetPersistentUpdateStorage().servers;
+            systemSettings()->targetPersistentUpdateStorage().servers;
         result.unite(
             QSet<QnUuid>(persistentStorageServers.begin(), persistentStorageServers.end()));
     }
@@ -829,7 +828,7 @@ bool ServerUpdateTool::verifyUpdateManifest(
         : QnUuid();
     clientData.installedVersions = clientVersions;
     VerificationOptions options;
-    options.commonModule = commonModule();
+    options.systemContext = systemContext();
     return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
@@ -1211,7 +1210,7 @@ void ServerUpdateTool::requestModuleInformation()
     // We expect that m_serverConnection is created in requestStartUpdate
     if (!m_serverConnection)
     {
-        if (auto ec2connection = messageBusConnection())
+        if (auto ec2connection = systemContext()->messageBusConnection())
         {
             const nx::vms::api::ModuleInformation& moduleInformation =
                 ec2connection->moduleInformation();
@@ -1219,8 +1218,8 @@ void ServerUpdateTool::requestModuleInformation()
             // TODO: #sivanov Looks like we can take existing rest connection here.
             m_serverConnection.reset(new rest::ServerConnection(
                 moduleInformation.id,
-                /*auditId*/ commonModule()->sessionId(),
-                qnClientCoreModule->networkModule()->certificateVerifier(),
+                /*auditId*/ systemContext()->sessionId(),
+                systemContext()->certificateVerifier(),
                 ec2connection->address(),
                 ec2connection->credentials()));
         }
@@ -1554,23 +1553,35 @@ nx::utils::Url getServerUrl(nx::network::SocketAddress address, QString path)
 
 QString ServerUpdateTool::getUpdateStateUrl() const
 {
-    const auto url = getServerUrl(connectionAddress(), "/ec2/updateStatus");
-    return url.toString(QUrl::RemoveUserInfo);
+    if (auto connection = this->connection(); NX_ASSERT(connection))
+    {
+        const auto url = getServerUrl(connection->address(), "/ec2/updateStatus");
+        return url.toString(QUrl::RemoveUserInfo);
+    }
+    return {};
 }
 
 QString ServerUpdateTool::getUpdateInformationUrl() const
 {
-    const auto url = getServerUrl(connectionAddress(), "/ec2/updateInformation");
-    return url.toString(QUrl::RemoveUserInfo);
+    if (auto connection = this->connection(); NX_ASSERT(connection))
+    {
+        const auto url = getServerUrl(connection->address(), "/ec2/updateInformation");
+        return url.toString(QUrl::RemoveUserInfo);
+    }
+    return {};
 }
 
 QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 {
-    auto url = getServerUrl(connectionAddress(), "/ec2/updateInfomation");
-    QUrlQuery query;
-    query.addQueryItem("version", "latest");
-    url.setQuery(query);
-    return url.toString(QUrl::RemoveUserInfo);
+    if (auto connection = this->connection(); NX_ASSERT(connection))
+    {
+        auto url = getServerUrl(connection->address(), "/ec2/updateInfomation");
+        QUrlQuery query;
+        query.addQueryItem("version", "latest");
+        url.setQuery(query);
+        return url.toString(QUrl::RemoveUserInfo);
+    }
+    return {};
 }
 
 std::future<UpdateContents> ServerUpdateTool::checkForUpdate(

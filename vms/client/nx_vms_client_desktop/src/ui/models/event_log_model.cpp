@@ -23,6 +23,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -414,7 +415,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             if (action.eventParams.eventType == nx::vms::api::EventType::analyticsSdkEvent)
             {
                 const std::shared_ptr<AbstractState> taxonomyState =
-                    commonModule()->systemContext()->analyticsTaxonomyState();
+                    systemContext()->analyticsTaxonomyState();
 
                 if (!taxonomyState)
                     m_stringsHelper->eventName(action.eventParams.eventType);
@@ -499,7 +500,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                 ).join('\n'));
             }
 
-            if (!vms::event::hasToggleState(eventType, action.eventParams, commonModule()))
+            if (!vms::event::hasToggleState(eventType, action.eventParams, systemContext()))
             {
                 int count = action.aggregationCount;
                 if (count > 1)
@@ -636,11 +637,15 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
     if (column != DescriptionColumn || !action.hasFlags(vms::event::ActionData::VideoLinkExists))
         return QString();
 
+    nx::network::SocketAddress connectionAddress;
+    if (auto connection = this->connection(); NX_ASSERT(connection))
+        connectionAddress = connection->address();
+
     return m_stringsHelper->urlForCamera(
         action.eventParams.eventResourceId,
         std::chrono::milliseconds(action.eventParams.eventTimestampUsec / 1000),
         /*usePublicIp*/ true, //< Not used on the client side anyway.
-        connectionAddress());
+        connectionAddress);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const

@@ -2,18 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/shared_item/shared_item.h>
-
-class QnCommonModule;
-class QnLayoutTourManager;
-namespace nx::vms::common { class SystemSettings; }
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::api { struct UserRoleData; }
 
@@ -22,14 +18,14 @@ namespace entity_resource_tree {
 
 class RecorderItemDataHelper;
 
-class ResourceTreeItemFactory: public QObject
+class ResourceTreeItemFactory: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
     using AbstractItemPtr = entity_item_model::AbstractItemPtr;
 
 public:
-    ResourceTreeItemFactory(const QnCommonModule* commonModule);
+    ResourceTreeItemFactory(SystemContext* systemContext);
 
     // Resource Tree header items.
     AbstractItemPtr createCurrentSystemItem() const;
@@ -96,12 +92,6 @@ public:
     AbstractItemPtr createCloudLayoutItem(const QnLayoutResourcePtr& layout);
 
 private:
-    QnResourcePool* resourcePool() const;
-    nx::vms::common::SystemSettings* globalSettings() const;
-    QnLayoutTourManager* showreelManager() const;
-
-private:
-    const QnCommonModule* m_commonModule;
     QHash<QnResourcePtr, entity_item_model::SharedItemOriginPtr> m_resourceItemCache;
 };
 

@@ -17,7 +17,7 @@ class PluginDiagnosticEventWidget: public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit PluginDiagnosticEventWidget(QWidget* parent = nullptr);
+    explicit PluginDiagnosticEventWidget(SystemContext* systemContext, QWidget* parent = nullptr);
     virtual ~PluginDiagnosticEventWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

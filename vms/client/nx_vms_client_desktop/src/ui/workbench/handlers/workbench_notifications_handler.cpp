@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
@@ -42,7 +43,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -93,7 +93,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
 
-    QnCommonMessageProcessor* messageProcessor = commonModule()->messageProcessor();
+    QnCommonMessageProcessor* messageProcessor = systemContext()->messageProcessor();
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
@@ -336,7 +336,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
 {
     bool canShow = true;
 
-    const bool connected = qnClientCoreModule->networkModule()->isConnected();
+    const bool connected = context()->user();
 
     if (!connected)
     {

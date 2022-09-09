@@ -10,11 +10,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
-#include <nx/utils/string.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/string.h>
 #include <nx/vms/api/data/user_role_data.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -22,7 +23,7 @@ using namespace nx::vms::client::desktop;
 
 class QnDeprecatedUserListModelPrivate:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware
+    public SystemContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnDeprecatedUserListModelPrivate)
     using base_type = QObject;
@@ -37,6 +38,7 @@ public:
 
     QnDeprecatedUserListModelPrivate(QnDeprecatedUserListModel* parent) :
         base_type(parent),
+        SystemContextAware(parent->systemContext()),
         model(parent)
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,

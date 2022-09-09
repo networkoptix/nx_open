@@ -4,13 +4,13 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <utils/common/checked_cast.h>
 
@@ -159,8 +159,9 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
     if (!m_reconnectOnPasswordChange)
         return false;
 
+    const auto credentials = systemContext()->connectionCredentials();
     const bool bearerAuthIsUsed =
-        (connectionCredentials().authToken.type == nx::network::http::AuthTokenType::bearer);
+        (credentials.authToken.type == nx::network::http::AuthTokenType::bearer);
 
     // Reconnect is never needed when token auth is used.
     if (bearerAuthIsUsed)

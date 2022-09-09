@@ -6,19 +6,21 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
 #include <nx/vms/event/action_parameters.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
 
-QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(QWidget* parent):
-    base_type(parent),
+QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::ShowOnAlarmLayoutActionWidget)
 {
     ui->setupUi(this);

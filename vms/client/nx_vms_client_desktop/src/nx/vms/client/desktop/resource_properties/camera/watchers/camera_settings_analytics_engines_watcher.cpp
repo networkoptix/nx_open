@@ -5,10 +5,10 @@
 #include <algorithm>
 
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
@@ -43,10 +43,10 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
 
 class CameraSettingsAnalyticsEnginesWatcher::Private:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
 public:
-    Private(QnCommonModule* commonModule, CameraSettingsDialogStore* store);
+    Private(SystemContext* systemContext, CameraSettingsDialogStore* store);
 
     QList<AnalyticsEngineInfo> engineInfoList() const;
 
@@ -69,10 +69,10 @@ public:
 };
 
 CameraSettingsAnalyticsEnginesWatcher::Private::Private(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     CameraSettingsDialogStore* store)
     :
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     store(store)
 {
     const auto messageProcessor = qnClientMessageProcessor;
@@ -259,7 +259,7 @@ CameraSettingsAnalyticsEnginesWatcher::CameraSettingsAnalyticsEnginesWatcher(
     :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private(commonModule(), store))
+    d(new Private(systemContext(), store))
 {
 }
 

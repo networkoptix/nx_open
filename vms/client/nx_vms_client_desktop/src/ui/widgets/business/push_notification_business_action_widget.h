@@ -8,19 +8,22 @@
 
 namespace Ui { class PushNotificationBusinessActionWidget; }
 
+class QnWorkbenchContext;
+
 namespace nx::vms::client::desktop {
 
 class Aligner;
 
 class PushNotificationBusinessActionWidget:
-    public QnSubjectTargetActionWidget,
-    public QnWorkbenchContextAware
+    public QnSubjectTargetActionWidget
 {
     Q_OBJECT
     using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit PushNotificationBusinessActionWidget(QWidget* parent = nullptr);
+    explicit PushNotificationBusinessActionWidget(
+        QnWorkbenchContext* context,
+        QWidget* parent = nullptr);
     virtual ~PushNotificationBusinessActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
@@ -35,7 +38,8 @@ private:
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
-    nx::vms::client::desktop::Aligner* const m_aligner;
+    QnWorkbenchContext* const m_context;
+    Aligner* const m_aligner;
 };
 
 } // namespace nx::vms::client::desktop

@@ -1,12 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "avg_tabs_count_metric.h"
 
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <statistics/base/time_duration_metric.h>
 
-AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
+using namespace nx::vms::client::desktop;
+
+AvgTabsCountMetric::AvgTabsCountMetric(Workbench *workbench)
     : base_type()
     , QnAbstractMetric()
     , m_workbench(workbench)
@@ -37,8 +38,7 @@ AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
         durationCounter->setCounterActive(true);
     };
 
-    connect(m_workbench, &QnWorkbench::layoutsChanged
-        , this, layoutsCountChangedHandler);
+    connect(m_workbench, &Workbench::layoutsChanged, this, layoutsCountChangedHandler);
 }
 
 AvgTabsCountMetric::~AvgTabsCountMetric()

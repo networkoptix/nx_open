@@ -14,8 +14,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "../flux/camera_settings_dialog_store.h"
 #include "../flux/camera_settings_dialog_state.h"
+#include "../flux/camera_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
 

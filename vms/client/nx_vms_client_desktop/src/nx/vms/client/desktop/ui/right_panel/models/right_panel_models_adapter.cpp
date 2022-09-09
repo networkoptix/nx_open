@@ -51,13 +51,14 @@
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -1042,7 +1043,9 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 EventType::userDefinedEvent});
 
             m_analyticsEvents.reset(
-                new AnalyticsEventModel(m_context->commonModule(), q->sourceModel()));
+                new AnalyticsEventModel(
+                    m_context->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+                    q->sourceModel()));
 
             break;
         }

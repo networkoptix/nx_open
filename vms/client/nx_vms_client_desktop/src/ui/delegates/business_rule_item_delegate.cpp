@@ -11,7 +11,6 @@
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
@@ -351,9 +350,9 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     else if (actionType == ActionType::openLayoutAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        auto validator = new QnLayoutAccessValidationPolicy(commonModule());
+        auto validator = new QnLayoutAccessValidationPolicy(systemContext());
         validator->setLayout(
-            systemContext()->resourcePool()->getResourceById<QnLayoutResource>(
+            resourcePool()->getResourceById<QnLayoutResource>(
                 model->actionParams().actionResourceId));
         usersButton->setSubjectValidationPolicy(validator);
         editorButton = usersButton;
@@ -447,7 +446,7 @@ QWidget* QnBusinessRuleItemDelegate::createActionEditor(QWidget* parent,
 {
     auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
     auto eventParams = index.data(Qn::EventParametersRole).value<nx::vms::event::EventParameters>();
-    bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
+    bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, systemContext());
 
     QComboBox* comboBox = new QComboBox(parent);
     comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);

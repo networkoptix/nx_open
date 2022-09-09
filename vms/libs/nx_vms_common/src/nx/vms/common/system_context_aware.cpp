@@ -49,9 +49,19 @@ SystemContext* SystemContextAware::systemContext() const
     return d->systemContext.data();
 }
 
+std::shared_ptr<ec2::AbstractECConnection> SystemContextAware::messageBusConnection() const
+{
+    return systemContext()->messageBusConnection();
+}
+
 QnResourceAccessManager* SystemContextAware::resourceAccessManager() const
 {
     return systemContext()->resourceAccessManager();
+}
+
+QnGlobalPermissionsManager* SystemContextAware::globalPermissionsManager() const
+{
+    return systemContext()->globalPermissionsManager();
 }
 
 nx::core::access::ResourceAccessProvider* SystemContextAware::resourceAccessProvider() const
@@ -77,6 +87,26 @@ QnCameraHistoryPool* SystemContextAware::cameraHistoryPool() const
 SystemSettings* SystemContextAware::systemSettings() const
 {
     return systemContext()->globalSettings();
+}
+
+QnLayoutTourManager* SystemContextAware::showreelManager() const
+{
+    return systemContext()->showreelManager();
+}
+
+QnRuntimeInfoManager* SystemContextAware::runtimeInfoManager() const
+{
+    return systemContext()->runtimeInfoManager();
+}
+
+QnUserRolesManager* SystemContextAware::userRolesManager() const
+{
+    return systemContext()->userRolesManager();
+}
+
+QnSharedResourcesManager* SystemContextAware::sharedResourcesManager() const
+{
+    return systemContext()->sharedResourcesManager();
 }
 
 } // namespace nx::vms::common

@@ -284,7 +284,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         });
 
     auto analyticsEventsSearchTreeBuilder =
-        commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+        context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
     const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
     addItemRecursive(rootItem, root);
 }
@@ -392,7 +392,7 @@ void QnEventLogDialog::initEventsModel()
     updateAnalyticsSubmenuOperation->fire();
     updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-    connect(commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+    connect(context()->findInstance<AnalyticsEventsSearchTreeBuilder>(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
@@ -452,7 +452,7 @@ void QnEventLogDialog::updateData()
     if (serverIssue)
         setCameraList(QSet<QnUuid>());
 
-    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), commonModule())
+    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), systemContext())
         && eventType != EventType::undefinedEvent;
 
     updateActionList(istantOnly);

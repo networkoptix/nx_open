@@ -201,7 +201,7 @@ QnResourceDataPool* QnCommonModule::resourceDataPool() const
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
 {
     return NX_ASSERT(d->systemContext)
-        ? d->systemContext->ec2Connection()
+        ? d->systemContext->messageBusConnection()
         : nullptr;
 }
 

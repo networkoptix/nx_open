@@ -1,13 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "motion_search_duration_metric.h"
 
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_item.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench_item.h>
+
+using namespace nx::vms::client::desktop;
 
 MotionSearchDurationMetric::MotionSearchDurationMetric(QnWorkbenchContext *context)
     : base_type()
@@ -23,7 +24,7 @@ MotionSearchDurationMetric::MotionSearchDurationMetric(QnWorkbenchContext *conte
     connect(m_context->display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved
         , this, &MotionSearchDurationMetric::removeWidget);
 
-    connect(m_context->workbench(), &QnWorkbench::currentLayoutChanged
+    connect(m_context->workbench(), &Workbench::currentLayoutChanged
         , this, &MotionSearchDurationMetric::updateCounterState);
 }
 

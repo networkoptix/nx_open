@@ -21,12 +21,14 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
@@ -34,7 +36,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -149,29 +150,26 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
 
 void QnWorkbenchBookmarksHandler::setupBookmarksExport()
 {
-    const auto updateExportAbility =
+    auto calculateExportAbility =
         [this]()
         {
             const auto currentWidget = navigator()->currentWidget();
             if (!currentWidget)
-                return;
+                return false;
 
-            const auto resource = currentWidget->resource();
-            if (!resource)
-                return;
-
-            const bool allowExport = accessController()->hasPermissions(
+            return ResourceAccessManager::hasPermissions(
                 currentWidget->resource(), Qn::ExportPermission);
+        };
 
+    const auto updateExportAbility =
+        [this, calculateExportAbility]()
+        {
             // QnWorkbenchNavigator is controlled by QnWorkbenchContext that can live longer than
             // MainWindow. QnTimeSlider cannot exist longer than MainWindow, because MainWindow is
             // the top level parent of QnTimeSlider. Therefore, sometimes there may be situations
             // that the slider will not be valid here.
-            const auto slider = navigator()->timeSlider();
-            if (!slider)
-                return;
-
-            slider->bookmarksViewer()->setAllowExport(allowExport);
+            if (const auto slider = navigator()->timeSlider())
+                slider->bookmarksViewer()->setAllowExport(calculateExportAbility());
         };
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,

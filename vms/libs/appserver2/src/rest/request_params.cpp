@@ -121,7 +121,7 @@ bool parseHttpRequestParams(
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::camera_id_helper::flexibleIdToId(
-            commonModule->systemContext()->resourcePool(), stringValue);
+            commonModule->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }
@@ -140,7 +140,7 @@ bool parseHttpRequestParams(
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::layout_id_helper::flexibleIdToId(
-            commonModule->systemContext()->resourcePool(), stringValue);
+            commonModule->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }

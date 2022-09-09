@@ -65,8 +65,7 @@ QUrl CloudUrlHelper::faqUrl() const
 
 QUrl CloudUrlHelper::viewSystemUrl() const
 {
-    const auto systemId = qnClientCoreModule->commonModule()
-        ->systemContext()->globalSettings()->cloudSystemId();
+    const auto systemId = qnClientCoreModule->commonModule()->globalSettings()->cloudSystemId();
     if (systemId.isEmpty())
         return mainUrl();
 

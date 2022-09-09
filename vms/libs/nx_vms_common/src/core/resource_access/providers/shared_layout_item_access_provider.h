@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
-#include <common/common_module_aware.h>
 
 class QnLayoutItemAggregator;
 using QnLayoutItemAggregatorPtr = QSharedPointer<QnLayoutItemAggregator>;

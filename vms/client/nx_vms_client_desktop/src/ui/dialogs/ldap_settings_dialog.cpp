@@ -7,21 +7,20 @@
 #include <QtWidgets/QPushButton>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
-using namespace nx;
-using namespace nx::vms::common;
+using namespace nx::vms;
+using namespace nx::vms::client::desktop;
 
 namespace {
     /** Special value, used when the user has pressed "Test" button. */
@@ -33,8 +32,7 @@ namespace {
 
 class QnLdapSettingsDialogPrivate:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_DECLARE_PUBLIC(QnLdapSettingsDialog)
     Q_DECLARE_TR_FUNCTIONS(QnLdapSettingsDialogPrivate)
@@ -57,13 +55,14 @@ public:
     void at_serverLineEdit_editingFinished();
 };
 
-QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , testHandle(kTestInvalidHandle)
-    , timeoutTimer(new QTimer(parent))
+QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog* parent):
+    QObject(parent),
+    SystemContextAware(parent->systemContext()),
+    q_ptr(parent),
+    testHandle(kTestInvalidHandle),
+    timeoutTimer(new QTimer(parent))
 {
-    connect(globalSettings(), &SystemSettings::ldapSettingsChanged,
+    connect(systemSettings(), &common::SystemSettings::ldapSettingsChanged,
         this, &QnLdapSettingsDialogPrivate::updateFromSettings);
     connect(timeoutTimer, &QTimer::timeout,
         this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
@@ -167,7 +166,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     stopTesting();
 
-    const auto& settings = globalSettings()->ldapSettings();
+    const auto& settings = systemSettings()->ldapSettings();
 
     QUrl url = settings.uri;
     if (url.port() == nx::vms::api::LdapSettings::defaultPort(url.scheme() == "ldaps"))
@@ -302,8 +301,8 @@ void QnLdapSettingsDialog::accept() {
 
     d->stopTesting();
 
-    globalSettings()->setLdapSettings(d->settings());
-    globalSettings()->synchronizeNow();
+    systemSettings()->setLdapSettings(d->settings());
+    systemSettings()->synchronizeNow();
 
     base_type::accept();
 }

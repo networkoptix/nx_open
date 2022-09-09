@@ -1,8 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "system_tab_bar.h"
-#include "system_tab_bar_model.h"
-#include "private/close_tab_button.h"
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QPainter>
@@ -16,9 +14,12 @@
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workbench/workbench.h>
 #include <utils/common/delayed.h>
+
+#include "private/close_tab_button.h"
+#include "system_tab_bar_model.h"
 
 namespace {
 static const int kFixedTabSizeHeight = 32;
@@ -60,7 +61,7 @@ SystemTabBar::SystemTabBar(QWidget *parent):
 
     connect(this, &QTabBar::currentChanged, this, &SystemTabBar::at_currentTabChanged);
     connect(workbench(),
-        &QnWorkbench::currentSystemChanged,
+        &Workbench::currentSystemChanged,
         this,
         &SystemTabBar::at_currentSystemChanged);
     connect(action(ui::action::RemoveSystemFromTabBarAction),

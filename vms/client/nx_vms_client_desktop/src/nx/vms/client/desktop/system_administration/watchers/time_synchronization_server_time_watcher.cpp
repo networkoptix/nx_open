@@ -126,7 +126,6 @@ TimeSynchronizationServerTimeWatcher::TimeSynchronizationServerTimeWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnCommonModuleAware(parent),
     d(new Private(this, store))
 {
 }

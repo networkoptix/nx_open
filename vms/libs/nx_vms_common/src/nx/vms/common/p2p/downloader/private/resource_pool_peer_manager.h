@@ -2,22 +2,22 @@
 
 #pragma once
 
-#include "abstract_peer_manager.h"
-
-#include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
-#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selector.h>
+#include <nx/vms/common/system_context_aware.h>
+
+#include "abstract_peer_manager.h"
 
 namespace nx::vms::common::p2p::downloader {
 
 class NX_VMS_COMMON_API ResourcePoolPeerManager:
     public AbstractPeerManager,
-    public /*mixin*/ QnCommonModuleAware
+    public SystemContextAware
 {
 public:
-    ResourcePoolPeerManager(QnCommonModule* commonModule, const PeerSelector& peerSelector = {});
+    ResourcePoolPeerManager(SystemContext* systemContext, const PeerSelector& peerSelector = {});
 
     virtual ~ResourcePoolPeerManager() override;
 
@@ -48,7 +48,7 @@ public:
 protected:
     ResourcePoolPeerManager(
         Capabilities capabilities,
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const PeerSelector& peerSelector = {});
 
     virtual QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
@@ -65,7 +65,8 @@ class NX_VMS_COMMON_API ResourcePoolProxyPeerManager: public ResourcePoolPeerMan
 {
 public:
     ResourcePoolProxyPeerManager(
-        QnCommonModule* commonModule, const PeerSelector& peerSelector = {});
+        SystemContext* systemContext,
+        const PeerSelector& peerSelector = {});
 };
 
 } // namespace nx::vms::common::p2p::downloader

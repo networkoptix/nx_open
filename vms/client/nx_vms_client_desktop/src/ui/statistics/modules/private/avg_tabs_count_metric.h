@@ -8,7 +8,7 @@
 #include <statistics/base/base_fwd.h>
 #include <statistics/base/abstract_metric.h>
 
-class QnWorkbench;
+namespace nx::vms::client::desktop { class Workbench; }
 
 class AvgTabsCountMetric : public QObject
     , public QnAbstractMetric
@@ -16,7 +16,7 @@ class AvgTabsCountMetric : public QObject
     typedef QObject base_type;
 
 public:
-    AvgTabsCountMetric(QnWorkbench *workbench);
+    AvgTabsCountMetric(nx::vms::client::desktop::Workbench *workbench);
 
     virtual ~AvgTabsCountMetric();
 
@@ -25,7 +25,7 @@ public:
     void reset() override;
 
 private:
-    typedef QPointer<QnWorkbench> QnWorkbenchPtr;
+    typedef QPointer<nx::vms::client::desktop::Workbench> QnWorkbenchPtr;
     typedef QHash<int, QnTimeDurationMetricPtr> TabsCountDurationsMetrics;
 
     const QnWorkbenchPtr m_workbench;

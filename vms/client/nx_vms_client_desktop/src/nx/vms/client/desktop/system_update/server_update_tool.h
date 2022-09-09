@@ -9,8 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/system_information.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -36,8 +35,7 @@ struct UpdateItem;
  */
 class NX_VMS_CLIENT_DESKTOP_API ServerUpdateTool:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -47,7 +45,7 @@ class NX_VMS_CLIENT_DESKTOP_API ServerUpdateTool:
     using TimePoint = std::chrono::time_point<Clock>;
 
 public:
-    ServerUpdateTool(QObject* parent = nullptr);
+    ServerUpdateTool(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~ServerUpdateTool() override;
 
     // Check if we should sync UI and data from here.

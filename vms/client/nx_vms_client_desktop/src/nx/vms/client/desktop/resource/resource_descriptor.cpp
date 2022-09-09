@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::client::desktop {
 
@@ -46,8 +47,16 @@ QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
     const bool belongsToOtherContext = (systemContext != appContext()->currentSystemContext());
     if (NX_ASSERT(systemContext) && (forceCloud || belongsToOtherContext))
     {
-        if (auto cloudSystemId = systemContext->moduleInformation().cloudSystemId;
-            NX_ASSERT(!cloudSystemId.isEmpty()))
+        // TODO: #sivanov Update cloudSystemId in the current system context module information
+        // when the system is bound to the cloud or vise versa.
+
+        // Using module information is generally better for the remote cloud systems, but we cannot
+        // use it for the current system as it may be bound to the cloud in the current session.
+        const QString cloudSystemId = belongsToOtherContext
+            ? systemContext->moduleInformation().cloudSystemId
+            : systemContext->globalSettings()->cloudSystemId();
+
+        if (NX_ASSERT(!cloudSystemId.isEmpty()))
         {
             return resourcePath(resource->getId(), cloudSystemId);
         }

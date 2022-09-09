@@ -30,7 +30,6 @@ QIcon getIcon(const QnMediaServerResourcePtr& server)
 
 QnChooseServerButton::QnChooseServerButton(QWidget* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
     m_serverStatus(this)
 {
     setDisplayActionIcon(true);

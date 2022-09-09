@@ -8,11 +8,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/types/access_rights_types.h>
-
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-
-class QnCommonModule;
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -23,7 +21,9 @@ class RecorderItemDataHelper;
 class ResourceTreeItemFactory;
 class ResourceTreeItemKeySourcePool;
 
-class NX_VMS_CLIENT_DESKTOP_API ResourceTreeEntityBuilder: public QObject
+class NX_VMS_CLIENT_DESKTOP_API ResourceTreeEntityBuilder:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -32,7 +32,7 @@ class NX_VMS_CLIENT_DESKTOP_API ResourceTreeEntityBuilder: public QObject
 
 
 public:
-    ResourceTreeEntityBuilder(const QnCommonModule* commonModule);
+    ResourceTreeEntityBuilder(SystemContext* systemContext);
     ~ResourceTreeEntityBuilder();
 
     QnUserResourcePtr user() const;
@@ -87,7 +87,6 @@ public:
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
 
 private:
-    const QnCommonModule* m_commonModule;
     QScopedPointer<CameraResourceIndex> m_cameraResourceIndex;
     QScopedPointer<UserLayoutResourceIndex> m_userLayoutResourceIndex;
     QSharedPointer<RecorderItemDataHelper> m_recorderItemDataHelper;

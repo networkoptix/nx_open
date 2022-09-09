@@ -7,7 +7,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
 
-class QnCommonModule;
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx {
 namespace vms {
@@ -27,12 +27,12 @@ NX_VMS_COMMON_API bool isResourceRequired(EventType eventType);
 NX_VMS_COMMON_API bool hasToggleState(
     EventType eventType,
     const EventParameters& runtimeParams,
-    QnCommonModule* commonModule);
+    nx::vms::common::SystemContext* systemContext);
 
 NX_VMS_COMMON_API QList<EventState> allowedEventStates(
     EventType eventType,
     const EventParameters& runtimeParams,
-    QnCommonModule* commonModule);
+    nx::vms::common::SystemContext* systemContext);
 
 /** Check if camera required for this event to setup a rule. */
 NX_VMS_COMMON_API bool requiresCameraResource(EventType eventType);

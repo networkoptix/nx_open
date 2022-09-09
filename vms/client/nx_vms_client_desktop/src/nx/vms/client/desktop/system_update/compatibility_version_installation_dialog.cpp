@@ -17,6 +17,8 @@
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 
@@ -76,7 +78,9 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     m_private->logonData = logonData;
     m_private->logonData.purpose = core::LogonData::Purpose::connectInCompatibilityMode;
     m_private->logonData.expectedServerId = moduleInformation.id;
-    m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
+    m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(
+        appContext()->currentSystemContext(),
+        this));
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()
@@ -131,7 +135,7 @@ int CompatibilityVersionInstallationDialog::exec()
 
 void CompatibilityVersionInstallationDialog::processUpdateContents(const UpdateContents& contents)
 {
-    auto commonModule = m_private->clientUpdateTool->commonModule();
+    auto systemContext = m_private->clientUpdateTool->systemContext();
     auto verifiedContents = contents;
     // We need to supply non-zero Uuid for the client to make verification work.
     // commonModule->globalSettings()->localSystemId() is zero right now.
@@ -140,7 +144,7 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(const UpdateC
     clientData.fillDefault();
     VerificationOptions options;
     options.compatibilityMode = true;
-    options.commonModule = commonModule;
+    options.systemContext = systemContext;
     options.downloadAllPackages = false;
 
     if (verifyUpdateContents(verifiedContents, /*servers=*/{}, clientData, options))

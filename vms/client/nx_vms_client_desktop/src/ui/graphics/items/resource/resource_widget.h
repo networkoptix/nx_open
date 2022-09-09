@@ -13,7 +13,9 @@
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/animation/animated.h>
@@ -143,7 +145,7 @@ public:
     const QnResourcePtr &resource() const;
 
     /** Layout resource, owning this item. */
-    QnLayoutResourcePtr layoutResource() const;
+    nx::vms::client::desktop::LayoutResourcePtr layoutResource() const;
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns nullptr.
@@ -429,6 +431,9 @@ protected:
 
 private:
     friend class QnWorkbenchDisplay;
+
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 
     /** Layout item. */
     QPointer<QnWorkbenchItem> m_item;

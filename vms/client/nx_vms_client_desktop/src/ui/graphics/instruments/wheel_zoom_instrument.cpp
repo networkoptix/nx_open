@@ -5,15 +5,15 @@
 #include <cmath> /* For std::pow. */
 
 #include <QtCore/QDateTime>
+#include <QtGui/QCursor>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 #include <QtWidgets/QGraphicsView>
-#include <QtGui/QCursor>
 
-#include <ui/processors/kinetic_cutting_processor.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/animation_timer.h>
-#include <ui/workbench/workbench.h>
+#include <ui/processors/kinetic_cutting_processor.h>
 
 namespace {
     const qreal kDegreesFor2x = 90.0;

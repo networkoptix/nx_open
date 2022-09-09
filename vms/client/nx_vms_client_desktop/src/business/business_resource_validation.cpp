@@ -2,13 +2,12 @@
 
 #include "business_resource_validation.h"
 
+#include <algorithm>
+
 #include <QtCore/QCryptographicHash>
 #include <QtWidgets/QLayout>
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
@@ -24,12 +23,16 @@
 #include <nx/network/app_info.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <utils/email/email.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -311,20 +314,23 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
 {
-    using boost::algorithm::all_of;
-
-    auto module = qnClientCoreModule->commonModule()->systemContext();
+    auto context = appContext()->currentSystemContext();
 
     QnUserResourceList users;
     QList<QnUuid> roles;
-    module->userRolesManager()->usersAndRoles(ids, users, roles);
+    context->userRolesManager()->usersAndRoles(ids, users, roles);
 
-    if (!all_of(users, &isValidUser))
+    if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
         return false;
 
     const auto additionalRecipients = parseAdditional(additional);
-    if (!all_of(additionalRecipients, nx::email::isValidAddress))
+    if (!std::all_of(
+        additionalRecipients.cbegin(),
+        additionalRecipients.cend(),
+        nx::email::isValidAddress))
+    {
         return false;
+    }
 
     for (const auto& roleId: roles)
     {
@@ -334,7 +340,8 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
                 return isValid(subject.user());
             };
 
-        if (!all_of(module->resourceAccessSubjectsCache()->allUsersInRole(roleId), isValidSubject))
+        const auto usersInRole = context->resourceAccessSubjectsCache()->allUsersInRole(roleId);
+        if (!std::all_of(usersInRole.cbegin(), usersInRole.cend(), isValidSubject))
             return false;
     }
 
@@ -344,7 +351,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto module = qnClientCoreModule->commonModule()->systemContext();
+    auto module = appContext()->currentSystemContext();
 
     QnUserResourceList users;
     QList<QnUuid> roles;
@@ -762,9 +769,9 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
 //-------------------------------------------------------------------------------------------------
 // QnLayoutAccessValidationPolicy
 
-QnLayoutAccessValidationPolicy::QnLayoutAccessValidationPolicy(QnCommonModule* common):
-    m_accessManager(common->systemContext()->resourceAccessManager()),
-    m_rolesManager(common->systemContext()->userRolesManager())
+QnLayoutAccessValidationPolicy::QnLayoutAccessValidationPolicy(SystemContext* systemContext):
+    m_accessManager(systemContext->resourceAccessManager()),
+    m_rolesManager(systemContext->userRolesManager())
 {
 }
 

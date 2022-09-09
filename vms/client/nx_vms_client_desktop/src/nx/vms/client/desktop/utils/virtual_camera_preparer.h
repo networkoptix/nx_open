@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 

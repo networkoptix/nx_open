@@ -50,40 +50,6 @@ public:
     static constexpr auto kDefaultCellSpacing = Qn::CellSpacing::Small;
 
     /**
-     * Helper struct for obtaining detailed information on move operations.
-     */
-    struct Disposition
-    {
-        /** Set of free slots that the moved items will occupy. */
-        QSet<QPoint> free;
-
-        /** Set of slots that are already occupied, thus blocking the items from being moved. */
-        QSet<QPoint> occupied;
-    };
-
-    /**
-     * Constructor.
-     * @param resource Layout resource that this layout will be in sync with.
-     * @param parent Parent object for this layout.
-     */
-    QnWorkbenchLayout(const LayoutResourcePtr& resource, QObject* parent = nullptr);
-
-    /**
-     * @return Resource associated with this layout, if any.
-     */
-    LayoutResourcePtr resource() const;
-
-    /**
-     * @return Plain pointer to the associated resource. Needed by QML.
-     */
-    QnLayoutResource* resourcePtr() const;
-
-    /**
-     * @return Layout associated with the given resource, if any.
-     */
-    static QnWorkbenchLayout* instance(const QnLayoutResourcePtr& resource);
-
-    /**
      * @return Layout associated with the given resource, if any.
      */
     static QnWorkbenchLayout* instance(const LayoutResourcePtr& resource);
@@ -100,6 +66,16 @@ public:
     virtual ~QnWorkbenchLayout();
 
     QnWorkbenchLayoutSynchronizer* layoutSynchronizer() const;
+
+    /**
+     * @return Resource associated with this layout, if any.
+     */
+    LayoutResourcePtr resource() const;
+
+    /**
+     * @return Plain pointer to the associated resource. Needed by QML.
+     */
+    QnLayoutResource* resourcePtr() const;
 
     QIcon icon() const;
 
@@ -133,6 +109,18 @@ public:
      * @returns true if the layout has no specific Cell Aspect Ratio and it can be adjusted.
      */
     bool canAutoAdjustAspectRatio();
+
+    /**
+     * Helper struct for obtaining detailed information on move operations.
+     */
+    struct Disposition
+    {
+        /** Set of free slots that the moved items will occupy. */
+        QSet<QPoint> free;
+
+        /** Set of slots that are already occupied, thus blocking the items from being moved. */
+        QSet<QPoint> occupied;
+    };
 
     /**
      * @param item Item to check.
@@ -309,7 +297,6 @@ public:
      */
     void setData(Qn::ItemDataRole role, const QVariant& value);
 
-public:
     /**
      * Move all items to the center of the grid coordinates (relative position is not changed).
      */
@@ -335,11 +322,6 @@ signals:
     void flagsChanged();
 
     void iconChanged();
-
-    /**
-     * Emitted when this layout is about to be destroyed (i.e. its destructor has started).
-     */
-    void aboutToBeDestroyed();
 
     /**
      * Emitted whenever an item is added to this layout. At the time of emit all internal data
@@ -387,6 +369,13 @@ signals:
      * @param role Role of the changed data.
      */
     void dataChanged(Qn::ItemDataRole role);
+
+protected:
+    /**
+     * Constructor.
+     * @param resource Layout resource that this layout will be in sync with.
+     */
+    QnWorkbenchLayout(const LayoutResourcePtr& resource);
 
 private:
     void moveItemInternal(QnWorkbenchItem* item, const QRect& geometry);

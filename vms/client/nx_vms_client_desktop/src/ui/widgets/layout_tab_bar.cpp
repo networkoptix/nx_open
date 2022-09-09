@@ -26,9 +26,8 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
@@ -69,9 +68,9 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
 
-    connect(workbench(), &QnWorkbench::layoutsChanged, this,
+    connect(workbench(), &Workbench::layoutsChanged, this,
         &QnLayoutTabBar::at_workbench_layoutsChanged);
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         &QnLayoutTabBar::at_workbench_currentLayoutChanged);
 
     // Layouts can currently be stored only in the current and cloud layouts contexts.
@@ -106,7 +105,12 @@ void QnLayoutTabBar::checkInvariants() const
 
     if (workbench() && m_submit && m_update)
     {
-        NX_ASSERT(workbench()->layouts() == m_layouts);
+        if (NX_ASSERT((int) workbench()->layouts().size() == m_layouts.size()))
+        {
+            for (int i = 0; i < m_layouts.size(); ++i)
+                NX_ASSERT(workbench()->layouts()[i].get() == m_layouts[i]);
+        }
+
         NX_ASSERT(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex()
             || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
     }
@@ -171,7 +175,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
             baseName = idx.item().name;
     }
 
-    QnLayoutResourcePtr resource = layout->resource();
+    LayoutResourcePtr resource = layout->resource();
     auto systemContext = SystemContext::fromResource(resource);
     if (!systemContext) //< Perfectly valid for temporary layouts like showreel.
         return baseName;
@@ -209,7 +213,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         {
             if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-            if (idx.item().runtimeStatus.controlledBy == commonModule()->peerId())
+            if (idx.item().runtimeStatus.controlledBy == systemContext()->peerId())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
             return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
         }
@@ -225,6 +229,9 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
 
 void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout)
 {
+    if (!layout)
+        return;
+
     int idx = m_layouts.indexOf(layout);
     QString oldText = tabText(idx);
     QString newText = layoutText(layout);
@@ -346,7 +353,10 @@ void QnLayoutTabBar::at_workbench_layoutsChanged()
     if (!m_update)
         return;
 
-    const QList<QnWorkbenchLayout *> &layouts = workbench()->layouts();
+    QnWorkbenchLayoutList layouts;
+    for (const auto& layout: workbench()->layouts())
+        layouts.push_back(layout.get());
+
     if (m_layouts == layouts)
         return;
 
@@ -401,7 +411,8 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged()
 
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource)
 {
-    updateTabText(QnWorkbenchLayout::instance(resource));
+    auto layout = resource.dynamicCast<LayoutResource>();
+    updateTabText(workbench()->layout(layout));
 }
 
 void QnLayoutTabBar::tabInserted(int index)
@@ -419,8 +430,9 @@ void QnLayoutTabBar::tabInserted(int index)
                 updateTabIcon(layout);
             });
 
-        if (m_submit)
-            workbench()->insertLayout(layout, index);
+        // FIXME: #sivanov Investigate if this is needed.
+        //if (m_submit)
+        //    workbench()->insertLayout(layout, index);
         submitCurrentLayout();
     }
 
@@ -432,15 +444,11 @@ void QnLayoutTabBar::tabRemoved(int index)
 {
     {
         QScopedValueRollback<bool> guard(m_update, false);
-
-        QnWorkbenchLayout *layout = m_layouts[index];
-        disconnect(layout, nullptr, this, nullptr);
-
         m_layouts.removeAt(index);
         submitCurrentLayout();
 
         if (m_submit)
-            workbench()->removeLayout(layout);
+            workbench()->removeLayout(index);
     }
 
     checkInvariants();

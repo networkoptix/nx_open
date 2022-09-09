@@ -22,7 +22,6 @@ public:
 
     SystemContext* systemContext() const;
 
-protected:
     QnWorkbenchAccessController* accessController() const;
 };
 

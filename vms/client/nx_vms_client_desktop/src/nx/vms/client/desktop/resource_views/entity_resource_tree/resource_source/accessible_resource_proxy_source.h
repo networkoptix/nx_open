@@ -2,28 +2,27 @@
 
 #pragma once
 
-#include "abstract_resource_source.h"
-
 #include <functional>
 
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
-class QnCommonModule;
+#include "abstract_resource_source.h"
 
 namespace nx::core::access { class ResourceAccessProvider; }
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class AccessibleResourceProxySource: public AbstractResourceSource
+class AccessibleResourceProxySource: public AbstractResourceSource, public SystemContextAware
 {
     Q_OBJECT
     using base_type = AbstractResourceSource;
 
 public:
     AccessibleResourceProxySource(
-        const QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const nx::core::access::ResourceAccessProvider* accessProvider,
         const QnResourceAccessSubject& accessSubject,
         const std::unique_ptr<AbstractResourceSource> baseResourceSource);

@@ -59,7 +59,6 @@ VirtualCameraWorker::VirtualCameraWorker(
     QObject* parent)
     :
     base_type(parent),
-    QnCommonModuleAware(parent),
     d(new Private(camera))
 {
     d->user = user;

@@ -37,7 +37,7 @@ public:
     virtual ~QnWorkbenchVideoWallHandler();
 
     bool saveReviewLayout(
-        const QnLayoutResourcePtr& layout,
+        const nx::vms::client::desktop::LayoutResourcePtr& layout,
         std::function<void(int, ec2::ErrorCode)> callback);
 
     bool saveReviewLayout(
@@ -52,7 +52,8 @@ private:
         Removed
     };
 
-    void resetLayout(const QnVideoWallItemIndexList& items, const QnLayoutResourcePtr& layout);
+    void resetLayout(const QnVideoWallItemIndexList& items,
+        const nx::vms::client::desktop::LayoutResourcePtr& layout);
 
     /**
      * Place first layout to the first item, second layout to the second item. Save layouts if
@@ -60,9 +61,9 @@ private:
      */
     void swapLayouts(
         const QnVideoWallItemIndex firstIndex,
-        const QnLayoutResourcePtr& firstLayout,
+        const nx::vms::client::desktop::LayoutResourcePtr& firstLayout,
         const QnVideoWallItemIndex& secondIndex,
-        const QnLayoutResourcePtr& secondLayout);
+        const nx::vms::client::desktop::LayoutResourcePtr& secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
     void updateItemsLayout(const QnVideoWallItemIndexList& items, const QnUuid& layoutId);
@@ -227,8 +228,9 @@ private:
 
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false);
-    void saveVideowallAndReviewLayout(const QnVideoWallResourcePtr& videowall,
-        const QnLayoutResourcePtr& layout = QnLayoutResourcePtr());
+    void saveVideowallAndReviewLayout(
+        const QnVideoWallResourcePtr& videowall,
+        const nx::vms::client::desktop::LayoutResourcePtr& layout = {});
 
 private:
     void showControlledByAnotherUserMessage() const;

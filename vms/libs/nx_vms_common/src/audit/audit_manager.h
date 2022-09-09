@@ -5,16 +5,15 @@
 #include <atomic>
 #include <deque>
 
-#include <QTimer>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 
+#include <api/model/audit/audit_record.h>
+#include <api/model/audit/auth_session.h>
 #include <nx/utils/thread/mutex.h>
+#include <recording/time_period.h>
 
 #include "audit_manager_fwd.h"
-#include "api/model/audit/audit_record.h"
-#include "api/model/audit/auth_session.h"
-#include "recording/time_period.h"
-#include <common/common_module_aware.h>
 
 class NX_VMS_COMMON_API QnAuditManager
 {

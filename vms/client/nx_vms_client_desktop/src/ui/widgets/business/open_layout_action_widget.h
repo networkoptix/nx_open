@@ -27,7 +27,9 @@ class OpenLayoutActionWidget : public QnSubjectTargetActionWidget
     using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit OpenLayoutActionWidget(QWidget* parent = nullptr);
+    explicit OpenLayoutActionWidget(
+        SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~OpenLayoutActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

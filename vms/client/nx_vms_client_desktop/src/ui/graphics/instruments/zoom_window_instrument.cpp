@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
@@ -21,7 +22,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -554,7 +554,7 @@ void ZoomWindowInstrument::ensureSelectionItem()
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
     selectionItem()->setBrush(Qt::NoBrush);
-    selectionItem()->setElementSize(QnWorkbench::kUnitSize / 64.0);
+    selectionItem()->setElementSize(Workbench::kUnitSize / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawSideElements);
 
     const auto currentScene = scene();

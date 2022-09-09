@@ -6,12 +6,12 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <common/common_module.h>
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -104,7 +104,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     updateControls();
 
     // Regional support info is stored in the licenses pool.
-    connect(commonModule()->licensePool(), &QnLicensePool::licensesChanged, this,
+    connect(systemContext()->licensePool(), &QnLicensePool::licensesChanged, this,
         &QnLicenseWidget::updateManualActivationLinkText);
 }
 
@@ -203,7 +203,7 @@ void QnLicenseWidget::updateControls()
 
 QString QnLicenseWidget::calculateManualActivationLinkText() const
 {
-    CustomerSupport customerSupport(commonModule());
+    CustomerSupport customerSupport(systemContext());
 
     if (customerSupport.regionalContacts.empty())
     {

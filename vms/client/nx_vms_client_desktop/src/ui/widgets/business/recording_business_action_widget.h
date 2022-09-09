@@ -16,7 +16,9 @@ class QnRecordingBusinessActionWidget: public QnAbstractBusinessParamsWidget
     using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnRecordingBusinessActionWidget(QWidget* parent = nullptr);
+    explicit QnRecordingBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnRecordingBusinessActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

@@ -2,10 +2,10 @@
 
 #include "desktop_client_message_processor.h"
 
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -35,7 +35,7 @@ void QnDesktopClientMessageProcessor::updateResource(
     if (isFile(resource) || isFile(ownResource))
         return;
 
-    auto layout = ownResource.dynamicCast<QnLayoutResource>();
+    auto layout = ownResource.dynamicCast<LayoutResource>();
     auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
 
     // Ignore remote layout update if user has unsaved data.

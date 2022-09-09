@@ -11,16 +11,20 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
-
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(QWidget* parent):
-    base_type(parent),
-    m_helper(new vms::event::StringsHelper(systemContext()))
+QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
+    m_helper(new vms::event::StringsHelper(systemContext))
 {
 }
 
@@ -144,7 +148,10 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     {
         QnUserResourceList users;
         QList<QnUuid> roles;
-        userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
+        systemContext()->userRolesManager()->usersAndRoles(
+            params.additionalResources,
+            users,
+            roles);
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
         if (users.isEmpty() && roles.isEmpty())

@@ -61,15 +61,15 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_notifiedVersion(),
     m_private(new Private())
 {
-    m_private->serverUpdateTool = context()->instance<ServerUpdateTool>();
+    m_private->serverUpdateTool = context()->findInstance<ServerUpdateTool>();
     NX_ASSERT(m_private->serverUpdateTool);
 
-    m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();
+    m_autoChecksEnabled = systemSettings()->isUpdateNotificationsEnabled();
 
-    connect(globalSettings(), &SystemSettings::updateNotificationsChanged, this,
+    connect(systemSettings(), &SystemSettings::updateNotificationsChanged, this,
         [this]()
         {
-            m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();
+            m_autoChecksEnabled = systemSettings()->isUpdateNotificationsEnabled();
             syncState();
         });
 
@@ -95,7 +95,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             {
                 if (m_userLoggedIn)
                 {
-                    auto systemId = globalSettings()->localSystemId();
+                    auto systemId = systemSettings()->localSystemId();
                     m_private->serverUpdateTool->onConnectToSystem(systemId);
                 }
                 else
@@ -177,7 +177,7 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
-    if (!globalSettings()->isUpdateNotificationsEnabled())
+    if (!systemSettings()->isUpdateNotificationsEnabled())
         return;
 
     m_private->updateContents = contents;
@@ -209,7 +209,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // Administrator disabled update notifications globally.
-    if (!globalSettings()->isUpdateNotificationsEnabled())
+    if (!systemSettings()->isUpdateNotificationsEnabled())
         return;
 
     // Do not show notifications near the end of the week or on our holidays.

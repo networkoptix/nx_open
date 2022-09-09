@@ -4,15 +4,15 @@
 
 #include <QtCore/QAbstractListModel>
 
-#include <common/common_module_aware.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class FoundDevicesModel:
     public ScopedModelOperations<QAbstractListModel>,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;

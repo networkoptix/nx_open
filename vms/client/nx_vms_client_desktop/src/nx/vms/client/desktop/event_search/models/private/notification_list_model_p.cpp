@@ -639,7 +639,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
     }
 
-    if (!context()->accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
         return;
 
     auto& actionParams = action->getParams();

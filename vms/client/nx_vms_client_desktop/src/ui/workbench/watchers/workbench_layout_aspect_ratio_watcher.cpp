@@ -5,9 +5,9 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -24,9 +24,18 @@ QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(
     m_renderWatcher(windowContext->resourceWidgetRenderWatcher())
 {
     NX_CRITICAL(m_renderWatcher, "Initialization order failure");
-    connect(m_renderWatcher,    &QnWorkbenchRenderWatcher::widgetChanged,       this,   &QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged);
-    connect(workbench(),        &QnWorkbench::currentLayoutAboutToBeChanged,    this,   &QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutAboutToBeChanged);
-    connect(workbench(),        &QnWorkbench::currentLayoutChanged,             this,   &QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutChanged);
+    connect(m_renderWatcher,
+        &QnWorkbenchRenderWatcher::widgetChanged,
+        this,
+        &QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged);
+    connect(workbench(),
+        &Workbench::currentLayoutAboutToBeChanged,
+        this,
+        &QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutAboutToBeChanged);
+    connect(workbench(),
+        &Workbench::currentLayoutChanged,
+        this,
+        &QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutChanged);
 }
 
 QnWorkbenchLayoutAspectRatioWatcher::~QnWorkbenchLayoutAspectRatioWatcher()

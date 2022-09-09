@@ -8,8 +8,8 @@
 
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -138,12 +139,10 @@ namespace nx::vms::client::desktop {
 using namespace nx::vms::api;
 using namespace backup_settings_view;
 
-BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(QnCommonModule* commonModule):
+BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(SystemContext* systemContext):
     base_type(nullptr),
-    QnCommonModuleAware(commonModule)
+    SystemContextAware(systemContext)
 {
-    NX_ASSERT(commonModule);
-
     connect(this, &BackupSettingsDecoratorModel::rowsAboutToBeRemoved,
         this, &BackupSettingsDecoratorModel::onRowsAboutToBeRemoved);
 }
@@ -310,7 +309,7 @@ BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
 {
     return m_changedGlobalBackupSettings
         ? *m_changedGlobalBackupSettings
-        : globalSettings()->backupSettings();
+        : systemSettings()->backupSettings();
 }
 
 void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings& backupSettings)
@@ -318,7 +317,7 @@ void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings&
     auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(this);
     auto hasChangesNotifier = makeHasChangesNotifier(this);
 
-    const auto savedGlobalBackupSettings = globalSettings()->backupSettings();
+    const auto savedGlobalBackupSettings = systemSettings()->backupSettings();
     if (savedGlobalBackupSettings == backupSettings)
         m_changedGlobalBackupSettings.reset();
     else
@@ -496,8 +495,8 @@ void BackupSettingsDecoratorModel::applyChanges()
 
     if (m_changedGlobalBackupSettings)
     {
-        globalSettings()->setBackupSettings(*m_changedGlobalBackupSettings);
-        globalSettings()->synchronizeNow();
+        systemSettings()->setBackupSettings(*m_changedGlobalBackupSettings);
+        systemSettings()->synchronizeNow();
     }
 
     m_changedContentTypes.clear();

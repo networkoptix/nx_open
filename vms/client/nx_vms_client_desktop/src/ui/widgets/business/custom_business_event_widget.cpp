@@ -17,6 +17,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+using namespace nx::vms::client::desktop;
+
 namespace {
 
 static const QString kDocumentationScheme = nx::network::http::kSecureUrlSchemeName;
@@ -24,8 +26,10 @@ static const QString kApiDocFragment = "/api-tool/api-createevent-get?version=cu
 
 } // namespace
 
-QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
-    base_type(parent),
+QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(
+    SystemContext* systemContext,
+    QWidget* parent):
+    base_type(systemContext, parent),
     ui(new Ui::CustomBusinessEventWidget)
 {
     using namespace nx::vms::common;

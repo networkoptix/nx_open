@@ -5,6 +5,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -16,7 +18,7 @@ namespace nx::vms::client::desktop::jsapi::detail {
 struct ResourcesApiBackend::Private
 {
     Private(
-        QnWorkbenchContext* context,
+        SystemContext* context,
         ResourcesApiBackend* q);
 
     /**
@@ -26,12 +28,12 @@ struct ResourcesApiBackend::Private
     bool isResourceAvailable(const QnResourcePtr& resource) const;
 
     ResourcesApiBackend* const q;
-    QnWorkbenchContext* const context;
+    SystemContext* const context;
     QnResourcePool* const pool;
 };
 
 ResourcesApiBackend::Private::Private(
-    QnWorkbenchContext* context,
+    SystemContext* context,
     ResourcesApiBackend* q)
     :
     q(q),
@@ -44,7 +46,7 @@ bool ResourcesApiBackend::Private::isResourceAvailable(const QnResourcePtr& reso
 {
     return resource
         && detail::resourceType(resource) != detail::ResourceType::undefined
-        && context->accessController()->hasPermissions(resource, Qn::ViewContentPermission);
+        && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -54,7 +56,7 @@ ResourcesApiBackend::ResourcesApiBackend(
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(context, this))
+    d(new Private(context->systemContext(), this))
 {
     connect(d->pool, &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)

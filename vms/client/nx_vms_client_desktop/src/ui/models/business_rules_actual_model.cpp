@@ -3,16 +3,12 @@
 #include "business_rules_actual_model.h"
 
 #include <api/common_message_processor.h>
-
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_event_rules_manager.h>
-
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/rule_manager.h>
-
-#include <common/common_module.h>
-
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx;
@@ -20,7 +16,7 @@ using namespace nx;
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
     QnBusinessRulesViewModel(parent)
 {
-    auto eventRuleManager = commonModule()->eventRuleManager();
+    auto eventRuleManager = systemContext()->eventRuleManager();
 
     connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
         this, &QnBusinessRulesActualModel::at_ruleAddedOrUpdated);
@@ -36,7 +32,7 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
 
 void QnBusinessRulesActualModel::reset()
 {
-    at_rulesReset(commonModule()->eventRuleManager()->rules());
+    at_rulesReset(systemContext()->eventRuleManager()->rules());
 }
 
 void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)

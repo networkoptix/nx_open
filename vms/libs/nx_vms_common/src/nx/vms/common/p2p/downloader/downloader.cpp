@@ -5,17 +5,17 @@
 #include <QtCore/QHash>
 
 #include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/delayed.h>
-#include <common/common_module.h>
 
+#include "private/internet_only_peer_manager.h"
+#include "private/resource_pool_peer_manager.h"
 #include "private/storage.h"
 #include "private/worker.h"
-#include "private/resource_pool_peer_manager.h"
-#include "private/internet_only_peer_manager.h"
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -28,7 +28,6 @@ public:
 
     void startDownload(const QString& fileName);
     void stopDownload(const QString& fileName, bool emitSignals = true);
-    void handleFileAdded(const FileInformation& fileInformation);
 
 public:
     nx::Mutex mutex;
@@ -71,7 +70,7 @@ void Downloader::Private::startDownload(const QString& fileName)
         fileName,
         storage.data(),
         peerManagers,
-        q->peerId());
+        q->systemContext()->peerId());
     workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,
@@ -111,12 +110,12 @@ void Downloader::Private::stopDownload(const QString& fileName, bool emitSignals
 
 Downloader::Downloader(
     const QDir& downloadsDirectory,
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const QList<AbstractPeerManager*>& peerManagers,
     QObject* parent)
     :
     QObject(parent),
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
     NX_DEBUG(this, "Created");
@@ -146,9 +145,9 @@ Downloader::Downloader(
     d->peerManagers = peerManagers;
     if (peerManagers.isEmpty())
     {
-        d->peerManagers.append(new ResourcePoolPeerManager(commonModule));
+        d->peerManagers.append(new ResourcePoolPeerManager(systemContext));
         d->peerManagers.append(new InternetOnlyPeerManager());
-        d->peerManagers.append(new ResourcePoolProxyPeerManager(commonModule));
+        d->peerManagers.append(new ResourcePoolProxyPeerManager(systemContext));
     }
 }
 

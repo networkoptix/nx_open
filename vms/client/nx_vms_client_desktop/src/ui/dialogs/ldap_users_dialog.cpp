@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -49,7 +50,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
-    const auto settings = globalSettings()->ldapSettings();
+    const auto settings = systemSettings()->ldapSettings();
 
     if (!settings.isValid(/*checkPassword*/ false))
     {
@@ -150,7 +151,7 @@ void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
 
 void QnLdapUsersDialog::updateExistingUsers(const nx::vms::api::LdapUserList& users)
 {
-    auto connection = messageBusConnection();
+    auto connection = systemContext()->messageBusConnection();
     if (!connection)
         return;
 
@@ -186,7 +187,7 @@ void QnLdapUsersDialog::updateExistingUsers(const nx::vms::api::LdapUserList& us
 
 void QnLdapUsersDialog::importUsers(const nx::vms::api::LdapUserList& users)
 {
-    auto connection = messageBusConnection();
+    auto connection = systemContext()->messageBusConnection();
     if (!connection)
         return;
 

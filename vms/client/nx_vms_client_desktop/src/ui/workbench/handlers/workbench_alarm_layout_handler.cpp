@@ -24,11 +24,10 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -68,11 +67,11 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (m_alarmLayoutId.isNull())
                 return;
 
-            auto alarmLayout = resourcePool()->getResourceById<QnLayoutResource>(m_alarmLayoutId);
-            if (const auto wbLayout = QnWorkbenchLayout::instance(alarmLayout))
+            if (auto alarmLayout =
+                resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId))
             {
-                workbench()->removeLayout(wbLayout);
-                resourcePool()->removeResource(wbLayout->resource());
+                workbench()->removeLayout(alarmLayout);
+                resourcePool()->removeResource(alarmLayout);
                 m_alarmLayoutId = {};
             }
         });
@@ -268,13 +267,12 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
             static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
     }
 
-    auto workbenchAlarmLayout = QnWorkbenchLayout::instance(alarmLayout);
+    auto workbenchAlarmLayout = workbench()->layout(alarmLayout);
     if (!workbenchAlarmLayout)
     {
         // If user have closed alarm layout, all cameras must be removed.
         alarmLayout->setItems(QnLayoutItemDataMap());
-        workbenchAlarmLayout = qnWorkbenchLayoutsFactory->create(alarmLayout, workbench());
-        workbench()->addLayout(workbenchAlarmLayout);
+        workbenchAlarmLayout = workbench()->addLayout(alarmLayout);
     }
 
     return workbenchAlarmLayout;
@@ -288,11 +286,11 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const
     if (m_alarmLayoutId.isNull())
         return false;
 
-    auto alarmLayout = resourcePool()->getResourceById<QnLayoutResource>(m_alarmLayoutId);
+    auto alarmLayout = resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId);
     if (!alarmLayout)
         return false;
 
-    return QnWorkbenchLayout::instance(alarmLayout);
+    return workbench()->layout(alarmLayout) != nullptr;
 }
 
 void QnWorkbenchAlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *layout,

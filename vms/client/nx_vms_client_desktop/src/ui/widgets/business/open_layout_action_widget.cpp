@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
@@ -25,8 +26,11 @@ using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
-OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
-    base_type(parent),
+OpenLayoutActionWidget::OpenLayoutActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::OpenLayoutActionWidget)
 {
     ui->setupUi(this);
@@ -42,7 +46,7 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
 
     setSubjectsButton(ui->selectUsersButton);
 
-    m_validator = new QnLayoutAccessValidationPolicy(commonModule());
+    m_validator = new QnLayoutAccessValidationPolicy(systemContext);
     setValidationPolicy(m_validator); //< Takes ownership, so we use raw pointer here.
 
     connect(ui->rewindForWidget, &RewindForWidget::valueEdited, this,
@@ -157,7 +161,7 @@ void OpenLayoutActionWidget::checkWarnings()
     bool foundUserWarning = false;
     bool foundLayoutWarning = false;
 
-    auto accessManager = commonModule()->resourceAccessManager();
+    auto accessManager = resourceAccessManager();
 
     int noAccess = 0;
     bool othersLocal = false;
@@ -230,8 +234,11 @@ std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelected
 
         for (const auto& roleId: roles)
         {
-            for (const auto& subject: resourceAccessSubjectsCache()->allUsersInRole(roleId))
+            for (const auto& subject:
+                systemContext()->resourceAccessSubjectsCache()->allUsersInRole(roleId))
+            {
                 users.append(subject.user());
+            }
         }
 
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });

@@ -35,7 +35,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/viewport_animator.h>
@@ -57,7 +56,6 @@
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -71,8 +69,10 @@
 #include "panels/left_workbench_panel.h"
 #include "panels/notifications_workbench_panel.h"
 #include "panels/resource_tree_workbench_panel.h"
+#include "panels/special_layout_panel.h"
 #include "panels/timeline_workbench_panel.h"
 #include "panels/title_workbench_panel.h"
+#include "workbench.h"
 
 namespace nx::vms::client::desktop {
 
@@ -322,7 +322,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     // TODO: #ynikitenkov before final commit: add currentLayoutFlags to the workbench()?
     // Possibly it should be used in several places
-    m_connections << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+    m_connections << connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         [this]()
         {
             const auto layout = workbench()->currentLayout();
@@ -333,7 +333,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
                 this, &WorkbenchUi::updateControlsVisibilityAnimated);
         });
 
-    m_connections << connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    m_connections << connect(workbench(), &Workbench::currentLayoutChanged, this,
         [this]()
         {
             const auto layout = workbench()->currentLayout();
@@ -373,7 +373,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     updateAutoFpsLimit();
 
     m_connections << connect(workbench(),
-        &QnWorkbench::currentLayoutItemsChanged,
+        &Workbench::currentLayoutItemsChanged,
         this,
         &WorkbenchUi::updateAutoFpsLimit);
 

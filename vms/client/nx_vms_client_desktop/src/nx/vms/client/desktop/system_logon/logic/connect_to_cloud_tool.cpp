@@ -158,7 +158,7 @@ void ConnectToCloudTool::onCloudAuthDataReady()
     m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
 
     SystemRegistrationData sysRegistrationData;
-    sysRegistrationData.name = globalSettings()->systemName().toStdString();
+    sysRegistrationData.name = systemSettings()->systemName().toStdString();
     sysRegistrationData.customization = nx::branding::customization().toStdString();
 
     const auto handler = nx::utils::AsyncHandlerExecutor(this).bind(

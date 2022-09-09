@@ -1,19 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "buzzer_business_action_widget.h"
-
 #include "ui_buzzer_business_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <QtCore/QScopedValueRollback>
-
 namespace nx::vms::client::desktop {
 
-BuzzerBusinessActionWidget::BuzzerBusinessActionWidget(QWidget* parent):
-    base_type(parent),
+BuzzerBusinessActionWidget::BuzzerBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::BuzzerBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -58,7 +61,7 @@ void BuzzerBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (fields.testFlag(Field::eventType))
     {
         const bool hasToggleState = vms::event::hasToggleState(
-            model()->eventType(), model()->eventParams(), commonModule());
+            model()->eventType(), model()->eventParams(), systemContext());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

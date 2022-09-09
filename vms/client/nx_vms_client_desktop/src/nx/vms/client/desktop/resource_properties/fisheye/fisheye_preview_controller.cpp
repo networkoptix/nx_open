@@ -3,13 +3,12 @@
 #include "fisheye_preview_controller.h"
 
 #include <core/resource/media_resource.h>
-#include <ui/graphics/items/resource/resource_widget.h>
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-
-#include <nx/vms/api/data/dewarping_data.h>
 
 namespace nx::vms::client::desktop {
 

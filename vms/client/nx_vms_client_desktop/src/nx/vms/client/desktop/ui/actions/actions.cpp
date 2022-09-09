@@ -4,15 +4,16 @@
 
 #include <QtCore/QMetaEnum>
 
-#include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_factories.h>
@@ -334,7 +335,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Browse Local Files"))
         .toggledText(ContextMenu::tr("Show Welcome Screen"))
-        .condition(new BrowseLocalFilesCondition());
+        .condition(!condition::isLoggedIn());
 
     factory()
         .flags(Main | Tree)

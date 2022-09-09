@@ -1,8 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "multi_server_updates_widget.h"
-
-#include "client/client_globals.h"
 #include "ui_multi_server_updates_widget.h"
 
 #include <functional>
@@ -16,11 +14,10 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -38,6 +35,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -50,6 +48,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/connection_diagnostics_helper.h>
 
+#include "client/client_globals.h"
 #include "peer_state_tracker.h"
 #include "server_status_delegate.h"
 #include "server_update_tool.h"
@@ -162,7 +161,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_serverUpdateTool = watcher->getServerUpdateTool();
     NX_ASSERT(m_serverUpdateTool);
 
-    m_clientUpdateTool.reset(new ClientUpdateTool(this));
+    m_clientUpdateTool.reset(new ClientUpdateTool(systemContext(), this));
     m_updateCheck = watcher->takeUpdateCheck();
 
     m_stateTracker = m_serverUpdateTool->getStateTracker();
@@ -280,7 +279,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
-    connect(globalSettings(), &SystemSettings::cloudSettingsChanged, this,
+    connect(systemSettings(), &SystemSettings::cloudSettingsChanged, this,
         [this]()
         {
             if (m_widgetState != WidgetUpdateState::ready
@@ -333,10 +332,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         this, &MultiServerUpdatesWidget::atStartInstallComplete,
         Qt::ConnectionType::QueuedConnection);
 
-    connect(globalSettings(), &SystemSettings::localSystemIdChanged, this,
+    connect(systemSettings(), &SystemSettings::localSystemIdChanged, this,
         [this]()
         {
-            auto systemId = globalSettings()->localSystemId();
+            auto systemId = systemSettings()->localSystemId();
             NX_DEBUG(this, "localSystemId is changed to %1. Need to refresh server list", systemId);
             if (systemId.isNull())
             {
@@ -426,7 +425,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateCheckTimer.get(), &QTimer::timeout,
         this, &MultiServerUpdatesWidget::atUpdateCurrentState);
 
-    if (const auto connection = messageBusConnection())
+    if (const auto connection = systemContext()->messageBusConnection())
     {
         const nx::vms::api::ModuleInformation& moduleInformation = connection->moduleInformation();
 

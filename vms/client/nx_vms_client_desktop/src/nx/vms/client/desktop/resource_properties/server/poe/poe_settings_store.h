@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
 #include <nx/utils/impl_ptr.h>
 
-class QnCommonModuleAware;
+class QnResourcePool;
 namespace nx::vms::api { struct NetworkBlockData; };
 
 namespace nx::vms::client::desktop {
@@ -23,7 +23,7 @@ class PoeSettingsStore: public QObject
 
 public:
     PoeSettingsStore(
-        QnCommonModuleAware* commonModuleAware,
+        QnResourcePool* resourcePool,
         QObject* parent = nullptr);
 
     void setStores(
