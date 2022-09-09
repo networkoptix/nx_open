@@ -635,12 +635,18 @@ bool QnAviArchiveDelegate::findStreams()
     return m_streamsFound;
 }
 
+void QnAviArchiveDelegate::setForcedVideoChannelsCount(int videoChannels)
+{
+    m_forceVideoChannelsCount = videoChannels;
+}
+
 void QnAviArchiveDelegate::initLayoutStreams()
 {
     int videoNum= 0;
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
     m_hasVideo = false;
+
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -666,6 +672,12 @@ void QnAviArchiveDelegate::initLayoutStreams()
         default:
             break;
         }
+
+        // Ffmpeg has a bug when mux AAC into mkv, see
+        // https://github.com/HandBrake/HandBrake/issues/2809.
+        // So force video channles count from resource video layout.
+        if (m_forceVideoChannelsCount.has_value() && m_forceVideoChannelsCount <= videoNum)
+            break;
     }
 
     lastStreamID = -1;

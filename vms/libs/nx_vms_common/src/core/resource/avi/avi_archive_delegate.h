@@ -72,6 +72,7 @@ public:
     */
     qint64 seekWithFallback(qint64 time, bool findIFrame);
 
+    void setForcedVideoChannelsCount(int videoChannels);
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual AudioLayoutConstPtr getAudioLayout() override;
     virtual bool hasVideo() const override;
@@ -152,6 +153,7 @@ private:
     double m_speed = 1.0;
     BeforeOpenInputCallback m_beforeOpenInputCallback = nullptr;
     bool m_readFailed = false;
+    std::optional<int> m_forceVideoChannelsCount;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
