@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation>使用硬體解碼影片</translation>
+      <translation>使用硬體加速進行影像解碼</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
@@ -360,7 +360,7 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation>區域寬度</translation>
+      <translation>書籤顯示寬度</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -368,7 +368,7 @@
     </message>
     <message>
       <source>Include description</source>
-      <translation>包含說明</translation>
+      <translation>包含書籤描述內容</translation>
     </message>
   </context>
   <context>
@@ -536,7 +536,7 @@
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation>停用次串流</translation>
+      <translation>停用攝影機的次串流</translation>
     </message>
     <message>
       <source>Motion Detection</source>
@@ -560,11 +560,11 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義 ID</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>信任攝影機的時間戳記</translation>
+      <translation>使用攝影機所提供的時間戳記</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
@@ -580,7 +580,7 @@
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation>在匯入檔案時偵測到移動</translation>
+      <translation>匯入檔案時，同時進行移動偵測。</translation>
     </message>
     <message>
       <source>Stream Settings</source>
@@ -592,7 +592,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>使用Media2服務取得串流設定</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -695,7 +695,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義 ID</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation>編輯串流......</translation>
+      <translation>編輯串流網址......</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
@@ -815,7 +815,7 @@
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation>串流地址</translation>
+      <translation>串流網址</translation>
     </message>
   </context>
   <context>
@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>Make read-only</source>
-      <translation>建立為唯獨模式</translation>
+      <translation>設定為唯讀模式</translation>
     </message>
   </context>
   <context>
@@ -1083,15 +1083,15 @@
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation>套用過濾器</translation>
+      <translation>套用影像強化設定</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>翻轉、魚眼攤平校正及影像強化等.</translation>
+      <translation>影像旋轉、魚眼攤平校正及影像強化等.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>套用的過濾器和新增的浮水印需要轉碼. 這會增加CPU使用率且可能需要很長時間.</translation>
+      <translation>若匯出時有套用影像強化設定或使用者自訂內容(如文字，圖片或書籤內容等)，則此影像需要重新編碼。CPU使用率會暫時提高且需要較長時間來完成。</translation>
     </message>
   </context>
   <context>
@@ -1113,7 +1113,7 @@
     </message>
     <message>
       <source>Single Camera</source>
-      <translation>單支攝影機</translation>
+      <translation>單ㄧ影像</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -1121,7 +1121,7 @@
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>多支影像</translation>
+      <translation>複數影像</translation>
     </message>
   </context>
   <context>
@@ -1296,7 +1296,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation>透明度</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1326,7 +1326,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation>關於</translation>
+      <translation>資訊</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1403,7 +1403,7 @@
     </message>
     <message>
       <source>Width</source>
-      <translation>宽度</translation>
+      <translation>寬度</translation>
     </message>
     <message>
       <source>Height</source>
@@ -1411,7 +1411,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義ID</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation>最小網格尺寸</translation>
+      <translation>最小影像顯示網格尺寸</translation>
     </message>
   </context>
   <context>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>僅使用HTTPS協定與攝影機進行連線</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2438,7 +2438,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>若攝影機不支援 HTTPS ，則無法與攝影機進行連線。</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -3054,7 +3054,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation>透明度</translation>
     </message>
     <message>
       <source>Frequency</source>

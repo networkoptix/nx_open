@@ -8655,7 +8655,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation>既存のシステムURL</translation>
+      <translation>既存のシステムのURL</translation>
     </message>
     <message>
       <source>Merge with %1</source>
