@@ -6,11 +6,11 @@ nx_configure_file(${customization_dir}/license.html
     ${distribution_output_dir}/eula-${customization.eulaVersion}.html)
 nx_copy(${customization_dir}/description.json DESTINATION ${distribution_output_dir})
 if(WINDOWS)
-    add_subdirectory(wix)
+    nx_add_subdirectories_for_flavors(wix)
 elseif(platform STREQUAL "linux")
     nx_add_subdirectories_for_flavors(deb)
 elseif(MACOSX)
-    add_subdirectory(dmg)
+    nx_add_subdirectories_for_flavors(dmg)
 endif()
 
 if(withUnitTestsArchive)
