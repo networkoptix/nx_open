@@ -746,6 +746,10 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
             if (target->hasFlags(Qn::user))
                 return InvisibleAction;
 
+            /* According to the specification cross system resources mustn't have 'rename' context menu action. */
+            if (target->hasFlags(Qn::cross_system))
+                return InvisibleAction;
+
             /* Edge servers renaming is forbidden. */
             if (QnMediaServerResource::isEdgeServer(target))
                 return InvisibleAction;
