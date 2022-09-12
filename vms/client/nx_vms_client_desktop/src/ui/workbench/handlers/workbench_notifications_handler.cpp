@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/strings_helper.h>
@@ -52,7 +53,6 @@
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-#include <utils/resource_property_adaptors.h>
 
 using namespace std::chrono;
 
@@ -83,7 +83,7 @@ QString toString(vms::event::AbstractActionPtr action)
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
     QnSessionAwareDelegate(parent),
-    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
+    m_adaptor(new nx::vms::common::BusinessEventFilterResourcePropertyAdaptor(this))
 {
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
     static_cast<void>(sessionDelegate); //< Debug?
