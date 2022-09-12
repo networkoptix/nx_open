@@ -14,7 +14,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
+#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/event/migration_utils.h>
 
 #include "action_field.h"
 #include "action_fields/optional_time_field.h"
@@ -30,6 +32,11 @@
 namespace nx::vms::rules {
 
 namespace {
+
+static const QSet<QString> kAllowedEvents = {
+    "nx.events.debug",
+    "nx.events.test",
+};
 
 /** Keep in sync with hasAccessToSource() in the old engine. */
 EventPtr permissionFilter(
@@ -113,7 +120,6 @@ EventPtr permissionFilter(
             return {};
         }
     }
-
 
     if (!filteredFields.empty())
     {
@@ -381,6 +387,7 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
     };
 
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
+    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor userFilter;
 
     QSignalBlocker signalBlocker{targetUsersField};
 
@@ -388,6 +395,17 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
     // appropriate rights to see the event details.
     for (const auto& user: targetUsersField->users())
     {
+        if (!kAllowedEvents.contains(aggregatedEvent->type()))
+        {
+            userFilter.setResource(user);
+            if (!userFilter.isAllowed(nx::vms::event::convertEventType(aggregatedEvent->type())))
+            {
+                NX_VERBOSE(this, "Event %1 is filtered by user %2",
+                    aggregatedEvent->type(), user->getName());
+                continue;
+            }
+        }
+
         // Checks whether the user has rights to view the event. At the moment only cameras are
         // required to be checked.
         auto filteredAggregatedEvent = aggregatedEvent->filtered(

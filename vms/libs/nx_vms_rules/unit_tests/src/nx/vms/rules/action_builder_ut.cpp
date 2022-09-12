@@ -1,14 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <thread>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <thread>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
@@ -17,6 +18,8 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
+#include <nx/vms/rules/events/server_failure_event.h>
+#include <nx/vms/rules/events/server_started_event.h>
 #include <nx/vms/rules/utils/field.h>
 #include <utils/common/synctime.h>
 
@@ -50,7 +53,11 @@ class ActionBuilderTest:
     public TestPlugin
 {
 public:
-    ActionBuilderTest() : TestPlugin(engine.get()) {}
+    ActionBuilderTest() : TestPlugin(engine.get())
+    {
+        registerEvent<ServerStartedEvent>();
+        registerEvent<ServerFailureEvent>();
+    }
 
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
     {
@@ -400,6 +407,29 @@ TEST_F(ActionBuilderTest, userWithoutPermissionsReceivesNoAction)
 
     auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
     builder->process(eventAggregator);
+}
+
+TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
+{
+    using nx::vms::event::EventType;
+    using namespace std::chrono;
+
+    auto user1 = addUser(GlobalPermission::admin);
+    auto filterProp = nx::vms::common::BusinessEventFilterResourcePropertyAdaptor();
+
+    filterProp.setResource(user1);
+    filterProp.setWatchedEvents({EventType::serverStartEvent});
+
+    UuidSelection selection{.ids = {user1->getId()}};
+    auto builder = makeBuilderWithTargetUserField(selection);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(1);
+
+    builder->process(AggregatedEventPtr::create(EventPtr(
+        new ServerStartedEvent(0ms, QnUuid()))));
+    builder->process(AggregatedEventPtr::create(EventPtr(
+        new ServerFailureEvent(0ms, QnUuid(), nx::vms::api::EventReason::none))));
 }
 
 TEST_F(ActionBuilderTest, builderWithoutIntervalNotAggregatesEvents)
