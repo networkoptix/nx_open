@@ -345,8 +345,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     logicalIdHint->setHintText(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
-    ui->disableAutoExportCheckBox->setHint(tr("Video recorded on the internal camera's "
-        "storage will not be uploaded to the main archive automatically."));
+    ui->disableAutoExportCheckBox->setHint(tr("Server will not push time settings to the camera."));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
