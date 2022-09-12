@@ -128,6 +128,8 @@ namespace ResourcePropertyKey
      */
     static const QString kRemoteArchiveSynchronizationEnabledOnce("remoteArchiveSynchronizationEnabledOnce");
 
+    static const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDueToRemoteArchiveSync");
+
     namespace Onvif
     {
         static const QString kMediaUrl("MediaUrl");
