@@ -134,6 +134,11 @@ static const QString kRemoteArchiveSynchronizationDisabled("remoteArchiveSynchro
  */
 static const QString kRemoteArchiveSynchronizationEnabledOnce("remoteArchiveSynchronizationEnabledOnce");
 
+/**
+ * Whether to download remote (i.e. on-camera) archives.
+ */
+static const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDueToRemoteArchiveSync");
+
 namespace Onvif {
 
 static const QString kMediaUrl = "MediaUrl";
