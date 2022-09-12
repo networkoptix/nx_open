@@ -543,8 +543,10 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // ONVIF Profile G remote archive automatic export.
 
     ui->remoteArchiveAutoExportGroupBox->setVisible(remoteArchiveMdSupported);
-    ui->disableAutoExportCheckBox->setChecked(
-        state.expert.remoteArchiveAutoExportDisabled.valueOr(false));
+
+    check_box_utils::setupTristateCheckbox(
+        ui->disableAutoExportCheckBox,
+        state.expert.remoteArchiveAutoExportDisabled);
 
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
