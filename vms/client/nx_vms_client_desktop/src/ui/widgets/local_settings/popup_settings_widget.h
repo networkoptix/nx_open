@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QWidget>
 
-#include <nx/vms/event/event_fwd.h>
 #include <health/system_health.h>
-
+#include <nx/vms/event/event_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -15,9 +14,8 @@ namespace Ui {
 class PopupSettingsWidget;
 }
 
-namespace nx { namespace vms { namespace event { class StringsHelper; }}}
-
-class QnBusinessEventsFilterResourcePropertyAdaptor;
+namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
+namespace nx::vms::event { class StringsHelper; }
 
 class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
@@ -40,7 +38,7 @@ private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
     QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
     QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
-    QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
+    nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
 };

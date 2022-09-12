@@ -27,7 +27,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <utils/resource_property_adaptors.h>
 
 using namespace std::chrono;
 using namespace nx::vms::common::ptz;

@@ -84,7 +84,6 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/util.h>
-#include <utils/resource_property_adaptors.h>
 
 #include "toggle.h"
 #include "workbench.h"

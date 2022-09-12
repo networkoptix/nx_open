@@ -24,7 +24,8 @@ public:
     MockActionBuilderEvents(ActionBuilder* builder):
         m_builder(builder)
     {
-        connect(m_builder, &ActionBuilder::action, this, &MockActionBuilderEvents::onAction, Qt::DirectConnection);
+        connect(m_builder, &ActionBuilder::action, this,
+            &MockActionBuilderEvents::onAction, Qt::DirectConnection);
     }
 
 private:

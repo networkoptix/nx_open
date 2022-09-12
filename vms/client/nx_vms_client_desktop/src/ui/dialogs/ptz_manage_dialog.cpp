@@ -3,43 +3,33 @@
 #include "ptz_manage_dialog.h"
 #include "ui_ptz_manage_dialog.h"
 
-#include <nx/utils/uuid.h>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QScopedValueRollback>
-
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <client/client_settings.h>
 #include <common/common_globals.h>
-
-#include <core/resource/resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_tour.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
-
-#include <client/client_settings.h>
-
-#include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
-
 #include <nx/utils/string.h>
-
-#include <utils/common/event_processors.h>
-#include <utils/resource_property_adaptors.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/ptz/helpers.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
-
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
-#include <ui/widgets/ptz_tour_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/skin.h>
-
+#include <ui/widgets/ptz_tour_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <utils/common/event_processors.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;

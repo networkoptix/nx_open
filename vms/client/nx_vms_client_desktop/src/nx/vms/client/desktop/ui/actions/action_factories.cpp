@@ -34,7 +34,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/resource_property_adaptors.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
