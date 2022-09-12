@@ -49,6 +49,8 @@ enum MessageType
     replacedDeviceDiscovered = 23, //< Camera discovered is currently replaced by the given one.
 
     RemoteArchiveSyncAvailable = 24,
+    RemoteArchiveSyncStopSchedule = 25,
+    RemoteArchiveSyncStopAutoMode = 26,
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
