@@ -18,6 +18,9 @@ struct Builder::Context
 
     std::vector<aio::AbstractAioThread*> aioThreads;
     std::vector<aio::AbstractAioThread*>::iterator nextAioThreadIt;
+
+    Context(const Settings& settings, MultiEndpointServer* server):
+        settings(settings), server(server) {}
 };
 
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::build(
@@ -89,7 +92,7 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
 {
     auto server = std::make_unique<MultiEndpointServer>(requestHandler);
 
-    Context context{.settings = settings, .server = server.get(), .listeningConcurrency = 0};
+    Context context(settings, server.get());
     if (!applySettings(&context, settings.endpoints))
         return {nullptr, SystemError::getLastOSErrorCode()};
     configureServerUrls(&context, false);
@@ -109,7 +112,7 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
         requestHandler,
         std::move(httpsContext));
 
-    Context context{.settings = settings, .server = server.get(), .listeningConcurrency = 0};
+    Context context(settings, server.get());
     if (!applySettings(&context, settings.ssl.endpoints))
         return {nullptr, SystemError::getLastOSErrorCode()};
     configureServerUrls(&context, true);
