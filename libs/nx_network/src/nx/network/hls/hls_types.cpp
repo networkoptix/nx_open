@@ -16,8 +16,8 @@ QString timeZoneOffsetString(QDateTime dt1)
     const int offsetSeconds = dt2.secsTo(dt1);
 
     const QChar sign = offsetSeconds >= 0 ? '+' : '-';
-    const int hours = offsetSeconds / 3600;
-    const int minutes = (offsetSeconds % 3600) / 60;
+    const int hours = std::abs(offsetSeconds) / 3600;
+    const int minutes = (std::abs(offsetSeconds) % 3600) / 60;
     return QString("%1%2:%3").arg(sign).arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 }
 
