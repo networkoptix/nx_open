@@ -219,7 +219,7 @@ QString SystemHealthListModel::Private::text(int index) const
         }
 
         case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return tr("SD archive found");
+            return tr("On-device recordings were found");
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Export in progress...");
         case QnSystemHealth::RemoteArchiveSyncFinished:
