@@ -30,9 +30,10 @@
 
 namespace {
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::entity_item_model;
 using namespace nx::vms::client::desktop::entity_resource_tree;
-using namespace nx::vms::common;
+using nx::vms::common::SystemSettings;
 
 //-------------------------------------------------------------------------------------------------
 // Provider and invalidator pair factory functions for the header system name name generic item.
@@ -133,20 +134,19 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
     return
         [systemId]
         {
-            namespace desktop = nx::vms::client::desktop;
-            auto context = desktop::appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
 
             if (NX_ASSERT(context))
             {
                 const auto status = context->status();
-                if (status == desktop::CloudCrossSystemContext::Status::connectionFailure)
+                if (status == CloudCrossSystemContext::Status::connectionFailure)
                 {
                     return static_cast<int>(
                         QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
                 }
 
-                if (status == desktop::CloudCrossSystemContext::Status::unsupportedPermanently
-                    || status == desktop::CloudCrossSystemContext::Status::unsupportedTemporary)
+                if (status == CloudCrossSystemContext::Status::unsupportedPermanently
+                    || status == CloudCrossSystemContext::Status::unsupportedTemporary)
                 {
                     return static_cast<int>(
                         QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
@@ -159,17 +159,15 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
 
 InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
 {
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
     auto result = std::make_shared<Invalidator>();
-
-    const auto context = nx::vms::client::desktop::appContext()->cloudCrossSystemManager()
-        ->systemContext(systemId);
 
     if (!NX_ASSERT(context))
         return result;
 
     result->connections()->add(QObject::connect(
         context,
-        &nx::vms::client::desktop::CloudCrossSystemContext::statusChanged,
+        &CloudCrossSystemContext::statusChanged,
         [invalidator = result.get()]
         {
             invalidator->invalidate();
@@ -178,16 +176,23 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
     return result;
 }
 
-GenericItem::FlagsProvider cloudSystemFlagsProvider(const QnSystemDescriptionPtr& systemDescription)
+GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
 {
     return
-        [weakSystemDescription = systemDescription.toWeakRef()]() -> Qt::ItemFlags
+        [systemId]() -> Qt::ItemFlags
         {
-            if (auto systemDescription = weakSystemDescription.lock())
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (NX_ASSERT(context))
             {
-                if (systemDescription->isReachable() && systemDescription->isOnline())
+                const auto status = context->status();
+                if (status == CloudCrossSystemContext::Status::connecting
+                    || status == CloudCrossSystemContext::Status::connectionFailure
+                    || context->isSystemReadyToUse())
+                {
                     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+                }
             }
+
             return Qt::ItemIsSelectable;
         };
 }
@@ -497,7 +502,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withRole(Qn::CloudSystemIdRole, systemId)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
-        .withFlags(cloudSystemFlagsProvider(systemDescription));
+        .withFlags(cloudSystemFlagsProvider(systemId));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUuid)
