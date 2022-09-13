@@ -963,7 +963,7 @@ void QnVirtualCameraResource::setForcedProfile(const QString& token, nx::vms::ap
         token);
 }
 
-QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index)
+QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index) const
 {
     return getProperty(
         index == StreamIndex::primary 

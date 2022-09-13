@@ -244,7 +244,7 @@ public:
     /**
      * Read manually configured profile ID to use. Can be empty.
      */
-    QString forcedProfile(nx::vms::api::StreamIndex index);
+    QString forcedProfile(nx::vms::api::StreamIndex index) const;
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
