@@ -90,7 +90,7 @@ namespace Qn {
         desktop_camera = 1 << 20, /**< Desktop Camera resource */
 
         // Server-only flag.
-        parent_change = 1 << 21, /**< Camera discovery internal purpose. Server-only flag. */
+        need_recreate = 1 << 21, /**< Camera discovery internal purpose. Server-only flag. */
 
         // Server-only flag.
         search_upd_only = 1 << 22, /**< Disable to insert new resource during discovery process,
