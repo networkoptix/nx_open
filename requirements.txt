@@ -1,0 +1,30 @@
+# Please list here only packages, required to build VMS
+
+biplist==1.0.3
+conan==1.46.2
+dmgbuild==1.3.2
+PyYAML==5.1.1
+requests==2.25.1
+cmake==3.22.6
+ninja==1.10.2
+
+## The following requirements were added by pip freeze:
+bottle==0.12.23
+certifi==2022.6.15.1
+chardet==4.0.0
+colorama==0.4.5
+ds-store==1.3.0
+fasteners==0.17.3
+idna==2.10
+Jinja2==3.1.2
+mac-alias==2.2.0
+MarkupSafe==2.1.1
+node-semver==0.6.1
+patch-ng==1.17.4
+pluginbase==1.0.1
+Pygments==2.13.0
+PyJWT==1.7.1
+python-dateutil==2.8.2
+six==1.16.0
+tqdm==4.64.1
+urllib3==1.26.12

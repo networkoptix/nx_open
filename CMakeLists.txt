@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-cmake_minimum_required(VERSION 3.17.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR) #< This version is bundled with MSVC 2019.
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -91,6 +91,11 @@ add_subdirectory(libs)
 
 include(cmake/distribution/common.cmake)
 add_subdirectory(vms)
+
+if(WINDOWS)
+    include(windows_utils)
+    nx_prepare_vs_settings()
+endif()
 
 nx_create_dev_qt_conf()
 
