@@ -25,59 +25,39 @@ is likely that a policy for contributions will be developed and offered in the f
 ---------------------------------------------------------------------------------------------------
 ## Build environment
 
-Currently the following platforms and architectures are supported by this repository:
+Currently the following target platforms and architectures are supported by this repository:
 - Windows x64 (Microsoft Visual Studio).
 - Linux x64 (GCC or Clang).
 - Linux 64-bit ARM (cross-compiling on Linux x64, GCC or Clang).
 - Linux 32-bit ARM (cross-compiling on Linux x64, GCC or Clang).
 - MacOS (Xcode with Clang).
 
-- **Windows**: this guide implies Windows 10 x64 - other versions may require some adaptation. The
-    build can be triggered from the command line of `cmd`, MinGW (Git Bash), or **Cygwin**.
-- **Linux**: this guide implies Ubuntu 18.04 or 20.04 - other flavors/versions may require some
-    adaptation.
-
-Here we describe the pre-requisites which are needed to build all of the Components.
-
-NOTE: Certain Components in this repository can be built using more platforms and compilers, e.g.
+NOTE: Certain components in this repository can be built using more platforms and compilers, e.g.
 the Nx Kit library (`artifacts/nx_kit/`).
 
-Pre-requisites per platform (the details are given in the further subsections):
-- CMake 3.19.0+ (on Windows, comes with Microsoft Visual Studio).
-- Ninja (on Windows, comes with Miscosoft Visual Studio).
-- Python 3.8+.
-- Conan 1.43.x.
-- **Linux:**
-    - `chrpath`.
-    - Certain packages for the build dependencies.
-- **Windows:** Microsoft Visual Studio 2022, Community Edition.
-    - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
-        but its support may be dropped in further branches like `vms_5.0_patch`.
-- **MacOS**:
-    - Xcode 12.5.
-    
-**MacOS**: for easy installation of further build prerequisites, install Homebrew:
+**Windows** host: this guide implies Windows 10 x64 - other versions may require some adaptation.
+The build can be triggered from the command line of `cmd`, MinGW (Git Bash), or **Cygwin**.
+
+**Linux** host: this guide implies Ubuntu 18.04 or 20.04 - other flavors/versions may require some
+adaptation.
+
+**MacOS** host: for easy installation of the further build prerequisites, install Homebrew:
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew update
 ```
 
-### CMake
-
-The Components use CMake as a build system. CMake 3.19.0+ must be installed (the latest stable
-version is recommended) and be available on `PATH` as `cmake`.
-
-- **Linux**: either from https://cmake.org/download/, or from the official Kitware APT repository
-    for Ubuntu (https://apt.kitware.com/). It is recommended to completely remove
-    (`apt purge -y --auto-remove cmake`) the CMake package from the Main repository before
-    installing the one from the Kitware repository.
-- **Windows**: CMake which comes with Microsoft Visual Studio is suitable. If desired, a
-    standalone installation of CMake can be performed from https://cmake.org/download/; after
-    installing, choose "Add CMake to the system PATH for all users" and add the path to `cmake.exe`
-    to `CMakeSettings.json` (see the "Building and debugging in Visual Studio" section of this
-    guide).
-    - ATTENTION: If you use Cygwin, make sure the Cygwin's `cmake` is not on `PATH`.
-- **MacOS**: Download and install the latest stable CMake version from https://cmake.org/download/.
+Pre-requisites needed to build all of the Components (the details on installing are given below):
+- Python 3.8+.
+- CMake 3.20+.
+- Ninja.
+- Conan 1.46.x.
+- **Linux:** Certain packages for the build dependencies.
+- **Windows:** Microsoft Visual Studio 2022, Community Edition.
+    - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branches
+        `vms_5.0`, `vms_5.0_patch` and `vms_5.1`, but its support may be dropped in further
+        branches like `vms_5.1_patch` and `master`.
+- **MacOS**: Xcode 12.5.
 
 ### Python
 
@@ -85,8 +65,8 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
 **MacOS** - as `python3.<minor>`. In this guide we assume its main command is `python`.
 
 - **Windows**: a Windows-native (non-Cygwin) version of Python should be installed. A Cygwin
-    version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes
-    it not visible to Windows-native programs including `cmake`).
+    version of Python may be installed additionally, but must appear on `PATH` as a symlink (this
+    makes it not visible to Windows-native programs including `cmake`).
 - **Linux**:
     - `distutils` and `pip` must be installed explicitly:
         ```
@@ -107,28 +87,34 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
     ```
     brew install python3.9
     python3.9 -m ensurepip
-    ```    
-- Python module `pyaml` should be installed into Python:
-    ```
-    python -m pip install pyaml
     ```
 
-### Conan
+### CMake, Ninja, and Conan
 
-Conan 1.43.x should be installed. It is recommended to install Conan by Python's `pip`:
-- **Windows:**
-    ```
-    python -m pip install markupsafe==2.0.1 conan==1.43.2
-    ```
-- **Linux:**
-    ```
-    python3 -m pip install markupsafe==2.0.1 conan==1.43.2
-    ```
+The file **`requirements.txt`** in the root directory of this repository lists all the Python
+packages that are necessary for the build, including pre-packaged CMake, Ninja and Conan. To
+install them, check out the **`master` branch** (its `requirements.txt` is guaranteed to list the
+proper packages to build any currently supported repository branches), and run the command:
+```
+pip install -r requirements.txt
+```
+Here are the hints for the correct installation on different platforms:
+- **Windows**:
+    - For the correct installation, **`pip`** must be run with **Administrator privileges**: find
+      the Command Prompt in the Start menu, right-click it and choose "Run as administrator" from
+      the menu.
+    - ATTENTION: If you use **Cygwin**, make sure the Cygwin's **`cmake` is not on `PATH`**.
+- **Linux**:
+    - `pip` installs the binaries to `~/.local/bin/`, so make sure this directory is on `PATH`.
 
-NOTE: Conan requires the `markupsafe` package of version no later than 2.0.1.
+Alternatively to using `requirements.txt`, you may install CMake and Ninja manually (just make sure
+they appear on `PATH`) and install the `pyaml` and `conan` Python packages:
+```
+python -m pip install pyaml conan==1.46.2
+```
+On **Windows**, CMake and Ninja which come with Microsoft Visual Studio are suitable.
 
-ATTENTION: `pip` installs package binaries to `~/.local/bin/`, so make sure that this directory is
-on `PATH`.
+### Conan cache
 
 The VMS build system is configured in such a way that Conan stores the downloaded artifacts in the
 `.conan/` directory in the build directory. To avoid re-downloading all the artifacts from the
@@ -139,74 +125,30 @@ directory `conan_cache/` next to the repository root and the build directories.
 ### Build tools
 
 - **Windows**:
-    Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/)
-    **The Workload** "Desktop development with C++" should be installed. Also make sure that in
-    **Individual components**, "C++ CMake tools for Windows" is selected.
+    Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/) and
+    make sure that the following components are selected:
+    - "The Workload" -> "Desktop development with C++"
+    - "Individual components" -> "C++ CMake tools for Windows"
 
 - **Linux**:
-    - Install the `chrpath` tool.
-        ```
-        sudo apt install chrpath
-        ```
-    - Install Ninja build tool using either way:
-        - From https://ninja-build.org/; make sure `ninja` is on `PATH`.
-        - **Ubuntu**: Install via apt:
-            ```
-            sudo apt install ninja-build
-            ```
-        - **MacOS**: Install via Homebrew:
-            ```
-            brew install ninja
-            ```
+    - NOTE: The compiler is downloaded as a Conan artifact during the CMake Generation stage -
+        compilers installed in the Linux system (if any) are not used.
     - Install the following build and runtime dependencies:
-        - zlib: `zlib1g-dev`
-        - OpenAL: `libopenal-dev`
-        - Mesa 3D: `mesa-common-dev`
-        - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
-        - Mesa 3D GLU: `libglu1-mesa-dev`
-        - LDAP: `libldap2-dev`
-        - Xfixes: `libxfixes-dev` (used for cursors)
-        - X11 Screen Saver extension library: `libxss-dev`
-        - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
-        - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
-        - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
-        - Zip archiver: `zip` (command, required for ARM distribution building)
-        - Pkg-config: `pkg-config`
-        - Autoconf: `autoconf`
-        - X C Binding, xinerama extension: `libxcb-xinerama0`
-
-        A typical command to install all of the above via apt:
         ```
-        sudo apt install zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
+        sudo apt install -y \
+            chrpath libtinfo5 zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
             libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
             libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0
-        ```
-    - **Ubuntu 20+**: Install `libtinfo5` library:
-        ```
-        sudo apt install -y libtinfo5
         ```
 
 - **MacOS**:
     - Install the latest Xcode from AppStore.
     - Install the following build dependencies:
-        - zlib: `zlib1g-dev`
-        - OpenAL: `libopenal-dev`
-        - Mesa 3D: `mesa-common-dev`
-        - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
-        - Mesa 3D GLU: `libglu1-mesa-dev`
-        - LDAP: `libldap2-dev`
-        - Xfixes: `libxfixes-dev` (used for cursors)
-        - X11 Screen Saver extension library: `libxss-dev`
-        - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
-        - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
-        - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
-        
-        A typicall command to install all of the above via Homebew:
         ```
-            brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
-                libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
+        brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
+            libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
         ```
-    
+
 ---------------------------------------------------------------------------------------------------
 ## Using CMake
 
@@ -347,13 +289,13 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - **Linux**:
 
     Signing is not required; no tools or instructions are provided.
-    
+
 - **MacOS**:
 
     A signing tool suitable for standalone use is being developed and will likely be provided in
     the future. As for now, you can use your regular signing procedure that you involve for your
     other MacOS developments.
-    
+
 ---------------------------------------------------------------------------------------------------
 ## Running VMS Desktop Client
 
@@ -361,7 +303,7 @@ The VMS Desktop Client can be run directly from the build directory, without ins
 distribution package.
 
 After the successful build, the Desktop Client executable is located in `nx_open-build/bin/`; its
-names may depend on the customization package.
+name may depend on the customization package.
 
 For **Linux** and **MacOS**, just run the Desktop Client executable.
 
@@ -403,7 +345,7 @@ IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
 ### Automatic VMS updates
 
 The VMS product includes a comprehensive auto-update support, but this feature is turned off for
-the open-source Desktop Client, because it will simply re-write a custom-built Desktop Client with
+the open-source Desktop Client, because it would simply re-write a custom-built Desktop Client with
 the new version of the Desktop Client built by Nx. Note that the VMS admin still can force such
 an automatic update, with the mentioned consequences.
 
@@ -419,37 +361,29 @@ On Windows, besides the command-line way described above, you can use the Visual
 build and debug the Client.
 
 The build configurations (Debug, Release and the like) used by the IDE are defined in the file
-`CMakeSettings.json` in the repository root directory. Initially, this file is absent - you can
-copy the provided example file `CMakeSettings.json.template` located in the repository root
-directory to `CMakeSettings.json` for a start. For each build configuration, this file defines the
-name of the build directory: in the provided example, it is the source directory appended with
-`-build-debug` for Debug configurations, and `-build` for Release configurations.
-
-If you use a *separately installed CMake* (not the one supplied with Visual Studio), set the
-`cmakeExecutable` parameter in `CMakeSettings.json` for every configuration to the full path to the
-CMake executable; to use the version supplied with Visual Studio, leave this value empty.
+`CMakeSettings.json` in the repository root directory. If absent, this file is created during the
+Generation stage. It defines a build directory name for each build configuration, and a path to
+`cmake.exe` - if you installed CMake manually, write its path to the `cmakeExecutable` parameter.
 
 Open Visual Studio, select "Open a local folder" and choose the repository root folder.
 Alternatively, run `devenv.exe` (Visual Studio IDE executable) supplying the repository root
 directory as an argument.
 
 Right after opening the directory, Visual Studio will start the CMake generation stage using the
-default build configuration - `Debug (minimal)`. If this build configuration is not the desired
-one, in the toolbar at the top of the Visual Studio window, select the desired build configuration;
-the CMake generation stage for the newly selected configuration will be started immediately, using
-the respective build directory defined in `CMakeSettings.json`. The build directory from the
-previously selected configuration (if any) is not needed anymore and can be deleted manually.
+default build configuration - `Debug (minimal)`. If you need another build configuration, select it
+in the Visual Studio main toolbar - the CMake generation stage will be started immediately, and the
+build directory from the previously selected build configuration can be deleted manually.
 
 If you don't need advanced debugging features, you may choose one of the Release configurations -
 the basics of visual debugging like breakpoints and step-by-step execution will work anyway in most
 cases, and the build time and disk usage will be noticeably lower than with a Debug configuration.
 
-After choosing the desired build configuration and successfully finishing the CMake generation
-stage, open the "Solution Explorer" side window, click the "Switch between solutions and available
-views" toolbar button at the top of this side window (looking like a document icon with a Visual
-Studio logo on it), and in the tree below double-click the "CMake Targets View". The CMake
-generation stage will be run again, and when finished, the tree of CMake targets will appear -
-watch the "Output" window for the generation stage progress.
+After successfully finishing the CMake Generation stage, open the "Solution Explorer" side window,
+click the "Switch between solutions and available views" toolbar button at the top of this side
+window (looking like a document icon with a Visual Studio logo on it), and in the tree below
+double-click the "CMake Targets View". The CMake Generation stage will be run again, and when
+finished, the tree of CMake targets will appear - watch the "Output" window for the Generation
+stage progress.
 
 To build the solution, right-click on "vms Project" in "Solution Explorer" and select "Build All".
 Alternatively, build only the required project of the solution, for example, right-click on
@@ -459,24 +393,17 @@ Alternatively, build only the required project of the solution, for example, rig
 
 To be able to run and debug the built Desktop Client from the IDE, the file `launch.vs.json` must
 be created in the `.vs/` directory which Visual Studio creates in the source (repository root)
-directory. You can copy the provided `launch.vs.json.template` example file in the repository root
-directory to `.vs/launch.vs.json`. This file defines the parameters and other details like `PATH`
-for the particular executables of the solution.
+directory. The first run of the CMake Generation stage checks if `.vs/` directory already exists
+and creates `launch.vs.json` file if it is not the case.
 
-Also you need to specify the actual path to the Qt library binaries in the file
-`CMakeSettings.json` in the repository root directory, as follows. First, find the Qt directory
-used by the current build: it is located in the `.conan/` directory inside the build directory, and
-has the path like `.conan/data/qt/#.#.#/_/_/package/.../bin`, where `...` is a checksum, and
-`#.#.#` is the Qt version. Then set the `qtdir` parameter of each configuration in
-`CMakeSettings.json` to its full path.
+Also it is necessary to specify the actual path to the Qt library binaries in the file
+`CMakeSettings.json` in the repository root directory. This is also done automatically by CMake
+during the Generation stage.
 
-ATTENTION: The path to the Qt directory in `CMakeSettings.json` must be adjusted when switching
-between git branches that use different Qt versions.
-
-After performing the above steps, right-click the required executable, e.g. "desktop_client", in
-the "CMake Targets View" of the "Solution Explorer" side window, and select either "Debug" to run
-it immediately, or "Set As Startup Item" to allow running it using the green triangle ("play") icon
-in the toolbar at the top of the main Visual Studio window.
+If all the above steps are performed correctly, you can right-click the required executable, e.g.
+"desktop_client", in the "CMake Targets View" of the "Solution Explorer" side window, and select
+either "Debug" to run it immediately, or "Set As Startup Item" to allow running it using the green
+triangle ("play") icon in the toolbar at the top of the main Visual Studio window.
 
 ---------------------------------------------------------------------------------------------------
 ## Free and Open-Source Software Notices
