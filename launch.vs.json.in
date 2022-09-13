@@ -3,8 +3,8 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
-      "projectTarget": "HD Witness.exe (bin\\HD Witness.exe)",
-      "name": "HD Witness.exe (bin\\HD Witness.exe)",
+      "projectTarget": "@customization.vmsId@.exe (bin\\@customization.vmsId@.exe)",
+      "name": "@customization.vmsId@.exe (bin\\@customization.vmsId@.exe)",
       "args": [],
       "env": "PATH=${env.qtdir};${env.PATH}"
     },
@@ -28,7 +28,7 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
-      "projectTarget": "HD Witness Launcher.exe (bin\\HD Witness Launcher.exe)",
+      "projectTarget": "@customization.vmsId@ Launcher.exe (bin\\@customization.vmsId@ Launcher.exe)",
       "name": "HD Witness Launcher.exe (bin\\HD Witness Launcher.exe)",
       "env": "PATH=${env.qtdir};${env.PATH}"
     },

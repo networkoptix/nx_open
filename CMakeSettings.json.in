@@ -2,7 +2,7 @@
   "configurations": [
    {
       "name": "Debug+ut",
-      "cmakeExecutable": "",
+      "cmakeExecutable": "@CMAKE_EXECUTABLE@",
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
@@ -18,7 +18,7 @@
     },
     {
       "name": "Debug (minimal)",
-      "cmakeExecutable": "",
+      "cmakeExecutable": "@CMAKE_EXECUTABLE@",
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
@@ -34,7 +34,7 @@
     },
     {
       "name": "Release+ut",
-      "cmakeExecutable": "",
+      "cmakeExecutable": "@CMAKE_EXECUTABLE@",
       "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [ "msvc_x64_x64" ],
@@ -50,7 +50,7 @@
     },
     {
       "name": "Release+ut+distrib",
-      "cmakeExecutable": "",
+      "cmakeExecutable": "@CMAKE_EXECUTABLE@",
       "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [ "msvc_x64_x64" ],
