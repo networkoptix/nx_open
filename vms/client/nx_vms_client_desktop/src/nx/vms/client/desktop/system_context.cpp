@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -48,6 +49,7 @@ struct SystemContext::Private
     std::unique_ptr<VideoCache> videoCache;
     std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
+    std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -92,6 +94,7 @@ SystemContext::SystemContext(
             d->videoCache = std::make_unique<VideoCache>(this);
             d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
             d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
+            d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -172,6 +175,11 @@ ShowreelStateManager* SystemContext::showreelStateManager() const
     return d->showreelStateManager.get();
 }
 
+LogsManagementWatcher* SystemContext::logsManagementWatcher() const
+{
+    return d->logsManagementWatcher.get();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
@@ -179,6 +187,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     auto clientMessageProcessor = static_cast<QnClientMessageProcessor*>(messageProcessor);
     d->incompatibleServerWatcher->setMessageProcessor(clientMessageProcessor);
     d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
+    d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
 }
 
 } // namespace nx::vms::client::desktop

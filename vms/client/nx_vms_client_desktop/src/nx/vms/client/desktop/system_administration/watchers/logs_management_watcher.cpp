@@ -723,31 +723,6 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
     settings.mainLog.primaryLevel = nx::utils::log::mainLogger()->defaultLevel();
     d->client->data()->setSettings(settings);
 
-    connect(
-        messageProcessor(),
-        &QnCommonMessageProcessor::initialResourcesReceived,
-        this,
-        [this]
-        {
-            {
-                NX_MUTEX_LOCKER lock(&d->mutex);
-                d->path = "";
-                d->state = State::empty;
-
-                // Reinit client unit.
-                d->client->data()->setChecked(false);
-
-                d->initNotificationManager();
-                d->updateClientLogLevelWarning();
-                d->updateServerLogLevelWarning();
-            }
-
-            emit stateChanged(State::empty);
-            emit selectionChanged(Qt::Unchecked);
-            emit itemListChanged();
-            d->api->loadInitialSettings();
-        });
-
     connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
         {
@@ -816,6 +791,37 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
 
 LogsManagementWatcher::~LogsManagementWatcher()
 {
+}
+
+void LogsManagementWatcher::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
+{
+    if (messageProcessor)
+    {
+        connect(
+            messageProcessor,
+            &QnCommonMessageProcessor::initialResourcesReceived,
+            this,
+            [this]
+            {
+                {
+                    NX_MUTEX_LOCKER lock(&d->mutex);
+                    d->path = "";
+                    d->state = State::empty;
+
+                    // Reinit client unit.
+                    d->client->data()->setChecked(false);
+
+                    d->initNotificationManager();
+                    d->updateClientLogLevelWarning();
+                    d->updateServerLogLevelWarning();
+                }
+
+                emit stateChanged(State::empty);
+                emit selectionChanged(Qt::Unchecked);
+                emit itemListChanged();
+                d->api->loadInitialSettings();
+            });
+    }
 }
 
 QList<LogsManagementUnitPtr> LogsManagementWatcher::items() const
