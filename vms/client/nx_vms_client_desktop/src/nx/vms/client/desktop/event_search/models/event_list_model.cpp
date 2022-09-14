@@ -106,9 +106,29 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::ActionIdRole:
             return QVariant::fromValue(event.actionId);
 
+        case Qn::ForcePreviewLoaderRole:
+            return event.forcePreviewLoader;
+
         default:
             return base_type::data(index, role);
     }
+}
+
+bool EventListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if (!isValid(index))
+        return false;
+
+    if (role == Qn::ForcePreviewLoaderRole)
+    {
+        auto event = d->getEvent(index.row());
+        event.forcePreviewLoader = value.toBool();
+        d->updateEvent(event);
+
+        return true;
+    }
+
+    return base_type::setData(index, value, role);
 }
 
 bool EventListModel::addEvent(const EventData& event, Position where)

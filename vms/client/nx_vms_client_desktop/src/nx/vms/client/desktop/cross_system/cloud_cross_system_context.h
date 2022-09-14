@@ -67,8 +67,9 @@ public:
 
     /**
      * Try to establish connection with user interaction allowed.
+     * Return true if new connection is started.
      */
-    void initializeConnectionWithUserInteraction();
+    bool initializeConnectionWithUserInteraction();
 
     QnVirtualCameraResourcePtr createThumbCameraResource(QnUuid id);
 

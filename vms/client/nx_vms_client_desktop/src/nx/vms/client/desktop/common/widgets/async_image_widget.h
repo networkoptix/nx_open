@@ -109,6 +109,8 @@ public:
     void setPlaceholder(const QString& text);
     const QString& placeholder() const;
 
+    void setForceLoadingIndicator(bool force);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -151,6 +153,7 @@ private:
     QColor m_placeholderBackgroundColor;
     // Force no crop and no highlight for frames potentially pre-cropped by analytics plugin.
     bool m_forceNoCrop = false;
+    bool m_forceLoadingIndicator = false;
 };
 
 } // namespace nx::vms::client::desktop

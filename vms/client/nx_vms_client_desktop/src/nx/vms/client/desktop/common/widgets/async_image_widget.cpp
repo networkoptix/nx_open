@@ -445,7 +445,7 @@ void AsyncImageWidget::setReloadMode(ReloadMode value)
 void AsyncImageWidget::setPlaceholder(const QString& text)
 {
     m_placeholderText = text;
-    
+
     retranslateUi();
     updateThumbnailStatus(m_previousStatus);
 }
@@ -453,6 +453,13 @@ void AsyncImageWidget::setPlaceholder(const QString& text)
 const QString& AsyncImageWidget::placeholder() const
 {
     return m_placeholderText;
+}
+
+void AsyncImageWidget::setForceLoadingIndicator(bool force)
+{
+    m_forceLoadingIndicator = force;
+
+    updateThumbnailStatus(m_previousStatus);
 }
 
 void AsyncImageWidget::updateSizeHint() const
@@ -510,7 +517,12 @@ void AsyncImageWidget::updateCache()
 
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
-    if (!m_placeholderText.isEmpty())
+    if (m_forceLoadingIndicator)
+    {
+        setLoadingIndicationVisible(true);
+        m_placeholder->hide();
+    }
+    else if (!m_placeholderText.isEmpty())
     {
         setLoadingIndicationVisible(false);
         m_placeholder->show();
