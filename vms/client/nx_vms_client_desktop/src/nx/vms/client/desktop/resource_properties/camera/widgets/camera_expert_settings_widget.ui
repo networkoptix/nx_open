@@ -365,7 +365,7 @@
              <item>
               <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
                <property name="title">
-                <string>Export From SD Cards</string>
+                <string>Export From Device</string>
                </property>
                <property name="flat">
                 <bool>true</bool>
