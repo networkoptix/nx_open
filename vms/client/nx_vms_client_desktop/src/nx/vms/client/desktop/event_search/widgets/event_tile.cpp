@@ -80,6 +80,8 @@ static constexpr QMargins kNarrowPreviewMarginsWithoutHeader(0, 0, 0, 0);
 static constexpr QMargins kCloseButtonMarginsWithHeader(0, 6, 2, 0);
 static constexpr QMargins kCloseButtonMarginsWithoutHeader(0, 2, 2, 0);
 
+static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPreviousImage;
+
 void setWidgetHolder(QWidget* widget, QWidget* newHolder)
 {
     auto oldHolder = widget->parentWidget();
@@ -330,7 +332,7 @@ EventTile::EventTile(QWidget* parent):
     ui->wideHolder->hide();
 
     ui->previewWidget->setAutoScaleUp(true);
-    ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
+    ui->previewWidget->setReloadMode(kDefaultReloadMode);
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::always);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
@@ -618,6 +620,15 @@ void EventTile::setPlaceholder(const QString& text)
 
     if (!text.isEmpty())
        setPreview(nullptr, /*forceUpdate*/ true);
+}
+
+void EventTile::setForcePreviewLoader(bool force)
+{
+    ui->previewWidget->setReloadMode(force
+        ? AsyncImageWidget::ReloadMode::showLoadingIndicator
+        : kDefaultReloadMode);
+
+    ui->previewWidget->setForceLoadingIndicator(force);
 }
 
 QRectF EventTile::previewHighlightRect() const

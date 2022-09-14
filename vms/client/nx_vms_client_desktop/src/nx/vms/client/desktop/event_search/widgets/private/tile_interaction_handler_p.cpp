@@ -179,12 +179,28 @@ void TileInteractionHandler::handleClick(
     if (!NX_ASSERT(index.isValid()))
         return;
 
-    if (auto actionSupported = checkActionSupport(index);
-        actionSupported != ActionSupport::supported)
+    switch (checkActionSupport(index))
     {
-        if (actionSupported == ActionSupport::unsupported)
+        case ActionSupport::crossSystem:
             showMessage(tr("This action is not supported for notifications from other Systems"));
-        return;
+            return;
+
+        case ActionSupport::interactionRequired:
+        {
+            const auto cloudSystemId = index.data(Qn::CloudSystemIdRole).toString();
+            if (auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
+            {
+                if (context->initializeConnectionWithUserInteraction())
+                {
+                    auto model = const_cast<QAbstractItemModel*>(index.model());
+                    model->setData(index, true, Qn::ForcePreviewLoaderRole);
+                }
+            }
+            return;
+        }
+
+        case ActionSupport::unsupported:
+            return;
     }
 
     if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
@@ -487,18 +503,15 @@ TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport
     if (const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         previewResource && previewResource->hasFlags(Qn::ResourceFlag::fake))
     {
-        if (auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
-            context->initializeConnectionWithUserInteraction();
-
-        return ActionSupport::cross_system;
+        return ActionSupport::interactionRequired;
     }
 
     auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
     if (actionType == ui::action::BrowseUrlAction)
-        return ActionSupport::cross_system;
+        return ActionSupport::unsupported;
 
     if (actionType != ui::action::NoAction)
-        return ActionSupport::unsupported;
+        return ActionSupport::crossSystem;
 
     return ActionSupport::supported;
 }

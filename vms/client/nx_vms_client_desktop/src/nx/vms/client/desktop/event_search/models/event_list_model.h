@@ -41,6 +41,7 @@ public:
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
         QnUuid ruleId;
+        bool forcePreviewLoader = false; //< Display loader on tile preview.
 
         // Resource data.
         QString cloudSystemId; //< The field is filled in only for events received from cloud.
@@ -65,6 +66,7 @@ public:
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
     virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
