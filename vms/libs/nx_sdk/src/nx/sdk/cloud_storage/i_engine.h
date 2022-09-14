@@ -126,6 +126,26 @@ public:
         const char* deviceId, int64_t timestampUs, MetadataType type, const char* data) = 0;
 
     /**
+     * Add a best shot image to the `ObjectTrack`. `data` is the JSON representation of the
+     * nx::sdk::cloud_storage::Image struct.
+     */
+    public: virtual ErrorCode saveBestShotImage(const char* data) = 0;
+
+    /**
+     * Fetch a best shot image assiciated with the givem objectTrackId. Result string should
+     * contain the JSON representation of the nx::sdk::cloud_storage::Image struct.
+     */
+    public: Result<IString*> fetchBestShotImage(const char* objectTrackId) const
+    {
+        Result<IString*> result;
+        doFetchBestShotImage(objectTrackId, &result);
+        return result;
+    }
+
+    protected: virtual void doFetchBestShotImage(
+        const char* objectTrackId, Result<IString*>* outResult) const = 0;
+
+    /**
      * No IArchiveUpdateHandler::onArchiveUpdated() should be called by the plugin before this
      * function has been called.
      */

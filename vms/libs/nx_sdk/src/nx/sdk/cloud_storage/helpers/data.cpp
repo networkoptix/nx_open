@@ -796,6 +796,26 @@ nx::kit::Json ObjectTrack::to_json() const
         });
 }
 
+BestShotImage::BestShotImage(const nx::kit::Json& json)
+{
+    objectTrackId = getStringValue(json, "objectTrackId");
+    format = getStringValue(json, "format");
+    data64 = getStringValue(json, "data64");
+}
+
+BestShotImage::BestShotImage(const char* jsonData): BestShotImage(parseJson(jsonData))
+{
+}
+
+nx::kit::Json BestShotImage::to_json() const
+{
+    return nx::kit::Json::object({
+        {"objectTrackId", objectTrackId},
+        {"format", format},
+        {"data64", data64},
+        });
+}
+
 AnalyticsLookupResult analyticsLookupResultFromJson(const char* data)
 {
     return objectListFromJson<ObjectTrack>(data);

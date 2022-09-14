@@ -356,6 +356,25 @@ struct ObjectTrack
     BestShot bestShot;
 };
 
+// BestShot image associated with the given ObjectTrack.
+struct BestShotImage
+{
+    BestShotImage() = default;
+    BestShotImage(const nx::kit::Json& json);
+    BestShotImage(const char* jsonData);
+
+    template<typename T>
+    BestShotImage(const T&) = delete;
+
+    nx::kit::Json to_json() const;
+
+    std::string objectTrackId;
+    // Human-readable image format name.
+    std::string format;
+    // Base64 encoded image data.
+    std::string data64;
+};
+
 using AnalyticsLookupResult = std::vector<ObjectTrack>;
 
 AnalyticsLookupResult analyticsLookupResultFromJson(const char* data);
