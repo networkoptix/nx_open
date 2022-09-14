@@ -3,19 +3,22 @@
 #pragma once
 
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui { class LogsManagementWidget; }
 
 namespace nx::vms::client::desktop {
 
-class LogsManagementWidget: public QnAbstractPreferencesWidget
+class LogsManagementWidget:
+    public QnAbstractPreferencesWidget,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit LogsManagementWidget(QWidget* parent = nullptr);
+    explicit LogsManagementWidget(SystemContext* context, QWidget* parent = nullptr);
     virtual ~LogsManagementWidget();
 
     virtual void loadDataToUi() override;

@@ -59,7 +59,6 @@
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
@@ -538,7 +537,6 @@ struct ApplicationContext::Private
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
     std::unique_ptr<QnSystemsWeightsManager> systemsWeightsManager;
-    std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
 
     // Network modules
@@ -613,7 +611,6 @@ ApplicationContext::ApplicationContext(
             d->resourceFactory = std::make_unique<ResourceFactory>();
             d->uploadManager = std::make_unique<UploadManager>();
             d->systemsWeightsManager = std::make_unique<QnSystemsWeightsManager>();
-            d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(currentSystemContext());
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
             break;
         }
@@ -799,11 +796,6 @@ UploadManager* ApplicationContext::uploadManager() const
 QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
 {
     return d->resourceDiscoveryManager.get();
-}
-
-LogsManagementWatcher* ApplicationContext::logsManagementWatcher() const
-{
-    return d->logsManagementWatcher.get();
 }
 
 ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const

@@ -64,7 +64,7 @@ AdvancedSystemSettingsWidget::AdvancedSystemSettingsWidget(
     d(new Private(this))
 {
     d->addTab(tr("Backup and Restore"), new QnDatabaseManagementWidget(this));
-    d->addTab(tr("Logs Management"), new LogsManagementWidget(this));
+    d->addTab(tr("Logs Management"), new LogsManagementWidget(context, this));
 }
 
 AdvancedSystemSettingsWidget::~AdvancedSystemSettingsWidget()

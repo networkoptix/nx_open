@@ -8,20 +8,24 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QFileDialog>
 
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
 
-LogsManagementWidget::LogsManagementWidget(QWidget* parent):
+LogsManagementWidget::LogsManagementWidget(
+    SystemContext* context,
+    QWidget* parent)
+    :
     base_type(parent),
+    SystemContextAware(context),
     ui(new Ui::LogsManagementWidget),
-    m_watcher(appContext()->logsManagementWatcher())
+    m_watcher(context->logsManagementWatcher())
 {
     setupUi();
 }
