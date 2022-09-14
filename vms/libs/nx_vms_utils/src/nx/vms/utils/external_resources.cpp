@@ -3,15 +3,16 @@
 #include "external_resources.h"
 
 #include <algorithm>
-
 #include <QtCore/QCoreApplication>
 #include <QtCore/QResource>
 
-#include <nx/utils/log/assert.h>
-
 #include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::utils {
+
+static Mutex g_resourceMutex;
 
 QDir externalResourcesDirectory()
 {
@@ -32,6 +33,7 @@ QDir externalResourcesDirectory()
 
 bool registerExternalResource(const QString& filename, const QString& mapRoot)
 {
+    NX_MUTEX_LOCKER lock(&g_resourceMutex);
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
     return QResource::registerResource(filePath, mapRoot);
@@ -39,6 +41,7 @@ bool registerExternalResource(const QString& filename, const QString& mapRoot)
 
 bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 {
+    NX_MUTEX_LOCKER lock(&g_resourceMutex);
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
     return QResource::unregisterResource(filePath, mapRoot);
@@ -46,6 +49,7 @@ bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 
 bool registerExternalResourceDirectory(const QString& directory)
 {
+    NX_MUTEX_LOCKER lock(&g_resourceMutex);
     QDir assetsDirectory(externalResourcesDirectory());
     if (!NX_ASSERT(assetsDirectory.cd(directory),
         "Unable to find '%1' in asset directory: %2", directory, assetsDirectory))

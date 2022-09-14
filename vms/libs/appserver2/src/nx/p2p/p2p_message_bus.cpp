@@ -86,10 +86,15 @@ MessageBus::MessageBus(
     TransactionMessageBusBase(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
-    qRegisterMetaType<MessageType>();
-    qRegisterMetaType<ConnectionBase::State>("ConnectionBase::State");
-    qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
-    qRegisterMetaType<QWeakPointer<ConnectionBase>>("QWeakPointer<ConnectionBase>");
+    static const int kMetaTypeRegistrator =
+        []()
+        {
+            qRegisterMetaType<MessageType>();
+            qRegisterMetaType<ConnectionBase::State>("ConnectionBase::State");
+            qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
+            qRegisterMetaType<QWeakPointer<ConnectionBase>>("QWeakPointer<ConnectionBase>");
+            return 0;
+        }();
 
     m_thread->setObjectName("P2pMessageBus");
     connect(m_thread, &QThread::started,
@@ -1248,7 +1253,7 @@ void MessageBus::gotUnicastTransaction(
 }
 
 bool MessageBus::handlePushTransactionList(
-    const P2pConnectionPtr& connection, 
+    const P2pConnectionPtr& connection,
     const QByteArray& data,
     nx::Locker<nx::Mutex>* lock)
 {
