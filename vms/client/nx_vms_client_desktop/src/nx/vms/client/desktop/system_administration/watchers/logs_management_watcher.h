@@ -58,6 +58,8 @@ public:
     LogsManagementWatcher(SystemContext* context, QObject* parent = nullptr);
     ~LogsManagementWatcher();
 
+    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
+
     QList<UnitPtr> items() const;
     QList<UnitPtr> checkedItems() const;
 
