@@ -56,6 +56,7 @@ public:
     void setPreview(ImageProvider* value, bool forceUpdate);
 
     void setPlaceholder(const QString& text);
+    void setForcePreviewLoader(bool force);
 
     QRectF previewHighlightRect() const;
     void setPreviewHighlightRect(const QRectF& relativeRect);

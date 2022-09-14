@@ -383,6 +383,11 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!mediaResource)
         return;
 
+    const bool forcePreviewLoader = modelIndex.data(Qn::ForcePreviewLoaderRole).toBool();
+    widget->setForcePreviewLoader(forcePreviewLoader);
+    if (forcePreviewLoader)
+        return;
+
     if (previewResource->hasFlags(Qn::ResourceFlag::fake))
     {
         widget->setPlaceholder(tr("CLICK TO SHOW"));

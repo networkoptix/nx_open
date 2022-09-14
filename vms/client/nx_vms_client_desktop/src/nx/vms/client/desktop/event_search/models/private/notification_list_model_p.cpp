@@ -190,16 +190,21 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         &QnWorkbenchNotificationsHandler::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationAction);
 
-    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemFound, this,
-        [this](const QString& systemId)
-        {
-            connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
-                &CloudCrossSystemContext::statusChanged, this,
-                [this, systemId]
-                {
-                    updateCloudItems(systemId);
-                });
-        });
+    auto processNewSystem = [this](const QString& systemId)
+    {
+        connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
+            &CloudCrossSystemContext::statusChanged, this,
+            [this, systemId]
+            {
+                updateCloudItems(systemId);
+            });
+    };
+
+    for (const auto& systemId: appContext()->cloudCrossSystemManager()->cloudSystems())
+        processNewSystem(systemId);
+
+    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemFound,
+        this, processNewSystem);
 
     connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemLost, this,
         [this](const QString& systemId)
@@ -215,11 +220,13 @@ NotificationListModel::Private::~Private()
 
 void NotificationListModel::Private::updateCloudItems(const QString& systemId)
 {
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
     for (auto it = m_itemsByCloudSystem.find(systemId);
         it != m_itemsByCloudSystem.end() && it.key() == systemId;
         ++it)
     {
-        q->updateEvent(it.value());
+        q->setData(q->indexOf(it.value()), false, Qn::ForcePreviewLoaderRole);
     }
 }
 
@@ -255,10 +262,19 @@ void NotificationListModel::Private::onNotificationAction(
     NX_VERBOSE(this, "Received action: %1, id: %2, system: %3",
         action->type(), action->id(), cloudSystemId);
 
-    if (!cloudSystemId.isEmpty() && !appContext()->systemContextByCloudSystemId(cloudSystemId))
+    if (!cloudSystemId.isEmpty())
     {
-        NX_VERBOSE(this, "Unknown cloud system, skipping notification");
-        return;
+        using Status = CloudCrossSystemContext::Status;
+
+        const auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
+        const auto status = context ? context->status() : Status::uninitialized;
+
+        if (status == Status::uninitialized || status == Status::unsupportedPermanently
+            || status == Status::unsupportedTemporary)
+        {
+            NX_VERBOSE(this, "Invalid context status: %1, system: %2", status, cloudSystemId);
+            return;
+        }
     }
 
     EventData eventData;

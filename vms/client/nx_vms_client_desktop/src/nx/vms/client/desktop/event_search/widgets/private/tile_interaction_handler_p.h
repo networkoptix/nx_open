@@ -80,7 +80,8 @@ private:
         unsupported,
 
         /** Generally supported, but not for the Cross-System tiles. */
-        cross_system,
+        crossSystem,
+        interactionRequired,
     };
     ActionSupport checkActionSupport(const QModelIndex& index);
 

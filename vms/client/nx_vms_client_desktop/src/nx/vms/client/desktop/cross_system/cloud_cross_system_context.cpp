@@ -174,76 +174,84 @@ struct CloudCrossSystemContext::Private
         emit q->statusChanged();
     }
 
-    void ensureConnection(bool allowUserInteraction = false)
+    /** Returns true if new connection is started. */
+    bool ensureConnection(bool allowUserInteraction = false)
     {
         if (!ini().crossSystemLayouts)
-            return;
+            return false;
 
         if (status == Status::unsupportedPermanently)
-            return;
+            return false;
 
         if (systemContext->connection())
-            return;
+            return false;
 
         NX_VERBOSE(this, "Ensure connection exists");
         if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::Online)
         {
             NX_VERBOSE(this, "Cloud status failure: %1", qnCloudStatusWatcher->status());
-            return;
+            return false;
         }
 
         if (connectionProcess)
         {
             NX_VERBOSE(this, "Connection is already in progress");
+            return false;
         }
-        else
+
+        auto endpoint = core::cloudSystemEndpoint(systemDescription);
+        if (!endpoint)
         {
-            auto handleConnection =
-                [this](core::RemoteConnectionFactory::ConnectionOrError result)
-                {
-                    if (auto connection = std::get_if<core::RemoteConnectionPtr>(&result))
-                    {
-                        NX_VERBOSE(this, "Connection successfully established");
-                        initializeContext(*connection);
-                    }
-                    else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
-                    {
-                        NX_WARNING(this, "Error while establishing connection %1", error->code);
-                        if (error->code == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
-                            || error->code == core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled)
-                        {
-                            updateStatus(Status::unsupportedTemporary);
-                        }
-                        else
-                        {
-                            updateStatus(Status::connectionFailure);
-                        }
-                    }
-
-                    connectionProcess.reset();
-                };
-
-            auto endpoint = core::cloudSystemEndpoint(systemDescription);
-            if (!endpoint)
-            {
-                NX_VERBOSE(this, "Endpoint was not found");
-                return;
-            }
-
-            updateStatus(Status::connecting);
-
-            NX_VERBOSE(this, "Initialize new connection");
-            connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
-                {
-                    .address = endpoint->address,
-                    .credentials = {},
-                    .userType = nx::vms::api::UserType::cloud,
-                    .purpose = core::LogonData::Purpose::connectInCrossSystemMode,
-                    .expectedServerId = endpoint->serverId,
-                    .userInteractionAllowed = allowUserInteraction
-                },
-                handleConnection);
+            NX_VERBOSE(this, "Endpoint was not found");
+            return false;
         }
+
+        auto handleConnection =
+            [this](core::RemoteConnectionFactory::ConnectionOrError result)
+            {
+                if (auto connection = std::get_if<core::RemoteConnectionPtr>(&result))
+                {
+                    NX_VERBOSE(this, "Connection successfully established");
+                    initializeContext(*connection);
+                }
+                else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
+                {
+                    NX_WARNING(this, "Error while establishing connection %1", error->code);
+
+                    auto status = Status::connectionFailure;
+
+                    if (error->code
+                        == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa)
+                    {
+                        status = Status::unsupportedPermanently;
+                    }
+                    else if (error->code
+                        == core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled)
+                    {
+                        status = Status::unsupportedTemporary;
+                    }
+
+                    updateStatus(status);
+                }
+
+                connectionProcess.reset();
+            };
+
+        updateStatus(Status::connecting);
+
+        NX_VERBOSE(this, "Initialize new connection");
+        connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
+            {
+                .address = endpoint->address,
+                .credentials = {},
+                .userType = nx::vms::api::UserType::cloud,
+                .purpose = core::LogonData::Purpose::connectInCrossSystemMode,
+                .expectedServerId = endpoint->serverId,
+                .userInteractionAllowed = allowUserInteraction
+            },
+            handleConnection);
+
+        return true;
     }
 
     void initializeContext(core::RemoteConnectionPtr connection)
@@ -496,17 +504,17 @@ QString CloudCrossSystemContext::toString() const
     return d->toString();
 }
 
-void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
+bool CloudCrossSystemContext::initializeConnectionWithUserInteraction()
 {
     if (d->connectionProcess && d->connectionProcess->context->logonData.userInteractionAllowed)
     {
         NX_DEBUG(this, "Connection with user interaction is already in progress");
-        return;
+        return false;
     }
 
     d->connectionProcess.reset();
     d->updateStatus(Status::connecting);
-    d->ensureConnection(/*allowUserInteraction*/ true);
+    return d->ensureConnection(/*allowUserInteraction*/ true);
 }
 
 QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(QnUuid id)
