@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>1</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
    <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
     <number>0</number>
    </property>
    <property name="bottomMargin">
@@ -33,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>315</width>
-        <height>148</height>
+        <width>333</width>
+        <height>172</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -47,7 +56,13 @@
        <property name="spacing">
         <number>20</number>
        </property>
+       <property name="leftMargin">
+        <number>11</number>
+       </property>
        <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
         <number>16</number>
        </property>
        <item>
@@ -83,8 +98,19 @@
      </widget>
     </widget>
    </item>
+   <item>
+    <widget class="nx::vms::client::desktop::MessageBar" name="deprecationMessageBar" native="true"/>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::MessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
