@@ -1723,7 +1723,10 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
+            && ConditionWrapper(new ResourceStatusCondition(
+                nx::vms::api::ResourceStatus::online,
+                true /* all */)));
 
     factory(ServerIssuesAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
