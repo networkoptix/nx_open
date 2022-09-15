@@ -14,9 +14,9 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <statistics/statistics_manager.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -38,7 +38,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 {
     if (!force)
     {
-        // State is saved by QnWorkbench::StateDelegate.
+        // State is saved by Workbench::StateDelegate.
         if (auto statisticsManager = statisticsModule()->manager())
         {
             statisticsManager->saveCurrentStatistics();

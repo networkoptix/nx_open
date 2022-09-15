@@ -38,9 +38,12 @@ struct DefaultPasswordCamerasWatcher::Private
     QnVirtualCameraResourceSet camerasWithDefaultPassword;
 };
 
-DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
+DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,

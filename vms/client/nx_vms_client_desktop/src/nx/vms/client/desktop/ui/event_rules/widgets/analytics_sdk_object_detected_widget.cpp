@@ -6,21 +6,20 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QSortFilterProxyModel>
 
-#include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-
-#include <ui/workaround/widgets_signals_workaround.h>
-
-#include <ui/help/help_topics.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-AnalyticsSdkObjectDetectedWidget::AnalyticsSdkObjectDetectedWidget(QWidget* parent):
-    base_type(parent),
+AnalyticsSdkObjectDetectedWidget::AnalyticsSdkObjectDetectedWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::AnalyticsSdkObjectDetectedWidget)
 {
     ui->setupUi(this);

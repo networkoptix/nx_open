@@ -176,13 +176,13 @@ public:
         q(parent),
         resourceModel(resourceModel),
         resourceIconCache(qnResIconCache),
-        connectedToServer(qnClientCoreModule->networkModule()->isConnected())
+        connectedToServer(q->context()->user())
     {
-        scopedConnections.add(connect(qnClientCoreModule->networkModule(),
-            &nx::vms::client::core::NetworkModule::remoteIdChanged,
-            [this]
+        scopedConnections.add(connect(q->context(),
+            &QnWorkbenchContext::userChanged,
+            [this](const QnUserResourcePtr& user)
             {
-                connectedToServer = qnClientCoreModule->networkModule()->isConnected();
+                connectedToServer = !user.isNull();
 
                 for (int row = 0; row < q->rowCount(); ++row)
                 {

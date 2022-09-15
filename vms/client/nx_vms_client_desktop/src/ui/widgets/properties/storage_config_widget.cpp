@@ -11,9 +11,7 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/server_rest_connection.h>
-#include <client/client_module.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -267,29 +265,29 @@ static constexpr int kUpdateStatusTimeoutMs = 5 * 1000;
 
 class QnStorageConfigWidget::MetadataWatcher:
     public QObject,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     const std::chrono::milliseconds kUpdateDelay = std::chrono::milliseconds(100);
 
 public:
-    MetadataWatcher(QnCommonModule* commonModule, QObject* parent = nullptr):
+    MetadataWatcher(SystemContext* systemContext, QObject* parent = nullptr):
         QObject(parent),
-        m_commonModule(commonModule),
+        SystemContextAware(systemContext),
         m_updateEngines([this]{ updateEnginesFromServer(); }, kUpdateDelay, this)
     {
         m_updateEngines.setFlags(utils::PendingOperation::FireOnlyWhenIdle);
 
-        connect(commonModule->resourcePool(), &QnResourcePool::resourceAdded,
+        connect(resourcePool(), &QnResourcePool::resourceAdded,
             this, &MetadataWatcher::handleResourceAdded);
 
-        connect(commonModule->resourcePool(), &QnResourcePool::resourceRemoved,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved,
             this, &MetadataWatcher::handleResourceRemoved);
 
-        for (const auto& camera: commonModule->resourcePool()->getAllCameras())
+        for (const auto& camera: resourcePool()->getAllCameras())
             handleResourceAdded(camera);
 
         connect(
-            appContext()->currentSystemContext()->serverRuntimeEventConnector(),
+            systemContext->serverRuntimeEventConnector(),
             &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
             this,
             [this](const QnUuid& serverId)
@@ -318,8 +316,7 @@ public:
             return;
 
         // Check if we have enabled analytics engines.
-        m_enginesEnabled =
-            nx::analytics::serverHasActiveObjectEngines(m_commonModule, m_server->getId());
+        m_enginesEnabled = nx::analytics::serverHasActiveObjectEngines(m_server);
 
         connect(m_server.get(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr&, const QString& key)
@@ -410,8 +407,7 @@ public:
         if (!m_server)
             return;
 
-        const bool enginesEnabled =
-            nx::analytics::serverHasActiveObjectEngines(m_commonModule, m_server->getId());
+        const bool enginesEnabled = nx::analytics::serverHasActiveObjectEngines(m_server);
 
         if (m_enginesEnabled && !enginesEnabled)
         {
@@ -447,7 +443,6 @@ public:
     }
 
 private:
-    QnCommonModule* m_commonModule;
     QnMediaServerResourcePtr m_server;
     bool m_enginesEnabled = false;
     bool m_metadataExists = false;
@@ -608,7 +603,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
             }
         });
 
-    m_metadataWatcher.reset(new MetadataWatcher(commonModule(), this));
+    m_metadataWatcher.reset(new MetadataWatcher(systemContext(), this));
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()

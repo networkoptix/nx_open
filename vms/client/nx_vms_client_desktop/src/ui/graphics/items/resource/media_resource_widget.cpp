@@ -63,6 +63,7 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
@@ -274,14 +275,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_toggleImageEnhancementAction(new QAction(this))
 {
     NX_ASSERT(d->mediaResource, "Media resource widget was created with a non-media resource.");
-    d->isExportedLayout = item
-        && item->layout()
-        && item->layout()->resource()
-        && item->layout()->resource()->isFile();
-
-    d->isPreviewSearchLayout = item
-        && item->layout()
-        && item->layout()->isPreviewSearchLayout();
+    d->isExportedLayout = layoutResource()->isFile();
+    d->isPreviewSearchLayout = layoutResource()->isPreviewSearchLayout();
 
     initRenderer();
     initDisplay();
@@ -453,9 +448,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 
-    auto layoutResource = item->layout()->resource();
-    NX_ASSERT(layoutResource);
-    connect(layoutResource.get(),
+    connect(layoutResource().get(),
         &LayoutResource::itemDataChanged,
         this,
         &QnMediaResourceWidget::handleItemDataChanged);
@@ -464,9 +457,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     executeDelayedParented(
         [this]()
         {
-            auto layoutResource = this->item()->layout()->resource();
-            NX_ASSERT(layoutResource);
-            const QVariant isPaused = layoutResource->itemData(m_itemId, Qn::ItemPausedRole);
+            const QVariant isPaused = layoutResource()->itemData(m_itemId, Qn::ItemPausedRole);
             if (isPaused.isValid())
             {
                 handleItemDataChanged(
@@ -476,8 +467,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             }
         }, this);
 
-    const bool canRotate = systemContext->accessController()->hasPermissions(
-        item->layout()->resource(),
+    const bool canRotate = ResourceAccessManager::hasPermissions(layoutResource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
@@ -523,7 +513,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 void QnMediaResourceWidget::beforeDestroy()
 {
-    item()->layout()->resource()->disconnect(this);
+    layoutResource()->disconnect(this);
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(
@@ -727,7 +717,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
          [this, changeCameraPassword]()
          {
              const auto passwordWatcher = windowContext()->workbenchContext()
-                 ->instance<DefaultPasswordCamerasWatcher>();
+                 ->findInstance<DefaultPasswordCamerasWatcher>();
              changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
          });
 }
@@ -865,7 +855,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
         return QString();
 
     const auto watcher = windowContext()->workbenchContext()
-        ->instance<DefaultPasswordCamerasWatcher>();
+        ->findInstance<DefaultPasswordCamerasWatcher>();
     const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
     return camerasCount > 1
         ? tr("Set for all %n Cameras", nullptr, camerasCount)
@@ -2352,13 +2342,13 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->hasVideo && !qnRuntime->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
-        if (item()
-            && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(),
-                Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            && !tourIsRunning(windowContext()->workbenchContext())
-            )
+        const Qn::Permissions permissions = ResourceAccessManager::permissions(layoutResource());
+        if (permissions.testFlag(Qn::WritePermission)
+            && permissions.testFlag(Qn::AddRemoveItemsPermission)
+            && !tourIsRunning(windowContext()->workbenchContext()))
+        {
             result |= Qn::ZoomWindowButton;
+        }
     }
 
     if (d->camera && (!d->camera->hasFlags(Qn::virtual_camera)))

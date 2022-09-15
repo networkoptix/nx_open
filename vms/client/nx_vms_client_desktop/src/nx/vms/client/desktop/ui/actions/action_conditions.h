@@ -416,12 +416,6 @@ public:
         QnWorkbenchContext* context) override;
 };
 
-class BrowseLocalFilesCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class PtzCondition: public Condition
 {
 public:

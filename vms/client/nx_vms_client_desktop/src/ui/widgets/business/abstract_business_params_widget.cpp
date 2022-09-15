@@ -2,10 +2,16 @@
 
 #include "abstract_business_params_widget.h"
 
-QnAbstractBusinessParamsWidget::QnAbstractBusinessParamsWidget(QWidget *parent)
-    : base_type(parent)
-    , m_updating(false)
-    , m_model()
+using namespace nx::vms::client::desktop;
+
+QnAbstractBusinessParamsWidget::QnAbstractBusinessParamsWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(parent),
+    SystemContextAware(systemContext),
+    m_updating(false),
+    m_model()
 {
 }
 

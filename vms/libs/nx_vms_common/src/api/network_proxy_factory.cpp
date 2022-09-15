@@ -92,7 +92,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    const auto& connection = context->ec2Connection();
+    const auto& connection = context->messageBusConnection();
     if (server && connection)
     {
         const QnUuid id = server->getOriginalGuid();

@@ -69,6 +69,7 @@
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -81,7 +82,6 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -126,7 +126,6 @@ struct ConnectActionsHandler::Private
 {
     ConnectActionsHandler* const q;
     LogicalState logicalState = LogicalState::disconnected;
-    std::shared_ptr<RemoteSession> session;
     QPointer<QnReconnectInfoDialog> reconnectDialog;
     QPointer<ConnectingToServerDialog> switchServerDialog;
     RemoteConnectionFactory::ProcessPtr currentConnectionProcess;
@@ -167,7 +166,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
-    d->crashReporter = std::make_unique<ec2::CrashReporter>(commonModule());
+    d->crashReporter = std::make_unique<ec2::CrashReporter>(systemContext());
 
     // Videowall must not disconnect automatically as we may have not option to restart it.
     // ACS clients display only fixed part of the archive, so they look quite safe.
@@ -210,6 +209,8 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
         this,
         [this]()
         {
+            auto existingCredentials = systemContext()->connectionCredentials();
+            const bool passwordValidationMode = existingCredentials.authToken.isPassword();
             const auto refreshSessionResult = SessionRefreshDialog::refreshSession(
                 mainWindowWidget(),
                 tr("Re-authentication required"),
@@ -217,7 +218,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                 tr("Your session has expired. Please sign in again to continue."),
                 tr("OK", "Dialog button text."),
                 /*warningStyledAction*/ false,
-                /*passwordValidationMode*/ connectionCredentials().authToken.isPassword());
+                passwordValidationMode);
 
             if (!refreshSessionResult.token.empty())
             {
@@ -244,9 +245,9 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(userWatcher, &ContextCurrentUserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
         {
-            QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+            QnPeerRuntimeInfo localInfo = systemContext()->runtimeInfoManager()->localInfo();
             localInfo.data.userId = user ? user->getId() : QnUuid();
-            runtimeInfoManager()->updateLocalItem(localInfo);
+            systemContext()->runtimeInfoManager()->updateLocalItem(localInfo);
         });
 
     connect(action(ui::action::ConnectAction), &QAction::triggered, this,
@@ -337,13 +338,13 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                 DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin));
         });
 
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(systemContext()->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.uuid != commonModule()->peerId())
+            if (info.uuid != systemContext()->peerId())
                 return;
 
-            if (auto connection = messageBusConnection())
+            if (auto connection = systemContext()->messageBusConnection())
             {
                 connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
                     info.data, [](int /*requestId*/, ec2::ErrorCode) {});
@@ -360,7 +361,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
 
             if (mainWindow()->welcomeScreen())
                 mainWindow()->setWelcomeScreenVisible(!checked);
-            if (workbench()->layouts().isEmpty())
+            if (workbench()->layouts().empty())
                 menu()->trigger(ui::action::OpenNewTabAction);
         });
 
@@ -572,10 +573,12 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
                 NX_ASSERT(qnRuntime->isVideoWallMode() || context()->user());
 
-                integrations::connectionEstablished(context()->user(), messageBusConnection());
+                integrations::connectionEstablished(
+                    context()->user(),
+                    systemContext()->messageBusConnection());
 
                 // Reload all dialogs and dependent data.
-                // It's done delayed because some things - for example globalSettings() -
+                // It's done delayed because some things - for example systemSettings() -
                 // are updated in QueuedConnection to initial notification or resource addition.
                 const auto workbenchStateUpdate =
                     [this, logonData, systemId]()
@@ -763,7 +766,7 @@ void ConnectActionsHandler::showWarnMessagesOnce()
         [this](const auto& server)
         {
             return server->metadataStorageId().isNull()
-                && nx::analytics::serverHasActiveObjectEngines(commonModule(), server->getId());
+                && nx::analytics::serverHasActiveObjectEngines(server);
         }))
     {
         menu()->triggerIfPossible(ui::action::ConfirmAnalyticsStorageAction);
@@ -1115,7 +1118,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
         return;
     }
 
-    const auto systemId = globalSettings()->cloudSystemId();
+    const auto systemId = systemSettings()->cloudSystemId();
     const auto currentUser = context()->user();
 
     core::LogonData logonData{
@@ -1210,7 +1213,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     }
 
     if (!force)
-        globalSettings()->synchronizeNow();
+        systemSettings()->synchronizeNow();
 
     if (flags.testFlag(DisconnectFlag::SwitchingServer))
     {
@@ -1282,10 +1285,9 @@ void ConnectActionsHandler::clearConnection()
     NX_DEBUG(this, "Clear connection");
     resourcePool()->removeResources(resourcesToRemove);
 
-    resourcePropertyDictionary()->clear(idList);
-    statusDictionary()->clear(idList);
-
-    licensePool()->reset();
+    systemContext()->resourcePropertyDictionary()->clear(idList);
+    systemContext()->resourceStatusDictionary()->clear(idList);
+    systemContext()->licensePool()->reset();
 
     resourceAccessProvider()->endUpdate();
     resourceAccessManager()->endUpdate();

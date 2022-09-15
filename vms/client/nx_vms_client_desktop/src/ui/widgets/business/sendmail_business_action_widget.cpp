@@ -4,19 +4,20 @@
 #include "ui_sendmail_business_action_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-
 #include <QtWidgets/QAction>
 
-#include <nx/vms/event/action_parameters.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
+QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(
+    QnWorkbenchContext* context,
+    QWidget* parent)
+    :
+    base_type(context->systemContext(), parent),
     ui(new Ui::SendmailBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -25,7 +26,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget* parent):
         this, &QnSendmailBusinessActionWidget::paramsChanged);
 
     connect(ui->settingsButton, &QPushButton::clicked,
-        action(action::PreferencesSmtpTabAction), &QAction::trigger);
+        context->action(action::PreferencesSmtpTabAction), &QAction::trigger);
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()

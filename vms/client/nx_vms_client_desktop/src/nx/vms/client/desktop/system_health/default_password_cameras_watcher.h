@@ -5,19 +5,22 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
+// TODO: #sivanov Move to System Context.
 class DefaultPasswordCamerasWatcher:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit DefaultPasswordCamerasWatcher(QObject* parent = nullptr);
+    explicit DefaultPasswordCamerasWatcher(
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~DefaultPasswordCamerasWatcher() override;
 
     QnVirtualCameraResourceSet camerasWithDefaultPassword() const;

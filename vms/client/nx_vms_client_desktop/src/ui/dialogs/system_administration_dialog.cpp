@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_list_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_management_tab_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

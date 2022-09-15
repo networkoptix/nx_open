@@ -121,7 +121,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
     QObject(owner),
     QnWorkbenchContextAware(owner),
     q_ptr(owner),
-    m_cameraNamesWatcher(commonModule())
+    m_cameraNamesWatcher(systemContext())
 {
     m_filter.limit = kMaxVisibleRows;
     m_filter.orderBy = QnSearchBookmarksModel::defaultSortOrder();
@@ -266,7 +266,7 @@ void QnSearchBookmarksModelPrivate::sort(int column, Qt::SortOrder order)
     {
         Q_Q(QnSearchBookmarksModel);
 
-        QnCameraBookmark::sortBookmarks(commonModule(), m_bookmarks, m_filter.orderBy);
+        QnCameraBookmark::sortBookmarks(systemContext(), m_bookmarks, m_filter.orderBy);
 
         const auto startIndex = q->index(0, 0);
         const auto finishIndex = q->index(m_bookmarks.size() - 1,

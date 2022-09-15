@@ -32,7 +32,6 @@ class QMenu;
 
 class QnProgressDialog;
 class QnResourcePool;
-class QnWorkbench;
 class QnWorkbenchContext;
 class ActionHandler;
 class QnBusinessRulesDialog;

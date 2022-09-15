@@ -11,8 +11,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 
 using nx::vms::client::core::MotionSelection;
@@ -82,10 +82,10 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
 
     connect(this, &AbstractSearchSynchronizer::activeChanged, this, updateActiveState);
 
-    connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this,
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         [this]() { m_layoutChanging = true; });
 
-    connect(workbench(), &QnWorkbench::layoutChangeProcessFinished, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         [this, updateActiveState]()
         {
             m_layoutChanging = false;

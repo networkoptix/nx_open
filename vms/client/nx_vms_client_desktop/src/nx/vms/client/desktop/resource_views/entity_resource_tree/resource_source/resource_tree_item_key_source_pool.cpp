@@ -2,7 +2,6 @@
 
 #include "resource_tree_item_key_source_pool.h"
 
-#include <common/common_module.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
@@ -31,14 +30,14 @@ using namespace nx::core::access;
 using namespace nx::vms::client::desktop::entity_item_model;
 
 ResourceTreeItemKeySourcePool::ResourceTreeItemKeySourcePool(
-    const QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const CameraResourceIndex* cameraResourceIndex,
     const UserLayoutResourceIndex* sharedLayoutResourceIndex)
     :
-    m_commonModule(commonModule),
+    SystemContextAware(systemContext),
     m_cameraResourceIndex(cameraResourceIndex),
     m_userLayoutResourceIndex(sharedLayoutResourceIndex),
-    m_userRolesProvider(new UserRolesProvider(commonModule->userRolesManager())),
+    m_userRolesProvider(new UserRolesProvider(systemContext->userRolesManager())),
     m_webPageResourceIndex(new WebPageResourceIndex(resourcePool()))
 {
 }
@@ -65,20 +64,20 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::serversSource(
     // Custom users are able to see only servers which implicitly marked as accessible or parent
     // servers of accessible resources.
     auto accessibleServersSource = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<ServerResourceSource>(resourcePool(), withEdgeServers));
 
     auto accessibleCamerasSource = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<CameraResourceSource>(m_cameraResourceIndex, QnMediaServerResourcePtr()));
 
     auto accessibleProxiedWebPagesSource = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<ProxiedWebResourceSource>(
             m_webPageResourceIndex.get(),
@@ -106,8 +105,8 @@ ResourceTreeItemKeySourcePool::UniqueResourceSourcePtr ResourceTreeItemKeySource
 {
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<AccessibleResourceProxySource>(
-            m_commonModule,
-            accessProvider(),
+            systemContext(),
+            resourceAccessProvider(),
             accessSubject,
             std::make_unique<FilteredResourceProxySource>(
                 resourceFilter,
@@ -119,14 +118,14 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::devicesAndProxiedWebPages
     const QnResourceAccessSubject& subject)
 {
     auto cameras = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<CameraResourceSource>(m_cameraResourceIndex, parentServer));
 
     auto proxiedWebResources = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<ProxiedWebResourceSource>(m_webPageResourceIndex.get(), parentServer));
 
@@ -140,14 +139,14 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
     const QnUserResourcePtr& user)
 {
     auto layouts = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         user,
         std::make_unique<LayoutResourceSource>(resourcePool(), user, true));
 
     auto intercomLayouts = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         user,
         std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
 
@@ -161,11 +160,12 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
     const QnUserResourcePtr& user)
 {
-    return std::make_shared<ResourceSourceAdapter>(std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
-        user,
-        std::make_unique<LayoutResourceSource>(resourcePool(), QnUserResourcePtr(), true)));
+    return std::make_shared<ResourceSourceAdapter>(
+        std::make_unique<AccessibleResourceProxySource>(
+            systemContext(),
+            resourceAccessProvider(),
+            user,
+            std::make_unique<LayoutResourceSource>(resourcePool(), QnUserResourcePtr(), true)));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
@@ -173,8 +173,8 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
 {
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<AccessibleResourceProxySource>(
-            m_commonModule,
-            accessProvider(),
+            systemContext(),
+            resourceAccessProvider(),
             user,
             std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
 }
@@ -203,7 +203,10 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::userAccessibleDevicesSour
     const QnResourceAccessSubject& subject)
 {
     return std::make_shared<ResourceSourceAdapter>(std::make_unique<UserAccessibleDevicesSource>(
-        resourcePool(), globalPermissionsManager(), accessProvider(), subject));
+        resourcePool(),
+        systemContext()->globalPermissionsManager(),
+        resourceAccessProvider(),
+        subject));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::sharedAndOwnLayoutsSource(
@@ -214,15 +217,15 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::sharedAndOwnLayoutsSource
         subject.user());
 
     auto intercomLayouts = std::make_unique<AccessibleResourceProxySource>(
-        m_commonModule,
-        accessProvider(),
+        systemContext(),
+        resourceAccessProvider(),
         subject,
         std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
 
     auto directlySharedLayouts = std::make_unique<DirectlySharedLayoutsSource>(
         resourcePool(),
-        globalPermissionsManager(),
-        sharedResourcesManager(),
+        systemContext()->globalPermissionsManager(),
+        systemContext()->sharedResourcesManager(),
         subject.user());
 
     return std::make_shared<ResourceSourceAdapter>(
@@ -237,7 +240,10 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::directlySharedLayoutsSour
     const QnResourceAccessSubject& subject)
 {
     return std::make_shared<ResourceSourceAdapter>(std::make_unique<DirectlySharedLayoutsSource>(
-        resourcePool(), globalPermissionsManager(), sharedResourcesManager(), subject));
+        resourcePool(),
+        systemContext()->globalPermissionsManager(),
+        systemContext()->sharedResourcesManager(),
+        subject));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesSource(
@@ -246,8 +252,8 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesSource(
 {
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<AccessibleResourceProxySource>(
-            m_commonModule,
-            accessProvider(),
+            systemContext(),
+            resourceAccessProvider(),
             subject,
             std::make_unique<WebpageResourceSource>(
                 m_webPageResourceIndex.get(),
@@ -259,8 +265,8 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::videoWallsSource(
 {
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<AccessibleResourceProxySource>(
-            m_commonModule,
-            accessProvider(),
+            systemContext(),
+            resourceAccessProvider(),
             subject,
             std::make_unique<VideowallResourceSource>(resourcePool())));
 }
@@ -297,26 +303,6 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::cloudSystemCamerasSource(
     const QString& systemId)
 {
     return std::make_shared<CloudSystemCamerasSource>(systemId);
-}
-
-const QnResourcePool* ResourceTreeItemKeySourcePool::resourcePool() const
-{
-    return m_commonModule->resourcePool();
-}
-
-const ResourceAccessProvider* ResourceTreeItemKeySourcePool::accessProvider() const
-{
-    return m_commonModule->resourceAccessProvider();
-}
-
-const QnGlobalPermissionsManager* ResourceTreeItemKeySourcePool::globalPermissionsManager() const
-{
-    return m_commonModule->globalPermissionsManager();
-}
-
-const QnSharedResourcesManager* ResourceTreeItemKeySourcePool::sharedResourcesManager() const
-{
-    return m_commonModule->sharedResourcesManager();
 }
 
 UniqueUuidSourcePtr ResourceTreeItemKeySourcePool::userRolesSource()

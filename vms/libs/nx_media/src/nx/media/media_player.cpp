@@ -790,7 +790,7 @@ bool PlayerPrivate::createArchiveReader()
     else
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        auto connection = q_ptr->commonModule()->systemContext()->ec2Connection();
+        auto connection = q_ptr->commonModule()->ec2Connection();
         NX_ASSERT(camera);
         auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(
             archiveReader.get(),

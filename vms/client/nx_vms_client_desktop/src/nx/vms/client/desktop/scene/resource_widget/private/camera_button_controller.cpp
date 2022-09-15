@@ -2,8 +2,6 @@
 
 #include "camera_button_controller.h"
 
-#include "two_way_audio_manager.h"
-
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -13,6 +11,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
@@ -20,8 +19,9 @@
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+
+#include "two_way_audio_manager.h"
 
 using ExtendedCameraOutput = nx::vms::api::ExtendedCameraOutput;
 

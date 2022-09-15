@@ -3,7 +3,6 @@
 #include "resource_tree_item_factory.h"
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
@@ -25,6 +24,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topics.h>
 
@@ -258,16 +258,16 @@ using IconCache = QnResourceIconCache;
 
 using namespace entity_item_model;
 
-ResourceTreeItemFactory::ResourceTreeItemFactory(const QnCommonModule* commonModule):
+ResourceTreeItemFactory::ResourceTreeItemFactory(SystemContext* systemContext):
     base_type(),
-    m_commonModule(commonModule)
+    SystemContextAware(systemContext)
 {
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createCurrentSystemItem() const
 {
-    const auto nameProvider = systemNameProvider(globalSettings());
-    const auto nameInvalidator = systemNameInvalidator(globalSettings());
+    const auto nameProvider = systemNameProvider(systemSettings());
+    const auto nameInvalidator = systemNameInvalidator(systemSettings());
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
@@ -507,7 +507,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
 
 AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUuid)
 {
-    const auto userRolesManager = m_commonModule->userRolesManager();
+    const auto userRolesManager = systemContext()->userRolesManager();
     const auto nameProvider = userRoleNameProvider(userRolesManager, roleUuid);
     const auto nameInvalidator = userRoleNameInvalidator(userRolesManager, roleUuid);
 
@@ -521,7 +521,7 @@ AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUu
 
 AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showreelId)
 {
-    return std::make_unique<ShowreelItem>(layoutTourManager(), showreelId);
+    return std::make_unique<ShowreelItem>(systemContext()->layoutTourManager(), showreelId);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallScreenItem(
@@ -557,21 +557,6 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
         .withFlags(flagsProvider);
-}
-
-QnResourcePool* ResourceTreeItemFactory::resourcePool() const
-{
-    return m_commonModule->resourcePool();
-}
-
-SystemSettings* ResourceTreeItemFactory::globalSettings() const
-{
-    return m_commonModule->globalSettings();
-}
-
-QnLayoutTourManager* ResourceTreeItemFactory::layoutTourManager() const
-{
-    return m_commonModule->layoutTourManager();
 }
 
 } // namespace entity_resource_tree

@@ -16,7 +16,9 @@ class QnExecPtzPresetBusinessActionWidget : public QnAbstractBusinessParamsWidge
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnExecPtzPresetBusinessActionWidget(QWidget *parent = 0);
+    explicit QnExecPtzPresetBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~QnExecPtzPresetBusinessActionWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;

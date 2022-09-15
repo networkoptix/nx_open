@@ -127,7 +127,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     q(q),
     restartAction(new QAction(tr("Restart Client"))),
     settingsAction(new QAction(tr("Updates Settings"))),
-    clientUpdateTool(new ClientUpdateTool(this)),
+    clientUpdateTool(new ClientUpdateTool(systemContext(), this)),
     notificationsManager(
         context()->findInstance<desktop::workbench::LocalNotificationsManager>()),
     checkForUpdateTimer(new QTimer(this)),
@@ -142,7 +142,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         &Private::handleConnectionStateChanged);
 
-    connect(globalSettings(),
+    connect(systemSettings(),
         &SystemSettings::clientUpdateSettingsChanged,
         this,
         &Private::handleClientUpdateSettingsChanged);
@@ -188,7 +188,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         [this](const QnUuid& notificationId)
         {
-            if (!context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
+            if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
                 return;
 
             if (notificationId == errorNotificationId
@@ -316,7 +316,7 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
     if (!autoUpdateFeatureNotificationId.isNull())
         return;
 
-    if (!context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return;
 
     NX_VERBOSE(this, "Showing a notification about Client-only auto-update feature.");
@@ -491,7 +491,7 @@ void ClientUpdateManager::Private::planUpdate()
     endOfDeliveryPeriod = std::max(startOfDeliveryPeriod, endOfDeliveryPeriod);
 
     QRandomGenerator64 randomGenerator =
-        getRandomGenerator(globalSettings()->localSystemId(), updateContents.info.version);
+        getRandomGenerator(systemSettings()->localSystemId(), updateContents.info.version);
 
     generatedUpdateDateTime = milliseconds(nx::utils::random::number(
        randomGenerator,
@@ -593,7 +593,7 @@ void ClientUpdateManager::Private::handleUpdateContents(UpdateContents newConten
         clientData.fillDefault();
         VerificationOptions options;
         options.compatibilityMode = true;
-        options.commonModule = commonModule();
+        options.systemContext = systemContext();
         options.downloadAllPackages = false;
 
         verificationPassed =
@@ -711,14 +711,14 @@ void ClientUpdateManager::Private::handleUpdateStateChanged(ClientUpdateTool::St
 
 common::api::ClientUpdateSettings ClientUpdateManager::Private::globalClientUpdateSettings() const
 {
-    return globalSettings()->clientUpdateSettings();
+    return systemSettings()->clientUpdateSettings();
 }
 
 void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
     const common::api::ClientUpdateSettings& settings)
 {
-    globalSettings()->setClientUpdateSettings(settings);
-    globalSettings()->synchronizeNow();
+    systemSettings()->setClientUpdateSettings(settings);
+    systemSettings()->synchronizeNow();
 }
 
 //-------------------------------------------------------------------------------------------------

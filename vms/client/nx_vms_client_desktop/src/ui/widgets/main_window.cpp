@@ -47,6 +47,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/workbench_ui.h>
 #include <nx/vms/discovery/manager.h>
@@ -87,7 +88,6 @@
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_display.h>
@@ -211,7 +211,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_scene.reset(new QnGraphicsScene(this));
 
     connect(workbench(),
-        &QnWorkbench::currentLayoutAboutToBeChanged,
+        &Workbench::currentLayoutAboutToBeChanged,
         this,
         [this]()
         {
@@ -219,7 +219,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
                 resource->disconnect(this);
         });
     connect(workbench(),
-        &QnWorkbench::currentLayoutChanged,
+        &Workbench::currentLayoutChanged,
         this,
         [this]()
         {

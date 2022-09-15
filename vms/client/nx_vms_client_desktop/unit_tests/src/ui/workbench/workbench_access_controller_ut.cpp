@@ -252,6 +252,7 @@ TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 
     QnUserResourcePtr newCloudUser(new QnUserResource(nx::vms::api::UserType::cloud));
     newCloudUser->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(newCloudUser);
 
     checkForbiddenPermissions(newCloudUser, Qn::WriteDigestPermission);
 }

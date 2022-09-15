@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef EMPTY_BUSINESS_ACTION_WIDGET_H
-#define EMPTY_BUSINESS_ACTION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -11,17 +10,18 @@ namespace Ui {
     class EmptyBusinessActionWidget;
 }
 
-class QnEmptyBusinessActionWidget : public QnAbstractBusinessParamsWidget
+class QnEmptyBusinessActionWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnEmptyBusinessActionWidget(nx::vms::event::ActionType actionType, QWidget *parent = 0);
+    explicit QnEmptyBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::event::ActionType actionType,
+        QWidget* parent = nullptr);
     ~QnEmptyBusinessActionWidget();
 
 private:
     QScopedPointer<Ui::EmptyBusinessActionWidget> ui;
 };
-
-#endif // EMPTY_BUSINESS_ACTION_WIDGET_H

@@ -16,7 +16,9 @@ class QnSayTextBusinessActionWidget: public QnSubjectTargetActionWidget
     using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit QnSayTextBusinessActionWidget(QWidget* parent = nullptr);
+    explicit QnSayTextBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnSayTextBusinessActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

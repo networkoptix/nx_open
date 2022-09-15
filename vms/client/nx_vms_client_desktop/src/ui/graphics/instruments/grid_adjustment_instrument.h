@@ -7,12 +7,14 @@
 
 #include "instrument.h"
 
-class QnWorkbench;
+namespace nx::vms::client::desktop { class Workbench; }
 
 class GridAdjustmentInstrument: public Instrument {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
-    GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent = nullptr);
+    GridAdjustmentInstrument(
+        nx::vms::client::desktop::Workbench* workbench, QObject* parent = nullptr);
 
     virtual ~GridAdjustmentInstrument();
 
@@ -29,11 +31,11 @@ protected:
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 
 private:
-    QnWorkbench *workbench() const;
+    nx::vms::client::desktop::Workbench *workbench() const;
 
 private:
     QPointer<QWidget> m_currentViewport;
-    QPointer<QnWorkbench> m_workbench;
+    QPointer<nx::vms::client::desktop::Workbench> m_workbench;
     qreal m_speed;
     qreal m_maxSpacing;
 };

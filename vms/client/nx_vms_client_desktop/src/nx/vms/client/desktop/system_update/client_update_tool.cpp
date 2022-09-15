@@ -5,9 +5,8 @@
 #include <QtCore/QCoreApplication>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <client/client_startup_parameters.h>
-#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -21,6 +20,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
 #include <nx/vms/common/system_settings.h>
@@ -65,11 +65,12 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     return false;
 }
 
-ClientUpdateTool::ClientUpdateTool(QObject *parent):
+ClientUpdateTool::ClientUpdateTool(SystemContext* systemContext, QObject *parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client")),
-    m_peerManager(new ResourcePoolPeerManager(commonModule())),
-    m_proxyPeerManager(new ResourcePoolProxyPeerManager(commonModule()))
+    m_peerManager(new ResourcePoolPeerManager(systemContext)),
+    m_proxyPeerManager(new ResourcePoolProxyPeerManager(systemContext))
 {
     qRegisterMetaType<State>();
     qRegisterMetaType<Error>();
@@ -81,7 +82,7 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
     m_downloader.reset(new Downloader(
         m_outputDir,
-        commonModule(),
+        systemContext,
         {m_peerManager, new InternetOnlyPeerManager(), m_proxyPeerManager}));
 
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
@@ -259,7 +260,7 @@ void ClientUpdateTool::setServerUrl(
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
-            /*auditId*/ commonModule()->sessionId(),
+            /*auditId*/ systemContext()->sessionId(),
             certificateVerifier,
             logonData.address,
             logonData.credentials));

@@ -6,9 +6,9 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QPoint;
-class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
@@ -21,7 +21,7 @@ class Parameters;
 
 namespace ResourceTree { enum class ActivationType; }
 
-class ResourceTreeInteractionHandler: public QObject
+class ResourceTreeInteractionHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QObject;

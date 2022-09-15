@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
 #include <ui/common/palette.h>
@@ -51,7 +52,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/systems_controller.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>

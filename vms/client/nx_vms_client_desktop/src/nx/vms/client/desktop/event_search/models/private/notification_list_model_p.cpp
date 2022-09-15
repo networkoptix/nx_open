@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -623,7 +624,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
     }
 
-    if (!context()->accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
         return;
 
     auto& actionParams = action->getParams();

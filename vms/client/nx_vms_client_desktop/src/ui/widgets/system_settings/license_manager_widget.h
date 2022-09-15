@@ -19,7 +19,7 @@ class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QPushButton;
-
+class QnLicensePool;
 class QnLicenseListModel;
 
 namespace nx::vms::client::desktop { class LayoutWidgetHider; }
@@ -56,6 +56,9 @@ private slots:
     void licenseDetailsRequested(const QModelIndex& index);
 
 private:
+    QnLicensePool* licensePool() const;
+    QnUuid serverId() const;
+
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
     void processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url, bool infoMode);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);

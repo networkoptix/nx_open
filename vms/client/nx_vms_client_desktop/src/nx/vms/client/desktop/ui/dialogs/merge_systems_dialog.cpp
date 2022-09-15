@@ -6,28 +6,29 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <client/client_settings.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_tool.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_validator.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
@@ -137,7 +138,7 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->setCurrentText(QString());
 
     const QString displayName = nx::utils::elideString(
-        globalSettings()->systemName(), kMaxSystemNameLength);
+        systemSettings()->systemName(), kMaxSystemNameLength);
 
     ui->currentSystemLabel->setText(
         tr("You are about to merge the current System %1 with System")
@@ -223,7 +224,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         return;
 
     const bool ownSettings = ui->currentSystemRadioButton->isChecked();
-    const QString currentSystemName = globalSettings()->systemName();
+    const QString currentSystemName = systemSettings()->systemName();
     const QString targetSystemName = ui->remoteSystemRadioButton->text();
 
     const auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(

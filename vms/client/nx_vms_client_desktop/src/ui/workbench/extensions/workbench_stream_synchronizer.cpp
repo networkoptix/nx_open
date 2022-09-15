@@ -13,15 +13,14 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <plugins/resource/archive/syncplay_wrapper.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/common/checked_cast.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (isSyncOn)(timeUs)(speed))
 
@@ -65,7 +64,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(
         this,
         &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
     connect(workbench(),
-        &QnWorkbench::currentLayoutChanged,
+        &Workbench::currentLayoutChanged,
         this,
         &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
 

@@ -100,7 +100,7 @@ void LayoutResourceSource::processResource(
 
     const auto layout = resource.staticCast<LayoutResource>();
 
-    if (layout->isServiceLayout() || layout->isPreviewSearchLayout())
+    if (layout->isServiceLayout())
         return;
 
     if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))

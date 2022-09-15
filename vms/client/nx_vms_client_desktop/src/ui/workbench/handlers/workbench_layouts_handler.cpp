@@ -33,7 +33,9 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
@@ -41,7 +43,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -59,7 +61,6 @@
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h> //< TODO: #sivanov Dependencies.
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -242,26 +243,29 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(action(action::OpenIntercomLayoutAction), &QAction::triggered, this,
         &LayoutsHandler::at_openIntercomLayoutAction_triggered);
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(appContext()->unifiedResourcePool(), &UnifiedResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            if (!resource->hasFlags(Qn::layout))
-                return;
-
-            auto layoutResource = resource.dynamicCast<LayoutResource>();
-            if (!layoutResource)
-                return;
-
-            if (auto layout = QnWorkbenchLayout::instance(layoutResource))
-            {
-                workbench()->removeLayout(layout);
-                layout->deleteLater();
-            }
+            auto layouts = resources.filtered<LayoutResource>();
+            if (!layouts.empty())
+                workbench()->removeLayouts(layouts);
 
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
                 && workbench()->layouts().empty())
             {
                 menu()->trigger(action::OpenNewTabAction);
+            }
+        });
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            // Remove layouts if current user has lost access to them.
+            if (auto layoutResource = resource.dynamicCast<LayoutResource>();
+                layoutResource
+                && !accessController()->hasPermissions(layoutResource, Qn::ReadPermission))
+            {
+                workbench()->removeLayout(layoutResource);
             }
         });
 
@@ -292,7 +296,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
         });
 
-    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
+    connect(systemContext()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
         this, &LayoutsHandler::at_openLayoutAction_triggered);
 }
 
@@ -340,7 +344,7 @@ void LayoutsHandler::at_openLayoutAction_triggered(
             return;
     }
 
-    if (accessController()->hasPermissions(layout, Qn::ReadPermission))
+    if (ResourceAccessManager::hasPermissions(layout, Qn::ReadPermission))
     {
         using namespace std::chrono;
         menu()->trigger(action::OpenInNewTabAction, layout);
@@ -368,11 +372,7 @@ void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
 
     // This should be done before layout updates, because QnWorkbenchLayout overwrites
     // all data in the layout.
-    if (auto workbenchLayout = QnWorkbenchLayout::instance(layout.dynamicCast<LayoutResource>()))
-    {
-        workbench()->removeLayout(workbenchLayout);
-        delete workbenchLayout;
-    }
+    workbench()->removeLayout(layout);
 
     layout::reloadFromFile(layout); //< Actually reload the file without a password.
 
@@ -439,7 +439,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
     if (!snapshotManager->isSaveable(layout))
         return;
 
-    if (!accessController()->hasPermissions(layout, Qn::SavePermission))
+    if (!ResourceAccessManager::hasPermissions(layout, Qn::SavePermission))
         return;
 
     if (layout->isFile())
@@ -451,10 +451,10 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
         snapshotManager->save(layout);
         return;
     }
-    else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+    else if (layout->isVideoWallReviewLayout())
     {
         // TODO: #sivanov Refactor common code to common place.
-        NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
+        NX_ASSERT(ResourceAccessManager::hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 nx::utils::guarded(this,
@@ -513,7 +513,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
         return;
 
     const QnResourcePtr layoutOwnerUser = layout->getParentResource();
-    bool hasSavePermission = accessController()->hasPermissions(layout, Qn::SavePermission);
+    bool hasSavePermission = ResourceAccessManager::hasPermissions(layout, Qn::SavePermission);
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
         QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindowWidget()));
@@ -601,7 +601,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     {
         int index = workbench()->currentLayoutIndex();
 
-        workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(newLayout, this), index);
+        workbench()->insertLayout(newLayout, index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
@@ -676,7 +676,7 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
     // Replace opened layout with the cloud one.
     int index = workbench()->currentLayoutIndex();
 
-    workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(cloudLayout, this), index);
+    workbench()->insertLayout(cloudLayout, index);
     workbench()->setCurrentLayoutIndex(index);
     workbench()->removeLayout(index + 1);
 }
@@ -734,7 +734,7 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     // Replace opened layout with the cloud one.
     int index = workbench()->currentLayoutIndex();
 
-    workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(cloudLayout, this), index);
+    workbench()->insertLayout(cloudLayout, index);
     workbench()->setCurrentLayoutIndex(index);
     workbench()->removeLayout(index + 1);
 }
@@ -994,7 +994,7 @@ bool LayoutsHandler::canRemoveLayouts(const LayoutResourceList &layouts)
     return std::all_of(layouts.cbegin(), layouts.cend(),
         [this](const LayoutResourcePtr& layout)
         {
-            return accessController()->hasPermissions(layout, Qn::RemovePermission);
+            return ResourceAccessManager::hasPermissions(layout, Qn::RemovePermission);
         });
 }
 
@@ -1049,8 +1049,9 @@ bool LayoutsHandler::closeLayouts(
             if (layout->hasFlags(Qn::local))
                 continue;
 
+            // Temporary layouts have no system context.
             auto systemContext = SystemContext::fromResource(layout);
-            if (!NX_ASSERT(systemContext))
+            if (!systemContext)
                 continue;
 
             bool changed = systemContext->layoutSnapshotManager()->isChanged(layout);
@@ -1070,27 +1071,21 @@ void LayoutsHandler::closeLayoutsInternal(
 {
     for (const LayoutResourcePtr& layout: rollbackResources)
     {
+        // Temporary layouts have no system context.
         auto systemContext = SystemContext::fromResource(layout);
-        if (!NX_ASSERT(systemContext))
+        if (!systemContext)
             continue;
 
         systemContext->layoutSnapshotManager()->restore(layout);
     }
 
+    workbench()->removeLayouts(resources);
     for (const LayoutResourcePtr& resource: resources)
     {
-        if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(resource))
-        {
-            workbench()->removeLayout(layout);
-            delete layout;
-        }
-
-        //< Temporary layouts can have no system context.
+        // Temporary layouts have no system context.
         auto systemContext = SystemContext::fromResource(resource);
-        if (!systemContext)
-            continue;
-
-        if (resource->hasFlags(Qn::local)
+        if (systemContext
+            && resource->hasFlags(Qn::local)
             && !resource->isFile()
             && !resource->hasFlags(Qn::local_intercom_layout))
         {
@@ -1122,12 +1117,10 @@ void LayoutsHandler::openLayouts(
     QnWorkbenchLayout* lastLayout = nullptr;
     for (const auto& layout: layouts)
     {
-        auto wbLayout = QnWorkbenchLayout::instance(layout);
+        auto wbLayout = workbench()->layout(layout);
         if (!wbLayout)
         {
-            wbLayout = qnWorkbenchLayoutsFactory->create(layout, workbench());
-
-            workbench()->addLayout(wbLayout);
+            wbLayout = workbench()->addLayout(layout);
 
             if (!wbLayout->isPreviewSearchLayout())
             {
@@ -1229,13 +1222,17 @@ void LayoutsHandler::at_closeLayoutAction_triggered()
 void LayoutsHandler::at_closeAllButThisLayoutAction_triggered()
 {
     QnWorkbenchLayoutList layouts = menu()->currentParameters(sender()).layouts();
-    if (layouts.empty())
+    if (layouts.size() != 1)
         return;
 
-    QnWorkbenchLayoutList layoutsToClose = workbench()->layouts();
-    foreach(QnWorkbenchLayout *layout, layouts)
-        layoutsToClose.removeOne(layout);
+    auto selectedLayout = layouts[0];
+    workbench()->setCurrentLayout(selectedLayout);
 
+    LayoutResourceList layoutsToClose;
+    for (const auto& layout: workbench()->layouts())
+        layoutsToClose.push_back(layout->resource());
+
+    layoutsToClose.removeOne(selectedLayout->resource());
     closeLayouts(layoutsToClose);
 }
 
@@ -1296,18 +1293,17 @@ void LayoutsHandler::at_openNewTabAction_triggered()
         tr("New Layout %1")));
     if (context()->user())
         resource->setParentId(context()->user()->getId());
-    resourcePool()->addResource(resource);
-
-    QnWorkbenchLayout* layout = qnWorkbenchLayoutsFactory->create(resource, this);
 
     const auto parameters = menu()->currentParameters(sender());
     if (parameters.hasArgument(Qn::LayoutSyncStateRole))
     {
         const auto syncState = parameters.argument(Qn::LayoutSyncStateRole);
-        layout->setData(Qn::LayoutSyncStateRole, syncState);
+        resource->setData(Qn::LayoutSyncStateRole, syncState);
     }
 
-    workbench()->addLayout(layout);
+    resourcePool()->addResource(resource);
+
+    QnWorkbenchLayout* layout = workbench()->addLayout(resource);
     workbench()->setCurrentLayout(layout);
 }
 
@@ -1332,7 +1328,8 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
         [this](const QnResourceWidget* widget)
         {
             const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-            return camera && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+            return camera
+                && ResourceAccessManager::hasPermissions(camera, Qn::ViewFootagePermission);
         };
 
     const auto currentWidget = navigator()->currentWidget();

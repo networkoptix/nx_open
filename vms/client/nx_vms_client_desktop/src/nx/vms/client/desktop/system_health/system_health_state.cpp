@@ -90,14 +90,17 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
 
     // NoLicenses.
 
-    connect(q->licensePool(), &QnLicensePool::licensesChanged, q, update(NoLicenses));
+    connect(q->systemContext()->licensePool(),
+        &QnLicensePool::licensesChanged,
+        q,
+        update(NoLicenses));
     connect(q->context(), &QnWorkbenchContext::userChanged, q, update(NoLicenses));
 
     update(NoLicenses)();
 
     // SmtpIsNotSet.
 
-    connect(q->globalSettings(), &SystemSettings::emailSettingsChanged, q, update(SmtpIsNotSet));
+    connect(q->systemSettings(), &SystemSettings::emailSettingsChanged, q, update(SmtpIsNotSet));
     connect(q->context(), &QnWorkbenchContext::userChanged, q, update(SmtpIsNotSet));
 
     update(SmtpIsNotSet)();
@@ -109,11 +112,11 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
     connect(internetAccessWatcher(), &SystemInternetAccessWatcher::internetAccessChanged,
         q, update(NoInternetForTimeSync));
 
-    connect(q->globalSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
+    connect(q->systemSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
         q, update(NoInternetForTimeSync));
 
     const auto messageProcessor =
-        dynamic_cast<QnClientMessageProcessor*>(q->systemContext()->messageProcessor());
+        dynamic_cast<QnClientMessageProcessor*>(q->messageProcessor());
 
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, q,
         [this]()
@@ -284,7 +287,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
                     servers.insert(item.uuid);
             }
 
-            return q->commonModule()->resourcePool()->getResourcesByIds<QnMediaServerResource>(
+            return q->resourcePool()->getResourcesByIds<QnMediaServerResource>(
                 servers);
         };
 
@@ -323,22 +326,22 @@ bool SystemHealthState::Private::setState(SystemHealthIndex index, bool value)
 
 bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 {
-    if (!qnClientCoreModule->networkModule()->isConnected())
+    if (!q->context()->user())
         return false;
 
     switch (index)
     {
         case SystemHealthIndex::NoInternetForTimeSync:
             return isAdmin()
-                && q->globalSettings()->isTimeSynchronizationEnabled()
-                && q->globalSettings()->primaryTimeServer().isNull()
+                && q->systemSettings()->isTimeSynchronizationEnabled()
+                && q->systemSettings()->primaryTimeServer().isNull()
                 && !internetAccessWatcher()->systemHasInternetAccess();
 
         case SystemHealthIndex::NoLicenses:
-            return isAdmin() && q->licensePool()->isEmpty();
+            return isAdmin() && q->systemContext()->licensePool()->isEmpty();
 
         case SystemHealthIndex::SmtpIsNotSet:
-            return isAdmin() && !q->globalSettings()->emailSettings().isValid();
+            return isAdmin() && !q->systemSettings()->emailSettings().isValid();
 
         case SystemHealthIndex::DefaultCameraPasswords:
             return isAdmin() && !m_camerasWithDefaultPassword.empty();
@@ -356,7 +359,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::CloudPromo:
             return q->context()->user()
                 && q->context()->user()->userRole() == Qn::UserRole::owner
-                && q->globalSettings()->cloudSystemId().isNull()
+                && q->systemSettings()->cloudSystemId().isEmpty()
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
         case SystemHealthIndex::StoragesNotConfigured:
@@ -407,12 +410,12 @@ bool SystemHealthState::Private::isAdmin() const
 
 SystemInternetAccessWatcher* SystemHealthState::Private::internetAccessWatcher() const
 {
-    return q->commonModule()->instance<SystemInternetAccessWatcher>();
+    return q->context()->findInstance<SystemInternetAccessWatcher>();
 }
 
 DefaultPasswordCamerasWatcher* SystemHealthState::Private::defaultPasswordWatcher() const
 {
-    return q->context()->instance<DefaultPasswordCamerasWatcher>();
+    return q->context()->findInstance<DefaultPasswordCamerasWatcher>();
 }
 
 UserEmailsWatcher* SystemHealthState::Private::userEmailsWatcher() const

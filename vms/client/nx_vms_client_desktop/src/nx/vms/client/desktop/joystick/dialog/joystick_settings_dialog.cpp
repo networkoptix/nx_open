@@ -71,12 +71,12 @@ struct JoystickSettingsDialog::Private
 JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager* manager):
     q(owner),
     manager(manager),
-    treeEntityBuilder(new ResourceTreeEntityBuilder(q->commonModule())),
+    treeEntityBuilder(new ResourceTreeEntityBuilder(q->systemContext())),
     buttonSettingsModel(new JoystickButtonSettingsModel(&filterModel, owner)),
     buttonBaseActionChoiceModel(new JoystickButtonActionChoiceModel(true, owner)),
     buttonModifiedActionChoiceModel(new JoystickButtonActionChoiceModel(false, owner))
 {
-    treeEntityBuilder->setUser(q->context()->accessController()->user());
+    treeEntityBuilder->setUser(q->accessController()->user());
     layoutsEntity = treeEntityBuilder->createDialogAllLayoutsEntity();
     layoutModel.setRootEntity(layoutsEntity.get());
     iconDecoratorModel.setSourceModel(&layoutModel);
@@ -248,14 +248,14 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
 
     QmlProperty<QObject*>(rootObjectHolder(), "layoutModel") = &d->filterModel;
 
-    QmlProperty<bool>(rootObjectHolder(), "connectedToServer") =
-        qnClientCoreModule->networkModule()->isConnected();
+    QmlProperty<bool>(rootObjectHolder(), "connectedToServer") = !context()->user().isNull();
 
-    d->connections << connect(qnClientCoreModule->networkModule(),
-        &nx::vms::client::core::NetworkModule::remoteIdChanged,
-        [this]
+    d->connections << connect(context(),
+        &QnWorkbenchContext::userChanged,
+        this,
+        [this](const QnUserResourcePtr& user)
         {
-            const bool connectedToServer = qnClientCoreModule->networkModule()->isConnected();
+            const bool connectedToServer = !user.isNull();
 
             QmlProperty<bool>(rootObjectHolder(), "connectedToServer") = connectedToServer;
 
@@ -272,10 +272,10 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
                 openLayoutChoiceVisible);
         });
 
-    d->connections << connect(context()->accessController(), &QnWorkbenchAccessController::userChanged,
+    d->connections << connect(accessController(), &QnWorkbenchAccessController::userChanged,
         [this]
         {
-            d->treeEntityBuilder->setUser(context()->accessController()->user());
+            d->treeEntityBuilder->setUser(accessController()->user());
             auto layoutsEntity = d->treeEntityBuilder->createDialogAllLayoutsEntity();
             d->layoutModel.setRootEntity(layoutsEntity.get());
             d->layoutsEntity = std::move(layoutsEntity);

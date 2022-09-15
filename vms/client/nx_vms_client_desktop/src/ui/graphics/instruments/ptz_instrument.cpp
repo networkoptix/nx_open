@@ -25,12 +25,12 @@
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/ptz_promo_overlay.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -269,7 +269,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
-    m_expansionSpeed(QnWorkbench::kUnitSize / 5.0),
+    m_expansionSpeed(Workbench::kUnitSize / 5.0),
     m_movement(NoMovement),
     m_wheelZoomTimer(new QTimer(this))
 {
@@ -676,7 +676,7 @@ void PtzInstrument::ensureSelectionItem()
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setElementSize(QnWorkbench::kUnitSize / 64.0);
+    selectionItem()->setElementSize(Workbench::kUnitSize / 64.0);
     selectionItem()->setOptions(
         FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
 

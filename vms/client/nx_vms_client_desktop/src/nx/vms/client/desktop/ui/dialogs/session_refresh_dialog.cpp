@@ -5,7 +5,6 @@
 #include <QtWidgets/QLabel>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
@@ -13,6 +12,7 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
@@ -64,7 +64,7 @@ SessionRefreshDialog::SessionRefreshDialog(
 
     auto loginField = new InputField(this);
     loginField->setEnabled(false);
-    loginField->setText(QString::fromStdString(connectionCredentials().username));
+    loginField->setText(QString::fromStdString(systemContext()->connectionCredentials().username));
     addCustomWidget(loginField);
 
     // Password input and label.
@@ -104,7 +104,8 @@ void SessionRefreshDialog::accept()
     }
 
     nx::vms::api::LoginSessionRequest loginRequest;
-    loginRequest.username = QString::fromStdString(connectionCredentials().username);
+    loginRequest.username = QString::fromStdString(
+        systemContext()->connectionCredentials().username);
     loginRequest.password = m_passwordField->text();
 
     lockUi(true);
@@ -158,9 +159,10 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
 
 void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest)
 {
-    const auto currentToken = connectionCredentials().authToken;
-    NX_ASSERT(currentToken.isPassword());
+    const nx::network::http::AuthToken currentToken =
+        systemContext()->connectionCredentials().authToken;
 
+    NX_ASSERT(currentToken.isPassword());
     if (loginRequest.password == currentToken.value)
     {
         m_validationResult = ValidationResult::kValid;

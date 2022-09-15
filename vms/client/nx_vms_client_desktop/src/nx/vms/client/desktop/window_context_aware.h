@@ -9,7 +9,6 @@
 class QAction;
 class QWidget;
 
-class QnWorkbench;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 
@@ -19,6 +18,7 @@ namespace ui::action { class Manager; }
 
 class MainWindow;
 class WindowContext;
+class Workbench;
 
 class WindowContextAware
 {
@@ -29,7 +29,7 @@ public:
     WindowContext* windowContext() const;
 
 protected:
-    QnWorkbench* workbench() const;
+    Workbench* workbench() const;
 
     QnWorkbenchDisplay* display() const;
 

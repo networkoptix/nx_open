@@ -24,9 +24,9 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
@@ -112,10 +112,10 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     connect(action(action::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
         &LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered);
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         &LayoutTourReviewController::stopListeningLayout);
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
 }
 
@@ -133,7 +133,7 @@ void LayoutTourReviewController::handleTourChanged(const nx::vms::api::LayoutTou
 
     reviewLayout->setName(tour.name);
     reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
-    auto wbLayout = QnWorkbenchLayout::instance(reviewLayout);
+    auto wbLayout = workbench()->layout(reviewLayout);
     if (wbLayout)
         wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
 
@@ -157,13 +157,9 @@ void LayoutTourReviewController::handleTourRemoved(const QnUuid& tourId)
     // Handle only tours we are currently reviewing.
     if (auto reviewLayout = m_reviewLayouts.take(tourId))
     {
-        if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
-        {
-            wbLayout->deleteLater();
-            workbench()->removeLayout(wbLayout);
-            if (workbench()->layouts().empty())
-                menu()->trigger(action::OpenNewTabAction);
-        }
+        workbench()->removeLayout(reviewLayout);
+        if (workbench()->layouts().empty())
+            menu()->trigger(action::OpenNewTabAction);
     }
 }
 

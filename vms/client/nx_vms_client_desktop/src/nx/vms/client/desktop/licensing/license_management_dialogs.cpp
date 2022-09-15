@@ -7,13 +7,13 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QPushButton>
 
-#include <common/common_module.h>
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/license/validator.h>
@@ -105,9 +105,9 @@ public:
 
         QnLicenseList licenses = limitToLicenses
             ? *limitToLicenses
-            : context->licensePool()->getLicenses();
+            : context->systemContext()->licensePool()->getLicenses();
 
-        CustomerSupport customerSupport(context->commonModule());
+        CustomerSupport customerSupport(context->systemContext());
         const auto regionalContacts = customerSupport.regionalContactsForLicenses(licenses);
 
         if (regionalContacts.empty())

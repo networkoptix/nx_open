@@ -51,7 +51,7 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
     {
         case nx::vms::api::ResourceStatus::online:
         {
-            auto connection = resource->systemContext()->ec2Connection();
+            auto connection = resource->systemContext()->messageBusConnection();
             if (key == Key::Server
                 && connection
                 && resource->getId() == connection->moduleInformation().id)

@@ -9,9 +9,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
-class QnCommonModule;
-class QnWorkbenchAccessController;
 class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop::entity_item_model { class EntityItemModel; }
@@ -24,15 +23,14 @@ namespace entity_resource_tree {
 
 class ResourceTreeEntityBuilder;
 
-class NX_VMS_CLIENT_DESKTOP_API ResourceTreeComposer: public QObject
+class NX_VMS_CLIENT_DESKTOP_API ResourceTreeComposer: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
     ResourceTreeComposer(
-        QnCommonModule* commonModule,
-        QnWorkbenchAccessController* accessController,
+        SystemContext* systemContext,
         ResourceTreeSettings* resourceTreeSettings);
 
     virtual ~ResourceTreeComposer() override;
@@ -83,8 +81,6 @@ private:
     entity_item_model::AbstractEntity* entityForCurrentFilterMode() const;
 
 private:
-    const QnCommonModule* m_commonModule;
-    const QnWorkbenchAccessController* m_acccessController;
     const ResourceTreeSettings* m_resourceTreeSettings;
 
     QScopedPointer<ResourceTreeEntityBuilder> m_entityBuilder;

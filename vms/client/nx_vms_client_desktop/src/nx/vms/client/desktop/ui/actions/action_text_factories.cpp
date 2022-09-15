@@ -2,10 +2,9 @@
 
 #include "action_text_factories.h"
 
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-
 #include <core/resource/camera_resource.h>
-
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {

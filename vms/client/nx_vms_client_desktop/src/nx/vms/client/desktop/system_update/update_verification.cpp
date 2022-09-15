@@ -3,8 +3,6 @@
 #include "update_verification.h"
 
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
@@ -12,6 +10,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/update/update_check.h>
@@ -25,7 +24,7 @@ const QString kFilePrefix = "file://";
 
 namespace nx::vms::client::desktop {
 
-QSet<QnUuid> getServersLinkedToCloud(QnCommonModule* commonModule, const QSet<QnUuid>& peers)
+QSet<QnUuid> getServersLinkedToCloud(SystemContext* systemContext, const QSet<QnUuid>& peers)
 {
     QSet<QnUuid> result;
 
@@ -35,7 +34,7 @@ QSet<QnUuid> getServersLinkedToCloud(QnCommonModule* commonModule, const QSet<Qn
 
     for (const auto& id: peers)
     {
-        const auto server = commonModule->resourcePool()->getIncompatibleServerById(id);
+        const auto server = systemContext->resourcePool()->getIncompatibleServerById(id);
         if (!server)
             continue;
 
@@ -61,9 +60,13 @@ void ClientVerificationData::fillDefault()
     currentVersion = nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
 }
 
-bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion targetVersion, QString cloudUrl, const QSet<QnUuid>& peers)
+bool checkCloudHost(
+    SystemContext* systemContext,
+    nx::utils::SoftwareVersion targetVersion,
+    QString cloudUrl,
+    const QSet<QnUuid>& peers)
 {
-    NX_ASSERT(commonModule);
+    NX_ASSERT(systemContext);
     /* Ignore cloud host for versions lower than 3.0. */
     static const nx::utils::SoftwareVersion kCloudRequiredVersion(3, 0);
 
@@ -75,11 +78,11 @@ bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion tar
     if (cloudUrl == nx::network::SocketGlobals::cloud().cloudHost())
         return true;
 
-    const bool isBoundToCloud = !commonModule->globalSettings()->cloudSystemId().isEmpty();
+    const bool isBoundToCloud = !systemContext->globalSettings()->cloudSystemId().isEmpty();
     if (isBoundToCloud)
         return false;
 
-    const auto serversLinkedToCloud = getServersLinkedToCloud(commonModule, peers);
+    const auto serversLinkedToCloud = getServersLinkedToCloud(systemContext, peers);
     return serversLinkedToCloud.isEmpty();
 }
 
@@ -387,10 +390,10 @@ bool verifyUpdateContents(
         contents.ignorePeers = serversWithNewerVersion;
     }
 
-    if (options.commonModule)
+    if (options.systemContext)
     {
         contents.cloudIsCompatible = checkCloudHost(
-            options.commonModule, targetVersion, contents.info.cloudHost, allServers);
+            options.systemContext, targetVersion, contents.info.cloudHost, allServers);
     }
 
     for (auto id: contents.unsuportedSystemsReport.keys())

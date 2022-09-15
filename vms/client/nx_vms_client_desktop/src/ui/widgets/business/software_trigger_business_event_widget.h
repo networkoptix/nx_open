@@ -23,7 +23,9 @@ class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidge
     using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnSoftwareTriggerBusinessEventWidget(QWidget* parent = nullptr);
+    explicit QnSoftwareTriggerBusinessEventWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnSoftwareTriggerBusinessEventWidget();
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

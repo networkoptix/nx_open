@@ -98,7 +98,7 @@ NetworkModule* QnClientCoreModule::networkModule() const
 
 QnResourcePool* QnClientCoreModule::resourcePool() const
 {
-    return d->commonModule->systemContext()->resourcePool();
+    return d->commonModule->resourcePool();
 }
 
 QnCommonModule* QnClientCoreModule::commonModule() const

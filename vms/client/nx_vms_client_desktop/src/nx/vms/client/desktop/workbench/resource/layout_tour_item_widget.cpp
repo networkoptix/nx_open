@@ -268,10 +268,7 @@ void LayoutTourItemWidget::initOverlay()
             menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 
-    auto layoutResource = item()->layout()->resource();
-    NX_ASSERT(layoutResource);
-
-    connect(layoutResource.get(),
+    connect(layoutResource().get(),
         &LayoutResource::itemDataChanged,
         this,
         [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)

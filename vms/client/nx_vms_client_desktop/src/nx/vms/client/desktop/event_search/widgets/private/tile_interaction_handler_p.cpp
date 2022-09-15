@@ -37,8 +37,8 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -50,13 +50,13 @@
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/utils/table_export_helper.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -166,8 +166,8 @@ TileInteractionHandler::TileInteractionHandler(QnWorkbenchContext* context, QObj
                 : QSet<QnResourcePtr>());
         };
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, updateHighlightedResources);
-    connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this, updateHighlightedResources);
+    connect(workbench(), &Workbench::currentLayoutChanged, this, updateHighlightedResources);
+    connect(workbench(), &Workbench::currentLayoutItemsChanged, this, updateHighlightedResources);
 
     connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged, this,
         [this]() { emit highlightedTimestampChanged(microseconds(navigator()->positionUsec())); });
@@ -311,7 +311,7 @@ void TileInteractionHandler::executePluginAction(
     if (!connection())
         return;
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(commonModule());
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext());
     const auto actionDescriptor = descriptorManager.descriptor(actionTypeId);
     if (!actionDescriptor)
         return;
@@ -422,7 +422,7 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 
                         case HeaderItem::camera:
                         {
-                            ::utils::QnCameraNamesWatcher cameraNamesWatcher(commonModule());
+                            ::utils::QnCameraNamesWatcher cameraNamesWatcher(systemContext());
                             cellValue = cameraNamesWatcher.getCameraName(bookmark.cameraId);
                             break;
                         }

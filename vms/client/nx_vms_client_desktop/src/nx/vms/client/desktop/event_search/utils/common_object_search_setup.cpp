@@ -20,7 +20,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -182,7 +182,8 @@ int CommonObjectSearchSetup::cameraCount() const
 
 bool CommonObjectSearchSetup::mixedDevices() const
 {
-    return context() && context()->resourcePool() && context()->resourcePool()->containsIoModules();
+    return context()
+        && context()->resourcePool()->containsIoModules();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -271,10 +272,10 @@ void CommonObjectSearchSetup::Private::setContext(QnWorkbenchContext* value)
         << connect(m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
             this, camerasUpdaterFor(RightPanel::CameraSelection::current));
 
-    m_contextConnections << connect(m_context->workbench(), &QnWorkbench::currentLayoutChanged,
+    m_contextConnections << connect(m_context->workbench(), &Workbench::currentLayoutChanged,
         this, camerasUpdaterFor(RightPanel::CameraSelection::layout));
 
-    m_contextConnections << connect(m_context->workbench(), &QnWorkbench::currentLayoutItemsChanged,
+    m_contextConnections << connect(m_context->workbench(), &Workbench::currentLayoutItemsChanged,
         this, camerasUpdaterFor(RightPanel::CameraSelection::layout));
 }
 
@@ -394,7 +395,8 @@ bool CommonObjectSearchSetup::Private::chooseCustomCameras()
     }
 
     const auto cameras = nx::utils::toQSet(
-        m_context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(chosenIds));
+        m_context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            chosenIds));
 
     if (cameras.empty())
         return false; //< Cancel, if user didn't select any camera.

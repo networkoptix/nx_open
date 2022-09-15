@@ -4,19 +4,21 @@
 
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/scoped_value_rollback.h>
 
-#include "workbench.h"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
 using namespace nx::vms::client::desktop;
 
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(
-    QnWorkbenchLayout* layout, QObject* parent):
+    QnWorkbenchLayout* layout,
+    QObject* parent)
+    :
     base_type(parent),
     m_layout(layout)
 {
@@ -56,10 +58,6 @@ void QnWorkbenchLayoutSynchronizer::initialize()
         this,
         &QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved);
 
-    connect(m_layout,
-        &QnWorkbenchLayout::aboutToBeDestroyed,
-        this,
-        &QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed);
     // TODO: #sivanov Get rid of resourceChanged.
     connect(resource,
         &QnLayoutResource::resourceChanged,
@@ -83,7 +81,7 @@ void QnWorkbenchLayoutSynchronizer::initialize()
 }
 
 QnWorkbenchLayoutSynchronizer* QnWorkbenchLayoutSynchronizer::instance(
-    const QnLayoutResourcePtr& resource)
+    const LayoutResourcePtr& resource)
 {
     if (auto layout = QnWorkbenchLayout::instance(resource))
         return layout->layoutSynchronizer();
@@ -269,11 +267,6 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem* item)
     m_pendingItems.remove(item->uuid());
 
     resource()->removeItem(item->uuid());
-}
-
-void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed()
-{
-    submitPendingItems();
 }
 
 void QnWorkbenchLayoutSynchronizer::at_item_dataChanged(int role)

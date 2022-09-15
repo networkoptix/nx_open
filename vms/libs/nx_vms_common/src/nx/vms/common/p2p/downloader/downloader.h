@@ -6,7 +6,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QDir>
 
-#include <common/common_module_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 #include "result_code.h"
 #include "file_information.h"
@@ -17,14 +17,14 @@ class AbstractPeerManager;
 
 class NX_VMS_COMMON_API Downloader:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
 
 public:
     Downloader(
         const QDir& downloadsDirectory,
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const QList<AbstractPeerManager*>& peerManagers = {},
         QObject* parent = nullptr);
 

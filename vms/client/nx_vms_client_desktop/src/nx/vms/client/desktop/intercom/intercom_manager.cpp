@@ -38,7 +38,7 @@ struct IntercomManager::Private: public QObject
     Private(IntercomManager* owner):
         q(owner)
     {
-        connect(q->systemContext()->resourceAccessProvider(),
+        connect(q->resourceAccessProvider(),
             &nx::core::access::ResourceAccessProvider::accessChanged,
             this,
             [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
@@ -47,7 +47,7 @@ struct IntercomManager::Private: public QObject
                 if (!camera)
                     return;
 
-                if (q->systemContext()->resourceAccessProvider()->hasAccess(currentUser, resource))
+                if (q->resourceAccessProvider()->hasAccess(currentUser, resource))
                     tryCreateLayouts({camera});
                 else
                     tryRemoveLayouts({camera}, /*localOnly*/ true);
@@ -122,7 +122,7 @@ struct IntercomManager::Private: public QObject
 
     void tryCreateIntercomLocalLayout(const QnResourcePtr& intercom)
     {
-        if (!q->systemContext()->resourceAccessProvider()->hasAccess(currentUser, intercom))
+        if (!q->resourceAccessProvider()->hasAccess(currentUser, intercom))
             return;
 
         auto resourcePool = intercom->resourcePool();

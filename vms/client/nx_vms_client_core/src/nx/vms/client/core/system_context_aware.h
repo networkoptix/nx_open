@@ -31,8 +31,6 @@ public:
 
     SystemContext* systemContext() const;
 
-protected:
-
     QnClientMessageProcessor* clientMessageProcessor() const;
 
     /**

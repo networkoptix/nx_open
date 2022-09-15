@@ -9,7 +9,7 @@
 
 #include <camera/gl_renderer.h>
 #include <core/resource/resource_fwd.h>
-
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -45,7 +45,7 @@ public:
     QnWorkbenchGridMapper* mapper() const;
     void setMapper(QnWorkbenchGridMapper* mapper);
 
-    void update(const QnLayoutResourcePtr& layout);
+    void update(const nx::vms::client::desktop::LayoutResourcePtr& layout);
 
     QRect sceneBoundingRect() const;
 

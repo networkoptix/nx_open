@@ -3,13 +3,14 @@
 #include "exec_http_request_action_widget.h"
 #include "ui_exec_http_request_action_widget.h"
 
+#include <map>
+
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/network/http/http_async_client.h>
 #include <nx/vms/event/action_parameters.h>
 
-#include <nx/network/http/http_async_client.h>
-
-#include <map>
+using namespace nx::vms::client::desktop;
 
 namespace
 {
@@ -25,8 +26,11 @@ static const QStringList kAutoRequestTypes{
 };
 } // namespace
 
-QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
-    base_type(parent),
+QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::ExecHttpRequestActionWidget)
 {
     ui->setupUi(this);

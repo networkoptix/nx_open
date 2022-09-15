@@ -464,7 +464,7 @@ void OutgoingMailSettingsWidget::Private::updateCloudServiceStatus()
     if (!NX_ASSERT(getUseCloudServiceFromDialog()))
         return;
 
-    const auto connectedToCloud = !q->systemSettings()->cloudSystemId().isNull();
+    const auto connectedToCloud = !q->systemSettings()->cloudSystemId().isEmpty();
     if (connectedToCloud)
     {
         setConfigurationStatus(Active);
@@ -568,7 +568,7 @@ bool OutgoingMailSettingsWidget::Private::ignoreInputNotifications() const
 
 QMenu* OutgoingMailSettingsWidget::Private::effectiveServiceTypeDropdownMenu() const
 {
-    const auto connectedToCloud = !q->systemSettings()->cloudSystemId().isNull();
+    const auto connectedToCloud = !q->systemSettings()->cloudSystemId().isEmpty();
 
     // Menu will be shown anyway if "Cloud" option was set somehow.
     const auto showMenu =

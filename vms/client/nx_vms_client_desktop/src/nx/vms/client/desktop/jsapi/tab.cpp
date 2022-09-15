@@ -4,7 +4,7 @@
 
 #include <QtCore/QJsonDocument>
 
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "detail/helpers.h"

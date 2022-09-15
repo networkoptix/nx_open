@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -14,6 +13,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -25,17 +25,15 @@ using namespace nx::vms::api;
 using namespace entity_item_model;
 
 ResourceTreeComposer::ResourceTreeComposer(
-    QnCommonModule* commonModule,
-    QnWorkbenchAccessController* accessController,
+    SystemContext* systemContext,
     ResourceTreeSettings* resourceTreeSettings)
     :
     base_type(nullptr),
-    m_commonModule(commonModule),
-    m_acccessController(accessController),
+    SystemContextAware(systemContext),
     m_resourceTreeSettings(resourceTreeSettings),
-    m_entityBuilder(new ResourceTreeEntityBuilder(commonModule))
+    m_entityBuilder(new ResourceTreeEntityBuilder(systemContext))
 {
-    connect(m_acccessController, &QnWorkbenchAccessController::userChanged,
+    connect(systemContext->accessController(), &QnWorkbenchAccessController::userChanged,
         this, &ResourceTreeComposer::onWorkbenchUserChanged);
 
     if (m_resourceTreeSettings)
@@ -44,7 +42,7 @@ ResourceTreeComposer::ResourceTreeComposer(
             this, &ResourceTreeComposer::onShowServersInTreeChanged);
     }
 
-    onWorkbenchUserChanged(m_acccessController->user());
+    onWorkbenchUserChanged(systemContext->accessController()->user());
 }
 
 ResourceTreeComposer::~ResourceTreeComposer()
@@ -75,8 +73,8 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
         return m_entityBuilder->createServersGroupEntity();
 
     const bool userCanSeeServers =
-        m_acccessController->hasGlobalPermission(GlobalPermission::admin)
-            || m_commonModule->globalSettings()->showServersInTreeForNonAdmins();
+        accessController()->hasGlobalPermission(GlobalPermission::admin)
+            || systemSettings()->showServersInTreeForNonAdmins();
 
     const bool showServers = userCanSeeServers
         && m_resourceTreeSettings->showServersInTree();
@@ -88,8 +86,8 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
 
 void ResourceTreeComposer::rebuildEntity()
 {
-    const auto currentUser = m_acccessController->user();
-    const bool isAdmin = m_acccessController->hasGlobalPermission(GlobalPermission::admin);
+    const auto currentUser = accessController()->user();
+    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     if (m_attachedModel)
         m_attachedModel->setRootEntity(nullptr);

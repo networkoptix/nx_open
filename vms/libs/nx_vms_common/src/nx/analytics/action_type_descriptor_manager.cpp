@@ -2,18 +2,17 @@
 
 #include "action_type_descriptor_manager.h"
 
-#include <nx/analytics/properties.h>
-#include <nx/analytics/utils.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-
-#include <common/common_module.h>
+#include <api/runtime_info_manager.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
-
-#include <api/runtime_info_manager.h>
-
+#include <nx/analytics/properties.h>
+#include <nx/analytics/utils.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/system_context.h>
+
+using namespace nx::vms::common;
 
 namespace nx::analytics {
 
@@ -41,8 +40,8 @@ std::map<ActionTypeId, ActionTypeDescriptor> retrieveActionTypeDescriptors(
 
 } // namespace
 
-ActionTypeDescriptorManager::ActionTypeDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule)
+ActionTypeDescriptorManager::ActionTypeDescriptorManager(SystemContext* systemContext):
+    SystemContextAware(systemContext)
 {
 }
 
@@ -72,7 +71,8 @@ ActionTypeDescriptorMap ActionTypeDescriptorManager::availableObjectActionTypeDe
     if (!deviceParentServer)
         return {};
 
-    const auto runtimeInfo = runtimeInfoManager()->item(deviceParentServer->getId());
+    const auto runtimeInfo = systemContext()->runtimeInfoManager()->item(
+        deviceParentServer->getId());
 
     const auto engines = resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
         runtimeInfo.data.activeAnalyticsEngines);

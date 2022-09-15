@@ -8,8 +8,8 @@
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/email/email.h>
 
@@ -96,10 +96,10 @@ ContactAddress::ContactAddress(const QString& address):
 {
 }
 
-CustomerSupport::CustomerSupport(QnCommonModule* commonModule):
+CustomerSupport::CustomerSupport(SystemContext* systemContext):
     CustomerSupport(
-        commonModule->systemContext()->globalSettings()->emailSettings().supportEmail,
-        commonModule->systemContext()->licensePool()->getLicenses())
+        systemContext->globalSettings()->emailSettings().supportEmail,
+        systemContext->licensePool()->getLicenses())
 {
 }
 

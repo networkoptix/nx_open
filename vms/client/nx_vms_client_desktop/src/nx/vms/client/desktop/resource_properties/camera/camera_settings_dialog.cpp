@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
@@ -33,7 +34,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -245,7 +245,8 @@ struct CameraSettingsDialog::Private: public QObject
 
     void handleCamerasWithDefaultPasswordChanged()
     {
-        const auto defaultPasswordWatcher = q->context()->instance<DefaultPasswordCamerasWatcher>();
+        const auto defaultPasswordWatcher =
+            q->context()->findInstance<DefaultPasswordCamerasWatcher>();
         const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword()
             .intersect(nx::utils::toQSet(cameras));
 
@@ -402,7 +403,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(ui->defaultPasswordAlert, &DefaultPasswordAlertBar::changeDefaultPasswordRequest, this,
         [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
 
-    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto defaultPasswordWatcher = context()->findInstance<DefaultPasswordCamerasWatcher>();
     connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraSetChanged, this,
         [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
 

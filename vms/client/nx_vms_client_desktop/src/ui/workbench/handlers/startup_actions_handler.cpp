@@ -39,12 +39,12 @@
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -404,12 +404,9 @@ void StartupActionsHandler::handleAcsModeResources(
 
     LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid());
-    layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
-    resourcePool()->addResource(layout);
 
-    const auto wlayout = new QnWorkbenchLayout(layout, this);
-    workbench()->addLayout(wlayout);
+    const auto wlayout = workbench()->addLayout(layout);
     workbench()->setCurrentLayout(wlayout);
 
     menu()->trigger(OpenInCurrentLayoutAction, resources);

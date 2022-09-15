@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "abstract_search_widget_p.h"
-#include "tile_interaction_handler_p.h"
 #include "ui_abstract_search_widget.h"
 
 #include <chrono>
@@ -9,21 +8,34 @@
 #include <QtCore/QEasingCurve>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QTimer>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QToolButton>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QToolButton>
 
-#include <nx/vms/client/desktop/ini.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/common/palette.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
+#include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
+#include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/common/palette.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -32,19 +44,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
-#include <nx/vms/client/desktop/common/utils/custom_painted.h>
-#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-#include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
-#include <nx/vms/client/desktop/event_search/models/private/busy_indicator_model_p.h>
-#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
-#include <nx/utils/log/assert.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/math/fuzzy.h>
-#include <nx/utils/pending_operation.h>
+#include "tile_interaction_handler_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -578,7 +578,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 QString AbstractSearchWidget::Private::currentDeviceText() const
 {
     const auto camera = m_commonSetup->singleCamera();
-    const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+    const auto baseText = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
         QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")), camera);
 
     return singleDeviceText(baseText, camera);
@@ -605,13 +605,13 @@ QString AbstractSearchWidget::Private::deviceButtonText(
         {
             if (m_commonSetup->cameraCount() > 1)
             {
-                return QnDeviceDependentStrings::getDefaultNameFromSet(q->resourcePool(),
+                return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
                     tr("%n chosen devices", "", m_commonSetup->cameraCount()),
                     tr("%n chosen cameras", "", m_commonSetup->cameraCount()));
             }
 
             const auto camera = m_commonSetup->singleCamera();
-            const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+            const auto baseText = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(tr("Chosen device"), tr("Chosen camera")),
                     camera);
 
@@ -780,7 +780,7 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
         if (item.action)
         {
             item.action->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                q->resourcePool(), item.mixedString, item.cameraString));
+                resourcePool(), item.mixedString, item.cameraString));
         }
     }
 }

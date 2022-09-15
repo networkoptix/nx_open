@@ -4,19 +4,19 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class SystemInternetAccessWatcher:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
 
 public:
-    explicit SystemInternetAccessWatcher(QObject* parent = nullptr);
+    explicit SystemInternetAccessWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~SystemInternetAccessWatcher() override;
 
     bool systemHasInternetAccess() const;

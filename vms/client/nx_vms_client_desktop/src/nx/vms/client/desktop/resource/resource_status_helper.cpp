@@ -18,6 +18,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -68,7 +69,6 @@ private:
     nx::utils::ScopedConnections m_resourceConnections;
     StatusFlags m_status{};
     LicenseUsage m_licenseUsage = LicenseUsage::notUsed;
-    QPointer<QnWorkbenchAccessController> m_cameraAccessController;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ int ResourceStatusHelper::defaultPasswordCameras() const
     if (!d->context())
         return 0;
 
-    const auto watcher = d->context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto watcher = d->context()->findInstance<DefaultPasswordCamerasWatcher>();
     return watcher ? watcher->camerasWithDefaultPassword().size() : 0;
 }
 
@@ -174,7 +174,7 @@ void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
             this,
             &Private::updateStatus);
 
-        const auto watcher = m_context->instance<DefaultPasswordCamerasWatcher>();
+        const auto watcher = m_context->findInstance<DefaultPasswordCamerasWatcher>();
         if (NX_ASSERT(watcher))
         {
             m_contextConnections << connect(watcher,
@@ -233,8 +233,6 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
 
         if (m_camera)
         {
-            m_cameraAccessController = SystemContext::fromResource(m_camera)->accessController();
-
             using namespace nx::vms::license;
             m_licenseHelper.reset(new SingleCamLicenseStatusHelper(m_camera));
             connect(m_licenseHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
@@ -274,13 +272,14 @@ void ResourceStatusHelper::Private::updateStatus()
             m_camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::isOldFirmware));
 
         status.setFlag(StatusFlag::canViewLive,
-            m_context->accessController()->hasPermissions(m_resource, Qn::ViewLivePermission));
+            ResourceAccessManager::hasPermissions(m_resource, Qn::ViewLivePermission));
 
         status.setFlag(StatusFlag::canViewArchive,
-            m_context->accessController()->hasPermissions(m_resource, Qn::ViewFootagePermission));
+            ResourceAccessManager::hasPermissions(m_resource, Qn::ViewFootagePermission));
 
-        status.setFlag(StatusFlag::canEditSettings, m_context->accessController()->hasPermissions(
-            m_resource, Qn::SavePermission | Qn::WritePermission));
+        status.setFlag(StatusFlag::canEditSettings,
+            ResourceAccessManager::hasPermissions(m_resource,
+                Qn::SavePermission | Qn::WritePermission));
 
         status.setFlag(StatusFlag::canInvokeDiagnostics, m_camera->hasFlags(Qn::live_cam)
             && !m_context->action(ui::action::ToggleLayoutTourModeAction)->isChecked());
@@ -288,11 +287,12 @@ void ResourceStatusHelper::Private::updateStatus()
         status.setFlag(StatusFlag::dts, m_camera->isDtsBased());
 
         status.setFlag(StatusFlag::accessDenied,
-            !m_cameraAccessController->hasPermissions(m_camera, Qn::ViewContentPermission));
+            !ResourceAccessManager::hasPermissions(m_camera, Qn::ViewContentPermission));
     }
 
     status.setFlag(StatusFlag::canChangePasswords, qnRuntime->isDesktopMode()
-        && m_context->accessController()->hasGlobalPermission(GlobalPermission::admin));
+        && m_context->accessController()->hasGlobalPermission(
+            GlobalPermission::admin));
 
     const auto resourceStatus = m_resource->getStatus();
     status.setFlag(StatusFlag::offline, resourceStatus == nx::vms::api::ResourceStatus::offline);
@@ -423,7 +423,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::setPasswords:
         {
-            const auto watcher = m_context->instance<DefaultPasswordCamerasWatcher>();
+            const auto watcher = m_context->findInstance<DefaultPasswordCamerasWatcher>();
             if (NX_ASSERT(watcher))
                 changeCameraPassword(watcher->camerasWithDefaultPassword().values(), true);
 

@@ -4,21 +4,18 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QScopedValueRollback>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/menu_factory.h>
 #include <nx/vms/client/desktop/ui/actions/action_builder.h>
 #include <nx/vms/client/desktop/ui/actions/action_factories.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
-
-#include <ui/workbench/workbench.h>
-
-#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/ui/actions/menu_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -73,7 +70,7 @@ Manager::Manager(QObject* parent):
     m_actionById[NoAction] = m_root;
     m_idByAction[m_root] = NoAction;
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         &Manager::hideAllMenus);
     initialize(this, m_root);
 }

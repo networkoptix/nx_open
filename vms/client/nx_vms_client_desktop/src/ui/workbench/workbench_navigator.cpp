@@ -52,6 +52,7 @@ extern "C" {
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <server/server_storage_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -73,7 +74,6 @@ extern "C" {
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
-#include "workbench.h"
 #include "workbench_context.h"
 #include "workbench_display.h"
 #include "workbench_item.h"
@@ -212,16 +212,18 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     });
     updateCameraHistoryTimer->start();
 
-    connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this, [this]
-    {
-        m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
-    });
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
+        [this]
+        {
+            m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
+        });
 
-    connect(workbench(), &QnWorkbench::layoutChangeProcessFinished, this, [this]
-    {
-        resetSyncedPeriods();
-        updateSyncedPeriods();
-    });
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
+        [this]
+        {
+            resetSyncedPeriods();
+            updateSyncedPeriods();
+        });
 }
 
 QnWorkbenchNavigator::~QnWorkbenchNavigator()
@@ -386,7 +388,7 @@ void QnWorkbenchNavigator::initialize()
     if (!isValid())
         return;
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged,
+    connect(workbench(), &Workbench::currentLayoutChanged,
         this, &QnWorkbenchNavigator::updateSliderOptions);
 
     connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
@@ -2801,19 +2803,26 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr& c
 
 void QnWorkbenchNavigator::updateHistoryForCamera(QnSecurityCamResourcePtr camera)
 {
-    if (!camera)
+    // Silently retry loading for cameras which context is not ready yet.
+    if (!camera || (camera->hasFlags(Qn::cross_system) && camera->hasFlags(Qn::fake)))
         return;
 
     m_updateHistoryQueue.remove(camera);
 
-    if (cameraHistoryPool()->isCameraHistoryValid(camera))
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
         return;
 
-    QnCameraHistoryPool::StartResult result = cameraHistoryPool()->updateCameraHistoryAsync(camera, [this, camera](bool success)
-    {
-        if (!success)
-            m_updateHistoryQueue.insert(camera); //< retry loading
-    });
+    if (systemContext->cameraHistoryPool()->isCameraHistoryValid(camera))
+        return;
+
+    QnCameraHistoryPool::StartResult result =
+        systemContext->cameraHistoryPool()->updateCameraHistoryAsync(camera,
+            [this, camera](bool success)
+            {
+                if (!success)
+                    m_updateHistoryQueue.insert(camera); //< retry loading
+            });
     if (result == QnCameraHistoryPool::StartResult::failed)
         m_updateHistoryQueue.insert(camera); //< retry loading
 }

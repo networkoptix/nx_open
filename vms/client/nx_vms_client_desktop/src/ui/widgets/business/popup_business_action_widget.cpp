@@ -12,10 +12,14 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
-    base_type(parent),
+QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::PopupBusinessActionWidget)
 {
     ui->setupUi(this);

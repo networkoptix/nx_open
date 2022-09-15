@@ -53,7 +53,7 @@ void QnDesktopResource::initializeConnection(
         server,
         userId,
         systemContext()->peerId(),
-        systemContext()->ec2Connection()->credentials()));
+        systemContext()->messageBusConnection()->credentials()));
     m_connection->start();
 }
 

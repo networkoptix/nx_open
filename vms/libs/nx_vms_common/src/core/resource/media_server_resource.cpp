@@ -331,7 +331,7 @@ QString QnMediaServerResource::rtspUrl() const
 
     if (auto context = systemContext())
     {
-        if (auto connection = context->ec2Connection())
+        if (auto connection = context->messageBusConnection())
         {
             isSecure = context->globalSettings()->isVideoTrafficEncryptionForced()
                 || connection->credentials().authToken.isBearerToken();

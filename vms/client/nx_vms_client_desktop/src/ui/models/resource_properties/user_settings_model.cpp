@@ -2,16 +2,16 @@
 
 #include "user_settings_model.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_access/resource_access_filter.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace
 {

@@ -17,7 +17,9 @@ class QnShowTextOverlayActionWidget : public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnShowTextOverlayActionWidget(QWidget *parent = 0);
+    explicit QnShowTextOverlayActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~QnShowTextOverlayActionWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;

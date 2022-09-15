@@ -49,6 +49,7 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
@@ -58,6 +59,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
@@ -72,7 +74,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -292,10 +293,8 @@ TimePeriodType periodType(const QnTimePeriod& period)
 bool canExportPeriods(
     const QnResourceList& resources,
     const QnTimePeriod& period,
-    QnWorkbenchContext* context,
     bool ignoreLoadedChunks = false)
 {
-    const auto accessController = context->accessController();
     return std::any_of(
         resources.cbegin(),
         resources.cend(),
@@ -307,6 +306,12 @@ bool canExportPeriods(
 
             if (resource->hasFlags(Qn::still_image))
                 return false;
+
+            auto systemContext = SystemContext::fromResource(resource);
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            const auto accessController = systemContext->accessController();
 
             if (!accessController->hasPermissions(resource, Qn::ExportPermission))
                 return false;
@@ -321,10 +326,6 @@ bool canExportPeriods(
             // is not available for the given period.
             if (ignoreLoadedChunks)
                 return true;
-
-            auto systemContext = SystemContext::fromResource(resource);
-            if (!NX_ASSERT(systemContext))
-                return false;
 
             // This condition can be checked in the bookmarks dialog when loader is not created.
             const auto loader =
@@ -342,7 +343,7 @@ bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchCont
     const QnResourceList resources{
         context->resourcePool()->getResourceById(bookmark.cameraId)
     };
-    return canExportPeriods(resources, period, context, /*ignoreLoadedChunks*/ true);
+    return canExportPeriods(resources, period, /*ignoreLoadedChunks*/ true);
 }
 
 bool resourceHasVideo(const QnResourcePtr& resource)
@@ -705,8 +706,11 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
     for (auto resource : parameters.resources())
     {
-        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
+        if (context->resourceAccessProvider()->accessibleVia(subject, resource)
+            == nx::core::access::Source::shared)
+        {
             return EnabledAction;
+        }
     }
 
     return DisabledAction;
@@ -754,18 +758,21 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
     return InvisibleAction;
 }
 
-ActionVisibility LayoutItemRemovalCondition::check(const LayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility LayoutItemRemovalCondition::check(
+    const LayoutItemIndexList& layoutItems,
+    QnWorkbenchContext* context)
 {
     for (const LayoutItemIndex& item: layoutItems)
     {
-        if (!context->accessController()->hasPermissions(item.layout(),
+        if (!ResourceAccessManager::hasPermissions(item.layout(),
             Qn::WritePermission | Qn::AddRemoveItemsPermission))
         {
             return InvisibleAction;
         }
 
         const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
-        const auto resource = context->resourcePool()->getResourceById<QnResource>(resourceId);
+        const auto resource =
+            context->resourcePool()->getResourceById<QnResource>(resourceId);
 
         if (nx::vms::common::isIntercomOnIntercomLayout(resource, item.layout()))
         {
@@ -1089,7 +1096,7 @@ ActionVisibility LayoutSettingsCondition::check(const QnResourceList& resources,
     if (!resource)
         return InvisibleAction;
 
-    if (!context->accessController()->hasPermissions(resource, Qn::EditLayoutSettingsPermission))
+    if (!ResourceAccessManager::hasPermissions(resource, Qn::EditLayoutSettingsPermission))
         return InvisibleAction;
     return EnabledAction;
 }
@@ -1299,11 +1306,6 @@ ActionVisibility SetAsBackgroundCondition::check(const LayoutItemIndexList& layo
     return InvisibleAction;
 }
 
-ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
-{
-    return (qnClientCoreModule->networkModule()->isConnected() ? InvisibleAction : EnabledAction);
-}
-
 ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     QnWorkbenchContext* context)
 {
@@ -1434,7 +1436,7 @@ ActionVisibility SaveVideowallReviewCondition::check(
     const QnResourceList& resources,
     QnWorkbenchContext* context)
 {
-    QnLayoutResourceList layouts;
+    LayoutResourceList layouts;
 
     if (m_current)
     {
@@ -1467,7 +1469,7 @@ ActionVisibility SaveVideowallReviewCondition::check(
     if (layouts.isEmpty())
         return InvisibleAction;
 
-    for (const QnLayoutResourcePtr& layout: std::as_const(layouts))
+    for (const LayoutResourcePtr& layout: std::as_const(layouts))
     {
         auto systemContext = SystemContext::fromResource(layout);
         if (NX_ASSERT(systemContext)
@@ -1673,11 +1675,12 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
             return InvisibleAction;
 
         const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
-            context->commonModule()->peerId(), user->getId());
+            context->systemContext()->peerId(), user->getId());
 
         /* Do not check real pointer type to speed up check. */
-        const auto desktopCamera = context->resourcePool()->getNetworkResourceByPhysicalId(
-            desktopCameraId);
+        const auto desktopCamera =
+            context->resourcePool()->getNetworkResourceByPhysicalId(
+                desktopCameraId);
         if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
             return EnabledAction;
 
@@ -1957,7 +1960,7 @@ ConditionWrapper isLoggedIn()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            return qnClientCoreModule->networkModule()->isConnected();
+            return !context->user().isNull();
         });
 }
 
@@ -2138,7 +2141,7 @@ ConditionWrapper canExportLayout()
             if (periodType(period) != NormalTimePeriod)
                 return false;
             const auto resources = ParameterTypes::resources(context->display()->widgets());
-            return canExportPeriods(resources, period, context);
+            return canExportPeriods(resources, period);
         });
 }
 
@@ -2278,8 +2281,9 @@ ConditionWrapper allowedToShowServersInResourceTree()
     return new CustomBoolCondition(
         [](const Parameters&, QnWorkbenchContext* context)
         {
-            return context->accessController()->hasGlobalPermission(GlobalPermission::admin)
-                || context->globalSettings()->showServersInTreeForNonAdmins();
+            return context->accessController()->hasGlobalPermission(
+                GlobalPermission::admin)
+                || context->systemSettings()->showServersInTreeForNonAdmins();
         });
 }
 

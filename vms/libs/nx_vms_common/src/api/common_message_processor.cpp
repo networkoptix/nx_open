@@ -684,7 +684,7 @@ bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
         kvPairs.push_back(nx::vms::api::ResourceParamWithRefData(
             param.resourceId, param.name, ownData));
 
-        m_context->ec2Connection()->getResourceManager(Qn::kSystemAccess)->save(
+        messageBusConnection()->getResourceManager(Qn::kSystemAccess)->save(
             kvPairs, [](int /*requestId*/, ec2::ErrorCode) {});
     }
     return true;
@@ -723,7 +723,7 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
     {
         if (auto res = resourcePool()->getResourceById(resourceId))
         {
-            if (auto connection = m_context->ec2Connection())
+            if (auto connection = messageBusConnection())
             {
                 connection->getResourceManager(Qn::kSystemAccess)->setResourceStatus(
                     resourceId, res->getStatus(), [](int /*requestId*/, ec2::ErrorCode) {});

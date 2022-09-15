@@ -7,15 +7,16 @@
 #include <QtWidgets/QPushButton>
 
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -24,11 +25,12 @@ namespace {
 
 bool shouldDisplayServersInTree(QnWorkbenchContext* context)
 {
+    auto systemContext = context->systemContext();
     const auto isAdmin =
-        context->accessController()->hasGlobalPermission(GlobalPermission::admin);
+        systemContext->accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     const bool currentUserAllowedToShowServers =
-        isAdmin || context->globalSettings()->showServersInTreeForNonAdmins();
+        isAdmin || systemContext->globalSettings()->showServersInTreeForNonAdmins();
 
     const bool showServersInTree = currentUserAllowedToShowServers
         && context->resourceTreeSettings()->showServersInTree();
@@ -67,7 +69,7 @@ CameraSelectionDialog::CameraSelectionDialog(
 
     allCamerasSwitch->setVisible(true);
     allCamerasSwitch->setText(
-        QnDeviceDependentStrings::getDefaultNameFromSet(context()->resourcePool(),
+        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
             tr("Show all devices"),
             tr("Show all cameras")));
 
@@ -77,12 +79,12 @@ CameraSelectionDialog::CameraSelectionDialog(
             if (mode == ResourceSelectionMode::MultiSelection)
             {
                 setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-                    context()->resourcePool(), tr("Select Devices"), tr("Select Cameras")));
+                    resourcePool(), tr("Select Devices"), tr("Select Cameras")));
             }
             else
             {
                 setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-                    context()->resourcePool(), tr("Select Device"), tr("Select Camera")));
+                    resourcePool(), tr("Select Device"), tr("Select Camera")));
             }
         };
 

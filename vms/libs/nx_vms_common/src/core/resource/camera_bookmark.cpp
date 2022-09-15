@@ -5,14 +5,13 @@
 #include <QtCore/QLinkedList>
 #include <QtCore/QMap>
 
-#include <common/common_module.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/system_context.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 
-using std::chrono::milliseconds;
-using namespace std::literals::chrono_literals;
+using namespace std::chrono;
+using namespace nx::vms::common;
 
 namespace
 {
@@ -146,7 +145,7 @@ bool compareCameraThenStartTimeDesc(const QnCameraBookmark &first, const QnCamer
     return first.startTimeMs > second.startTimeMs;
 }
 
-BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSortOrder &sortOrder)
+BinaryPredicate createPredicate(SystemContext* systemContext, const QnBookmarkSortOrder &sortOrder)
 {
     const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
 
@@ -209,16 +208,16 @@ BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSo
         case nx::vms::api::BookmarkSortField::creator:
         {
             const auto creatorGetter =
-                [commonModule](const QnCameraBookmark& bookmark)
+                [systemContext](const QnCameraBookmark& bookmark)
                 {
-                    auto resourcePool = commonModule->systemContext()->resourcePool();
+                    auto resourcePool = systemContext->resourcePool();
                     return helpers::getBookmarkCreatorName(bookmark, resourcePool);
                 };
             return makePredByGetter(creatorGetter, isAscending);
         }
         case nx::vms::api::BookmarkSortField::cameraName:
         {
-            static utils::QnCameraNamesWatcher namesWatcher(commonModule);
+            static utils::QnCameraNamesWatcher namesWatcher(systemContext);
             static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
                 { return namesWatcher.getCameraName(bookmark.cameraId); };
 
@@ -233,12 +232,12 @@ BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSo
 };
 
 QnMultiServerCameraBookmarkList sortEachList(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     QnMultiServerCameraBookmarkList sources,
     const QnBookmarkSortOrder &sortProp)
 {
     for (auto &source: sources)
-        QnCameraBookmark::sortBookmarks(commonModule, source, sortProp);
+        QnCameraBookmark::sortBookmarks(systemContext, source, sortProp);
 
     return std::move(sources);
 }
@@ -360,13 +359,13 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const Q
 
 // TODO: #sivanov Create unit tests.
 void QnCameraBookmark::sortBookmarks(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     QnCameraBookmarkList &bookmarks,
     const QnBookmarkSortOrder orderBy)
 {
     /* For some reason clang fails to compile this if createPredicate is passed directly to std::sort.
        Using lambda for this works. */
-    auto pred = createPredicate(commonModule, orderBy);
+    auto pred = createPredicate(systemContext, orderBy);
     std::sort(bookmarks.begin(), bookmarks.end(), [pred](const QnCameraBookmark &first, const QnCameraBookmark &second)
     {
         return pred(first, second);
@@ -402,7 +401,7 @@ QnCameraBookmark::QnCameraBookmark():
 }
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const QnMultiServerCameraBookmarkList &source,
     const QnBookmarkSortOrder &sortOrder,
     const std::optional<milliseconds>& minVisibleLength,
@@ -412,7 +411,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     if (limit <= 0)
         return QnCameraBookmarkList();
 
-    const auto pred = createPredicate(commonModule, sortOrder);
+    const auto pred = createPredicate(systemContext, sortOrder);
 
     const int intermediateLimit = (minVisibleLength ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
     QnCameraBookmarkList result;
@@ -423,7 +422,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
         case nx::vms::api::BookmarkSortField::cameraName:
         case nx::vms::api::BookmarkSortField::tags:
         {
-            const auto bookmarksList = sortEachList(commonModule, source, sortOrder);
+            const auto bookmarksList = sortEachList(systemContext, source, sortOrder);
             result = mergeSortedBookmarks(bookmarksList, pred, intermediateLimit);
             break;
         }

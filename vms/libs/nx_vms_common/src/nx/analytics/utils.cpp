@@ -3,7 +3,8 @@
 #include "utils.h"
 
 #include <core/resource/camera_resource.h>
-#include <nx/vms/common/system_context.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx::analytics {
 
@@ -33,13 +34,12 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
     return result;
 }
 
-bool serverHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId)
+bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server)
 {
-    auto server = commonModule->systemContext()->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    if (!server)
+    if (!NX_ASSERT(server))
         return false;
 
-    auto cameras = commonModule->systemContext()->resourcePool()->getAllCameras(server);
+    auto cameras = server->resourcePool()->getAllCameras(server);
     return std::any_of(cameras.cbegin(), cameras.cend(),
         [](const auto& camera) { return !camera->supportedObjectTypes().empty(); });
 }

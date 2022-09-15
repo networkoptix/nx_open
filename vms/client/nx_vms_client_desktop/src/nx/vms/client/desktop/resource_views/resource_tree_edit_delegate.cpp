@@ -2,15 +2,16 @@
 
 #include "resource_tree_edit_delegate.h"
 
-#include <QtCore/QVariant>
 #include <QtCore/QModelIndex>
+#include <QtCore/QVariant>
 
 #include <client/client_globals.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/workbench_context.h>
@@ -166,7 +167,10 @@ bool ResourceTreeEditDelegate::operator()(const QModelIndex& index, const QVaria
     if (actionId == ui::action::NoAction)
         return false;
 
-    ActionParameters parameters = getActionParameters(index, nodeType, m_context->resourcePool());
+    ActionParameters parameters = getActionParameters(
+        index,
+        nodeType,
+        m_context->resourcePool());
     parameters.setArgument(Qn::ResourceNameRole, stringValue);
     parameters.setArgument(Qn::NodeTypeRole, nodeType);
 
