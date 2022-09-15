@@ -46,10 +46,9 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         default:
             break;
     }
-    NX_ASSERT(false, "Requesting name for non-visual action");
+    NX_ASSERT(false, "Requesting name for non-visual action: %1", messageType);
     return QString();
 }
-
 
 QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
    const QString& resourceName)
