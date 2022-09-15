@@ -279,8 +279,6 @@ QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay ove
     {
         case Qn::UnauthorizedOverlay:
             return tr("Please check authentication information");
-        case Qn::AccessDeniedOverlay:
-            return tr("Access denied, please contact system administrator");
         default:
             break;
     }
