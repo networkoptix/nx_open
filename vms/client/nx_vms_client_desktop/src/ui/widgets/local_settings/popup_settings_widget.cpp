@@ -39,6 +39,9 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
+    ui->deprecationMessageBar->setText(tr("These settings apply only to the System you are logged"
+        " in and will be removed in the future versions."));
+
     for (EventType eventType: nx::vms::event::allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
