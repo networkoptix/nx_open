@@ -355,8 +355,7 @@ Item
 
                 case StatusOverlay.AccessDenied:
                     return makeErrorOverlayData(qsTr("Access denied"),
-                        "qrc:///skin/item_placeholders/access_denied.png",
-                        qsTr("Access denied, please contact system administrator"))
+                        "qrc:///skin/item_placeholders/access_denied.png")
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
@@ -447,6 +446,7 @@ Item
                         : []
                 }
 
+                case StatusOverlay.AccessDenied:
                 case StatusOverlay.OldFirmwareOverlay:
                 case StatusOverlay.OfflineOverlay:
                 {
