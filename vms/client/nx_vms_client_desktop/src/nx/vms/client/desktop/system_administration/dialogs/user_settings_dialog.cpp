@@ -214,7 +214,8 @@ void UserSettingsDialog::onGroupClicked(const QVariant& idVariant)
 {
     d->sessionNotifier->actionManager()->trigger(
         ui::action::UserRolesAction, ui::action::Parameters()
-            .withArgument(Qn::UuidRole, idVariant.value<QnUuid>()));
+            .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
+            .withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void UserSettingsDialog::onDeleteRequested()
