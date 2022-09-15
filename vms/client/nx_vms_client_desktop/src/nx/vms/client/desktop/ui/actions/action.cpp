@@ -14,11 +14,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
@@ -286,7 +287,13 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
             if (resources.isEmpty() && required > 0)
                 return InvisibleAction;
 
-            if ((accessController()->combinedPermissions(resources) & required) != required)
+            const bool hasPermissions = std::all_of(resources.cbegin(), resources.cend(),
+                [required](const QnResourcePtr& resource)
+                {
+                    return ResourceAccessManager::hasPermissions(resource, required);
+                });
+
+            if (!hasPermissions)
                 return InvisibleAction;
         }
     }

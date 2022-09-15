@@ -50,8 +50,7 @@ void ResourceTreeModelTest::SetUp()
     nx::utils::ModelTransactionChecker::install(m_newResourceTreeModel.get());
 
     m_resourceTreeComposer.reset(new entity_resource_tree::ResourceTreeComposer(
-        commonModule(),
-        systemContext()->accessController(),
+        systemContext(),
         nullptr));
     m_resourceTreeComposer->attachModel(m_newResourceTreeModel.get());
 }

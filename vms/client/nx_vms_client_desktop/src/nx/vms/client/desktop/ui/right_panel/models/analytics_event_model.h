@@ -8,9 +8,9 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 
-class QnCommonModule;
-
 namespace nx::vms::client::desktop {
+
+class AnalyticsEventsSearchTreeBuilder;
 
 class AnalyticsEventModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -25,7 +25,7 @@ public:
     };
 
 public:
-    AnalyticsEventModel(QnCommonModule* commonModule, QObject* parent = nullptr);
+    AnalyticsEventModel(AnalyticsEventsSearchTreeBuilder* builder, QObject* parent = nullptr);
     virtual ~AnalyticsEventModel() override;
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent) const override;

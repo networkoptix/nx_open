@@ -9,16 +9,17 @@
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -49,7 +50,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
-    const QnLdapSettings &settings = globalSettings()->ldapSettings();
+    const QnLdapSettings &settings = systemSettings()->ldapSettings();
 
     if (!settings.isValid(/*checkPassword*/ false))
     {
@@ -146,7 +147,7 @@ void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
 
 void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
 {
-    auto connection = messageBusConnection();
+    auto connection = systemContext()->messageBusConnection();
     if (!connection)
         return;
 
@@ -182,7 +183,7 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
 
 void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
 {
-    auto connection = messageBusConnection();
+    auto connection = systemContext()->messageBusConnection();
     if (!connection)
         return;
 

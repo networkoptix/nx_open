@@ -101,7 +101,7 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->settingsWarningLabel->setVisible(false);
     ui->statisticsReportCheckBox->setChecked(globalSettings()->isStatisticsAllowed());
 
-    const bool connectedToCloud = !globalSettings()->cloudSystemId().isNull();
+    const bool connectedToCloud = !globalSettings()->cloudSystemId().isEmpty();
     const bool hasCustomLanguage = !globalSettings()->cloudNotificationsLanguage().isEmpty();
 
     ui->customNotificationLanguageCheckBox->setVisible(connectedToCloud);
@@ -142,7 +142,7 @@ void QnSystemSettingsWidget::applyChanges()
     globalSettings()->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);
 
-    if (!globalSettings()->cloudSystemId().isNull())
+    if (!globalSettings()->cloudSystemId().isEmpty())
     {
         const auto& locale = ui->languageComboBox->currentData(
             QnTranslationListModel::TranslationRole)
@@ -173,7 +173,7 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (ui->statisticsReportCheckBox->isChecked() != globalSettings()->isStatisticsAllowed())
         return true;
 
-    if (!globalSettings()->cloudSystemId().isNull())
+    if (!globalSettings()->cloudSystemId().isEmpty())
     {
         const auto& currentLocale = globalSettings()->cloudNotificationsLanguage();
 

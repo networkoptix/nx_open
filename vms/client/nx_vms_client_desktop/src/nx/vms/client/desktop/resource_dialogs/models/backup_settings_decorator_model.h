@@ -6,17 +6,17 @@
 
 #include <QtCore/QIdentityProxyModel>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class BackupSettingsDecoratorModel:
     public QIdentityProxyModel,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QIdentityProxyModel;
@@ -26,7 +26,7 @@ public:
     using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
 
 public:
-    BackupSettingsDecoratorModel(QnCommonModule* commonModule);
+    BackupSettingsDecoratorModel(SystemContext* systemContext);
     virtual ~BackupSettingsDecoratorModel() override;
 
     virtual QVariant data(const QModelIndex& index, int role) const override;

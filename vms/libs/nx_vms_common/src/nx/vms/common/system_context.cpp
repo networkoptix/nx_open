@@ -179,7 +179,7 @@ nx::vms::discovery::Manager* SystemContext::moduleDiscoveryManager() const
     return d->moduleDiscoveryManager;
 }
 
-std::shared_ptr<ec2::AbstractECConnection> SystemContext::ec2Connection() const
+std::shared_ptr<ec2::AbstractECConnection> SystemContext::messageBusConnection() const
 {
     if (d->messageProcessor)
         return d->messageProcessor->connection();

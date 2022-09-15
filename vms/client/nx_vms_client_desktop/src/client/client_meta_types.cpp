@@ -78,12 +78,12 @@
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_context.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/help/help_handler.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/color_space/image_correction.h>
@@ -260,7 +260,7 @@ void QnClientMetaTypes::registerQmlTypes()
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
     qmlRegisterType<PerformanceInfo>("nx.vms.client.desktop", 1, 0, "PerformanceInfo");
 
-    qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
+    qmlRegisterUncreatableType<Workbench>("nx.client.desktop", 1, 0, "Workbench",
         "Cannot create instance of Workbench.");
     qmlRegisterUncreatableType<QnWorkbenchContext>("nx.client.desktop", 1, 0, "WorkbenchContext",
         "Cannot create instance of WorkbenchContext.");

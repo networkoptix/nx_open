@@ -609,7 +609,7 @@ QnTimeSlider::QnTimeSlider(
     m_liveSupported(false),
     m_selectionInitiated(false),
     m_livePreview(new LivePreview(this)),
-    m_useLivePreview(ini().enableTimelinePreview && globalSettings()->showMouseTimelinePreview()),
+    m_useLivePreview(ini().enableTimelinePreview && systemSettings()->showMouseTimelinePreview()),
     m_updatingValue(false),
     m_kineticZoomHandler(new KineticZoomHandler(this)),
     m_kineticScrollHandler(new KineticScrollHandler(this)),
@@ -730,11 +730,11 @@ QnTimeSlider::QnTimeSlider(
     connect(qApp, &QApplication::focusChanged, this,
         [this](QWidget* old, QWidget* /*now*/) { m_lastFocusedWidget = old; });
 
-    connect(globalSettings(), &SystemSettings::showMouseTimelinePreviewChanged,
+    connect(systemSettings(), &SystemSettings::showMouseTimelinePreviewChanged,
         [this]
         {
             m_useLivePreview = ini().enableTimelinePreview
-                && globalSettings()->showMouseTimelinePreview();
+                && systemSettings()->showMouseTimelinePreview();
         });
 }
 

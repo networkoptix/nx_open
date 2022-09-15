@@ -7,15 +7,16 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/event/events/camera_input_event.h>
-
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/event/events/camera_input_event.h>
 
 using namespace nx::vms::client::desktop;
 
-QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *parent) :
-    base_type(parent),
+QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::CameraInputBusinessEventWidget)
 {
     ui->setupUi(this);

@@ -1,0 +1,840 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "workbench.h"
+
+#include <common/common_module.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource/layout_reader.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <finders/systems_finder.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/qset.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_synchronizer.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/util.h>
+#include <utils/web_downloader.h>
+
+#include "handlers/layout_tours_handler.h"
+#include "layouts/special_layout.h"
+
+namespace nx::vms::client::desktop {
+
+using namespace ui;
+using namespace ui::workbench;
+
+namespace {
+
+static const QString kWorkbenchDataKey = "workbenchState";
+
+QnWorkbenchItem* bestItemForRole(
+    QnWorkbenchItem** itemByRole, Qn::ItemRole role, const QnWorkbenchItem* ignoredItem = nullptr)
+{
+    for (int i = 0; i != role; i++)
+    {
+        if (itemByRole[i] && itemByRole[i] != ignoredItem)
+            return itemByRole[i];
+    }
+
+    return nullptr;
+}
+
+class StateDelegate: public ClientStateDelegate
+{
+public:
+    StateDelegate(Workbench* workbench): m_workbench(workbench) {}
+
+    virtual bool loadState(const DelegateState& state,
+        SubstateFlags flags,
+        const StartupParameters& /*params*/) override
+    {
+        if (!flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
+            return false;
+
+        // We can't restore Workbench state until all resources are loaded.
+        m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
+        m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
+        QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
+        if (ini().enableMultiSystemTabBar)
+            QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
+        return true;
+    }
+
+    virtual void saveState(DelegateState* state, SubstateFlags flags) override
+    {
+        if (flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
+        {
+            m_state = {};
+            m_workbench->submit(m_state);
+
+            DelegateState result;
+            result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
+            result[kRunningTourId] = m_state.runningTourId.toString();
+            QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
+            if (ini().enableMultiSystemTabBar)
+                QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
+            *state = result;
+        }
+    }
+
+    virtual void createInheritedState(DelegateState* /*state*/,
+        SubstateFlags /*flags*/,
+        const QStringList& /*resources*/) override
+    {
+        // Just return an empty current state without saving and modyfying
+        return;
+    }
+
+    virtual void forceLoad() override { updateWorkbench(); }
+
+    void updateWorkbench() { m_workbench->update(m_state); }
+
+private:
+    QnWorkbenchState m_state;
+    QPointer<Workbench> m_workbench;
+
+    const QString kCurrentLayoutId = "currentLayoutId";
+    const QString kRunningTourId = "runningTourId";
+    const QString kLayoutUuids = "layoutUids";
+    const QString kUnsavedLayouts = "unsavedLayouts";
+};
+
+class WorkbenchLayout: public QnWorkbenchLayout
+{
+public:
+    WorkbenchLayout(const LayoutResourcePtr& resource):
+        QnWorkbenchLayout(resource)
+    {
+    }
+};
+
+} // namespace
+
+struct Workbench::Private
+{
+    /** Current layout. */
+    QnWorkbenchLayout* currentLayout = nullptr;
+
+    /** List of this workbench's layouts. */
+    std::vector<std::unique_ptr<QnWorkbenchLayout>> layouts;
+
+    /** Grid mapper of this workbench. */
+    QnWorkbenchGridMapper* mapper;
+
+    /** Items by role. */
+    QnWorkbenchItem* itemByRole[Qn::ItemRoleCount];
+
+    /** Stored dummy layout. It is used to ensure that current layout is never nullptr. */
+    QnWorkbenchLayout* dummyLayout;
+
+    /** Whether current layout is being changed. */
+    bool inLayoutChangeProcess = false;
+
+    std::shared_ptr<StateDelegate> stateDelegate;
+
+    int layoutIndex(const LayoutResourcePtr& resource) const
+    {
+        auto iter = std::find_if(layouts.cbegin(), layouts.cend(),
+            [resource](const auto& layout) { return layout->resource() == resource; });
+        return iter != layouts.cend()
+            ? std::distance(layouts.cbegin(), iter)
+            : -1;
+    }
+};
+
+Workbench::Workbench(QObject* parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
+    d(new Private())
+{
+    for (int i = 0; i < Qn::ItemRoleCount; i++)
+        d->itemByRole[i] = nullptr;
+
+    const QSizeF kDefaultCellSize(
+        kUnitSize, kUnitSize / QnLayoutResource::kDefaultCellAspectRatio);
+    d->mapper = new QnWorkbenchGridMapper(kDefaultCellSize, this);
+
+    auto dummyLayoutResource = LayoutResourcePtr(new LayoutResource());
+    d->dummyLayout = new WorkbenchLayout(dummyLayoutResource);
+    setCurrentLayout(d->dummyLayout);
+
+    d->stateDelegate = std::make_shared<StateDelegate>(this);
+    appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
+
+    using WebEngineProfileManager = utils::WebEngineProfileManager;
+    connect(WebEngineProfileManager::instance(),
+        &WebEngineProfileManager::downloadRequested,
+        this,
+        [this](QObject* item) { utils::WebDownloader::download(item, context()); });
+}
+
+Workbench::~Workbench()
+{
+    emit aboutToBeDestroyed();
+
+    QSignalBlocker blocker(this);
+    appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
+    delete d->dummyLayout;
+    d->dummyLayout = nullptr;
+    d->layouts.clear();
+}
+
+WindowContext* Workbench::windowContext() const
+{
+    return appContext()->mainWindowContext();
+}
+
+void Workbench::clear()
+{
+    for (const auto& layout: d->layouts)
+    {
+        if (layout->data(Qn::IsSpecialLayoutRole).isValid()
+            && layout->data(Qn::IsSpecialLayoutRole).toBool())
+        {
+            continue;
+        }
+
+        if (const auto layoutResource = layout->resource())
+        {
+            auto systemContext = SystemContext::fromResource(layoutResource);
+            if (NX_ASSERT(systemContext)
+                && systemContext->layoutSnapshotManager()->hasSnapshot(layoutResource))
+            {
+                systemContext->layoutSnapshotManager()->restore(layoutResource);
+            }
+        }
+    }
+
+    setCurrentLayout(nullptr);
+    d->layouts.clear();
+    emit layoutsChanged();
+}
+
+QnWorkbenchLayout* Workbench::currentLayout() const
+{
+    return d->currentLayout;
+}
+
+LayoutResourcePtr Workbench::currentLayoutResource() const
+{
+    return currentLayout()->resource();
+}
+
+QnWorkbenchLayout* Workbench::layout(int index) const
+{
+    if (index < 0 || index >= d->layouts.size())
+    {
+        NX_ASSERT(false, "Invalid layout index '%1'.", index);
+        return nullptr;
+    }
+
+    return d->layouts[index].get();
+}
+
+QnWorkbenchLayout* Workbench::layout(const LayoutResourcePtr& resource)
+{
+    auto index = d->layoutIndex(resource);
+    return index >= 0
+        ? d->layouts[index].get()
+        : nullptr;
+}
+
+const std::vector<std::unique_ptr<QnWorkbenchLayout>>& Workbench::layouts() const
+{
+    return d->layouts;
+}
+
+QnWorkbenchLayout* Workbench::addLayout(const LayoutResourcePtr& resource)
+{
+    return insertLayout(resource, d->layouts.size());
+}
+
+QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, int index)
+{
+    auto existing = layout(resource);
+    if (!NX_ASSERT(!existing, "Layout resource already exists on workbench"))
+        return existing;
+
+    // Silently fix index.
+    index = std::clamp<int>(0, index, d->layouts.size());
+    auto iter = d->layouts.cbegin() + index;
+
+    const bool isSpecial = resource->data(Qn::IsSpecialLayoutRole).toBool();
+    std::unique_ptr<QnWorkbenchLayout> layout;
+    if (isSpecial)
+        layout = std::make_unique<SpecialLayout>(resource);
+    else
+        layout = std::make_unique<WorkbenchLayout>(resource);
+
+    auto result = layout.get();
+    d->layouts.insert(iter, std::move(layout));
+
+    NX_ASSERT(result == d->layouts[index].get());
+
+    emit layoutsChanged();
+    return result;
+}
+
+void Workbench::removeLayout(int index)
+{
+    if (!NX_ASSERT(index >= 0 && index < d->layouts.size()))
+        return;
+
+    // Update current layout if it's being removed.
+    if (d->layouts[index].get() == d->currentLayout)
+    {
+        QnWorkbenchLayout* newCurrentLayout = nullptr;
+
+        int newCurrentIndex = index;
+        newCurrentIndex++;
+        if (newCurrentIndex >= d->layouts.size())
+            newCurrentIndex -= 2;
+        if (newCurrentIndex >= 0)
+            newCurrentLayout = d->layouts[newCurrentIndex].get();
+
+        setCurrentLayout(newCurrentLayout);
+    }
+
+    d->layouts.erase(d->layouts.begin() + index);
+
+    emit layoutsChanged();
+}
+
+void Workbench::removeLayout(const LayoutResourcePtr& resource)
+{
+    auto index = d->layoutIndex(resource);
+    if (index >= 0)
+        removeLayout(index);
+}
+
+void Workbench::removeLayouts(const LayoutResourceList& resources)
+{
+    auto layoutsSet = nx::utils::toQSet(resources);
+    const bool updateCurrentLayout = (d->currentLayout
+        && layoutsSet.contains(d->currentLayout->resource()));
+
+    if (updateCurrentLayout)
+    {
+        int newCurrentLayoutIndex = 0;
+        while (newCurrentLayoutIndex < d->layouts.size()
+            && layoutsSet.contains(d->layouts[newCurrentLayoutIndex]->resource()))
+        {
+            ++newCurrentLayoutIndex;
+        }
+
+        if (newCurrentLayoutIndex < d->layouts.size())
+            setCurrentLayout(d->layouts[newCurrentLayoutIndex].get());
+        else
+            setCurrentLayout(nullptr);
+    }
+
+    const size_t removed = nx::utils::erase_if(d->layouts,
+        [&layoutsSet](const std::unique_ptr<QnWorkbenchLayout>& layout)
+        {
+            return layoutsSet.contains(layout->resource());
+        });
+
+    if (removed == 0)
+    {
+        NX_ASSERT(!updateCurrentLayout);
+        return;
+    }
+
+    emit layoutsChanged();
+}
+
+void Workbench::moveLayout(QnWorkbenchLayout* layout, int index)
+{
+    if (!NX_ASSERT(layout))
+        return;
+
+    int currentIndex = d->layoutIndex(layout->resource());
+    if (!NX_ASSERT(currentIndex >= 0, "Layout is not in the list"))
+        return;
+
+    // Silently fix index.
+    index = std::clamp<int>(0, index, d->layouts.size());
+    if (currentIndex == index)
+        return;
+
+    std::swap(d->layouts[currentIndex], d->layouts[index]);
+    emit layoutsChanged();
+}
+
+int Workbench::layoutIndex(QnWorkbenchLayout* layout) const
+{
+    return d->layoutIndex(layout->resource());
+}
+
+void Workbench::setCurrentLayoutIndex(int index)
+{
+    if (d->layouts.empty())
+        return;
+
+    setCurrentLayout(d->layouts[std::clamp<int>(0, index, d->layouts.size())].get());
+}
+
+void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
+{
+    auto systemDescription = qnSystemsFinder->getSystem(systemId.toString());
+    if (systemDescription.isNull())
+        systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
+
+    NX_ASSERT(systemDescription);
+
+    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    emit currentSystemChanged(systemDescription);
+}
+
+void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
+{
+    auto systemDescription = qnSystemsFinder->getSystem(systemId);
+
+    NX_ASSERT(systemDescription);
+
+    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    emit currentSystemChanged(systemDescription);
+}
+
+void Workbench::removeSystem(const QnSystemDescriptionPtr& systemDescription)
+{
+    windowContext()->systemTabBarModel()->removeSystem(systemDescription);
+}
+
+void Workbench::removeSystem(const QString& systemId)
+{
+    windowContext()->systemTabBarModel()->removeSystem(systemId);
+}
+
+void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
+{
+    if (!layout)
+        layout = d->dummyLayout;
+
+    if (d->currentLayout == layout)
+        return;
+
+    QString password;
+    if (NX_ASSERT(layout))
+    {
+        auto resource = layout->resource().dynamicCast<QnFileLayoutResource>();
+        if (resource && resource->requiresPassword())
+        {
+            // When opening encrypted layout, ask for the password and remove layout if
+            // unsuccessful.
+            password = layout::askPassword(resource, mainWindowWidget());
+            if (password.isEmpty())
+            {
+                // FIXME: #sivanov Layout must be closed and deleted here.
+                NX_ASSERT(false, "Layout must be closed and deleted here");
+                return;
+            }
+
+            layout::reloadFromFile(resource, password);
+            layout->layoutSynchronizer()->update();
+
+            auto systemContext = SystemContext::fromResource(resource);
+            if (NX_ASSERT(systemContext))
+                systemContext->layoutSnapshotManager()->store(resource);
+        }
+    }
+
+    d->inLayoutChangeProcess = true;
+    emit currentLayoutAboutToBeChanged();
+
+    // Clean up old layout.
+    // It may be nullptr only when this function is called from constructor.
+    qreal oldCellAspectRatio = -1.0;
+    qreal oldCellSpacing = -1.0;
+    if (d->currentLayout)
+    {
+        oldCellAspectRatio = d->currentLayout->cellAspectRatio();
+        oldCellSpacing = d->currentLayout->cellSpacing();
+
+        const auto activeItem = d->itemByRole[Qn::ActiveRole];
+        d->currentLayout->setData(Qn::LayoutActiveItemRole,
+            activeItem ? QVariant::fromValue(activeItem->uuid()) : QVariant());
+
+        for (int i = 0; i < Qn::ItemRoleCount; i++)
+            setItem(static_cast<Qn::ItemRole>(i), nullptr);
+
+        d->currentLayout->disconnect(this);
+    }
+
+    /* Prepare new layout. */
+    d->currentLayout = layout;
+    if (d->currentLayout == nullptr && NX_ASSERT(d->dummyLayout))
+    {
+        d->dummyLayout->clear();
+        d->currentLayout = d->dummyLayout;
+    }
+
+    // Set up a new layout.
+    const auto activeItemUuid = d->currentLayout->data(Qn::LayoutActiveItemRole).value<QnUuid>();
+    if (!activeItemUuid.isNull())
+        setItem(Qn::ActiveRole, d->currentLayout->item(activeItemUuid));
+
+    connect(
+        d->currentLayout, &QnWorkbenchLayout::itemAdded, this, &Workbench::at_layout_itemAdded);
+    connect(d->currentLayout,
+        &QnWorkbenchLayout::itemRemoved,
+        this,
+        &Workbench::at_layout_itemRemoved);
+    connect(d->currentLayout,
+        &QnWorkbenchLayout::cellAspectRatioChanged,
+        this,
+        &Workbench::at_layout_cellAspectRatioChanged);
+    connect(d->currentLayout,
+        &QnWorkbenchLayout::cellSpacingChanged,
+        this,
+        &Workbench::at_layout_cellSpacingChanged);
+
+    const qreal newCellAspectRatio = d->currentLayout->cellAspectRatio();
+    const qreal newCellSpacing = d->currentLayout->cellSpacing();
+
+    if (!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
+        at_layout_cellAspectRatioChanged();
+
+    if (!qFuzzyEquals(newCellSpacing, oldCellSpacing))
+        at_layout_cellSpacingChanged();
+
+    updateActiveRoleItem();
+
+    d->inLayoutChangeProcess = false;
+
+    emit currentLayoutChanged();
+}
+
+QnWorkbenchGridMapper* Workbench::mapper() const
+{
+    return d->mapper;
+}
+
+QnWorkbenchItem* Workbench::item(Qn::ItemRole role)
+{
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+
+    return d->itemByRole[role];
+}
+
+void Workbench::setItem(Qn::ItemRole role, QnWorkbenchItem* item)
+{
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+    if (d->itemByRole[role] == item)
+        return;
+
+    // Do not set focus at the item if it is not allowed.
+    const auto widget = display()->widget(item);
+    if (widget && !widget->options().testFlag(QnResourceWidget::AllowFocus)
+        && role > Qn::SingleSelectedRole)
+    {
+        return;
+    }
+
+    // Delayed clicks may lead to very interesting scenarios. Just ignore.
+    bool validLayout = !item || item->layout() == d->currentLayout;
+    if (!validLayout)
+        return;
+
+    emit itemAboutToBeChanged(role);
+    d->itemByRole[role] = item;
+    emit itemChanged(role);
+
+    /* If we are changing focus, make sure raised item will be un-raised. */
+    if (role > Qn::RaisedRole && d->itemByRole[Qn::RaisedRole]
+        && d->itemByRole[Qn::RaisedRole] != item)
+    {
+        setItem(Qn::RaisedRole, nullptr);
+        return; /* Active and central roles will be updated in the recursive call */
+    }
+
+    /* Update items for derived roles. */
+    if (role < Qn::ActiveRole)
+        updateActiveRoleItem();
+
+    if (role < Qn::CentralRole)
+        updateCentralRoleItem();
+}
+
+void Workbench::updateSingleRoleItem()
+{
+    if (d->currentLayout->items().size() == 1)
+    {
+        setItem(Qn::SingleRole, *d->currentLayout->items().begin());
+    }
+    else
+    {
+        setItem(Qn::SingleRole, nullptr);
+    }
+}
+
+void Workbench::updateActiveRoleItem(const QnWorkbenchItem* removedItem)
+{
+    auto activeItem = bestItemForRole(d->itemByRole, Qn::ActiveRole, removedItem);
+    if (activeItem)
+    {
+        setItem(Qn::ActiveRole, activeItem);
+        return;
+    }
+
+    if (d->itemByRole[Qn::ActiveRole] && d->itemByRole[Qn::ActiveRole] != removedItem)
+        return;
+
+    // Try to select the same camera as just removed (if any left).
+    QSet<QnWorkbenchItem*> sameResourceItems;
+    if (removedItem)
+        sameResourceItems = d->currentLayout->items(removedItem->resource());
+
+    const auto& itemsToSelectFrom =
+        sameResourceItems.empty() ? d->currentLayout->items() : sameResourceItems;
+
+    if (!itemsToSelectFrom.isEmpty())
+        activeItem = *itemsToSelectFrom.begin();
+
+    setItem(Qn::ActiveRole, activeItem);
+}
+
+void Workbench::updateCentralRoleItem()
+{
+    setItem(Qn::CentralRole, bestItemForRole(d->itemByRole, Qn::CentralRole));
+}
+
+void Workbench::update(const QnWorkbenchState& state)
+{
+    clear();
+
+    for (const auto& id: state.layoutUuids)
+    {
+        if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
+        {
+            addLayout(layout);
+            continue;
+        }
+
+        if (const auto videoWall = resourcePool()->getResourceById<QnVideoWallResource>(id))
+        {
+            menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            continue;
+        }
+
+        const auto tour = layoutTourManager()->tour(id);
+        if (tour.isValid())
+        {
+            menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, id});
+            continue;
+        }
+    }
+
+    if (ini().enableMultiSystemTabBar && context()->user())
+    {
+        const auto userId = context()->user()->getId();
+        for (const auto& stateLayout: state.unsavedLayouts)
+        {
+            if (stateLayout.parentId != userId)
+                continue;
+
+            auto layoutResource = resourcePool()->getResourceById<LayoutResource>(stateLayout.id);
+            if (!layoutResource)
+            {
+                layoutResource.reset(new LayoutResource());
+                layoutResource->addFlags(Qn::local);
+                layoutResource->setParentId(stateLayout.parentId);
+                layoutResource->setIdUnsafe(stateLayout.id);
+                resourcePool()->addResource(layoutResource);
+            }
+
+            layoutResource->setName(stateLayout.name);
+            layoutResource->setCellSpacing(stateLayout.cellSpacing);
+            layoutResource->setCellAspectRatio(stateLayout.cellAspectRatio);
+            layoutResource->setBackgroundImageFilename(stateLayout.backgroundImageFilename);
+            layoutResource->setBackgroundOpacity(stateLayout.backgroundOpacity);
+            layoutResource->setBackgroundSize(stateLayout.backgroundSize);
+
+            QnLayoutItemDataList items;
+            for (const auto& itemData: stateLayout.items)
+            {
+                items.append(itemData);
+            }
+            layoutResource->setItems(items);
+
+            if (QnWorkbenchLayout* layout = this->layout(layoutResource))
+                layout->update(layoutResource);
+            else
+                layout = addLayout(layoutResource);
+        }
+    }
+
+    if (!state.currentLayoutId.isNull())
+    {
+        const auto layout =
+            resourcePool()->getResourceById<LayoutResource>(state.currentLayoutId);
+        if (layout)
+        {
+            if (const auto wbLayout = this->layout(layout))
+                setCurrentLayout(wbLayout);
+        }
+    }
+
+    // Empty workbench is not supported correctly.
+    // Create a new layout in the case there are no opened layouts in the workbench state.
+    if (layouts().empty())
+        menu()->trigger(ui::action::OpenNewTabAction);
+
+    if (currentLayoutIndex() == -1)
+        setCurrentLayoutIndex(layouts().size() - 1);
+
+    if (!state.runningTourId.isNull())
+    {
+        menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, state.runningTourId});
+    }
+}
+
+void Workbench::submit(QnWorkbenchState& state)
+{
+    auto isLayoutSupported = [](const LayoutResourcePtr& layout)
+    {
+        // Support showreels.
+        if (layout->isShowreelReviewLayout())
+            return true;
+
+        if (layout->data().contains(Qn::VideoWallResourceRole))
+            return true;
+
+        // Ignore other service layouts, e.g. videowall control layouts.
+        if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
+            return false;
+
+        // Ignore temporary layouts such as preview search or audit trail.
+        if (!layout->systemContext())
+            return false;
+
+        return true;
+    };
+
+    auto sourceId = [](const LayoutResourcePtr& layout)
+    {
+        if (const auto videoWall =
+                layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>())
+        {
+            return videoWall->getId();
+        }
+
+        const auto tourId = layout->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+        return tourId.isNull() ? layout->getId() : tourId;
+    };
+
+    {
+        auto currentResource = currentLayout()->resource();
+        if (currentResource && isLayoutSupported(currentResource))
+            state.currentLayoutId = sourceId(currentResource);
+    }
+
+    for (const auto& layout: d->layouts)
+    {
+        auto resource = layout->resource();
+        if (resource)
+        {
+            if (isLayoutSupported(resource))
+                state.layoutUuids.push_back(sourceId(resource));
+
+            if (ini().enableMultiSystemTabBar && resource->hasFlags(Qn::local)
+                && !resource->hasFlags(Qn::cross_system))
+            {
+                QnWorkbenchState::UnsavedLayout unsavedLayout;
+                unsavedLayout.id = resource->getId();
+                unsavedLayout.parentId = resource->getParentId();
+                unsavedLayout.name = layout->name();
+                unsavedLayout.cellSpacing = resource->cellSpacing();
+                unsavedLayout.cellAspectRatio = resource->cellAspectRatio();
+                unsavedLayout.backgroundImageFilename = resource->backgroundImageFilename();
+                unsavedLayout.backgroundOpacity = resource->backgroundOpacity();
+                unsavedLayout.backgroundSize = resource->backgroundSize();
+
+                for (const auto& itemData: resource->getItems().values())
+                {
+                    unsavedLayout.items << itemData;
+                }
+                state.unsavedLayouts << unsavedLayout;
+            }
+        }
+    }
+
+    state.runningTourId = context()->instance<LayoutToursHandler>()->runningTour();
+}
+
+void Workbench::applyLoadedState()
+{
+    d->stateDelegate->updateWorkbench();
+}
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void Workbench::at_layout_itemAdded(QnWorkbenchItem* item)
+{
+    emit currentLayoutItemAdded(item);
+    emit currentLayoutItemsChanged();
+    updateSingleRoleItem();
+}
+
+void Workbench::at_layout_itemRemoved(QnWorkbenchItem* item)
+{
+    emit currentLayoutItemRemoved(item);
+    emit currentLayoutItemsChanged();
+
+    updateSingleRoleItem();
+    updateActiveRoleItem(item);
+
+    for (int i = 0; i < Qn::ItemRoleCount; i++)
+    {
+        if (item == d->itemByRole[i])
+            setItem(static_cast<Qn::ItemRole>(i), nullptr);
+    }
+}
+
+void Workbench::at_layout_cellAspectRatioChanged()
+{
+    qreal cellAspectRatio = d->currentLayout->hasCellAspectRatio()
+        ? d->currentLayout->cellAspectRatio()
+        : QnLayoutResource::kDefaultCellAspectRatio;
+
+    d->mapper->setCellSize(kUnitSize, kUnitSize / cellAspectRatio);
+
+    emit cellAspectRatioChanged();
+}
+
+void Workbench::at_layout_cellSpacingChanged()
+{
+    d->mapper->setSpacing(d->currentLayout->cellSpacing() * kUnitSize);
+
+    emit cellSpacingChanged();
+}
+
+bool Workbench::isInLayoutChangeProcess() const
+{
+    return d->inLayoutChangeProcess;
+}
+
+} // namespace nx::vms::client::desktop

@@ -24,7 +24,7 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (!currentSession)
         return false;
 
-    const auto& manager = qnClientCoreModule->commonModule()->systemContext()->runtimeInfoManager();
+    const auto& manager = qnClientCoreModule->commonModule()->runtimeInfoManager();
     auto commonInfo =
         manager->items()->getItem(currentSession->connection()->moduleInformation().id);
 

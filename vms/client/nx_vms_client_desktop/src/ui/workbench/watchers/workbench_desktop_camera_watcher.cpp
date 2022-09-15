@@ -43,11 +43,6 @@ QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
 
-    connect(qnClientCoreModule->networkModule(),
-        &nx::vms::client::core::NetworkModule::remoteIdChanged,
-        this,
-        &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
-
     initialize();
 }
 

@@ -162,7 +162,7 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
                 ? reasonField->text().split(lit("\n"))
                 : QStringList(reasonComboBox->text());
 
-            const auto systemName = globalSettings()->systemName();
+            const auto systemName = systemSettings()->systemName();
             const auto userName = context()->user()->getName();
             m_info = nx::vms::client::desktop::license::RequestInfo({
                 nameField->text(), emailField->text(), reasonText, systemName, userName});

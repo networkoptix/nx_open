@@ -3,18 +3,23 @@
 #include "workbench_context_aware.h"
 
 #include <QtCore/QObject>
-#include <QtWidgets/QGraphicsItem>
 #include <QtQml/QtQml>
+#include <QtWidgets/QGraphicsItem>
 
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/main_window.h>
 
 #include "workbench_context.h"
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 QString QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName("workbenchContext");
 
 QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, InitializationMode initMode):
+    // TODO: #GDM initialize from existing context later.
+    SystemContextAware(appContext()->currentSystemContext()),
     m_parent(parent),
     m_initializationMode(initMode)
 {
@@ -22,7 +27,9 @@ QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, Initialization
         init(parent);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext* context)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext* context):
+    // TODO: #GDM initialize from existing context.
+    SystemContextAware(appContext()->currentSystemContext())
 {
     init(context);
 }
@@ -141,7 +148,7 @@ action::Manager* QnWorkbenchContextAware::menu() const
     return context()->menu();
 }
 
-QnWorkbench* QnWorkbenchContextAware::workbench() const
+Workbench* QnWorkbenchContextAware::workbench() const
 {
     return context()->workbench();
 }

@@ -12,7 +12,6 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 
-class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
 
@@ -40,11 +39,8 @@ public:
         return m_layout;
     }
 
-    /**
-     * \param resource                  Layout resource.
-     * \returns                         Synchronizer associated with the given resource, or nullptr if none.
-     */
-    static QnWorkbenchLayoutSynchronizer *instance(const QnLayoutResourcePtr &resource);
+    /** Synchronizer associated with the given resource, or nullptr if none. */
+    static QnWorkbenchLayoutSynchronizer* instance(const LayoutResourcePtr& resource);
 
 public:
     void update();
@@ -65,7 +61,6 @@ private:
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
-    void at_layout_aboutToBeDestroyed();
 
     void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);

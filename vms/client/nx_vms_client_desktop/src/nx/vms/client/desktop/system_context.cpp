@@ -71,7 +71,7 @@ SystemContext::SystemContext(
     base_type(mode, std::move(peerId), resourceAccessMode, parent),
     d(new Private{.q = this})
 {
-    d->accessController = std::make_unique<QnWorkbenchAccessController>(this);
+    d->accessController = std::make_unique<QnWorkbenchAccessController>(this, resourceAccessMode);
 
     switch (mode)
     {

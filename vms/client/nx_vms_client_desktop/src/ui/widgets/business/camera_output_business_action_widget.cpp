@@ -5,18 +5,22 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/vms/event/action_parameters.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* parent):
-    base_type(parent),
+using namespace nx::vms::client::desktop;
+
+QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::CameraOutputBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -67,7 +71,10 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
+        bool hasToggleState = nx::vms::event::hasToggleState(
+            model()->eventType(),
+            model()->eventParams(),
+            systemContext());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

@@ -15,7 +15,9 @@ class QnCameraOutputBusinessActionWidget : public QnAbstractBusinessParamsWidget
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit QnCameraOutputBusinessActionWidget(QWidget *parent = 0);
+    explicit QnCameraOutputBusinessActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     ~QnCameraOutputBusinessActionWidget();
 
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;

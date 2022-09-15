@@ -19,8 +19,11 @@
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
 
-QnFullscreenCameraActionWidget::QnFullscreenCameraActionWidget(QWidget* parent):
-    base_type(parent),
+QnFullscreenCameraActionWidget::QnFullscreenCameraActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::FullscreenCameraActionWidget)
 {
     ui->setupUi(this);

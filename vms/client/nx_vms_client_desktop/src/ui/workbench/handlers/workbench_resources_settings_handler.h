@@ -5,7 +5,7 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -37,7 +37,7 @@ private:
     void at_copyRecordingScheduleAction_triggered();
 
 private:
-    void openLayoutSettingsDialog(const QnLayoutResourcePtr& layout);
+    void openLayoutSettingsDialog(const nx::vms::client::desktop::LayoutResourcePtr& layout);
 
 private:
     QPointer<nx::vms::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;

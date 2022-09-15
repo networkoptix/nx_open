@@ -684,8 +684,6 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->addFlags(Qn::local);
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(tr("Audit trail replay"));
-    if(context()->user())
-        layout->setParentId(context()->user()->getId());
 
     /* Calculate size of the resulting matrix. */
     qreal desiredItemAspectRatio = QnLayoutResource::kDefaultCellAspectRatio;
@@ -730,10 +728,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
-
-    resourcePool()->addResource(layout);
     menu()->trigger(action::OpenInNewTabAction, layout);
-
 }
 
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,

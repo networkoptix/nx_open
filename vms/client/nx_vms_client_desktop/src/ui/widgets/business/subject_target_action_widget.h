@@ -27,7 +27,9 @@ class QnSubjectTargetActionWidget: public QnAbstractBusinessParamsWidget
     using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnSubjectTargetActionWidget(QWidget* parent = nullptr);
+    explicit QnSubjectTargetActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnSubjectTargetActionWidget() override;
 
 protected:

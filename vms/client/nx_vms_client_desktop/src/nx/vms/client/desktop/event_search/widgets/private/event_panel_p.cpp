@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -44,12 +45,12 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/widget_opacity_animator.h>
 #include <ui/common/notification_levels.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -345,7 +346,7 @@ EventPanel::Private::Private(EventPanel* q):
 
         connect(
             workbench(),
-            &QnWorkbench::currentLayoutChanged,
+            &Workbench::currentLayoutChanged,
             this,
             [this]
             {
@@ -618,10 +619,7 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
                 if (camera->hasFlags(Qn::ResourceFlag::cross_system))
                     return true;
 
-                return QnWorkbenchAccessController::checkPermissions(
-                    camera,
-                    requiredPermission,
-                    {});
+                return ResourceAccessManager::hasPermissions(camera, requiredPermission);
             });
 
     if (cameras.size() < 2)

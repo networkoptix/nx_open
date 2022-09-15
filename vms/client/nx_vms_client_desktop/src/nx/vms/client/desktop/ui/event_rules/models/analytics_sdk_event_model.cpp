@@ -3,22 +3,21 @@
 #include "analytics_sdk_event_model.h"
 
 #include <client/client_runtime_settings.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
-
-#include <common/common_module.h>
-
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
-    QnCommonModuleAware(parent),
-    QStandardItemModel(parent)
+AnalyticsSdkEventModel::AnalyticsSdkEventModel(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
+    QStandardItemModel(parent),
+    SystemContextAware(systemContext)
 {
 }
 
@@ -60,7 +59,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
 
 
     const auto root = AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
-        commonModule(),
+        systemContext(),
         cameras,
         {
             {

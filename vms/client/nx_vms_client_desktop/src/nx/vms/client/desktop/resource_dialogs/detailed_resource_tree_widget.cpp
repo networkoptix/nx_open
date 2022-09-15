@@ -29,7 +29,7 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::DetailedResourceTreeWidget()),
-    m_treeEntityBuilder(new entity_resource_tree::ResourceTreeEntityBuilder(commonModule())),
+    m_treeEntityBuilder(new entity_resource_tree::ResourceTreeEntityBuilder(systemContext())),
     m_entityModel(new entity_item_model::EntityItemModel(columnCount)),
     m_iconDecoratorModel(new ResourceTreeIconDecoratorModel())
 {

@@ -6,11 +6,12 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <nx/vms/event/action_parameters.h>
-
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -20,8 +21,11 @@ namespace {
 
 }
 
-QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) :
-    base_type(parent),
+QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::BookmarkBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -67,7 +71,10 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
+        bool hasToggleState = nx::vms::event::hasToggleState(
+            model()->eventType(),
+            model()->eventParams(),
+            systemContext());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

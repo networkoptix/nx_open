@@ -47,7 +47,6 @@ class GridAdjustmentInstrument;
 class QnToggle;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
-class QnWorkbench;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchItem;

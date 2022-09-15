@@ -18,9 +18,9 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -72,14 +72,14 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     connect(d->controller, &RadassController::performanceCanBeImproved, this,
         &RadassActionHandler::notifyAboutPerformanceLoss);
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+    connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
         &RadassActionHandler::handleCurrentLayoutAboutToBeChanged);
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+    connect(workbench(), &Workbench::currentLayoutChanged, this,
         &RadassActionHandler::handleCurrentLayoutChanged);
 
     // We must load settings as early as possible to handle auto-run showreels and layouts.
-    connect(globalSettings(), &SystemSettings::localSystemIdChanged, this,
+    connect(systemSettings(), &SystemSettings::localSystemIdChanged, this,
         &RadassActionHandler::handleLocalSystemIdChanged);
 }
 
@@ -103,8 +103,8 @@ void RadassActionHandler::at_radassAction_triggered()
     else
         d->manager->setMode(layoutItems, mode);
 
-    if (!globalSettings()->localSystemId().isNull())
-        d->manager->saveData(globalSettings()->localSystemId(), resourcePool());
+    if (!systemSettings()->localSystemId().isNull())
+        d->manager->saveData(systemSettings()->localSystemId(), resourcePool());
 }
 
 void RadassActionHandler::handleItemModeChanged(const LayoutItemIndex& item, RadassMode mode)
@@ -168,7 +168,7 @@ void RadassActionHandler::handleCurrentLayoutChanged()
 
 void RadassActionHandler::handleLocalSystemIdChanged()
 {
-    d->manager->switchLocalSystemId(globalSettings()->localSystemId());
+    d->manager->switchLocalSystemId(systemSettings()->localSystemId());
     handleCurrentLayoutChanged();
 }
 

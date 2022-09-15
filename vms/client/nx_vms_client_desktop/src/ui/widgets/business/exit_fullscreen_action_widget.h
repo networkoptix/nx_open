@@ -14,7 +14,9 @@ class QnExitFullscreenActionWidget: public QnAbstractBusinessParamsWidget
     using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnExitFullscreenActionWidget(QWidget* parent = nullptr);
+    explicit QnExitFullscreenActionWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QWidget* parent = nullptr);
     virtual ~QnExitFullscreenActionWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;

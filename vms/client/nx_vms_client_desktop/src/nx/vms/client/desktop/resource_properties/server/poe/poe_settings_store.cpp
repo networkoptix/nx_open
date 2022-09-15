@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 
 struct PoeSettingsStore::Private
 {
-    Private(PoeSettingsStore* store, QnCommonModuleAware* commonModuleAware);
+    Private(PoeSettingsStore* store, QnResourcePool* resourcePool);
     void applyPatch(const PoeSettingsStatePatch& patch);
 
     PoeSettingsStore* const q;
@@ -25,9 +25,9 @@ struct PoeSettingsStore::Private
     PoeSettingsState state;
 };
 
-PoeSettingsStore::Private::Private(PoeSettingsStore* store, QnCommonModuleAware* commonModuleAware):
+PoeSettingsStore::Private::Private(PoeSettingsStore* store, QnResourcePool* resourcePool):
     q(store),
-    pool(commonModuleAware->resourcePool())
+    pool(resourcePool)
 {
 }
 
@@ -59,9 +59,9 @@ void PoeSettingsStore::Private::applyPatch(const PoeSettingsStatePatch& patch)
 
 //--------------------------------------------------------------------------------------------------
 
-PoeSettingsStore::PoeSettingsStore(QnCommonModuleAware* commonModuleAware, QObject* parent):
+PoeSettingsStore::PoeSettingsStore(QnResourcePool* resourcePool, QObject* parent):
     base_type(parent),
-    d(new Private(this, commonModuleAware))
+    d(new Private(this, resourcePool))
 {
 }
 

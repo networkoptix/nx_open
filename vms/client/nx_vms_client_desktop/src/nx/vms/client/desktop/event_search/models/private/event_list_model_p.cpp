@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -128,11 +129,13 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
     // Assuming the rights are checked before sending the notification.
     if (event.previewCamera->hasFlags(Qn::ResourceFlag::cross_system))
         return event.previewCamera;
-    
-    const bool hasAccess = QnWorkbenchAccessController::checkPermissions(
-        event.previewCamera,
-        Qn::ViewContentPermission,
-        GlobalPermission::viewArchive);
+
+    auto accessController = ResourceAccessManager::accessController(event.previewCamera);
+    if (!NX_ASSERT(accessController))
+        return {};
+
+    const bool hasAccess = accessController->hasGlobalPermission(GlobalPermission::viewArchive)
+        && accessController->hasPermissions(event.previewCamera, Qn::ViewContentPermission);
 
     return hasAccess ? event.previewCamera : QnVirtualCameraResourcePtr();
 }
@@ -146,10 +149,7 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
             if (NX_ASSERT(camera) && camera->hasFlags(Qn::ResourceFlag::cross_system))
                 return true;
 
-            return QnWorkbenchAccessController::checkPermissions(
-                camera,
-                Qn::ViewContentPermission,
-                {});
+            return ResourceAccessManager::hasPermissions(camera, Qn::ViewContentPermission);
         });
 }
 

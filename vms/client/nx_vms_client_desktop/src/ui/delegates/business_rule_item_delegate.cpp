@@ -3,46 +3,37 @@
 #include "business_rule_item_delegate.h"
 
 #include <QtGui/QPainter>
-
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
-#include <QtWidgets/QComboBox>
 
 // TODO: #vkutin Think about proper location and namespace.
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
-
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/strings_helper.h>
-
 #include <client_core/client_core_module.h>
-
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-
-#include <ui/delegates/resource_selection_dialog_delegate.h>
-#include <ui/models/business_rules_view_model.h>
-#include <ui/models/notification_sound_model.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <ui/widgets/business/aggregation_widget.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
-#include <nx/vms/client/desktop/rules/event_action_subtype.h>
-#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
-
-#include <ui/delegates/select_servers_delegate_editor_button.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
+#include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/delegates/select_cameras_delegate_editor_button.h>
+#include <ui/delegates/select_servers_delegate_editor_button.h>
 #include <ui/delegates/select_users_delegate_editor_button.h>
-
+#include <ui/models/business_rules_view_model.h>
+#include <ui/models/notification_sound_model.h>
+#include <ui/widgets/business/aggregation_widget.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/math/color_transformations.h>
 
 using namespace nx;
@@ -359,9 +350,9 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     else if (actionType == ActionType::openLayoutAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        auto validator = new QnLayoutAccessValidationPolicy(commonModule());
+        auto validator = new QnLayoutAccessValidationPolicy(systemContext());
         validator->setLayout(
-            commonModule()->resourcePool()->getResourceById<QnLayoutResource>(
+            resourcePool()->getResourceById<QnLayoutResource>(
                 model->actionParams().actionResourceId));
         usersButton->setSubjectValidationPolicy(validator);
         editorButton = usersButton;
@@ -455,7 +446,7 @@ QWidget* QnBusinessRuleItemDelegate::createActionEditor(QWidget* parent,
 {
     auto eventType = index.data(Qn::EventTypeRole).value<vms::api::EventType>();
     auto eventParams = index.data(Qn::EventParametersRole).value<nx::vms::event::EventParameters>();
-    bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, commonModule());
+    bool isInstantOnly = !vms::event::hasToggleState(eventType, eventParams, systemContext());
 
     QComboBox* comboBox = new QComboBox(parent);
     comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);

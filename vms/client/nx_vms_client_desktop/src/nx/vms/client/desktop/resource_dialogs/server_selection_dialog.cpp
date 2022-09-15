@@ -24,7 +24,7 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {

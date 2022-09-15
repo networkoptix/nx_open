@@ -27,7 +27,7 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
             const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
                 ->layoutSnapshotManager();
 
-            for (const auto& layout: cloudLayoutsResourcePool->getResources<QnLayoutResource>())
+            for (const auto& layout: cloudLayoutsResourcePool->getResources<LayoutResource>())
             {
                 const bool wasModifiedByUser = snapshotManager->isModified(layout);
                 const auto items = layout->getItems(); //< Iterate over local copy.

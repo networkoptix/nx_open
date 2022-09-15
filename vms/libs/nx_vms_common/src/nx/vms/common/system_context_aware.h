@@ -8,9 +8,15 @@
 
 class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
+class QnGlobalPermissionsManager;
+class QnLayoutTourManager;
 class QnResourceAccessManager;
 class QnResourcePool;
+class QnRuntimeInfoManager;
+class QnSharedResourcesManager;
+class QnUserRolesManager;
 
+namespace ec2 { class AbstractECConnection; }
 namespace nx::core::access { class ResourceAccessProvider; }
 
 namespace nx::vms::common {
@@ -40,11 +46,20 @@ public:
      */
     SystemContext* systemContext() const;
 
-protected:
+    /**
+     * Interface for the Message Bus connection.
+     */
+    std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
+
     /**
      * Manages which permissions User has on each of its accessible Resources.
      */
     QnResourceAccessManager* resourceAccessManager() const;
+
+    /**
+     * Manages which global permissions each User or Role has.
+     */
+    QnGlobalPermissionsManager* globalPermissionsManager() const;
 
     /**
      * Grants information about resource access status.
@@ -68,6 +83,29 @@ protected:
      * Currently stored as Resource Properties for the `admin` User.
      */
     SystemSettings* systemSettings() const;
+
+    // FIXME: #sivanov Remove compatibility layer.
+    SystemSettings* globalSettings() const { return systemSettings(); }
+
+    /**
+     * Manages Showreels.
+     */
+    QnLayoutTourManager* layoutTourManager() const;
+
+    /**
+     * List of all peers, connected to the System.
+     */
+    QnRuntimeInfoManager* runtimeInfoManager() const;
+
+    /**
+     * List of all User Roles.
+     */
+    QnUserRolesManager* userRolesManager() const;
+
+    /**
+     * Manages which Resources are directly shared with Users or Roles.
+     */
+    QnSharedResourcesManager* sharedResourcesManager() const;
 
     // TODO: #GDM Remove field.
     SystemContext* m_context = nullptr;

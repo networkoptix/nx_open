@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>

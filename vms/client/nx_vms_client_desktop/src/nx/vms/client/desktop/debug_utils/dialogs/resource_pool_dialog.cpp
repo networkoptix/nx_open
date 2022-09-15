@@ -5,6 +5,7 @@
 #include <QtWidgets/QBoxLayout>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 

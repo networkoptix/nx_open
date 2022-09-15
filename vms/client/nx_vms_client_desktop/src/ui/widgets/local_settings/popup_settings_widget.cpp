@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <health/system_health_strings_helper.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -132,7 +133,7 @@ void QnPopupSettingsWidget::applyChanges()
     {
         m_adaptor->setWatchedEvents(watchedEvents());
         m_adaptor->saveToResource();
-        resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
+        systemContext()->resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
     }
 
     qnSettings->setPopupSystemHealth(watchedSystemHealth());

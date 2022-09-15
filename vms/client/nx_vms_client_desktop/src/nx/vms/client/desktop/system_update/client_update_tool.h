@@ -5,9 +5,8 @@
 #include <set>
 
 #include <nx/vms/api/data/software_version.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/network/connection_info.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
@@ -36,8 +35,7 @@ namespace nx::vms::client::desktop {
  */
 class ClientUpdateTool:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -46,7 +44,7 @@ class ClientUpdateTool:
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
 
 public:
-    ClientUpdateTool(QObject* parent = nullptr);
+    ClientUpdateTool(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~ClientUpdateTool() override;
 
     using Error = std::variant<nx::vms::common::update::Status::ErrorCode, QString>;

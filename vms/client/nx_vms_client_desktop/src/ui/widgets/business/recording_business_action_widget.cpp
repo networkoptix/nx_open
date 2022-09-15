@@ -5,24 +5,24 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/vms/event/action_parameters.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
-
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <utils/common/delayed.h>
 
 static constexpr int kMsecPerSecond = 1000;
 
 using namespace nx::vms::client::desktop;
 
-QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent) :
-    base_type(parent),
+QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::RecordingBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -83,7 +83,10 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
+        bool hasToggleState = nx::vms::event::hasToggleState(
+            model()->eventType(),
+            model()->eventParams(),
+            systemContext());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

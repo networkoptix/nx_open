@@ -10,7 +10,7 @@
 QnLayoutTourStateManager::QnLayoutTourStateManager(QObject* parent):
     base_type(parent)
 {
-    connect(qnClientCoreModule->commonModule()->systemContext()->layoutTourManager(),
+    connect(qnClientCoreModule->commonModule()->layoutTourManager(),
         &QnLayoutTourManager::tourRemoved,
         this,
         &QnAbstractSaveStateManager::clean);

@@ -5,18 +5,19 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
-
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
+#include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
+#include <nx/vms/event/action_parameters.h>
 
 using namespace nx::vms::client::desktop;
 
-QnExitFullscreenActionWidget::QnExitFullscreenActionWidget(QWidget* parent):
-    base_type(parent),
+QnExitFullscreenActionWidget::QnExitFullscreenActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::ExitFullscreenActionWidget)
 {
     ui->setupUi(this);

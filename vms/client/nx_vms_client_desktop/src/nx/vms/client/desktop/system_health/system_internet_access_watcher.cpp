@@ -20,9 +20,12 @@ bool haveInternetAccess(const QnMediaServerResourceList& servers)
 
 } // namespace
 
-SystemInternetAccessWatcher::SystemInternetAccessWatcher(QObject* parent):
+SystemInternetAccessWatcher::SystemInternetAccessWatcher(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
     QObject(parent),
-    QnCommonModuleAware(parent)
+    SystemContextAware(systemContext)
 {
     auto serverChangesListener =
         new core::SessionResourcesSignalListener<QnMediaServerResource>(this);

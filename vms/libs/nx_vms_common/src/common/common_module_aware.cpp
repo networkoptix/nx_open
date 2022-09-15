@@ -187,7 +187,7 @@ QnResourceDataPool* QnCommonModuleAware::dataPool() const
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModuleAware::ec2Connection() const
 {
     NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->systemContext()->ec2Connection() : nullptr;
+    return m_commonModule ? m_commonModule->ec2Connection() : nullptr;
 }
 
 QnCommonMessageProcessor* QnCommonModuleAware::messageProcessor() const

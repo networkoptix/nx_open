@@ -5,17 +5,15 @@
 #include <QtWidgets/QAction>
 
 #include <core/resource_management/layout_tour_manager.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
-
-#include <ui/workbench/workbench.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
-
-#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

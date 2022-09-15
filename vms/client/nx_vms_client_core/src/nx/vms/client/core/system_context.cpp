@@ -186,10 +186,26 @@ RemoteConnectionPtr SystemContext::connection() const
     return d->connection;
 }
 
+nx::network::http::Credentials SystemContext::connectionCredentials() const
+{
+    if (auto connection = this->connection())
+        return connection->credentials();
+
+    return {};
+}
+
 rest::ServerConnectionPtr SystemContext::connectedServerApi() const
 {
     if (auto connection = this->connection())
         return connection->serverApi();
+
+    return {};
+}
+
+ec2::AbstractECConnectionPtr SystemContext::messageBusConnection() const
+{
+    if (auto connection = this->connection())
+        return connection->messageBusConnection();
 
     return {};
 }

@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
@@ -54,7 +56,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -109,6 +110,17 @@ void splitFormat(const QString &format, QString *left, QString *right)
 
 } // anonymous namespace
 
+struct QnResourceWidget::Private
+{
+    Private(QnWorkbenchItem* item):
+        layout(item->layout()->resource())
+    {
+        NX_ASSERT(layout, "Widget is created without layout");
+    }
+
+    LayoutResourcePtr layout;
+};
+
 // -------------------------------------------------------------------------- //
 // Logic
 // -------------------------------------------------------------------------- //
@@ -123,6 +135,7 @@ QnResourceWidget::QnResourceWidget(
     WindowContextAware(windowContext),
     m_hudOverlay(new QnHudOverlayWidget(this)),
     m_statusOverlay(new QnStatusOverlayWidget(this)),
+    d(new Private(item)),
     m_item(item),
     m_options(DisplaySelection | AllowFocus),
     m_localActive(false),
@@ -178,9 +191,7 @@ QnResourceWidget::QnResourceWidget(
 
     m_aspectRatio = defaultAspectRatio();
 
-    auto layoutResource = item->layout()->resource();
-    NX_ASSERT(layoutResource);
-    connect(layoutResource.get(),
+    connect(d->layout.get(),
         &LayoutResource::itemDataChanged,
         this,
         [this, itemId = item->uuid()](
@@ -418,11 +429,9 @@ const QnResourcePtr &QnResourceWidget::resource() const
     return m_resource;
 }
 
-QnLayoutResourcePtr QnResourceWidget::layoutResource() const
+LayoutResourcePtr QnResourceWidget::layoutResource() const
 {
-    if (!m_item || !m_item->layout())
-        return {};
-    return m_item->layout()->resource();
+    return d->layout;
 }
 
 QnWorkbenchItem* QnResourceWidget::item() const
@@ -834,7 +843,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
         case Qt::MinimumSize:
         {
             static const qreal kMinPartOfCell = 0.25;
-            static const qreal kMinimalWidth = QnWorkbench::kUnitSize * kMinPartOfCell;
+            static const qreal kMinimalWidth = Workbench::kUnitSize * kMinPartOfCell;
             static const qreal kMinimalHeight = kMinimalWidth
                 / QnLayoutResource::kDefaultCellAspectRatio;
             result = QSizeF(kMinimalWidth, kMinimalHeight);
@@ -843,7 +852,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
         case Qt::MaximumSize:
         {
             static const int kMaxCells = 64;
-            static const qreal kMaximalWidth = QnWorkbench::kUnitSize * kMaxCells;
+            static const qreal kMaximalWidth = Workbench::kUnitSize * kMaxCells;
             static const qreal kMaximalHeight = kMaximalWidth
                 / QnLayoutResource::kDefaultCellAspectRatio;
             result = QSizeF(kMaximalWidth, kMaximalHeight);
@@ -975,14 +984,9 @@ int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
 
-    const auto layout = layoutResource();
-    auto layoutSystemContext = SystemContext::fromResource(layout);
-    // Layout context can be absent for temporary layouts like showreel.
-    const Qn::Permissions permissions = layoutSystemContext
-        ? layoutSystemContext->accessController()->permissions(layout)
-        : Qn::AllPermissions;
     const bool fullscreenMode = options().testFlag(FullScreenMode);
 
+    const Qn::Permissions permissions = ResourceAccessManager::permissions(d->layout);
     if (!m_options.testFlag(WindowRotationForbidden) && permissions.testFlag(Qn::WritePermission))
         result |= Qn::RotateButton;
 

@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
-
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 class QnWorkbenchLayout;
@@ -34,7 +34,7 @@ private:
     void at_shareWebPageAction_triggered();
 
 private:
-    void shareLayoutWith(const QnLayoutResourcePtr& layout, const QnResourceAccessSubject& subject);
+    void shareLayoutWith(const LayoutResourcePtr& layout, const QnResourceAccessSubject& subject);
 
     void shareCameraWith(const QnVirtualCameraResourcePtr& camera, const QnResourceAccessSubject& subject);
 

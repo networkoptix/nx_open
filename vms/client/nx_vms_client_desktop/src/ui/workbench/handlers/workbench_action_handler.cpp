@@ -82,6 +82,7 @@
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
@@ -114,7 +115,7 @@
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_settings.h>
@@ -148,7 +149,6 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -850,9 +850,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
                 // Replace opened layout with the cloud one.
                 int index = workbench()->currentLayoutIndex();
-                workbench()->insertLayout(
-                    qnWorkbenchLayoutsFactory->create(cloudLayout, this),
-                    index);
+                workbench()->insertLayout(cloudLayout, index);
                 workbench()->setCurrentLayoutIndex(index);
                 menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
                 workbench()->removeLayout(index + 1);
@@ -2063,8 +2061,6 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
-    if (context()->user())
-        layout->setParentId(context()->user()->getId());
 
     qint64 time = period.startTimeMs;
     for (int i = 0; i < itemCount; i++) {
@@ -2104,11 +2100,6 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
     NX_ASSERT(layout->isPreviewSearchLayout());
-
-    // TODO: #sivanov Adding layout to the resource pool is not needed, moreover it requires to add
-    // a lot of additional checks in different places. But to remove this line we need to implement
-    // a mechanism to cleanup QnResourceRuntimeDataManager layout item data.
-    resourcePool()->addResource(layout);
     menu()->trigger(action::OpenInNewTabAction, layout);
 }
 
@@ -2616,7 +2607,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             if (!context()->user() || !NX_ASSERT(layout))
                 return false; // action should not be triggered while we are not connected
 
-            if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
+            if (!ResourceAccessManager::hasPermissions(layout, Qn::EditLayoutSettingsPermission))
                 return false;
 
             if (layout->locked())
@@ -3095,7 +3086,12 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    if (const auto token = connectionCredentials().authToken; token.isBearerToken())
+    auto systemContext = SystemContext::fromResource(server);
+    if (!NX_ASSERT(systemContext) || !NX_ASSERT(systemContext->connection()))
+        return;
+
+    const auto credentials = systemContext->connection()->credentials();
+    if (const auto token = credentials.authToken; token.isBearerToken())
     {
         return openInBrowser(server, serverUrl, token.value, AuthMethod::bearerToken);
     }
@@ -3108,7 +3104,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         // No other requests to this proxy, so we have to get nonce by ourselves.
         auto reply = new QnAsyncHttpClientReply(
             nx::network::http::AsyncHttpClient::create(
-                commonModule()->certificateVerifier()->makeAdapterFunc(server->getId())),
+                systemContext->certificateVerifier()->makeAdapterFunc(server->getId())),
             this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
@@ -3143,9 +3139,14 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         return;
     }
 
-    const auto credentials = connectionCredentials();
     for (const auto& request: requests)
     {
+        auto systemContext = SystemContext::fromResource(request.server);
+        if (!NX_ASSERT(systemContext) || !NX_ASSERT(systemContext->connection()))
+            continue;
+
+        const auto credentials = systemContext->connection()->credentials();
+
         const auto authParam = createHttpQueryAuthParam(
             QString::fromStdString(credentials.username),
             QString::fromStdString(credentials.authToken.value),

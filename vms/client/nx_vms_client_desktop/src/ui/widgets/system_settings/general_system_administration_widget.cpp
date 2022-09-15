@@ -3,15 +3,15 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QAction>
 #include <QtGui/QResizeEvent>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
@@ -20,12 +20,12 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench.h>
 #include <utils/common/event_processors.h>
 
 using namespace nx::vms::client::desktop;

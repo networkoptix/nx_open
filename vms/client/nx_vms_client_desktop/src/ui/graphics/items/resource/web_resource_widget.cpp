@@ -5,16 +5,17 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
-#include <core/resource/layout_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -23,7 +24,6 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>

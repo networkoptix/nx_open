@@ -9,14 +9,18 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/media/audio_player.h>
 
-#include <nx/vms/event/action_parameters.h>
+using namespace nx::vms::client::desktop;
 
-QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
-    base_type(parent),
+QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::SayTextBusinessActionWidget)
 {
     ui->setupUi(this);

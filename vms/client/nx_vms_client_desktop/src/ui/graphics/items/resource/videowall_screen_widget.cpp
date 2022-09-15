@@ -3,35 +3,30 @@
 #include "videowall_screen_widget.h"
 
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QGraphicsAnchorLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-
-#include <core/resource/resource.h>
+#include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/network_resource.h>
-#include <core/resource/videowall_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
-#include <core/resource/layout_item_data.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/videowall/utils.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/resource/videowall_item_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/videowall/utils.h>
-
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
-#include <nx/vms/client/desktop/style/skin.h>
 
 using namespace nx::vms::client::desktop;
 

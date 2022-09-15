@@ -52,7 +52,6 @@
 #include <nx/vms/client/desktop/style/svg_icon_provider.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/license_health_watcher.h>
-#include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
@@ -162,7 +161,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
     commonModule->store(new LocalProxyServer());
 
-    commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(

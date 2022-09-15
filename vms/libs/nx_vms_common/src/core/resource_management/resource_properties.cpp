@@ -33,7 +33,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     if( params.empty() )
         return true;
 
-    ec2::AbstractECConnectionPtr conn = m_context->ec2Connection();
+    ec2::AbstractECConnectionPtr conn = messageBusConnection();
     ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
@@ -64,7 +64,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
 {
     if (data.empty())
         return -1; // nothing to save
-    ec2::AbstractECConnectionPtr conn = m_context->ec2Connection();
+    ec2::AbstractECConnectionPtr conn = messageBusConnection();
     if (!conn)
         return -1; // not connected to ec2
     NX_MUTEX_LOCKER lock(&m_requestMutex);

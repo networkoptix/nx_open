@@ -2,18 +2,17 @@
 
 #include "resource_pool_peer_manager.h"
 
+#include <api/server_rest_connection.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/delayed.h>
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <api/server_rest_connection.h>
-#include <common/common_module.h>
-
-#include "internet_only_peer_manager.h"
 #include "../downloader.h"
+#include "internet_only_peer_manager.h"
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -54,7 +53,7 @@ public:
 
         QList<PeerInformation> result;
 
-        const auto& selfId = q->peerId();
+        const auto& selfId = q->systemContext()->peerId();
 
         for (const auto& server:
             q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online))
@@ -87,20 +86,20 @@ public:
 };
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const PeerSelector& peerSelector)
     :
-    ResourcePoolPeerManager(AllCapabilities, commonModule, peerSelector)
+    ResourcePoolPeerManager(AllCapabilities, systemContext, peerSelector)
 {
 }
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
     Capabilities capabilities,
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const PeerSelector& peerSelector)
     :
     AbstractPeerManager(capabilities),
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
     d->peerSelector = peerSelector;
@@ -145,7 +144,7 @@ QList<QnUuid> ResourcePoolPeerManager::peers() const
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 {
-    const auto& connection = ec2Connection();
+    const auto& connection = systemContext()->messageBusConnection();
     if (!connection)
         return -1;
 
@@ -316,10 +315,10 @@ rest::ServerConnectionPtr ResourcePoolPeerManager::getConnection(const QnUuid& p
 }
 
 ResourcePoolProxyPeerManager::ResourcePoolProxyPeerManager(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const PeerSelector& peerSelector)
     :
-    ResourcePoolPeerManager(Capabilities(FileInfo | DownloadChunk), commonModule, peerSelector)
+    ResourcePoolPeerManager(Capabilities(FileInfo | DownloadChunk), systemContext, peerSelector)
 {
     setIndirectInternetRequestsAllowed(true);
 }

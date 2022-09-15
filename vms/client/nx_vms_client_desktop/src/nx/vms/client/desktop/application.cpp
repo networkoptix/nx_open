@@ -237,8 +237,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     qApp->installEventFilter(&wheelFilter);
 
     /* Create workbench context. */
-    auto workbenchContext = std::make_unique<QnWorkbenchContext>(
-        client.systemContext()->accessController());
+    auto workbenchContext = std::make_unique<QnWorkbenchContext>(client.systemContext());
 
     // TODO: #sivanov Invert dependency. Workbench context should depend on Window context.
     auto windowContext = std::make_unique<WindowContext>(workbenchContext.get());

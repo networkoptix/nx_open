@@ -6,24 +6,23 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QSortFilterProxyModel>
 
-#include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-
-#include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(QWidget* parent):
-    base_type(parent),
+PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(
+    SystemContext* systemContext,
+    QWidget* parent)
+    :
+    base_type(systemContext, parent),
     ui(new Ui::PluginDiagnosticEventWidget),
     m_pluginDiagnosticEventModel(new PluginDiagnosticEventModel(this))
 {
