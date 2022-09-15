@@ -10278,7 +10278,7 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>Zalecany maksymalny czas trwania sesji użytkownika to %1</translation>
     </message>
   </context>
   <context>

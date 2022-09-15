@@ -1875,7 +1875,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>Nie udało się wykonać kopii zapasowej pliku %1</translation>
     </message>
   </context>
   <context>
