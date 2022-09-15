@@ -59,7 +59,7 @@ class NxOpenConan(ConanFile):
     ffmpeg_version = "4.4"
     requires = (
         f"ffmpeg/{ffmpeg_version}" "#25419419d970893ebb7b5213d879c77c",
-        "openssl/1.1.1k" "#5adf0506cae13abf5170409c9d92819b",
+        "openssl/1.1.1k" "#1623dc1f92c8f1e59d56b49fe4ea32e5",
         "qt/5.15.2" "#861711c85d38f586cf29066cd2c10336",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
@@ -94,10 +94,10 @@ class NxOpenConan(ConanFile):
                     "#b4e7ff961f0fb8957c5d5a755d5eb55a")
 
         if self.haveDesktopClient:
-            self.requires("hidapi/0.10.1" "#a876ff0453c3a0743228811370d0874a")
+            self.requires("hidapi/0.10.1" "#7251f4d4b67e96c946a3de8e205a4c07")
 
             if not self.isEdge1:
-                self.requires("flite/2.2" "#97d02c44abce7573ef767ddb6260835a")
+                self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
                 self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isWindows or self.isAndroid:
