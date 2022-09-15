@@ -36,6 +36,7 @@ public:
     using LayoutCallbackFunction = std::function<void(bool, const QnLayoutResourcePtr&)>;
     using WebPageChangesFunction = std::function<void(const QnWebPageResourcePtr&)>;
     using WebPageCallbackFunction = std::function<void(bool, const QnWebPageResourcePtr&)>;
+    using AccessRightsCallbackFunction = std::function<void(bool)>;
 
     using GenericChangesFunction = std::function<void()>;
     using GenericCallbackFunction = std::function<void(bool)>;
@@ -95,7 +96,8 @@ public:
     /** Save accessible rights for the given subject. */
     void saveAccessRights(
         const QnResourceAccessSubject& subject,
-        const nx::core::access::ResourceAccessMap& accessRights);
+        const nx::core::access::ResourceAccessMap& accessRights,
+        AccessRightsCallbackFunction callback);
 
     void saveUserRole(const nx::vms::api::UserRoleData& role,
         RoleCallbackFunction callback = RoleCallbackFunction());
