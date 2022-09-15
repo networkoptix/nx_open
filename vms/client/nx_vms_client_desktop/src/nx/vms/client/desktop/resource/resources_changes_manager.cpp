@@ -579,25 +579,38 @@ void ResourcesChangesManager::saveAccessibleResources(
 
 void ResourcesChangesManager::saveAccessRights(
     const QnResourceAccessSubject& subject,
-    const nx::core::access::ResourceAccessMap& accessRights)
+    const nx::core::access::ResourceAccessMap& accessRights,
+    AccessRightsCallbackFunction callback)
 {
     const auto connection = messageBusConnection();
     if (!connection)
+    {
+        callback(false);
         return;
+    }
 
     const auto accessRightsManager = systemContext()->accessRightsManager();
     const auto backup = accessRightsManager->ownResourceAccessMap(subject.id());
 
     if (backup == accessRights)
+    {
+        callback(true);
         return;
+    }
 
     accessRightsManager->setOwnResourceAccessMap(subject.id(), accessRights);
 
     auto handler =
-        [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
+        [this, subject, accessRights, backup, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            if (const bool error = errorCode != ec2::ErrorCode::ok)
-                systemContext()->accessRightsManager()->setOwnResourceAccessMap(subject.id(), backup);
+            const bool error = errorCode != ec2::ErrorCode::ok;
+            if (error)
+            {
+                systemContext()->accessRightsManager()->setOwnResourceAccessMap(
+                    subject.id(),
+                    backup);
+            }
+            callback(!error);
         };
 
     vms::api::AccessRightsData accessRightsData;
