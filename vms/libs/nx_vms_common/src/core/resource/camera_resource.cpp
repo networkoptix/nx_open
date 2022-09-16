@@ -462,6 +462,12 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit isIOModuleChanged(::toSharedPointer(this));
     }
 
+    if (key == kDeviceAgentManifestsProperty || key == kAnalyzedStreamIndexes)
+    {
+        auto cachedAnalyzedStreamIndex = m_cachedAnalyzedStreamIndex.lock();
+        cachedAnalyzedStreamIndex->clear();
+    }
+
     base_type::emitPropertyChanged(key, prevValue, newValue);
 }
 
@@ -768,6 +774,17 @@ std::optional<nx::vms::api::StreamIndex>
 }
 
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(QnUuid engineId) const
+{
+    auto cachedAnalyzedStreamIndex = m_cachedAnalyzedStreamIndex.lock();
+    auto it = cachedAnalyzedStreamIndex->find(engineId);
+    if (it != cachedAnalyzedStreamIndex->end())
+        return it->second;
+    auto result = analyzedStreamIndexInternal(engineId);
+    cachedAnalyzedStreamIndex->emplace(engineId, result);
+    return result;
+}
+
+nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndexInternal(const QnUuid& engineId) const
 {
     const std::optional<nx::vms::api::StreamIndex> userChosenAnalyzedStreamIndex =
         obtainUserChosenAnalyzedStreamIndex(engineId);

@@ -10,6 +10,7 @@
 
 #include <nx_ec/ec_api_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/lockable.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/aspect_ratio.h>
 
@@ -282,6 +283,7 @@ private:
 
     std::optional<nx::vms::api::StreamIndex> obtainUserChosenAnalyzedStreamIndex(
         QnUuid engineId) const;
+    nx::vms::api::StreamIndex analyzedStreamIndexInternal(const QnUuid& engineId) const;
 
 private:
     nx::Mutex m_mediaStreamsMutex;
@@ -291,6 +293,7 @@ private:
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
     nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedEventTypes;
     nx::utils::CachedValue<std::map<QnUuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+    mutable nx::utils::Lockable<std::map<QnUuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);
