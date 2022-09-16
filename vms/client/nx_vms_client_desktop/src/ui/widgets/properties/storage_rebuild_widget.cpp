@@ -3,14 +3,14 @@
 #include "storage_rebuild_widget.h"
 #include "ui_storage_rebuild_widget.h"
 
-#include <api/model/rebuild_archive_reply.h>
+#include <nx/vms/api/data/storage_scan_info.h>
 
 QnStorageRebuildWidget::QnStorageRebuildWidget(QWidget* parent) :
     base_type(parent),
     ui(new Ui::StorageRebuildWidget())
 {
     ui->setupUi(this);
-    loadData(QnStorageScanData(), false);
+    loadData(nx::vms::api::StorageScanInfo(), false);
 
     connect(ui->stopButton, &QPushButton::clicked, this, [this]
     {
@@ -23,7 +23,7 @@ QnStorageRebuildWidget::~QnStorageRebuildWidget()
 {
 }
 
-void QnStorageRebuildWidget::loadData(const QnStorageScanData& data, bool isBackup)
+void QnStorageRebuildWidget::loadData(const nx::vms::api::StorageScanInfo& data, bool isBackup)
 {
     QString placeholder = lit(" \t%p%");
     if (data.progress >= 0)
@@ -31,12 +31,12 @@ void QnStorageRebuildWidget::loadData(const QnStorageScanData& data, bool isBack
         ui->progressBar->setValue(data.totalProgress * 100 + 0.5);
         switch (data.state)
         {
-            case Qn::RebuildState_PartialScan:
+            case nx::vms::api::RebuildState::partial:
                 ui->progressBar->setFormat(isBackup
                     ? tr("Fast Backup Scan...") + placeholder
                     : tr("Fast Archive Scan...") + placeholder);
                 break;
-            case Qn::RebuildState_FullScan:
+            case nx::vms::api::RebuildState::full:
                 ui->progressBar->setFormat(isBackup
                     ? tr("Reindexing Backup...") + placeholder
                     : tr("Reindexing Archive...") + placeholder);
@@ -46,6 +46,6 @@ void QnStorageRebuildWidget::loadData(const QnStorageScanData& data, bool isBack
         }
     }
 
-    ui->stopButton->setEnabled(data.state == Qn::RebuildState_FullScan);
-    setVisible(data.state == Qn::RebuildState_PartialScan || data.state == Qn::RebuildState_FullScan);
+    ui->stopButton->setEnabled(data.state == nx::vms::api::RebuildState::full);
+    setVisible(data.state == nx::vms::api::RebuildState::partial || data.state == nx::vms::api::RebuildState::full);
 }

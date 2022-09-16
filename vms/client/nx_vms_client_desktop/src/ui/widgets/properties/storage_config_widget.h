@@ -55,7 +55,7 @@ private:
     void updateRebuildInfo();
     void at_storageView_clicked(const QModelIndex& index);
 
-    void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
+    void updateRebuildUi(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& reply);
 
     void confirmNewMetadataStorage(const QnUuid& storageId);
 
@@ -65,7 +65,7 @@ private:
     void cancelRebuild(bool isMain);
 
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
-        QnServerStoragesPool pool, const QnStorageScanData& status);
+        QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& status);
 
     void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr& server,
         QnServerStoragesPool pool);

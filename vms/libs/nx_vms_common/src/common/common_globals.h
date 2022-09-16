@@ -24,13 +24,6 @@ namespace Qn {
     )
     Q_ENUM_NS(ExtrapolationMode)
 
-    NX_REFLECTION_ENUM(RebuildState,
-        RebuildState_None = 1,
-        RebuildState_FullScan = 2,
-        RebuildState_PartialScan = 3
-        //RebuildState_Canceled    = 4
-    )
-
     NX_REFLECTION_ENUM(BackupState,
         BackupState_None = 0,
         BackupState_InProgress = 1
@@ -639,7 +632,6 @@ Q_DECLARE_METATYPE(Qn::PanicMode)
 Q_DECLARE_METATYPE(Qn::RecordingState)
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ConnectionRole)
-Q_DECLARE_METATYPE(Qn::RebuildState)
 Q_DECLARE_METATYPE(Qn::BackupState)
 Q_DECLARE_METATYPE(Qn::RebuildAction)
 Q_DECLARE_METATYPE(Qn::BackupAction)

@@ -17,7 +17,6 @@
 #include "camera_list_reply.h"
 #include "configure_reply.h"
 #include "update_information_reply.h"
-#include "rebuild_archive_reply.h"
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
 #include "backup_status_reply.h"
@@ -71,8 +70,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnStorageStatusReply, (ubjson)(xml)(json)(csv_record), QnStorageStatusReply_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnStorageScanData, (ubjson)(xml)(json)(csv_record), QnStorageScanData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnBackupStatusData, (ubjson)(xml)(json)(csv_record), QnBackupStatusData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
