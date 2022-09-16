@@ -76,7 +76,7 @@ bool isIntercomLayout(const QnResourcePtr& layoutResource)
         return false;
 
     // The function could be called while intercom is in removing process.
-    // In this case all intercom-specific featires could be already removed from intercom resource.
+    // In this case all intercom-specific features could be already removed from intercom resource.
     // So, it is the only robust way to identify intercom layout for now.
     const auto parent = layoutResource->getParentResource();
     return parent && parent->hasFlags(Qn::video);
