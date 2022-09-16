@@ -126,9 +126,9 @@ void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
         index(rowCount() - 1, ActionsColumn));
 }
 
-void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus)
+void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& rebuildStatus)
 {
-    QnStorageScanData old = m_rebuildStatus[static_cast<int>(pool)];
+    nx::vms::api::StorageScanInfo old = m_rebuildStatus[static_cast<int>(pool)];
     int oldRow = storageIndex(m_storages, old.path);
 
     m_rebuildStatus[static_cast<int>(pool)] = rebuildStatus;
@@ -195,9 +195,9 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 int progress = static_cast<int>(rebuildStatus.progress * 100 + 0.5);
                 switch (rebuildStatus.state)
                 {
-                    case Qn::RebuildState_PartialScan:
+                    case nx::vms::api::RebuildState::partial:
                         return tr("%1 (Scanning... %2%)").arg(path).arg(progress);
-                    case Qn::RebuildState_FullScan:
+                    case nx::vms::api::RebuildState::full:
                         return tr("%1 (Rebuilding... %2%)").arg(path).arg(progress);
                     default:
                         break;
@@ -468,9 +468,9 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
     if (isStorageInRebuild(data))
         return false;
 
-    auto isFullScan = [](const QnStorageScanData& status)
+    auto isFullScan = [](const nx::vms::api::StorageScanInfo& status)
     {
-        return status.state == Qn::RebuildState_FullScan;
+        return status.state == nx::vms::api::RebuildState::full;
     };
 
     if (any_of(m_rebuildStatus, isFullScan))
@@ -555,7 +555,7 @@ bool QnStorageListModel::isStoragePoolInRebuild(const QnStorageModelInfo& storag
     auto status = m_rebuildStatus[static_cast<int>(pool)];
 
     /* Check if the whole section is in rebuild. */
-    return (status.state == Qn::RebuildState_FullScan);
+    return (status.state == nx::vms::api::RebuildState::full);
 }
 
 bool QnStorageListModel::isStorageInRebuild(const QnStorageModelInfo& storage) const
@@ -564,7 +564,7 @@ bool QnStorageListModel::isStorageInRebuild(const QnStorageModelInfo& storage) c
     for (const auto& rebuildStatus: m_rebuildStatus)
     {
         if (rebuildStatus.path == storage.url)
-            return rebuildStatus.state != Qn::RebuildState_None;
+            return rebuildStatus.state != nx::vms::api::RebuildState::none;
     }
     return false;
 }

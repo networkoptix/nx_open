@@ -8,7 +8,7 @@ namespace Ui {
     class StorageRebuildWidget;
 } // namespace Ui
 
-struct QnStorageScanData;
+namespace nx::vms::api { struct StorageScanInfo; }
 
 class QnStorageRebuildWidget : public QWidget
 {
@@ -19,7 +19,7 @@ public:
     QnStorageRebuildWidget(QWidget* parent = nullptr);
     virtual ~QnStorageRebuildWidget();
 
-    void loadData(const QnStorageScanData &data, bool isBackup);
+    void loadData(const nx::vms::api::StorageScanInfo &data, bool isBackup);
 
 signals:
     void cancelRequested();
