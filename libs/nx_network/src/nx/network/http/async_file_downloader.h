@@ -64,7 +64,14 @@ public:
     std::optional<size_t> contentLength() const;
     const Response* response() const;
 
+    /**
+     * Checks request delivery as well as response return HTTP code (expect 2XX).
+     */
     bool hasRequestSucceeded() const;
+    /**
+     * @return true if no response has been recevied due to transport error or data failed to be
+     * written due to filesystem error.
+     */
     bool failed() const;
     SystemError::ErrorCode lastSysErrorCode() const;
 
