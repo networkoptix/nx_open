@@ -13,7 +13,6 @@
 #include <api/model/configure_reply.h>
 #include <api/model/getnonce_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
-#include <api/model/rebuild_archive_reply.h>
 #include <api/model/recording_stats_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/storage_space_reply.h>
@@ -193,7 +192,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
-    qRegisterMetaType<QnStorageScanData>();
     qRegisterMetaType<QnBackupStatusData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -222,7 +220,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<Qn::PanicMode>();
-    qRegisterMetaType<Qn::RebuildState>();
 
     qRegisterMetaType<Qn::ResourceInfoLevel>();
     qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();

@@ -8,7 +8,6 @@
 #include <QtWidgets/QMenu>
 
 #include <analytics/db/analytics_db_types.h>
-#include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/server_rest_connection.h>
 #include <common/common_globals.h>
@@ -19,6 +18,7 @@
 #include <nx/analytics/utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -1043,7 +1043,7 @@ void QnStorageConfigWidget::updateWarnings()
 
 void QnStorageConfigWidget::updateRebuildUi(
     QnServerStoragesPool pool,
-    const QnStorageScanData& reply)
+    const nx::vms::api::StorageScanInfo& reply)
 {
     QScopedValueRollback<bool> updatingGuard(m_updating, true);
 
@@ -1056,7 +1056,7 @@ void QnStorageConfigWidget::updateRebuildUi(
 
     const bool canStartRebuild =
         isServerOnline()
-        && reply.state == Qn::RebuildState_None
+        && reply.state == nx::vms::api::RebuildState::none
         && !hasStoragesChanges(m_model->storages())
         && std::any_of(modelStorages.cbegin(), modelStorages.cend(),
             [this, isMainPool](const QnStorageModelInfo& info)
@@ -1071,20 +1071,20 @@ void QnStorageConfigWidget::updateRebuildUi(
     {
         ui->rebuildMainWidget->loadData(reply, false);
         ui->rebuildMainButton->setEnabled(canStartRebuild);
-        ui->rebuildMainButton->setVisible(reply.state == Qn::RebuildState_None);
+        ui->rebuildMainButton->setVisible(reply.state == nx::vms::api::RebuildState::none);
     }
     else
     {
         ui->rebuildBackupWidget->loadData(reply, true);
         ui->rebuildBackupButton->setEnabled(canStartRebuild);
-        ui->rebuildBackupButton->setVisible(reply.state == Qn::RebuildState_None);
+        ui->rebuildBackupButton->setVisible(reply.state == nx::vms::api::RebuildState::none);
     }
 }
 
 void QnStorageConfigWidget::at_serverRebuildStatusChanged(
     const QnMediaServerResourcePtr& server,
     QnServerStoragesPool pool,
-    const QnStorageScanData& status)
+    const nx::vms::api::StorageScanInfo& status)
 {
     if (server == m_server)
         updateRebuildUi(pool, status);

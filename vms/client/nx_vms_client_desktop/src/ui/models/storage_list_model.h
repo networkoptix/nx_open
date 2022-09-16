@@ -8,11 +8,11 @@
 #include <QtGui/QBrush>
 
 #include <api/model/storage_space_reply.h>
-#include <api/model/rebuild_archive_reply.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/api/data/storage_scan_info.h>
 
 #include <server/server_storage_manager_fwd.h>
 
@@ -60,7 +60,7 @@ public:
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
 
-    void updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus);
+    void updateRebuildInfo(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& rebuildStatus);
 
     /** Check if the storage can be moved from this model to another. */
     bool canChangeStoragePool(const QnStorageModelInfo& data) const;
@@ -110,7 +110,7 @@ private:
     QnMediaServerResourcePtr m_server;
     QnStorageModelInfoList m_storages;
     QSet<QnUuid> m_checkedStorages;
-    std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
+    std::array<nx::vms::api::StorageScanInfo, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
     QnUuid m_metadataStorageId;
 
     bool m_readOnly;
