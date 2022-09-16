@@ -41,7 +41,7 @@ public:
     static QnServerStorageManager* instance();
 
     QSet<QString> protocols(const QnMediaServerResourcePtr& server) const;
-    QnStorageScanData rebuildStatus(
+    nx::vms::api::StorageScanInfo rebuildStatus(
         const QnMediaServerResourcePtr& server, QnServerStoragesPool pool) const;
 
     bool rebuildServerStorages(const QnMediaServerResourcePtr& server, QnServerStoragesPool pool);
@@ -81,7 +81,7 @@ signals:
         const QnMediaServerResourcePtr& server, const QSet<QString>& protocols);
 
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
-        QnServerStoragesPool pool, const QnStorageScanData& status);
+        QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& status);
 
     void serverRebuildArchiveFinished(
         const QnMediaServerResourcePtr& server, QnServerStoragesPool pool);
@@ -118,7 +118,7 @@ private:
         bool suppressNotificationSignal = false);
 
 private:
-    void at_archiveRebuildReply(bool success, int handle, const QnStorageScanData& reply);
+    void at_archiveRebuildReply(bool success, int handle, const nx::vms::api::StorageScanInfo& reply);
     void at_storageSpaceReply(bool success, int handle, const QnStorageSpaceReply& reply);
 
 private:
