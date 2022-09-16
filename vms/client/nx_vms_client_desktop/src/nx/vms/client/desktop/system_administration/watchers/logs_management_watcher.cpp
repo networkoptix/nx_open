@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/zip/extractor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -164,12 +165,23 @@ struct LogsManagementWatcher::Unit::Private
         m_timer.start();
 
         m_downloader->setOnResponseReceived(
-            [this, callback](std::optional<size_t> size)
+            [this, filePath = dir.absoluteFilePath(filename), callback](std::optional<size_t> size)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
-                m_fileSize = size;
-                m_state = DownloadState::loading;
+                if (!m_downloader->hasRequestSucceeded())
+                {
+                    lock.unlock();
+                    m_downloader->pleaseStopSync();
+                    lock.relock();
+                    m_state = DownloadState::error;
+                    fixZipFileIfNeeded(filePath);
+                }
+                else
+                {
+                    m_fileSize = size;
+                    m_state = DownloadState::loading;
+                }
 
                 lock.unlock();
                 if (callback)
@@ -195,11 +207,14 @@ struct LogsManagementWatcher::Unit::Private
             });
 
         m_downloader->setOnDone(
-            [this, callback]
+            [this, filePath = dir.absoluteFilePath(filename), callback]
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
                 m_state = m_downloader->failed() ? DownloadState::error : DownloadState::complete;
+
+                if (m_state == DownloadState::error)
+                    fixZipFileIfNeeded(filePath);
 
                 lock.unlock();
                 if (callback)
@@ -208,6 +223,15 @@ struct LogsManagementWatcher::Unit::Private
 
         m_state = DownloadState::pending;
         m_downloader->start(url, file);
+    }
+
+    void fixZipFileIfNeeded(const QString& filePath)
+    {
+        using namespace nx::zip;
+        auto dirPath = QFileInfo(filePath).absoluteDir().absolutePath();
+        auto extractor = std::make_unique<Extractor>(filePath, dirPath);
+        if (extractor->tryOpen() != Extractor::Ok && QFile::resize(filePath, 0))
+            extractor->createEmptyZipFile();
     }
 
     void stopDownload()

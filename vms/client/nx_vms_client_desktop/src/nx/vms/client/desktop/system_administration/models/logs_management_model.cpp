@@ -35,7 +35,7 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
             return qnSkin->icon("text_buttons/ok.png");
 
         case State::error:
-            return qnSkin->icon("text_buttons/clear_error.png");
+            return qnSkin->icon("text_buttons/error.svg");
     }
 
     return {};

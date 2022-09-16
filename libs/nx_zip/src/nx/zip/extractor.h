@@ -44,6 +44,9 @@ public:
     Error extractZip();
     QStringList fileList();
 
+    Error tryOpen();
+    void createEmptyZipFile();
+
 signals:
     void finished(nx::zip::Extractor::Error error);
 
