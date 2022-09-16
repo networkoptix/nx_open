@@ -173,6 +173,25 @@ QStringList Extractor::fileList()
     return result;
 }
 
+Extractor::Error Extractor::tryOpen()
+{
+    if (!m_dir.exists())
+        return WrongDir;
+
+    if (!m_zip->open(QuaZip::mdUnzip))
+        return BrokenZip;
+
+    m_zip->close();
+
+    return Ok;
+}
+
+void Extractor::createEmptyZipFile()
+{
+    if (m_zip->open(QuaZip::mdCreate))
+        m_zip->close();
+}
+
 qint64 Extractor::estimateUnpackedSize() const
 {
     int64_t result = 0;
