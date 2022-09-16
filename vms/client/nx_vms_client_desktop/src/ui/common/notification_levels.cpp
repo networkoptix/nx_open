@@ -50,6 +50,8 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
         case QnSystemHealth::replacedDeviceDiscovered:
+        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
+        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.

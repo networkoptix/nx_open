@@ -226,6 +226,9 @@ QString SystemHealthListModel::Private::text(int index) const
             return tr("Export archive from %1 completed").arg(resourceName);
         case QnSystemHealth::RemoteArchiveSyncError:
             return tr("Export archive from %1 failed").arg(resourceName);
+        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
+        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
+            return tr("Export archive from %1 stopped").arg(resourceName);
 
         default:
             return QnSystemHealthStringsHelper::messageText(item.message,
@@ -345,9 +348,13 @@ QString SystemHealthListModel::Private::description(int index) const
                 camera);
         }
         case QnSystemHealth::RemoteArchiveSyncProgress:
-        {
             return tr("Export archive from %1").arg(resourceName);
-        }
+        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
+            return tr("The archive stream settings have been changed by user");
+        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
+            return tr("The recording settings have been changed by user");
+        default:
+            break;
     }
     return {};
 }
@@ -373,6 +380,8 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
     {
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
+        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
         {
             return QVariant::fromValue(std::chrono::microseconds(
                 item.serverData->getRuntimeParams().eventTimestampUsec));
@@ -617,14 +626,18 @@ void SystemHealthListModel::Private::doAddItem(
     }
 
     if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopSchedule
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopAutoMode)
     {
         removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, resource);
     }
 
     if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress
         || message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopSchedule
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopAutoMode)
     {
         removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncAvailable, resource);
     }

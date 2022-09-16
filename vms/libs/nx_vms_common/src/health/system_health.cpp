@@ -39,6 +39,8 @@ bool isMessageVisibleInSettings(MessageType message)
         case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
+        case RemoteArchiveSyncStopSchedule:
+        case RemoteArchiveSyncStopAutoMode:
         case replacedDeviceDiscovered:
             return false;
 
@@ -66,6 +68,8 @@ bool isMessageLocked(MessageType message)
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncError:
+        case RemoteArchiveSyncStopSchedule:
+        case RemoteArchiveSyncStopAutoMode:
             return true;
         default:
             return false;
@@ -96,6 +100,8 @@ bool skipPackedFlag(MessageType message)
         case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
+        case RemoteArchiveSyncStopSchedule:
+        case RemoteArchiveSyncStopAutoMode:
             return true;
 
         default:
