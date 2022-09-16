@@ -292,12 +292,12 @@ static const QString kAnalogEncoder("analogEncoder");
 // Holes in remote archive smaller than this many seconds will be patched up.
 static const QString kOnvifRemoteArchiveMinChunkDuration("onvifRemoteArchiveMinChunkDuration");
 
-// Skip this many seconds at the start of remote archive when when downloading it.
+// Skip this many seconds at the start of remote archive when downloading it.
 static const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveStartSkipDuration");
 
 static const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
-// Do not attemp donloading remote archive faster than real-time. This is necessary since some
+// Do not attempt downloading remote archive faster than real-time. This is necessary since some
 // cameras cannot cope with that.
 static const QString kOnvifRemoteArchiveDisableFastDownload(
     "onvifRemoteArchiveDisableFastDownload");
