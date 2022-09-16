@@ -16,7 +16,7 @@ void visitModel(
     QModelIndex parent,
     std::function<bool(QModelIndex)> onVisited)
 {
-    if (!model->hasChildren(parent))
+    if (!model || !model->hasChildren(parent))
         return;
 
     for (int r = 0; r < model->rowCount(parent); ++r)
