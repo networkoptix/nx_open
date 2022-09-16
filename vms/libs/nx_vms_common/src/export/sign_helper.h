@@ -6,13 +6,9 @@
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
 
-#include <common/common_module_aware.h>
-
 #include <licensing/license_fwd.h>
-
-#include <nx/utils/cryptographic_hash.h>
-
 #include <nx/streaming/video_data_packet.h>
+#include <nx/utils/cryptographic_hash.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -24,6 +20,7 @@ static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::
 class QnUuid;
 class SPSUnit;
 class PPSUnit;
+class QnLicensePool;
 
 class NX_VMS_COMMON_API QnSignHelper:
     public QObject

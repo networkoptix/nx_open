@@ -129,7 +129,6 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
 
 CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidget* parent):
     base_type(parent),
-    QnCommonModuleAware(parent, false),
     d(new Private(this))
 {
     NX_ASSERT(store);

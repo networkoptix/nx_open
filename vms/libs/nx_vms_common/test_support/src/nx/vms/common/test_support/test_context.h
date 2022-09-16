@@ -31,23 +31,28 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
-    public ::testing::Test,
-    protected QnResourcePoolTestHelper
+class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTestBase:
+    public ::testing::Test
 {
 public:
-    ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
-
-    ~ContextBasedTest();
+    ContextBasedTestBase(nx::core::access::Mode resourceAccessMode);
+    ~ContextBasedTestBase();
 
     Context* context() const { return m_context.get(); }
-
-    SystemContext* systemContext() const { return m_context->systemContext(); }
 
     MessageProcessorMock* createMessageProcessor();
 
 private:
     std::unique_ptr<Context> m_context;
+};
+
+// QnResourcePoolTestHelper must be initialized after context already created.
+class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
+    public ContextBasedTestBase,
+    protected QnResourcePoolTestHelper
+{
+public:
+    ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
 };
 
 } // namespace nx::vms::common::test

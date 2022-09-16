@@ -14,15 +14,6 @@
 
 #include "storage_resource_stub.h"
 
-QnResourcePoolTestHelper::QnResourcePoolTestHelper():
-    QnCommonModuleAware(/*parent*/ nullptr, /*lazyInitialization*/ true)
-{
-}
-
-QnResourcePoolTestHelper::~QnResourcePoolTestHelper()
-{
-}
-
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalPermissions,
     const QString& name,
     nx::vms::api::UserType userType)

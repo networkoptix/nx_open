@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "server_online_status_watcher.h"
-
-#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 #include <core/resource/resource_fwd.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
+
+#include "server_online_status_watcher.h"
 
 class QMenu;
 class QnUuid;
 
-class QnChooseServerButton: public DropdownButton, public QnCommonModuleAware
+class QnChooseServerButton: public DropdownButton, public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = DropdownButton;

@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_access/user_access_data.h>

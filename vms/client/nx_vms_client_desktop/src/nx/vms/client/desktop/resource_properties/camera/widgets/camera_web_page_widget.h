@@ -5,16 +5,14 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <common/common_module_aware.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
-class CameraWebPageWidget:
-    public QWidget,
-    public QnCommonModuleAware
+class CameraWebPageWidget: public QWidget, public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = QWidget;

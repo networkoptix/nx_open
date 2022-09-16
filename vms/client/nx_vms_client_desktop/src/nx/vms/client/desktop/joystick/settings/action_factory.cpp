@@ -366,7 +366,6 @@ ActionFactory::ActionFactory(
     QObject* parent)
     :
     base_type(parent),
-    QnCommonModuleAware(parent),
     d(new Private(this, config))
 {
 }

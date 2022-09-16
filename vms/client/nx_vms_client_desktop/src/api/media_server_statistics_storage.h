@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
+#include <QtCore/QString>
 
 #include <api/model/statistics_reply.h>
 #include <api/server_rest_connection_fwd.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 
 class QTimer;
@@ -21,7 +21,7 @@ namespace nx::network::rest { struct JsonResult; }
  */
 class QnMediaServerStatisticsStorage:
     public QObject,
-    public QnCommonModuleAware,
+    public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT

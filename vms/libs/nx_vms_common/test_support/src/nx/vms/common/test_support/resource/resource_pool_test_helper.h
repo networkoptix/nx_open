@@ -3,19 +3,19 @@
 #pragma once
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <core/resource/user_resource.h> //not so good but we can allow it for test module
+#include <core/resource/user_resource.h> //< Not so good but we can allow it for the test module.
+#include <nx/vms/common/system_context_aware.h>
 
 #include "camera_resource_stub.h"
 
 namespace nx::vms::api { struct UserRoleData; }
 
-class NX_VMS_COMMON_TEST_SUPPORT_API QnResourcePoolTestHelper: public QnCommonModuleAware
+class NX_VMS_COMMON_TEST_SUPPORT_API QnResourcePoolTestHelper:
+    public nx::vms::common::SystemContextAware
 {
 public:
-    QnResourcePoolTestHelper();
-    virtual ~QnResourcePoolTestHelper();
+    using nx::vms::common::SystemContextAware::SystemContextAware;
 
     static constexpr auto kTestUserName = "user";
     static constexpr auto kTestUserName2 = "user_2";

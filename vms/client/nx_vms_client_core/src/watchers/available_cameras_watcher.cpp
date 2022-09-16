@@ -28,7 +28,6 @@ public:
 
 QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
     d_ptr(new QnAvailableCamerasWatcherPrivate(this))
 {
     Q_D(QnAvailableCamerasWatcher);

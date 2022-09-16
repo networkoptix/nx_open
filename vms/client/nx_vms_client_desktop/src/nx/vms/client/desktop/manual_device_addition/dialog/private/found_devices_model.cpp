@@ -35,8 +35,7 @@ QFont selectionColumnFont()
 namespace nx::vms::client::desktop {
 
 FoundDevicesModel::FoundDevicesModel(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+    base_type(parent)
 {
 }
 

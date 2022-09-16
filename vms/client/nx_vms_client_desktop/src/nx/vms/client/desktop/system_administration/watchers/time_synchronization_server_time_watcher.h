@@ -6,8 +6,8 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -15,7 +15,7 @@ class TimeSynchronizationWidgetStore;
 
 class TimeSynchronizationServerTimeWatcher:
     public QObject,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;
