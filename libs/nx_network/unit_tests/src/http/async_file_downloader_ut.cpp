@@ -22,6 +22,7 @@ static constexpr char kFilePath[] = "/file.zip";
 static constexpr char kInfiniteFilePath[] = "/infiniteFile.zip";
 static constexpr char kPartialFilePath[] = "/partialFile.zip";
 static constexpr char kEmptyFilePath[] = "/emptyFile.zip";
+static constexpr char kNoSuchFilePath[] = "/noSuchFile.zip";
 static constexpr int kContentLength = 10 * 1024 * 1024;
 static const nx::Buffer kLine10Chars = "123456789\n";
 static constexpr auto k50msTimeout = std::chrono::milliseconds(50);
@@ -121,6 +122,15 @@ protected:
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
             });
+        m_httpServer->registerRequestProcessorFunc(
+            kNoSuchFilePath,
+            [](auto&&... args)
+            {
+                serve(
+                    std::bind(&AsyncFileDownloader::send404Response,
+                        std::placeholders::_1, std::placeholders::_2),
+                    std::forward<decltype(args)>(args)...);
+            });
 
         m_httpServer->enableAuthentication(".*");
         m_httpServer->registerUserCredentials(m_credentials);
@@ -200,6 +210,14 @@ protected:
         result.body = std::make_unique<EmptyMessageBodySource>(
             "application/octet-stream",
             kContentLength);
+        completionHandler(std::move(result));
+    }
+
+    static void send404Response(
+        nx::network::http::RequestContext /*requestContext*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        http::RequestResult result(StatusCode::notFound);
         completionHandler(std::move(result));
     }
 
@@ -468,6 +486,26 @@ TEST_F(AsyncFileDownloader, timedOutBeforeContent)
     ASSERT_EQ(context->calls, 0);
     ASSERT_EQ(context->downloaded, 0);
     ASSERT_EQ(context->downloaded, context->file->size());
+}
+
+TEST_F(AsyncFileDownloader, notFound)
+{
+    auto context = prepareTestContext(
+        ssl::kAcceptAnyCertificate,
+        {kNoTimeout, kNoTimeout, k50msTimeout});
+    context->downloader->start(prepareUrl(kNoSuchFilePath), context->file);
+
+    ASSERT_EQ(context->responseFuture.get().value(), 0);
+
+    ASSERT_TRUE(context->doneFuture.get());
+
+    ASSERT_FALSE(context->downloader->hasRequestSucceeded());
+    ASSERT_EQ(context->downloader->response()->statusLine.statusCode, StatusCode::notFound);
+    ASSERT_EQ(SystemError::noError, context->downloader->lastSysErrorCode());
+    ASSERT_EQ(context->calls, 0);
+    ASSERT_EQ(context->downloaded, 0);
+    ASSERT_EQ(context->downloaded, context->file->size());
+    context->downloader->pleaseStopSync();
 }
 
 TEST_F(AsyncFileDownloader, sequential)
