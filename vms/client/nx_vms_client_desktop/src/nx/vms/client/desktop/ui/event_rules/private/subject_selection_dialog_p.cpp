@@ -34,8 +34,7 @@ namespace subject_selection_dialog_private {
 // subject_selection_dialog_private::RoleListModel
 
 RoleListModel::RoleListModel(QObject* parent):
-    base_type(parent, StandardRoleFlag | UserRoleFlag),
-    QnCommonModuleAware(parent)
+    base_type(parent, StandardRoleFlag | UserRoleFlag)
 {
     setHasCheckBoxes(true);
     setPredefinedRoleIdsEnabled(true);
@@ -180,7 +179,6 @@ UserListModel::UserListModel(
     RoleListModel* rolesModel, QObject* parent)
     :
     base_type(parent),
-    QnCommonModuleAware(parent),
     m_usersModel(new QnResourceListModel(this)),
     m_rolesModel(rolesModel)
 {
@@ -371,8 +369,7 @@ void UserListModel::updateIndicators()
 // subject_selection_dialog_private::RoleListDelegate
 
 RoleListDelegate::RoleListDelegate(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+    base_type(parent)
 {
     setOptions(HighlightChecked | ValidateOnlyChecked);
     setCheckBoxColumn(RoleListModel::CheckColumn);

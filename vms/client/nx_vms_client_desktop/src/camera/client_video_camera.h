@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_CLIENT_VIDEO_CAMERA_H
-#define QN_CLIENT_VIDEO_CAMERA_H
+#pragma once
 
-#include "cam_display.h"
+#include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/streaming/config.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
-
 #include <recording/time_period_list.h>
+
+#include "cam_display.h"
 
 class QnlTimeSource;
 class QnMediaStreamStatistics;
@@ -83,4 +82,3 @@ private:
     bool m_displayStarted;
 };
 
-#endif //QN_CLIENT_VIDEO_CAMERA_H

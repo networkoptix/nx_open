@@ -4,7 +4,6 @@
 
 #include <QtCore/QVector>
 
-#include <common/common_module_aware.h>
 #include <analytics/common/object_metadata.h>
 #include <nx/utils/impl_ptr.h>
 

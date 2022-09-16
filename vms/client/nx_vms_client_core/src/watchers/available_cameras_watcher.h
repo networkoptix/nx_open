@@ -2,16 +2,15 @@
 
 #pragma once
 
-#include <common/common_module_aware.h>
-
-#include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 class QnAvailableCamerasWatcherPrivate;
 
 class NX_VMS_CLIENT_CORE_API QnAvailableCamerasWatcher:
     public QObject,
-    public QnCommonModuleAware
+    public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
 

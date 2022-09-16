@@ -3,7 +3,6 @@
 #pragma once
 
 #include <api/server_rest_connection_fwd.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>

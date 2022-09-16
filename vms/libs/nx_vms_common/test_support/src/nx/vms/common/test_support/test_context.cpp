@@ -41,24 +41,32 @@ SystemContext* Context::systemContext() const
     return d->systemContext.get();
 }
 
-ContextBasedTest::ContextBasedTest(
-    nx::core::access::Mode resourceAccessMode)
+//-------------------------------------------------------------------------------------------------
+// ContextBasedTestBase
+
+ContextBasedTestBase::ContextBasedTestBase(nx::core::access::Mode resourceAccessMode):
+    m_context(std::make_unique<Context>(resourceAccessMode))
 {
-    m_context = std::make_unique<Context>(resourceAccessMode);
-    initializeContext(m_context->commonModule());
 }
 
-ContextBasedTest::~ContextBasedTest()
+ContextBasedTestBase::~ContextBasedTestBase()
 {
-    deinitializeContext();
-    if (systemContext()->messageProcessor())
-        systemContext()->deleteMessageProcessor();
-    m_context.reset();
+    if (m_context->systemContext()->messageProcessor())
+        m_context->systemContext()->deleteMessageProcessor();
 }
 
-MessageProcessorMock* ContextBasedTest::createMessageProcessor()
+MessageProcessorMock* ContextBasedTestBase::createMessageProcessor()
 {
-    return systemContext()->createMessageProcessor<MessageProcessorMock>();
+    return m_context->systemContext()->createMessageProcessor<MessageProcessorMock>();
+}
+
+//-------------------------------------------------------------------------------------------------
+// ContextBasedTest
+
+ContextBasedTest::ContextBasedTest(nx::core::access::Mode resourceAccessMode):
+    ContextBasedTestBase(resourceAccessMode),
+    QnResourcePoolTestHelper(this->context()->systemContext())
+{
 }
 
 } // namespace nx::vms::common::test

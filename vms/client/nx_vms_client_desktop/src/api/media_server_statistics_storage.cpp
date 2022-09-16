@@ -29,7 +29,6 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(
     QObject* parent)
     :
     QObject(parent),
-    QnCommonModuleAware(parent),
     m_serverId(serverId),
     m_pointsLimit(pointsLimit),
     m_updatePeriod(kDefaultUpdatePeriod),

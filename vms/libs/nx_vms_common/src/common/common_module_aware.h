@@ -30,19 +30,13 @@ namespace nx::vms::rules { class Engine; }
 namespace nx::core::access { class ResourceAccessProvider; }
 namespace ec2 { class AbstractECConnection; }
 
+/**
+ * Deprecated class to get access to the System Context. Use SystemContextAware instead.
+ */
 class NX_VMS_COMMON_API QnCommonModuleAware
 {
 public:
     QnCommonModuleAware(QnCommonModule* commonModule);
-    QnCommonModuleAware(QObject* parent, bool lazyInitialization = false);
-
-    /** Delayed initialization call. */
-    void initializeContext(QObject *parent);
-
-    /** Delayed initialization call. */
-    void initializeContext(QnCommonModule* commonModule);
-
-    void deinitializeContext();
 
     QnCommonModule* commonModule() const;
 
@@ -72,9 +66,5 @@ public:
     QnCommonMessageProcessor* messageProcessor() const;
 
 private:
-    void init(QObject *parent);
-
-private:
     QPointer<QnCommonModule> m_commonModule;
-    bool m_initialized {false};
 };
