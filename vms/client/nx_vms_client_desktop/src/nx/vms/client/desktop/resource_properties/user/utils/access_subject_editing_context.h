@@ -24,6 +24,8 @@ public:
 
     virtual ~AccessSubjectEditingContext() override;
 
+    nx::vms::common::SystemContext* systemContext() const;
+
     /** A current subject being edited. */
     QnUuid currentSubjectId() const;
     void setCurrentSubjectId(const QnUuid& subjectId);

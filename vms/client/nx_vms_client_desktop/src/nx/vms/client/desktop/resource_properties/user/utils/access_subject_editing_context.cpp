@@ -128,6 +128,11 @@ AccessSubjectEditingContext::~AccessSubjectEditingContext()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+nx::vms::common::SystemContext* AccessSubjectEditingContext::systemContext() const
+{
+    return d->systemContext;
+}
+
 QnUuid AccessSubjectEditingContext::currentSubjectId() const
 {
     return d->currentSubjectId;
