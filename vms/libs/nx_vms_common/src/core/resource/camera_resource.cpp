@@ -146,15 +146,6 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     if (!storeUrlForRole(role))
         return;
 
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        auto cachedUrl = m_cachedStreamUrls.find(role);
-        bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
-
-        if (cachedUrlExists && cachedUrl->second == url)
-            return;
-    }
-
     NX_DEBUG(this, nx::format("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
 
     const auto roleStr = QString::number(role);
@@ -957,8 +948,8 @@ nx::vms::api::DeviceProfiles QnVirtualCameraResource::availableProfiles() const
 void QnVirtualCameraResource::setForcedProfile(const QString& token, nx::vms::api::StreamIndex index)
 {
     using namespace nx::vms::api;
-    setProperty(index == StreamIndex::primary 
-        ? ResourcePropertyKey::kForcedPrimaryProfile 
+    setProperty(index == StreamIndex::primary
+        ? ResourcePropertyKey::kForcedPrimaryProfile
         : ResourcePropertyKey::kForcedSecondaryProfile,
         token);
 }
@@ -966,7 +957,7 @@ void QnVirtualCameraResource::setForcedProfile(const QString& token, nx::vms::ap
 QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index) const
 {
     return getProperty(
-        index == StreamIndex::primary 
-        ? ResourcePropertyKey::kForcedPrimaryProfile 
+        index == StreamIndex::primary
+        ? ResourcePropertyKey::kForcedPrimaryProfile
         : ResourcePropertyKey::kForcedSecondaryProfile);
 }

@@ -284,7 +284,6 @@ private:
         QnUuid engineId) const;
 
 private:
-    std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
     nx::Mutex m_mediaStreamsMutex;
 
     nx::utils::CachedValue<QSet<QnUuid>> m_cachedUserEnabledAnalyticsEngines;
