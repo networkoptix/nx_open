@@ -166,6 +166,8 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
                         || healthMessage == QnSystemHealth::ArchiveFastScanFinished
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncError
+                        || healthMessage == QnSystemHealth::RemoteArchiveSyncStopSchedule
+                        || healthMessage == QnSystemHealth::RemoteArchiveSyncStopAutoMode
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                     {
                         auto eventParams = businessAction->getRuntimeParams();
@@ -173,6 +175,8 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
 
                         if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
                             || healthMessage == QnSystemHealth::RemoteArchiveSyncError
+                            || healthMessage == QnSystemHealth::RemoteArchiveSyncStopSchedule
+                            || healthMessage == QnSystemHealth::RemoteArchiveSyncStopAutoMode
                             || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                         {
                             if (eventParams.metadata.cameraRefs.empty())
