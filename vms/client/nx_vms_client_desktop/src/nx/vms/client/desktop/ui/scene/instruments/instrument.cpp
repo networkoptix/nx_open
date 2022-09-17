@@ -130,7 +130,7 @@ void Instrument::setItem(QObject* item)
 
     d->item = item;
 
-    if (d->enabled)
+    if (d->enabled && item)
         item->installEventFilter(this);
 
     emit itemChanged();
