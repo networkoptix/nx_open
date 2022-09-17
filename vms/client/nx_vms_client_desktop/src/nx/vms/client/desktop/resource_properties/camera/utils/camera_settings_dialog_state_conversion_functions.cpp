@@ -466,13 +466,13 @@ void setCredentials(const QnVirtualCameraResourcePtr& camera, const QAuthenticat
 
 void setCredentials(const State::Credentials& value, const Cameras& cameras)
 {
-    NX_ASSERT(value.login.hasValue() || value.password.hasValue());
+    if (!NX_ASSERT(value.password.hasValue(), "New camera credentials password should be defined"))
+        return;
 
     QAuthenticator authenticator;
     if (value.login.hasValue())
         authenticator.setUser(value.login());
-    if (value.password.hasValue())
-        authenticator.setPassword(value.password());
+    authenticator.setPassword(value.password());
 
     if (!value.login.hasValue())
     {
@@ -480,23 +480,7 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
         for (const auto& camera: cameras)
         {
             const auto oldAuth = camera->getAuth();
-            if (oldAuth.password() == authenticator.password())
-                continue;
-
             authenticator.setUser(oldAuth.user());
-            setCredentials(camera, authenticator);
-        }
-    }
-    else if (!value.password.hasValue())
-    {
-        // Change only login, fetch passwords from cameras.
-        for (const auto& camera: cameras)
-        {
-            const auto oldAuth = camera->getAuth();
-            if (oldAuth.user() == authenticator.user())
-                continue;
-
-            authenticator.setPassword(oldAuth.password());
             setCredentials(camera, authenticator);
         }
     }
@@ -504,10 +488,7 @@ void setCredentials(const State::Credentials& value, const Cameras& cameras)
     {
         // Change both login and password.
         for (const auto& camera: cameras)
-        {
-            if (camera->getAuth() != authenticator)
-                setCredentials(camera, authenticator);
-        }
+            setCredentials(camera, authenticator);
     }
 }
 
@@ -593,7 +574,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         }
     }
 
-    if ((state.credentials.login.hasValue() || state.credentials.password.hasValue())
+    if (state.credentials.password.hasValue()
         && state.devicesDescription.isVirtualCamera == CombinedValue::None)
     {
         setCredentials(state.credentials, cameras);
