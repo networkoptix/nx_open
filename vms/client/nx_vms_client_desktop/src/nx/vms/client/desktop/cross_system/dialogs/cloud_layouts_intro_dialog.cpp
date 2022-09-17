@@ -5,9 +5,12 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/html/html.h>
+#include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
 
@@ -20,14 +23,30 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     ui(new Ui::CloudLayoutsIntroDialog())
 {
     ui->setupUi(this);
-    ui->imageLabel->setPixmap(qnSkin->pixmap("promo/cloud_layouts_promo.png"));
+    ui->imageLabel->setPixmap(qnSkin->pixmap("promo/screen.png"));
+    ui->availableActionsIconLabel->setPixmap(qnSkin->pixmap("promo/available.svg"));
+    ui->inFutureIconLabel->setPixmap(qnSkin->pixmap("promo/future.svg"));
     ui->captionLabel->setText(tr(
         "Introducing %1 Layouts",
         "%1 is the short cloud name (like Cloud)").arg(nx::branding::shortCloudName()));
     ui->descriptionLabel->setText(tr(
-        "Adding a Camera from another System transforms the Layout to a %1 Layout",
-        "%1 is the short cloud name (like Cloud)")
-            .arg(nx::branding::shortCloudName()));
+        "%1 Layouts are <b>cross-system layouts</b> that allow you to work with devices from "
+        "different Systems. Currently, only some features of regular layouts are available, but "
+        "we will continue to expand the capabilities of %1 Layouts in future versions")
+        .arg(nx::branding::shortCloudName()));
+    ui->helpIconLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->helpLabel->setText(tr("Read more on the %1")
+        .arg(common::html::localLink(tr("help page"))));
+    connect(ui->helpLabel, &QLabel::linkActivated,
+        [this]()
+        {
+            // TODO: #aivashchenko Open help page which will be issued later.
+        });
+
+    QColor captionTextColor = colorTheme()->color("light1");
+    setPaletteColor(ui->captionLabel, QPalette::WindowText, captionTextColor);
+    setPaletteColor(ui->availableActionsLabel, QPalette::WindowText, captionTextColor);
+    setPaletteColor(ui->inFutureLabel, QPalette::WindowText, captionTextColor);
 
     if (mode == Mode::confirmation)
     {
