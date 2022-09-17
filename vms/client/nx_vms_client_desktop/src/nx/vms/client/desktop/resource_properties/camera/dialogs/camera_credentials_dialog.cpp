@@ -20,6 +20,13 @@ CameraCredentialsDialog::CameraCredentialsDialog(QWidget* parent):
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ui->loginInputField, ui->passwordInputField});
+
+    connect(ui->loginInputField->lineEdit(), &QLineEdit::textEdited, this,
+        [passwordInput = ui->passwordInputField]
+        {
+            if (passwordInput->hasRemotePassword() || !passwordInput->optionalText())
+                passwordInput->setOptionalText(QString());
+        });
 }
 
 CameraCredentialsDialog::~CameraCredentialsDialog()
@@ -44,6 +51,16 @@ std::optional<QString> CameraCredentialsDialog::password() const
 void CameraCredentialsDialog::setPassword(const std::optional<QString>& value)
 {
     ui->passwordInputField->setOptionalText(value);
+}
+
+bool CameraCredentialsDialog::hasRemotePassword() const
+{
+    return ui->passwordInputField->hasRemotePassword();
+}
+
+void CameraCredentialsDialog::setHasRemotePassword(bool value)
+{
+    ui->passwordInputField->setHasRemotePassword(value);
 }
 
 } // namespace nx::vms::client::desktop

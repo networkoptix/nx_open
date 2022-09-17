@@ -175,9 +175,20 @@ void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* 
 
     const auto& credentials = store->state().credentials;
     dialog->setLogin(credentials.login);
-    dialog->setPassword(credentials.password);
 
-    if (dialog->exec() == QDialog::Accepted)
+    if (credentials.password.hasValue())
+    {
+        dialog->setPassword(credentials.password); //< Actual password value accessible to the user.
+    }
+    else
+    {
+        if (store->state().isSingleCamera())
+            dialog->setHasRemotePassword(true); //< Dots placeholder, password is unknown.
+        else
+            dialog->setPassword(std::nullopt); //< "Multiple values" placeholder.
+    }
+
+    if (dialog->exec() == QDialog::Accepted && !dialog->hasRemotePassword())
         store->setCredentials(dialog->login(), dialog->password());
 }
 

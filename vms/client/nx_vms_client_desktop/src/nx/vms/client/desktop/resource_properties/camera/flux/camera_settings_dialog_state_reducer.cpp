@@ -1204,8 +1204,10 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<QString>(state.credentials.login, cameras,
         [](const Camera& camera) { return camera->getAuth().user(); });
-    fetchFromCameras<QString>(state.credentials.password, cameras,
-        [](const Camera& camera) { return camera->getAuth().password(); });
+
+    // Password value aren't accessible by the client and doesn't fetched. state.credentials.login
+    // that hasn't value is interpreted as "Unknown remote stored password" for the single camera
+    // or as "Multiple values" for the multiple camera selection.
 
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
