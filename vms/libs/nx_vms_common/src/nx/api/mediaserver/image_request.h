@@ -35,9 +35,6 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
 
     /** Check if value is "special" - DATETIME_NOW or negative. */
     static bool isSpecialTimeValue(std::chrono::microseconds value);
-
-    static const int kMinimumSize = 32;
-    static const int kMaximumSize = 4096;
 };
 
 } // namespace nx::api
