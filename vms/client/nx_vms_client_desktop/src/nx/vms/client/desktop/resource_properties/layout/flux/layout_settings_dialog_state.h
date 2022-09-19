@@ -26,6 +26,10 @@ struct LayoutSettingsDialogState: AbstractFluxState
 
     bool locked = false;
     bool isLocalFile = false;
+
+    /** Whether layout is cross-system one. */
+    bool isCrossSystem = false;
+
     float cellAspectRatio = 0.0;
 
     int logicalId = 0;
