@@ -58,6 +58,12 @@ ManagerWindows::~ManagerWindows()
     m_directInput->Release();
 }
 
+void ManagerWindows::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
+{
+    base_type::removeUnpluggedJoysticks(foundDevicePaths);
+    m_foundDevices.clear();
+}
+
 DevicePtr ManagerWindows::createDevice(
     const JoystickDescriptor& deviceConfig,
     const QString& path,
