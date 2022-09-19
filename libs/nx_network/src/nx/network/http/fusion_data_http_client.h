@@ -412,10 +412,21 @@ public:
         :
         ParentType(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
-        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
-            this->m_requestBody = nx::reflect::json::serialize(input);
-        else
-            this->m_requestBody = QJson::serialized(input).toStdString();
+        if constexpr (std::is_same_v<InputData, std::string>)
+        {
+            this->m_requestBody = input;
+        }
+        else 
+        {
+            if constexpr (nx::reflect::IsInstrumentedV<InputData>) 
+            {
+                this->m_requestBody = nx::reflect::json::serialize(input);
+            }
+            else
+            {
+                this->m_requestBody = QJson::serialized(input).toStdString();
+            }
+        }
 
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
