@@ -82,6 +82,9 @@ static constexpr QMargins kCloseButtonMarginsWithoutHeader(0, 2, 2, 0);
 
 static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPreviousImage;
 
+constexpr auto kDotRadius = 8;
+constexpr auto kDotSpacing = 4;
+
 void setWidgetHolder(QWidget* widget, QWidget* newHolder)
 {
     auto oldHolder = widget->parentWidget();
@@ -330,6 +333,10 @@ EventTile::EventTile(QWidget* parent):
     ui->progressDescriptionLabel->hide();
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
+
+    auto dots = ui->previewWidget->busyIndicator()->dots();
+    dots->setDotRadius(kDotRadius);
+    dots->setDotSpacing(kDotSpacing);
 
     ui->previewWidget->setAutoScaleUp(true);
     ui->previewWidget->setReloadMode(kDefaultReloadMode);
