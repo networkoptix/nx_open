@@ -238,6 +238,7 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     state.locked = layout->locked();
     state.logicalId = layout->logicalId();
     state.isLocalFile = layout->isFile();
+    state.isCrossSystem = layout->hasFlags(Qn::cross_system);
 
     state.fixedSize = layout->fixedSize();
     state.fixedSizeEnabled = !state.fixedSize.isEmpty();
@@ -256,7 +257,7 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     }
 
     resetBackgroundParameters(state);
-    state.background.supported = !layout->hasFlags(Qn::cross_system);
+    state.background.supported = !state.isCrossSystem;
     if (state.background.supported)
     {
         state.background.filename = layout->backgroundImageFilename();

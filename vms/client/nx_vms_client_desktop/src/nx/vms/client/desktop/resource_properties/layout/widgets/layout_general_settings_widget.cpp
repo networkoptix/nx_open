@@ -68,15 +68,19 @@ void LayoutGeneralSettingsWidget::setupUi()
 
 void LayoutGeneralSettingsWidget::loadState(const LayoutSettingsDialogState& state)
 {
+    ui->logicalIdGroupBox->setHidden(state.isCrossSystem);
+    if (!state.isCrossSystem)
+    {
+        ui->logicalIdSpinBox->setValue(state.logicalId);
+        const bool duplicateLogicalId = state.isDuplicateLogicalId();
+        ui->logicalIdWarningLabel->setVisible(duplicateLogicalId);
+        setWarningStyleOn(ui->logicalIdSpinBox, duplicateLogicalId);
+    }
+
     ui->lockedCheckBox->setChecked(state.locked);
-    ui->logicalIdSpinBox->setValue(state.logicalId);
     ui->fixedSizeGroupBox->setChecked(state.fixedSizeEnabled);
     ui->fixedWidthSpinBox->setValue(state.fixedSize.width());
     ui->fixedHeightSpinBox->setValue(state.fixedSize.height());
-
-    const bool duplicateLogicalId = state.isDuplicateLogicalId();
-    ui->logicalIdWarningLabel->setVisible(duplicateLogicalId);
-    setWarningStyleOn(ui->logicalIdSpinBox, duplicateLogicalId);
 }
 
 } // namespace nx::vms::client::desktop
