@@ -239,6 +239,7 @@ Button
                 Label
                 {
                     height: titleRect.height
+                    width: titleRect.width
 
                     elide: Text.ElideRight
                     font.pixelSize: 20
