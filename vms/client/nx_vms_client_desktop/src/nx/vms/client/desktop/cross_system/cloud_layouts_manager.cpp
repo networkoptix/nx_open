@@ -273,6 +273,12 @@ struct CloudLayoutsManager::Private
         cloudLayout->setIdUnsafe(QnUuid::createUuid());
         cloudLayout->setParentId(QnUuid());
         cloudLayout->addFlags(Qn::local);
+
+        // Reset background if it is set.
+        cloudLayout->setBackgroundImageFilename({});
+        cloudLayout->setBackgroundOpacity(nx::vms::api::LayoutData::kDefaultBackgroundOpacity);
+        cloudLayout->setBackgroundSize({});
+
         cloudLayout->setName(nx::utils::generateUniqueString(
             usedNames,
             tr("%1 (Copy)", "Original name will be substituted")
