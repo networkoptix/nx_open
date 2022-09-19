@@ -93,6 +93,8 @@ struct NX_VMS_API ThumbnailFilter
 
     static constexpr std::chrono::microseconds kLatestThumbnail{-1};
     static constexpr int kDefaultRotation = -1;
+    static constexpr int kMinimumSize = 32;
+    static constexpr int kMaximumSize = 4096;
 
     /**%apidoc Device id. */
     QnUuid id;
@@ -115,9 +117,10 @@ struct NX_VMS_API ThumbnailFilter
     int rotation = kDefaultRotation;
 
     /**%apidoc[opt]:string
-     * Image size, format `{width}x{height}`. If the image has only height or only width then
-     * aspect ratio will be used. Any value must be not less than 128, or -1. If the width is
-     * not -1 then the height should not be -1.
+     * Image size, format `{width}x{height}`. Any valid value must not be less than 32 and not
+     * larger than 4096, or it can be less than or equal to 0 to indicate auto-sizing. During
+     * auto-sizing if only height or only width is positive then aspect ratio is used to calculate
+     * the other value, and if both values are not positive then the original frame size is used.
      */
     ThumbnailSize size;
 
