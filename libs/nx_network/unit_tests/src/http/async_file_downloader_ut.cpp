@@ -124,7 +124,7 @@ protected:
             kNoSuchFilePath,
             [](auto&&... args)
             {
-                serve(
+                handleRequest(
                     std::bind(&AsyncFileDownloader::send404Response,
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
