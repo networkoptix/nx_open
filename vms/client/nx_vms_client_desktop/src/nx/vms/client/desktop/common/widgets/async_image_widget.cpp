@@ -39,16 +39,14 @@ static constexpr QSize kDefaultThumbnailSize(1920, 1080);
 
 static constexpr bool kShowLoadingIndicationInInitialState = true;
 
-} // namespace
-
 // BusyIndicatorWidget draws dots snapped to the pixel grid.
 // This descendant when it is downscaled draws dots generally not snapped.
-class QnAutoscaledBusyIndicatorWidget: public BusyIndicatorWidget
+class AutoscaledBusyIndicatorWidget: public BusyIndicatorWidget
 {
     using base_type = BusyIndicatorWidget;
 
 public:
-    QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
+    AutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
         base_type(parent)
     {
     }
@@ -73,10 +71,12 @@ public:
     }
 };
 
+} // namespace
+
 AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     base_type(parent),
     m_placeholder(new AutoscaledPlainText(this)),
-    m_indicator(new QnAutoscaledBusyIndicatorWidget(this))
+    m_indicator(new AutoscaledBusyIndicatorWidget(this))
 {
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
     setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light16"));
