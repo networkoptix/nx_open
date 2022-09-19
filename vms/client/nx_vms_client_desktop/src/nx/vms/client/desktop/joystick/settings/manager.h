@@ -75,7 +75,7 @@ protected:
         const QString& searchDir,
         DeviceConfigs& destConfigs,
         QMap<QString, QString>& destIdToRelativePath) const;
-    void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
+    virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
     void initializeDevice(
         DevicePtr& device,
         const JoystickDescriptor& description,

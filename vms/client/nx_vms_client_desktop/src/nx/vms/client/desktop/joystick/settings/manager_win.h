@@ -28,6 +28,9 @@ public:
     ManagerWindows(QObject* parent = 0);
     ~ManagerWindows();
 
+protected:
+    virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths) override;
+
 private:
     virtual void enumerateDevices() override;
 
