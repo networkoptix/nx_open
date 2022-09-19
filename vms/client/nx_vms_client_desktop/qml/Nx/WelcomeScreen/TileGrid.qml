@@ -25,7 +25,7 @@ Item
 
     readonly property int tileSpacing: 16
     readonly property int minTileWidth: 260
-    readonly property int maxTileWidth: 1000
+    readonly property int maxTileWidth: 360
 
     readonly property int maxColCount: (width + tileSpacing) / (minTileWidth + tileSpacing)
     readonly property int colCount: model ? MathUtils.bound(1, model.systemsCount, maxColCount) : 0
