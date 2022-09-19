@@ -12,7 +12,7 @@ bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ThumbnailSize*
 {
     if (value.isString())
     {
-        std::regex re("^(.\\d)x(.\\d)$");
+        std::regex re("^([+-]?\\d+)x([+-]?\\d+)$");
         std::smatch match;
 
         const auto str = value.toString().toStdString();
