@@ -327,6 +327,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->secondStreamDisableCheckBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->keepCameraTimeSettingsCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    setHelpTopic(ui->disableAutoExportCheckBox, Qn::CameraSettings_Expert_AutomaticExport_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
