@@ -420,8 +420,8 @@ public:
     QnUuid preferredServerId() const;
 
     void synchronizeRemoteArchiveOnce();
-    void setRemoteArchiveSynchronizationDisabled(bool disabled);
-    bool remoteArchiveSynchronizationDisabled() const;
+    void setRemoteArchiveSynchronizationEnabled(bool isEnabled);
+    bool isRemoteArchiveSynchronizationEnabled() const;
 
     /**
      * If preferred server is not set, assigns current server as preferred.
