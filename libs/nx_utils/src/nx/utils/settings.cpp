@@ -7,10 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/literal.h>
 
-
-
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 void Settings::add(const QString& name, BaseOption* option)
 {
@@ -43,10 +40,14 @@ void Settings::attach(std::shared_ptr<AbstractQSettings>& settings)
 
         auto& option = optionIt->second;
         if (const auto setting = settings->value(optionName); !option->load(setting))
+        {
             NX_ERROR(this, "Failed to load option: %1", optionName);
+        }
         else
-            NX_DEBUG(this, "Loaded %1 loaded as '%2' from '%3'", optionName, option->save(), setting);
-
+        {
+            NX_DEBUG(
+                this, "Loaded %1 loaded as '%2' from '%3'", optionName, option->save(), setting);
+        }
     }
 
     applyMigrations(settings);
@@ -58,21 +59,17 @@ void Settings::sync()
     m_qtSettings->sync();
 }
 
-QJsonObject Settings::buildDocumentation() const
+std::map<QString, SettingInfo> Settings::buildDocumentation() const
 {
-    QJsonObject documentation;
-    QJsonArray settings;
+    std::map<QString, SettingInfo> documentation;
     for (const auto& option: m_options)
     {
-        QJsonObject description;
-        description.insert("name", option.first);
-        description.insert("defaultValue", option.second->defaultValueVariant().toString());
-        description.insert("description", option.second->description());
-        settings << description;
+        SettingInfo info;
+        info.defaultValue = option.second->defaultValueVariant().toJsonValue();
+        info.description = option.second->description();
+        documentation.emplace(option.first, info);
     }
-    documentation.insert("settings", settings);
     return documentation;
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils
