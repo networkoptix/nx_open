@@ -382,6 +382,12 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+enum class SocketTypeLimitation
+{
+    noConcurrentBlockingIo,
+    notUsableAfterSendInterrupt,
+};
+
 template<typename SocketTypeSet>
 class StreamSocketAcceptance:
     public ::testing::Test,
@@ -589,13 +595,15 @@ protected:
         whenConnectToServerAsync(m_mappedEndpoint, [](){});
     }
 
-    void whenSendRandomDataToServer()
+    nx::Buffer whenSendRandomDataToServer()
     {
-        m_sentData = nx::utils::generateRandomName(256);
-        ASSERT_EQ(
+        m_sentData = nx::utils::generateRandomName(1023);
+        EXPECT_EQ(
             m_sentData.size(),
             m_connection->send(m_sentData.data(), m_sentData.size()))
             << SystemError::getLastOSErrorText();
+
+        return m_sentData;
     }
 
     void whenSendAsyncRandomDataToServer()
@@ -741,6 +749,7 @@ protected:
             (bytesSent = m_connection->send(m_randomDataBuffer.data(), m_randomDataBuffer.size())) > 0;)
         {
             m_sentData += m_randomDataBuffer.substr(0, bytesSent);
+            m_randomDataBuffer = nx::utils::generateRandomName(64 * 1024);
         }
 
         m_sendResultQueue.push(SystemError::getLastOSErrorCode());
@@ -1010,8 +1019,6 @@ protected:
     {
         thenConnectionHasBeenAccepted();
 
-        ASSERT_TRUE(lastAcceptedSocket()->setNonBlockingMode(false));
-
         assertAcceptedConnectionReceivedAllSentData();
         assertAcceptedConnectionReceivedEof();
     }
@@ -1049,6 +1056,8 @@ protected:
 
     void assertAcceptedConnectionReceived(const nx::Buffer& expected)
     {
+        ASSERT_TRUE(lastAcceptedSocket()->setNonBlockingMode(false));
+
         whenServerReadsBytesWithFlags(expected.size(), 0);
 
         ASSERT_EQ(expected, m_synchronousServerReceivedData.internalBuffer());
@@ -1203,8 +1212,6 @@ protected:
         SendPingFunc sendPingFunc,
         RecvPingFunc recvPingFunc)
     {
-        ASSERT_TRUE(connection()->setNonBlockingMode(false));
-
         sendPingFunc();
         if (m_sendResultQueue.pop() != SystemError::noError)
             return;
@@ -1227,10 +1234,10 @@ protected:
 
     template<typename T>
     SocketAddress getServerEndpointForConnectShutdown(
-        typename std::enable_if<
+        typename std::enable_if_t<
             std::is_same<
-                typename std::remove_const<decltype(T::serverEndpointForConnectShutdown)>::type,
-                SocketAddress>::value>::type* = nullptr)
+                typename std::remove_const_t<decltype(T::serverEndpointForConnectShutdown)>,
+                SocketAddress>::value>* = nullptr)
     {
         return T::serverEndpointForConnectShutdown;
     }
@@ -1240,6 +1247,13 @@ protected:
     {
         return serverEndpoint();
     }
+
+    bool hasLimitation(SocketTypeLimitation limitation) const
+    {
+        return hasLimitationImpl<SocketTypeSet>(limitation);
+    }
+
+    //---------------------------------------------------------------------------------------------
 
     void givenConnectionBlockedInConnect()
     {
@@ -1441,6 +1455,29 @@ protected:
     const nx::Buffer& clientMessage() const
     {
         return m_clientMessage;
+    }
+
+private:
+    template<typename SocketTypeSet_>
+    static bool hasLimitationImpl(
+        SocketTypeLimitation value,
+        typename std::enable_if_t<std::is_same_v<
+            std::void_t<decltype(SocketTypeSet_::limitations)>, void>>* = nullptr)
+    {
+        for (auto c: SocketTypeSet::limitations)
+        {
+            if (c == value)
+                return true;
+        }
+
+        return false;
+    }
+
+    template<typename>
+    static bool hasLimitationImpl(...)
+    {
+        // If SocketTypeSet does not specify limitations, then assuming everything supported.
+        return false;
     }
 
 private:
@@ -1688,6 +1725,9 @@ TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblock
 
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
 {
+    if (this->hasLimitation(SocketTypeLimitation::noConcurrentBlockingIo))
+        GTEST_SKIP() << "Current socket type does not support concurrent blocking I/O";
+
     this->whenSendDataConcurrentlyThroughConnectedSockets();
     this->thenBothSocketsReceiveExpectedData();
 }
@@ -1708,6 +1748,9 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_reusable_after_recv_timeout)
 
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_reusable_after_send_timeout)
 {
+    if (this->hasLimitation(SocketTypeLimitation::notUsableAfterSendInterrupt))
+        GTEST_SKIP() << "Current socket type cannot be used further after send timeout";
+
     this->givenClientConnectionTimedOutOnSend();
 
     // Receiving data sent before timedOut.
@@ -1748,10 +1791,18 @@ TYPED_TEST_P(
     this->givenAcceptingServerSocket();
     this->givenConnectedSocket();
 
-    this->whenSendRandomDataToServer();
+    auto expectedData = this->whenSendRandomDataToServer();
+
+    // Ensuring that the SSL handshake is completed before the client connection is closed.
+    // Otherwise, the accepted connection may not be able to read (depends on SSL version).
+    this->thenConnectionHasBeenAccepted();
+    this->assertAcceptedConnectionReceived(expectedData.substr(0, 1));
+    expectedData = expectedData.substr(1);
+
     this->whenClientConnectionIsClosed();
 
-    this->thenServerSocketReceivesAllDataBeforeEof();
+    this->assertAcceptedConnectionReceived(expectedData);
+    this->assertAcceptedConnectionReceivedEof();
     this->assertAcceptedConnectionReportsNotConnected();
 }
 
@@ -1920,8 +1971,11 @@ TYPED_TEST_P(
     this->thenServerMessageIsReceived();
 }
 
-TYPED_TEST_P(StreamSocketAcceptance, DISABLED_socket_is_usable_after_send_cancellation)
+TYPED_TEST_P(StreamSocketAcceptance, socket_is_usable_after_send_cancellation)
 {
+    if (this->hasLimitation(SocketTypeLimitation::notUsableAfterSendInterrupt))
+        GTEST_SKIP() << "Current socket type cannot be used further after send cancellation";
+
     // SSL socket cannot recover from incomplete send.
     // So, it can be ready for I/O or can report an error.
     // Checking that it does not crash at least.
@@ -2256,7 +2310,7 @@ REGISTER_TYPED_TEST_SUITE_P(StreamSocketAcceptance,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
     change_aio_thread_of_accepted_connection,
-    DISABLED_socket_is_usable_after_send_cancellation,
+    socket_is_usable_after_send_cancellation,
 
     // This test is disabled because currently it does not work on Linux and Mac. In future, we may
     // introduce connect implementation with shutdown support.
