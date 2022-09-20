@@ -317,7 +317,7 @@ void setForcedSecondaryProfile(const QString& value, const Cameras& cameras)
 void setRemoteArchiveAutoExportDisabled(const bool& value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-        camera->setRemoteArchiveSynchronizationDisabled(value);
+        camera->setRemoteArchiveSynchronizationEnabled(!value);
 }
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
