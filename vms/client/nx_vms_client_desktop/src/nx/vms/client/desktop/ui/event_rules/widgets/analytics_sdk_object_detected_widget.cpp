@@ -62,7 +62,8 @@ void AnalyticsSdkObjectDetectedWidget::at_model_dataChanged(Fields fields)
             ui->attributesEdit->setText(attributes);
     }
 
-    ui->detectableObjectTypeComboBox->setSelectedObjectTypeId(model()->eventParams().getAnalyticsObjectTypeId());
+    ui->detectableObjectTypeComboBox->setSelectedMainObjectTypeId(
+        model()->eventParams().getAnalyticsObjectTypeId());
 }
 
 void AnalyticsSdkObjectDetectedWidget::paramsChanged()
@@ -72,7 +73,7 @@ void AnalyticsSdkObjectDetectedWidget::paramsChanged()
     QScopedValueRollback<bool> guard(m_updating, true);
 
     model()->setEventParams(createEventParameters(
-        ui->detectableObjectTypeComboBox->selectedObjectTypeId(), ui->attributesEdit->text()));
+        ui->detectableObjectTypeComboBox->selectedMainObjectTypeId(), ui->attributesEdit->text()));
 }
 
 nx::vms::event::EventParameters AnalyticsSdkObjectDetectedWidget::createEventParameters(

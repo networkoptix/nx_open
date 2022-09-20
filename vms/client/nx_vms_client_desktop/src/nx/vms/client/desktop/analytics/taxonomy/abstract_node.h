@@ -22,11 +22,15 @@ class AbstractNode: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(std::vector<QString> typeIds READ typeIds CONSTANT)
+    Q_PROPERTY(QString mainTypeId READ mainTypeId CONSTANT)
     Q_PROPERTY(std::vector<QString> fullSubtreeTypeIds READ fullSubtreeTypeIds CONSTANT)
+    Q_PROPERTY(QString id READ id CONSTANT)
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString iconSource READ icon CONSTANT)
     Q_PROPERTY(std::vector<nx::vms::client::desktop::analytics::taxonomy::AbstractAttribute*>
         attributes READ attributes CONSTANT)
+    Q_PROPERTY(nx::vms::client::desktop::analytics::taxonomy::AbstractNode*
+        baseNode READ baseNode CONSTANT)
     Q_PROPERTY(std::vector<nx::vms::client::desktop::analytics::taxonomy::AbstractNode*>
         derivedNodes READ derivedNodes CONSTANT)
 
@@ -35,8 +39,15 @@ public:
 
     virtual ~AbstractNode() {}
 
-    /** Ids of Object or Event types from which the node is built. */
+    /**
+     * Ids of Object or Event types from which the node is built, including hidden descendants.
+     */
     virtual std::vector<QString> typeIds() const = 0;
+
+    /**
+     * Id of main Object or Event type from which the node is built.
+     */
+    virtual QString mainTypeId() const = 0;
 
     /**
      * Ids of Object or Event types from which the node is built and ids of all its explicit and
@@ -44,11 +55,17 @@ public:
      */
     virtual std::vector<QString> fullSubtreeTypeIds() const = 0;
 
+    virtual QString id() const = 0;
+
     virtual QString name() const = 0;
 
     virtual QString icon() const = 0;
 
     virtual std::vector<AbstractAttribute*> attributes() const = 0;
+
+    virtual AbstractNode* baseNode() const = 0;
+
+    virtual void setBaseNode(AbstractNode* node) = 0;
 
     virtual std::vector<AbstractNode*> derivedNodes() const = 0;
 };

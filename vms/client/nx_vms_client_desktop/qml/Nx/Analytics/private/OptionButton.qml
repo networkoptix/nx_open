@@ -12,7 +12,6 @@ AbstractButton
 {
     id: button
 
-    property var optionId
     property bool selected: false
 
     property bool horizontal: false

@@ -11,6 +11,8 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/common/system_context.h>
 
+#include "analytics_filter_model.h"
+
 namespace nx::vms::client::desktop {
 namespace analytics {
 
@@ -125,10 +127,21 @@ TaxonomyManager::~TaxonomyManager()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-Taxonomy* TaxonomyManager::currentTaxonomy() const
+std::shared_ptr<Taxonomy> TaxonomyManager::currentTaxonomy() const
+{
+    d->ensureTaxonomy(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    return d->currentTaxonomy.value();
+}
+
+Taxonomy* TaxonomyManager::qmlCurrentTaxonomy() const
 {
     d->ensureTaxonomy(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->currentTaxonomy.value().get();
+}
+
+taxonomy::AnalyticsFilterModel* TaxonomyManager::createFilterModel(QObject* parent)
+{
+    return new taxonomy::AnalyticsFilterModel(this, parent);
 }
 
 QVariant TaxonomyManager::objectTypeById(const QString& objectTypeId) const
@@ -182,19 +195,23 @@ void TaxonomyManager::registerQmlTypes()
         "nx.vms.client.desktop.analytics", 1, 0, "Taxonomy",
         "Cannot create an instance of Taxonomy");
 
+    qmlRegisterUncreatableType<taxonomy::AnalyticsFilterModel>(
+        "nx.vms.client.desktop.analytics", 1, 0, "AnalyticsFilterModel",
+        "Cannot create an instance of AnalyticsFilterModel");
+
     qmlRegisterUncreatableType<AbstractEngine>(
         "nx.vms.client.desktop.analytics", 1, 0, "Engine",
         "Cannot create an instance of Engine");
 
-    qmlRegisterUncreatableType<AbstractObjectType>(
+    qmlRegisterUncreatableType<taxonomy::AbstractNode>(
         "nx.vms.client.desktop.analytics", 1, 0, "ObjectType",
         "Cannot create an instance of ObjectType");
 
-    qmlRegisterUncreatableType<AbstractEnumType>(
+    qmlRegisterUncreatableType<taxonomy::AbstractEnumeration>(
         "nx.vms.client.desktop.analytics", 1, 0, "EnumType",
         "Cannot create an instance of EnumType");
 
-    qmlRegisterUncreatableType<AbstractAttribute>(
+    qmlRegisterUncreatableType<taxonomy::AbstractAttribute>(
         "nx.vms.client.desktop.analytics", 1, 0, "Attribute",
         "Cannot create an instance of Attribute");
 

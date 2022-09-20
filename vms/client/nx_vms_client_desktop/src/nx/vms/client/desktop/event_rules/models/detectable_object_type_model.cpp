@@ -8,106 +8,70 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::analytics::taxonomy;
+using namespace nx::vms::client::desktop::analytics::taxonomy;
 
 class DetectableObjectTypeModel::Private
 {
-    DetectableObjectTypeModel* const q;
-    QPointer<TaxonomyManager> manager;
-
 public:
-    Private(DetectableObjectTypeModel* q, TaxonomyManager* manager):
-        q(q),
-        manager(manager)
-    {
-        if (!NX_ASSERT(manager))
-            return;
-
-        QObject::connect(manager, &TaxonomyManager::currentTaxonomyAboutToBeChanged, q,
-            [this]() { this->q->beginResetModel(); });
-
-        QObject::connect(manager, &TaxonomyManager::currentTaxonomyChanged, q,
-            [this]()
-            {
-                invalidateCache();
-                this->q->endResetModel();
-            });
-    }
-
     struct TypeData
     {
-        AbstractObjectType* type = nullptr;
-        QVector<quintptr> derivedTypeIds;
+        AbstractNode* parent = nullptr;
         int indexInParent = -1;
     };
 
-    TypeData data(quintptr id) const
+    Private(DetectableObjectTypeModel* q, analytics::taxonomy::AnalyticsFilterModel* filterModel):
+        q(q),
+        filterModel(filterModel)
     {
-        ensureObjectTypeCache();
-        return objectTypeCache.value(id);
-    }
-
-    void invalidateCache()
-    {
-        objectTypeCache.clear();
-    }
-
-    bool liveTypesExcluded = false;
-    QPointer<AbstractEngine> engine;
-
-private:
-    void ensureObjectTypeCache() const
-    {
-        if (!objectTypeCache.empty() || !NX_ASSERT(manager))
+        if (!NX_ASSERT(filterModel))
             return;
 
-        const auto currentTaxonomy = manager->currentTaxonomy();
-        if (!currentTaxonomy)
-            return;
-
-        recursivelyAddDetectableTypes(/*parent*/ nullptr, /*indexInParent*/ -1,
-            currentTaxonomy->rootObjectTypes());
-    }
-
-    void recursivelyAddDetectableTypes(
-        AbstractObjectType* parent,
-        int indexInParent,
-        const std::vector<AbstractObjectType*>& children) const
-    {
-        auto& data = objectTypeCache[(quintptr) parent];
-        data.type = parent;
-        data.indexInParent = indexInParent;
-        data.derivedTypeIds.clear();
-
-        for (const auto& child: children)
-        {
-            if (!child->isReachable()
-                || (liveTypesExcluded && (child->isLiveOnly() || child->isNonIndexable()))
-                || (engine && !manager->isRelevantForEngine(child, engine)))
+        QObject::connect(filterModel, &AnalyticsFilterModel::objectTypesChanged, q,
+            [this]()
             {
-                continue;
-            }
+                ScopedReset reset(this->q);
+                updateData();
+            });
+    }
 
-            const int indexInParent = data.derivedTypeIds.size();
-            recursivelyAddDetectableTypes(child, indexInParent, child->derivedTypes());
-            data.derivedTypeIds.push_back((quintptr) child);
+    void updateData(const std::vector<AbstractNode*>& types)
+    {
+        for (int i = 0; i < types.size(); ++i)
+        {
+            AbstractNode* type = types[i];
+            data.insert(type, TypeData{.indexInParent = i});
+            updateData(type->derivedNodes());
         }
     }
 
-private:
-    mutable QHash<quintptr, TypeData> objectTypeCache;
+    void updateData()
+    {
+        data.clear();
+        updateData(filterModel->objectTypes());
+    }
+
+    AbstractNode* type(const QModelIndex& index) const
+    {
+        return static_cast<AbstractNode*>(index.internalPointer());
+    }
+
+public:
+    DetectableObjectTypeModel* const q;
+    AnalyticsFilterModel* const filterModel;
+    QMap<AbstractNode*, TypeData> data;
 };
 
 DetectableObjectTypeModel::DetectableObjectTypeModel(
-    TaxonomyManager* taxonomyManager,
+    analytics::taxonomy::AnalyticsFilterModel* filterModel,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, taxonomyManager))
+    d(new Private(this, filterModel))
 {
 }
 
@@ -121,8 +85,9 @@ QModelIndex DetectableObjectTypeModel::index(int row, int column, const QModelIn
     if (!hasIndex(row, column, parent))
         return {};
 
-    const auto& parentData = d->data(parent.internalId());
-    return createIndex(row, column, parentData.derivedTypeIds[row]);
+    AbstractNode* type = d->type(parent);
+    return createIndex(
+        row, column, type ? type->derivedNodes()[row] : d->filterModel->objectTypes()[row]);
 }
 
 QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
@@ -130,20 +95,24 @@ QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
     if (!index.isValid() || !NX_ASSERT(checkIndex(index, CheckIndexOption::DoNotUseParent)))
         return {};
 
-    const auto& data = d->data(index.internalId());
-    const auto baseTypeId = NX_ASSERT(data.type) ? (quintptr) data.type->base() : 0;
-    if (!baseTypeId)
+    AbstractNode* type = d->type(index);
+    AbstractNode* parent = type ? type->baseNode() : nullptr;
+    if (!parent)
         return {};
 
-    const auto baseData = d->data(baseTypeId);
-    return createIndex(baseData.indexInParent, 0, baseTypeId);
+    return parent
+        ? createIndex(d->data[parent].indexInParent, 0, parent)
+        : QModelIndex();
 }
 
 int DetectableObjectTypeModel::rowCount(const QModelIndex& parent) const
 {
-    return NX_ASSERT(checkIndex(parent))
-        ? d->data(parent.internalId()).derivedTypeIds.size()
-        : 0;
+    if (!NX_ASSERT(checkIndex(parent)))
+        return 0;
+
+    return parent.isValid()
+        ? d->type(parent)->derivedNodes().size()
+        : d->filterModel->objectTypes().size(); //< Parent is the root item.
 }
 
 int DetectableObjectTypeModel::columnCount(const QModelIndex& parent) const
@@ -156,7 +125,7 @@ QVariant DetectableObjectTypeModel::data(const QModelIndex& index, int role) con
     if (!index.isValid() || !NX_ASSERT(checkIndex(index)))
         return {};
 
-    const auto type = d->data(index.internalId()).type;
+    AbstractNode* type = d->type(index);
     if (!type)
         return {};
 
@@ -165,42 +134,30 @@ QVariant DetectableObjectTypeModel::data(const QModelIndex& index, int role) con
         case NameRole:
             return type->name();
 
-        case IdRole:
-            return type->id();
+        case IdsRole:
+            return d->filterModel->getAnalyticsObjectTypeIds(type);
+
+        case MainIdRole:
+            return type->mainTypeId();
 
         default:
             return {};
     }
 }
 
-bool DetectableObjectTypeModel::liveTypesExcluded() const
-{
-    return d->liveTypesExcluded;
-}
-
 void DetectableObjectTypeModel::setLiveTypesExcluded(bool value)
 {
-    if (d->liveTypesExcluded == value)
-        return;
-
-    const ScopedReset reset(this);
-    d->invalidateCache();
-    d->liveTypesExcluded = value;
+    d->filterModel->setLiveTypesExcluded(value);
 }
 
-AbstractEngine* DetectableObjectTypeModel::engine() const
+void DetectableObjectTypeModel::setEngine(AbstractEngine* engine)
 {
-    return d->engine;
+    d->filterModel->setSelectedEngine(engine);
 }
 
-void DetectableObjectTypeModel::setEngine(AbstractEngine* value)
+AnalyticsFilterModel* DetectableObjectTypeModel::sourceModel() const
 {
-    if (d->engine == value)
-        return;
-
-    const ScopedReset reset(this);
-    d->invalidateCache();
-    d->engine = value;
+    return d->filterModel;
 }
 
 } // namespace nx::vms::client::desktop

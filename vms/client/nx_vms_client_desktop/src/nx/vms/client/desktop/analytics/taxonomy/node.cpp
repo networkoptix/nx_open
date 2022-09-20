@@ -2,16 +2,18 @@
 
 #include "node.h"
 
-#include "utils.h"
-
 #include <map>
 #include <optional>
+
+#include <QtCore/QPointer>
 
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/common.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/attribute.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
+
+#include "utils.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
@@ -28,6 +30,8 @@ struct Node::Private
     std::map<QString, const nx::analytics::taxonomy::AbstractObjectType*> additionalObjectTypes;
     mutable std::optional<std::vector<QString>> cachedTypeIds;
     mutable std::optional<std::vector<QString>> cachedFullSubtreeTypeIds;
+    mutable std::optional<QString> cachedId;
+    QPointer<AbstractNode> baseNode;
     std::vector<AbstractNode*> derivedNodes;
     std::vector<AbstractAttribute*> attributes;
     const AbstractStateViewFilter* filter = nullptr;
@@ -50,6 +54,9 @@ void Node::addDerivedNode(AbstractNode* node)
     if (!NX_ASSERT(node))
         return;
 
+    NX_ASSERT(node->baseNode() == nullptr);
+
+    node->setBaseNode(this);
     d->derivedNodes.push_back(node);
 }
 
@@ -68,7 +75,7 @@ std::vector<QString> Node::typeIds() const
 
     d->cachedTypeIds = std::vector<QString>();
     if (objectTypeMatchesFilter(d->filter, d->mainObjectType))
-    d->cachedTypeIds->push_back(d->mainObjectType->id());
+        d->cachedTypeIds->push_back(d->mainObjectType->id());
 
     for (const auto& [objectTypeId, objectType]: d->additionalObjectTypes)
     {
@@ -77,6 +84,11 @@ std::vector<QString> Node::typeIds() const
     }
 
     return *d->cachedTypeIds;
+}
+
+QString Node::mainTypeId() const
+{
+    return d->mainObjectType->id();
 }
 
 std::vector<QString> Node::fullSubtreeTypeIds() const
@@ -98,6 +110,16 @@ std::vector<QString> Node::fullSubtreeTypeIds() const
     return *d->cachedFullSubtreeTypeIds;
 }
 
+QString Node::id() const
+{
+    if (d->cachedId)
+        return *d->cachedId;
+
+    const std::vector<QString> ids = fullSubtreeTypeIds();
+    d->cachedId = makeId(QStringList{ids.begin(), ids.end()});
+    return *d->cachedId;
+}
+
 QString Node::name() const
 {
     if (NX_ASSERT(d->mainObjectType))
@@ -117,6 +139,11 @@ QString Node::icon() const
 std::vector<AbstractAttribute*> Node::attributes() const
 {
     return d->attributes;
+}
+
+AbstractNode* Node::baseNode() const
+{
+    return d->baseNode;
 }
 
 std::vector<AbstractNode*> Node::derivedNodes() const
@@ -143,6 +170,16 @@ void Node::resolveAttributes()
     }
 
     d->attributes = taxonomy::resolveAttributes(objectTypes, d->filter, this);
+}
+
+QString Node::makeId(const QStringList& analyticsObjectTypeIds)
+{
+    return analyticsObjectTypeIds.join("|");
+}
+
+void Node::setBaseNode(AbstractNode* node)
+{
+    d->baseNode = node;
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

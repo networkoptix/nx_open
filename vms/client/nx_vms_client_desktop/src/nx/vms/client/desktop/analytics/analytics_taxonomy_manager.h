@@ -10,7 +10,6 @@
 #include <QtCore/QSet>
 
 #include <common/common_module_aware.h>
-
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
@@ -20,6 +19,9 @@ class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 namespace analytics {
+namespace taxonomy {
+class AnalyticsFilterModel;
+} // namespace taxonomy
 
 using Taxonomy = nx::analytics::taxonomy::AbstractState;
 
@@ -29,7 +31,7 @@ class TaxonomyManager:
 {
     Q_OBJECT
     Q_PROPERTY(nx::analytics::taxonomy::AbstractState* currentTaxonomy
-        READ currentTaxonomy NOTIFY currentTaxonomyChanged)
+        READ qmlCurrentTaxonomy NOTIFY currentTaxonomyChanged)
 
 public:
     explicit TaxonomyManager(QnCommonModule* commonModule, QObject* parent = nullptr);
@@ -37,7 +39,10 @@ public:
 
     static void registerQmlTypes();
 
-    Taxonomy* currentTaxonomy() const;
+    std::shared_ptr<Taxonomy> currentTaxonomy() const;
+    Taxonomy* qmlCurrentTaxonomy() const;
+    Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel*
+        createFilterModel(QObject* parent = nullptr);
 
     Q_INVOKABLE QVariant objectTypeById(const QString& objectTypeId) const;
 

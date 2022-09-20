@@ -87,7 +87,7 @@ Window
 
         Repeater
         {
-            model: d.relevantEngines
+            model: d.filterModel.engines
 
             EngineButton
             {
@@ -185,9 +185,7 @@ Window
                         width: parent.width
                         bottomPadding: 16
 
-                        rootObjectTypes: taxonomyCache.currentTaxonomy
-                            ? taxonomyCache.currentTaxonomy.rootObjectTypes
-                            : []
+                        model: d.filterModel
                     }
 
                     onFiltersReset:
@@ -629,6 +627,8 @@ Window
         readonly property Analytics.Engine selectedAnalyticsEngine:
             tabBar.currentItem ? tabBar.currentItem.engine : null
 
+        property bool updating: false
+
         function showSelectionOnLayout()
         {
             if (selection.index.valid)
@@ -637,32 +637,31 @@ Window
 
         onSelectedAnalyticsEngineChanged:
         {
+            updating = true
             analyticsFiltersByEngine[analyticsFilters.engine] = {
-                "objectTypeId": analyticsFilters.selectedObjectTypeId,
+                "objectTypeIds": analyticsFilters.selectedAnalyticsObjectTypeIds,
                 "attributeValues": analyticsFilters.selectedAttributeValues}
 
-            analyticsFilters.engine = selectedAnalyticsEngine
+            analyticsFilters.model.setSelectedEngine(selectedAnalyticsEngine)
 
             eventModel.analyticsSetup.engine = selectedAnalyticsEngine
                 ? NxGlobals.uuid(selectedAnalyticsEngine.id)
                 : NxGlobals.uuid("")
 
             const savedData = analyticsFiltersByEngine[analyticsFilters.engine]
-            analyticsFilters.setSelectedObjectTypeId(savedData ? savedData.objectTypeId : "")
+            analyticsFilters.setSelectedAnalyticsObjectTypeIds(
+                savedData ? savedData.objectTypeIds : null)
+
+            if (!analyticsFilters.selectedAnalyticsObjectTypeIds.length)
+                eventModel.analyticsSetup.objectTypes = []
+
             analyticsFilters.setSelectedAttributeValues(savedData ? savedData.attributeValues : {})
+            updating = false
         }
 
-        readonly property var relevantEngines:
-        {
-            if (!taxonomyCache.currentTaxonomy)
-                return []
+        property var filterModel: Analytics.TaxonomyManager.createFilterModel()
 
-            return Array.prototype.filter.call(taxonomyCache.currentTaxonomy.engines,
-                Analytics.TaxonomyManager.isEngineRelevant).sort(
-                    (a, b) => a.name.localeCompare(b.name))
-        }
-
-        readonly property bool pluginTabsShown: relevantEngines.length > 1
+        readonly property bool pluginTabsShown: filterModel.engines.length > 1
 
         PropertyUpdateFilter on delayedAttributesFilter
         {
@@ -677,20 +676,25 @@ Window
             value: d.delayedAttributesFilter
         }
 
-        Binding
+        Connections
         {
-            target: eventModel.analyticsSetup
-            property: "objectType"
-            value: analyticsFilters.selectedObjectTypeId
+            target: analyticsFilters
+            enabled: !d.updating
+            function onSelectedAnalyticsObjectTypeIdsChanged()
+            {
+                eventModel.analyticsSetup.objectTypes =
+                    analyticsFilters.selectedAnalyticsObjectTypeIds
+            }
         }
 
         Connections
         {
             target: eventModel.analyticsSetup
 
-            function onObjectTypeChanged()
+            function onObjectTypesChanged()
             {
-                analyticsFilters.setSelectedObjectTypeId(eventModel.analyticsSetup.objectType)
+                analyticsFilters.setSelectedAnalyticsObjectTypeIds(
+                    eventModel.analyticsSetup.objectTypes)
             }
 
             function onEngineChanged()

@@ -13,7 +13,7 @@ CollapsiblePanel
     id: control
 
     property alias model: repeater.model
-    property var selectedTypeId
+    property var selectedTypeId: null
 
     property string textRole: "name"
     property string iconRole: "icon"
@@ -31,8 +31,8 @@ CollapsiblePanel
 
     function clear()
     {
-        if (selectedTypeId !== undefined)
-            selectedTypeId = undefined
+        if (selectedTypeId)
+            selectedTypeId = null
     }
 
     onClearRequested:
@@ -66,14 +66,14 @@ CollapsiblePanel
                     ? modelData
                     : model
 
+                readonly property var id: data[idRole]
+
                 horizontal: grid.columns === 1
 
                 text: data[textRole]
                 width: grid.cellWidth
-                optionId: data[idRole]
-                selected: optionId === control.selectedTypeId
-
-                visible: selected || control.selectedTypeId === undefined || grid.columns > 1
+                selected: id === control.selectedTypeId
+                visible: (selected || !control.selectedTypeId || grid.columns > 1)
 
                 icon.source: iconPath && typeof iconPath === "function"
                     ? iconPath(data[iconRole])
@@ -83,7 +83,7 @@ CollapsiblePanel
                 icon.height: 20
 
                 onClicked:
-                    control.selectedTypeId = selected ? undefined : optionId
+                    control.selectedTypeId = selected ? null : id
             }
         }
     }

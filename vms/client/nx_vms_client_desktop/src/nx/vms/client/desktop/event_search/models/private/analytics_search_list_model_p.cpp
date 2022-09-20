@@ -365,20 +365,20 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
     emit q->filterRectChanged();
 }
 
-QString AnalyticsSearchListModel::Private::selectedObjectType() const
+QStringList AnalyticsSearchListModel::Private::selectedObjectTypes() const
 {
-    return m_selectedObjectType;
+    return m_selectedObjectTypes;
 }
 
-void AnalyticsSearchListModel::Private::setSelectedObjectType(const QString& value)
+void AnalyticsSearchListModel::Private::setSelectedObjectTypes(const QStringList& value)
 {
-    if (m_selectedObjectType == value)
+    if (m_selectedObjectTypes == value)
         return;
 
     q->clear();
-    m_selectedObjectType = value;
-    NX_VERBOSE(q, "Set selected object type to \"%1\"", m_selectedObjectType);
-    emit q->selectedObjectTypeChanged();
+    m_selectedObjectTypes = value;
+    NX_VERBOSE(q, "Set selected object type to \"%1\"", m_selectedObjectTypes);
+    emit q->selectedObjectTypesChanged();
 
     updateRelevantObjectTypes();
 }
@@ -422,18 +422,8 @@ void AnalyticsSearchListModel::Private::setAttributeFilters(const QStringList& v
 
 void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
 {
-    std::set<QString> relevantObjectTypes;
-    if (!m_selectedObjectType.isEmpty())
-    {
-        const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
-        if (NX_ASSERT(watcher))
-        {
-            relevantObjectTypes = nx::analytics::taxonomy::getAllDerivedTypeIds(
-                watcher->state().get(), m_selectedObjectType);
-        }
-
-        relevantObjectTypes.insert(m_selectedObjectType);
-    }
+    std::set<QString> relevantObjectTypes(
+        m_selectedObjectTypes.begin(), m_selectedObjectTypes.end());
 
     if (relevantObjectTypes == m_relevantObjectTypes)
         return;
@@ -652,8 +642,11 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.withBestShotOnly = true;
     request.analyticsEngineId = m_selectedEngine;
 
-    if (!m_selectedObjectType.isEmpty())
-        request.objectTypeId = {m_selectedObjectType};
+    if (!m_selectedObjectTypes.isEmpty())
+    {
+        request.objectTypeId =
+            std::set(m_selectedObjectTypes.begin(), m_selectedObjectTypes.end());
+    }
 
     if (q->cameraSet()->type() == ManagedCameraSet::Type::single && m_filterRect.isValid())
         request.boundingBox = m_filterRect;

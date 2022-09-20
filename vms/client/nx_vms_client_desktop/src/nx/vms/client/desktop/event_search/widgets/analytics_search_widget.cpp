@@ -66,6 +66,7 @@ using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::desktop::analytics;
 using namespace nx::vms::client::desktop::ui;
+using namespace analytics::taxonomy;
 
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget::Private
@@ -80,6 +81,7 @@ public:
 
     void resetFilters();
     void updateTaxonomyIfNeeded();
+    std::vector<AbstractEngine*> engines() const;
 
     AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
 
@@ -102,7 +104,10 @@ private:
     AbstractEngine* engineById(const QnUuid& id) const;
 
     QAction* addEngineMenuAction(QMenu* menu, const QString& title, const QnUuid& engineId);
-    QAction* addObjectMenuAction(QMenu* menu, const QString& title, const QString& objectTypeId);
+    QAction* addObjectMenuAction(
+        QMenu* menu,
+        const QString& title,
+        const QStringList& objectTypeIds);
 
 private:
     AnalyticsSearchListModel* const m_model = qobject_cast<AnalyticsSearchListModel*>(q->model());
@@ -110,6 +115,7 @@ private:
     SelectableTextButton* const m_areaSelectionButton;
     SelectableTextButton* const m_engineSelectionButton;
     SelectableTextButton* const m_typeSelectionButton;
+    AnalyticsFilterModel* const m_filterModel;
     DetectableObjectTypeModel* const m_objectTypeModel;
     QMenu* const m_engineMenu;
     ItemModelMenu* const m_objectTypeMenu;
@@ -182,7 +188,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
     const bool hasPermissions = model()->isOnline()
         && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
 
-    return hasPermissions && !d->taxonomyManager->relevantEngines().empty();
+    return hasPermissions && !d->engines().empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -195,7 +201,8 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     m_areaSelectionButton(q->createCustomFilterButton()),
     m_engineSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),
-    m_objectTypeModel(new DetectableObjectTypeModel(taxonomyManager, this)),
+    m_filterModel(new analytics::taxonomy::AnalyticsFilterModel(taxonomyManager, this)),
+    m_objectTypeModel(new DetectableObjectTypeModel(m_filterModel, this)),
     m_engineMenu(q->createDropdownMenu()),
     m_objectTypeMenu(new ItemModelMenu(q))
 {
@@ -297,33 +304,34 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
     connect(m_objectTypeMenu, &ItemModelMenu::itemTriggered, this,
         [this](const QModelIndex& index)
         {
-            m_analyticsSetup->setObjectType(index.isValid()
-                ? index.data(DetectableObjectTypeModel::IdRole).toString()
-                : QString());
+            QStringList typeIds = index.isValid()
+                ? index.data(DetectableObjectTypeModel::IdsRole).toStringList()
+                : QStringList();
+
+            m_analyticsSetup->setObjectTypes(typeIds);
         });
 
     connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
-                m_analyticsSetup->setObjectType({});
+                m_analyticsSetup->setObjectTypes({});
         });
 
-    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::objectTypeChanged,
+    connect(m_analyticsSetup.get(), &AnalyticsSearchSetup::objectTypesChanged,
         this, &Private::updateTypeButton);
 }
 
 void AnalyticsSearchWidget::Private::updateTypeButton()
 {
-    const auto taxonomy = taxonomyManager ? taxonomyManager->currentTaxonomy() : nullptr;
-    const auto objectType = taxonomy
-        ? taxonomy->objectTypeById(m_analyticsSetup->objectType())
-        : nullptr;
+    const auto objectTypeIds = m_analyticsSetup->objectTypes();
+    AbstractNode* objectType =
+        m_objectTypeModel->sourceModel()->findFilterObjectType(objectTypeIds);
 
     const auto engine = engineById(m_analyticsSetup->engine());
     m_objectTypeModel->setEngine(engine);
 
-    if (objectType && (!engine || taxonomyManager->isRelevantForEngine(objectType, engine)))
+    if (objectType)
     {
         const int numFilters = analyticsSetup()->attributeFilters().size();
         m_typeSelectionButton->setText(numFilters > 0
@@ -354,7 +362,7 @@ void AnalyticsSearchWidget::Private::updateTaxonomy()
     if (!NX_ASSERT(taxonomyManager && taxonomyManager->currentTaxonomy()))
         return;
 
-    auto relevantEngines = taxonomyManager->relevantEngines().values();
+    auto relevantEngines = m_filterModel->engines();
     const bool noEngineSelection = relevantEngines.size() < 2;
 
     m_engineSelectionButton->setHidden(noEngineSelection);
@@ -440,14 +448,17 @@ void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
         : tr("In selected area"));
 }
 
+std::vector<AbstractEngine*> AnalyticsSearchWidget::Private::engines() const
+{
+    return m_filterModel->engines();
+}
+
 AbstractEngine* AnalyticsSearchWidget::Private::engineById(const QnUuid& id) const
 {
     if (id.isNull())
         return nullptr;
 
-    const auto relevantEngines = taxonomyManager
-        ? taxonomyManager->relevantEngines()
-        : decltype(taxonomyManager->relevantEngines()){};
+    const auto relevantEngines = m_filterModel->engines();
 
     const auto it = std::find_if(relevantEngines.cbegin(), relevantEngines.cend(),
         [id](AbstractEngine* engine) { return QnUuid(engine->id()) == id; });
@@ -466,11 +477,11 @@ QAction* AnalyticsSearchWidget::Private::addEngineMenuAction(
 }
 
 QAction* AnalyticsSearchWidget::Private::addObjectMenuAction(
-    QMenu* menu, const QString& title, const QString& objectTypeId)
+    QMenu* menu, const QString& title, const QStringList& objectTypeIds)
 {
     auto action = menu->addAction(title);
     connect(action, &QAction::triggered, this,
-        [this, objectTypeId]() { m_analyticsSetup->setObjectType(objectTypeId); });
+        [this, objectTypeIds]() { m_analyticsSetup->setObjectTypes(objectTypeIds); });
 
     return action;
 }
