@@ -149,3 +149,60 @@ function(nx_go_build target working_dir package_path)
         add_dependencies(${target} ${target}_lib)
     endif()
 endfunction()
+
+function(nx_go_openapi_gen_command source_yaml target_go working_dir)
+    set(multi_value_args DEPENDS)
+    cmake_parse_arguments(GO_OAPI_GEN "" "" "${multi_value_args}" ${ARGN})
+
+    set(gobin ${CMAKE_CURRENT_BINARY_DIR})
+    get_filename_component(target_dir "${target_go}" DIRECTORY)
+    add_custom_command(
+        OUTPUT "${target_go}"
+        DEPENDS
+            "${source_yaml}"
+            ${GO_OAPI_GEN_DEPENDS}
+        WORKING_DIRECTORY "${working_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${target_dir}"
+        COMMAND ${CMAKE_COMMAND} -E env GOBIN=${gobin} ${NX_GO_COMPILER} install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.9.0
+        COMMAND ${gobin}/oapi-codegen -package handlers -generate server,types -o "${target_go}" "${source_yaml}")
+    set_source_files_properties("${target_go}" PROPERTIES GENERATED TRUE)
+endfunction()
+
+function(nx_go_add_rest_api_service name working_dir)
+    set(option_args WITHOUT_TESTS)
+    set(one_value_args C_GO_INCLUDE_DIRECTORY)
+    set(multi_value_args DEPENDS TEST_EXCLUDE_FOLDERS OAPI_YAMLS GENERATED_FILES)
+    cmake_parse_arguments(GO_REST_SERVICE "${option_args}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+    nx_go_add_target(
+        "${name}"
+        DEPENDS
+            ${GO_REST_SERVICE_GENERATED_FILES}
+            ${GO_REST_SERVICE_DEPENDS}
+        C_GO_INCLUDE_DIRECTORY "${GO_REST_SERVICE_C_GO_INCLUDE_DIRECTORY}"
+        FOLDER cloud/utility
+    )
+
+    list(LENGTH GO_REST_SERVICE_OAPI_YAMLS len)
+    math(EXPR lenMinusOne "${len} - 1")
+    foreach(i RANGE ${lenMinusOne})
+        list(GET GO_REST_SERVICE_OAPI_YAMLS ${i} yaml)
+        list(GET GO_REST_SERVICE_GENERATED_FILES ${i} go_file)
+        nx_go_openapi_gen_command(
+            "${yaml}"
+            "${go_file}"
+            "${working_dir}"
+        )
+    endforeach()
+
+    if(NOT GO_REST_SERVICE_WITHOUT_TESTS)
+        nx_go_add_test(
+            "${name}_ut"
+            FOLDER cloud/tests
+            EXCLUDE_FOLDERS ${GO_REST_SERVICE_TEST_EXCLUDE_FOLDERS}
+            DEPENDS
+                ${GO_REST_SERVICE_GENERATED_FILES}
+                ${GO_REST_SERVICE_DEPENDS}
+        )
+    endif()
+endfunction()
