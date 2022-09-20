@@ -748,6 +748,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
     {
         m_connected = false; //connection closed by remote host
     }
+
     return bytesRead;
 }
 
@@ -795,6 +796,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
             g_totalSocketBytesSent += sent;
         #endif
     }
+
     return sent;
 }
 
