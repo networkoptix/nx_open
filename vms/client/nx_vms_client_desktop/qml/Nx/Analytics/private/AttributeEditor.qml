@@ -34,7 +34,7 @@ CollapsiblePanel
             return value && (typeof value !== "string" || /true/i.test(value))
         }
 
-        if (attribute.type === Analytics.Attribute.Type.object)
+        if (attribute.type === Analytics.Attribute.Type.attributeSet)
         {
             loader.item.selectedValue = toBoolean(value)
             loader.item.setSelectedAttributeValues(value)
@@ -87,10 +87,10 @@ CollapsiblePanel
                 case Analytics.Attribute.Type.string:
                     return "StringEditor.qml"
 
-                case Analytics.Attribute.Type.color:
+                case Analytics.Attribute.Type.colorSet:
                 {
-                    if (!attributeEditor.attribute.colorType
-                        || !attributeEditor.attribute.colorType.items.length)
+                    if (!attributeEditor.attribute.colorSet
+                        || !attributeEditor.attribute.colorSet.items.length)
                     {
                         console.warn(loggingCategory,
                             `Invalid analytics color attribute "${attributeEditor.attribute.id}"`)
@@ -100,15 +100,15 @@ CollapsiblePanel
                     if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
                         return "ColorRadioGroup.qml"
 
-                    return attributeEditor.attribute.colorType.items.length < 5
+                    return attributeEditor.attribute.colorSet.items.length < 5
                         ? "ColorTagGroup.qml"
                         : "ColorComboBox.qml"
                 }
 
                 case Analytics.Attribute.Type.enumeration:
                 {
-                    if (!attributeEditor.attribute.enumType
-                        || !attributeEditor.attribute.enumType.items.length)
+                    if (!attributeEditor.attribute.enumeration
+                        || !attributeEditor.attribute.enumeration.items.length)
                     {
                         console.warn(loggingCategory,
                             `Invalid analytics enum attribute "${attributeEditor.attribute.id}"`)
@@ -118,12 +118,12 @@ CollapsiblePanel
                     if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
                         return "EnumerationRadioGroup.qml"
 
-                    return attributeEditor.attribute.enumType.items.length < 5
+                    return attributeEditor.attribute.enumeration.items.length < 5
                         ? "EnumerationTagGroup.qml"
                         : "EnumerationComboBox.qml"
                 }
 
-                case Analytics.Attribute.Type.object:
+                case Analytics.Attribute.Type.attributeSet:
                     return "ObjectEditor.qml"
 
                 default:

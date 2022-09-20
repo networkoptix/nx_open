@@ -29,8 +29,8 @@ AnalyticsSearchSetup::AnalyticsSearchSetup(
     connect(model, &AnalyticsSearchListModel::filterRectChanged,
         this, &AnalyticsSearchSetup::areaChanged);
 
-    connect(model, &AnalyticsSearchListModel::selectedObjectTypeChanged,
-        this, &AnalyticsSearchSetup::objectTypeChanged);
+    connect(model, &AnalyticsSearchListModel::selectedObjectTypesChanged,
+        this, &AnalyticsSearchSetup::objectTypesChanged);
 
     connect(model, &AnalyticsSearchListModel::relevantObjectTypesChanged,
         this, &AnalyticsSearchSetup::relevantObjectTypesChanged);
@@ -80,9 +80,9 @@ void AnalyticsSearchSetup::setEngine(const QnUuid& value)
         d->model->setSelectedEngine(value);
 }
 
-QString AnalyticsSearchSetup::objectType() const
+QStringList AnalyticsSearchSetup::objectTypes() const
 {
-    return d->model ? d->model->selectedObjectType() : QString();
+    return d->model ? d->model->selectedObjectTypes() : QStringList();
 }
 
 const std::set<QString>& AnalyticsSearchSetup::relevantObjectTypes() const
@@ -91,10 +91,10 @@ const std::set<QString>& AnalyticsSearchSetup::relevantObjectTypes() const
     return d->model ? d->model->relevantObjectTypes() : dummy;
 }
 
-void AnalyticsSearchSetup::setObjectType(const QString& value)
+void AnalyticsSearchSetup::setObjectTypes(const QStringList& value)
 {
     if (NX_ASSERT(d->model))
-        d->model->setSelectedObjectType(value);
+        d->model->setSelectedObjectTypes(value);
 }
 
 QStringList AnalyticsSearchSetup::attributeFilters() const

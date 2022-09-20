@@ -16,7 +16,7 @@ class EngineStateViewFilter: public AbstractStateViewFilter
 {
 public:
     EngineStateViewFilter(
-        const nx::analytics::taxonomy::AbstractEngine* engine = nullptr,
+        nx::analytics::taxonomy::AbstractEngine* engine = nullptr,
         QObject* parent = nullptr);
 
     virtual ~EngineStateViewFilter() override;
@@ -37,6 +37,8 @@ public:
     /** @return True if attribute belongs to an Object type that matches the filter. */
     virtual bool matches(
         const nx::analytics::taxonomy::AbstractAttribute* attribute) const override;
+
+    nx::analytics::taxonomy::AbstractEngine* engine() const;
 
 private:
     struct Private;

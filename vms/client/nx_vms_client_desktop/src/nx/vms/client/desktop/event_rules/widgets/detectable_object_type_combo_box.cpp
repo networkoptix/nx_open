@@ -17,20 +17,35 @@ DetectableObjectTypeComboBox::DetectableObjectTypeComboBox(QWidget* parent):
 {
     using nx::vms::client::desktop::analytics::TaxonomyManager;
 
-    setModel(new DetectableObjectTypeModel(
+    const auto taxonomyManager =
         qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
-            qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager")),
-        this));
+            qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
+
+    const auto filterModel = new analytics::taxonomy::AnalyticsFilterModel(taxonomyManager, this);
+
+    setModel(new DetectableObjectTypeModel(filterModel, this));
 }
 
-QString DetectableObjectTypeComboBox::selectedObjectTypeId() const
+QStringList DetectableObjectTypeComboBox::selectedObjectTypeIds() const
 {
-    return currentData(DetectableObjectTypeModel::IdRole).toString();
+    return currentData(DetectableObjectTypeModel::IdsRole).toStringList();
 }
 
-void DetectableObjectTypeComboBox::setSelectedObjectTypeId(const QString& value)
+void DetectableObjectTypeComboBox::setSelectedObjectTypeIds(const QStringList& objectTypeIds)
 {
-    const auto index = findData(value, DetectableObjectTypeModel::IdRole);
+    const auto index = findData(objectTypeIds, DetectableObjectTypeModel::IdsRole);
+    if (index.isValid())
+        setCurrentIndex(index);
+}
+
+QString DetectableObjectTypeComboBox::selectedMainObjectTypeId() const
+{
+    return currentData(DetectableObjectTypeModel::MainIdRole).toString();
+}
+
+void DetectableObjectTypeComboBox::setSelectedMainObjectTypeId(const QString& objectTypeId)
+{
+    const auto index = findData(objectTypeId, DetectableObjectTypeModel::MainIdRole);
     if (index.isValid())
         setCurrentIndex(index);
 }

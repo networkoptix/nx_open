@@ -451,11 +451,11 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
                 instance->m_analyticsSetup->setEngine(m_analyticsSetup->engine());
         });
 
-    connect(m_analyticsSetup, &AnalyticsSearchSetup::objectTypeChanged, this,
+    connect(m_analyticsSetup, &AnalyticsSearchSetup::objectTypesChanged, this,
         [this]()
         {
             for (auto instance : instancesToNotify())
-                instance->m_analyticsSetup->setObjectType(m_analyticsSetup->objectType());
+                instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
         });
 
     connect(m_analyticsSetup, &AnalyticsSearchSetup::attributeFiltersChanged, this,
@@ -499,7 +499,7 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
         m_commonSetup->setCustomCameras(master->m_commonSetup->selectedCameras());
 
     m_analyticsSetup->setEngine(master->m_analyticsSetup->engine());
-    m_analyticsSetup->setObjectType(master->m_analyticsSetup->objectType());
+    m_analyticsSetup->setObjectTypes(master->m_analyticsSetup->objectTypes());
     m_analyticsSetup->setAttributeFilters(master->m_analyticsSetup->attributeFilters());
     m_analyticsSetup->setArea(master->m_analyticsSetup->area());
     m_analyticsSetup->setAreaSelectionActive(master->m_analyticsSetup->areaSelectionActive());

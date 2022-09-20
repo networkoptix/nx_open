@@ -8,21 +8,14 @@ GenericTypeSelector
 {
     id: control
 
-    property var objectTypes: []
-    property string selectedObjectTypeId: selectedTypeId ?? ""
-    readonly property var selectedObjectType: objectTypeById[selectedObjectTypeId] || null
-
-    readonly property var objectTypeById: Array.prototype.reduce.call(objectTypes,
-        function(result, objectType)
+    property alias objectTypes: control.model
+    readonly property var selectedObjectType: objectTypeById[selectedTypeId] || null
+    readonly property var objectTypeById:
+        objectTypes.reduce((result, objectType) =>
         {
             result[objectType.id] = objectType
             return result
-        },
-        {})
-
-    value: selectedObjectType ? selectedObjectType.name : ""
-
-    model: objectTypes
+        }, {})
 
     iconRole: "iconSource"
     iconPath: (iconName => Analytics.IconManager.iconUrl(iconName))

@@ -12,13 +12,13 @@ RadioGroup
 
     property Analytics.Attribute attribute
 
-    model: Utils.toArray(attribute && attribute.colorType && attribute.colorType.items)
+    model: Utils.toArray(attribute && attribute.colorSet && attribute.colorSet.items)
 
     middleItemDelegate: Rectangle
     {
         width: 16
         height: 16
-        color: attribute.colorType.color(modelData)
+        color: attribute.colorSet.color(modelData)
         border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
         radius: 1
     }

@@ -11,11 +11,11 @@ namespace nx::vms::client::desktop::analytics::taxonomy {
 
 struct EngineStateViewFilter::Private
 {
-    const nx::analytics::taxonomy::AbstractEngine* const engine = nullptr;
+    nx::analytics::taxonomy::AbstractEngine* const engine = nullptr;
 };
 
 EngineStateViewFilter::EngineStateViewFilter(
-    const nx::analytics::taxonomy::AbstractEngine* engine,
+    nx::analytics::taxonomy::AbstractEngine* engine,
     QObject* parent)
     :
     AbstractStateViewFilter(parent),
@@ -64,6 +64,11 @@ bool EngineStateViewFilter::matches(
     const nx::analytics::taxonomy::AbstractAttribute* attribute) const
 {
     return NX_ASSERT(attribute);
+}
+
+nx::analytics::taxonomy::AbstractEngine* EngineStateViewFilter::engine() const
+{
+    return d->engine;
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

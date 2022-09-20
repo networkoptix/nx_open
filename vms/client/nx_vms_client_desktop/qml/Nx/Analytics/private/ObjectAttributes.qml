@@ -8,7 +8,7 @@ Column
 {
     id: objectAttributes
 
-    property Analytics.ObjectType objectType
+    property var attributes
     property string prefix
 
     property var loggingCategory
@@ -62,31 +62,15 @@ Column
     {
         model:
         {
-            if (!objectAttributes.objectType)
+            if (!objectAttributes.attributes)
                 return null
 
             const attributeByName = {}
             const orderedAttributeNames = []
-            for (const attribute of objectAttributes.objectType.supportedAttributes)
+            for (const attribute of objectAttributes.attributes)
             {
                 attributeByName[attribute.name] = attribute
                 orderedAttributeNames.push(attribute.name)
-            }
-
-            // Add attributes of private derived types.
-            for (const derivedType of objectAttributes.objectType.derivedTypes)
-            {
-                if (derivedType.isReachable)
-                    continue
-
-                for (const attribute of derivedType.supportedAttributes)
-                {
-                    if (attributeByName.hasOwnProperty(attribute.name))
-                        continue;
-
-                    attributeByName[attribute.name] = attribute
-                    orderedAttributeNames.push(attribute.name)
-                }
             }
 
             return orderedAttributeNames.map(attributeName => attributeByName[attributeName])

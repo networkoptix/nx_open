@@ -39,14 +39,14 @@ void AnalyticsSearchListModel::setSelectedEngine(const QnUuid& value)
     d->setSelectedEngine(value);
 }
 
-QString AnalyticsSearchListModel::selectedObjectType() const
+QStringList AnalyticsSearchListModel::selectedObjectTypes() const
 {
-    return d->selectedObjectType();
+    return d->selectedObjectTypes();
 }
 
-void AnalyticsSearchListModel::setSelectedObjectType(const QString& value)
+void AnalyticsSearchListModel::setSelectedObjectTypes(const QStringList& value)
 {
-    d->setSelectedObjectType(value);
+    d->setSelectedObjectTypes(value);
 }
 
 const std::set<QString>& AnalyticsSearchListModel::relevantObjectTypes() const
@@ -84,7 +84,7 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid()
         || !d->textFilter->text().isEmpty()
         || !selectedEngine().isNull()
-        || !selectedObjectType().isEmpty()
+        || !selectedObjectTypes().isEmpty()
         || !attributeFilters().empty()
         || base_type::isConstrained();
 }

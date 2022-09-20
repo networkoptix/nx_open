@@ -16,11 +16,10 @@ Column
 
     spacing: 8
 
-    property var rootObjectTypes: []
+    property Analytics.AnalyticsFilterModel model: null
 
-    property alias engine: objectTypeSelector.engine
-
-    readonly property alias selectedObjectTypeId: objectTypeSelector.selectedObjectTypeId
+    readonly property var selectedAnalyticsObjectTypeIds:
+        model.getAnalyticsObjectTypeIds(objectTypeSelector.selectedObjectType)
 
     readonly property var selectedAttributeValues:
     {
@@ -57,18 +56,23 @@ Column
         objectTypeSelector.clear()
     }
 
-    function setSelectedObjectTypeId(id)
+    function setSelectedAnalyticsObjectTypeIds(ids)
     {
-        if (!id || !taxonomyCache.currentTaxonomy)
+        let filterObjectType = ids && ids.length
+            ? model.findFilterObjectType(ids)
+            : null
+
+        if (!filterObjectType)
         {
             objectTypeSelector.clear()
             return
         }
 
-        if (id === objectTypeSelector.selectedObjectTypeId)
-            return
+        if (filterObjectType.id !== objectTypeSelector.selectedObjectTypeId)
+        {
+            objectTypeSelector.setSelectedObjectType(filterObjectType)
+        }
 
-        objectTypeSelector.setSelectedObjectType(Analytics.TaxonomyManager.objectTypeById(id))
     }
 
     function setSelectedAttributeValues(stringList)
@@ -155,13 +159,19 @@ Column
         objectAttributes.setSelectedAttributeValues(attributeTree)
     }
 
+    onVisibleChanged:
+    {
+        if (model)
+            model.active = visible
+    }
+
     RecursiveObjectTypeSelector
     {
         id: objectTypeSelector
 
         width: analyticsFilters.width
         title: qsTr("Object Type")
-        objectTypes: allowedObjectTypes(analyticsFilters.rootObjectTypes)
+        objectTypes: model.objectTypes
     }
 
     ObjectAttributes
@@ -169,7 +179,9 @@ Column
         id: objectAttributes
 
         width: analyticsFilters.width
-        objectType: objectTypeSelector.selectedObjectType
+        attributes: objectTypeSelector.selectedObjectType
+            ? objectTypeSelector.selectedObjectType.attributes
+            : null
         loggingCategory: category
     }
 
