@@ -16,7 +16,8 @@ class AnalyticsSearchSetup: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnUuid engine READ engine WRITE setEngine NOTIFY engineChanged)
-    Q_PROPERTY(QString objectType READ objectType WRITE setObjectType NOTIFY objectTypeChanged)
+    Q_PROPERTY(QStringList objectTypes
+        READ objectTypes WRITE setObjectTypes NOTIFY objectTypesChanged)
 
     Q_PROPERTY(QStringList attributeFilters READ attributeFilters WRITE setAttributeFilters
         NOTIFY attributeFiltersChanged)
@@ -37,8 +38,8 @@ public:
     QnUuid engine() const;
     void setEngine(const QnUuid& value);
 
-    QString objectType() const;
-    void setObjectType(const QString& value);
+    QStringList objectTypes() const;
+    void setObjectTypes(const QStringList& value);
     const std::set<QString>& relevantObjectTypes() const;
 
     QStringList attributeFilters() const;
@@ -64,7 +65,7 @@ public:
     Q_INVOKABLE void commitAvailableNewTracks();
 
 signals:
-    void objectTypeChanged();
+    void objectTypesChanged();
     void relevantObjectTypesChanged();
     void combinedTextFilterChanged();
     void areaChanged();

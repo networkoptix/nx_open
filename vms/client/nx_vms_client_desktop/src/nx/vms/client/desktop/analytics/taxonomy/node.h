@@ -24,13 +24,21 @@ public:
 
     virtual std::vector<QString> typeIds() const override;
 
+    virtual QString mainTypeId() const override;
+
     virtual std::vector<QString> fullSubtreeTypeIds() const override;
+
+    virtual QString id() const override;
 
     virtual QString name() const override;
 
     virtual QString icon() const override;
 
     virtual std::vector<AbstractAttribute*> attributes() const override;
+
+    virtual AbstractNode* baseNode() const override;
+
+    virtual void setBaseNode(AbstractNode* node) override;
 
     virtual std::vector<AbstractNode*> derivedNodes() const override;
 
@@ -41,6 +49,8 @@ public:
     void setFilter(const AbstractStateViewFilter* filter);
 
     void resolveAttributes();
+
+    static QString makeId(const QStringList& analyticsObjectTypeIds);
 
 private:
     struct Private;

@@ -12,8 +12,6 @@ Column
 
     property alias title: selector.name
 
-    property Analytics.Engine engine: null
-
     readonly property Analytics.ObjectType selectedObjectType:
         derivedSelectorLoader.item && derivedSelectorLoader.item.selectedObjectType
             ? derivedSelectorLoader.item.selectedObjectType
@@ -22,16 +20,6 @@ Column
     readonly property string selectedObjectTypeId: selectedObjectType
         ? selectedObjectType.id
         : null
-
-    function allowedObjectTypes(objectTypes)
-    {
-        return Array.prototype.filter.call(objectTypes,
-            function (objectType)
-            {
-                return objectType.isReachable && !objectType.isLiveOnly && !objectType.isNonIndexable
-                    && Analytics.TaxonomyManager.isRelevantForEngine(objectType, engine)
-            })
-    }
 
     function clear()
     {
@@ -44,7 +32,7 @@ Column
             return
 
         let hierarchy = []
-        for (let type = value; !!type; type = type.baseType)
+        for (let type = value; !!type; type = type.baseNode)
             hierarchy.unshift(type)
 
         selectRecursively(hierarchy)
@@ -60,7 +48,7 @@ Column
         name: qsTr("Object Type")
 
         readonly property var derivedTypes: selectedObjectType
-            ? allowedObjectTypes(selectedObjectType.derivedTypes)
+            ? selectedObjectType.derivedNodes
             : []
     }
 
@@ -81,13 +69,6 @@ Column
             target: derivedSelectorLoader.item
             property: "objectTypes"
             value: selector.derivedTypes
-        }
-
-        Binding
-        {
-            target: derivedSelectorLoader.item
-            property: "engine"
-            value: control.engine
         }
 
         Binding

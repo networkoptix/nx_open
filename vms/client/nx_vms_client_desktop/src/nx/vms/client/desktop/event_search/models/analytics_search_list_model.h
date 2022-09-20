@@ -32,8 +32,8 @@ public:
     QnUuid selectedEngine() const;
     void setSelectedEngine(const QnUuid& value);
 
-    QString selectedObjectType() const;
-    void setSelectedObjectType(const QString& value);
+    QStringList selectedObjectTypes() const;
+    void setSelectedObjectTypes(const QStringList& value);
     const std::set<QString>& relevantObjectTypes() const;
 
     QStringList attributeFilters() const;
@@ -71,7 +71,7 @@ signals:
 
     void filterRectChanged();
     void selectedEngineChanged();
-    void selectedObjectTypeChanged();
+    void selectedObjectTypesChanged();
     void relevantObjectTypesChanged();
     void availableNewTracksChanged();
     void attributeFiltersChanged();

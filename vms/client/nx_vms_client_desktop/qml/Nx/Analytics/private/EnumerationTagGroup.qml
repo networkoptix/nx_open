@@ -18,7 +18,7 @@ Flow
 
     Repeater
     {
-        model: Utils.toArray(attribute && attribute.enumType && attribute.enumType.items)
+        model: Utils.toArray(attribute && attribute.enumeration && attribute.enumeration.items)
 
         OptionButton
         {
