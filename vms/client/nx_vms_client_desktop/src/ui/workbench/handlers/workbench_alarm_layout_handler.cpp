@@ -259,7 +259,6 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
         alarmLayout->addFlags(Qn::local);
         alarmLayout->setIdUnsafe(QnUuid::createUuid());
         m_alarmLayoutId = alarmLayout->getId();
-        resourcePool()->addResource(alarmLayout);
         alarmLayout->setName(tr("Alarms"));
         alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
         alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
