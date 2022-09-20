@@ -917,6 +917,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 workbench()->currentLayout()->removeItem(item);
             break;
         }
+        // Keep in sync with QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged.
         case QnVideoWallControlMessage::LayoutItemDataChanged:
         {
             QByteArray value = message[valueKey].toUtf8();
@@ -936,8 +937,6 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                     NX_VERBOSE(this, "RECEIVER: Item %1 geometry changed to %2", uuid, data);
                     break;
                 }
-                case Qn::ItemGeometryDeltaRole:
-                case Qn::ItemCombinedGeometryRole:
                 case Qn::ItemZoomRectRole:
                 {
                     QRectF data = QJson::deserialized<QRectF>(value);
@@ -1031,6 +1030,8 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 }
 
                 default:
+                    NX_ASSERT(this, "Unexpected item data change, role: %1",
+                        QnLexical::serialized(role));
                     break;
             }
 
@@ -2871,12 +2872,19 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged(Qn::ItemDataRol
     }
 }
 
+// Keep in sync with QnWorkbenchVideoWallHandler::handleMessage.
 void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role)
 {
     if (!m_controlMode.active)
         return;
 
-    QnWorkbenchItem* item = static_cast<QnWorkbenchItem *>(sender());
+    static const QSet<Qn::ItemDataRole> kIgnoreOnLayoutChange =
+        {Qn::ItemPausedRole, Qn::ItemSpeedRole, Qn::ItemPositionRole};
+
+    if (display()->isChangingLayout() && kIgnoreOnLayoutChange.contains(role))
+        return;
+
+    const QnWorkbenchItem* item = static_cast<QnWorkbenchItem*>(sender());
     QByteArray json;
     QVariant data = item->data(role);
     bool cached = false;
@@ -2894,13 +2902,14 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
         case Qn::ItemGeometryDeltaRole:
             return;
 
-        case Qn::ItemPausedRole:
-        case Qn::ItemSpeedRole:
         case Qn::ItemPositionRole:
-            // Do not pause playing if changing layout, else fallthrough.
-            if (display()->isChangingLayout())
-                return;
-            [[fallthrough]];
+        {
+            const auto value = data.value<QPointF>();
+            NX_VERBOSE(this, "SENDER: Item %1 %2 changed to %3",
+                item->uuid(), QnLexical::serialized(role), value);
+            QJson::serialize(value, &json);
+            break;
+        }
 
         case Qn::ItemGeometryRole:
         {
@@ -2921,6 +2930,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
             break;
         }
 
+        case Qn::ItemPausedRole:
         case Qn::ItemZoomWindowRectangleVisibleRole:
         case Qn::ItemFlipRole:
         {
@@ -2931,6 +2941,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
             break;
         }
 
+        case Qn::ItemSpeedRole:
         case Qn::ItemRotationRole:
         {
             qreal value = data.toReal();
