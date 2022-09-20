@@ -40,6 +40,8 @@ std::string Pipeline::serverNameFromClientHello() const
 
 int Pipeline::write(const void* data, size_t size)
 {
+    NX_TRACE(this, "Write %1 bytes", size);
+
     if (m_failed)
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
@@ -50,11 +52,15 @@ int Pipeline::write(const void* data, size_t size)
     if (m_state >= State::handshakeDone && !m_isPaused && resultCode < 0)
         m_failed = true;
 
+    NX_TRACE(this, "Written %1 bytes out of %2 requested", resultCode, size);
+
     return resultCode;
 }
 
 int Pipeline::read(void* data, size_t size)
 {
+    NX_TRACE(this, "Read %1 bytes", size);
+
     // NOTE: Not checking m_failed similar to Pipeline::write because openssl supports
     // recovering from read errors. It may be useful to read already-received bytes even
     // when write has failed.
@@ -63,6 +69,9 @@ int Pipeline::read(void* data, size_t size)
     const auto resultCode = performSslIoOperation(&SSL_read, data, size);
     if (resultCode == 0)
         m_eof = true;
+
+    NX_TRACE(this, "Read %1 bytes out of %2 requested", resultCode, size);
+
     return resultCode;
 }
 
@@ -163,12 +172,14 @@ void Pipeline::initSslBio(std::shared_ptr<SSL_CTX> context)
     BIO_meth_set_destroy(m_bioMethods.get(), &Pipeline::bioFree);
 
     BIO* rbio = BIO_new(m_bioMethods.get());
-    BIO_set_nbio(rbio, 1);
+    BIO_up_ref(rbio);
+    BIO_set_nbio(rbio, /*nonblocking I/O*/ 1);
     BIO_set_app_data(rbio, this);
 
     BIO* wbio = BIO_new(m_bioMethods.get());
+    BIO_up_ref(wbio);
+    BIO_set_nbio(wbio, /*nonblocking I/O*/ 1);
     BIO_set_app_data(wbio, this);
-    BIO_set_nbio(wbio, 1);
 
     NX_ASSERT(context);
     m_ssl.reset(SSL_new(context.get()));
@@ -177,7 +188,8 @@ void Pipeline::initSslBio(std::shared_ptr<SSL_CTX> context)
 
     SSL_set_ex_data(m_ssl.get(), kSslExDataThisIndex, this);
 
-    SSL_set_bio(m_ssl.get(), rbio, wbio); //< SSL will free bio when freed.
+    SSL_set0_rbio(m_ssl.get(), rbio); //< SSL will free bio when freed.
+    SSL_set0_wbio(m_ssl.get(), wbio); //< SSL will free bio when freed.
 
     SSL_set_allow_early_data_cb(
         m_ssl.get(),
@@ -198,7 +210,6 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
         return utils::bstream::StreamIoError::wouldBlock;
 
     ERR_clear_error();
-
 
     const int resultCode = sslFunc(m_ssl.get(), data, static_cast<int>(size));
     return handleSslIoResult(resultCode);
