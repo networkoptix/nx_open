@@ -97,7 +97,7 @@ QnWebResourceWidget::QnWebResourceWidget(
         });
 
     connect(layoutResource().get(), &QnLayoutResource::lockedChanged,
-        this, &QnWebResourceWidget::updateInterfaceVisibility);
+        this, &QnWebResourceWidget::setupWidget);
 
     setupOverlays();
     updateButtonsVisibility();
@@ -163,18 +163,14 @@ void QnWebResourceWidget::setupWidget()
 {
     removeOverlayWidget(m_webEngineView.get());
 
-    const auto contentMargins = m_isMinimalTitleBar ? QMargins{} : kDefaultWidgetMargins;
+    const bool hasButtons = calculateButtonsVisibility() != 0;
+    const auto contentMargins = hasButtons ? kDefaultWidgetMargins : QMargins{};
     const auto webParams =
         detail::OverlayParams(Visible, OverlayFlag::bindToViewport, BaseLayer, contentMargins);
 
     addOverlayWidget(m_webEngineView.get(), webParams);
-}
 
-void QnWebResourceWidget::updateInterfaceVisibility()
-{
-    const bool hasButtons = calculateButtonsVisibility() != 0;
-    titleBar()->setVisible(hasButtons || !m_isMinimalTitleBar);
-    setOption(AlwaysShowName, !m_isMinimalTitleBar);
+    titleBar()->setVisible(hasButtons);
 }
 
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
@@ -269,7 +265,6 @@ nx::vms::client::desktop::GraphicsWebEngineView* QnWebResourceWidget::webView() 
 void QnWebResourceWidget::setMinimalTitleBarMode(bool value)
 {
     m_isMinimalTitleBar = value;
-    updateInterfaceVisibility();
     setupWidget();
     updateButtonsVisibility();
     updateTitleText();
