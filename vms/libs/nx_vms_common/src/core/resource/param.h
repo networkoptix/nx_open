@@ -121,7 +121,7 @@ namespace ResourcePropertyKey
     /**
      * Whether to download remote (i.e. on-camera) archives.
      */
-    static const QString kRemoteArchiveSynchronizationDisabled("remoteArchiveSynchronizationDisabled");
+    static const QString kRemoteArchiveSynchronizationEnabled("remoteArchiveSynchronizationEnabled");
 
     /**
      * Whether to download remote (i.e. on-camera) archives.

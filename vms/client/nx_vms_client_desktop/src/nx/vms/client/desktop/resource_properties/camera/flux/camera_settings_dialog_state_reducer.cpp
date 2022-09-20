@@ -1217,7 +1217,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         });
 
     fetchFromCameras<bool>(state.expert.remoteArchiveAutoExportDisabled, cameras,
-        [](const Camera& camera) { return camera->remoteArchiveSynchronizationDisabled(); });
+        [](const Camera& camera) { return !camera->isRemoteArchiveSynchronizationEnabled(); });
 
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)

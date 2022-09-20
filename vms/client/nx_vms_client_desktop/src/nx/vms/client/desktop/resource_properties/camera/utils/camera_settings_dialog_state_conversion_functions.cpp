@@ -305,7 +305,7 @@ void setRtpTransportType(nx::vms::api::RtpTransportType value, const Cameras& ca
 void setRemoteArchiveAutoExportDisabled(const bool& value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
-        camera->setRemoteArchiveSynchronizationDisabled(value);
+        camera->setRemoteArchiveSynchronizationEnabled(!value);
 }
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
