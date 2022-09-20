@@ -6,6 +6,8 @@
 #include <functional>
 #include <chrono>
 
+#include <nx/reflect/instrument.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 
@@ -13,8 +15,7 @@
 #include <QJsonObject>
 
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 namespace detail {
 
@@ -83,6 +84,13 @@ QVariant toQVariant(const T& value)
 
 } // namespace detail
 
+struct NX_UTILS_API SettingInfo
+{
+    QJsonValue defaultValue;
+    QString description;
+};
+#define SettingInfo_Fields (defaultValue)(description)
+
 class AbstractQSettings
 {
 public:
@@ -136,7 +144,7 @@ public:
     void attach(std::shared_ptr<AbstractQSettings>& settings);
     void sync();
 
-    QJsonObject buildDocumentation() const;
+    std::map<QString, SettingInfo> buildDocumentation() const;
 
 protected:
     struct BaseOption
@@ -238,9 +246,9 @@ protected:
         }
 
     private:
-        const Settings *const m_settings;
-        T  m_value;
-        T  m_defaultValue;
+        const Settings* const m_settings;
+        T m_value;
+        T m_defaultValue;
         QString m_name;
 
         Accessor m_accessor;
@@ -259,6 +267,4 @@ private:
     virtual void applyMigrations(std::shared_ptr<AbstractQSettings>& settings) = 0;
 };
 
-
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils
