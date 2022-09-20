@@ -22,6 +22,12 @@ void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)
     m_url = std::move(url);
 }
 
+void CloudModuleUrlFetcher::resetUrl()
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_url = std::nullopt;
+}
+
 void CloudModuleUrlFetcher::get(Handler handler)
 {
     get(nx::network::http::AuthInfo(), ssl::kDefaultCertificateCheck, std::move(handler));

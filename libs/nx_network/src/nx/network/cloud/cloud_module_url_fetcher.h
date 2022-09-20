@@ -69,6 +69,11 @@ public:
      */
     void setUrl(nx::utils::Url endpoint);
 
+    /**
+     * Reset cached url value.
+     */
+    void resetUrl();
+
 protected:
     virtual bool analyzeXmlSearchResult(
         const nx::utils::stree::AttributeDictionary& searchResult) override;
