@@ -6,6 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
 
 namespace nx::analytics::taxonomy { class AbstractEngine; }
 
@@ -23,7 +24,9 @@ class DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel
     using TaxonomyManager = nx::vms::client::desktop::analytics::TaxonomyManager;
 
 public:
-    explicit DetectableObjectTypeModel(TaxonomyManager* taxonomyManager, QObject* parent = nullptr);
+    explicit DetectableObjectTypeModel(
+        analytics::taxonomy::AnalyticsFilterModel* filterModel,
+        QObject* parent = nullptr);
     virtual ~DetectableObjectTypeModel() override;
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent) const override;
@@ -33,16 +36,16 @@ public:
     virtual int columnCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    bool liveTypesExcluded() const;
     void setLiveTypesExcluded(bool value);
-
-    nx::analytics::taxonomy::AbstractEngine* engine() const;
     void setEngine(nx::analytics::taxonomy::AbstractEngine* value);
+
+    analytics::taxonomy::AnalyticsFilterModel* sourceModel() const;
 
     enum Roles
     {
-        NameRole = Qt::DisplayRole,
-        IdRole = Qt::UserRole
+        NameRole = Qt::DisplayRole, //< QString.
+        IdsRole = Qt::UserRole, //< QStringList.
+        MainIdRole //< QString.
     };
 
 private:

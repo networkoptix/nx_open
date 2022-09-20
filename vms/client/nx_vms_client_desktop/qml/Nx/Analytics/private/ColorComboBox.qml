@@ -20,11 +20,11 @@ ComboBox
 
     model:
     {
-        if (!attribute || !attribute.colorType)
+        if (!attribute || !attribute.colorSet)
             return []
 
-        return Array.prototype.map.call(attribute.colorType.items,
-            name => ({"name": name, "color": attribute.colorType.color(name)}))
+        return Array.prototype.map.call(attribute.colorSet.items,
+            name => ({"name": name, "color": attribute.colorSet.color(name)}))
     }
 
     withColorSection: true

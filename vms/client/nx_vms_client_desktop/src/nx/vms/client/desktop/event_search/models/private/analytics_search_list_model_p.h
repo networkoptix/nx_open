@@ -61,8 +61,8 @@ public:
     QnUuid selectedEngine() const;
     void setSelectedEngine(const QnUuid& value);
 
-    QString selectedObjectType() const;
-    void setSelectedObjectType(const QString& value);
+    QStringList selectedObjectTypes() const;
+    void setSelectedObjectTypes(const QStringList& value);
     const std::set<QString>& relevantObjectTypes() const;
 
     QStringList attributeFilters() const;
@@ -148,7 +148,7 @@ private:
 private:
     QRectF m_filterRect;
     QnUuid m_selectedEngine;
-    QString m_selectedObjectType;
+    QStringList m_selectedObjectTypes;
     std::set<QString> m_relevantObjectTypes; //< Empty for all types.
     mutable QHash<QString, bool> m_objectTypeAcceptanceCache; //< Used in metadata processing.
 

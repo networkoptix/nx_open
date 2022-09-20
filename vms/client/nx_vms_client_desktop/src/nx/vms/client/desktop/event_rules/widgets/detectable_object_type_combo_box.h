@@ -17,8 +17,10 @@ class DetectableObjectTypeComboBox: public QnTreeComboBox
 public:
     DetectableObjectTypeComboBox(QWidget* parent = nullptr);
 
-    QString selectedObjectTypeId() const;
-    void setSelectedObjectTypeId(const QString& value);
+    QStringList selectedObjectTypeIds() const;
+    void setSelectedObjectTypeIds(const QStringList& objectTypeIds);
+    QString selectedMainObjectTypeId() const;
+    void setSelectedMainObjectTypeId(const QString& objectTypeId);
 };
 
 } // namespace nx::vms::client::desktop

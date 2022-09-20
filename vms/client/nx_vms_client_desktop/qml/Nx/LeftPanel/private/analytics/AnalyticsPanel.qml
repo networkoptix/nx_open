@@ -11,6 +11,7 @@ import Nx.RightPanel 1.0
 
 import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop.analytics 1.0 as Analytics
 
 import ".."
 
@@ -108,12 +109,6 @@ Item
                     eventModel.analyticsSetup.areaSelectionActive = true
             }
 
-            TaxonomyCache
-            {
-                id: taxonomyCache
-                active: analyticsPanel.visible
-            }
-
             AnalyticsFilters
             {
                 id: analyticsFilters
@@ -121,9 +116,7 @@ Item
                 width: parent.width
                 bottomPadding: 16
 
-                rootObjectTypes: taxonomyCache.currentTaxonomy
-                    ? taxonomyCache.currentTaxonomy.rootObjectTypes
-                    : []
+                model: Analytics.TaxonomyManager.createFilterModel()
             }
 
             onFiltersReset:
@@ -355,8 +348,8 @@ Item
         Binding
         {
             target: eventModel.analyticsSetup
-            property: "objectType"
-            value: analyticsFilters.selectedObjectTypeId
+            property: "objectTypes"
+            value: analyticsFilters.selectedAnalyticsObjectTypeIds
         }
     }
 }

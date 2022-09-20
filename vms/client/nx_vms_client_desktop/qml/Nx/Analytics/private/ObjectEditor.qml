@@ -44,7 +44,7 @@ Column
 
         width: parent.width
         visible: !!selectedValue
-        objectType: (attribute && selectedValue) ? attribute.objectType : null
+        attributes: (attribute && selectedValue) ? attribute.attributeSet : null
         prefix: attribute ? `${attribute.name} \u2192 ` : ""
         loggingCategory: control.loggingCategory
     }

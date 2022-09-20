@@ -18,7 +18,7 @@ Flow
 
     Repeater
     {
-        model: Utils.toArray(attribute && attribute.colorType && attribute.colorType.items)
+        model: Utils.toArray(attribute && attribute.colorSet && attribute.colorSet.items)
 
         OptionButton
         {
@@ -44,7 +44,7 @@ Flow
                 height: 14
                 anchors.verticalCenter: button.verticalCenter
                 radius: 1
-                color: attribute.colorType.color(modelData)
+                color: attribute.colorSet.color(modelData)
                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
             }
         }
