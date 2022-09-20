@@ -11,7 +11,7 @@ std::optional<nx::vms::api::StorageSpaceData> selectOne(const QnStorageSpaceData
         candidates.cbegin(), candidates.cend(), std::back_inserter(filtered),
         [](const nx::vms::api::StorageSpaceData& data)
         {
-            static const int64_t kMinUpdatePersistentStorageTotalSpace = 1024 * 1024 * 1024LL; // 1 GB
+            static constexpr int64_t kMinUpdatePersistentStorageTotalSpace = 1024LL * 1024 * 1024 * 1024; // 1 TB
             return
                 data.isWritable
                 && data.freeSpace > data.reservedSpace * 0.9
