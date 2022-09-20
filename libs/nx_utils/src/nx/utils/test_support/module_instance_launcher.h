@@ -53,7 +53,8 @@ public:
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {
-                        afterModuleStart();
+                        if (isStarted)
+                            afterModuleStart();
                         m_moduleStartedPromise->set_value(isStarted);
                     });
                 moduleInstantiatedCreatedPromise.set_value();
