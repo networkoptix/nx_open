@@ -36,19 +36,13 @@ public:
     }
 };
 
+static constexpr int kDefaultDisabledServerVersions =
+    SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1;
+
 } // namespace
 
-static int defaultDisabledServerVersions()
-{
-    int value = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1;
-    if (ini().disableTls13ByDefault)
-        value |= SSL_OP_NO_TLSv1_3;
-    return value;
-}
-
 Context::Context():
-
-    m_disabledServerVersions(defaultDisabledServerVersions()),
+    m_disabledServerVersions(kDefaultDisabledServerVersions),
     m_allowedServerCiphers("HIGH:!RC4:!3DES")
 {
     static OpenSslInitializer openSslInitializer;

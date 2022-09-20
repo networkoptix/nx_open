@@ -6,6 +6,7 @@
 #include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 
 namespace nx::network::ssl::test {
 
@@ -54,19 +55,28 @@ public:
     }
 };
 
-struct SslSocketBothEndsEncryptedTypeSet
+//-------------------------------------------------------------------------------------------------
+
+struct SslSocketTypeSetBase
+{
+    static constexpr nx::network::test::SocketTypeLimitation limitations[] = {
+        nx::network::test::SocketTypeLimitation::noConcurrentBlockingIo,
+        nx::network::test::SocketTypeLimitation::notUsableAfterSendInterrupt};
+};
+
+struct SslSocketBothEndsEncryptedTypeSet: SslSocketTypeSetBase
 {
     using ClientSocket = SslOverTcpStreamSocket;
     using ServerSocket = EnforcedSslOverTcpServerSocket;
 };
 
-struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet
+struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet: SslSocketTypeSetBase
 {
     using ClientSocket = SslOverTcpStreamSocket;
     using ServerSocket = AutoDetectedSslOverTcpServerSocket;
 };
 
-struct SslSocketClientNotEncryptedTypeSet
+struct SslSocketClientNotEncryptedTypeSet: SslSocketTypeSetBase
 {
     using ClientSocket = TCPSocket;
     using ServerSocket = AutoDetectedSslOverTcpServerSocket;
