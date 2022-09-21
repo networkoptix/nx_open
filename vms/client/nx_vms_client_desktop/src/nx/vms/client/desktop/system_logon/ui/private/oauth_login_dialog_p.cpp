@@ -162,6 +162,9 @@ void OauthLoginDialogPrivate::at_loadFinished(bool success)
     m_stackedWidget->setCurrentWidget(success
         ? static_cast<QWidget*>(m_webViewWidget)
         : m_placeholder);
+
+    if (q->isActiveWindow())
+        m_webViewWidget->setFocus();
 }
 
 void OauthLoginDialogPrivate::retryLoad()
