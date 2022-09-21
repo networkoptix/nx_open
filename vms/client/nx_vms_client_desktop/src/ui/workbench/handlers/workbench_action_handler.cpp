@@ -1042,10 +1042,6 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
 
 void ActionHandler::at_openInNewTabAction_triggered()
 {
-    // Stop layout tour if it is running.
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction);
-
     const auto isCameraWithFootage =
         [this](const QnResourceWidget* widget)
         {
@@ -1065,6 +1061,14 @@ void ActionHandler::at_openInNewTabAction_triggered()
     {
         // Get default value.
         currentState = QnStreamSynchronizationState::live();
+    }
+
+    // Stop layout tour if it is running.
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    {
+        // Avoid keeping links to widgets as they are to be destroyed when the tour is stopped.
+        parameters = action::Parameters(parameters.resources());
+        menu()->trigger(action::ToggleLayoutTourModeAction);
     }
 
     for (const auto& layout: layouts)
