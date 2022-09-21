@@ -49,7 +49,7 @@ struct CameraWebPageWidget::Private
     WebWidget* const webWidget;
 
     CameraWebPageWidget* parent;
-    CameraSettingsDialogState::Credentials credentials;
+    QString cameraLogin;
     QUrl lastRequestUrl;
     CameraSettingsDialogState::SingleCameraProperties lastCamera;
     bool pendingLoadPage = false;
@@ -109,7 +109,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
 
                     // Just show user login in the dialog.
                     QAuthenticator loginOnly;
-                    loginOnly.setUser(this->credentials.login());
+                    loginOnly.setUser(this->cameraLogin);
                     webWidget->controller()->auth(WebViewController::ShowDialog, loginOnly);
                 };
 
@@ -212,16 +212,13 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 {
     NX_ASSERT(currentlyOnUiThread());
 
-    d->credentials = state.credentials;
-
     if (!state.canShowWebPage())
     {
         d->resetPage();
         return;
     }
 
-    NX_ASSERT(d->credentials.login.hasValue() && d->credentials.password.hasValue());
-
+    d->cameraLogin = state.credentials.login.valueOr(QString());
     const auto cameraId = state.singleCameraProperties.id;
     const auto camera =
         commonModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
