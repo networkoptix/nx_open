@@ -4951,10 +4951,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Password cannot be empty.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System Signature</source>
         <translation></translation>
     </message>
@@ -5118,6 +5114,10 @@ to %1</source>
     <message>
         <source>Unlock</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>ACCESS DENIED</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7142,44 +7142,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-        <source>%n weeks</source>
-        <translation>
-            <numerusform>%n week</numerusform>
-            <numerusform>%n weeks</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n days</source>
-        <translation>
-            <numerusform>%n day</numerusform>
-            <numerusform>%n days</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hours</source>
-        <translation>
-            <numerusform>%n hour</numerusform>
-            <numerusform>%n hours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minutes</source>
-        <translation>
-            <numerusform>%n minute</numerusform>
-            <numerusform>%n minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n seconds</source>
-        <translation>
-            <numerusform>%n second</numerusform>
-            <numerusform>%n seconds</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
         <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7328,6 +7290,11 @@ We recommend you not to open this web page. If you understand the risks, you can
             <numerusform>Backup is enabled for %n cameras</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Footage from these cameras is backed up through to %1 %2</source>
+        <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7374,6 +7341,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Wiper</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open door</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drop</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7450,7 +7433,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8584,6 +8567,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+        <source>%1 Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
         <source>Copy</source>
@@ -9251,6 +9241,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>Acknowledge</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Calling...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10320,10 +10314,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
         <translation></translation>
     </message>
     <message>
-        <source>SD archive found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export in progress...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10349,6 +10339,10 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
         <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On-device recordings were found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10832,21 +10826,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
         <source>New Group %1</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-        <source>Intercom Alarm Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Intercom Open Door</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open door</source>
         <translation></translation>
     </message>
 </context>

@@ -1159,6 +1159,10 @@ to activate PTZ</source>
         <source>Unsupported firmware version</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Access denied</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyledRadioButton</name>

@@ -313,10 +313,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Maximum backup queue size</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>All files are successfully backed up! New files will be backed up automatically</source>
         <translation></translation>
     </message>
@@ -631,11 +627,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Export From SD Cards</source>
+        <source>Do not export video automatically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not export video automatically</source>
+        <source>Export From Device</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
