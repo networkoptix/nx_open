@@ -285,6 +285,10 @@ QnResourceList ParameterTypes::resources(const QVariant& items)
 
 LayoutItemIndex ParameterTypes::layoutItem(QnResourceWidget* widget)
 {
+    // TODO: #sivanov Check is not required since 5.1.
+    if (!NX_ASSERT(widget->item()))
+        return {};
+
     QnWorkbenchLayout* layout = widget->item()->layout();
     if (layout == nullptr)
         return LayoutItemIndex();
