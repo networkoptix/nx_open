@@ -759,17 +759,17 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    const bool canEditUser =
-        m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission);
+    const bool canEditUser = mode == QnUserSettingsModel::NewUser
+        || (m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission));
 
     m_userEnabledButton->setVisible(settingsPageVisible && canEditUser);
 
     const bool digestEnabled = m_model->digestAuthorizationEnabled();
-    const bool canChangeDigestMode =
-        m_user && accessController()->hasPermissions(m_user, Qn::WriteDigestPermission);
+    const bool canChangeDigestMode = mode == QnUserSettingsModel::NewUser
+        || (m_user && accessController()->hasPermissions(m_user, Qn::WriteDigestPermission));
 
-    const bool canEnableDigest = canChangeDigestMode
-        && accessController()->hasPermissions(m_user, Qn::WritePasswordPermission);
+    const bool canEnableDigest = mode == QnUserSettingsModel::NewUser || (canChangeDigestMode
+        && accessController()->hasPermissions(m_user, Qn::WritePasswordPermission));
 
     ui->warningBanner->setVisible(digestEnabled);
 

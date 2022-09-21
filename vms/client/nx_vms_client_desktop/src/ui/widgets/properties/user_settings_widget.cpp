@@ -632,9 +632,17 @@ void QnUserSettingsWidget::updateRoleComboBox()
 
 void QnUserSettingsWidget::updateControlsAccess()
 {
-    Qn::Permissions permissions = m_model->user()
-        ? accessController()->permissions(m_model->user())
-        : Qn::NoPermissions;
+    Qn::Permissions permissions;
+    if (m_model->mode() == QnUserSettingsModel::NewUser)
+    {
+        permissions = Qn::FullUserPermissions;
+    }
+    else
+    {
+        permissions = m_model->user()
+            ? accessController()->permissions(m_model->user())
+            : Qn::NoPermissions;
+    }
 
     ui->loginInputField->setReadOnly(!permissions.testFlag(Qn::WriteNamePermission));
     ui->passwordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
