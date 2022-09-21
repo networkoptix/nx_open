@@ -36,11 +36,11 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         .arg(nx::branding::shortCloudName()));
     ui->helpIconLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->helpLabel->setText(tr("Read more on the %1")
-        .arg(common::html::localLink(tr("help page"))));
+        .arg(tr("help page")));
     connect(ui->helpLabel, &QLabel::linkActivated,
         [this]()
         {
-            // TODO: #aivashchenko Open help page which will be issued later.
+            // TODO: #aivashchenko: Open help page which will be issued later.
         });
 
     QColor captionTextColor = colorTheme()->color("light1");
@@ -50,8 +50,8 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
 
     if (mode == Mode::confirmation)
     {
-        auto acceptButton = ui->buttonBox->addButton(tr("Create"), QDialogButtonBox::AcceptRole);
-        setAccentStyle(acceptButton);
+        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+        setAccentStyle(this, QDialogButtonBox::Ok);
     }
     else
     {
