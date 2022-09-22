@@ -99,12 +99,6 @@ signals:
     /** Property change notification signal, emitted together with userChanged(). */
     void userIdChanged();
 
-    /**
-     * This signal is emitted when this workbench context is about to be destroyed,
-     * but before its state is altered in any way by the destructor.
-     */
-    void aboutToBeDestroyed();
-
     void mainWindowChanged();
 
 private:

@@ -504,8 +504,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
 {
-    ensureAboutToBeDestroyedEmitted();
-
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 

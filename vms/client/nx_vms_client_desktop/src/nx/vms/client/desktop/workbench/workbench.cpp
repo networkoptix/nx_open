@@ -2,11 +2,13 @@
 
 #include "workbench.h"
 
-#include <common/common_module.h>
+#include <array>
+
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
@@ -19,6 +21,8 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -27,6 +31,7 @@
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
@@ -49,8 +54,14 @@ namespace {
 
 static const QString kWorkbenchDataKey = "workbenchState";
 
+static const QSizeF kDefaultCellSize(
+    Workbench::kUnitSize,
+    Workbench::kUnitSize / QnLayoutResource::kDefaultCellAspectRatio);
+
 QnWorkbenchItem* bestItemForRole(
-    QnWorkbenchItem** itemByRole, Qn::ItemRole role, const QnWorkbenchItem* ignoredItem = nullptr)
+    const std::array<QnWorkbenchItem*, Qn::ItemRoleCount>& itemByRole,
+    Qn::ItemRole role,
+    const QnWorkbenchItem* ignoredItem = nullptr)
 {
     for (int i = 0; i != role; i++)
     {
@@ -141,13 +152,14 @@ struct Workbench::Private
     std::vector<std::unique_ptr<QnWorkbenchLayout>> layouts;
 
     /** Grid mapper of this workbench. */
-    QnWorkbenchGridMapper* mapper;
+    std::unique_ptr<QnWorkbenchGridMapper> mapper = std::make_unique<QnWorkbenchGridMapper>(
+        kDefaultCellSize);
 
     /** Items by role. */
-    QnWorkbenchItem* itemByRole[Qn::ItemRoleCount];
+    std::array<QnWorkbenchItem*, Qn::ItemRoleCount> itemByRole = {};
 
     /** Stored dummy layout. It is used to ensure that current layout is never nullptr. */
-    QnWorkbenchLayout* dummyLayout;
+    QnWorkbenchLayout* dummyLayout = new WorkbenchLayout(LayoutResourcePtr(new LayoutResource()));
 
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
@@ -162,6 +174,54 @@ struct Workbench::Private
             ? std::distance(layouts.cbegin(), iter)
             : -1;
     }
+
+    /** Remove unsaved local layouts, restore modified ones. */
+    void processRemovedLayouts(const QSet<LayoutResourcePtr>& layouts)
+    {
+        LayoutResourceList rollbackResources;
+
+        for (const auto& layout: layouts)
+        {
+            auto systemContext = SystemContext::fromResource(layout);
+
+            // Temporary layouts have no system context and should not be processes anyway.
+            if (!systemContext)
+                continue;
+
+            auto snapshotManager = systemContext->layoutSnapshotManager();
+
+            // Delete unsaved local layouts.
+            if (layout->hasFlags(Qn::local)
+                && !layout->isFile()
+                && !layout->hasFlags(Qn::local_intercom_layout)) //< FIXME: #dfisenko Remove this.
+            {
+                systemContext->resourcePool()->removeResource(layout);
+            }
+            else if (snapshotManager->isChanged(layout))
+            {
+                snapshotManager->restore(layout);
+            }
+        }
+    }
+
+    void handleResourcesRemoved(const QnResourceList& resources)
+    {
+        if (currentLayout)
+        {
+            for (const auto& resource: resources)
+                currentLayout->removeItems(resource);
+        }
+    }
+
+    void removeInaccessibleItems(const QnResourcePtr& resource)
+    {
+        const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+            ? Qn::ViewContentPermission
+            : Qn::ReadPermission;
+
+        if (currentLayout && !ResourceAccessManager::hasPermissions(resource, requiredPermission))
+            currentLayout->removeItems(resource);
+    }
 };
 
 Workbench::Workbench(QObject* parent):
@@ -169,20 +229,19 @@ Workbench::Workbench(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private())
 {
-    for (int i = 0; i < Qn::ItemRoleCount; i++)
-        d->itemByRole[i] = nullptr;
-
-    const QSizeF kDefaultCellSize(
-        kUnitSize, kUnitSize / QnLayoutResource::kDefaultCellAspectRatio);
-    d->mapper = new QnWorkbenchGridMapper(kDefaultCellSize, this);
-
-    auto dummyLayoutResource = LayoutResourcePtr(new LayoutResource());
-    d->dummyLayout = new WorkbenchLayout(dummyLayoutResource);
     setCurrentLayout(d->dummyLayout);
 
     d->stateDelegate = std::make_shared<StateDelegate>(this);
     appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
 
+    connect(appContext()->unifiedResourcePool(), &UnifiedResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources) { d->handleResourcesRemoved(resources); });
+
+    // Only currenly connected context resources are checked actually.
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        [this](const QnResourcePtr& resource) { d->removeInaccessibleItems(resource); });
+
+    // TODO: #sivanov Move to the appropriate place.
     using WebEngineProfileManager = utils::WebEngineProfileManager;
     connect(WebEngineProfileManager::instance(),
         &WebEngineProfileManager::downloadRequested,
@@ -192,8 +251,6 @@ Workbench::Workbench(QObject* parent):
 
 Workbench::~Workbench()
 {
-    emit aboutToBeDestroyed();
-
     QSignalBlocker blocker(this);
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
     delete d->dummyLayout;
@@ -208,27 +265,15 @@ WindowContext* Workbench::windowContext() const
 
 void Workbench::clear()
 {
-    for (const auto& layout: d->layouts)
-    {
-        if (layout->data(Qn::IsSpecialLayoutRole).isValid()
-            && layout->data(Qn::IsSpecialLayoutRole).toBool())
-        {
-            continue;
-        }
-
-        if (const auto layoutResource = layout->resource())
-        {
-            auto systemContext = SystemContext::fromResource(layoutResource);
-            if (NX_ASSERT(systemContext)
-                && systemContext->layoutSnapshotManager()->hasSnapshot(layoutResource))
-            {
-                systemContext->layoutSnapshotManager()->restore(layoutResource);
-            }
-        }
-    }
-
     setCurrentLayout(nullptr);
+
+    QSet<LayoutResourcePtr> removedLayouts;
+
+    for (const auto& layout: d->layouts)
+        removedLayouts.insert(layout->resource());
+
     d->layouts.clear();
+    d->processRemovedLayouts(removedLayouts);
     emit layoutsChanged();
 }
 
@@ -284,7 +329,7 @@ QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, in
     const bool isSpecial = resource->data(Qn::IsSpecialLayoutRole).toBool();
     std::unique_ptr<QnWorkbenchLayout> layout;
     if (isSpecial)
-        layout = std::make_unique<SpecialLayout>(resource);
+        layout = std::make_unique<SpecialLayout>(windowContext(), resource);
     else
         layout = std::make_unique<WorkbenchLayout>(resource);
 
@@ -302,8 +347,11 @@ void Workbench::removeLayout(int index)
     if (!NX_ASSERT(index >= 0 && index < d->layouts.size()))
         return;
 
+    auto layout = d->layouts[index].get();
+    QSet<LayoutResourcePtr> removedLayouts{layout->resource()};
+
     // Update current layout if it's being removed.
-    if (d->layouts[index].get() == d->currentLayout)
+    if (layout == d->currentLayout)
     {
         QnWorkbenchLayout* newCurrentLayout = nullptr;
 
@@ -318,6 +366,7 @@ void Workbench::removeLayout(int index)
     }
 
     d->layouts.erase(d->layouts.begin() + index);
+    d->processRemovedLayouts(removedLayouts);
 
     emit layoutsChanged();
 }
@@ -331,15 +380,16 @@ void Workbench::removeLayout(const LayoutResourcePtr& resource)
 
 void Workbench::removeLayouts(const LayoutResourceList& resources)
 {
-    auto layoutsSet = nx::utils::toQSet(resources);
+    const auto removedLayouts = nx::utils::toQSet(resources);
+    NX_ASSERT(removedLayouts.size() == resources.size());
     const bool updateCurrentLayout = (d->currentLayout
-        && layoutsSet.contains(d->currentLayout->resource()));
+        && removedLayouts.contains(d->currentLayout->resource()));
 
     if (updateCurrentLayout)
     {
         int newCurrentLayoutIndex = 0;
         while (newCurrentLayoutIndex < d->layouts.size()
-            && layoutsSet.contains(d->layouts[newCurrentLayoutIndex]->resource()))
+            && removedLayouts.contains(d->layouts[newCurrentLayoutIndex]->resource()))
         {
             ++newCurrentLayoutIndex;
         }
@@ -351,9 +401,9 @@ void Workbench::removeLayouts(const LayoutResourceList& resources)
     }
 
     const size_t removed = nx::utils::erase_if(d->layouts,
-        [&layoutsSet](const std::unique_ptr<QnWorkbenchLayout>& layout)
+        [&removedLayouts](const std::unique_ptr<QnWorkbenchLayout>& layout)
         {
-            return layoutsSet.contains(layout->resource());
+            return removedLayouts.contains(layout->resource());
         });
 
     if (removed == 0)
@@ -362,6 +412,7 @@ void Workbench::removeLayouts(const LayoutResourceList& resources)
         return;
     }
 
+    d->processRemovedLayouts(removedLayouts);
     emit layoutsChanged();
 }
 
@@ -529,7 +580,7 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
 
 QnWorkbenchGridMapper* Workbench::mapper() const
 {
-    return d->mapper;
+    return d->mapper.get();
 }
 
 QnWorkbenchItem* Workbench::item(Qn::ItemRole role)

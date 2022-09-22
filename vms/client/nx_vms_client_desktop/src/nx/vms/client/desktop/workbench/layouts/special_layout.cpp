@@ -10,9 +10,9 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-SpecialLayout::SpecialLayout(const LayoutResourcePtr& resource):
+SpecialLayout::SpecialLayout(WindowContext* windowContext, const LayoutResourcePtr& resource):
     base_type(resource),
-    m_panelWidget(new SpecialLayoutPanelWidget(resource, this))
+    m_panelWidget(new SpecialLayoutPanelWidget(windowContext, resource, this))
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
 }

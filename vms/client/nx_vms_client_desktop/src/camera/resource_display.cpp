@@ -215,12 +215,10 @@ void QnResourceDisplay::addRenderer(QnResourceWidgetRenderer *renderer) {
         m_camera->getCamDisplay()->addVideoRenderer(videoLayout()->channelCount(), renderer, true);
 }
 
-void QnResourceDisplay::removeRenderer(QnResourceWidgetRenderer *renderer) {
-    int channelCount = videoLayout()->channelCount();
-    if (m_camera) {
-        for(int i = 0; i < channelCount; i++)
-            m_camera->getCamDisplay()->removeVideoRenderer(renderer);
-    }
+void QnResourceDisplay::removeRenderer(QnResourceWidgetRenderer* renderer)
+{
+    if (m_camera)
+        m_camera->getCamDisplay()->removeVideoRenderer(renderer);
 }
 
 void QnResourceDisplay::addMetadataConsumer(

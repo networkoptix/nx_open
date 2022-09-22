@@ -1024,82 +1024,25 @@ void LayoutsHandler::removeLayouts(const LayoutResourceList &layouts)
     qnResourcesChangesManager->deleteResources(remoteResources);
 }
 
-bool LayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool force)
+bool LayoutsHandler::closeLayouts(const QnWorkbenchLayoutList& layouts)
 {
     LayoutResourceList resources;
     for (auto layout: layouts)
         resources.push_back(layout->resource());
 
-    return closeLayouts(resources, force);
+    return closeLayouts(resources);
 }
 
-bool LayoutsHandler::closeLayouts(
-    const LayoutResourceList& resources,
-    bool force)
+bool LayoutsHandler::closeLayouts(const LayoutResourceList& resources)
 {
     if (resources.empty())
         return true;
 
-    LayoutResourceList rollbackResources;
-    if (!force)
-    {
-        for (const LayoutResourcePtr& layout: resources)
-        {
-            // Do not rollback unsaved or temporary layouts.
-            if (layout->hasFlags(Qn::local))
-                continue;
-
-            // Temporary layouts have no system context.
-            auto systemContext = SystemContext::fromResource(layout);
-            if (!systemContext)
-                continue;
-
-            bool changed = systemContext->layoutSnapshotManager()->isChanged(layout);
-            if (!changed)
-                continue;
-
-            rollbackResources.push_back(layout);
-        }
-    }
-    closeLayoutsInternal(resources, rollbackResources);
-    return true;
-}
-
-void LayoutsHandler::closeLayoutsInternal(
-    const LayoutResourceList& resources,
-    const LayoutResourceList& rollbackResources)
-{
-    for (const LayoutResourcePtr& layout: rollbackResources)
-    {
-        // Temporary layouts have no system context.
-        auto systemContext = SystemContext::fromResource(layout);
-        if (!systemContext)
-            continue;
-
-        systemContext->layoutSnapshotManager()->restore(layout);
-    }
-
     workbench()->removeLayouts(resources);
-    for (const LayoutResourcePtr& resource: resources)
-    {
-        // Temporary layouts have no system context.
-        auto systemContext = SystemContext::fromResource(resource);
-        if (systemContext
-            && resource->hasFlags(Qn::local)
-            && !resource->isFile()
-            && !resource->hasFlags(Qn::local_intercom_layout))
-        {
-            systemContext->resourcePool()->removeResource(resource);
-        }
-    }
-
     if (workbench()->layouts().empty())
         menu()->trigger(action::OpenNewTabAction);
-}
 
-bool LayoutsHandler::closeAllLayouts(bool force)
-{
-    return closeLayouts(resourcePool()->getResources<LayoutResource>(), force);
+    return true;
 }
 
 void LayoutsHandler::openLayouts(
@@ -1441,14 +1384,15 @@ void LayoutsHandler::at_openIntercomLayoutAction_triggered()
     }
 }
 
-bool LayoutsHandler::tryClose(bool force)
+bool LayoutsHandler::tryClose(bool /*force*/)
 {
-    return closeAllLayouts(force);
+    workbench()->clear();
+    return true;
 }
 
 void LayoutsHandler::forcedUpdate()
 {
-    //do nothing
+    // Do nothing.
 }
 
 } // namespace workbench

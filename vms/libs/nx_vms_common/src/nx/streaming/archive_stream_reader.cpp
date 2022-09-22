@@ -468,7 +468,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
-    if (needToStop())
+    if (needToStop() || m_resource->hasFlags(Qn::removed))
     {
         NX_VERBOSE(this, "Need to stop, return null packet");
         return QnAbstractMediaDataPtr();
