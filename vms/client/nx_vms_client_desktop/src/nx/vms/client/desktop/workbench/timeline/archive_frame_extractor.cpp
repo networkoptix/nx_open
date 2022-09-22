@@ -7,48 +7,49 @@
 #include <memory>
 #include <thread>
 
-#include <QtCore/QMetaMethod>
-#include <QtCore/QMetaObject>
-
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <utils/common/delayed.h>
 #include <utils/media/frame_info.h>
 
-#include "abstract_archive_delegate.h"
-#include "media_data_packet.h"
-#include "rtsp_client_archive_delegate.h"
+using namespace std::chrono;
 
-using namespace std::literals::chrono_literals;
+namespace nx::vms::client::desktop {
 
 namespace {
 
 static constexpr auto kIdleStreamKeepAliveTime = 15s;
 static constexpr auto kAcceptableTimeDivergence = 0.1;
 
-std::chrono::milliseconds frameTimeMs(const QnCompressedVideoDataPtr& encodedFrame)
+milliseconds frameTimeMs(const QnCompressedVideoDataPtr& encodedFrame)
 {
     if (!NX_ASSERT(encodedFrame))
         return 0ms;
 
-    return std::chrono::round<std::chrono::milliseconds>(
-        std::chrono::microseconds(encodedFrame->timestamp));
+    return round<milliseconds>(
+        microseconds(encodedFrame->timestamp));
 }
 
 bool timeSatisfiesRequest(
-    const nx::streaming::ArchiveFrameExtractor::Request& request,
-    std::chrono::milliseconds timePoint)
+    const ArchiveFrameExtractor::Request& request,
+    milliseconds timePoint)
 {
     return timePoint >= request.timePoint - request.tolerance
         && timePoint < request.timePoint + request.tolerance;
 }
 
 double requestedTimeDivergence(
-    const nx::streaming::ArchiveFrameExtractor::Request& request,
-    std::chrono::milliseconds timePoint)
+    const ArchiveFrameExtractor::Request& request,
+    milliseconds timePoint)
 {
     if (request.tolerance == 0ms)
         return 0.0;
@@ -68,8 +69,6 @@ void setDecodeTwiceFlag(const QnCompressedVideoDataPtr& encodedFrame)
 
 } // namespace
 
-namespace nx::streaming {
-
 struct ArchiveFrameExtractor::Private
 {
     ArchiveFrameExtractor* const q;
@@ -87,9 +86,9 @@ struct ArchiveFrameExtractor::Private
         std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate;
         QnCompressedVideoDataPtr currentFrame;
 
-        std::optional<std::chrono::microseconds> lastKeyFrameTime;
-        std::optional<std::chrono::milliseconds> lastSeekTime;
-        std::optional<std::chrono::microseconds> lastGopDuration;
+        std::optional<microseconds> lastKeyFrameTime;
+        std::optional<milliseconds> lastSeekTime;
+        std::optional<microseconds> lastGopDuration;
     };
     StreamWorker streamWorker;
 
@@ -122,8 +121,7 @@ struct ArchiveFrameExtractor::Private
         result.request = request;
         result.decodedFrame = decodedFrame;
         result.resultCode = resultCode;
-        QMetaObject::invokeMethod(q, "frameRequestDone", Qt::QueuedConnection,
-            Q_ARG(nx::streaming::ArchiveFrameExtractor::Result, result));
+        executeLater([this, result]() { emit q->frameRequestDone(result); }, q);
     }
 
     void processRequests()
@@ -196,7 +194,7 @@ struct ArchiveFrameExtractor::Private
         {
             streamWorker.lastSeekTime = request.timePoint;
             streamWorker.archiveDelegate->seek(
-                std::chrono::duration_cast<std::chrono::microseconds>(request.timePoint).count(),
+                duration_cast<microseconds>(request.timePoint).count(),
                 /*findIFrame*/ true);
 
             streamWorker.currentFrame = getNextVideoData();
@@ -207,7 +205,7 @@ struct ArchiveFrameExtractor::Private
                 return;
             }
             streamWorker.lastKeyFrameTime =
-                std::chrono::microseconds(streamWorker.currentFrame->timestamp);
+                microseconds(streamWorker.currentFrame->timestamp);
         }
         else
         {
@@ -223,7 +221,7 @@ struct ArchiveFrameExtractor::Private
                 if (isKeyFrame(streamWorker.currentFrame))
                 {
                     streamWorker.lastKeyFrameTime =
-                        std::chrono::microseconds(streamWorker.currentFrame->timestamp);
+                        microseconds(streamWorker.currentFrame->timestamp);
                 }
             }
         }
@@ -250,11 +248,11 @@ struct ArchiveFrameExtractor::Private
                 if (isKeyFrame(streamWorker.currentFrame))
                 {
                     streamWorker.lastGopDuration =
-                        std::chrono::microseconds(streamWorker.currentFrame->timestamp)
+                        microseconds(streamWorker.currentFrame->timestamp)
                             - streamWorker.lastKeyFrameTime.value();
                     decodeJob.frameSequence.clear();
                     streamWorker.lastKeyFrameTime =
-                        std::chrono::microseconds(streamWorker.currentFrame->timestamp);
+                        microseconds(streamWorker.currentFrame->timestamp);
                 }
                 decodeJob.frameSequence.push_back(streamWorker.currentFrame);
             }
@@ -346,7 +344,6 @@ struct ArchiveFrameExtractor::Private
 
 ArchiveFrameExtractor::ArchiveFrameExtractor(
     const QnMediaResourcePtr& mediaResource,
-    nx::network::http::Credentials credentials,
     VideoQuality videQuality,
     bool sleepIfEmptySocket)
     :
@@ -361,6 +358,14 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
 
     if (const auto cameraResource = mediaResource.dynamicCast<QnVirtualCameraResource>())
     {
+        auto context = SystemContext::fromResource(cameraResource);
+        if (!NX_ASSERT(context))
+            return;
+
+        nx::network::http::Credentials credentials;
+        if (auto connection = context->connection())
+            credentials = context->connection()->credentials();
+
         auto rtspDelegate = std::make_unique<QnRtspClientArchiveDelegate>(
             /*archiveStreamReader*/ nullptr,
             std::move(credentials),
@@ -438,4 +443,4 @@ void ArchiveFrameExtractor::clearRequestQueue()
     d->decodeWorker.decodeQueue.clear();
 }
 
-} // namespace nx::streaming
+} // namespace nx::vms::client::desktop

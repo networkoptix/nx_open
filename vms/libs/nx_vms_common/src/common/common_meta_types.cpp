@@ -58,7 +58,6 @@
 #include <nx/network/rest/params.h>
 #include <nx/network/socket_common.h>
 #include <nx/streaming/abstract_data_packet.h>
-#include <nx/streaming/archive_frame_extractor.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/string.h>
 #include <nx/utils/metatypes.h>
@@ -188,7 +187,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
-    qRegisterMetaType<nx::streaming::ArchiveFrameExtractor::Result>();
 
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStatisticsReply>();
