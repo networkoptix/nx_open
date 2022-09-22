@@ -7,7 +7,6 @@
 #include <utils/common/synctime.h>
 
 using namespace std::literals::chrono_literals;
-using namespace nx::streaming;
 
 namespace {
 
@@ -49,7 +48,8 @@ namespace nx::vms::client::desktop::workbench::timeline {
 ThumbnailLoader::ThumbnailLoader(const QnMediaResourcePtr& resource, Mode mode):
     m_mode(mode),
     m_frameExtractor(new ArchiveFrameExtractor(
-        resource, connectionCredentials(), ArchiveFrameExtractor::VideoQuality::low))
+        resource,
+        ArchiveFrameExtractor::VideoQuality::low))
 {
     connect(m_frameExtractor.get(), &ArchiveFrameExtractor::frameRequestDone,
         this, &ThumbnailLoader::handleExtractedFrame);
