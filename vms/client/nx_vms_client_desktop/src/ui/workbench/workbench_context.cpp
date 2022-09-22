@@ -125,11 +125,8 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
     initWorkarounds();
 }
 
-QnWorkbenchContext::~QnWorkbenchContext() {
-    bool signalsBlocked = blockSignals(false);
-    emit aboutToBeDestroyed();
-    blockSignals(signalsBlocked);
-
+QnWorkbenchContext::~QnWorkbenchContext()
+{
     /* Destroy typed subobjects in reverse order to how they were constructed. */
     QnInstanceStorage::clear();
 

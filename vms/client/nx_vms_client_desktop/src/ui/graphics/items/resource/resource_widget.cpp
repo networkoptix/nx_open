@@ -143,7 +143,6 @@ QnResourceWidget::QnResourceWidget(
     m_frameDistinctionColor(),
     m_titleTextFormat("%1"),
     m_titleTextFormatHasPlaceholder(true),
-    m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0),
@@ -255,7 +254,6 @@ QnResourceWidget::QnResourceWidget(
 
 QnResourceWidget::~QnResourceWidget()
 {
-    ensureAboutToBeDestroyedEmitted();
 }
 
 void QnResourceWidget::setupOverlayButtonsHandlers()
@@ -1021,15 +1019,6 @@ void QnResourceWidget::updateButtonsVisibility()
 int QnResourceWidget::helpTopicAt(const QPointF &) const
 {
     return -1;
-}
-
-void QnResourceWidget::ensureAboutToBeDestroyedEmitted()
-{
-    if (m_aboutToBeDestroyedEmitted)
-        return;
-
-    m_aboutToBeDestroyedEmitted = true;
-    emit aboutToBeDestroyed();
 }
 
 void QnResourceWidget::setOption(Option option, bool value /*= true*/)

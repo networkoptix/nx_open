@@ -309,7 +309,6 @@ public:
 signals:
     void painted();
     void aspectRatioChanged();
-    void aboutToBeDestroyed();
     void optionsChanged(Options changedOptions, QPrivateSignal);
     void zoomRectChanged();
     void zoomTargetWidgetChanged();
@@ -387,8 +386,6 @@ protected:
 
     void registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias);
     QnImageButtonWidget* createStatisticAwareButton(const QString& alias);
-
-    void ensureAboutToBeDestroyedEmitted();
 
     Q_SLOT virtual void at_itemDataChanged(int role);
 
@@ -471,9 +468,6 @@ private:
     /* Widgets for overlaid stuff. */
 
     QnStatusOverlayController* m_statusController;
-
-    /** Whether aboutToBeDestroyed signal has already been emitted. */
-    bool m_aboutToBeDestroyedEmitted;
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;

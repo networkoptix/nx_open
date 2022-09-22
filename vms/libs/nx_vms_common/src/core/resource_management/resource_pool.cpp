@@ -174,6 +174,9 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
 void QnResourcePool::removeResources(const QnResourceList& resources)
 {
+    if (resources.empty())
+        return;
+
     QVector<QnResourcePtr> removedLayouts;
     QVector<QnResourcePtr> removedUsers;
     QVector<QnResourcePtr> removedOtherResources;
@@ -300,7 +303,8 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         emit resourceRemoved(user);
     }
 
-    emit resourcesRemoved(removedResources);
+    if (!removedResources.empty())
+        emit resourcesRemoved(removedResources);
 }
 
 QnResourceList QnResourcePool::getResources() const
@@ -501,7 +505,10 @@ void QnResourcePool::clear()
     }
 
     for (const auto& resource: std::as_const(tempList))
+    {
+        resource->addFlags(Qn::removed);
         resource->disconnect(this);
+    }
 }
 
 bool QnResourcePool::containsIoModules() const

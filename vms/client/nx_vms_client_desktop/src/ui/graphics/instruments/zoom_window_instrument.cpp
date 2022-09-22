@@ -568,8 +568,6 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
         &ZoomWindowInstrument::at_widget_zoomRectChanged);
     connect(widget, &QnResourceWidget::frameDistinctionColorChanged, this,
         &ZoomWindowInstrument::at_widget_frameColorChanged);
-    connect(widget, &QnResourceWidget::aboutToBeDestroyed, this,
-        &ZoomWindowInstrument::at_widget_aboutToBeDestroyed);
     connect(widget, &QnResourceWidget::optionsChanged, this,
         &ZoomWindowInstrument::at_widget_optionsChanged);
 
@@ -951,11 +949,6 @@ void ZoomWindowInstrument::finishDrag(DragInfo* /*info*/)
 void ZoomWindowInstrument::finishDragProcess(DragInfo* /*info*/)
 {
     emit zoomWindowProcessFinished(target());
-}
-
-void ZoomWindowInstrument::at_widget_aboutToBeDestroyed()
-{
-    unregisterWidget(checked_cast<QnMediaResourceWidget*>(sender()));
 }
 
 void ZoomWindowInstrument::at_widget_zoomRectChanged()

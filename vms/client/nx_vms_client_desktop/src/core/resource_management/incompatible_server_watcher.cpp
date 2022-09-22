@@ -339,7 +339,9 @@ void QnIncompatibleServerWatcher::stop()
             servers.push_back(server);
     }
     NX_DEBUG(this, "Stop watching");
-    resourcePool()->removeResources(servers);
+
+    if (!servers.empty())
+        resourcePool()->removeResources(servers);
 }
 
 void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep)
