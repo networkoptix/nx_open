@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
+#include <nx/branding.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/config.h>
@@ -23,7 +24,7 @@
 #include "video_stream_display.h"
 
 #if defined(Q_OS_MAC)
-    #include <CoreServices/CoreServices.h>
+    #include <IOKit/pwr_mgt/IOPMLib.h>
 #elif defined(Q_OS_WIN)
     #include <qt_windows.h>
     #include <plugins/resource/desktop_win/desktop_resource.h>
@@ -44,24 +45,55 @@ static void updateActivity()
     if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
     {
 #ifdef Q_OS_MAC
-        UpdateSystemActivity(UsrActivity);
+        static IOPMAssertionID powerAssertionID = 0;
+
+        // Prevent computer entering sleep mode unless it disabled in the local settings.
+        if (qnSettings->allowComputerEnteringSleepMode())
+        {
+            if (powerAssertionID == 0)
+                return;
+
+            IOPMAssertionRelease(powerAssertionID);
+            powerAssertionID = 0;
+        }
+        else
+        {
+            if (powerAssertionID != 0)
+                return;
+
+            const auto activityReason = QnCamDisplay::tr("%1 Running",
+                "%1 will be substituted with desktop client display name, e.g 'NX Witness Client'")
+                    .arg(nx::branding::desktopClientDisplayName());
+
+            IOPMAssertionCreateWithName(
+                kIOPMAssertionTypeNoDisplaySleep,
+                kIOPMAssertionLevelOn,
+                activityReason.toCFString(),
+                &powerAssertionID);
+        }
 #elif defined(Q_OS_WIN)
         // disable screen saver ### should we enable it back on exit?
         static bool screenSaverDisabled = SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, 0, SPIF_SENDWININICHANGE);
         Q_UNUSED(screenSaverDisabled)
 
-        // don't sleep
-        if (QSysInfo::windowsVersion() < QSysInfo::WV_VISTA)
-            SetThreadExecutionState(ES_USER_PRESENT | ES_CONTINUOUS);
+        // Prevent computer entering sleep mode unless it disabled in the local settings.
+        if (qnSettings->allowComputerEnteringSleepMode())
+        {
+            SetThreadExecutionState(ES_CONTINUOUS);
+        }
         else
-            SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
+        {
+            SetThreadExecutionState(QSysInfo::windowsVersion() < QSysInfo::WV_VISTA
+                ? ES_USER_PRESENT | ES_CONTINUOUS
+                : ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
+        }
 #endif
-        // Update system activity timer once per 20 seconds
+        // Update system activity timer once per 20 seconds.
         activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
     }
 }
 
-// a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
+// A lot of small audio packets in Blu-ray HD audio codecs. So, previous size 7 is not enough.
 static const int CL_MAX_DISPLAY_QUEUE_SIZE = 20;
 static const int CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE = 30;
 

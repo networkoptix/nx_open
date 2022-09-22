@@ -182,6 +182,9 @@ public:
         /** Mute audio output while two way audio is engaged. */
         MUTE_ON_AUDIO_TRANSMIT,
 
+        /** Allow computer entering sleep mode on idle while running client. */
+        ALLOW_COMPUTER_ENTERING_SLEEP_MODE,
+        
         /** Approved urls that have access to a session token using jsapi. */
         AUTH_ALLOWED_URLS,
 
@@ -313,6 +316,7 @@ private:
 
         QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
         QN_DECLARE_RW_PROPERTY(bool, restoreUserSessionData, setRestoreUserSessionData, RESTORE_USER_SESSION, true)
+        QN_DECLARE_RW_PROPERTY(bool, allowComputerEnteringSleepMode, setAllowComputerEnteringSleepMode, ALLOW_COMPUTER_ENTERING_SLEEP_MODE, false)
 
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
