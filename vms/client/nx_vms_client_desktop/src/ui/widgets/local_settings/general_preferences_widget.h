@@ -52,6 +52,9 @@ private:
     bool restoreUserSessionData() const;
     void setRestoreUserSessionData(bool value);
 
+    bool allowComputerEnteringSleepMode() const;
+    void setAllowComputerEnteringSleepMode(bool value);
+
     void initAudioDevices();
 
     QString primaryAudioDeviceName() const;

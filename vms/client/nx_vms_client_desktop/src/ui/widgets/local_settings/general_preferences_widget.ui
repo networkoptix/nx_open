@@ -153,6 +153,13 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="playAudioForAllCamerasCheckbox">
+        <property name="text">
+         <string>Play audio from all cameras on layout</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="restoreSessionCheckBox">
         <property name="text">
@@ -232,10 +239,10 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="playAudioForAllCamerasCheckbox">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="allowEnteringSleepModeCheckBox">
         <property name="text">
-         <string>Play audio from all cameras on layout</string>
+         <string>Allow computer entering sleep mode on idle</string>
         </property>
        </widget>
       </item>
