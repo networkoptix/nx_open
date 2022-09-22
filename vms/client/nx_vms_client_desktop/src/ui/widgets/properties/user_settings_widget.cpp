@@ -361,7 +361,9 @@ void QnUserSettingsWidget::applyChanges()
     if (isReadOnly())
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(m_model->user());
+    Qn::Permissions permissions = (m_model->mode() == QnUserSettingsModel::NewUser)
+        ? Qn::FullUserPermissions
+        : accessController()->permissions(m_model->user());
 
     if (m_model->user()->isCloud())
     {
