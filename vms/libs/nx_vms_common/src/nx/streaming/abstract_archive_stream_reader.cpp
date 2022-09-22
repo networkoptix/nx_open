@@ -127,11 +127,12 @@ void QnAbstractArchiveStreamReader::run()
                 std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(data)));
         }
 
+        
+        if (m_noDataHandler && (!data || data->dataType == QnAbstractMediaData::EMPTY_DATA))
+            m_noDataHandler();
+
         if (!data && !needToStop())
         {
-            if (m_noDataHandler)
-                m_noDataHandler();
-
             setNeedKeyData();
             onEvent(CameraDiagnostics::BadMediaStreamResult());
 
