@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/workbench/workbench_layout.h>
 
 class QGraphicsWidget;
@@ -21,7 +22,7 @@ class SpecialLayout: public QnWorkbenchLayout
     using base_type = QnWorkbenchLayout;
 
 public:
-    SpecialLayout(const LayoutResourcePtr& resource);
+    SpecialLayout(WindowContext* windowContext, const LayoutResourcePtr& resource);
     virtual ~SpecialLayout();
 
     void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership under widget

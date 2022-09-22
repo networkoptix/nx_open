@@ -82,8 +82,14 @@ struct CloudLayoutsManager::Private
     Private(CloudLayoutsManager* owner):
         q(owner)
     {
+        appContext()->addSystemContext(systemContext.get());
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });
+    }
+
+    ~Private()
+    {
+        appContext()->removeSystemContext(systemContext.get());
     }
 
     Request makeRequest()

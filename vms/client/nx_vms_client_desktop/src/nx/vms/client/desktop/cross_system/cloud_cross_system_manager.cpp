@@ -56,19 +56,19 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
         };
 
     connect(
-        qnCloudStatusWatcher,
+        appContext()->cloudStatusWatcher(),
         &core::CloudStatusWatcher::statusChanged,
         this,
         [this, setCloudSystems](auto status)
         {
             NX_VERBOSE(this, "Cloud status changed to %1", status);
             setCloudSystems(status == core::CloudStatusWatcher::Online
-                ? qnCloudStatusWatcher->cloudSystems()
+                ? appContext()->cloudStatusWatcher()->cloudSystems()
                 : QnCloudSystemList());
         });
 
     connect(
-        qnCloudStatusWatcher,
+        appContext()->cloudStatusWatcher(),
         &core::CloudStatusWatcher::cloudSystemsChanged,
         this,
         [this, setCloudSystems](const auto& currentCloudSystems)
@@ -77,7 +77,7 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             setCloudSystems(currentCloudSystems);
         });
 
-    setCloudSystems(qnCloudStatusWatcher->cloudSystems());
+    setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
 
     NX_VERBOSE(this, "Initialized");
 }

@@ -56,7 +56,6 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
-    void at_widget_aboutToBeDestroyed();
     void at_widget_zoomRectChanged();
     void at_widget_frameColorChanged();
     void at_widget_optionsChanged();

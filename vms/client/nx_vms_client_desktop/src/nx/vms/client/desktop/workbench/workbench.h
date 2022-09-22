@@ -193,12 +193,6 @@ public:
 
 signals:
     /**
-     * This signal is emitted while the workbench is still intact, but is about
-     * to be destroyed.
-     */
-    void aboutToBeDestroyed();
-
-    /**
      * This signal is emitted whenever the layout of this workbench is about to be changed.
      */
     void currentLayoutAboutToBeChanged();

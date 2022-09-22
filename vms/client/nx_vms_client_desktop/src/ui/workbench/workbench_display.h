@@ -319,9 +319,6 @@ signals:
     void zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
     void zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
 
-    void resourceAdded(const QnResourcePtr &resource);
-    void resourceAboutToBeRemoved(const QnResourcePtr &resource);
-
     void layoutAccessChanged();
 
 protected:
@@ -347,7 +344,7 @@ protected:
     ItemLayer shadowLayer(ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay);
-    bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
+    bool removeItemInternal(QnWorkbenchItem *item);
 
     bool addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     bool removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
@@ -357,7 +354,6 @@ protected:
 
     void deinitSceneView();
     void initSceneView();
-    void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
@@ -389,9 +385,6 @@ protected slots:
     void at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect);
 
-    void at_context_permissionsChanged(const QnResourcePtr &resource);
-    void at_resourcePool_resourcesRemoved(const QnResourceList& resources);
-
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
     void at_item_zoomRectChanged();
@@ -403,7 +396,6 @@ protected slots:
     void at_widgetActivityInstrument_activityStarted();
 
     void at_widget_aspectRatioChanged();
-    void at_widget_aboutToBeDestroyed();
 
     void at_view_destroyed();
 

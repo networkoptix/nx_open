@@ -68,7 +68,7 @@ public:
     QnWorkbenchLayoutSynchronizer* layoutSynchronizer() const;
 
     /**
-     * @return Resource associated with this layout, if any.
+     * @return Resource associated with this layout. Always exists.
      */
     LayoutResourcePtr resource() const;
 
@@ -181,6 +181,11 @@ public:
      * @param item Item to remove
      */
     Q_SLOT void removeItem(QnWorkbenchItem* item);
+
+    /**
+     * Remove all items by the given resource.
+     */
+    void removeItems(const QnResourcePtr& resource);
 
     /**
      * Clears this layout by removing all its items.

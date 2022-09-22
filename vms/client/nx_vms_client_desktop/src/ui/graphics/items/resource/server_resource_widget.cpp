@@ -460,10 +460,9 @@ QnServerResourceWidget::QnServerResourceWidget(
     at_statistics_received();
 }
 
-QnServerResourceWidget::~QnServerResourceWidget() {
+QnServerResourceWidget::~QnServerResourceWidget()
+{
     m_manager->unregisterConsumer(m_resource, this);
-
-    ensureAboutToBeDestroyedEmitted();
 }
 
 QnMediaServerResourcePtr QnServerResourceWidget::resource() const {

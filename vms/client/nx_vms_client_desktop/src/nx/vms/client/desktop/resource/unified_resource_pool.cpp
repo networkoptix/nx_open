@@ -39,7 +39,8 @@ UnifiedResourcePool::UnifiedResourcePool(QObject* parent):
     connect(appContext(), &ApplicationContext::systemContextRemoved,
         this, disconnectFromContext);
 
-    connectToContext(appContext()->currentSystemContext());
+    for (auto context: appContext()->systemContexts())
+        connectToContext(context);
 }
 
 } // namespace nx::vms::client::desktop

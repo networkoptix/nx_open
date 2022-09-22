@@ -145,6 +145,11 @@ struct CloudCrossSystemContext::Private
         ensureConnection();
     }
 
+    ~Private()
+    {
+        appContext()->removeSystemContext(systemContext.get());
+    }
+
     CloudCrossSystemContext* const q;
     std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
     QnSystemDescriptionPtr const systemDescription;

@@ -7,8 +7,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui{
 class SpecialLayoutPanelWidget;
@@ -18,15 +18,16 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelWidget:
-    public QnMaskedProxyWidget,
-    public QnWorkbenchContextAware
+class SpecialLayoutPanelWidget: public QnMaskedProxyWidget, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QnMaskedProxyWidget;
 
 public:
-    SpecialLayoutPanelWidget(const LayoutResourcePtr& layoutResource, QObject* parent = nullptr);
+    SpecialLayoutPanelWidget(
+        WindowContext* windowContext,
+        const LayoutResourcePtr& layoutResource,
+        QObject* parent = nullptr);
 
     virtual ~SpecialLayoutPanelWidget();
 
