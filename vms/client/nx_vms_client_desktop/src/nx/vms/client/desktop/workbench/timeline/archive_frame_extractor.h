@@ -10,13 +10,13 @@
 #include <nx/utils/impl_ptr.h>
 #include <utils/media/frame_info.h>
 
-namespace nx::streaming {
+namespace nx::vms::client::desktop {
 
 /**
  * The ArchiveFrameExtractor class provides asynchronous interface for extracting single frames
  * at given time points from resources which have video content.
  */
-class NX_VMS_COMMON_API ArchiveFrameExtractor: public QObject
+class ArchiveFrameExtractor: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -37,14 +37,14 @@ public:
         aborted,
     };
 
-    struct NX_VMS_COMMON_API Request
+    struct Request
     {
         std::chrono::milliseconds timePoint;
         std::chrono::milliseconds tolerance;
         QVariant userData;
     };
 
-    struct NX_VMS_COMMON_API Result
+    struct Result
     {
         Request request;
         ResultCode resultCode;
@@ -61,7 +61,6 @@ public:
      */
     ArchiveFrameExtractor(
         const QnMediaResourcePtr& mediaResource,
-        nx::network::http::Credentials credentials,
         VideoQuality videoQuality,
         bool sleepIfEmptySocket = false);
 
@@ -101,13 +100,12 @@ signals:
      * Signal which emitted when result is ready. Signal is emitted from the this object's thread
      * event loop.
      */
-    void frameRequestDone(nx::streaming::ArchiveFrameExtractor::Result result);
+    void frameRequestDone(ArchiveFrameExtractor::Result result);
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::streaming
+} // namespace nx::vms::client::desktop
 
-Q_DECLARE_METATYPE(nx::streaming::ArchiveFrameExtractor::Result)

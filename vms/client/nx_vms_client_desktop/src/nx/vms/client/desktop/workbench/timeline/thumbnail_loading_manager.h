@@ -8,7 +8,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSize>
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <recording/time_period.h>
 #include <utils/common/aspect_ratio.h>
 
@@ -29,7 +28,7 @@ class ThumbnailLoader;
  * - m_livePreviewLoader is used to load individual Live Preview thumbnails requested by hovering
  *   mouse over timeline.
  */
-class ThumbnailLoadingManager: public QObject, public nx::vms::client::core::RemoteConnectionAware
+class ThumbnailLoadingManager: public QObject
 {
     Q_OBJECT
 
