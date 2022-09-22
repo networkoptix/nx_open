@@ -718,8 +718,11 @@ void QnUserSettingsDialog::applyChangesInternal()
 {
     base_type::applyChanges();
 
-    if (accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+    if (m_model->mode() == QnUserSettingsModel::NewUser
+        || accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+    {
         m_user->setEnabled(m_userEnabledButton->isChecked());
+    }
 }
 
 bool QnUserSettingsDialog::hasChanges() const
