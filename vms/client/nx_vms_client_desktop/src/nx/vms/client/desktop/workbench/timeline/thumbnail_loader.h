@@ -12,19 +12,18 @@
 #include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <utils/common/aspect_ratio.h>
 #include <utils/media/frame_info.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/streaming/archive_frame_extractor.h>
 
+#include "archive_frame_extractor.h"
 #include "thumbnail.h"
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
-class ThumbnailLoader: public QObject, public nx::vms::client::core::RemoteConnectionAware
+class ThumbnailLoader: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -71,13 +70,13 @@ private:
     void invalidateThumbnails();
     void process();
     void addThumbnail(const ThumbnailPtr& thumbnail);
-    void handleExtractedFrame(nx::streaming::ArchiveFrameExtractor::Result request);
+    void handleExtractedFrame(ArchiveFrameExtractor::Result request);
 
 private:
     const Mode m_mode;
     TransformParams m_transformParams;
 
-    std::unique_ptr<nx::streaming::ArchiveFrameExtractor> m_frameExtractor;
+    std::unique_ptr<ArchiveFrameExtractor> m_frameExtractor;
     std::optional<QnTimePeriodList> m_recordedTimePeriods;
 
     std::chrono::milliseconds m_timeStep{0};
