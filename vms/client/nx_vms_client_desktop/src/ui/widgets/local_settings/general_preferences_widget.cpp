@@ -65,6 +65,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->restoreSessionCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->allowEnteringSleepModeCheckBox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->primaryAudioDeviceComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->secondaryAudioDeviceComboBox, QnComboboxCurrentIndexChanged, this,
@@ -73,6 +75,9 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->muteOnAudioTransmitCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    if (nx::build_info::isLinux())
+        ui->allowEnteringSleepModeCheckBox->setHidden(true); //< Not implemented for Linux.
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -104,6 +109,8 @@ void QnGeneralPreferencesWidget::applyChanges()
     bool restoreData = restoreUserSessionData();
     qnSettings->setRestoreUserSessionData(restoreData);
 
+    qnSettings->setAllowComputerEnteringSleepMode(allowComputerEnteringSleepMode());
+
     qnSettings->setMuteOnAudioTransmit(muteOnAudioTransmit());
 
     if (recorderSettingsChanged)
@@ -119,6 +126,7 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     setAutoStart(qnSettings->autoStart());
     setAutoLogin(qnSettings->autoLogin());
     setRestoreUserSessionData(qnSettings->restoreUserSessionData());
+    setAllowComputerEnteringSleepMode(qnSettings->allowComputerEnteringSleepMode());
     ui->playAudioForAllCamerasCheckbox->setChecked(qnSettings->playAudioForAllItems());
     setMuteOnAudioTransmit(qnSettings->muteOnAudioTransmit());
 }
@@ -159,6 +167,9 @@ bool QnGeneralPreferencesWidget::hasChanges() const
         return true;
 
     if (qnSettings->restoreUserSessionData() != restoreUserSessionData())
+        return true;
+
+    if (qnSettings->allowComputerEnteringSleepMode() != allowComputerEnteringSleepMode())
         return true;
 
     if (qnSettings->muteOnAudioTransmit() != muteOnAudioTransmit())
@@ -337,6 +348,16 @@ bool QnGeneralPreferencesWidget::restoreUserSessionData() const
 void QnGeneralPreferencesWidget::setRestoreUserSessionData(bool value)
 {
     ui->restoreSessionCheckBox->setChecked(value);
+}
+
+bool QnGeneralPreferencesWidget::allowComputerEnteringSleepMode() const
+{
+    return ui->allowEnteringSleepModeCheckBox->isChecked();
+}
+
+void QnGeneralPreferencesWidget::setAllowComputerEnteringSleepMode(bool value)
+{
+    ui->allowEnteringSleepModeCheckBox->setChecked(value);
 }
 
 bool QnGeneralPreferencesWidget::muteOnAudioTransmit() const
