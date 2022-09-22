@@ -202,16 +202,6 @@ QString QnWorkbenchLayout::name() const
 
 bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
 {
-    // TODO: #sivanov Note that we keep items that are not present in resource's data.
-    // This is not correct, but we currently need it.
-    const QHash<Qn::ItemDataRole, QVariant> data = resource->data();
-    for (auto i = data.begin(); i != data.end(); i++)
-    {
-        if (i.key() == Qn::VideoWallItemGuidRole)
-            continue;
-        setData(i.key(), i.value());
-    }
-
     bool result = true;
 
     /* Unpin all items so that pinned state does not interfere with
@@ -371,6 +361,22 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
     emit itemRemoved(item);
 
     updateBoundingRectInternal();
+}
+
+void QnWorkbenchLayout::removeItems(const QnResourcePtr& resource)
+{
+    auto itemsByResourceIt = d->itemsByResource.find(resource);
+    while (itemsByResourceIt != d->itemsByResource.end())
+    {
+        if (!NX_ASSERT(!itemsByResourceIt->empty()))
+        {
+            d->itemsByResource.erase(itemsByResourceIt);
+            return;
+        }
+
+        removeItem(*itemsByResourceIt->begin());
+        itemsByResourceIt = d->itemsByResource.find(resource);
+    }
 }
 
 void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem)

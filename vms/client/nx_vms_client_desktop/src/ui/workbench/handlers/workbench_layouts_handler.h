@@ -43,8 +43,6 @@ private:
     void at_openInNewTabAction_triggered();
 
 private:
-    bool closeAllLayouts(bool force = false);
-
     /**
      * Save target file, local or remote layout.
      * @param layout Layout to save.
@@ -97,11 +95,8 @@ private:
 
     void removeLayouts(const LayoutResourceList& layouts);
 
-    void closeLayoutsInternal(
-        const LayoutResourceList& resources,
-        const LayoutResourceList& rollbackResources);
-    bool closeLayouts(const LayoutResourceList& resources, bool force = false);
-    bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
+    bool closeLayouts(const LayoutResourceList& resources);
+    bool closeLayouts(const QnWorkbenchLayoutList& layouts);
 
     /**
      * Open provided layouts in new tabs.

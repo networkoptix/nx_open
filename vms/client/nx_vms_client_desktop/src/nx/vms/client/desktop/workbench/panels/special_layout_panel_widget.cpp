@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
-
 
 namespace nx::vms::client::desktop {
 
@@ -30,11 +30,11 @@ namespace ui {
 namespace workbench {
 
 SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
+    WindowContext* windowContext,
     const LayoutResourcePtr& layoutResource,
     QObject* parent)
     :
-    base_type(),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     ui(new Ui::SpecialLayoutPanelWidget()),
     m_layoutResource(layoutResource)
 {

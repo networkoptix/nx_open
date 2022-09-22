@@ -381,12 +381,14 @@ struct ApplicationContext::Private
 
     void initializeCrossSystemModules()
     {
+        // Cross-system cameras should process cloud status changes after cloudLayoutsManager. This
+        // makes "Logout from Cloud" scenario much more smooth. If layouts are closed before camera
+        // resources are removed, we do not need process widgets one by one.
+        if (ini().crossSystemLayouts)
+            cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
         cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
         if (ini().crossSystemLayouts)
-        {
-            cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
             crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
-        }
     }
 
     void initializeTranslations()
@@ -625,6 +627,8 @@ ApplicationContext::~ApplicationContext()
 
     // Remote session must be fully destroyed while application context still exists.
     d->mainSystemContext.reset();
+    d->cloudLayoutsManager.reset();
+    d->cloudCrossSystemManager.reset();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;

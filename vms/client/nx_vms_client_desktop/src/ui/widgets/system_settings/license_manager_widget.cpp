@@ -303,7 +303,8 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 
 void QnLicenseManagerWidget::loadDataToUi()
 {
-    updateLicenses();
+    if (connection())
+        updateLicenses();
 }
 
 bool QnLicenseManagerWidget::hasChanges() const
@@ -319,7 +320,7 @@ void QnLicenseManagerWidget::applyChanges()
 void QnLicenseManagerWidget::showEvent(QShowEvent *event)
 {
     base_type::showEvent(event);
-    updateLicenses();
+    loadDataToUi();
 }
 
 void QnLicenseManagerWidget::updateLicenses()
@@ -332,15 +333,23 @@ void QnLicenseManagerWidget::updateLicenses()
         connected = true;
         break;
     }
+    NX_ASSERT(static_cast<bool>(connection()) == connected);
 
     setEnabled(connected);
 
-    m_licenses = licensePool()->getLicenses();
+    if (connected)
+    {
+        m_licenses = licensePool()->getLicenses();
+        ui->licenseWidget->setHardwareId(licensePool()->currentHardwareId(serverId()));
+    }
+    else
+    {
+        m_licenses.clear();
+    }
 
     ListHelper licenseListHelper(m_licenses);
 
     /* Update license widget. */
-    ui->licenseWidget->setHardwareId(licensePool()->currentHardwareId(serverId()));
     ui->licenseWidget->setFreeLicenseAvailable(
         !licenseListHelper.haveLicenseKey(nx::branding::freeLicenseKey().toLatin1()));
 
