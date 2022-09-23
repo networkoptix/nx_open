@@ -35,6 +35,7 @@
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -42,6 +43,22 @@
 
 using namespace nx::vms::client::desktop;
 using namespace ui;
+
+namespace {
+
+// TODO: #sivanov Implement context-aware permissions check.
+QnVirtualCameraResourceList settingsAvailableCameras(const QnResourceList& resources)
+{
+    return resources.filtered<QnVirtualCameraResource>(
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return camera
+                && !camera->hasFlags(Qn::cross_system)
+                && !camera->hasFlags(Qn::removed);
+        });
+}
+
+} // namespace
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
@@ -67,6 +84,21 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     registerDebugAction(
         "Tracing: Layout settings",
         [](auto /*context*/) { LayoutSettingsDialogStateReducer::setTracingEnabled(true); });
+
+    // TODO: #sivanov Move out code from user settings and server settings dialogs here.
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+        [this](const QnResourceList& resources)
+        {
+            auto cameras = settingsAvailableCameras(resources);
+
+            if (!cameras.isEmpty()
+                && m_cameraSettingsDialog
+                && !m_cameraSettingsDialog->isHidden())
+            {
+                m_cameraSettingsDialog->setCameras(cameras);
+            }
+        });
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
@@ -76,9 +108,7 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    const auto cameras = parameters.resources().filtered<QnVirtualCameraResource>(
-        [](const QnResourcePtr& resource) { return resource && !resource->hasFlags(Qn::removed); });
-
+    const auto cameras = settingsAvailableCameras(parameters.resources());
     if (cameras.isEmpty())
         return;
 
