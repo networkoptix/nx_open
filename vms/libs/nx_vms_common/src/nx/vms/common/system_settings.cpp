@@ -436,11 +436,15 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudAuthKey, QString(), this, [] { return tr("Cloud authorization key"); });
 
+    m_system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::system2faEnabled, false, this, [] { return tr("Enable 2fa for system"); });
+
     AdaptorList result;
     result
         << m_cloudAccountNameAdaptor
         << m_cloudSystemIdAdaptor
-        << m_cloudAuthKeyAdaptor;
+        << m_cloudAuthKeyAdaptor
+        << m_system2faEnabledAdaptor;
 
     for (auto adaptor: result)
     {
@@ -2220,6 +2224,11 @@ bool SystemSettings::showMouseTimelinePreview() const
 void SystemSettings::setShowMouseTimelinePreview(bool value)
 {
     m_showMouseTimelinePreviewAdaptor->setValue(value);
+}
+
+bool SystemSettings::system2faEnabled() const
+{
+    return m_system2faEnabledAdaptor->value();
 }
 
 std::map<QString, int> SystemSettings::specificFeatures() const

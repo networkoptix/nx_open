@@ -79,6 +79,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(statisticsReportLastNumber);
     DECLARE_SETTING_NAME(statisticsReportLastTime);
     DECLARE_SETTING_NAME(statisticsReportLastVersion);
+    DECLARE_SETTING_NAME(system2faEnabled);
     DECLARE_SETTING_NAME(systemName);
     DECLARE_SETTING_NAME(trafficEncryptionForced);
     DECLARE_SETTING_NAME(videoTrafficEncryptionForced);
@@ -97,6 +98,7 @@ struct SystemSettingNames
         statisticsReportLastNumber,
         statisticsReportLastTime,
         statisticsReportLastVersion,
+        system2faEnabled
     };
 
     static const inline std::set<QString> kWriteOnlyNames = {
@@ -487,6 +489,8 @@ public:
     bool showMouseTimelinePreview() const;
     void setShowMouseTimelinePreview(bool value);
 
+    bool system2faEnabled() const;
+
     void update(const vms::api::SystemSettings& value);
 
 signals:
@@ -628,6 +632,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_system2faEnabledAdaptor = nullptr;
 
     // misc adaptors
     QnResourcePropertyAdaptor<int>* m_maxEventLogRecordsAdaptor = nullptr;
