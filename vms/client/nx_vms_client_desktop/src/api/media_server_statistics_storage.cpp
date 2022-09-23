@@ -4,15 +4,15 @@
 
 #include <QtCore/QTimer>
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
 #include <api/server_rest_connection.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/synctime.h>
-#include <common/common_module.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -24,11 +24,13 @@ constexpr int kRetryTimeoutMs = 5000;
 } // namespace
 
 QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(
+    SystemContext* systemContext,
     const QnUuid& serverId,
     int pointsLimit,
     QObject* parent)
     :
     QObject(parent),
+    SystemContextAware(systemContext),
     m_serverId(serverId),
     m_pointsLimit(pointsLimit),
     m_updatePeriod(kDefaultUpdatePeriod),

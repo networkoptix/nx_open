@@ -9,8 +9,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 class QTimer;
 
@@ -19,16 +18,18 @@ namespace nx::network::rest { struct JsonResult; }
 /**
  * Class that receives, parses and stores statistics data from one server.
  */
-class QnMediaServerStatisticsStorage:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class QnMediaServerStatisticsStorage: public QObject,
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 
 public:
     /** Construct a storage for the giver serverId. */
-    QnMediaServerStatisticsStorage(const QnUuid& serverId, int pointsLimit, QObject* parent);
+    QnMediaServerStatisticsStorage(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        const QnUuid& serverId,
+        int pointsLimit,
+        QObject* parent);
 
     virtual ~QnMediaServerStatisticsStorage() override;
 

@@ -94,7 +94,7 @@ void QnLayoutResource::updateInternal(const QnResourcePtr& source, NotifierList&
     base_type::updateInternal(source, notifiers);
 
     QnLayoutResourcePtr localOther = source.dynamicCast<QnLayoutResource>();
-    if (localOther)
+    if (NX_ASSERT(localOther))
     {
         if (!qFuzzyEquals(m_cellAspectRatio, localOther->m_cellAspectRatio))
         {

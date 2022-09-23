@@ -12,6 +12,7 @@
 
 class QnCameraBookmarksManager;
 class QnCameraDataManager;
+class QnMediaServerStatisticsManager;
 class QnServerStorageManager;
 
 namespace nx::vms::client::desktop {
@@ -60,6 +61,7 @@ public:
     VideoCache* videoCache() const;
     LayoutSnapshotManager* layoutSnapshotManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
+    QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
