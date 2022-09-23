@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -302,12 +303,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
-    // Fake servers
-    if (flags.testFlag(Qn::fake))
+    if (auto fakeServer = resource.dynamicCast<QnFakeMediaServerResource>())
     {
-        auto server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server);
-        status = helpers::serverBelongsToCurrentSystem(server)
+        status = helpers::serverBelongsToCurrentSystem(fakeServer)
             ? Incompatible
             : Online;
     }
