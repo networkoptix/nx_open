@@ -7,6 +7,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
@@ -309,11 +310,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             status = QnResourceIconCache::Unauthorized;
     }
     // Fake servers
-    else if (flags.testFlag(Qn::fake_server))
+    else if (auto fakeServer = resource.dynamicCast<QnFakeMediaServerResource>())
     {
-        auto server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server);
-        status = helpers::serverBelongsToCurrentSystem(server)
+        status = helpers::serverBelongsToCurrentSystem(fakeServer)
             ? Incompatible
             : Online;
     }
