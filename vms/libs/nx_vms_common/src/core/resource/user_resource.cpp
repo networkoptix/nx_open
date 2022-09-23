@@ -551,7 +551,7 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
     base_type::updateInternal(source, notifiers);
 
     QnUserResourcePtr localOther = source.dynamicCast<QnUserResource>();
-    if (localOther)
+    if (NX_ASSERT(localOther))
     {
         NX_ASSERT(m_userType == localOther->m_userType,
             "%1: User type was designed to be read-only", this);

@@ -270,8 +270,14 @@ struct CloudCrossSystemContext::Private
 
         systemContext->setConnection(connection);
 
+        const QnUuid serverId = connection->moduleInformation().id;
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
-        server->setIdUnsafe(connection->moduleInformation().id);
+        server->setIdUnsafe(serverId);
+
+        // If resource with such id was added to the cross-system layout, camera thumb will be
+        // created before server is added to the resource pool.
+        if (auto thumb = systemContext->resourcePool()->getResourceById(serverId))
+            systemContext->resourcePool()->removeResource(thumb);
 
         systemContext->resourcePool()->addResource(server);
         server->setStatus(nx::vms::api::ResourceStatus::online);

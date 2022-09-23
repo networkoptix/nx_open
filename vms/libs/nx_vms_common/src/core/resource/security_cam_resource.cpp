@@ -358,7 +358,7 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr& source, Notifier
     base_type::updateInternal(source, notifiers);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(source);
-    if (other_casted)
+    if (NX_ASSERT(other_casted))
     {
         if (other_casted->m_groupId != m_groupId)
         {
