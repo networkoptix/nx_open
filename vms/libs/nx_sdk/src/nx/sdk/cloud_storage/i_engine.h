@@ -152,6 +152,12 @@ public:
     public: virtual void startNotifications() = 0;
 
     /**
+     * No IArchiveUpdateHandler::onArchiveUpdated() should be called by the plugin after this
+     * function has been called.
+     */
+    public: virtual void stopNotifications() = 0;
+
+    /**
      * Check if plugin backend is operational. This function will be periodically called by
      * Server.
      */
