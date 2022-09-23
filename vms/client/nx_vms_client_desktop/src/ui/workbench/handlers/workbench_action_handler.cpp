@@ -847,13 +847,15 @@ void ActionHandler::at_openInLayoutAction_triggered()
             {
                 // Convert common layout to cloud one.
                 auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
-
                 // Replace opened layout with the cloud one.
-                int index = workbench()->currentLayoutIndex();
-                workbench()->insertLayout(cloudLayout, index);
-                workbench()->setCurrentLayoutIndex(index);
+                auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
+                if (!targetLayout)
+                    targetLayout = workbench()->addLayout(cloudLayout);
+
+                if (NX_ASSERT(targetLayout))
+                    workbench()->setCurrentLayout(targetLayout);
+
                 menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
-                workbench()->removeLayout(index + 1);
             };
 
         if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
