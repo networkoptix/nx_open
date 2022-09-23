@@ -342,6 +342,27 @@ QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, in
     return result;
 }
 
+QnWorkbenchLayout* Workbench::replaceLayout(
+    const LayoutResourcePtr& replaceableLayout,
+    const LayoutResourcePtr& newLayout)
+{
+    // Replace layout only if it is already on the workbench.
+    if (const auto workbenchLayout = layout(replaceableLayout))
+    {
+        int index = layoutIndex(workbenchLayout);
+        const auto newWorkbenchLayout = insertLayout(newLayout, index);
+
+        if (currentLayout() == workbenchLayout)
+            setCurrentLayoutIndex(index);
+
+        removeLayout(index + 1);
+
+        return newWorkbenchLayout;
+    }
+
+    return {};
+}
+
 void Workbench::removeLayout(int index)
 {
     if (!NX_ASSERT(index >= 0 && index < d->layouts.size()))

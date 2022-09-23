@@ -119,6 +119,15 @@ public:
     QnWorkbenchLayout* insertLayout(const LayoutResourcePtr& resource, int index);
 
     /**
+     * If provided layout based on 'replaceableLayout' is opened on the workbench, it is replaced
+     * with the new WorkbenchLayout, based on the `newLayout` resource.
+     * @return Newly created layout if any, nullptr otherwise.
+     */
+    QnWorkbenchLayout* replaceLayout(
+        const LayoutResourcePtr& replaceableLayout,
+        const LayoutResourcePtr& newLayout);
+
+    /**
      * Remove this resource's layout if it exists.
      */
     void removeLayout(const LayoutResourcePtr& resource);
