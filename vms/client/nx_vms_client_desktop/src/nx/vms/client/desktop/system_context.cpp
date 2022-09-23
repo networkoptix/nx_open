@@ -2,6 +2,7 @@
 
 #include "system_context.h"
 
+#include <api/media_server_statistics_manager.h>
 #include <api/runtime_info_manager.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_data_manager.h>
@@ -50,6 +51,7 @@ struct SystemContext::Private
     std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
+    std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
 
     void initLocalRuntimeInfo()
     {
@@ -95,12 +97,16 @@ SystemContext::SystemContext(
             d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
             d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
+            d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
+                this);
             break;
 
         case Mode::crossSystem:
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
+            d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
+                this);
             break;
 
         case Mode::cloudLayouts:
@@ -178,6 +184,11 @@ ShowreelStateManager* SystemContext::showreelStateManager() const
 LogsManagementWatcher* SystemContext::logsManagementWatcher() const
 {
     return d->logsManagementWatcher.get();
+}
+
+QnMediaServerStatisticsManager* SystemContext::mediaServerStatisticsManager() const
+{
+    return d->mediaServerStatisticsManager.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

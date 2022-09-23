@@ -438,7 +438,7 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr& source, Notifier
         notifiers << [r = toSharedPointer(this)]{ emit r->apiUrlChanged(r); };
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(source.data());
-    if (localOther)
+    if (NX_ASSERT(localOther))
     {
         if (m_version != localOther->m_version)
             notifiers << [r = toSharedPointer(this)]{ emit r->versionChanged(r); };
