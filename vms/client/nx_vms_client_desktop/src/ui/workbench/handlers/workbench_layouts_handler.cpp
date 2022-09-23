@@ -54,6 +54,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_resource_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
@@ -599,11 +600,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     if (isCurrent &&
         user == layoutOwnerUser)   //making current only new layout of current user
     {
-        int index = workbench()->currentLayoutIndex();
-
-        workbench()->insertLayout(newLayout, index);
-        workbench()->setCurrentLayoutIndex(index);
-        workbench()->removeLayout(index + 1);
+        workbench()->replaceLayout(layout, newLayout);
 
         // If current layout should not be deleted then roll it back
         if (!shouldDelete)
@@ -672,13 +669,8 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
     auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
     cloudLayout->setName(name);
     saveLayout(cloudLayout);
-
-    // Replace opened layout with the cloud one.
-    int index = workbench()->currentLayoutIndex();
-
-    workbench()->insertLayout(cloudLayout, index);
-    workbench()->setCurrentLayoutIndex(index);
-    workbench()->removeLayout(index + 1);
+    workbench()->replaceLayout(layout, cloudLayout);
+    removeLayouts({layout});
 }
 
 void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
@@ -725,18 +717,12 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
 
     auto cloudLayout = layout->clone();
     NX_ASSERT(isCloudLayout(cloudLayout));
-    cloudLayout->setIdUnsafe(QnUuid::createUuid());
     cloudLayout->addFlags(Qn::local);
     cloudLayout->setName(name);
     appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
-    appContext()->cloudLayoutsManager()->saveLayout(layout);
-
-    // Replace opened layout with the cloud one.
-    int index = workbench()->currentLayoutIndex();
-
-    workbench()->insertLayout(cloudLayout, index);
-    workbench()->setCurrentLayoutIndex(index);
-    workbench()->removeLayout(index + 1);
+    saveLayout(cloudLayout);
+    workbench()->replaceLayout(layout, cloudLayout);
+    removeLayouts({layout});
 }
 
 void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool autoSave)
