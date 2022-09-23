@@ -33,7 +33,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -376,18 +375,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         [this]()
         {
             d->store->fixupSchedule();
-        });
-
-    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
-        [this](const QnResourceList& resources)
-        {
-            if (isHidden())
-                return;
-
-            auto cameras = resources.filtered<QnVirtualCameraResource>();
-            if (!cameras.isEmpty())
-                setCameras(cameras);
         });
 
     // TODO: #sivanov Should we handle current user permission to camera change?
