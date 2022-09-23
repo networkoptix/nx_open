@@ -64,6 +64,10 @@ void AnalyticsSdkObjectDetectedWidget::at_model_dataChanged(Fields fields)
 
     ui->detectableObjectTypeComboBox->setSelectedMainObjectTypeId(
         model()->eventParams().getAnalyticsObjectTypeId());
+
+    // Ensure the model params match the UI.
+    model()->setEventParams(createEventParameters(
+        ui->detectableObjectTypeComboBox->selectedMainObjectTypeId(), ui->attributesEdit->text()));
 }
 
 void AnalyticsSdkObjectDetectedWidget::paramsChanged()
