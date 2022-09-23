@@ -5,6 +5,8 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+#include <qt_graphics_items/graphics_label.h>
+
 #include <api/media_server_statistics_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -13,13 +15,13 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/text/human_readable.h>
-#include <qt_graphics_items/graphics_label.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
@@ -425,7 +427,7 @@ QnServerResourceWidget::QnServerResourceWidget(
     QGraphicsItem* parent)
     :
     base_type(systemContext, windowContext, item, parent),
-    m_manager(windowContext->workbenchContext()->instance<QnMediaServerStatisticsManager>()),
+    m_manager(systemContext->mediaServerStatisticsManager()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
@@ -440,7 +442,7 @@ QnServerResourceWidget::QnServerResourceWidget(
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     NX_ASSERT(m_resource, "Server resource widget was created with a non-server resource.");
     m_manager->setFlagsFilter(Qn::StatisticsNETWORK, qnSettings->statisticsNetworkFilter());
-    m_pointsLimit = m_manager->pointsLimit();
+    m_pointsLimit = QnMediaServerStatisticsManager::kPointsLimit;
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
     setOption(QnResourceWidget::WindowRotationForbidden);
