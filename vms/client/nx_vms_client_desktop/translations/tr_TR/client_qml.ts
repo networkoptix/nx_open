@@ -1161,6 +1161,10 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <source>Unsupported firmware version</source>
       <translation>Desteklenmeyen yazılım versiyonu</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>

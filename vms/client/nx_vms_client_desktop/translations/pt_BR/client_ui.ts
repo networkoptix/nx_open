@@ -313,10 +313,6 @@
       <translation>Pular fila atual</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Tamanho máximo da fila de backup</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Todos os arquivos foram copiados com sucesso! Novos arquivos serão copiados automaticamente</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Manter as configurações de horário da câmera</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exportar de cartões SD</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Não exporte vídeo automaticamente</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

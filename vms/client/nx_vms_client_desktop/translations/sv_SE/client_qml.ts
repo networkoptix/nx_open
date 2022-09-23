@@ -1162,6 +1162,10 @@ att aktivera PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Firmwareversionen stöds ej</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>Åtkomst nekad</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>

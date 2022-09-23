@@ -313,10 +313,6 @@
       <translation>Hopp over gjeldende kø</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maksimal størrelse for backupkø</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Alle filene er sikkerhetskopiert! Nye filer vil bli sikkerhetskopiert automatisk</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Behold kameraets tidsinnstillinger</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

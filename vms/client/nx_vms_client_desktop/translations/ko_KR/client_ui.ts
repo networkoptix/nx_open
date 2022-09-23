@@ -313,10 +313,6 @@
       <translation>현재 대기열 건너뛰기</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>최대 백업 대기열 크기</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>모든 파일이 성공적으로 백업되었습니다! 새 파일이 자동으로 백업됩니다.</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>카메라 시간 설정 유지</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

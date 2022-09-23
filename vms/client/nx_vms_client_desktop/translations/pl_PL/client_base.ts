@@ -5088,10 +5088,6 @@ to %1</source>
       <translation>Hasło</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Hasło nie może być puste.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>Podpis systemowy</translation>
     </message>
@@ -5255,6 +5251,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>Odblokuj</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7359,54 +7359,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n tygodni</numerusform>
-        <numerusform>%n tygodni</numerusform>
-        <numerusform>%n tygodni</numerusform>
-        <numerusform>%n tygodni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n dni</numerusform>
-        <numerusform>%n dni</numerusform>
-        <numerusform>%n dni</numerusform>
-        <numerusform>%n dni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n godzin</numerusform>
-        <numerusform>%n godzin</numerusform>
-        <numerusform>%n godzin</numerusform>
-        <numerusform>%n godzin</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minut</numerusform>
-        <numerusform>%n minut</numerusform>
-        <numerusform>%n minut</numerusform>
-        <numerusform>%n minut</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n sekund</numerusform>
-        <numerusform>%n sekund</numerusform>
-        <numerusform>%n sekund</numerusform>
-        <numerusform>%n sekund</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7561,6 +7513,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
         <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7609,6 +7566,22 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Wiper</source>
       <translation>Wycieraczka</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Otwórz drzwi</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7687,8 +7660,8 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Serwer nie będzie przesyłał ustawień czasu do kamery.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8855,6 +8828,13 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9529,6 +9509,10 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message>
       <source>Acknowledge</source>
       <translation>Potwierdź</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10632,10 +10616,6 @@ Możesz wyświetlić %2 lub przeczytać %3, aby dowiedzieć się więcej o bież
       <translation>Harmonogram nagrywania zawiera tryby nagrywania, który nie jest obsługiwany przez niektóre kamery.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>Znaleziono archiwum SD</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation type="unfinished">Export in progress...</translation>
     </message>
@@ -10662,6 +10642,10 @@ Możesz wyświetlić %2 lub przeczytać %3, aby dowiedzieć się więcej o bież
     <message>
       <source>Export</source>
       <translation>Eksportuj</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -11151,21 +11135,6 @@ Możesz wyświetlić %2 lub przeczytać %3, aby dowiedzieć się więcej o bież
     <message>
       <source>New Group %1</source>
       <translation>Nowa grupa %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Układ alarmu domofonowego</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Domofon Otwarte Drzwi</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Otwórz drzwi</translation>
     </message>
   </context>
   <context>

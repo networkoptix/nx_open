@@ -1150,6 +1150,10 @@ PTZを行います</translation>
       <source>Unsupported firmware version</source>
       <translation>サポートされていないファームウェアバージョンです</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>アクセスが拒否されました</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>

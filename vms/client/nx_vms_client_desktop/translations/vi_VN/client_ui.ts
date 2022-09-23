@@ -313,10 +313,6 @@
       <translation>Bỏ qua hàng đợi hiện tại</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Kích thước hàng đợi sao lưu tối đa</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Tất cả các tệp đã được sao lưu thành công! Các tệp mới sẽ được sao lưu tự động</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Giữ cài đặt thời gian của camera</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Xuất từ thẻ SD</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Không tự động xuất video</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

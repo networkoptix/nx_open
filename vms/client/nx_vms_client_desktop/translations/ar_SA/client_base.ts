@@ -5228,10 +5228,6 @@ to %1</translation>
       <translation>Password</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Password cannot be empty.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>System Signature</translation>
     </message>
@@ -5395,6 +5391,10 @@ to %1</translation>
     <message>
       <source>Unlock</source>
       <translation type="unfinished">Unlock</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7579,64 +7579,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7797,6 +7739,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7847,6 +7794,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation type="unfinished">Wiper</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation type="unfinished">Open door</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7927,8 +7890,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Server will not push time settings to the camera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -9129,6 +9092,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9807,6 +9777,10 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Acknowledge</source>
       <translation>Acknowledge</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10937,10 +10911,6 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
       <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation type="unfinished">Export in progress...</translation>
     </message>
@@ -10967,6 +10937,10 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>Export</source>
       <translation>Export</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -11462,21 +11436,6 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>New Group %1</source>
       <translation type="unfinished">New Group %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
     </message>
   </context>
   <context>

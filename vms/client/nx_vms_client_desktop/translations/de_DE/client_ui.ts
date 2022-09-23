@@ -313,10 +313,6 @@
       <translation>Aktuelle Warteschlange überspringen</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maximale Größe der Backup-Warteschlange</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Alle Dateien werden erfolgreich gesichert! Neue Dateien werden automatisch gesichert</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Kamerazeiteinstellungen beibehalten</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exportieren von SD-Karten</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Video nicht automatisch exportieren</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

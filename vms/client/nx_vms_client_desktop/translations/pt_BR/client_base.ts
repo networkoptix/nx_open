@@ -4956,10 +4956,6 @@ a %1</translation>
       <translation>Senha</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>A senha não pode estar vazia.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>Assinatura do sistema</translation>
     </message>
@@ -5123,6 +5119,10 @@ a %1</translation>
     <message>
       <source>Unlock</source>
       <translation>Desbloquear</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7150,44 +7150,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n semanas</numerusform>
-        <numerusform>%n semanas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n dias</numerusform>
-        <numerusform>%n dias</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n horas</numerusform>
-        <numerusform>%n horas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minutos</numerusform>
-        <numerusform>%n minutos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n segundos</numerusform>
-        <numerusform>%n segundos</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7336,6 +7298,11 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
         <numerusform>O backup está habilitado para %n câmeras</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7382,6 +7349,22 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Wiper</source>
       <translation>Limpador</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Abrir porta</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7458,8 +7441,8 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>O servidor não enviará as configurações de tempo para a câmera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>O vídeo gravado no armazenamento interno da câmera&apos;s não será carregado no arquivo principal.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8592,6 +8575,13 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9262,6 +9252,10 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     <message>
       <source>Acknowledge</source>
       <translation>Reconhecer</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10340,10 +10334,6 @@ Você pode ver %2 ou ler este %3 para saber mais sobre o problema atual.</transl
       <translation>A programação de gravação em algumas câmeras contém modos de gravação que não são suportados.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>Arquivo SD encontrado</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation>Exportação em andamento...</translation>
     </message>
@@ -10370,6 +10360,10 @@ Você pode ver %2 ou ler este %3 para saber mais sobre o problema atual.</transl
     <message>
       <source>Export</source>
       <translation>Exportar</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -10853,21 +10847,6 @@ Você pode ver %2 ou ler este %3 para saber mais sobre o problema atual.</transl
     <message>
       <source>New Group %1</source>
       <translation>Novo Grupo %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Layout Alarme de Intercom</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Intercom - Porta Aberta</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Abrir porta</translation>
     </message>
   </context>
   <context>

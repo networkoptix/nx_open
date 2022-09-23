@@ -313,10 +313,6 @@
       <translation>Huidige wachtrij overslaan</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maximale back-up wachtrijgrootte</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Van alle bestanden is een back-up gemaakt! Van nieuwe bestanden wordt automatisch een back-up gemaakt</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Cameratijdinstellingen behouden</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

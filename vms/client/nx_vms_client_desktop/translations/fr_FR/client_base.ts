@@ -4956,10 +4956,6 @@ to %1</source>
       <translation>Mot de passe</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Le mot de passe ne peut pas être vide.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>Signature Système</translation>
     </message>
@@ -5123,6 +5119,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>Déverrouiller</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>ACCÈS REFUSÉ</translation>
     </message>
   </context>
   <context>
@@ -7151,44 +7151,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n semaine</numerusform>
-        <numerusform>%n semaines</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n jour</numerusform>
-        <numerusform>%n jours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n heure</numerusform>
-        <numerusform>%n heures</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minute</numerusform>
-        <numerusform>%n minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n seconde</numerusform>
-        <numerusform>%n secondes</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7337,6 +7299,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
         <numerusform>La sauvegarde est activée pour %n caméras</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>Les images de ces caméras sont sauvegardées jusqu'à %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7383,6 +7350,22 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Wiper</source>
       <translation>Essuie-glaces</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Muet</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>Rétablir le son</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Ouvrir la porte</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation>Laisser tomber</translation>
     </message>
   </context>
   <context>
@@ -7459,8 +7442,8 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Le serveur ne poussera pas les paramètres de l'heure à la caméra.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>La vidéo enregistrée sur le stockage interne de la caméra ne sera pas téléchargée dans l'archive principale.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation>La vidéo enregistrée sur la caméra interne ne sera pas automatiquement téléchargée dans l'archive principale.</translation>
     </message>
   </context>
   <context>
@@ -8593,6 +8576,13 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 Mise en page</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9263,6 +9253,10 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     <message>
       <source>Acknowledge</source>
       <translation>Reconnaître</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Appel en cours...</translation>
     </message>
   </context>
   <context>
@@ -9995,7 +9989,7 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>La durée de vie maximale de la session utilisateur recommandée est %1</translation>
     </message>
   </context>
   <context>
@@ -10055,11 +10049,11 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Certificat généré automatiquement</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Le certificat est généré automatiquement et épinglé sur %1</translation>
     </message>
   </context>
   <context>
@@ -10341,10 +10335,6 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
       <translation>Le calendrier d'enregistrement sur certaines caméras contient des modes d'enregistrement qui ne sont pas pris en charge.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>Archive SD trouvée</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation>Exportation en cours...</translation>
     </message>
@@ -10371,6 +10361,10 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     <message>
       <source>Export</source>
       <translation>Exporter</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>Des enregistrements sur l'appareil ont été trouvés</translation>
     </message>
   </context>
   <context>
@@ -10854,21 +10848,6 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     <message>
       <source>New Group %1</source>
       <translation>Nouveau groupe %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Interphone Mise en page de l'alarme</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Interphone porte ouverte</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Ouvrir la porte</translation>
     </message>
   </context>
   <context>

@@ -313,10 +313,6 @@
       <translation>Pomiń bieżącą kolejkę</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maksymalny rozmiar kolejki kopii zapasowej</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Kopia zapasowa wszystkich plików została pomyślnie utworzona! Kopie zapasowe nowych plików będą tworzone automatycznie</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Zachowaj ustawienia czasu kamery</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

@@ -313,10 +313,6 @@
       <translation>Saltar la cola actual</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Tamaño máximo de cola de copia de seguridad</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>¡Todos los archivos están respaldados con éxito! Los archivos nuevos se copiarán automáticamente</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Mantener ajustes de tiempo de la cámara</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

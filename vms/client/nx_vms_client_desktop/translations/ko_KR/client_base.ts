@@ -4885,10 +4885,6 @@ to %1</source>
       <translation>비밀번호</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>비밀번호는 필수 정보입니다.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>시스템 서명</translation>
     </message>
@@ -5052,6 +5048,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>해제</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7041,39 +7041,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n 주</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n 일</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n 시간</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n 분</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n 초</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7219,6 +7186,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n 개의 카메라에 대해 백업이 활성화되었습니다.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7264,6 +7236,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation>와이퍼</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation type="unfinished">Open door</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7339,8 +7327,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>서버는 카메라에 시간 설정을 푸시하지 않습니다.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8456,6 +8444,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9124,6 +9119,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Acknowledge</source>
       <translation>확인함</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10189,10 +10188,6 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
       <translation>일부 카메라의 녹화 일정에는 지원되지 않는 녹화 모드가 포함되어 있습니다.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation type="unfinished">Export in progress...</translation>
     </message>
@@ -10219,6 +10214,10 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>Export</source>
       <translation>내보내기</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -10699,21 +10698,6 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>New Group %1</source>
       <translation>새 그룹 %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>인터콤 알람 레이아웃</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>인터콤 오픈 도어</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
     </message>
   </context>
   <context>

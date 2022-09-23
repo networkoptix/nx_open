@@ -313,10 +313,6 @@
       <translation>Hoppa över aktuell kö</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maximal storlek på säkerhetskopieringskö</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Alla filer har säkerhetskopierats framgångsrikt! Nya filer kommer att säkerhetskopieras automatiskt</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Behåll kamerans tidsinställningar</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exportera från SD-kort</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Exportera inte video automatiskt</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>Exportera från enhet</translation>
     </message>
   </context>
   <context>

@@ -4888,10 +4888,6 @@ to %1</source>
       <translation>密碼</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>密碼不可為空.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>系統簽章</translation>
     </message>
@@ -5055,6 +5051,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>解除鎖定</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>拒絕存取</translation>
     </message>
   </context>
   <context>
@@ -7042,39 +7042,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n 週</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n 天</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n 小時</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n 分鐘</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n 秒鐘</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7220,6 +7187,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>已於%n台攝影機上啟用備份</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>這些攝影機上的錄影資料已備份至 %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7265,6 +7237,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation>雨刷</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>靜音</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>取消靜音</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation type="unfinished">Open door</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7340,8 +7328,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>服務器將不會推送時間設置至攝影機。</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8457,6 +8445,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 佈局</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9125,6 +9120,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Acknowledge</source>
       <translation>確認</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10187,10 +10186,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
       <translation>部分攝影機的錄影排程包含不支援的錄影模式</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>發現儲存於終端裝置上的錄影檔案</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation type="unfinished">Export in progress...</translation>
     </message>
@@ -10217,6 +10212,10 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <message>
       <source>Export</source>
       <translation>匯出</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -10697,21 +10696,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <message>
       <source>New Group %1</source>
       <translation>新群組 %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>透過對講機觸發佈局</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>透過對講機開門</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
     </message>
   </context>
   <context>

@@ -313,10 +313,6 @@
       <translation type="unfinished">Skip Current Queue</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation type="unfinished">Keep camera time settings</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

@@ -4956,10 +4956,6 @@ to %1</translation>
       <translation>Adgangskode</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Adgangskoden skal angives.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation type="unfinished">System Signature</translation>
     </message>
@@ -5123,6 +5119,10 @@ to %1</translation>
     <message>
       <source>Unlock</source>
       <translation>Lås op</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7150,44 +7150,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n uger</numerusform>
-        <numerusform>%n uger</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n dage</numerusform>
-        <numerusform>%n dage</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n timer</numerusform>
-        <numerusform>%n timer</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minutter</numerusform>
-        <numerusform>%n minutter</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n sekunder</numerusform>
-        <numerusform>%n sekunder</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7336,6 +7298,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
         <numerusform>Sikkerhedskopiering er aktiveret for %n kameraer</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7382,6 +7349,22 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Wiper</source>
       <translation>Visker</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation type="unfinished">Open door</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7458,8 +7441,8 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation>Serveren sender ikke tidsindstillinger til kameraet.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8592,6 +8575,13 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9262,6 +9252,10 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <message>
       <source>Acknowledge</source>
       <translation type="unfinished">Acknowledge</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10339,10 +10333,6 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
       <translation>Optagelsesplan på nogle kameraer indeholder optagetilstande, der ikke understøttes.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>SD arkiv fundet</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation type="unfinished">Export in progress...</translation>
     </message>
@@ -10369,6 +10359,10 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
     <message>
       <source>Export</source>
       <translation type="unfinished">Export</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -10852,21 +10846,6 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
     <message>
       <source>New Group %1</source>
       <translation>Ny gruppe %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Alarmlayout For Intercom</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Intercom åben dør</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
     </message>
   </context>
   <context>

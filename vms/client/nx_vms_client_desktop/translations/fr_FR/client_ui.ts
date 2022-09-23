@@ -313,10 +313,6 @@
       <translation>Ignorer la file d'attente actuelle</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Taille maximale de la file d'attente de sauvegarde</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Tous les fichiers sont sauvegardés avec succès ! Les nouveaux fichiers seront sauvegardés automatiquement</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>Conserver les paramètres d'heure de la caméra</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exporter depuis les cartes SD</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Ne pas exporter automatiquement la vidéo</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>Exporter depuis l'appareil</translation>
     </message>
   </context>
   <context>

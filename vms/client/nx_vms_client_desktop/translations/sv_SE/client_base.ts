@@ -4956,10 +4956,6 @@ till %1</translation>
       <translation>Lösenord</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Lösenordet kan inte vara tomt.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>Systemsignatur</translation>
     </message>
@@ -5123,6 +5119,10 @@ till %1</translation>
     <message>
       <source>Unlock</source>
       <translation>Lås upp</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>ÅTKOMST NEKAD</translation>
     </message>
   </context>
   <context>
@@ -7151,44 +7151,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n veckor</numerusform>
-        <numerusform>%n veckor</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n dagar</numerusform>
-        <numerusform>%n dagar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n timmar</numerusform>
-        <numerusform>%n timmar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minuter</numerusform>
-        <numerusform>%n minuter</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n sekunder</numerusform>
-        <numerusform>%n sekunder</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7337,6 +7299,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
         <numerusform>Säkerhetskopiering är aktiverad för %n kameror</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>Filmer från dessa kameror säkerhetskopieras till %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7383,6 +7350,22 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Wiper</source>
       <translation>Torkare</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tysta</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>Ljud på</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Öppna dörr</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation>Släpp</translation>
     </message>
   </context>
   <context>
@@ -7459,8 +7442,8 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Servern skickar inte tidsinställningar till kameran.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>Video inspelad på den interna kameran&apos;s lagring kommer inte att laddas upp till huvudarkivet.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation>Video som spelas in på den interna kamerans lagringsutrymme kommer inte att laddas upp till huvudarkivet automatiskt.</translation>
     </message>
   </context>
   <context>
@@ -8593,6 +8576,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9263,6 +9253,10 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>Acknowledge</source>
       <translation>Bekräfta</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Ringer...</translation>
     </message>
   </context>
   <context>
@@ -10340,10 +10334,6 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
       <translation>Inspelningsschemat på vissa kameror innehåller inspelningslägen som inte stöds.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>SD-arkiv hittat</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation>Export pågår...</translation>
     </message>
@@ -10370,6 +10360,10 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
     <message>
       <source>Export</source>
       <translation>Exportera</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>Inspelningar på enheten hittades</translation>
     </message>
   </context>
   <context>
@@ -10853,21 +10847,6 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
     <message>
       <source>New Group %1</source>
       <translation>Ny grupp %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Intercom larm layout</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Intercom öppna dörr</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Öppna dörr</translation>
     </message>
   </context>
   <context>

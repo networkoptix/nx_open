@@ -1759,7 +1759,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>Échec de la sauvegarde du fichier %1</translation>
     </message>
   </context>
   <context>

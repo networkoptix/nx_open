@@ -313,10 +313,6 @@
       <translation>現在のキューをスキップ</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>バックアップキューの最大サイズ</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>すべてのファイルが正常にバックアップされました。新しいファイルは自動的にバックアップされます。</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>カメラの時刻設定を保持する</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>SDカードからエクスポート</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>ビデオを自動的にエクスポートしない</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>デバイスからエクスポート</translation>
     </message>
   </context>
   <context>

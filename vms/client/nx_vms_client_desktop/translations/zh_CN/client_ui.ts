@@ -313,10 +313,6 @@
       <translation>跳过目前队列</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>最大备份队列容量</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>所有录像资料已备份成功！后续新增档案将依设置自动备份。</translation>
     </message>
@@ -631,12 +627,12 @@
       <translation>保持摄像机时间设置</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
     </message>
   </context>
   <context>

@@ -1162,6 +1162,10 @@ to activate PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Firmware på kamera er ikke støttet</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>

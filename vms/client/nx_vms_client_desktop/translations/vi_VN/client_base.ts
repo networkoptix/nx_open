@@ -4883,10 +4883,6 @@ to %1</source>
       <translation>Mật khẩu</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Password không có sản phẩm nào.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>Chữ ký hệ thống</translation>
     </message>
@@ -5050,6 +5046,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>Mở khóa</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -7039,39 +7039,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n tuần</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n ngày</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n giờ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n phút</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n giây</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7217,6 +7184,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
         <numerusform>Sao lưu được bật cho %n camera</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7262,6 +7234,22 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Wiper</source>
       <translation>Cần gạt</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Mở cửa</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7337,8 +7325,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Máy chủ sẽ không đẩy cài đặt thời gian vào camera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>Video được quay trên bộ nhớ nội bộ của camera sẽ không được tải lên kho lưu trữ chính.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
   </context>
   <context>
@@ -8454,6 +8442,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9122,6 +9117,10 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -10187,10 +10186,6 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
       <translation>Lịch ghi trên một số camera có các chế độ ghi không được hỗ trợ.</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>Tìm thấy kho lưu trữ SD</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation>Đang xuất...</translation>
     </message>
@@ -10217,6 +10212,10 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     <message>
       <source>Export</source>
       <translation>Xuất</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
     </message>
   </context>
   <context>
@@ -10697,21 +10696,6 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     <message>
       <source>New Group %1</source>
       <translation>Nhóm mới %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Bố cục cảnh báo Liên lạc nội bộ</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Liên lạc nội bộ Mở cửa</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Mở cửa</translation>
     </message>
   </context>
   <context>

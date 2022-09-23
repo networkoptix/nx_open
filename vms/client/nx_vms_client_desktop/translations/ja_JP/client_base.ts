@@ -4884,10 +4884,6 @@ to %1</source>
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>パスワードを入力してください.</translation>
-    </message>
-    <message>
       <source>System Signature</source>
       <translation>システム識別情報</translation>
     </message>
@@ -5051,6 +5047,10 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>ロック解除</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>アクセスが拒否されました</translation>
     </message>
   </context>
   <context>
@@ -7039,39 +7039,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n 週</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n 日</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n 時間</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n 分</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n 秒</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7217,6 +7184,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n カメラのバックアップが有効です</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>これらのカメラからの映像は %1 %2 までバックアップされています</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7262,6 +7234,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation>ワイパー</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>ミュート</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>ミュート解除</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>ドアを開く</translation>
+    </message>
+    <message>
+      <source>Drop</source>
+      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7337,8 +7325,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>サーバーは時刻設定をカメラに通知しません。</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>カメラの内部ストレージに保存された映像はメインアーカイブにアップロードされません。</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation>カメラの内部ストレージに保存された映像は、自動的にはメインアーカイブにアップロードされません。</translation>
     </message>
   </context>
   <context>
@@ -8454,6 +8442,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 レイアウト</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9122,6 +9117,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Acknowledge</source>
       <translation>確認</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation>発信中...</translation>
     </message>
   </context>
   <context>
@@ -10186,10 +10185,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
       <translation>一部のカメラの録画スケジュールには、サポートされていない録画モードが含まれています。</translation>
     </message>
     <message>
-      <source>SD archive found</source>
-      <translation>SD アーカイブが見つかりました</translation>
-    </message>
-    <message>
       <source>Export in progress...</source>
       <translation>エクスポート中...</translation>
     </message>
@@ -10216,6 +10211,10 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <message>
       <source>Export</source>
       <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>デバイス内録画が見つかりました</translation>
     </message>
   </context>
   <context>
@@ -10696,21 +10695,6 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <message>
       <source>New Group %1</source>
       <translation>新規グループ %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>インターホン アラームレイアウト</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>インターホン ドア開放</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>ドアを開く</translation>
     </message>
   </context>
   <context>
