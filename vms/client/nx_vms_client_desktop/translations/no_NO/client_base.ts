@@ -5122,7 +5122,7 @@ til %1</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>INGEN TILGANG</translation>
     </message>
   </context>
   <context>
@@ -7302,7 +7302,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Opptak fra disse kameraene sikkerhetskopieres til %1 %2</translation>
     </message>
   </context>
   <context>
@@ -7353,11 +7353,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Demp</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Skru av demping</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7365,7 +7365,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Slipp</translation>
     </message>
   </context>
   <context>
@@ -7443,7 +7443,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>Video tatt opp på det interne kameraet&apos;lagring vil ikke automatisk lastes opp til hovedarkivet.</translation>
     </message>
   </context>
   <context>
@@ -8579,7 +8579,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 layout</translation>
     </message>
   </context>
   <context>
@@ -9256,7 +9256,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Ringer...</translation>
     </message>
   </context>
   <context>
@@ -10361,7 +10361,7 @@ Du kan se %2 eller lese denne %3 for å lære mer om det nåværende problemet.<
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Det ble funnet opptak på enheten</translation>
     </message>
   </context>
   <context>
