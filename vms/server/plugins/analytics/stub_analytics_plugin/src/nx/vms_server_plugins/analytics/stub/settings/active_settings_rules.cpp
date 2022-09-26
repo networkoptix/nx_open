@@ -62,6 +62,8 @@ const std::map<
 {
     {kActiveComboBoxId, hideAdditionalComboBox},
     {kActiveCheckBoxId, hideAdditionalCheckBox},
+    {kActiveMaxValueId, updateMinMaxSpinBoxes},
+    {kActiveMinValueId, updateMinMaxSpinBoxes},
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -223,6 +225,41 @@ void hideAdditionalRadioButton(Json* inOutModel, std::map<std::string, std::stri
         kActiveRadioButtonGroupId,
         kHideAdditionalRadioButtonValue,
         kDefaultActiveRadioButtonGroupValue);
+}
+
+void updateMinMaxSpinBoxes(
+    nx::kit::Json* inOutModel,
+    std::map<std::string, std::string>* inOutValues)
+{
+    Json::array items = inOutModel->array_items();
+    auto minIt = findSetting(kActiveMinValueId, &items);
+    auto maxIt = findSetting(kActiveMaxValueId, &items);
+
+    if (minIt == items.end() || maxIt == items.end())
+        return;
+
+    const std::string minValueStr = (*inOutValues)[kActiveMinValueId];
+    const std::string maxValueStr = (*inOutValues)[kActiveMaxValueId];
+
+    if (minValueStr.empty() || maxValueStr.empty())
+        return;
+
+    const int minValue = std::stoi(minValueStr);
+    const int maxValue = std::stoi(maxValueStr);
+
+    auto setMinMax =
+        [](Json::array::iterator spinBoxIt, int min, int max)
+        {
+            Json::object spinBox = spinBoxIt->object_items();
+            spinBox[kMinValue] = min;
+            spinBox[kMaxValue] = max;
+            *spinBoxIt = Json(spinBox);
+        };
+
+    setMinMax(minIt, (*minIt)[kMinValue].int_value(), maxValue);
+    setMinMax(maxIt, minValue, (*maxIt)[kMaxValue].int_value());
+
+    *inOutModel = Json(items);
 }
 
 } // namespace settings

@@ -22,16 +22,17 @@ Some field names have the same meaning through all the controls and can have som
 
 Certain fields are supported by some of the controls.
 - `"isActive"` - Boolean. Marks the control as "active" - it means that every change of the control
-    value in the GUI immediately triggers sending a request to the Server, without waiting for the
-    confirmation with the "Apply" button. The request executes the code of the Active Setting
-    handler of the entity being set up by these Settings. The setting values sent in such a request
-    are not meant to be "applied" (stored in a database) - they are intended only for preparing a
-    proper reply to the user, which may include an adjusted Settings Model, adjusted values of the
-    GUI controls, and a message to be shown to the user or a URL to be opened in the web browser.
-    The main purpose of Active settings is to give the entities being set up a way to change the
-    Settings Model and values on-the-fly, providing a better user experience. An example could be
-    an Active combo-box which lists the supported measurement units, and the handler code which
-    converts the entered value into the selected unit.
+    value in the GUI immediately (or with some delay in the case of TextField-like fields) triggers
+    sending a request to the Server, without waiting for the confirmation with the "Apply" button.
+    The request executes the code of the Active Setting handler of the entity being set up by these
+    Settings. The setting values sent in such a request are not meant to be "applied" (stored in a
+    database) - they are intended only for preparing a proper reply to the user, which may include
+    an adjusted Settings Model, adjusted values of the GUI controls, and a message to be shown to
+    the user or a URL to be opened in the web browser. The main purpose of Active settings is to
+    give the entities being set up a way to change the Settings Model and values on-the-fly,
+    providing a better user experience. An example could be an Active combo-box which lists the
+    supported measurement units, and the handler code which converts the entered value into the
+    selected unit.
 - `"parametersModel"` - Settings Model JSON object. Applies only for controls with the `"isActive"`
     property set to `true`. Additional parameters are requested when the active control is triggered.
     NOTE: The `"parametersModel"` model does not support items with the `"isActive"` property set
@@ -81,7 +82,8 @@ Text data field. Supports regex validation for the entered value.
         "defaultValue": "a text",
         "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd.",
         "validationRegex": "^[a-f0-9]+$",
-        "validationRegexFlags": "i"
+        "validationRegexFlags": "i",
+        "isActive": false
     }
 
 ### Setting Value
@@ -110,7 +112,8 @@ Password data field. Supports regex validation for the entered value.
         "defaultValue": "1234",
         "validationErrorMessage": "Password must contain only digits",
         "validationRegex": "^[0-9]+$",
-        "validationRegexFlags": "i"
+        "validationRegexFlags": "i",
+        "isActive": false
     }
 
 ### Setting Value
@@ -137,7 +140,8 @@ Integer number data field. Supports minimum and maximum value limitations.
         "description": "An integer number field",
         "defaultValue": 5,
         "minValue": 0,
-        "maxValue": 100
+        "maxValue": 100,
+        "isActive": false
     }
 
 ### Setting Value
@@ -164,7 +168,8 @@ Floating point number data field. Supports minimum and maximum value limitations
         "description": "A floating-point number field",
         "defaultValue": 3.141,
         "minValue": 0.0,
-        "maxValue": 100.0
+        "maxValue": 100.0,
+        "isActive": false
     }
 
 ### Setting Value

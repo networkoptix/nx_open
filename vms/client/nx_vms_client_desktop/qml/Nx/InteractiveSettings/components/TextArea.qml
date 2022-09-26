@@ -4,7 +4,7 @@ import Nx.Controls 1.0
 
 import "private"
 
-LabeledItem
+ActiveTextItem
 {
     id: control
 
@@ -17,6 +17,7 @@ LabeledItem
     {
         id: textField
         text: defaultValue
+        textArea.focus: true
     }
 }
 

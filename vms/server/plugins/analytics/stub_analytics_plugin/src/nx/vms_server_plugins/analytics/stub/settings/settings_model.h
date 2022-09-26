@@ -27,6 +27,8 @@ static const std::string kName = "name";
 static const std::string kRange = "range";
 static const std::string kItems = "items";
 static const std::string kIsActive = "isActive";
+static const std::string kMinValue = "minValue";
+static const std::string kMaxValue = "maxValue";
 static const std::string kActiveSettingsSectionCaption = "Active settings section";
 static const std::string kActiveSettingsGroupBoxCaption = "Active settings";
 
@@ -44,6 +46,9 @@ static const std::string kActiveRadioButtonGroupId = "activeRadioButtonGroup";
 static const std::string kShowAdditionalRadioButtonValue = "Show something";
 static const std::string kHideAdditionalRadioButtonValue = "Hide me";
 static const std::string kDefaultActiveRadioButtonGroupValue = "Some value";
+
+static const std::string kActiveMinValueId = "activeMinValue";
+static const std::string kActiveMaxValueId = "activeMaxValue";
 
 static const std::string kShowMessageButtonId = "showMessageButton";
 static const std::string kShowUrlButtonId = "showUrlButton";
@@ -181,6 +186,24 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                         "Some value",
                         ")json" + kShowAdditionalRadioButtonValue + R"json("
                     ]
+                },
+                {
+                    "type": "SpinBox",
+                    "name": ")json" + kActiveMinValueId + R"json(",
+                    "caption": "Active Minimum",
+                    "defaultValue": 42,
+                    "minValue": 0,
+                    "maxValue": 42,
+                    "isActive": true
+                },
+                {
+                    "type": "SpinBox",
+                    "name": ")json" + kActiveMaxValueId + R"json(",
+                    "caption": "Active Maximum",
+                    "defaultValue": 42,
+                    "minValue": 42,
+                    "maxValue": 100,
+                    "isActive": true
                 },
                 {
                     "type": "Button",
@@ -644,6 +667,24 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                         "Some value",
                         ")json" + kShowAdditionalRadioButtonValue + R"json("
                     ]
+                },
+                {
+                    "type": "SpinBox",
+                    "name": ")json" + kActiveMinValueId + R"json(",
+                    "caption": "Active Minimum",
+                    "defaultValue": 42,
+                    "minValue": 0,
+                    "maxValue": 42,
+                    "isActive": true
+                },
+                {
+                    "type": "SpinBox",
+                    "name": ")json" + kActiveMaxValueId + R"json(",
+                    "caption": "Active Maximum",
+                    "defaultValue": 42,
+                    "minValue": 42,
+                    "maxValue": 100,
+                    "isActive": true
                 },
                 {
                     "type": "Button",
