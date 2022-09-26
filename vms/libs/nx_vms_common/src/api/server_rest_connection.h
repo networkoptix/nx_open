@@ -679,7 +679,7 @@ public:
         const QString& message)>;
 
     Handle testLdapSettingsAsync(
-        const nx::vms::api::LdapSettings& settings,
+        const nx::vms::api::LdapSettingsDeprecated& settings,
         LdapSettingsCallback&& callback,
         QThread* targetThread = nullptr);
 

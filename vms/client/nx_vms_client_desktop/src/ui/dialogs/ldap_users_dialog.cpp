@@ -50,7 +50,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
-    const auto settings = systemSettings()->ldapSettings();
+    auto settings = systemSettings()->ldap();
 
     if (!settings.isValid(/*checkPassword*/ false))
     {
@@ -79,7 +79,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     m_timeoutTimer->start();
 
     connectedServerApi()->testLdapSettingsAsync(
-        settings,
+        std::move(settings),
         nx::utils::guarded(this,
             [this](bool success, int handle, auto users, auto errorString)
             {
