@@ -638,6 +638,9 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    // Shared pointer to remote session must be freed as it's destructor depends on app context.
+    d->clientCoreModule.reset();
+
     if (d->mainSystemContext && d->mainSystemContext->messageProcessor())
         d->mainSystemContext->deleteMessageProcessor();
 
