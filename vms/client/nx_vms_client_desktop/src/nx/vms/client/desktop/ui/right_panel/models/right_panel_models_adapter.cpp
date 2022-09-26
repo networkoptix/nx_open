@@ -943,7 +943,8 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
                 return false;
 
             std::vector<AbstractObjectType*> objectTypes;
-            if (const auto state = m_context->systemContext()->analyticsTaxonomyState())
+            const auto state = m_context->systemContext()->analyticsTaxonomyState();
+            if (state)
                 objectTypes = state->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
