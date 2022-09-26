@@ -487,8 +487,11 @@ def main():
         help="Force ninja file patching.")
     parser.add_argument(
         "-o", "--log-output",
-        action='store_true',
-        help='Log output to file "<build-dir>/build_logs/pre_build.log".')
+        nargs="?",
+        type=str,
+        default=None,
+        const="",
+        help='Log output to file.')
     parser.add_argument(
         "-t", "--stack-trace",
         action='store_true',
@@ -505,8 +508,9 @@ def main():
     args = parser.parse_args()
 
     build_dir = args.build_dir.resolve()
-    if args.log_output:
-        redirect_output(build_dir / "build_logs" / "pre_build.log")
+    if args.log_output is not None:
+        log_file = Path(args.log_output or (build_dir / "build_logs" / "pre_build.log"))
+        redirect_output(log_file)
 
     try:
         if args.command:
