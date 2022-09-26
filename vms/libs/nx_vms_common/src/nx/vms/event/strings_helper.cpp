@@ -897,8 +897,10 @@ QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto taxonomyState = camera->commonModule()->taxonomyStateWatcher()->state();
-    const auto objectType = camera && camera->commonModule()
+    std::shared_ptr<nx::analytics::taxonomy::AbstractState> taxonomyState;
+    if (camera && camera->commonModule())
+        taxonomyState = camera->commonModule()->taxonomyStateWatcher()->state();
+    const auto objectType = taxonomyState
         ? taxonomyState->objectTypeById(objectTypeId)
         : nullptr;
 
