@@ -8,7 +8,7 @@ from typing import List
 
 
 class NinjaDepsProcessor:
-    NINJA_CALL_TIMEOUT_S = 30
+    NINJA_CALL_TIMEOUT_S = 60
 
     def __init__(self, build_dir: Path):
         self._build_dir = build_dir
