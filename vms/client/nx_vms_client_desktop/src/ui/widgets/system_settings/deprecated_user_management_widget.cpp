@@ -483,7 +483,7 @@ void QnDeprecatedUserManagementWidget::Private::updateLdapState()
 {
     ui->ldapSettingsButton->setEnabled(true);
     ui->fetchButton->setEnabled(
-        q->globalSettings()->ldapSettings().isValid(/*checkPassword*/ false));
+        q->globalSettings()->ldap().isValid(/*checkPassword*/ false));
 }
 
 void QnDeprecatedUserManagementWidget::Private::modelUpdated()
@@ -596,7 +596,7 @@ void QnDeprecatedUserManagementWidget::Private::fetchUsers()
     if (!q->context()->user())
         return;
 
-    if (!q->globalSettings()->ldapSettings().isValid(/*checkPassword*/ false))
+    if (!q->globalSettings()->ldap().isValid(/*checkPassword*/ false))
         return;
 
     QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(q));

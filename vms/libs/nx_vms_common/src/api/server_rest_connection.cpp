@@ -1587,7 +1587,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
 }
 
 Handle ServerConnection::testLdapSettingsAsync(
-    const nx::vms::api::LdapSettings& settings,
+    const nx::vms::api::LdapSettingsDeprecated& settings,
     LdapSettingsCallback&& callback,
     QThread* targetThread)
 {

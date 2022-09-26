@@ -72,7 +72,6 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
 {
     m_allAdaptors
         << initEmailAdaptors()
-        << initLdapAdaptors()
         << initStaticticsAdaptors()
         << initConnectionAdaptors()
         << initTimeSynchronizationAdaptors()
@@ -177,92 +176,6 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
             &QnAbstractResourcePropertyAdaptor::valueChanged,
             this,
             &SystemSettings::emailSettingsChanged,
-            Qt::QueuedConnection);
-    }
-
-    return result;
-}
-
-SystemSettings::AdaptorList SystemSettings::initLdapAdaptors()
-{
-    m_ldapUriAdaptor = new QnLexicalResourcePropertyAdaptor<QUrl>(
-        Names::ldapUri, QUrl(), this, [] { return tr("LDAP URI"); });
-
-    m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapAdminDn, QString(), this, [] { return tr("LDAP Admin DN"); });
-
-    m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapAdminPassword, QString(), this, [] { return tr("LDAP Admin password"); });
-
-    m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapSearchBase, QString(), this, [] { return tr("LDAP search base"); });
-
-    m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapSearchFilter, QString(), this,
-        []
-        {
-            return tr(
-                "LDAP User search filter", "Advanced Server settings, LDAP integration setup");
-        });
-
-    m_ldapLoginAttributeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapLoginAttribute, nx::vms::api::kDefaultLdapLoginAttribute, this,
-        [] {
-            return tr(
-                "LDAP User login attribute", "Advanced Server settings, LDAP integration setup");
-        });
-
-    m_ldapGroupObjectClassAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapGroupObjectClass, nx::vms::api::kDefaultLdapGroupObjectClass, this,
-        [] {
-            return tr(
-                "LDAP Group object class", "Advanced Server settings, LDAP integration setup");
-        });
-
-    m_ldapMemberAttributeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapMemberAttribute, nx::vms::api::kDefaultLdapMemberAttribute, this,
-        [] {
-            return tr(
-                "LDAP User member attribute", "Advanced Server settings, LDAP integration setup");
-        });
-
-    m_ldapPasswordExpirationPeriodAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::ldapPasswordExpirationPeriodMs,
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            nx::vms::api::kDefaultLdapPasswordExpirationPeriod).count(),
-        this,
-        [] { return tr("LDAP password expiration (milliseconds)"); });
-
-    m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::ldapSearchTimeoutS, nx::vms::api::kDefaultLdapSearchTimeout.count(), this,
-        [] { return tr("LDAP search timeout (seconds)"); });
-
-    m_ldapSearchPageSizeAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::ldapSearchPageSize, nx::vms::api::kDefaultLdapSearchPageSize, this,
-        [] {
-            return tr("LDAP search page size", "Advanced Server settings, LDAP integration setup");
-        });
-
-    AdaptorList result;
-    result
-        << m_ldapUriAdaptor
-        << m_ldapAdminDnAdaptor
-        << m_ldapAdminPasswordAdaptor
-        << m_ldapSearchBaseAdaptor
-        << m_ldapSearchFilterAdaptor
-        << m_ldapLoginAttributeAdaptor
-        << m_ldapGroupObjectClassAdaptor
-        << m_ldapMemberAttributeAdaptor
-        << m_ldapPasswordExpirationPeriodAdaptor
-        << m_ldapSearchTimeoutSAdaptor
-        << m_ldapSearchPageSizeAdaptor;
-    for (auto adaptor: result)
-    {
-        connect(
-            adaptor,
-            &QnAbstractResourcePropertyAdaptor::valueChanged,
-            this,
-            &SystemSettings::ldapSettingsChanged,
             Qt::QueuedConnection);
     }
 
@@ -794,6 +707,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
 
+    m_ldapAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::LdapSettings>(
+        Names::ldap, nx::vms::api::LdapSettings(), this,
+        [] { return tr("LDAP settings"); });
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1074,6 +991,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &SystemSettings::showMouseTimelinePreviewChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_ldapAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::ldapSettingsChanged,
+        Qt::DirectConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -1153,6 +1077,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_supportedOriginsAdaptor
         << m_frameOptionsHeaderAdaptor
         << m_showMouseTimelinePreviewAdaptor
+        << m_ldapAdaptor
     ;
 
     return result;
@@ -1338,38 +1263,14 @@ void SystemSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resour
         adaptor->setResource(QnResourcePtr());
 }
 
-nx::vms::api::LdapSettings SystemSettings::ldapSettings() const
+nx::vms::api::LdapSettings SystemSettings::ldap() const
 {
-    nx::vms::api::LdapSettings result;
-    result.uri = m_ldapUriAdaptor->value();
-    result.adminDn = m_ldapAdminDnAdaptor->value();
-    result.adminPassword = m_ldapAdminPasswordAdaptor->value();
-    result.searchBase = m_ldapSearchBaseAdaptor->value();
-    result.searchFilter = m_ldapSearchFilterAdaptor->value();
-    result.loginAttribute = m_ldapLoginAttributeAdaptor->value();
-    result.groupObjectClass = m_ldapGroupObjectClassAdaptor->value();
-    result.memberAttribute = m_ldapMemberAttributeAdaptor->value();
-    result.passwordExpirationPeriodMs =
-        std::chrono::milliseconds(m_ldapPasswordExpirationPeriodAdaptor->value());
-    result.searchTimeoutS = std::chrono::seconds(m_ldapSearchTimeoutSAdaptor->value());
-    result.searchPageSize = m_ldapSearchPageSizeAdaptor->value();
-    return result;
+    return m_ldapAdaptor->value();
 }
 
-void SystemSettings::setLdapSettings(const nx::vms::api::LdapSettings& settings)
+void SystemSettings::setLdap(const nx::vms::api::LdapSettings& settings)
 {
-    m_ldapUriAdaptor->setValue(settings.uri);
-    m_ldapAdminDnAdaptor->setValue(settings.adminDn);
-    m_ldapAdminPasswordAdaptor->setValue(
-        settings.isValid() ? settings.adminPassword : QString());
-    m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
-    m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
-    m_ldapLoginAttributeAdaptor->setValue(settings.loginAttribute);
-    m_ldapGroupObjectClassAdaptor->setValue(settings.groupObjectClass);
-    m_ldapMemberAttributeAdaptor->setValue(settings.memberAttribute);
-    m_ldapPasswordExpirationPeriodAdaptor->setValue(settings.passwordExpirationPeriodMs.count());
-    m_ldapSearchTimeoutSAdaptor->setValue(settings.searchTimeoutS.count());
-    m_ldapSearchPageSizeAdaptor->setValue(settings.searchPageSize);
+    m_ldapAdaptor->setValue(settings);
 }
 
 QnEmailSettings SystemSettings::emailSettings() const

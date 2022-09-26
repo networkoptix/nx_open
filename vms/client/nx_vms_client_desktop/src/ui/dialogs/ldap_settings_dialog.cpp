@@ -48,7 +48,7 @@ public:
     void testSettings();
     void showTestResult(const QString &text);
     void stopTesting(const QString &text = QString());
-    nx::vms::api::LdapSettings settings() const;
+    nx::vms::api::LdapSettingsDeprecated settings() const;
     void updateFromSettings();
 
     void at_timeoutTimer_timeout();
@@ -138,17 +138,17 @@ void QnLdapSettingsDialogPrivate::stopTesting(const QString &text) {
     showTestResult(text);
 }
 
-nx::vms::api::LdapSettings QnLdapSettingsDialogPrivate::settings() const
+nx::vms::api::LdapSettingsDeprecated QnLdapSettingsDialogPrivate::settings() const
 {
     Q_Q(const QnLdapSettingsDialog);
 
-    nx::vms::api::LdapSettings result;
+    nx::vms::api::LdapSettingsDeprecated result;
 
     QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text().trimmed());
     if (url.isValid())
     {
         if (url.port() == -1)
-            url.setPort(nx::vms::api::LdapSettings::defaultPort(url.scheme() == "ldaps"));
+            url.setPort(nx::vms::api::LdapSettingsBase::defaultPort(url.scheme() == "ldaps"));
         result.uri = url;
     }
 
@@ -166,17 +166,28 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     stopTesting();
 
-    const auto& settings = systemSettings()->ldapSettings();
+    const auto& settings = systemSettings()->ldap();
 
     QUrl url = settings.uri;
-    if (url.port() == nx::vms::api::LdapSettings::defaultPort(url.scheme() == "ldaps"))
+    if (url.port() == nx::vms::api::LdapSettingsBase::defaultPort(url.scheme() == "ldaps"))
         url.setPort(-1);
 
     q->ui->serverLineEdit->setText(url.toString());
     q->ui->adminDnLineEdit->setText(settings.adminDn.trimmed());
     q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
-    q->ui->searchBaseLineEdit->setText(settings.searchBase.trimmed());
-    q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
+
+    // TODO: Support multiple LDAP filters.
+    if (settings.filters.empty())
+    {
+        q->ui->searchBaseLineEdit->setText("");
+        q->ui->searchFilterLineEdit->setText("");
+    }
+    else
+    {
+        q->ui->searchBaseLineEdit->setText(settings.filters[0].base.trimmed());
+        q->ui->searchFilterLineEdit->setText(settings.filters[0].userFilter.trimmed());
+    }
+
     q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS.count());
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
@@ -301,7 +312,7 @@ void QnLdapSettingsDialog::accept() {
 
     d->stopTesting();
 
-    systemSettings()->setLdapSettings(d->settings());
+    systemSettings()->setLdap(d->settings());
     systemSettings()->synchronizeNow();
 
     base_type::accept();

@@ -53,17 +53,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
     DECLARE_SETTING_NAME(lastMergeSlaveId);
-    DECLARE_SETTING_NAME(ldapAdminDn);
-    DECLARE_SETTING_NAME(ldapAdminPassword);
-    DECLARE_SETTING_NAME(ldapGroupObjectClass);
-    DECLARE_SETTING_NAME(ldapLoginAttribute);
-    DECLARE_SETTING_NAME(ldapMemberAttribute);
-    DECLARE_SETTING_NAME(ldapPasswordExpirationPeriodMs);
-    DECLARE_SETTING_NAME(ldapSearchBase);
-    DECLARE_SETTING_NAME(ldapSearchFilter);
-    DECLARE_SETTING_NAME(ldapSearchTimeoutS);
-    DECLARE_SETTING_NAME(ldapSearchPageSize);
-    DECLARE_SETTING_NAME(ldapUri);
+    DECLARE_SETTING_NAME(ldap);
     DECLARE_SETTING_NAME(licenseServer);
     DECLARE_SETTING_NAME(localSystemId);
     DECLARE_SETTING_NAME(maxHttpTranscodingSessions);
@@ -92,6 +82,7 @@ struct SystemSettingNames
         cloudSystemID,
         lastMergeMasterId,
         lastMergeSlaveId,
+        ldap,
         localSystemId,
         primaryTimeServer,
         specificFeatures,
@@ -103,21 +94,13 @@ struct SystemSettingNames
 
     static const inline std::set<QString> kWriteOnlyNames = {
         cloudAuthKey,
-        ldapAdminPassword,
+        ldap,
         smtpPassword,
     };
 
     static const inline std::set<QString> kOwnerOnlyNames = {
         disabledVendors,
         insecureDeprecatedApiEnabled,
-        ldapAdminDn,
-        ldapAdminPassword,
-        ldapPasswordExpirationPeriodMs,
-        ldapSearchBase,
-        ldapSearchFilter,
-        ldapSearchTimeoutS,
-        ldapSearchPageSize,
-        ldapUri,
         licenseServer,
         maxHttpTranscodingSessions,
         remoteSessionTimeoutS,
@@ -232,8 +215,8 @@ public:
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings& settings, bool savePassword = true);
 
-    nx::vms::api::LdapSettings ldapSettings() const;
-    void setLdapSettings(const nx::vms::api::LdapSettings& settings);
+    nx::vms::api::LdapSettings ldap() const;
+    void setLdap(const nx::vms::api::LdapSettings& settings);
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
@@ -546,7 +529,6 @@ private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
 
     AdaptorList initEmailAdaptors();
-    AdaptorList initLdapAdaptors();
     AdaptorList initStaticticsAdaptors();
     AdaptorList initConnectionAdaptors();
     AdaptorList initTimeSynchronizationAdaptors();
@@ -610,18 +592,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_timeoutAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_smtpNameAdaptor = nullptr;
 
-    // set of ldap settings adaptors
-    QnResourcePropertyAdaptor<QUrl>* m_ldapUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapAdminDnAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapAdminPasswordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapSearchBaseAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapSearchFilterAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapLoginAttributeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapGroupObjectClassAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_ldapMemberAttributeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_ldapPasswordExpirationPeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_ldapSearchTimeoutSAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_ldapSearchPageSizeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::LdapSettings>* m_ldapAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor = nullptr;
     /** seconds */

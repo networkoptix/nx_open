@@ -154,6 +154,7 @@ public:
 
     bool isReadOnly() const { return m_isReadOnly; }
     bool isWriteOnly() const { return m_isWriteOnly; }
+    bool isHidden() const { return isReadOnly() && isWriteOnly(); }
     bool isOwnerOnly() const { return m_isOwnerOnly; }
 
     void markReadOnly() { m_isReadOnly = true; }
