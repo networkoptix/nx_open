@@ -937,8 +937,8 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
             if (!hasPermissions)
                 return false;
 
-            const auto taxonomyWatcher = m_context->commonModule()->taxonomyStateWatcher();
-            const auto objectTypes = taxonomyWatcher->state()->rootObjectTypes();
+            const auto taxonomyState = m_context->commonModule()->taxonomyStateWatcher()->state();
+            const auto objectTypes = taxonomyState->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
                 [](nx::analytics::taxonomy::AbstractObjectType* objectType)

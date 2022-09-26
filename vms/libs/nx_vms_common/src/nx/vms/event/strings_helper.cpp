@@ -897,8 +897,9 @@ QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
+    const auto taxonomyState = camera->commonModule()->taxonomyStateWatcher()->state();
     const auto objectType = camera && camera->commonModule()
-        ? camera->commonModule()->taxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
+        ? taxonomyState->objectTypeById(objectTypeId)
         : nullptr;
 
     return objectType ? objectType->name() : tr("Object detected");
