@@ -7,7 +7,7 @@ import QtQuick.Controls 2.4
  * This item has isGroup property and applies additional bottom padding
  * to itself if either its or next item in a positioner isGroup is true
  */
-Item
+FocusScope
 {
     property bool isGroup: false
     property alias paddedItem: control.contentItem

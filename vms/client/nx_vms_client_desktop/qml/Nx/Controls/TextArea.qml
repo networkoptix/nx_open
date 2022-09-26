@@ -9,6 +9,8 @@ TextArea
 {
     id: textArea
 
+    signal textEdited()
+
     font.pixelSize: 14
 
     color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
@@ -18,4 +20,10 @@ TextArea
     selectByMouse: true
     selectedTextColor: ColorTheme.brightText
     selectionColor: ColorTheme.highlight
+
+    onTextChanged:
+    {
+        if (activeFocus)
+            control.textEdited()
+    }
 }

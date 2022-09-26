@@ -33,6 +33,7 @@ BottomPaddedItem
     {
         id: focusScope
 
+        focus: true
         implicitWidth: label.width + (contentItem ? contentItem.implicitWidth + spacing : 0)
 
         implicitHeight: isBaselineAligned
@@ -61,7 +62,6 @@ BottomPaddedItem
             return
 
         contentItem.parent = focusScope
-        contentItem.focus = true
 
         contentItem.width = Qt.binding(
             function() { return labeledItem.width - contentItem.x })
