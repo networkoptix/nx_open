@@ -6,9 +6,14 @@ ScrollView
 {
     id: control
 
+    property alias textArea: textArea
     property alias text: textArea.text
     property alias wrapMode: textArea.wrapMode
     property alias readOnly: textArea.readOnly
+    property alias cursorPosition: textArea.cursorPosition
+
+    signal textEdited()
+    signal editingFinished()
 
     implicitWidth: 200
     implicitHeight: 64
@@ -25,5 +30,8 @@ ScrollView
         implicitHeight: control.implicitHeight
 
         wrapMode: Text.Wrap
+
+        onTextEdited: control.textEdited()
+        onEditingFinished: control.editingFinished()
     }
 }

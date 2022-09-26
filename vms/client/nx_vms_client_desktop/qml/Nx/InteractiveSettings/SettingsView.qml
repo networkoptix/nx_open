@@ -37,11 +37,14 @@ Item
 
     function loadModel(model, initialValues, restoreScrollPosition)
     {
+        let focusState = takeFocusState()
         let scrollPosition = contentItem ? contentItem.verticalScrollBar.position : 0.0
 
         if (contentItem)
         {
             contentItem.visible = false
+            contentItem.parent = null
+            contentItem.focus = false //< Signals may happen.
             contentItem.destroy()
         }
 
@@ -71,6 +74,9 @@ Item
 
         if (initialValues)
             setValues(initialValues)
+
+        if (focusState)
+            Settings.setFocusState(contentItem, focusState)
     }
 
     function getValues()
@@ -97,7 +103,7 @@ Item
 
     function triggerValuesEdited(activeItem)
     {
-        if (!impl.valuesChangedEnabled)
+        if (!impl.valuesChangedEnabled || !settingsView.enabled)
             return
 
         valuesEdited(activeItem)
@@ -144,5 +150,13 @@ Item
     function setErrors(errors)
     {
         Settings.setErrors(contentItem, errors)
+    }
+
+    function takeFocusState()
+    {
+        impl.valuesChangedEnabled = false
+        let focusState = contentItem ? Settings.takeFocusState(contentItem) : null
+        impl.valuesChangedEnabled = true
+        return focusState
     }
 }

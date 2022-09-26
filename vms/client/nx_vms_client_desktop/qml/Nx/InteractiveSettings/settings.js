@@ -32,16 +32,16 @@ function preprocessModel(model)
 
 function _connectSignals(parent, item)
 {
-    if (item.activeValueChanged)
+    if (item.activeValueEdited)
     {
-        item.activeValueChanged.connect(
+        item.activeValueEdited.connect(
             () => settingsView.triggerValuesEdited(item.isActive ? item : null))
     }
 
     if (item.valueChanged)
     {
         // An item can be active and only have a `valueChanged` signal.
-        let isDedicatedActiveSignalUsed = item.activeValueChanged
+        let isDedicatedActiveSignalUsed = item.activeValueEdited
         let activeItem =
             (item.isActive && !isDedicatedActiveSignalUsed) ? item : null
 
@@ -241,5 +241,35 @@ function setErrors(rootItem, errors)
         {
             if (item.name && errors[item.name] && item.setErrorMessage !== undefined)
                 item.setErrorMessage(errors[item.name])
+        })
+}
+
+function takeFocusState(rootItem)
+{
+    let state = {}
+
+    _processItemsRecursively(rootItem,
+        (item) =>
+        {
+            if (item.activeFocus && item.getFocusState && item.name)
+            {
+                state[item.name] = item.getFocusState()
+                item.focus = false
+            }
+        })
+
+    return state
+}
+
+function setFocusState(rootItem, state)
+{
+    _processItemsRecursively(rootItem,
+        (item) =>
+        {
+            if (item.setFocusState && (item.name in state))
+            {
+                item.setFocusState(state[item.name])
+                item.forceActiveFocus()
+            }
         })
 }

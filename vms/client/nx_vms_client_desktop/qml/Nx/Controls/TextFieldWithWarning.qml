@@ -5,6 +5,7 @@ import Nx 1.0
 
 FocusScope
 {
+    id: root
     property alias warningText: warningMessage.text
     property real warningSpacing: 8
 
@@ -20,11 +21,19 @@ FocusScope
     // available via textField property.
     property alias text: textField.text
     property alias warningState: textField.warningState
+    property alias cursorPosition: textField.cursorPosition
+
+    signal textEdited()
+    signal editingFinished()
 
     TextField
     {
         id: textField
         width: parent.width
+        focus: true
+
+        onTextEdited: parent.textEdited()
+        onEditingFinished: root.editingFinished()
     }
 
     Text

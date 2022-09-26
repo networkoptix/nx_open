@@ -12,6 +12,7 @@ TextFieldBase
     textFieldItem: TextField
     {
         id: textFieldItem
+
         textField.echoMode: showPassword.checked ? TextInput.Normal : TextInput.Password
 
         Nx.Button

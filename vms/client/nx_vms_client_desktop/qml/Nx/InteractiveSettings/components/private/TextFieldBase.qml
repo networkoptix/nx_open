@@ -2,7 +2,7 @@
 
 import QtQuick 2.15
 
-LabeledItem
+ActiveTextItem
 {
     id: control
 
@@ -11,29 +11,31 @@ LabeledItem
     property string validationRegexFlags: ""
     property string validationErrorMessage: ""
 
-    signal valueChanged()
-
     property alias textFieldItem: control.contentItem
     readonly property bool filled: textFieldItem.text !== ""
 
+    signal valueChanged()
+
+    Connections
+    {
+        target: textFieldItem
+        function onTextChanged() { control.valueChanged() }
+    }
+
     Binding { target: textFieldItem; property: "text"; value: defaultValue }
+
     Binding
     {
         target: textFieldItem
         property: "warningText"
         value: errorMessage || validationErrorMessage
     }
+
     Binding
     {
         target: textFieldItem
         property: "validationRegex"
         value: new RegExp(validationRegex, validationRegexFlags)
-    }
-
-    Connections
-    {
-        target: textFieldItem
-        function onTextChanged() { valueChanged() }
     }
 
     function getValue()

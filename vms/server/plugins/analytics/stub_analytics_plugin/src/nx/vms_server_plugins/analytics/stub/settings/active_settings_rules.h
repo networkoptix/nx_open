@@ -45,6 +45,10 @@ void hideAdditionalRadioButton(
     nx::kit::Json* inOutModel,
     std::map<std::string, std::string>* inOutValues);
 
+void updateMinMaxSpinBoxes(
+    nx::kit::Json* inOutModel,
+    std::map<std::string, std::string>* inOutValues);
+
 } // namespace settings
 } // namespace stub
 } // namespace analytics
