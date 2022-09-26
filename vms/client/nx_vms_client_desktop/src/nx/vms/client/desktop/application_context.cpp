@@ -85,6 +85,36 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
+/**
+ * Temporary implementation of the local resources search and maintain structure. Later will be
+ * replaced by a separate SystemContext descendant. As of current version, works over provided
+ * system context and must be destroyed before.
+ */
+struct LocalResourcesContext
+{
+    LocalResourcesContext(
+        SystemContext* systemContext,
+        const QnStartupParameters& startupParameters)
+    {
+        resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(systemContext);
+        clientResourceProcessor = std::make_unique<QnClientResourceProcessor>(systemContext);
+        clientResourceProcessor->moveToThread(resourceDiscoveryManager.get());
+        resourceDiscoveryManager->setResourceProcessor(clientResourceProcessor.get());
+        resourceDiscoveryManager->setReady(true);
+
+        localResourceStatusWatcher =
+            std::make_unique<QnLocalResourceStatusWatcher>(systemContext);
+
+        if (!startupParameters.skipMediaFolderScan && !startupParameters.acsMode)
+            resourceDirectoryBrowser = std::make_unique<ResourceDirectoryBrowser>(systemContext);
+    }
+
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager;
+    std::unique_ptr<QnClientResourceProcessor> clientResourceProcessor;
+    std::unique_ptr<QnLocalResourceStatusWatcher> localResourceStatusWatcher;
+    std::unique_ptr<ResourceDirectoryBrowser> resourceDirectoryBrowser;
+};
+
 core::ApplicationContext::Mode toCoreMode(ApplicationContext::Mode value)
 {
     if (value == ApplicationContext::Mode::unitTests)
@@ -483,19 +513,9 @@ struct ApplicationContext::Private
             QnLayoutFileStorageResource::instance);
 
         // In the future there will be a separate system context for local resources.
-        auto localContext = mainSystemContext.get();
-
-        resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(localContext);
-        clientResourceProcessor = std::make_unique<QnClientResourceProcessor>(localContext);
-        clientResourceProcessor->moveToThread(resourceDiscoveryManager.get());
-        resourceDiscoveryManager->setResourceProcessor(clientResourceProcessor.get());
-        resourceDiscoveryManager->setReady(true);
-
-        localResourceStatusWatcher =
-            std::make_unique<QnLocalResourceStatusWatcher>(localContext);
-
-        if (!startupParameters.skipMediaFolderScan && !startupParameters.acsMode)
-            resourceDirectoryBrowser = std::make_unique<ResourceDirectoryBrowser>(localContext);
+        localResourcesContext = std::make_unique<LocalResourcesContext>(
+            mainSystemContext.get(),
+            startupParameters);
     }
 
     ApplicationContext* const q;
@@ -522,10 +542,7 @@ struct ApplicationContext::Private
     std::unique_ptr<session::SessionManager> sessionManager;
 
     // Local resources search modules.
-    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager;
-    std::unique_ptr<QnClientResourceProcessor> clientResourceProcessor;
-    std::unique_ptr<QnLocalResourceStatusWatcher> localResourceStatusWatcher;
-    std::unique_ptr<ResourceDirectoryBrowser> resourceDirectoryBrowser;
+    std::unique_ptr<LocalResourcesContext> localResourcesContext;
 
     // Specialized context parts.
     std::unique_ptr<ContextStatisticsModule> statisticsModule;
@@ -621,6 +638,9 @@ ApplicationContext::~ApplicationContext()
 {
     if (d->mainSystemContext && d->mainSystemContext->messageProcessor())
         d->mainSystemContext->deleteMessageProcessor();
+
+    // Local resources context temporary implementation depends on main system context.
+    d->localResourcesContext.reset();
 
     // Remote session must be fully destroyed while application context still exists.
     d->mainSystemContext.reset();
@@ -797,7 +817,7 @@ UploadManager* ApplicationContext::uploadManager() const
 
 QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
 {
-    return d->resourceDiscoveryManager.get();
+    return d->localResourcesContext->resourceDiscoveryManager.get();
 }
 
 } // namespace nx::vms::client::desktop
