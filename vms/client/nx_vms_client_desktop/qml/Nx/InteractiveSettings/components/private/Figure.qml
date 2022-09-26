@@ -22,7 +22,7 @@ LabeledItem
     isGroup: true
 
     signal valueChanged()
-    signal activeValueChanged() //< This signal is emitted even if isActive is set to false.
+    signal activeValueEdited() //< This signal is emitted even if isActive is set to false.
 
     readonly property bool filled: !!figure
 
@@ -87,7 +87,7 @@ LabeledItem
             id: showOnCameraCheckBox
             text: qsTr("Display on video")
             enabled: figureView.hasFigure
-            onCheckedChanged: activeValueChanged()
+            onCheckedChanged: activeValueEdited()
             topPadding: 0
         }
     }
@@ -120,7 +120,7 @@ LabeledItem
         }
     }
 
-    onFigureChanged: activeValueChanged()
+    onFigureChanged: activeValueEdited()
 
     function openEditDialog()
     {

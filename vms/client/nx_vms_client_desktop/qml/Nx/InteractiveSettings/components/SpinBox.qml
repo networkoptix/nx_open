@@ -8,7 +8,7 @@ import nx.vms.client.desktop 1.0
 
 import "private"
 
-LabeledItem
+ActiveTextItem
 {
     id: control
 
@@ -21,6 +21,8 @@ LabeledItem
 
     defaultValueTooltipEnabled: true
 
+    targetTextField: spinBox.contentItem
+
     contentItem: Item
     {
         implicitWidth: spinBox.implicitWidth
@@ -31,9 +33,21 @@ LabeledItem
         {
             id: spinBox
 
+            focus: true
             editable: true
             value: defaultValue
             GlobalToolTip.text: control.defaultValueTooltipText(defaultValue)
+
+            SpinBoxSignalResolver
+            {
+                onValueEdited: (isKeyboardTyping) =>
+                {
+                    if (isKeyboardTyping)
+                        control.valueEdited()
+                    else
+                        control.activeValueEdited() //< Instant changes.
+                }
+            }
         }
     }
 }
