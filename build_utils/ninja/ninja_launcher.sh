@@ -10,11 +10,12 @@ fi
 
 if [[ -z "${DISABLE_NINJA_TOOL}" ]]
 then
-    python3 "${BASE_DIR}/ninja_tool.py" --log-output --stack-trace
+    LOG_FILE_NAME="$(pwd)/build_logs/pre_build.log"
+    python3 "${BASE_DIR}/ninja_tool.py" --log-output "${LOG_FILE_NAME}" --stack-trace
     if [[ $? != 0 ]]
     then
         echo "Ninja tool exited with error."
-        echo "For more details, see <build-dir>/build_logs/pre_build.log"
+        echo "For more details, see ${LOG_FILE_NAME}"
         exit 1
     fi
 fi
