@@ -280,9 +280,9 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
     std::optional<RangePoint> left, right;
 
     auto unquotedValue = value;
-    if (unquotedValue.startsWith(L'(') || unquotedValue.startsWith(L'['))
+    if (unquotedValue.startsWith('(') || unquotedValue.startsWith('['))
         unquotedValue = unquotedValue.mid(1);
-    if (unquotedValue.endsWith(L')') || unquotedValue.endsWith(L']'))
+    if (unquotedValue.endsWith(')') || unquotedValue.endsWith(']'))
         unquotedValue.chop(1);
 
     const auto params = QStringView(unquotedValue).split(kRangeDelimiter);
@@ -292,7 +292,7 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
     {
         left = RangePoint();
         left->value = params[0].toFloat(&ok);
-        left->inclusive = !value.startsWith(L'(');
+        left->inclusive = !value.startsWith('(');
         if (!ok)
             return NumericRange(); //< Invalid value
     }
@@ -300,7 +300,7 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
     {
         right = RangePoint();
         right->value = params[1].toFloat(&ok);
-        right->inclusive = !value.endsWith(L')');
+        right->inclusive = !value.endsWith(')');
         if (!ok)
             return NumericRange(); //< Invalid value
     }
