@@ -12,8 +12,8 @@ using ServerToStorages = std::pair<QnUuid, QnStorageSpaceDataList>;
 using ServerToStoragesList = std::vector<ServerToStorages>;
 
 NX_VMS_COMMON_API std::optional<nx::vms::api::StorageSpaceData> selectOne(
-    const QnStorageSpaceDataList& candidates);
+    const QnStorageSpaceDataList& candidates, int64_t minTotalSpaceGb);
 NX_VMS_COMMON_API QList<QnUuid> selectServers(
-    const ServerToStoragesList& serverToStorages);
+    const ServerToStoragesList& serverToStorages, int64_t minStorageTotalSpaceGb);
 
 } // namespace nx::vms::common::update::storage
