@@ -4,18 +4,18 @@
 
 namespace nx::vms::common::update::storage {
 
-std::optional<nx::vms::api::StorageSpaceData> selectOne(const QnStorageSpaceDataList& candidates)
+std::optional<nx::vms::api::StorageSpaceData> selectOne(
+    const QnStorageSpaceDataList& candidates, int64_t minTotalSpaceGb)
 {
     QnStorageSpaceDataList filtered;
     std::copy_if(
         candidates.cbegin(), candidates.cend(), std::back_inserter(filtered),
-        [](const nx::vms::api::StorageSpaceData& data)
+        [minTotalSpaceGb](const nx::vms::api::StorageSpaceData& data)
         {
-            static constexpr int64_t kMinUpdatePersistentStorageTotalSpace = 1024LL * 1024 * 1024 * 1024; // 1 TB
             return
                 data.isWritable
                 && data.freeSpace > data.reservedSpace * 0.9
-                && data.totalSpace > kMinUpdatePersistentStorageTotalSpace
+                && data.totalSpace > minTotalSpaceGb * 1024LL * 1024 * 1024
                 && !data.isExternal;
         });
 
@@ -28,12 +28,13 @@ std::optional<nx::vms::api::StorageSpaceData> selectOne(const QnStorageSpaceData
         : std::optional<nx::vms::api::StorageSpaceData>(filtered[0]);
 }
 
-QList<QnUuid> selectServers(const ServerToStoragesList& serverToStorages)
+QList<QnUuid> selectServers(
+    const ServerToStoragesList& serverToStorages, int64_t minStorageTotalSpaceGb)
 {
     std::vector<std::pair<QnUuid, int64_t>> serverToMaxStorageSpace;
     for (const auto& p: serverToStorages)
     {
-        const auto bestStorage = selectOne(p.second);
+        const auto bestStorage = selectOne(p.second, minStorageTotalSpaceGb);
         if (!bestStorage)
             continue;
 
