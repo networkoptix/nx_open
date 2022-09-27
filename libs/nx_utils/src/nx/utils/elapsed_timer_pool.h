@@ -19,12 +19,13 @@ namespace utils {
  * ElapsedTimerPool::processTimers call.
  * NOTE: Not thread-safe.
  */
-template<typename TimerId>
+template<typename TimerId, typename... TimerFuncArgs>
 // requires less_than_comparable<TimerId> && is_copy_constructible<TimerId>
 class ElapsedTimerPool
 {
 public:
-    using TimerFunction = nx::utils::MoveOnlyFunc<void(TimerId /*timerId*/)>;
+    using TimerFunction = nx::utils::MoveOnlyFunc<
+        void(TimerId /*timerId*/, TimerFuncArgs...)>;
 
     ElapsedTimerPool(TimerFunction timerFunction):
         m_timerFunction(std::move(timerFunction))
@@ -63,7 +64,7 @@ public:
     /**
      * Executes timerFunction with appropriate finished timers within this method.
      */
-    void processTimers()
+    void processTimers(TimerFuncArgs... args)
     {
         const auto currentTime = nx::utils::monotonicTime();
         while (!m_deadlineToTimerId.empty() &&
@@ -72,7 +73,7 @@ public:
             auto timerId = std::move(m_deadlineToTimerId.begin()->second);
             removeTimer(timerId);
 
-            m_timerFunction(timerId);
+            m_timerFunction(timerId, args...);
         }
     }
 
