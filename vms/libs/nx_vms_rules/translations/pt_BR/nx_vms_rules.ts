@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Utilizadores</translation>
+      <translation>Usuários</translation>
     </message>
     <message>
       <source>Name</source>
