@@ -162,6 +162,9 @@ enum class SortOrder
     descending,
 };
 
+std::string sortOrderToString(SortOrder order);
+SortOrder sortOrderFromString(const std::string& s);
+
 // This filter will be passed to the plugin when bookmarks are queried by Server.
 // For processing example refer to the 'nx/sdk/cloud_storage/algorithm.cpp'
 struct BookmarkFilter
@@ -184,6 +187,9 @@ struct BookmarkFilter
     BookmarkFilter(const T&) = delete;
 
     nx::kit::Json to_json() const;
+
+    static std::string sortColumnToString(SortColumn column);
+    static SortColumn sortColumnFromString(const std::string& s);
 
     std::optional<std::string> id;
     std::optional<std::chrono::milliseconds> startTimestamp;
@@ -398,6 +404,9 @@ struct AnalyticsFilter
         ignoreBoundingBox = 0x2,
         ignoreTimePeriod = 0x4,
     };
+
+    static std::string optionsToString(int options);
+    static int optionsFromString(const std::string& s);
 
     // If empty, any device is a match.
     std::vector<std::string> deviceIds;

@@ -440,6 +440,69 @@ BookmarkList bookmarkListFromJson(const char* data)
 
     return result;
 }
+std::string sortOrderToString(SortOrder order)
+{
+    switch (order)
+    {
+        case SortOrder::ascending:
+            return "ascending";
+        case SortOrder::descending:
+            return "descending";
+    }
+
+    throw std::logic_error("Unexpected value of the SortOrder");
+}
+
+SortOrder sortOrderFromString(const std::string& s)
+{
+    if (s == "ascending")
+        return SortOrder::ascending;
+
+    if (s == "descending")
+        return SortOrder::descending;
+
+    throw std::logic_error("Unexpected value of the SortOrder string: " + s);
+}
+
+std::string BookmarkFilter::sortColumnToString(SortColumn column)
+{
+    switch (column)
+    {
+        case SortColumn::creationTime:
+            return "creationTime";
+        case SortColumn::description:
+            return "description";
+        case SortColumn::duration:
+            return "duration";
+        case SortColumn::name:
+            return "name";
+        case SortColumn::startTime:
+            return "startTime";
+        case SortColumn::tags:
+            return "tags";
+    }
+
+    throw std::logic_error("Unexpected value of the SortColumn");
+}
+
+BookmarkFilter::SortColumn BookmarkFilter::sortColumnFromString(const std::string& s)
+{
+    if (s == "creationTime")
+        return SortColumn::creationTime;
+    if (s == "description")
+        return SortColumn::description;
+    if (s == "duration")
+        return SortColumn::duration;
+    if (s == "name")
+        return SortColumn::name;
+    if (s == "startTime")
+        return SortColumn::startTime;
+    if (s == "tags")
+        return SortColumn::tags;
+
+    throw std::logic_error("Unexpected value of the SortColumn string: " + s);
+}
+
 
 BookmarkFilter::BookmarkFilter(const char* jsonData): BookmarkFilter(parseJson(jsonData))
 {}
@@ -452,8 +515,8 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
     text = getOptionalStringValue(json, "text");
     const auto optionalLimit = getOptionalIntValue(json, "limit");
     limit = optionalLimit ? std::optional<int>((int) *optionalLimit) : std::nullopt;
-    order = (SortOrder) getIntValue(json, "order");
-    column = (SortColumn) getIntValue(json, "column");
+    order = sortOrderFromString(getStringValue(json, "order"));
+    column = sortColumnFromString(getStringValue(json, "column"));
     minVisibleLength = getOptionalDurationValue<milliseconds>(json, "minVisibleLength");
     std::vector<std::string> deviceIds = getStringListValue(json, "deviceIds");
     creationStartTimestamp = getOptionalDurationValue<milliseconds>(json, "creationStartTimestamp");
@@ -463,8 +526,8 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
 nx::kit::Json BookmarkFilter::to_json() const
 {
     auto result =  nx::kit::Json::object({
-        {"order", (int) order},
-        {"column", (int) column},
+        {"order", sortOrderToString(order)},
+        {"column", sortColumnToString(column)},
         });
 
     if (id)
@@ -611,7 +674,7 @@ MotionFilter::MotionFilter(const nx::kit::Json& json)
     regions = getObjectListValue<Rect>(json, "regions");
     const auto optionalLimit = getOptionalIntValue(json, "limit");
     limit = optionalLimit ? std::optional<int>((int)*optionalLimit) : std::nullopt;
-    order = (SortOrder) getIntValue(json, "order");
+    order = sortOrderFromString(getStringValue(json, "order"));
     detailLevel = milliseconds(getIntValue(json, "detailLevel"));
 }
 
@@ -619,7 +682,7 @@ nx::kit::Json MotionFilter::to_json() const
 {
     auto result = nx::kit::Json::object({
         {"timePeriod", timePeriod},
-        {"order", (int) order},
+        {"order", sortOrderToString(order)},
         {"detailLevel", (double) detailLevel.count() },
         });
 
@@ -688,6 +751,59 @@ IDeviceInfo* deviceInfo(const DeviceDescription& deviceDescription)
     return result;
 }
 
+std::string AnalyticsFilter::optionsToString(int options)
+{
+    if (options == 0)
+        return "none";
+
+    std::string result;
+    if (options & Option::ignoreBoundingBox)
+        result = "ignoreBoundingBox";
+
+    if (options & Option::ignoreTextFilter)
+    {
+        if (!result.empty())
+            result += "|";
+
+        result += "ignoreTextFilter";
+    }
+
+    if (options & Option::ignoreTimePeriod)
+    {
+        if (!result.empty())
+            result += "|";
+
+        result += "ignoreTimePeriod";
+    }
+
+    return result;
+}
+
+int AnalyticsFilter::optionsFromString(const std::string& s)
+{
+    if (s.empty())
+        throw std::logic_error("Options string is unexpectedly empty");
+
+    if (s == "none")
+        return 0;
+
+    int result = 0;
+    if (s.find("ignoreBoundingBox") != std::string::npos)
+        result |= Option::ignoreBoundingBox;
+
+    if (s.find("ignoreTextFilter") != std::string::npos)
+        result |= Option::ignoreTextFilter;
+
+    if (s.find("ignoreTimePeriod") != std::string::npos)
+        result |= Option::ignoreTimePeriod;
+
+    if (result == 0)
+        throw std::logic_error("Unexpected value of the options string: " + s);
+
+    return result;
+}
+
+
 AnalyticsFilter::AnalyticsFilter(const char* jsonData): AnalyticsFilter(parseJson(jsonData))
 {
 }
@@ -703,10 +819,10 @@ AnalyticsFilter::AnalyticsFilter(const nx::kit::Json& json)
     if (maybeMaxObjectTracksToSelect)
         maxObjectTracksToSelect = (int) *maybeMaxObjectTracksToSelect;
 
-    order = (SortOrder) getIntValue(json, "order");
+    order = sortOrderFromString(getStringValue(json, "order"));
     withBestShotOnly = getBoolValue(json, "withBestShotOnly");
     analyticsEngineId = getOptionalStringValue(json, "analyticsEngineId");
-    options = getIntValue(json, "options");
+    options = optionsFromString(getStringValue(json, "options"));
     detailLevel = getDurationValue<milliseconds>(json, "detailLevel");
 }
 
@@ -725,12 +841,12 @@ nx::kit::Json AnalyticsFilter::to_json() const
     if (maxObjectTracksToSelect)
         result["maxObjectTracksToSelect"] = *maxObjectTracksToSelect;
 
-    result["order"] = (int) order;
+    result["order"] = sortOrderToString(order);
     result["withBestShotOnly"] = withBestShotOnly;
     if (analyticsEngineId)
         result["analyticsEngineId"] = *analyticsEngineId;
 
-    result["options"] = options;
+    result["options"] = optionsToString(options);
     result["detailLevel"] = (double) detailLevel.count();
 
     return result;
