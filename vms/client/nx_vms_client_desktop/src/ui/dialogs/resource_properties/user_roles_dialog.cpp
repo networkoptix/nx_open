@@ -220,15 +220,18 @@ void QnUserRolesDialog::applyChanges()
 
         const auto accessibleResources = m_model->accessibleResources(userRole);
         m_sharedResourcesQueuedToSave.insert(userRole.id, accessibleResources);
-        const auto resourcePool = QPointer<QnResourcePool>(context()->resourcePool());
-        const auto actionManager = QPointer<action::Manager>(menu());
 
-        auto setupAccessibleResources = nx::utils::guarded(this,
-            [this, accessibleResources, resourcePool, actionManager](
-                bool roleIsStored,
-                const UserRoleData& role)
+        auto setupAccessibleResources =
+            [accessibleResources,
+                dialog = QPointer(this),
+                resourcePool = QPointer<QnResourcePool>(context()->resourcePool()),
+                actionManager = QPointer<action::Manager>(menu())](
+                    bool roleIsStored,
+                    const UserRoleData& role)
             {
-                m_sharedResourcesQueuedToSave.remove(role.id);
+                if (dialog)
+                    dialog->m_sharedResourcesQueuedToSave.remove(role.id);
+
                 if (!roleIsStored || !resourcePool || !actionManager)
                     return;
 
@@ -239,7 +242,7 @@ void QnUserRolesDialog::applyChanges()
                         action::Parameters(layout).withArgument(Qn::UuidRole, role.id));
                 }
                 qnResourcesChangesManager->saveAccessibleResources(role, accessibleResources, role.permissions);
-            });
+            };
 
         if (existing != userRole)
             qnResourcesChangesManager->saveUserRole(userRole, setupAccessibleResources);
