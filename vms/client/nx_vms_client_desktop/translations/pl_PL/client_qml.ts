@@ -1184,7 +1184,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>Brak dostępu</translation>
     </message>
   </context>
   <context>

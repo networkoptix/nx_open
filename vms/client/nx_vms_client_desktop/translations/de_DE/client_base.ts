@@ -5118,7 +5118,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ZUGRIFF ABGELEHNT</translation>
     </message>
   </context>
   <context>
@@ -7298,7 +7298,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Das Bildmaterial dieser Kameras wird bis zu %1 %2 gesichert</translation>
     </message>
   </context>
   <context>
@@ -7349,11 +7349,11 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Stumm</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Stummschaltung aufheben</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7361,7 +7361,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Auflegen</translation>
     </message>
   </context>
   <context>
@@ -7439,7 +7439,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>Videos, die auf dem internen Speicher der Kamera aufgezeichnet wurden, werden nicht automatisch in das Hauptarchiv hochgeladen.</translation>
     </message>
   </context>
   <context>
@@ -8575,7 +8575,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Layout</translation>
     </message>
   </context>
   <context>
@@ -9252,7 +9252,7 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Anrufen...</translation>
     </message>
   </context>
   <context>
@@ -10360,7 +10360,7 @@ Sie können %2 anzeigen oder diesen Artikel %3 lesen, um mehr über das aktuelle
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Aufzeichnungen auf dem Gerät wurden gefunden</translation>
     </message>
   </context>
   <context>

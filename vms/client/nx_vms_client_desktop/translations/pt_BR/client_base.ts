@@ -5122,7 +5122,7 @@ a %1</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ACESSO NEGADO</translation>
     </message>
   </context>
   <context>
@@ -7301,7 +7301,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>As imagens dessas câmeras são armazenadas em backup até %1 %2</translation>
     </message>
   </context>
   <context>
@@ -7352,11 +7352,11 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Mudo</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Restaurar Som</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7364,7 +7364,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Derrubar</translation>
     </message>
   </context>
   <context>
@@ -7442,7 +7442,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>O vídeo gravado no armazenamento interno da câmera&apos;s não será carregado no arquivo principal automaticamente.</translation>
     </message>
   </context>
   <context>
@@ -8578,7 +8578,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>Layout de %1</translation>
     </message>
   </context>
   <context>
@@ -9255,7 +9255,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Chamando...</translation>
     </message>
   </context>
   <context>
@@ -9988,7 +9988,7 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>O tempo de vida máximo recomendado da sessão do usuário é %1</translation>
     </message>
   </context>
   <context>
@@ -10048,11 +10048,11 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Certificado gerado automaticamente</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>O certificado é gerado automaticamente e fixado em %1</translation>
     </message>
   </context>
   <context>
@@ -10363,7 +10363,7 @@ Você pode ver %2 ou ler este %3 para saber mais sobre o problema atual.</transl
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Foram encontradas gravações no dispositivo</translation>
     </message>
   </context>
   <context>

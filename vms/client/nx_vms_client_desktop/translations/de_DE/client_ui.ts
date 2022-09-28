@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <translation>Vom Gerät exportieren</translation>
     </message>
   </context>
   <context>
