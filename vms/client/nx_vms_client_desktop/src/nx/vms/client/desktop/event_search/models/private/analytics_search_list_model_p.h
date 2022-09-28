@@ -100,6 +100,9 @@ private:
 
     using GetCallback = std::function<void(bool, rest::Handle, nx::analytics::db::LookupResult&&)>;
     rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit) const;
+    rest::Handle lookupObjectTracksCached(
+        const nx::analytics::db::Filter& request,
+        GetCallback callback) const;
 
     const nx::analytics::taxonomy::AbstractObjectType* objectTypeById(
         const QString& objectTypeId) const;
