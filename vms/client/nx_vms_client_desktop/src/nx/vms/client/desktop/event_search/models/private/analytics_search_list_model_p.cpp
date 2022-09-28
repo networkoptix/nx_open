@@ -670,8 +670,48 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         request.maxObjectTracksToSelect,
         request.withBestShotOnly);
 
-    return connectedServerApi()->lookupObjectTracks(
-        request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
+    return lookupObjectTracksCached(request, nx::utils::guarded(this, callback));
+}
+
+rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
+    const nx::analytics::db::Filter& request,
+    GetCallback callback) const
+{
+    struct LookupContext
+    {
+        nx::analytics::db::Filter filter;
+        rest::Handle handle{};
+        std::vector<GetCallback> callbacks;
+    };
+    static LookupContext lastRequest;
+
+    if (lastRequest.callbacks.empty() || lastRequest.filter == request)
+    {
+        lastRequest.filter = request;
+        lastRequest.callbacks.push_back(std::move(callback));
+
+        if (lastRequest.callbacks.size() == 1)
+        {
+            lastRequest.handle = connectedServerApi()->lookupObjectTracks(request, false /*isLocal*/,
+                [](bool success, rest::Handle handle, nx::analytics::db::LookupResult&& result)
+                {
+                    for (int i = 0; i < lastRequest.callbacks.size(); ++i)
+                    {
+                        const auto& callback = lastRequest.callbacks[i];
+                        if (i < lastRequest.callbacks.size() - 1)
+                            callback(success, handle, nx::analytics::db::LookupResult(result));
+                        else
+                            callback(success, handle, std::move(result));
+                    }
+                    lastRequest.callbacks.clear();
+                }, thread());
+        }
+        return lastRequest.handle;
+    }
+    else
+    {
+        return connectedServerApi()->lookupObjectTracks(request, false /*isLocal*/, callback, thread());
+    }
 }
 
 void AnalyticsSearchListModel::Private::setLiveTimestampGetter(LiveTimestampGetter value)
