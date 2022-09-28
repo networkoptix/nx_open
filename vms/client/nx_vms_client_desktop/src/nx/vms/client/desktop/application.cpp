@@ -52,7 +52,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/kit/output_redirector.h>
-#include <nx/media/decoder_registrar.h>
+#include <nx/vms/client/core/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -278,7 +278,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::media::DecoderRegistrar::registerDecoders({});
+    nx::vms::client::core::DecoderRegistrar::registerDecoders({});
 
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
         && startupParams.screen < QGuiApplication::screens().size();
