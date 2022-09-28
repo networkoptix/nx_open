@@ -25,7 +25,6 @@
 #include <QtCore/QSettings>
 #include <QtCore/QString>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QScreen>
 #include <QtGui/QWindow>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -280,9 +279,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     nx::vms::client::core::DecoderRegistrar::registerDecoders({});
 
-    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
-        && startupParams.screen < QGuiApplication::screens().size();
-
     // Window handle must exist before events processing. This is required to initialize the scene.
     volatile auto winId = mainWindow->winId();
 
@@ -298,32 +294,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     // We must handle all 'WindowScreenChange' events _before_ we move window.
     qApp->processEvents();
 
-    if (customScreen)
-    {
-        NX_INFO(kMainWindow) << "Running application on a custom screen" << startupParams.screen;
-        const auto windowHandle = mainWindow->windowHandle();
-        if (windowHandle && QGuiApplication::screens().size() > 0)
-        {
-            // Set target screen for fullscreen mode.
-            const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
-            NX_INFO(kMainWindow) << "Target screen geometry is" << screen->geometry();
-            windowHandle->setScreen(screen);
-
-            // Set target position for the window when we set fullscreen off.
-            QPoint screenDelta = mainWindow->pos() - mainWindow->screen()->geometry().topLeft();
-            NX_INFO(kMainWindow) << "Current display offset is" << screenDelta;
-
-            QPoint targetPosition = screen->geometry().topLeft() + screenDelta;
-            NX_INFO(kMainWindow) << "Target top-left corner position is" << targetPosition;
-
-            mainWindow->move(targetPosition);
-        }
-    }
-    else
-    {
-        applicationContext->clientStateHandler()->clientStarted(
-            StartupParameters::fromCommandLineParams(startupParams));
-    }
+    applicationContext->clientStateHandler()->clientStarted(
+        StartupParameters::fromCommandLineParams(startupParams));
 
     #if defined(Q_OS_WIN)
         if (qnRuntime->isVideoWallMode())

@@ -130,6 +130,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, disableChunksLoading,
         "[Dev] Completely disable camera chunks loading to simplify memory leaks detection.");
 
+    NX_INI_FLAG(false, doubleGeometrySet, "[Dev] Restore client geometry twice.");
+
     NX_INI_STRING("", cloudLayoutsEndpointOverride,
         "[Dev] Override url to cloud layouts endpoint (e.g. \"localhost::8000\").");
 
