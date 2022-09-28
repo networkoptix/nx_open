@@ -44,13 +44,7 @@ void TwoWayAudioManager::startStreaming()
     if (!m_controller.available() || !m_camera || m_controller.started())
         return;
 
-    const auto currentSession = qnClientCoreModule->networkModule()->session();
-    if (!currentSession)
-        return;
-
-    const auto server = m_camera->resourcePool()->getResourceById<QnMediaServerResource>(
-        currentSession->connection()->moduleInformation().id);
-
+    auto server = m_camera->getParentServer();
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
