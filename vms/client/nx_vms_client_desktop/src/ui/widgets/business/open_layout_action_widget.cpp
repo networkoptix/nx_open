@@ -356,7 +356,8 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     }
     else if (users.empty())
     {
-        dialog.showInfo(tr("Select some single user in \"Show to\" line to display his local layouts in this list"));
+        dialog.showInfo(tr("Looking for a local layout? Select only one user from the \"Show to\" "
+            "list to display their local layouts as an option here."));
         selectionMode = LayoutSelectionDialog::ModeHideLocal;
     }
     dialog.setLocalLayouts(localLayouts, selection, selectionMode);

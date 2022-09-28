@@ -228,9 +228,6 @@
           </item>
           <item>
            <widget class="QLabel" name="additionalInfoLabel">
-            <property name="text">
-             <string>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</string>
-            </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
