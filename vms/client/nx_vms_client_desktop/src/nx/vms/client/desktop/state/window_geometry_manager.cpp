@@ -11,6 +11,8 @@
 #include <nx/build_info.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -83,6 +85,10 @@ bool WindowGeometryManager::loadState(
 
         if (params.screen >= 0)
         {
+            // If screen is passed using command line, client is supposed to run in fullscreen.
+            if (!params.noFullScreen)
+                geometry.isFullscreen = geometry.isMaximized = true;
+
             const auto surface = d->control->suitableSurface();
             if (params.screen <= surface.size())
             {
@@ -106,6 +112,10 @@ bool WindowGeometryManager::loadState(
         }
 
         setWindowGeometry(geometry);
+        // Developer builds have an issue when console window is placed onto screen with another
+        // dpi value. Restored state is incorrect in this case and requires additional fix.
+        if (ini().doubleGeometrySet)
+            executeDelayedParented([this, geometry]{ setWindowGeometry(geometry); }, this);
 
         reportStatistics("window_fullscreen", geometry.isFullscreen);
         reportStatistics("window_position", geometry.geometry.topLeft());
