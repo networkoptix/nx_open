@@ -1013,13 +1013,17 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
     NX_VERBOSE(this, "Executing connect to the %1", endpoint->address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
+    std::optional<QnUuid> expectedServerId;
+    if (!endpoint->serverId.isNull())
+        expectedServerId = endpoint->serverId;
+
     d->currentConnectionProcess = remoteConnectionFactory->connect(
         {
             endpoint->address,
             {},
             nx::vms::api::UserType::cloud
         },
-        endpoint->serverId,
+        expectedServerId,
         callback);
 }
 
@@ -1341,15 +1345,32 @@ std::optional<ConnectActionsHandler::CloudSystemEndpoint>
         return std::nullopt;
     }
 
+    const auto servers = system->servers();
+
+    // Cloud systems are initialized with a dummy server with null id.
+    const bool systemHasInitialServerOnly = servers.size() == 1 && servers.first().id.isNull();
+
     CloudSystemEndpoint result;
     nx::utils::Url url;
+
+    if (systemHasInitialServerOnly)
+    {
+        url = system->getServerHost(QnUuid());
+        NX_DEBUG(this, "Connecting to the cloud system which was not pinged yet: %1", url);
+    }
 
     if (!ini().ignoreSavedPreferredCloudServers)
     {
         result.serverId = nx::vms::client::core::helpers::preferredCloudServer(systemId);
         if (!result.serverId.isNull())
         {
-            if (system->isReachableServer(result.serverId))
+            if (systemHasInitialServerOnly)
+            {
+                url = core::helpers::serverCloudHost(systemId, result.serverId);
+                NX_DEBUG(this, "Trying to connect to stored preferred cloud server %1 (%2)",
+                    result.serverId.toString(), url);
+            }
+            else if (system->isReachableServer(result.serverId))
             {
                 url = system->getServerHost(result.serverId);
                 if (NX_ASSERT(!url.isEmpty()))
@@ -1368,7 +1389,6 @@ std::optional<ConnectActionsHandler::CloudSystemEndpoint>
 
     if (url.isEmpty())
     {
-        const auto servers = system->servers();
 
         const auto debugServersInfo =
             [&servers, system]() -> QString

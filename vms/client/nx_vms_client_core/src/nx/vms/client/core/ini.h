@@ -14,6 +14,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(8, maxLastConnectedTilesStored,
         "[Support] Maximum last connected systems tiles stored on the Welcome Screen");
 
+    NX_INI_FLAG(false, doNotPingCloudSystems,
+        "[Dev] Disable cloud system pings, so desktop client will rely on cloud status only");
+
     // VMS-32318
     NX_INI_FLAG(true, asyncAuthTokenTermination,
         "[Bugfix] Support asynchronous auth token termination to avoid visual lag on disconnect");

@@ -5,12 +5,17 @@
 #include <QtCore/QTimer>
 
 #include <network/system_helpers.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/ini.h>
 #include <utils/common/delayed.h>
 
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(15);
@@ -18,14 +23,50 @@ static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seco
 
 namespace {
 
-nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+nx::utils::Url systemUrl(const QString& cloudSystemId)
 {
     nx::utils::Url url;
     url.setScheme(nx::network::http::kSecureUrlSchemeName);
     url.setHost(cloudSystemId);
-    url.setPort(0);
+    return url;
+}
+
+nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+{
+    nx::utils::Url url = systemUrl(cloudSystemId);
     url.setPath("/api/moduleInformation");
     return url;
+}
+
+/**
+ * By default if cloud system is listed as online we create some initial server record, so the
+ * system is displayed as reachable. If ping request fails, server will be removed.
+ */
+nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSystem& system)
+{
+    nx::vms::api::ModuleInformationWithAddresses result;
+
+    // Fill parameters with default values to avoid compatibility checks.
+    //result.id = kInitialServerId;
+    result.type = nx::vms::api::ModuleInformation::mediaServerId();
+    result.brand = nx::branding::brand();
+    result.customization = nx::branding::customization();
+    result.cloudHost = QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+    result.sslAllowed = true;
+
+    result.systemName = system.name;
+    result.cloudSystemId = system.cloudId;
+    result.localSystemId = system.localId;
+    result.remoteAddresses.insert(system.cloudId);
+    result.version = nx::vms::api::SoftwareVersion(system.version);
+
+    const auto localVersion = nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion());
+    const bool sameVersion = result.version.major() == localVersion.major()
+        && result.version.minor() == localVersion.minor();
+
+    result.protoVersion = sameVersion ? nx::vms::api::protocolVersion() : 0;
+
+    return result;
 }
 
 } // namespace
@@ -109,6 +150,14 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         const auto systemDescription = QnCloudSystemDescription::create(
             targetId, system.localId, system.name, system.ownerAccountEmail,
             system.ownerFullName, system.online, system.system2faEnabled);
+
+        if (system.online)
+        {
+            auto initialServer = createInitialServer(system);
+            systemDescription->addServer(initialServer, QnSystemDescription::kDefaultPriority);
+            systemDescription->setServerHost(initialServer.id, systemUrl(system.cloudId));
+        }
+
         updatedSystems.insert(system.cloudId, systemDescription);
     }
 
@@ -186,6 +235,9 @@ void QnCloudSystemsFinder::tryRemoveAlienServer(const nx::vms::api::ModuleInform
 
 void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 {
+    if (nx::vms::client::core::ini().doNotPingCloudSystems)
+        return;
+
     auto client = nx::network::http::AsyncHttpClient::create(nx::network::ssl::kAcceptAnyCertificate);
     client->setAuthType(nx::network::http::AuthType::authBasicAndDigest);
     // First connection to a system (cloud and not cloud) may take a long time
@@ -269,8 +321,16 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     }
                     else
                     {
-                        clearServers();
-                        systemDescription->addServer(moduleInformation, 0);
+                        // First we must add newly found server to make sure system will not become
+                        // unreachable in the process.
+                        systemDescription->addServer(moduleInformation,
+                            QnSystemDescription::kDefaultPriority);
+                        const auto currentServers = systemDescription->servers();
+                        for (const auto& server: currentServers)
+                        {
+                            if (server.id != serverId)
+                                systemDescription->removeServer(server.id);
+                        }
                     }
 
                     nx::utils::Url url;

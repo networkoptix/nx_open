@@ -78,6 +78,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
         system.weight = systemData.usageFrequency;
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
+        system.version = QString::fromStdString(systemData.version);
         result.append(system);
     }
 
