@@ -7,6 +7,9 @@
 
 #include <api/http_client_pool.h>
 #include <network/system_helpers.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -14,7 +17,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 
 using namespace std::chrono;
@@ -34,14 +39,50 @@ static constexpr nx::network::http::AsyncClient::Timeouts kDefaultTimeouts{
     .messageBodyReadTimeout = 1min
 };
 
-nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+nx::utils::Url systemUrl(const QString& cloudSystemId)
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setHost(cloudSystemId)
-        .setPort(0)
-        .setPath("/api/moduleInformation")
         .toUrl();
+}
+
+nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+{
+    nx::utils::Url url = systemUrl(cloudSystemId);
+    url.setPath("/api/moduleInformation");
+    return url;
+}
+
+/**
+ * By default if cloud system is listed as online we create some initial server record, so the
+ * system is displayed as reachable. If ping request fails, server will be removed.
+ */
+nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSystem& system)
+{
+    nx::vms::api::ModuleInformationWithAddresses result;
+
+    // Fill parameters with default values to avoid compatibility checks.
+    //result.id = kInitialServerId;
+    result.type = nx::vms::api::ModuleInformation::mediaServerId();
+    result.brand = nx::branding::brand();
+    result.customization = nx::branding::customization();
+    result.cloudHost = QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+    result.sslAllowed = true;
+
+    result.systemName = system.name;
+    result.cloudSystemId = system.cloudId;
+    result.localSystemId = system.localId;
+    result.remoteAddresses.insert(system.cloudId);
+    result.version = nx::vms::api::SoftwareVersion(system.version);
+
+    const auto localVersion = nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion());
+    const bool sameVersion = result.version.major() == localVersion.major()
+        && result.version.minor() == localVersion.minor();
+
+    result.protoVersion = sameVersion ? nx::vms::api::protocolVersion() : 0;
+
+    return result;
 }
 
 } // namespace
@@ -63,6 +104,9 @@ struct CloudSystemsFinder::Private
 
     void pingSystem(const QString& cloudSystemId)
     {
+        if (ini().doNotPingCloudSystems)
+            return;
+
         static const QnUuid kAdapterFuncId = QnUuid::createUuid();
         NX_DEBUG(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
 
@@ -167,8 +211,15 @@ struct CloudSystemsFinder::Private
         }
         else
         {
-            clearServersUnderLock(systemDescription);
-            systemDescription->addServer(moduleInformation, /*priority*/ 0);
+            // First we must add newly found server to make sure system will not become
+            // unreachable in the process.
+            systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
+            const auto currentServers = systemDescription->servers();
+            for (const auto& server: currentServers)
+            {
+                if (server.id != serverId)
+                    systemDescription->removeServer(server.id);
+            }
         }
 
         nx::utils::Url url;
@@ -229,6 +280,14 @@ struct CloudSystemsFinder::Private
                 system.ownerFullName,
                 system.online,
                 system.system2faEnabled);
+
+            if (system.online)
+            {
+                auto initialServer = createInitialServer(system);
+                systemDescription->addServer(initialServer, QnSystemDescription::kDefaultPriority);
+                systemDescription->setServerHost(initialServer.id, systemUrl(system.cloudId));
+            }
+
             updatedSystems.insert(system.cloudId, systemDescription);
         }
 

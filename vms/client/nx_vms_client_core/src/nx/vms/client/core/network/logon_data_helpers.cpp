@@ -26,13 +26,30 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
         return std::nullopt;
     }
 
+    const auto servers = system->servers();
+
+    // Cloud systems are initialized with a dummy server with null id.
+    const bool systemHasInitialServerOnly = servers.size() == 1 && servers.first().id.isNull();
+
     LogonData result;
     nx::utils::Url url;
+
+    if (systemHasInitialServerOnly)
+    {
+        url = system->getServerHost(QnUuid());
+        NX_DEBUG(kLogTag, "Connecting to the cloud system which was not pinged yet: %1", url);
+    }
 
     result.expectedServerId = settings()->preferredCloudServer(systemId);
     if (result.expectedServerId)
     {
-        if (system->isReachableServer(result.expectedServerId.value()))
+        if (systemHasInitialServerOnly)
+        {
+            url = helpers::serverCloudHost(systemId, result.expectedServerId.value());
+            NX_DEBUG(kLogTag, "Trying to connect to stored preferred cloud server %1 (%2)",
+                result.expectedServerId->toString(), url);
+        }
+        else if (system->isReachableServer(result.expectedServerId.value()))
         {
             url = system->getServerHost(result.expectedServerId.value());
             if (NX_ASSERT(!url.isEmpty()))
@@ -50,8 +67,6 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
 
     if (url.isEmpty())
     {
-        const auto servers = system->servers();
-
         const auto debugServersInfo =
             [&servers, system]() -> QString
         {
