@@ -13,12 +13,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
-namespace {
-
-constexpr auto kHangUpOutputId = nx::vms::api::ExtendedCameraOutput::hangUp;
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 IntercomResourceWidget::IntercomResourceWidget(
@@ -43,8 +37,6 @@ IntercomResourceWidget::IntercomResourceWidget(
 
 IntercomResourceWidget::~IntercomResourceWidget()
 {
-    if (camera()->extendedOutputs().testFlag(kHangUpOutputId))
-        setOutputPortState(kHangUpOutputId, nx::vms::api::EventState::active);
 }
 
 int IntercomResourceWidget::calculateButtonsVisibility() const
