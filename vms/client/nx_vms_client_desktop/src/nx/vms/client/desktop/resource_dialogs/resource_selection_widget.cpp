@@ -69,6 +69,7 @@ struct ResourceSelectionWidget::Private: public QObject
     std::unique_ptr<InvalidResourceDecoratorModel> invalidResourceDecoratorModel;
     std::unique_ptr<InvalidResourceFilterModel> invalidResourceFilterModel;
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
+    QPersistentModelIndex lastToggledIndex;
 };
 
 ResourceSelectionWidget::Private::Private(
@@ -103,8 +104,15 @@ void ResourceSelectionWidget::Private::onItemClicked(const QModelIndex& index)
         resourceIndex = proxyModel->mapToSource(resourceIndex);
     }
 
-    if (!selectionDecoratorModel->toggleSelection(resourceIndex))
+    const bool hasChanges =
+        QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier) && lastToggledIndex.isValid()
+            ? selectionDecoratorModel->toggleSelection(lastToggledIndex, resourceIndex)
+            : selectionDecoratorModel->toggleSelection(resourceIndex);
+
+    if (!hasChanges)
         return;
+
+    lastToggledIndex = resourceIndex;
 
     updateAlertMessage();
 
