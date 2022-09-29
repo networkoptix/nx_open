@@ -528,7 +528,6 @@ QnUuid QnMediaServerResource::metadataStorageId() const
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    NX_ASSERT(!value.isNull());
     setProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey, value.toString());
 }
 
