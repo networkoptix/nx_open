@@ -43,6 +43,7 @@ public:
     static void elideDocumentLines(
         QTextDocument* document,
         int maxLines,
+        bool trimLastLine = false,
         const QString& tail = "...");
 };
 
