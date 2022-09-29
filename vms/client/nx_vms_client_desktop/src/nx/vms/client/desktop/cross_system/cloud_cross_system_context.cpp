@@ -16,7 +16,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
-#include <nx/vms/client/core/network/cloud_system_endpoint.h>
+#include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -204,12 +204,14 @@ struct CloudCrossSystemContext::Private
             return false;
         }
 
-        auto endpoint = core::cloudSystemEndpoint(systemDescription);
-        if (!endpoint)
+        auto logonData = core::cloudLogonData(systemDescription);
+        if (!logonData)
         {
             NX_VERBOSE(this, "Endpoint was not found");
             return false;
         }
+        logonData->purpose = core::LogonData::Purpose::connectInCrossSystemMode;
+        logonData->userInteractionAllowed = allowUserInteraction;
 
         auto handleConnection =
             [this](core::RemoteConnectionFactory::ConnectionOrError result)
@@ -245,15 +247,9 @@ struct CloudCrossSystemContext::Private
         updateStatus(Status::connecting);
 
         NX_VERBOSE(this, "Initialize new connection");
+
         connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
-            {
-                .address = endpoint->address,
-                .credentials = {},
-                .userType = nx::vms::api::UserType::cloud,
-                .purpose = core::LogonData::Purpose::connectInCrossSystemMode,
-                .expectedServerId = endpoint->serverId,
-                .userInteractionAllowed = allowUserInteraction
-            },
+            *logonData,
             handleConnection);
 
         return true;
