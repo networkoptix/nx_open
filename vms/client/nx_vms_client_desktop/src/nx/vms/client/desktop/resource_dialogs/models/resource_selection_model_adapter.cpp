@@ -24,10 +24,10 @@ struct ResourceSelectionModelAdapter::Private
 {
     ResourceSelectionModelAdapter* const q;
 
+    entity_item_model::AbstractEntityPtr rootEntity;
     std::unique_ptr<entity_item_model::EntityItemModel> resourceTreeModel;
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
     std::unique_ptr<entity_resource_tree::ResourceTreeEntityBuilder> treeEntityBuilder;
-    entity_item_model::AbstractEntityPtr rootEntity;
 
     QnWorkbenchContext* context = nullptr;
     ResourceTree::ResourceFilters resourceTypes = 0;
