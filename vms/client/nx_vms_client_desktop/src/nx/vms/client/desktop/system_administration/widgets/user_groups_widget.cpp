@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/models/user_group_list_model.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -175,6 +176,7 @@ private:
 
 UserGroupsWidget::UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     d(new Private(this, manager))
 {
     if (!NX_ASSERT(manager))
@@ -356,12 +358,15 @@ void UserGroupsWidget::Private::handleCellClicked(const QModelIndex& index)
     if (index.column() == UserGroupListModel::CheckBoxColumn)
         return;
 
-    // TODO: #vkutin #ikulaychuk Invoke edit group action.
+    q->menu()->trigger(ui::action::UserRolesAction, ui::action::Parameters()
+        .withArgument(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>())
+        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
 void UserGroupsWidget::Private::createGroup()
 {
-    // TODO: #vkutin #ikulaychuk Invoke create group action.
+    q->menu()->triggerIfPossible(ui::action::UserRolesAction, ui::action::Parameters()
+        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
 void UserGroupsWidget::Private::deleteSelected()
