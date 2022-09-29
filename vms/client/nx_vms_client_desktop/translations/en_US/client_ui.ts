@@ -320,10 +320,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Maximum backup queue size</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>All files are successfully backed up! New files will be backed up automatically</source>
         <translation></translation>
     </message>
@@ -646,11 +642,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export From SD Cards</source>
+        <source>Do not export video automatically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not export video automatically</source>
+        <source>Export From Device</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -881,11 +877,39 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Create the Layout?</source>
+        <source>Available Actions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not show again</source>
+        <source>Video Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Video and Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Future</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching Motions, Objects, Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showreels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read more on the help page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not show this window again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1270,7 +1294,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add some comment</source>
+        <source>Add a comment</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1354,6 +1378,10 @@
     <message>
         <source>Mute audio when the mic is active</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Allow computer entering sleep mode on idle</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2547,11 +2575,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select some rule</source>
+        <source>Reset default rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reset default rules</source>
+        <source>Select a rule</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

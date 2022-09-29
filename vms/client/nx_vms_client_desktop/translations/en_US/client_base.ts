@@ -1302,14 +1302,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hardware ID</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1332,6 +1324,14 @@
     <message>
         <source>Hardware ID: %1
 License Key: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2497,6 +2497,14 @@ License Key: %2</source>
     <message>
         <source>Servers that support buzzer</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCamDisplay</name>
+    <message>
+        <source>%1 Running</source>
+        <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4336,6 +4344,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+        <source>These settings apply only to the System you are logged in and will be removed in the future versions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPtzManageDialog</name>
     <message>
         <source>Manage PTZ for %1...</source>
@@ -4978,15 +4993,15 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Details</source>
         <translation></translation>
     </message>
     <message>
         <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate received from the server does not match the certificate this server is pinned to.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5133,6 +5148,10 @@ to %1</source>
     </message>
     <message>
         <source>Provide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ACCESS DENIED</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5594,6 +5613,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Remote archive synchronization available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote archive synchronization has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6112,8 +6135,8 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-        <translation></translation>
+        <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7109,44 +7132,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-        <source>%n weeks</source>
-        <translation>
-            <numerusform>%n week</numerusform>
-            <numerusform>%n weeks</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n days</source>
-        <translation>
-            <numerusform>%n day</numerusform>
-            <numerusform>%n days</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hours</source>
-        <translation>
-            <numerusform>%n hour</numerusform>
-            <numerusform>%n hours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minutes</source>
-        <translation>
-            <numerusform>%n minute</numerusform>
-            <numerusform>%n minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n seconds</source>
-        <translation>
-            <numerusform>%n second</numerusform>
-            <numerusform>%n seconds</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
         <source>The camera has neither recorded footage nor recording scheduled</source>
@@ -7295,6 +7280,11 @@ We recommend you not to open this web page. If you understand the risks, you can
             <numerusform>Backup is enabled for %n cameras</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Footage from these cameras is backed up through to %1 %2</source>
+        <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7341,6 +7331,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Wiper</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open door</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drop</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7426,7 +7432,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7541,24 +7547,24 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 will be replaced by selected camera and removed from the system</source>
-        <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Data for Transfer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Checking if the data from the camera can be transferred to the new one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some data and settings may not supported for new Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Camera replaced!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be replaced by the selected camera and removed from the System</source>
+        <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some data and settings may not be compatible with the new camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7973,7 +7979,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Information required</source>
+        <source>Click to show cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7985,12 +7991,15 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adding a Camera from another System transforms the Layout to a %1 Layout</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Create</source>
+        <source>Read more on the %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>help page</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8084,8 +8093,8 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Internal server error. Please try again later.</source>
-        <translation></translation>
+        <source>Internal error. Please try again later.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8338,6 +8347,13 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Objects</source>
         <comment>Analytics tab title</comment>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+        <source>CLICK TO SHOW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8702,6 +8718,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+        <source>%1 Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
         <source>Copy</source>
@@ -8929,6 +8952,18 @@ Do not forget to return the Logging level to its default setting after you have 
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
         <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your account password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9477,6 +9512,10 @@ You can force it, but it may significantly increase CPU load.</source>
         <source>Acknowledge</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Calling...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9487,6 +9526,21 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>Notifications Settings</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n notifications</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Current System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Systems</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10235,10 +10289,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>Server Id: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This certificate does not match the certificate %1 is pinned to.</source>
         <translation></translation>
     </message>
@@ -10263,16 +10313,20 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto-generated certificate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The certificate is auto-generated and pinned to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you did not modify %2 server SSL certificate.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10537,10 +10591,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SD archive found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export archive from %1 completed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10562,6 +10612,22 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
         <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On-device recordings were found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export archive from %1 stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The archive stream settings have been changed by user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The recording settings have been changed by user</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11161,21 +11227,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-        <source>Intercom Alarm Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Intercom Open Door</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open door</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
         <source>Latest</source>
@@ -11261,14 +11312,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
 <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
-        <source>Cannot find an item with the specified id</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot find a resource with the specified id.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cannot specify a media parameters for the resource without media stream.</source>
         <translation></translation>
     </message>
@@ -11279,6 +11322,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
         <source>Cannot find a widget corresponding to the specified item.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Cannot find an item with the specified ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot find a resource with the specified ID.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11321,10 +11372,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Apply changes failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Restore all rules to default?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11333,7 +11380,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restore rules failed.</source>
+        <source>Failed to apply changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to restore rules.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11345,13 +11396,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
         <source>Action</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-        <source>Select at least one User</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12051,8 +12095,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-        <translation></translation>
+        <source>Cannot check client update availability. Check your internet connection and try again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
