@@ -3,11 +3,13 @@
 #include "event_tile.h"
 #include "ui_event_tile.h"
 
+#include <QtCore/QCache>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QTimer>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
+#include <QtGui/QTextDocument>
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
@@ -24,6 +26,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -41,6 +44,7 @@ namespace {
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
 static constexpr auto kRoundingRadius = 2;
+static constexpr int kTileTitleLineLimit = 2;
 
 static constexpr int kTitleFontPixelSize = 13;
 static constexpr int kTimestampFontPixelSize = 11;
@@ -143,6 +147,9 @@ struct EventTile::Private
     Qt::MouseButton clickButton = Qt::NoButton;
     Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
+    QCache<int, QString> titleByWidth; //< key - width of nameLabel, value - trimmed title string
+    QTextDocument doc;
+    int currentWidth = 0;
 
     Private(EventTile* q):
         q(q),
@@ -153,6 +160,24 @@ struct EventTile::Private
     {
         loadPreviewTimer->setSingleShot(true);
         QObject::connect(loadPreviewTimer.get(), &QTimer::timeout, [this]() { requestPreview(); });
+    }
+
+    void setTitle(const QString& value)
+    {
+        currentWidth = 0;
+        titleByWidth.clear();
+        titleByWidth.insert(0, new QString(value));
+        doc.setHtml(nx::vms::common::html::toHtml(value));
+    }
+
+    void updateTitlesIfNeeded(int width)
+    {
+        if (!titleByWidth.contains(width))
+        {
+            doc.setTextWidth(width);
+            WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
+            titleByWidth.insert(width, new QString(doc.toHtml("utf-8")));
+        }
     }
 
     void handleHoverChanged(bool hovered)
@@ -302,7 +327,6 @@ EventTile::EventTile(QWidget* parent):
     ui(new Ui::EventTile())
 {
     ui->setupUi(this);
-    ui->nameLabel->setElideMode(Qt::ElideRight);
     setAttribute(Qt::WA_Hover);
 
     setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
@@ -433,10 +457,31 @@ EventTile::EventTile(QWidget* parent):
 
     connect(ui->nameLabel, &QLabel::linkActivated, this, activateLink);
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
+
+    ui->nameLabel->installEventFilter(this);
 }
 
 EventTile::~EventTile()
 {
+}
+
+bool EventTile::eventFilter(QObject* object, QEvent* event)
+{
+    if (object == ui->nameLabel && event->type() == QEvent::Resize)
+    {
+        auto resizeEvent = static_cast<QResizeEvent*>(event);
+        if (auto width = resizeEvent->size().width(); width != 0)
+        {
+            d->updateTitlesIfNeeded(width);
+            if (d->currentWidth != width)
+            {
+                d->currentWidth = width;
+                ui->nameLabel->setText(*d->titleByWidth[width]);
+            }
+        }
+    }
+
+    return base_type::eventFilter(object, event);
 }
 
 bool EventTile::closeable() const
@@ -468,6 +513,7 @@ QString EventTile::title() const
 
 void EventTile::setTitle(const QString& value)
 {
+    d->setTitle(value);
     ui->nameLabel->setText(value);
     ui->mainWidget->setHidden(value.isEmpty());
 }

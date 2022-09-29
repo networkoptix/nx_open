@@ -147,13 +147,18 @@ void WidgetUtils::elideDocumentHeight(QTextDocument* document, int maxHeight, co
     }
 }
 
-void WidgetUtils::elideDocumentLines(QTextDocument* document, int maxLines, const QString& tail)
+void WidgetUtils::elideDocumentLines(
+    QTextDocument* document,
+    int maxLines,
+    bool trimLastLine,
+    const QString& tail)
 {
     // This line is required to force the document to create the layout, which will then be used
     // to count the lines.
     document->documentLayout();
 
     std::optional<int> lastFullyVisiblePosition;
+    qreal offset = 0;
 
     // Iterate over document blocks and their lines to find first partially visible line.
     for (QTextBlock block = document->firstBlock(); block.isValid(); block = block.next())
@@ -168,6 +173,7 @@ void WidgetUtils::elideDocumentLines(QTextDocument* document, int maxLines, cons
 
             if (lineIndex < maxLines)
             {
+                offset = document->textWidth() - line.naturalTextWidth();
                 // Remember it and go to the next line.
                 lastFullyVisiblePosition = documentPosition;
                 continue;
@@ -180,7 +186,15 @@ void WidgetUtils::elideDocumentLines(QTextDocument* document, int maxLines, cons
 
             // Replace last fully visible line with tail.
             QTextCursor cursor(document);
-            cursor.setPosition(*lastFullyVisiblePosition);
+            if (trimLastLine)
+            {
+                cursor.setPosition(line.xToCursor(offset));
+                cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, tail.size());
+            }
+            else
+            {
+                cursor.setPosition(*lastFullyVisiblePosition);
+            }
             cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
             cursor.insertText(tail);
             return;

@@ -122,7 +122,7 @@
          <widget class="nx::vms::client::desktop::NameValueTable" name="attributeTable" native="true"/>
         </item>
         <item row="0" column="1">
-         <widget class="QnElidedLabel" name="nameLabel">
+         <widget class="QLabel" name="nameLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -296,7 +296,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="0" column="0" alignment="Qt::AlignTop">
          <widget class="QLabel" name="iconLabel">
           <property name="minimumSize">
            <size>
@@ -451,11 +451,6 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/name_value_table.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnElidedLabel</class>
-   <extends>QLabel</extends>
-   <header location="global">ui/widgets/common/elided_label.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
