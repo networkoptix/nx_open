@@ -322,7 +322,10 @@ void QmlDialogWrapper::reject()
         d->done = true;
 
         if (d->window->isVisible())
-            d->window->close();
+        {
+            if (!d->window->close()) //< If close() didn't work at least hide the window.
+                d->window->hide();
+        }
         if (d->eventLoop.isRunning())
             d->eventLoop.exit(1);
 
