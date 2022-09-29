@@ -20,9 +20,13 @@ UserRoleData::UserRoleData(
 }
 
 UserRoleData UserRoleData::makePredefined(
-    const QnUuid& id, const QString& name, GlobalPermissions permissions)
+    const QnUuid& id,
+    const QString& name,
+    const QString& description,
+    GlobalPermissions permissions)
 {
     UserRoleData role(id, name, permissions);
+    role.description = description;
     role.isPredefined = true;
     return role;
 }

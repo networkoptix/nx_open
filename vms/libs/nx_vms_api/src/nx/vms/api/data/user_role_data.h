@@ -44,7 +44,10 @@ struct NX_VMS_API UserRoleData: IdData
         GlobalPermissions permissions = {}, std::vector<QnUuid> parentRoleIds = {});
 
     static UserRoleData makePredefined(
-        const QnUuid& id, const QString& name, GlobalPermissions permissions);
+        const QnUuid& id,
+        const QString& name,
+        const QString& description,
+        GlobalPermissions permissions);
 
     bool operator==(const UserRoleData& other) const = default;
     QString toString() const;
