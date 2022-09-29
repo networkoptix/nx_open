@@ -149,14 +149,12 @@ void CameraButtonController::createIntercomButtons()
 {
     createIntercomMuteButton();
     createOpenDoorButton();
-    createHangUpButton();
 }
 
 void CameraButtonController::removeIntercomButtons()
 {
     removeIntercomMuteButton();
     removeOpenDoorButton();
-    removeHangUpButton();
 }
 
 void CameraButtonController::handleChangedIOState(const QnIOStateData& value)
@@ -301,33 +299,6 @@ void CameraButtonController::createOpenDoorButton()
 void CameraButtonController::removeOpenDoorButton()
 {
     removeButton(ExtendedCameraOutput::powerRelay);
-}
-
-void CameraButtonController::createHangUpButton()
-{
-    if (!m_camera)
-        return;
-
-    ensureButtonState(ExtendedCameraOutput::hangUp,
-        [this]
-        {
-            auto hangUpButton = new SoftwareTriggerButton(m_parentWidget);
-            hangUpButton->setIcon("hang_up");
-            hangUpButton->setToolTip(tr("Drop"));
-
-            connect(hangUpButton, &SoftwareTriggerButton::clicked,
-                [this, hangUpButton]
-                {
-                    handleButtonClick(hangUpButton, ExtendedCameraOutput::hangUp);
-                });
-
-            return hangUpButton;
-        });
-}
-
-void CameraButtonController::removeHangUpButton()
-{
-    removeButton(ExtendedCameraOutput::hangUp);
 }
 
 } // namespace nx::vms::client::desktop
