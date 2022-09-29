@@ -10,6 +10,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/id_data.h>
+#include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -118,7 +119,7 @@ private:
         bool suppressNotificationSignal = false);
 
 private:
-    void at_archiveRebuildReply(bool success, int handle, const nx::vms::api::StorageScanInfo& reply);
+    void at_archiveRebuildReply(bool success, int handle, const nx::vms::api::StorageScanInfoFull& reply);
     void at_storageSpaceReply(bool success, int handle, const QnStorageSpaceReply& reply);
 
 private:
