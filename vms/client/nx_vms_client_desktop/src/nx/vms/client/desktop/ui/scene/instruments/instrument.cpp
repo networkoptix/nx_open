@@ -19,7 +19,7 @@ class Instrument::Private
 public:
     Private(Instrument* parent);
 
-    QPointer<QQuickItem> item;
+    QPointer<QObject> item;
     bool enabled = true;
 
     bool handleMouseButtonPress(QMouseEvent* event);
@@ -115,12 +115,12 @@ Instrument::~Instrument()
     setEnabled(false);
 }
 
-QQuickItem* Instrument::item() const
+QObject* Instrument::item() const
 {
     return d->item;
 }
 
-void Instrument::setItem(QQuickItem* item)
+void Instrument::setItem(QObject* item)
 {
     if (d->item == item)
         return;

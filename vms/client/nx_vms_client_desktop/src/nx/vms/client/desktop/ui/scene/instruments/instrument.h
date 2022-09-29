@@ -17,7 +17,7 @@ class KeyEvent;
 class Instrument: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QQuickItem* item READ item WRITE setItem NOTIFY itemChanged)
+    Q_PROPERTY(QObject* item READ item WRITE setItem NOTIFY itemChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
     using base_type = QObject;
@@ -26,8 +26,8 @@ public:
     Instrument(QObject* parent = nullptr);
     virtual ~Instrument() override;
 
-    QQuickItem* item() const;
-    void setItem(QQuickItem* item);
+    QObject* item() const;
+    void setItem(QObject* item);
 
     bool enabled() const;
     void setEnabled(bool enabled);
