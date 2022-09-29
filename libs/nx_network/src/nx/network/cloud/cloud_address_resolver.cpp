@@ -14,14 +14,14 @@ CloudAddressResolver::CloudAddressResolver():
 SystemError::ErrorCode CloudAddressResolver::resolve(
     const std::string_view& hostname,
     int /*ipVersion*/,
-    std::deque<AddressEntry>* resolvedAddresses)
+    ResolveResult* resolveResult)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
 
     if (!isCloudHostname(hostname))
         return SystemError::hostNotFound;
 
-    resolvedAddresses->push_back(AddressEntry(AddressType::cloud, HostAddress(hostname)));
+    resolveResult->entries.push_back(AddressEntry(AddressType::cloud, HostAddress(hostname)));
     return SystemError::noError;
 }
 

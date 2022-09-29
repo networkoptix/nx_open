@@ -72,9 +72,9 @@ void AddressResolver::resolveAsync(
     if (SocketGlobals::instance().isHostBlocked(hostname))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
-    std::deque<AddressEntry> resolvedAddresses;
-    if (resolveNonBlocking(hostname.toString(), natTraversalSupport, ipVersion, &resolvedAddresses))
-        return handler(SystemError::noError, std::move(resolvedAddresses));
+    ResolveResult resolved;
+    if (resolveNonBlocking(hostname.toString(), natTraversalSupport, ipVersion, &resolved))
+        return handler(SystemError::noError, std::move(resolved.entries));
 
     NX_MUTEX_LOCKER lk(&m_mutex);
 
@@ -190,7 +190,6 @@ bool AddressResolver::isCloudHostname(const char* hostname) const
 
 void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.stop();
     handler();
 }
@@ -316,7 +315,7 @@ bool AddressResolver::resolveNonBlocking(
     const std::string& hostname,
     NatTraversalSupport natTraversalSupport,
     int ipVersion,
-    std::deque<AddressEntry>* resolvedAddresses)
+    ResolveResult* resolved)
 {
     for (const auto& nonBlockingResolver: m_nonBlockingResolvers)
     {
@@ -328,7 +327,7 @@ bool AddressResolver::resolveNonBlocking(
         }
 
         const SystemError::ErrorCode resolveResult =
-            nonBlockingResolver->resolve(hostname, ipVersion, resolvedAddresses);
+            nonBlockingResolver->resolve(hostname, ipVersion, resolved);
         if (resolveResult == SystemError::noError)
             return true;
     }

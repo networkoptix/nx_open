@@ -11,11 +11,18 @@
 namespace nx::utils {
 
 /**
- * Cache which limits life-time of its elements.
+ * Cache which limits the life-time of its elements.
  * Implemented on top of LruCache.
- * Expired elements are removed by all non-const methods(getValue, put, erase)
- * by removing fixed number of elements (10) at most.
+ * Elements with a timestamp older than `now - expirationPeriod` are removed by all non-const
+ * methods(getValue, put, erase) by removing fixed number of elements (10) at most.
  * Thus, the run-time complexity of those methods is not degraded.
+ *
+ * Note: depending on the configuration, the cache may update an element's timestamp on each
+ * usage or may not.
+ * If the user chooses to update element's timestamp on each access, then the expirationPeriod
+ * is effectively an element idle timeout.
+ * If the user does not choose to update element's timestamp on each access, then the expirationPeriod
+ * effectively becomes an element lifetime.
  */
 template<
     typename Key, typename Value,
@@ -34,10 +41,12 @@ class TimeOutCache
 public:
     TimeOutCache(
         std::chrono::milliseconds expirationPeriod,
-        std::size_t maxSize)
+        std::size_t maxSize,
+        bool updateElementTimestampOnAccess = true)
         :
         m_expirationPeriod(expirationPeriod),
-        m_lruCache(maxSize)
+        m_lruCache(maxSize),
+        m_updateElementTimestampOnAccess(updateElementTimestampOnAccess)
     {
     }
 
@@ -52,14 +61,22 @@ public:
         if (!item)
             return std::nullopt;
 
-        ((Item&) *item).lastAccessTime = nx::utils::monotonicTime();
+        if (isExpired(*item))
+        {
+            m_lruCache.erase(key);
+            return std::nullopt;
+        }
+
+        if (m_updateElementTimestampOnAccess)
+            ((Item&) *item).lastAccessTime = nx::utils::monotonicTime();
+
         return std::reference_wrapper<Value>(((Item&) *item).value);
     }
 
     std::optional<std::reference_wrapper<const Value>> peekValue(const Key& key) const
     {
         auto item = m_lruCache.peekValue(key);
-        if (!item)
+        if (!item || isExpired(*item))
             return std::nullopt;
         return std::reference_wrapper<const Value>(((const Item&)*item).value);
     }
@@ -117,6 +134,7 @@ private:
 private:
     const std::chrono::milliseconds m_expirationPeriod;
     detail::LruCacheBase<Key, Item, Dict> m_lruCache;
+    const bool m_updateElementTimestampOnAccess = true;
 };
 
 } // namespace nx::utils
