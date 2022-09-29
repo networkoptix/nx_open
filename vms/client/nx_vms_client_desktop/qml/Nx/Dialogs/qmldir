@@ -1,4 +1,5 @@
 module Nx.Dialogs
 
 Dialog 1.0 Dialog.qml
+DialogWithState 1.0 DialogWithState.qml
 FigureEditorDialog 1.0 FigureEditorDialog.qml

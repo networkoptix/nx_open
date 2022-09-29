@@ -21,7 +21,7 @@ namespace nx::vms::client::desktop {
  * A wrapper which proxies accepted()/rejected() signals and accept()/reject() slots between C++
  * and a QML Dialog Window.
  */
-class QmlDialogWrapper: public QObject
+class NX_VMS_CLIENT_DESKTOP_API QmlDialogWrapper: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
@@ -52,6 +52,8 @@ public:
     QUrl source() const;
     void setSource(const QUrl& source);
 
+    void setData(const QByteArray& data, const QUrl& url);
+
     /** Initial properties for the wrapped dialog. */
     QVariantMap initialProperties() const;
     void setInitialProperties(const QVariantMap& initialProperties);
@@ -68,6 +70,7 @@ public:
     void setMaximized(bool value);
 
 signals:
+    void initialized();
     void sourceChanged();
     void initialPropertiesChanged();
     void transientParentChanged();
