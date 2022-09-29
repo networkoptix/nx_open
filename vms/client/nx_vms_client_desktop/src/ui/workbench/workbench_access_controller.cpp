@@ -249,12 +249,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
+        const auto basePermissions = resourceAccessManager()->permissions(m_user, resource);
+
+        Qn::Permissions forbidden = Qn::NoPermissions;
         if (camera->licenseType() == Qn::LC_VMAX && !camera->isScheduleEnabled())
-        {
-            const Qn::Permissions forbidden = Qn::ViewLivePermission | Qn::ViewFootagePermission;
-            const auto basePermissions = resourceAccessManager()->permissions(m_user, resource);
-            return basePermissions & ~forbidden;
-        }
+            forbidden |= Qn::ViewLivePermission | Qn::ViewFootagePermission;
+
+        if (camera->hasFlags(Qn::cross_system))
+            forbidden |= Qn::WritePermission | Qn::WriteNamePermission | Qn::SavePermission;
+
+        return basePermissions & ~forbidden;
     }
 
     return resourceAccessManager()->permissions(m_user, resource);
