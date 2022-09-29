@@ -6,6 +6,7 @@
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -1200,7 +1201,14 @@ void initialize(Manager* manager, Action* root)
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
-        .text(ContextMenu::tr("Save Layout"))
+        .dynamicText(new FunctionalTextFactory(
+            [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+            {
+                return parameters.resource()->hasFlags(Qn::cross_system)
+                    ? ContextMenu::tr("Save Cloud Layout")
+                    : ContextMenu::tr("Save Layout");
+            },
+            manager))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
     factory(SaveLocalLayoutAction)
@@ -1210,7 +1218,14 @@ void initialize(Manager* manager, Action* root)
 
     factory(SaveLayoutAsAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Save Layout As..."))
+        .dynamicText(new FunctionalTextFactory(
+            [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+            {
+                return parameters.resource()->hasFlags(Qn::cross_system)
+                    ? ContextMenu::tr("Save Cloud Layout As...")
+                    : ContextMenu::tr("Save Layout As...");
+            },
+            manager))
         .condition(
             condition::isLoggedIn()
             && condition::canSaveLayoutAs()
