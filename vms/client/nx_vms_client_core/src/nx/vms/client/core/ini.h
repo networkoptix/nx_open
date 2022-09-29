@@ -25,9 +25,6 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         " * 8 - All systems except those on localhost.\n"
     );
 
-    NX_INI_FLAG(false, ignoreSavedPreferredCloudServers,
-        "[Dev] Ignore cloud server preference saved by \"Connect to this Server\" commands.");
-
     NX_INI_STRING("", rootCertificatesFolder,
         "Path to a folder with user-provided certificates. If set, all *.pem and *.crt files\n"
         "from this folder are used as trusted root certificates together with the system ones.");
