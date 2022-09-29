@@ -22,6 +22,10 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
         READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QString filterText READ filterText WRITE setFilterText NOTIFY filterTextChanged)
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
+    Q_PROPERTY(QSet<nx::vms::client::desktop::ResourceTree::NodeType> collapsedNodes
+        READ collapsedNodes
+        WRITE setCollapsedNodes
+        NOTIFY collapsedNodesChanged)
 
     using base_type = ScopedModelOperations<FilterProxyModel>;
 
@@ -40,6 +44,9 @@ public:
 
     QString filterText() const;
     void setFilterText(const QString& value);
+
+    void setCollapsedNodes(const QSet<ResourceTree::NodeType>& nodeTypes);
+    QSet<ResourceTree::NodeType> collapsedNodes() const;
 
     bool isExtraInfoRequired() const;
 
@@ -61,6 +68,7 @@ public:
 signals:
     void contextChanged();
     void filterTextChanged();
+    void collapsedNodesChanged();
     void resourceTypesChanged();
     void selectionModeChanged();
     void extraInfoRequiredChanged();

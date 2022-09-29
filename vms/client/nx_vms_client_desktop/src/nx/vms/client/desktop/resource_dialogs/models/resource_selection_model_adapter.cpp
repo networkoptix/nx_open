@@ -33,6 +33,7 @@ struct ResourceSelectionModelAdapter::Private
     ResourceTree::ResourceFilters resourceTypes = 0;
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
+    QSet<ResourceTree::NodeType> collapsedNodes;
 
     Private(ResourceSelectionModelAdapter* q):
         q(q),
@@ -80,10 +81,30 @@ struct ResourceSelectionModelAdapter::Private
 
     bool isRowAccepted(int sourceRow, const QModelIndex& sourceParent) const
     {
+        if (!collapsedNodes.isEmpty())
+        {
+            const auto sourceIndex = q->sourceModel()->index(sourceRow, 0, sourceParent);
+
+            // Find root node type.
+            auto rootIndex = sourceIndex;
+            while (rootIndex.parent().isValid())
+                rootIndex = rootIndex.parent();
+
+            const auto rootNodeType = q->sourceModel()->data(rootIndex, Qn::NodeTypeRole)
+                .value<ResourceTree::NodeType>();
+
+            // Show only root nodes for collapsed node types.
+            if (collapsedNodes.contains(rootNodeType))
+                return rootIndex == sourceIndex;
+        }
+
         if (filterText.isEmpty())
             return true;
 
-        return true;
+        const auto text = q->sourceModel()->data(
+            q->sourceModel()->index(sourceRow, 0, sourceParent)).toString();
+
+        return text.contains(filterText, Qt::CaseInsensitive);
     }
 };
 
@@ -196,6 +217,23 @@ void ResourceSelectionModelAdapter::setFilterText(const QString& value)
     invalidateFilter();
 }
 
+void ResourceSelectionModelAdapter::setCollapsedNodes(
+    const QSet<ResourceTree::NodeType>& nodeTypes)
+{
+    if (d->collapsedNodes == nodeTypes)
+        return;
+
+    d->collapsedNodes = nodeTypes;
+    emit collapsedNodesChanged();
+
+    invalidateFilter();
+}
+
+QSet<ResourceTree::NodeType> ResourceSelectionModelAdapter::collapsedNodes() const
+{
+    return d->collapsedNodes;
+}
+
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const
 {
     return qnSettings->resourceInfoLevel() > Qn::RI_NameOnly;
@@ -281,6 +319,7 @@ void ResourceSelectionModelAdapter::registerQmlType()
 {
     qmlRegisterType<ResourceSelectionModelAdapter>(
         "nx.vms.client.desktop", 1, 0, "ResourceSelectionModel");
+    qRegisterMetaType<QSet<nx::vms::client::desktop::ResourceTree::NodeType>>();
 }
 
 } // namespace nx::vms::client::desktop
