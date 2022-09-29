@@ -183,6 +183,7 @@ QnPredefinedUserRoles::UserRoleDataList QnPredefinedUserRoles::list()
                 roles.emplace_back(UserRoleData::makePredefined(
                     id(role),
                     name(role),
+                    description(role),
                     permissions(role)));
             }
             return roles;
