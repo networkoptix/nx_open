@@ -157,15 +157,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check System Administration Settings to configure this plugin.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This plugin has no settings at System level.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check Camera Settings to configure this plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check System Administration settings to configure this plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This plugin has no settings at the System level.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1197,6 +1197,10 @@ to activate PTZ</source>
         <source>Unsupported firmware version</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Access denied</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyledRadioButton</name>
@@ -1306,10 +1310,6 @@ to activate PTZ</source>
 <context>
     <name>WelcomeScreen</name>
     <message>
-        <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Official Website</source>
         <translation></translation>
     </message>
@@ -1320,6 +1320,10 @@ to activate PTZ</source>
     <message>
         <source>Support</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>You do not have access to the %1. Please check your internet connection.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

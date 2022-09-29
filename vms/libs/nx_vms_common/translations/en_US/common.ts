@@ -1096,6 +1096,62 @@
     </message>
 </context>
 <context>
+    <name>Result</name>
+    <message>
+        <source>Missing required parameter: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to process request.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forbidden.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad request.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not implemented.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported media type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service unavailable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unauthorized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session expired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SystemHelpers</name>
     <message>
         <source>New System</source>
@@ -1138,10 +1194,6 @@
     </message>
     <message>
         <source>SMTP timeout (seconds)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SMTP use simple settings view in Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1342,10 +1394,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable crossdomain policy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable RTSP for Arecont</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1399,10 +1447,6 @@
     </message>
     <message>
         <source>Enable recording on EDGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable WebSocket for p2p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1522,19 +1566,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Servers in tree for non-admins</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>HTTP header: Origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>HTTP header: X-Frame-Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use only HTTPS for Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1554,11 +1590,35 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable insecure deprecated API functions</source>
+        <source>Enable 2fa for system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable insecure deprecated API functions curently used by %1 software</source>
+        <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cross-domain policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable WebSocket for P2P</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Servers in the Resource Tree for non-admins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only HTTPS for cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions (unsecure)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
         <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
