@@ -61,7 +61,6 @@ nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSy
     nx::vms::api::ModuleInformationWithAddresses result;
 
     // Fill parameters with default values to avoid compatibility checks.
-    //result.id = kInitialServerId;
     result.type = nx::vms::api::ModuleInformation::mediaServerId();
     result.brand = nx::branding::brand();
     result.customization = nx::branding::customization();
