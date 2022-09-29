@@ -180,7 +180,10 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
             QModelIndex parent = index;
             while (parent.isValid())
             {
-                emit dataChanged(parent.siblingAtColumn(0), parent.siblingAtColumn(1), {Qt::CheckStateRole});
+                emit dataChanged(
+                    parent.siblingAtColumn(kResourceColumn),
+                    parent.siblingAtColumn(checkBoxColumn(this)),
+                    {Qt::CheckStateRole});
                 parent = parent.parent();
             }
         };
@@ -216,7 +219,10 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
                 const QModelIndex toggledIndex = m_resourceMapping.value(resource);
                 if (toggledIndex.isValid())
                 {
-                    emit dataChanged(toggledIndex.siblingAtColumn(0), toggledIndex.siblingAtColumn(1), {Qt::CheckStateRole});
+                    emit dataChanged(
+                        toggledIndex.siblingAtColumn(kResourceColumn),
+                        toggledIndex.siblingAtColumn(checkBoxColumn(this)),
+                        {Qt::CheckStateRole});
                     affectedParents.insert(toggledIndex.parent());
                 }
             }
@@ -268,6 +274,54 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
     if (rowCount(index) > 0)
         return toggleGroupSelection(index);
     return toggleLeafSelection(index);
+}
+
+bool ResourceSelectionDecoratorModel::toggleSelection(
+    const QModelIndex& fromIndex,
+    const QModelIndex& toIndex)
+{
+    if (!toIndex.isValid() || toIndex.model() != this)
+        return NX_ASSERT(false, "Invalid toIndex");
+
+    if (fromIndex.isValid() && fromIndex.model() != this)
+        return NX_ASSERT(false, "Invalid fromIndex");
+
+    if (!fromIndex.isValid()
+        || fromIndex.parent() != toIndex.parent()
+        || fromIndex == toIndex
+        || m_resourceSelectionMode != ResourceSelectionMode::MultiSelection)
+    {
+        return toggleSelection(toIndex);
+    }
+
+    if (!toggleSelection(toIndex))
+        return false;
+
+    const auto fillValue = toIndex.siblingAtColumn(checkBoxColumn(this))
+        .data(Qt::CheckStateRole).value<Qt::CheckState>();
+    const auto parentIndex = toIndex.parent();
+
+    const auto fillRowsCount = std::abs(toIndex.row() - fromIndex.row());
+    const auto firstFillRow = toIndex.row() > fromIndex.row()
+        ? fromIndex.row()
+        : toIndex.row() + 1;
+
+    for (int row = firstFillRow; row < firstFillRow + fillRowsCount; ++row)
+    {
+        const auto rowIndex = index(row, toIndex.column(), parentIndex);
+        const auto rowCheckStateData = rowIndex.siblingAtColumn(checkBoxColumn(this))
+            .data(Qt::CheckStateRole);
+        if (rowCheckStateData.isNull())
+            continue;
+
+        const auto rowCheckState = rowCheckStateData.value<Qt::CheckState>();
+        if (rowCheckState == fillValue)
+            continue;
+
+        toggleSelection(rowIndex);
+    }
+
+    return true;
 }
 
 ResourceSelectionMode ResourceSelectionDecoratorModel::selectionMode() const
