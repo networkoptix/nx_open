@@ -1323,6 +1323,39 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
         targetThread);
 }
 
+Handle ServerConnection::startArchiveRebuild(const QnUuid& serverId,
+    const QString pool,
+    Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
+    QThread* targetThread)
+{
+    const auto endpoint =
+        NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
+    return executePost(endpoint, nx::network::rest::Params(), std::move(callback), targetThread);
+}
+
+Handle ServerConnection::getArchiveRebuildProgress(const QnUuid& serverId,
+    const QString pool,
+    Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
+    QThread* targetThread)
+{
+    const auto endpoint =
+        NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
+    return executeGet(endpoint,
+        nx::network::rest::Params{{"_keepDefault", QnLexical::serialized(true)}},
+        std::move(callback),
+        targetThread);
+}
+
+Handle ServerConnection::stopArchiveRebuild(const QnUuid& serverId,
+    const QString pool,
+    Result<ErrorOrEmpty>::type&& callback,
+    QThread* targetThread)
+{
+    const auto endpoint =
+        NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
+    return executeDelete(endpoint, nx::network::rest::Params(), std::move(callback), targetThread);
+}
+
 Handle ServerConnection::postJsonResult(
     const QString& action,
     const nx::network::rest::Params& params,

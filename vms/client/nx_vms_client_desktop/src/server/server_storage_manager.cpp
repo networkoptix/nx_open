@@ -389,44 +389,58 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
     if (!isServerValid(server) || !connection())
         return false;
 
-    auto endpoint = NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2",
-        server->getId().toSimpleString(),
-        (pool == QnServerStoragesPool::Main) ? "main" : "backup").toQString();
+    const auto poolStr = (pool == QnServerStoragesPool::Main)
+        ? QString("main")
+        : QString("backup");
+
+    auto callback = nx::utils::guarded(this,
+        [this](
+            bool success,
+            int handle,
+            rest::ErrorOrData<nx::vms::api::StorageScanInfoFull> errorOrData)
+        {
+            if (success)
+            {
+                at_archiveRebuildReply(
+                    success,
+                    handle,
+                    std::get<nx::vms::api::StorageScanInfoFull>(errorOrData));
+            }
+            else
+            {
+                at_archiveRebuildReply(success, handle, {});
+            }
+        });
 
     int handle = 0;
     if (action == Qn::RebuildAction_ShowProgress)
     {
-        handle = connectedServerApi()->getJsonResult(
-            endpoint,
-            /*params*/ {},
-            methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply),
+        handle = connectedServerApi()->getArchiveRebuildProgress(
+            server->getId(),
+            poolStr,
+            std::move(callback),
             thread());
     }
     else if (action == Qn::RebuildAction_Start)
     {
-        handle = connectedServerApi()->postJsonResult(
-            endpoint,
-            /*params*/ {},
-            /*body*/ {},
-            methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply),
-            thread(),
-            /*timeouts*/ std::nullopt);
+        handle = connectedServerApi()->startArchiveRebuild(
+            server->getId(),
+            poolStr,
+            std::move(callback),
+            thread());
     }
     else if (action == Qn::RebuildAction_Cancel)
     {
         auto callback = nx::utils::guarded(this,
-            [this](
-                bool success,
-                rest::Handle handle,
-                rest::ServerConnection::EmptyResponseType /*requestResult*/)
+            [this](bool success, rest::Handle handle, rest::ErrorOrEmpty /*result*/)
             {
                 at_archiveRebuildReply(success, handle, {});
             });
 
-        handle = connectedServerApi()->deleteEmptyResult(
-            endpoint,
-            /*params*/ {},
-            callback,
+        handle = connectedServerApi()->stopArchiveRebuild(
+            server->getId(),
+            poolStr,
+            std::move(callback),
             thread());
     }
 
@@ -443,7 +457,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
 }
 
 void QnServerStorageManager::at_archiveRebuildReply(
-    bool success, int handle, const nx::vms::api::StorageScanInfo& reply)
+    bool success, int handle, const nx::vms::api::StorageScanInfoFull& reply)
 {
     NX_VERBOSE(this, "Received archive rebuild reply %1, success %2, %3", handle, success, reply);
     if (!m_requests.contains(handle))
@@ -462,8 +476,12 @@ void QnServerStorageManager::at_archiveRebuildReply(
     ServerInfo& serverInfo = m_serverInfo[requestKey.server];
     ServerPoolInfo& poolInfo = serverInfo.storages[static_cast<int>(requestKey.pool)];
 
+    nx::vms::api::StorageScanInfo replyInfo;
+    if (reply.size() == 1)
+        replyInfo = reply.begin()->second;
+
     Callback delayedCallback;
-    if ((reply.state > nx::vms::api::RebuildState::none) || !success)
+    if ((replyInfo.state > nx::vms::api::RebuildState::none) || !success)
     {
         NX_VERBOSE(this, "Queue next rebuild progress request");
         delayedCallback =
@@ -485,15 +503,15 @@ void QnServerStorageManager::at_archiveRebuildReply(
     if (!success)
         return;
 
-    if (poolInfo.rebuildStatus != reply)
+    if (poolInfo.rebuildStatus != replyInfo)
     {
         const bool finished = (poolInfo.rebuildStatus.state == nx::vms::api::RebuildState::full
-            && reply.state == nx::vms::api::RebuildState::none);
+            && replyInfo.state == nx::vms::api::RebuildState::none);
 
         NX_VERBOSE(this, "Rebuild status changed, is finished: %1", finished);
 
-        poolInfo.rebuildStatus = reply;
-        emit serverRebuildStatusChanged(requestKey.server, requestKey.pool, reply);
+        poolInfo.rebuildStatus = replyInfo;
+        emit serverRebuildStatusChanged(requestKey.server, requestKey.pool, replyInfo);
 
         if (finished)
             emit serverRebuildArchiveFinished(requestKey.server, requestKey.pool);
