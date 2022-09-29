@@ -136,6 +136,7 @@ protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual QSize minimumSizeHint() const override;
     virtual bool event(QEvent* event) override;
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
     struct Private;
