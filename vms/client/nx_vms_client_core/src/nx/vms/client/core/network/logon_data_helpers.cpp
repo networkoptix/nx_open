@@ -5,7 +5,6 @@
 #include <finders/systems_finder.h>
 #include <helpers/system_helpers.h>
 #include <network/system_helpers.h>
-#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <watchers/cloud_status_watcher.h>
@@ -41,7 +40,13 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
     const auto servers = system->servers();
 
     // Cloud systems are initialized with a dummy server with null id.
-    const bool systemHasInitialServerOnly = servers.size() == 1 && servers.first().id.isNull();
+    const bool systemHasInitialServer = std::any_of(servers.cbegin(), servers.cend(),
+        [system](const nx::vms::api::ModuleInformationWithAddresses& server)
+        {
+            return server.id.isNull()
+                && helpers::isCloudUrl(system->getServerHost(QnUuid()));
+        });
+    const bool systemHasInitialServerOnly = systemHasInitialServer && servers.size() == 1;
 
     LogonData result;
     nx::utils::Url url;
@@ -55,13 +60,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
     result.expectedServerId = helpers::preferredCloudServer(system->id());
     if (result.expectedServerId)
     {
-        if (systemHasInitialServerOnly)
-        {
-            url = core::helpers::serverCloudHost(system->id(), result.expectedServerId.value());
-            NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
-                result.expectedServerId->toString(), url);
-        }
-        else if (system->isReachableServer(result.expectedServerId.value()))
+        if (system->isReachableServer(result.expectedServerId.value()))
         {
             url = system->getServerHost(result.expectedServerId.value());
             if (NX_ASSERT(!url.isEmpty()))
@@ -69,6 +68,12 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
                 NX_DEBUG(NX_SCOPE_TAG, "Choosing stored preferred cloud server %1 (%2)",
                     result.expectedServerId->toString(), url);
             }
+        }
+        else if (systemHasInitialServerOnly)
+        {
+            url = helpers::serverCloudHost(system->id(), result.expectedServerId.value());
+            NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
+                result.expectedServerId->toString(), url);
         }
         else
         {
@@ -97,26 +102,27 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
             [system](const nx::vms::api::ModuleInformation& server)
             {
-                return system->isReachableServer(server.id);
+                return !server.id.isNull() && system->isReachableServer(server.id);
             });
 
         if (iter != servers.cend())
         {
-            if (NX_ASSERT(!iter->id.isNull()))
+            result.expectedServerId = iter->id;
+            url = system->getServerHost(iter->id);
+            if (NX_ASSERT(!url.isEmpty()))
             {
-                result.expectedServerId = iter->id;
-                url = system->getServerHost(iter->id);
-                if (NX_ASSERT(!url.isEmpty()))
-                {
-                    const bool isCloudUrl =
-                        nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
-
-                    NX_DEBUG(NX_SCOPE_TAG,
-                        "Choosing %1 connection to the server %2 (%3)",
-                        isCloudUrl ? "cloud" : "local",
-                        result.expectedServerId,
-                        url);
-                }
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Choosing %1 connection to the server %2 (%3)",
+                    helpers::isCloudUrl(url) ? "cloud" : "local",
+                    result.expectedServerId,
+                    url);
+            }
+            else if (systemHasInitialServer)
+            {
+                url = system->getServerHost(QnUuid());
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Connecting to the cloud system which was not pinged yet: %1",
+                    url);
             }
         }
     }
