@@ -160,7 +160,8 @@ static void detectCoreCount(int& logicalCores, int& physicalCores)
     HardwareInformation::HardwareInformation()
     {
         struct sysinfo sys;
-        physicalMemory = (sysinfo(&sys) == 0) ? (sys.totalram * sys.mem_unit) : 0;
+        if (sysinfo(&sys) == 0)
+            physicalMemory = (qint64)(sys.totalram) * (qint64)(sys.mem_unit);
         cpuArchitecture = compileCpuArchicture();
 
         std::ifstream cpu("/proc/cpuinfo");
