@@ -64,10 +64,12 @@ static void convertAddrInfo(
 
 } // namespace
 
+static constexpr auto kMaxCachePeriod = std::chrono::minutes(1);
+
 SystemError::ErrorCode SystemResolver::resolve(
     const std::string_view& hostNameOriginal,
     int ipVersion,
-    std::deque<AddressEntry>* resolvedEntries)
+    ResolveResult* resolveResult)
 {
     // This is a workaround for operating systems where /etc/hosts does not work, thus localhost is
     // inaccessible, like certain Busybox-based systems.
@@ -78,13 +80,13 @@ SystemError::ErrorCode SystemResolver::resolve(
         {
             if (ipVersion == AF_INET)
             {
-                resolvedEntries->push_back({{AddressEntry(
+                resolveResult->entries.push_back({{AddressEntry(
                     AddressType::direct,
                     *HostAddress::localhost.ipV4())}});
             }
             else
             {
-                resolvedEntries->push_back({{AddressEntry(
+                resolveResult->entries.push_back({{AddressEntry(
                     AddressType::direct,
                     *HostAddress::localhost.ipV6().first)}});
             }
@@ -149,8 +151,8 @@ SystemError::ErrorCode SystemResolver::resolve(
         return resultCode;
     }
 
-    convertAddrInfo(addressInfo, resolvedEntries);
-    if (resolvedEntries->empty())
+    convertAddrInfo(addressInfo, &resolveResult->entries);
+    if (resolveResult->entries.empty())
     {
         resultCode = SystemError::hostNotFound;
         NX_VERBOSE(this, nx::format("Resolve of %1 on DNS failed with result %2. No suitable entries")
@@ -159,10 +161,12 @@ SystemError::ErrorCode SystemResolver::resolve(
     }
 
     if (ipVersion == AF_INET6 && (nx::utils::stricmp(hostNameOriginal, "localhost") == 0))
-        ensureLocalHostCompatibility(resolvedEntries);
+        ensureLocalHostCompatibility(&resolveResult->entries);
 
-    NX_VERBOSE(this, nx::format("Resolve of %1 on DNS completed successfully. %2 entries found")
-        .args(hostName, resolvedEntries->size()));
+    NX_VERBOSE(this, "Resolve of %1 on DNS completed successfully. %2 entries found",
+        hostName, resolveResult->entries);
+
+    resolveResult->ttl = kMaxCachePeriod;
 
     return SystemError::noError;
 }

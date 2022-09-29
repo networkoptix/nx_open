@@ -82,7 +82,7 @@ private:
     SystemError::ErrorCode testResolve(
         const std::string_view& hostName,
         int /*ipVersion*/,
-        std::deque<AddressEntry>* resolvedAddress)
+        ResolveResult* resolved)
     {
         if (hostName == hardToResolveHost)
         {
@@ -93,7 +93,7 @@ private:
         if (!m_pipelinedRequests.empty())
             startNextPipelinedTask();
 
-        resolvedAddress->push_back({AddressType::direct, HostAddress::localhost});
+        resolved->entries.push_back({AddressType::direct, HostAddress::localhost});
         return SystemError::noError;
     }
 
@@ -172,22 +172,22 @@ TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
 {
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     {
-        std::deque<HostAddress> ips;
-        const auto resultCode = dnsResolver.resolveSync("localhost", AF_INET, &ips);
+        ResolveResult resolved;
+        const auto resultCode = dnsResolver.resolveSync("localhost", AF_INET, &resolved);
         ASSERT_EQ(SystemError::noError, resultCode);
-        ASSERT_GE(ips.size(), 1U);
-        ASSERT_TRUE(ips.front().isIpAddress());
-        ASSERT_TRUE((bool)ips.front().ipV4());
-        ASSERT_TRUE((bool)ips.front().ipV6().first);
-        ASSERT_NE(0U, ips.front().ipV4()->s_addr);
+        ASSERT_GE(resolved.entries.size(), 1U);
+        ASSERT_TRUE(resolved.entries.front().host.isIpAddress());
+        ASSERT_TRUE((bool)resolved.entries.front().host.ipV4());
+        ASSERT_TRUE((bool)resolved.entries.front().host.ipV6().first);
+        ASSERT_NE(0U, resolved.entries.front().host.ipV4()->s_addr);
     }
 
     {
-        std::deque<HostAddress> ips;
+        ResolveResult resolved;
         const auto resultCode = dnsResolver.resolveSync(
-            "unknown-894ae3a4-5a95-42c3-a674-dd0e1c16e415.ru.", AF_INET, &ips);
+            "unknown-894ae3a4-5a95-42c3-a674-dd0e1c16e415.ru.", AF_INET, &resolved);
         ASSERT_EQ(SystemError::hostNotFound, resultCode);
-        ASSERT_EQ(0U, ips.size());
+        ASSERT_EQ(0U, resolved.entries.size());
     }
 
     {
@@ -198,21 +198,22 @@ TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
 
         dnsResolver.addEtcHost(kTestHost, kTestAddresses);
 
-        std::deque<HostAddress> ip4s;
-        SystemError::ErrorCode resultCode = dnsResolver.resolveSync(kTestHost, AF_INET, &ip4s);
+        ResolveResult resolvedV4;
+        SystemError::ErrorCode resultCode = dnsResolver.resolveSync(kTestHost, AF_INET, &resolvedV4);
         ASSERT_EQ(SystemError::noError, resultCode);
 
-        std::deque<HostAddress> ip6s;
-        resultCode = dnsResolver.resolveSync(kTestHost, AF_INET6, &ip6s);
+        ResolveResult resolvedV6;
+        resultCode = dnsResolver.resolveSync(kTestHost, AF_INET6, &resolvedV6);
         ASSERT_EQ(SystemError::noError, resultCode);
 
         dnsResolver.removeEtcHost(kTestHost);
 
-        ASSERT_EQ(1U, ip4s.size());
-        ASSERT_EQ(kTestAddresses.front(), ip4s.front());
-        ASSERT_EQ(2U, ip6s.size());
-        ASSERT_EQ(kTestAddresses.front(), ip6s.front());
-        ASSERT_EQ(kTestAddresses.back(), ip6s.back());
+        ASSERT_EQ(1U, resolvedV4.entries.size());
+        ASSERT_EQ(kTestAddresses.front(), resolvedV4.entries.front().host);
+
+        ASSERT_EQ(2U, resolvedV6.entries.size());
+        ASSERT_EQ(kTestAddresses.front(), resolvedV6.entries.front().host);
+        ASSERT_EQ(kTestAddresses.back(), resolvedV6.entries.back().host);
     }
 }
 

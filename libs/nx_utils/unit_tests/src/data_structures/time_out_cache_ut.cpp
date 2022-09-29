@@ -13,8 +13,8 @@ class TimeOutCache:
 public:
     static constexpr auto kExpirationPeriod = std::chrono::hours(1) * 24 * 365;
 
-    TimeOutCache():
-        m_cache(kExpirationPeriod, 100),
+    TimeOutCache(bool updateElementTimestampOnAccess = true):
+        m_cache(kExpirationPeriod, 100, updateElementTimestampOnAccess),
         m_timeShift(test::ClockType::steady)
     {
     }
@@ -92,6 +92,31 @@ TEST_F(TimeOutCache, element_access_prolongs_its_life)
 
     whenTimeHasPassed(kExpirationPeriod * 2 / 3);
     assertAddedItemIsFound();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class TimeOutCacheWithoutProlongation:
+    public TimeOutCache
+{
+public:
+    TimeOutCacheWithoutProlongation():
+        TimeOutCache(/*updateElementTimestampOnAccess*/ false)
+    {
+    }
+};
+
+TEST_F(TimeOutCacheWithoutProlongation, element_is_expired_regardless_of_the_usage)
+{
+    fillCache();
+    assertAddedItemIsFound();
+
+    whenTimeHasPassed(kExpirationPeriod * 2 / 3);
+    // Fetching value from cache. The value expiration time must not be affected.
+    assertAddedItemIsFound();
+
+    whenTimeHasPassed(kExpirationPeriod * 2 / 3);
+    thenNoItemCanBeFound();
 }
 
 } // namespace nx::utils::test
