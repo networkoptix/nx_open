@@ -19,7 +19,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const std::string_view& hostname,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses) override;
+        ResolveResult* resolveResult) override;
 
     bool isCloudHostname(const std::string_view& hostname) const;
 

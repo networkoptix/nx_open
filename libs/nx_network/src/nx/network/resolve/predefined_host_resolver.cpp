@@ -11,7 +11,7 @@ namespace network {
 SystemError::ErrorCode PredefinedHostResolver::resolve(
     const std::string_view& name,
     int ipVersion,
-    std::deque<AddressEntry>* resolvedAddresses)
+    ResolveResult* resolveResult)
 {
     auto reversedName = nx::utils::reverseWords(name, '.');
     nx::utils::toLower(&reversedName);
@@ -34,10 +34,10 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     {
         if (ipVersion == AF_INET && !entry.host.ipV4())
             continue; //< Only ipv4 hosts are requested.
-        resolvedAddresses->push_back(entry);
+        resolveResult->entries.push_back(entry);
     }
 
-    return resolvedAddresses->empty()
+    return resolveResult->entries.empty()
         ? SystemError::hostNotFound
         : SystemError::noError;
 }

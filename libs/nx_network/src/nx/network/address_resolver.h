@@ -176,7 +176,7 @@ protected:
         const std::string& hostName,
         NatTraversalSupport natTraversalSupport,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses);
+        ResolveResult* resolved);
 
     void dnsResolve(
         HaInfoIterator info, nx::Locker<nx::Mutex>* lk, bool needMediator, int ipVersion);

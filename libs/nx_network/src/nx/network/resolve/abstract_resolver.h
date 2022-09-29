@@ -13,18 +13,24 @@
 namespace nx {
 namespace network {
 
+struct ResolveResult
+{
+    std::deque<AddressEntry> entries;
+    std::optional<std::chrono::milliseconds> ttl;
+};
+
 class AbstractResolver
 {
 public:
     virtual ~AbstractResolver() = default;
 
     /**
-     * @param resolvedAddresses Not empty in case if SystemError::noError is returned.
+     * @param resolveResult Not empty in case if SystemError::noError is returned.
      */
     virtual SystemError::ErrorCode resolve(
         const std::string_view& hostName,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses) = 0;
+        ResolveResult* resolveResult) = 0;
 };
 
 } // namespace network

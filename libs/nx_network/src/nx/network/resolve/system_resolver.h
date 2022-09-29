@@ -16,7 +16,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const std::string_view& hostName,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses) override;
+        ResolveResult* resolveResult) override;
 
 private:
     SystemError::ErrorCode resolveStatusToErrno(int status);
