@@ -81,6 +81,7 @@ void QmlDialogWrapper::Private::handleStatusChanged(QQmlComponent::Status status
         connect(object, SIGNAL(applied()), q, SIGNAL(applied()));
 
     rootObjectHolder.setObject(window.get());
+    emit q->initialized();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -149,6 +150,11 @@ void QmlDialogWrapper::setSource(const QUrl& source)
     emit sourceChanged();
 
     d->qmlComponent->loadUrl(source);
+}
+
+void QmlDialogWrapper::setData(const QByteArray& data, const QUrl& url)
+{
+    d->qmlComponent->setData(data, url);
 }
 
 QVariantMap QmlDialogWrapper::initialProperties() const
@@ -277,8 +283,14 @@ void QmlDialogWrapper::accept()
         // avoid extra reject() call.
         d->done = true;
 
+        bool closed = true;
+
         if (d->window->isVisible())
-            d->window->close();
+            closed = d->window->close();
+
+        if (!closed)
+            return;
+
         if (d->eventLoop.isRunning())
             d->eventLoop.exit();
 
