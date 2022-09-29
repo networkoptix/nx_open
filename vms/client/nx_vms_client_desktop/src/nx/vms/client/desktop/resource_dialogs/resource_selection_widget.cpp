@@ -57,6 +57,7 @@ struct ResourceSelectionWidget::Private: public QObject
     std::unique_ptr<InvalidResourceDecoratorModel> invalidResourceDecoratorModel;
     std::unique_ptr<InvalidResourceFilterModel> invalidResourceFilterModel;
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
+    QPersistentModelIndex lastToggledIndex;
 };
 
 ResourceSelectionWidget::Private::Private(
@@ -82,8 +83,15 @@ void ResourceSelectionWidget::Private::onItemClicked(const QModelIndex& index)
     if (QApplication::keyboardModifiers().testFlag(Qt::AltModifier))
         return;
 
-    if (!selectionDecoratorModel->toggleSelection(index))
+    const bool hasChanges =
+        QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier) && lastToggledIndex.isValid()
+            ? selectionDecoratorModel->toggleSelection(lastToggledIndex, index)
+            : selectionDecoratorModel->toggleSelection(index);
+
+    if (!hasChanges)
         return;
+
+    lastToggledIndex = index;
 
     const auto selectedResources = selectionDecoratorModel->selectedResources();
 
