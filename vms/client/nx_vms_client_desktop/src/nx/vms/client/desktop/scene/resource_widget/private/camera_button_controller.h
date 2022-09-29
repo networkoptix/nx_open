@@ -75,9 +75,6 @@ private:
     void createOpenDoorButton();
     void removeOpenDoorButton();
 
-    void createHangUpButton();
-    void removeHangUpButton();
-
 private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
     QnUuid m_twoWayAudioWidgetId;
