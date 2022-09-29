@@ -10,12 +10,12 @@ namespace {
 const QString kOpenDoorPortName =
     QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
 
-bool checkIntercomCallPortExists(const QnResourcePtr& resource)
-{
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return false;
+} // namespace
 
+namespace nx::vms::common {
+
+bool checkIntercomCallPortExists(const QnVirtualCameraResourcePtr& camera)
+{
     const auto portDescriptions = camera->ioPortDescriptions();
     const auto portIter = std::find_if(portDescriptions.begin(), portDescriptions.end(),
         [](const auto& portData)
@@ -25,10 +25,6 @@ bool checkIntercomCallPortExists(const QnResourcePtr& resource)
 
     return portIter != portDescriptions.end();
 }
-
-} // namespace
-
-namespace nx::vms::common {
 
 QnUuid calculateIntercomLayoutId(const QnResourcePtr& intercom)
 {
@@ -40,14 +36,16 @@ QnUuid calculateIntercomLayoutId(const QnUuid& intercomId)
     return guidFromArbitraryData(intercomId.toString() + "layout");
 }
 
-// WARNING: For now it can return false negative result if an intercom is in removing process.
-// Because any intercom-specific feature could be already removed from resource.
 bool isIntercom(const QnResourcePtr& resource)
 {
     if (!resource)
         return false;
 
-    return checkIntercomCallPortExists(resource);
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return false;
+
+    return checkIntercomCallPortExists(camera);
 }
 
 bool isIntercomOnIntercomLayout(
@@ -63,7 +61,7 @@ bool isIntercomOnIntercomLayout(
     if (!layoutResource.dynamicCast<QnLayoutResource>())
         return false;
 
-    return checkIntercomCallPortExists(resource);
+    return isIntercom(resource);
 }
 
 bool isIntercomLayout(const QnResourcePtr& layoutResource)
@@ -71,15 +69,7 @@ bool isIntercomLayout(const QnResourcePtr& layoutResource)
     if (!layoutResource || !layoutResource->hasFlags(Qn::layout))
         return false;
 
-    const auto parentId = layoutResource->getParentId();
-    if (parentId.isNull())
-        return false;
-
-    // The function could be called while intercom is in removing process.
-    // In this case all intercom-specific features could be already removed from intercom resource.
-    // So, it is the only robust way to identify intercom layout for now.
-    const auto parent = layoutResource->getParentResource();
-    return parent && parent->hasFlags(Qn::video);
+    return isIntercom(layoutResource->getParentResource());
 }
 
 } // namespace nx::vms::common

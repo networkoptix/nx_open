@@ -2,6 +2,7 @@
 
 #include "resource_widget_factory.h"
 
+#include <core/resource/client_camera.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 
@@ -71,7 +72,8 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
     if (resource->hasFlags(Qn::videowall))
         return new QnVideowallScreenWidget(context, item);
 
-    if (itemIsIntercomLayout && nx::vms::common::isIntercom(resource))
+    QnClientCameraResourcePtr camera = resource.dynamicCast<QnClientCameraResource>();
+    if (itemIsIntercomLayout && camera && camera->isIntercom())
         return new IntercomResourceWidget(context, item);
 
     if (resource->hasFlags(Qn::media))

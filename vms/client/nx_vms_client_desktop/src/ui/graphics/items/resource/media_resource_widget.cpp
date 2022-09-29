@@ -1251,7 +1251,7 @@ void QnMediaResourceWidget::updateTwoWayAudioButton() const
         capabilityButtonsAreVisible()
         && m_buttonController->getAudioOutputDevice()->hasTwoWayAudio()
         && d->camera->isTwoWayAudioEnabled()
-        && !nx::vms::common::isIntercom(d->camera);
+        && !d->camera->isIntercom();
 
     if (twoWayAudioButtonVisible)
         m_buttonController->createTwoWayAudioButton();
@@ -1261,7 +1261,7 @@ void QnMediaResourceWidget::updateTwoWayAudioButton() const
 
 void QnMediaResourceWidget::updateIntercomButtons()
 {
-    if (capabilityButtonsAreVisible() && nx::vms::common::isIntercom(d->camera))
+    if (capabilityButtonsAreVisible() && d->camera->isIntercom())
         m_buttonController->createIntercomButtons();
     else
         m_buttonController->removeIntercomButtons();

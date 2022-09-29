@@ -24,9 +24,16 @@ private:
     void onResourcesRemoved(const QnResourceList& resources);
     bool processResource(const QnResourcePtr& resource);
 
+    // It is needed because we cannot define is the layout is intercom layout, or not,
+    // when intercom is removed.
+    bool isRememberedIntercomLayout(const QnResourcePtr& resource);
+    void rememberIntercomLayouts(const QnResourceList& resources);
+    void forgetIntercomLayout(const QnResourcePtr& resource);
+
 private:
     const QnResourcePool* m_resourcePool;
     QSet<QnResourcePtr> m_intercomLocalLayouts;
+    QSet<QnUuid> m_intercomLayoutIdList;
 };
 
 } // namespace entity_resource_tree

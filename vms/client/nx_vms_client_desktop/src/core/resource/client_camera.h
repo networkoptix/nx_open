@@ -39,6 +39,8 @@ public:
      */
     virtual QString idForToStringFromPtr() const override;
 
+    bool isIntercom() const;
+
 signals:
     void dataDropped();
 
@@ -50,4 +52,5 @@ private:
     Qn::ResourceFlags calculateFlags() const;
 private:
     mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
+    nx::utils::CachedValue<bool> m_isIntercom;
 };

@@ -5,6 +5,7 @@
 #include <api/model/api_ioport_data.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -99,7 +100,11 @@ struct IntercomManager::Private: public QObject
         return cameras.filtered(
             [](const QnVirtualCameraResourcePtr& camera)
             {
-                return nx::vms::common::isIntercom(camera);
+                const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
+                if (NX_ASSERT(clientCamera))
+                    return clientCamera->isIntercom();
+
+                return false;
             });
     }
 

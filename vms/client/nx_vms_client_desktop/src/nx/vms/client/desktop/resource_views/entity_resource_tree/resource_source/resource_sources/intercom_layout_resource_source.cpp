@@ -23,6 +23,8 @@ IntercomLayoutResourceSource::IntercomLayoutResourceSource(const QnResourcePool*
 
     connect(m_resourcePool, &QnResourcePool::resourcesRemoved,
         this, &IntercomLayoutResourceSource::onResourcesRemoved);
+
+    rememberIntercomLayouts(m_resourcePool->getResourcesWithFlag(Qn::layout));
 }
 
 QVector<QnResourcePtr> IntercomLayoutResourceSource::getResources()
@@ -41,6 +43,8 @@ QVector<QnResourcePtr> IntercomLayoutResourceSource::getResources()
 
 void IntercomLayoutResourceSource::onResourcesAdded(const QnResourceList& resources)
 {
+    rememberIntercomLayouts(resources);
+
     for (const auto& resource: resources)
     {
         if (processResource(resource))
@@ -58,10 +62,12 @@ void IntercomLayoutResourceSource::onResourcesRemoved(const QnResourceList& reso
             resource->disconnect(this);
             emit resourceRemoved(resource);
         }
-        else if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
+        else if (resource->hasFlags(Qn::layout)
+            && !resource->hasFlags(Qn::local)
+            && isRememberedIntercomLayout(resource))
         {
-            if (nx::vms::common::isIntercomLayout(resource))
-                emit resourceRemoved(resource);
+            forgetIntercomLayout(resource);
+            emit resourceRemoved(resource);
         }
     }
 }
@@ -96,6 +102,25 @@ bool IntercomLayoutResourceSource::processResource(const QnResourcePtr& resource
     }
 
     return nx::vms::common::isIntercomLayout(resource);
+}
+
+bool IntercomLayoutResourceSource::isRememberedIntercomLayout(const QnResourcePtr& resource)
+{
+    return m_intercomLayoutIdList.contains(resource->getId());
+}
+
+void IntercomLayoutResourceSource::rememberIntercomLayouts(const QnResourceList& resources)
+{
+    for (const auto& resource: resources)
+    {
+        if (nx::vms::common::isIntercomLayout(resource))
+            m_intercomLayoutIdList.insert(resource->getId());
+    }
+}
+
+void IntercomLayoutResourceSource::forgetIntercomLayout(const QnResourcePtr& resource)
+{
+    m_intercomLayoutIdList.remove(resource->getId());
 }
 
 } // namespace entity_resource_tree
