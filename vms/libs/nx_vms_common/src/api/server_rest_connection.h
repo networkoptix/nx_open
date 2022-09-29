@@ -41,6 +41,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
+#include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/event/event_fwd.h>
 #include <recording/time_period_list.h>
@@ -653,6 +654,24 @@ public:
         const QByteArray& salt,
         PostCallback&& callback,
         QThread* targetThread = nullptr);
+
+    Handle startArchiveRebuild(
+        const QnUuid& serverId,
+        const QString pool,
+        Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
+        QThread* targetThread);
+
+    Handle getArchiveRebuildProgress(
+        const QnUuid& serverId,
+        const QString pool,
+        Result<ErrorOrData<nx::vms::api::StorageScanInfoFull>>::type&& callback,
+        QThread* targetThread);
+
+    Handle stopArchiveRebuild(
+        const QnUuid& serverId,
+        const QString pool,
+        Result<ErrorOrEmpty>::type&& callback,
+        QThread* targetThread);
 
     /** Request the name of a system from the server. */
     Handle getSystemIdFromServer(
