@@ -45,7 +45,6 @@
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/network/cloud_system_endpoint.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>

@@ -15,14 +15,27 @@ namespace nx::vms::client::core {
 
 std::optional<LogonData> cloudLogonData(const QString& systemId)
 {
-    static const auto kLogTag = nx::utils::log::Tag(typeid(LogonData));
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
     const auto system = qnSystemsFinder->getSystem(systemId);
-    if (!system || !system->isCloudSystem() || !system->isReachable())
+    if (!system)
     {
-        NX_WARNING(kLogTag, "System %1 is no longer accessible", systemId);
+        NX_WARNING(NX_SCOPE_TAG, "System %1 does not longer exist", systemId);
+        return std::nullopt;
+    }
+
+    return cloudLogonData(system);
+}
+
+std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
+{
+    if (!NX_ASSERT(system))
+        return std::nullopt;
+
+    if (!system->isCloudSystem() || !system->isReachable())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "System %1 is no longer accessible", system->id());
         return std::nullopt;
     }
 
@@ -37,16 +50,16 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
     if (systemHasInitialServerOnly)
     {
         url = system->getServerHost(QnUuid());
-        NX_DEBUG(kLogTag, "Connecting to the cloud system which was not pinged yet: %1", url);
+        NX_DEBUG(NX_SCOPE_TAG, "Connecting to the cloud system which was not pinged yet: %1", url);
     }
 
-    result.expectedServerId = settings()->preferredCloudServer(systemId);
+    result.expectedServerId = settings()->preferredCloudServer(system->id());
     if (result.expectedServerId)
     {
         if (systemHasInitialServerOnly)
         {
-            url = helpers::serverCloudHost(systemId, result.expectedServerId.value());
-            NX_DEBUG(kLogTag, "Trying to connect to stored preferred cloud server %1 (%2)",
+            url = helpers::serverCloudHost(system->id(), result.expectedServerId.value());
+            NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
                 result.expectedServerId->toString(), url);
         }
         else if (system->isReachableServer(result.expectedServerId.value()))
@@ -54,13 +67,13 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
             url = system->getServerHost(result.expectedServerId.value());
             if (NX_ASSERT(!url.isEmpty()))
             {
-                NX_DEBUG(kLogTag, "Choosing stored preferred cloud server %1 (%2)",
+                NX_DEBUG(NX_SCOPE_TAG, "Choosing stored preferred cloud server %1 (%2)",
                     result.expectedServerId->toString(), url);
             }
         }
         else
         {
-            NX_DEBUG(kLogTag, "Stored preferred cloud server %1 is not reachable",
+            NX_DEBUG(NX_SCOPE_TAG, "Stored preferred cloud server %1 is not reachable",
                 result.expectedServerId->toString());
         }
     }
@@ -80,7 +93,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
             return result.join("\n");
         };
 
-        NX_DEBUG(kLogTag, "Connection options:\n%1", debugServersInfo());
+        NX_DEBUG(NX_SCOPE_TAG, "Connection options:\n%1", debugServersInfo());
 
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
             [system](const nx::vms::api::ModuleInformation& server)
@@ -99,7 +112,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
                     const bool isCloudUrl =
                         nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
 
-                    NX_DEBUG(kLogTag,
+                    NX_DEBUG(NX_SCOPE_TAG,
                         "Choosing %1 connection to the server %2 (%3)",
                         isCloudUrl ? "cloud" : "local",
                         result.expectedServerId,
@@ -111,7 +124,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
 
     if (url.isEmpty())
     {
-        NX_WARNING(kLogTag, "No connection to the system %1 is found", systemId);
+        NX_WARNING(NX_SCOPE_TAG, "No connection to the system %1 is found", system->id());
         return std::nullopt;
     }
 
