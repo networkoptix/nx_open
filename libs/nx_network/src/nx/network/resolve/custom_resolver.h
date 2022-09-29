@@ -22,9 +22,9 @@ public:
     virtual SystemError::ErrorCode resolve(
         const std::string_view& hostName,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses) override
+        ResolveResult* resolved) override
     {
-        return m_func(hostName, ipVersion, resolvedAddresses);
+        return m_func(hostName, ipVersion, resolved);
     }
 
 private:

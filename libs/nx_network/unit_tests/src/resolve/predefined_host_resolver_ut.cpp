@@ -52,7 +52,7 @@ protected:
         ASSERT_EQ(
             SystemError::noError,
             m_predefinedHostResolver.resolve(hostname, AF_INET, &m_lastResolveResult));
-        ASSERT_FALSE(m_lastResolveResult.empty());
+        ASSERT_FALSE(m_lastResolveResult.entries.empty());
     }
 
     void assertNameIsNotResolved(const std::string& hostname)
@@ -64,19 +64,19 @@ protected:
 
     void assertHostnameIsNotResolved()
     {
-        std::deque<AddressEntry> resolvedEntries;
+        ResolveResult resolved;
         ASSERT_EQ(
             SystemError::hostNotFound,
-            m_predefinedHostResolver.resolve(m_hostname, AF_INET, &resolvedEntries));
+            m_predefinedHostResolver.resolve(m_hostname, AF_INET, &resolved));
     }
 
     void assertAllMappedEntriesAreResolved()
     {
-        std::deque<AddressEntry> resolvedEntries;
+        ResolveResult resolved;
         ASSERT_EQ(
             SystemError::noError,
-            m_predefinedHostResolver.resolve(m_hostname, AF_INET, &resolvedEntries));
-        ASSERT_EQ(m_mappedEntries, resolvedEntries);
+            m_predefinedHostResolver.resolve(m_hostname, AF_INET, &resolved));
+        ASSERT_EQ(m_mappedEntries, resolved.entries);
     }
 
     void assertNameIsResolvedTo(
@@ -84,14 +84,14 @@ protected:
         const AddressEntry& expectedEntry)
     {
         assertNameIsResolved(hostname);
-        ASSERT_TRUE(nx::utils::contains(m_lastResolveResult, expectedEntry));
+        ASSERT_TRUE(nx::utils::contains(m_lastResolveResult.entries, expectedEntry));
     }
 
 private:
     network::PredefinedHostResolver m_predefinedHostResolver;
     std::string m_hostname;
     std::deque<AddressEntry> m_mappedEntries;
-    std::deque<AddressEntry> m_lastResolveResult;
+    ResolveResult m_lastResolveResult;
     int m_sequence = -1;
 
     AddressEntry generateRandomEntry()
