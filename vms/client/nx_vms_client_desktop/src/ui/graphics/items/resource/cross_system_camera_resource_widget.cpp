@@ -71,6 +71,16 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
                 nx::vms::client::desktop::ui::action::ConnectToCloudSystemWithUserInteractionAction,
                 {Qn::CloudSystemIdRole, systemId});
         });
+
+    connect(d->crossSystemCamera.get(), &QnResource::flagsChanged, this,
+        [this]()
+        {
+            updateButtonsVisibility();
+            updateOverlayButton();
+        });
+
+    updateButtonsVisibility();
+    updateOverlayButton();
 }
 
 QnCrossSystemCameraWidget::~QnCrossSystemCameraWidget() = default;
