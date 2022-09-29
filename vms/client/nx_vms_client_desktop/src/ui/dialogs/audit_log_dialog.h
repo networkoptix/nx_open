@@ -18,7 +18,7 @@ class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
 class QnAuditItemDelegate;
 class QnAuditLogModel;
-class QnTimePeriod;
+struct QnTimePeriod;
 class QLabel;
 
 namespace Ui { class AuditLogDialog; }
