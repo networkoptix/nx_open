@@ -14,6 +14,7 @@
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -30,6 +31,19 @@ using namespace nx::vms::client::desktop;
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
+
+bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
+{
+    auto server = resource.dynamicCast<QnMediaServerResource>();
+    if (!NX_ASSERT(server))
+        return false;
+
+    if (server->systemContext() != appContext()->currentSystemContext())
+        return false;
+
+    return !server->getId().isNull()
+        && appContext()->currentSystemContext()->currentServerId() == server->getId();
+}
 
 QIcon loadIcon(const QString& name)
 {
@@ -52,13 +66,8 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
     {
         case nx::vms::api::ResourceStatus::online:
         {
-            auto connection = resource->systemContext()->messageBusConnection();
-            if (key == Key::Server
-                && connection
-                && resource->getId() == connection->moduleInformation().id)
-            {
+            if (key == Key::Server && isCurrentlyConnectedServer(resource))
                 return Status::Control;
-            }
 
             return Status::Online;
         }
