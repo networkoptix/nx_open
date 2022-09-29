@@ -71,6 +71,8 @@ public:
      */
     Q_INVOKABLE QString makeSearchRegExp(const QString& value) const;
 
+    Q_INVOKABLE QString makeSearchRegExpNoAnchors(const QString& value) const;
+
     /** Returns QRegularExpression::escape(value) */
     Q_INVOKABLE QString escapeRegExp(const QString& value) const;
 };
