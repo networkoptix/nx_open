@@ -8,13 +8,13 @@ namespace network {
 SystemError::ErrorCode TextIpAddressResolver::resolve(
     const std::string_view& hostName,
     int ipVersion,
-    std::deque<AddressEntry>* resolvedAddresses)
+    ResolveResult* resolveResult)
 {
     HostAddress hostAddress(hostName);
 
     if (ipVersion == AF_INET && hostAddress.ipV4())
     {
-        resolvedAddresses->push_back(
+        resolveResult->entries.push_back(
             {{ AddressEntry(AddressType::direct, *hostAddress.ipV4()) }});
         return SystemError::noError;
     }
@@ -23,7 +23,7 @@ SystemError::ErrorCode TextIpAddressResolver::resolve(
     if (!ipV6WithScope.first || !hostAddress.isPureIpV6())
         return SystemError::hostUnreachable;
 
-    resolvedAddresses->push_back({{ AddressEntry(
+    resolveResult->entries.push_back({{ AddressEntry(
         AddressType::direct,
         HostAddress(*ipV6WithScope.first, ipV6WithScope.second)) }});
     return SystemError::noError;

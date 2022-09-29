@@ -214,7 +214,7 @@ protected:
 
     void whenResolve()
     {
-        ResolveResult resolveResult;
+        ResolveResultFull resolveResult;
         std::get<1>(resolveResult) = m_resolver.resolveSync(
             m_hostNameToResolve,
             m_natTraversalSupport,
@@ -352,7 +352,7 @@ protected:
     }
 
 private:
-    using ResolveResult =
+    using ResolveResultFull =
         std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
 
     network::AddressResolver m_resolver;
@@ -360,8 +360,8 @@ private:
     std::string m_hostNameToResolve;
     std::optional<HostAddress> m_dnsEntry;
     std::list<std::string> m_hostnamesPassedToDnsResolver;
-    nx::utils::SyncQueue<ResolveResult> m_resolveResults;
-    ResolveResult m_prevResolveResult;
+    nx::utils::SyncQueue<ResolveResultFull> m_resolveResults;
+    ResolveResultFull m_prevResolveResult;
     std::atomic<bool> m_handlerCompleted{false};
     NatTraversalSupport m_natTraversalSupport = NatTraversalSupport::disabled;
 
@@ -376,7 +376,7 @@ private:
     SystemError::ErrorCode saveHostNameWithoutResolving(
         const std::string_view& hostName,
         int /*ipVersion*/,
-        std::deque<AddressEntry>* /*resolvedAddresses*/)
+        ResolveResult* /*resolved*/)
     {
         m_hostnamesPassedToDnsResolver.push_back(std::string(hostName));
         return SystemError::hostNotFound;
@@ -608,21 +608,21 @@ protected:
     }
 
 private:
-    using ResolveResult =
+    using ResolveResultFull =
         std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
 
     std::string m_hostNameToResolve;
     SocketAddress m_hostEndpoint;
-    nx::utils::SyncQueue<ResolveResult> m_resolveResults;
+    nx::utils::SyncQueue<ResolveResultFull> m_resolveResults;
     HostAddress m_stubAddress;
     std::vector<SocketAddress> m_fixedEntries;
 
     SystemError::ErrorCode dnsResolveStub(
         const std::string_view& /*hostName*/,
         int /*ipVersion*/,
-        std::deque<AddressEntry>* resolvedAddresses)
+        ResolveResult* resolved)
     {
-        resolvedAddresses->push_back({AddressType::direct, m_stubAddress});
+        resolved->entries.push_back({AddressType::direct, m_stubAddress});
         return SystemError::noError;
     }
 

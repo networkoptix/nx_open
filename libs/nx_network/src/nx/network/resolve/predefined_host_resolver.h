@@ -33,7 +33,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const std::string_view& name,
         int ipVersion,
-        std::deque<AddressEntry>* resolvedAddresses) override;
+        ResolveResult* resolveResult) override;
 
     /**
      * Adds new entries to existing list of entries, name is resolved to.

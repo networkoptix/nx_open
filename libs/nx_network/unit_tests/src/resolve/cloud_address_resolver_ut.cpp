@@ -14,18 +14,18 @@ class CloudAddressResolver:
 protected:
     void assertResolved(const std::string_view& str)
     {
-        std::deque<AddressEntry> resolvedEntries;
-        ASSERT_EQ(SystemError::noError, m_resolver.resolve(str, AF_INET, &resolvedEntries));
-        ASSERT_EQ(1, resolvedEntries.size());
-        ASSERT_EQ(AddressType::cloud, resolvedEntries.front().type);
-        ASSERT_EQ(str, resolvedEntries.front().host.toString());
+        ResolveResult resolved;
+        ASSERT_EQ(SystemError::noError, m_resolver.resolve(str, AF_INET, &resolved));
+        ASSERT_EQ(1, resolved.entries.size());
+        ASSERT_EQ(AddressType::cloud, resolved.entries.front().type);
+        ASSERT_EQ(str, resolved.entries.front().host.toString());
     }
 
     void assertNotResolved(const std::string_view& str)
     {
-        std::deque<AddressEntry> resolvedEntries;
-        ASSERT_EQ(SystemError::hostNotFound, m_resolver.resolve(str, AF_INET, &resolvedEntries));
-        ASSERT_TRUE(resolvedEntries.empty());
+        ResolveResult resolved;
+        ASSERT_EQ(SystemError::hostNotFound, m_resolver.resolve(str, AF_INET, &resolved));
+        ASSERT_TRUE(resolved.entries.empty());
     }
 
 private:
