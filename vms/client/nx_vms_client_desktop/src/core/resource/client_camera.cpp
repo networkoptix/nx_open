@@ -26,7 +26,7 @@ QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
     connect(this, &QnClientCameraResource::propertyChanged, this,
         [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
-            if (key == ResourcePropertyKey::kIoSettings)
+            if (key == ResourcePropertyKey::kIoSettings && !m_isIntercom.get())
                 m_isIntercom.reset();
         }, Qt::DirectConnection);
 }
