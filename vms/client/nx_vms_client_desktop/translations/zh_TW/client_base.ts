@@ -9123,7 +9123,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>撥號中</translation>
     </message>
   </context>
   <context>
@@ -10215,7 +10215,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>已找到設備上的錄影資料</translation>
     </message>
   </context>
   <context>
