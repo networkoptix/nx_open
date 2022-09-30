@@ -636,6 +636,12 @@ bool ResourceTreeModelAdapter::expandsOnDoubleClick(const QModelIndex& index) co
     return !resource || !resource->hasFlags(Qn::layout);
 }
 
+bool ResourceTreeModelAdapter::activateOnSingleClick(const QModelIndex& index) const
+{
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    return nodeType == ResourceTree::NodeType::cloudSystemStatus;
+}
+
 bool ResourceTreeModelAdapter::isExtraInfoRequired() const
 {
     return qnSettings->resourceInfoLevel() > Qn::RI_NameOnly;
