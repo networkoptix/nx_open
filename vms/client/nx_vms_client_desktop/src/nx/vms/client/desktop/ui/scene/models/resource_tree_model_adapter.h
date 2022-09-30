@@ -7,7 +7,7 @@
 #include <QtCore/QIdentityProxyModel>
 
 // Squish does not handle forward declarations well, so resource_tree_squish_facade.h is included.
-#include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h> 
+#include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/utils/scoped_model_operations.h>
@@ -63,6 +63,8 @@ public:
     Q_INVOKABLE bool isExtraInfoForced(QnResource* resource) const;
 
     Q_INVOKABLE bool expandsOnDoubleClick(const QModelIndex& index) const;
+
+    Q_INVOKABLE bool activateOnSingleClick(const QModelIndex& index) const;
 
     bool isExtraInfoRequired() const;
 
