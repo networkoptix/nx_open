@@ -23,6 +23,9 @@ public:
     virtual ~AbstractCertificateVerifier();
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(const QnUuid& serverId) = 0;
+
+protected:
+    void loadTrustedCertificate(const QByteArray& data, const QString& name);
 };
 
 } // nx::vms::common

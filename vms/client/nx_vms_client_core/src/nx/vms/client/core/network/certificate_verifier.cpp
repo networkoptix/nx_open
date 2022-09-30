@@ -158,11 +158,8 @@ CertificateVerifier::CertificateVerifier(
     if (QString path = ini().rootCertificatesFolder; !path.isEmpty())
     {
         QDir folder(path);
-        if (!folder.exists())
-        {
-            NX_DEBUG(this, "Root certificates folder does not exist: %1", path);
+        if (!NX_ASSERT(folder.exists(), "Root certificates folder does not exist: %1", path))
             return;
-        }
 
         const auto entries = folder.entryList({"*.pem", "*.crt"}, QDir::Files);
         for (const auto& fileName: entries)
@@ -173,26 +170,7 @@ CertificateVerifier::CertificateVerifier(
                 NX_WARNING(this, "Cannot open file %1", folder.absoluteFilePath(fileName));
                 continue;
             }
-            const auto data = f.readAll();
-
-            auto chain = nx::network::ssl::Certificate::parse(
-                data.toStdString(),
-                /*assertOnFail*/ false);
-            if (chain.size() != 1)
-            {
-                NX_VERBOSE(this, "The file does not contain a single certificate: %1", fileName);
-                continue;
-            }
-
-            const auto& cert = chain[0];
-            if (cert.issuer() != cert.subject())
-            {
-                NX_VERBOSE(this, "Certificate is not self-signed: %1", fileName);
-                continue;
-            }
-
-            NX_VERBOSE(this, "Adding certificate into the trusted CA list: %1", fileName);
-            nx::network::ssl::addTrustedRootCertificate(cert);
+            loadTrustedCertificate(f.readAll(), fileName);
         }
     }
 }
