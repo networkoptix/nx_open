@@ -60,6 +60,7 @@ FocusScope
     property real maximumDragIndicatorWidth: 640
 
     property var expandsOnDoubleClick: (modelIndex => true) //< May be a bool value or a functor.
+    property var activateOnSingleClick: (modelIndex => false)
 
     property alias header: listView.header
     property alias headerPositioning: listView.headerPositioning
@@ -540,11 +541,13 @@ FocusScope
                             if (!modelIndex.valid)
                                 return
 
-                            if (mouse.button == Qt.MiddleButton)
+                            if (mouse.button == Qt.MiddleButton || treeView.activateOnSingleClick(listItem.sourceIndex))
                             {
                                 activated(modelIndex,
                                     selection(),
-                                    ResourceTree.ActivationType.middleClick,
+                                    (mouse.button == Qt.MiddleButton)
+                                        ? ResourceTree.ActivationType.middleClick
+                                        : ResourceTree.ActivationType.singleClick,
                                     Qt.NoModifier);
                             }
                             else

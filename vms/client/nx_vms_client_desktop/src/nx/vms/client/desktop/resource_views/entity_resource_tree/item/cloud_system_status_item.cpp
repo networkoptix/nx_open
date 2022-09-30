@@ -78,6 +78,9 @@ public:
         {
             case CloudCrossSystemContext::Status::uninitialized:
                 return {};
+            case CloudCrossSystemContext::Status::connectionFailure:
+                // Set this flags combination to allow activate item by enter key and single click.
+                return {Qt::ItemIsEnabled | Qt::ItemIsSelectable};
             default:
                 break;
         }
