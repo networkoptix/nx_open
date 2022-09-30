@@ -20,7 +20,7 @@ NX_VMS_API extern const QString kDefaultLdapGroupObjectClass;
 NX_VMS_API extern const QString kDefaultLdapMemberAttribute;
 constexpr std::chrono::minutes kDefaultLdapPasswordExpirationPeriod = 5min;
 constexpr std::chrono::seconds kDefaultLdapSearchTimeout = 30s;
-constexpr int kDefaultLdapSearchPageSize = 100;
+constexpr int kDefaultLdapSearchPageSize = 1000;
 
 struct NX_VMS_API LdapSettingsBase
 {
