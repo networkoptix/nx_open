@@ -524,9 +524,6 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
 
         case ResourceTree::NodeType::cloudSystemStatus:
         {
-            if (activationType != ResourceTree::ActivationType::doubleClick)
-                return;
-
             const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
             menu()->trigger(ui::action::ConnectToCloudSystemWithUserInteractionAction,
                 {Qn::CloudSystemIdRole, systemId});

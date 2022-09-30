@@ -54,6 +54,7 @@ TreeView
     autoExpandRoleName: "autoExpand"
 
     expandsOnDoubleClick: (modelIndex => resourceTreeModel.expandsOnDoubleClick(modelIndex))
+    activateOnSingleClick: (modelIndex => resourceTreeModel.activateOnSingleClick(modelIndex))
 
     rootIsDecorated:
     {

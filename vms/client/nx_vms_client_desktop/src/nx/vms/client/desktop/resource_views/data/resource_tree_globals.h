@@ -113,6 +113,7 @@ Q_ENUM_NS(FilterType);
 enum class ActivationType
 {
     enterKey,
+    singleClick,
     doubleClick,
     middleClick
 };
