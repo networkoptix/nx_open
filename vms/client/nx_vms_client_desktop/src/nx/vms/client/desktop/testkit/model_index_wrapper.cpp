@@ -2,6 +2,8 @@
 
 #include "model_index_wrapper.h"
 
+#include <QtWidgets/QAbstractItemView>
+
 #include "utils.h"
 
 namespace nx::vms::client::desktop::testkit {
@@ -54,6 +56,15 @@ QString ModelIndexWrapper::checkStateName(QVariant state)
 QVariant ModelIndexWrapper::data(int role) const
 {
     return m_index.data(role);
+}
+
+bool ModelIndexWrapper::isSelected() const
+{
+    if (const auto itemView = qobject_cast<QAbstractItemView*>(m_container))
+    {
+        return itemView->selectionModel()->isSelected(m_index);
+    }
+    return false;
 }
 
 QVariantMap ModelIndexWrapper::metaInfo(QString name) const
