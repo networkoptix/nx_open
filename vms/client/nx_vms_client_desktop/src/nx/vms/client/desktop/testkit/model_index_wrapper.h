@@ -24,6 +24,8 @@ class ModelIndexWrapper
     Q_PROPERTY(QString toolTip READ toolTip)
     Q_PROPERTY(QString type READ type)
     Q_PROPERTY(QString objectName READ name)
+    Q_PROPERTY(bool selected READ isSelected)
+    Q_PROPERTY(bool isSelected READ isSelected)
 
 public:
     ModelIndexWrapper(QModelIndex index = QModelIndex(), QWidget* container = nullptr):
@@ -48,6 +50,7 @@ public:
 
     bool operator<(const ModelIndexWrapper& other) const { return m_index < other.m_index; }
     bool operator==(const ModelIndexWrapper& other) const = default;
+    bool isSelected() const;
 
     Q_INVOKABLE QVariantMap metaInfo(QString name) const;
 
