@@ -111,7 +111,9 @@ QRect globalRect(QVariant object, QWindow** window)
 
         const QRect rect = view->visualRect(wrap.index());
         *window = view->window()->windowHandle();
-        return QRect(view->mapToGlobal(rect.topLeft()), view->mapToGlobal(rect.bottomRight()));
+        return QRect(
+            view->viewport()->mapToGlobal(rect.topLeft()),
+            view->viewport()->mapToGlobal(rect.bottomRight()));
     }
     return QRect();
 }
