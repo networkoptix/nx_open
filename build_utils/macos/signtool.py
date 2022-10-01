@@ -82,11 +82,6 @@ def sign_bundle(bundle_path, identity, entitlements=None, keychain=None):
     if keychain:
         command += ["--keychain", keychain]
 
-    logging.info("Signing the binary and libraries...")
-    logging.debug(f"Signing {bundle_path}")
-    if not run_and_retry_if_needed([*command, "--deep", bundle_path]):
-        return
-
     logging.info("Signing QML plugins...")
     # codesign tool does not sign libraries and executables in 'Resources' folder when using --deep
     # option (known codesign issue). But if we move 'qml' folder to the appropriate folder (like
@@ -98,6 +93,14 @@ def sign_bundle(bundle_path, identity, entitlements=None, keychain=None):
         logging.debug(f"Signing {lib}")
         if not run_and_retry_if_needed([*command, lib]):
             return
+
+    # IMPORTANT Note: The main binary must be signed last. Otherwise the notarization of the bundle
+    # will fail for unknown reason. It'll report that the main binary has an invalid signature
+    # despite the fact it was successfully signed and `codesign` verification can prove that.
+    logging.info("Signing the binary and libraries...")
+    logging.debug(f"Signing {bundle_path}")
+    if not run_and_retry_if_needed([*command, "--deep", bundle_path]):
+        return
 
     return True
 
