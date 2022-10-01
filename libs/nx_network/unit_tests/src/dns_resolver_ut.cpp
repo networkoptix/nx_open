@@ -25,11 +25,16 @@ class DnsResolver:
 public:
     DnsResolver()
     {
-        using namespace std::placeholders;
-
         m_dnsResolver.registerResolver(
-            makeCustomResolver(std::bind(&DnsResolver::testResolve, this, _1, _2, _3)),
+            makeCustomResolver([this](auto&&... args) {
+                return testResolve(std::forward<decltype(args)>(args)...);
+            }),
             m_dnsResolver.maxRegisteredResolverPriority() + 1);
+    }
+
+    ~DnsResolver()
+    {
+        m_dnsResolver.stop();
     }
 
 protected:
