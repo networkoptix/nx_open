@@ -97,6 +97,10 @@ private:
         const QnUuid& serverId,
         const nx::vms::api::ServerLogSettings& settings);
 
+    void onSentServerLogSettings(
+        const QnUuid& serverId,
+        bool success);
+
     void downloadClientLogs(const QString& folder, UnitPtr unit);
     void downloadServerLogs(const QString& folder, UnitPtr unit);
 
