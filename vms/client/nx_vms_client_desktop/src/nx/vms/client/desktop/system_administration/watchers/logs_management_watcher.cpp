@@ -720,6 +720,7 @@ struct LogsManagementWatcher::Private
                     if (!success)
                         server->data()->setSettings(oldSettings);
 
+                    q->onSentServerLogSettings(server->id(), success);
                     //TODO: #spanasenko Report an error.
                 });
 
@@ -1053,6 +1054,8 @@ void LogsManagementWatcher::applySettings(
 
         d->client->data()->setSettings(settings.applyTo(*existing));
         //TODO: #spanasenko Store client settings.
+
+        d->updateClientLogLevelWarning();
     }
 
     QList<UnitPtr> serversToStore;
@@ -1061,9 +1064,6 @@ void LogsManagementWatcher::applySettings(
         if (server->isChecked())
             serversToStore << server;
     }
-
-    d->updateClientLogLevelWarning();
-    d->updateServerLogLevelWarning();
 
     lock.unlock();
     for (auto server: serversToStore)
@@ -1096,6 +1096,14 @@ void LogsManagementWatcher::onReceivedServerLogSettings(
             return;
         }
     }
+}
+
+void LogsManagementWatcher::onSentServerLogSettings(
+    const QnUuid& serverId,
+    bool success)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    d->updateServerLogLevelWarning();
 }
 
 void LogsManagementWatcher::downloadClientLogs(const QString& folder, LogsManagementUnitPtr unit)
