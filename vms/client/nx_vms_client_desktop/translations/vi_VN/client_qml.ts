@@ -1154,7 +1154,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>Truy cập bị từ chối</translation>
     </message>
   </context>
   <context>

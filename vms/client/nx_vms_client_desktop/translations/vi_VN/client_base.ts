@@ -5049,7 +5049,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>TRUY CẬP BỊ TỪ CHỐI</translation>
     </message>
   </context>
   <context>
