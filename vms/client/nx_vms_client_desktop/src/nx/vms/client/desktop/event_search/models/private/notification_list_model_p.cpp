@@ -194,9 +194,12 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     {
         connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
             &CloudCrossSystemContext::statusChanged, this,
-            [this, systemId]
+            [this, systemId](CloudCrossSystemContext::Status oldStatus)
             {
-                updateCloudItems(systemId);
+                if (oldStatus == CloudCrossSystemContext::Status::connected)
+                    removeCloudItems(systemId);
+                else
+                    updateCloudItems(systemId);
             });
     };
 
@@ -209,8 +212,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemLost, this,
         [this](const QString& systemId)
         {
-            updateCloudItems(systemId);
-            m_itemsByCloudSystem.remove(systemId);
+            removeCloudItems(systemId);
         });
 }
 
@@ -220,14 +222,24 @@ NotificationListModel::Private::~Private()
 
 void NotificationListModel::Private::updateCloudItems(const QString& systemId)
 {
-    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-
     for (auto it = m_itemsByCloudSystem.find(systemId);
         it != m_itemsByCloudSystem.end() && it.key() == systemId;
         ++it)
     {
         q->setData(q->indexOf(it.value()), false, Qn::ForcePreviewLoaderRole);
     }
+}
+
+void NotificationListModel::Private::removeCloudItems(const QString& systemId)
+{
+    for (auto it = m_itemsByCloudSystem.find(systemId);
+        it != m_itemsByCloudSystem.end() && it.key() == systemId;
+        ++it)
+    {
+        q->removeEvent(it.value());
+    }
+
+    NX_ASSERT(!m_itemsByCloudSystem.contains(systemId));
 }
 
 void NotificationListModel::Private::onRowsAboutToBeRemoved(
