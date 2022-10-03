@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../abstract_search_widget.h"
+#include "../placeholder_widget.h"
 
 #include <optional>
 #include <vector>
@@ -111,6 +112,7 @@ private:
     const QScopedPointer<BusyIndicatorModel> m_tailIndicatorModel;
     const QScopedPointer<ConcatenationListModel> m_visualModel;
 
+    PlaceholderWidget* m_placeholderWidget;
     QToolButton* const m_togglePreviewsButton;
     QToolButton* const m_toggleFootersButton;
     QLabel* const m_itemCounterLabel;
