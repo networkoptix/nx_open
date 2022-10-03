@@ -68,13 +68,9 @@ bool ObjectRegion::isEmpty() const
     return boundingBoxGrid.size() == 0;
 }
 
-QRectF ObjectRegion::boundingBox() const
+QRect ObjectRegion::boundingBox() const
 {
-    QRect rect = QnMetaDataV1::boundingBox(boundingBoxGrid.data());
-    return QRectF(rect.left() / (float) Qn::kMotionGridWidth,
-        rect.top() / (float) Qn::kMotionGridHeight,
-        rect.width() / (float) Qn::kMotionGridWidth,
-        rect.height() / (float) Qn::kMotionGridHeight);
+    return QnMetaDataV1::boundingBox(boundingBoxGrid.data());
 }
 
 bool ObjectRegion::isSimpleRect() const

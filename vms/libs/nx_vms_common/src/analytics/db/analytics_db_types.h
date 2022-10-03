@@ -56,7 +56,7 @@ struct NX_VMS_COMMON_API ObjectRegion
     void add(const ObjectRegion& region);
     bool intersect(const QRectF& rect) const;
     bool isEmpty() const;
-    QRectF boundingBox() const;
+    QRect boundingBox() const;
     bool isSimpleRect() const;
     void clear();
 
