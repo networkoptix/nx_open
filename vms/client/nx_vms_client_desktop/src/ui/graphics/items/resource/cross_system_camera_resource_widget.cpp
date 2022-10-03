@@ -3,6 +3,7 @@
 #include "cross_system_camera_resource_widget.h"
 
 #include <core/resource/user_resource.h>
+#include <network/base_system_description.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -81,6 +82,7 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
 
     updateButtonsVisibility();
     updateOverlayButton();
+    updateTitleText();
 }
 
 QnCrossSystemCameraWidget::~QnCrossSystemCameraWidget() = default;
@@ -111,4 +113,16 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty;
 
     return QnMediaResourceWidget::calculateOverlayButton(statusOverlay);
+}
+
+QString QnCrossSystemCameraWidget::calculateTitleText() const
+{
+    if (const auto context = d->crossSystemCamera->crossSystemContext())
+    {
+        const auto resourceName = QnResourceWidget::resource()->getName();
+        const auto systemName = context->systemDescription()->name();
+        return QString("%1/%2").arg(resourceName).arg(systemName);
+    }
+
+    return QnMediaResourceWidget::calculateTitleText();
 }

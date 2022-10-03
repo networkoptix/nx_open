@@ -39,21 +39,25 @@ public:
     void init();
 
     void updateSizeHint();
-    
+
     void ensurePixmaps();
     void ensureStaticText();
 
     QColor textColor() const;
+    QString calculateText() const;
 
     GraphicsLabel::PerformanceHint performanceHint;
     Qt::Alignment alignment;
     QString text;
     QStaticText staticText;
     QPixmap pixmap;
-    QRectF rect;
+    QSizeF minimumSize;
+    QSizeF preferredSize;
+    QSizeF cachedSize;
     bool staticTextDirty;
     bool pixmapDirty;
     qreal shadowRadius = 0.0;
+    Qt::TextElideMode elideMode = Qt::ElideNone;
 };
 
 #endif // GRAPHICSLABEL_P_H
