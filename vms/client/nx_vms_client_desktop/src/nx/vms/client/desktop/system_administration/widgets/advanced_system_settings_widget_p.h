@@ -4,7 +4,9 @@
 
 #include "advanced_system_settings_widget.h"
 
+#include <QtCore/QHash>
 #include <QtCore/QStringList>
+#include <QtCore/QUrl>
 
 class QQuickWidget;
 class QStackedWidget;
@@ -18,14 +20,17 @@ class AdvancedSystemSettingsWidget::Private: public QObject
 public:
     Private(AdvancedSystemSettingsWidget* q);
 
-    void addTab(const QString& name, QWidget* widget);
+    void addTab(const QString& name, const QUrl& url, QWidget* widget);
+    bool openSubpage(const QUrl& url);
 
+    // Called from QML when user clicks on menu item.
     Q_INVOKABLE void setCurrentTab(int idx);
 
 private:
     AdvancedSystemSettingsWidget* const q = nullptr;
 
     QStringList m_items;
+    QHash<QUrl, int> m_urls;
     QQuickWidget* m_menu = nullptr;
     QStackedWidget* m_stack = nullptr;
 };
