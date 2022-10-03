@@ -63,7 +63,10 @@ struct MimeData::Private
     QHash<int, QVariant> arguments;
 
     /** Deserialize from the raw data.*/
-    bool deserialize(QByteArray data, const QList<QUrl>& urls)
+    bool deserialize(
+        QByteArray data,
+        const QList<QUrl>& urls,
+        std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)> createResourceCallback)
     {
         entities.clear();
         resources.clear();
@@ -83,7 +86,7 @@ struct MimeData::Private
             case Protocol::v40:
                 return deserializeContentV4(stream, urls);
             case Protocol::v51:
-                return deserializeContentV5(stream, urls);
+                return deserializeContentV5(stream, urls, std::move(createResourceCallback));
             default:
                 break;
         }
@@ -167,7 +170,10 @@ struct MimeData::Private
     }
 
     /** Deserialize content using format from 5.1 version.*/
-    bool deserializeContentV5(QDataStream& stream, const QList<QUrl>& urls)
+    bool deserializeContentV5(
+        QDataStream& stream,
+        const QList<QUrl>& urls,
+        std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)> createResourceCallback)
     {
         // Resources.
         {
@@ -180,11 +186,12 @@ struct MimeData::Private
                 nx::vms::common::ResourceDescriptor descriptor;
                 stream >> descriptor.id >> descriptor.path;
 
-                if (auto resource = getResourceByDescriptor(descriptor);
-                    resource && QnResourceAccessFilter::isDroppable(resource))
-                {
+                auto resource = getResourceByDescriptor(descriptor);
+                if (!resource && createResourceCallback)
+                    resource = createResourceCallback(descriptor);
+
+                if (resource && QnResourceAccessFilter::isDroppable(resource))
                     resources.push_back(resource);
-                }
             }
         }
 
@@ -265,7 +272,10 @@ MimeData::~MimeData()
 {
 }
 
-MimeData::MimeData(QByteArray data):
+MimeData::MimeData(
+    QByteArray data,
+    std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)> createResourceCallback)
+    :
     MimeData()
 {
     QDataStream stream(&data, QIODevice::ReadOnly);
@@ -276,7 +286,7 @@ MimeData::MimeData(QByteArray data):
     // Code reuse.
     QMimeData mimeData;
     toMimeData(&mimeData);
-    load(&mimeData);
+    load(&mimeData, std::move(createResourceCallback));
 }
 
 QStringList MimeData::mimeTypes()
@@ -360,7 +370,9 @@ bool MimeData::isEmpty() const
     return d->entities.empty() && d->resources.empty();
 }
 
-void MimeData::load(const QMimeData* data)
+void MimeData::load(
+    const QMimeData* data,
+    std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)> createResourceCallback)
 {
     for (const QString& format: data->formats())
         setData(format, data->data(format));
@@ -369,7 +381,7 @@ void MimeData::load(const QMimeData* data)
     if (data->hasUrls())
         urls = data->urls();
 
-    d->deserialize(this->data(kInternalMimeType), urls);
+    d->deserialize(this->data(kInternalMimeType), urls, std::move(createResourceCallback));
     d->updateInternalStorage();
 }
 
