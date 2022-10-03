@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +21,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
@@ -573,6 +575,38 @@ void ResourcesChangesManager::saveAccessibleResources(
 
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(
         accessRights, makeReplyProcessor(this, handler), this);
+}
+
+void ResourcesChangesManager::saveAccessRights(
+    const QnResourceAccessSubject& subject,
+    const nx::core::access::ResourceAccessMap& accessRights)
+{
+    const auto connection = messageBusConnection();
+    if (!connection)
+        return;
+
+    const auto accessRightsManager = systemContext()->accessRightsManager();
+    const auto backup = accessRightsManager->ownResourceAccessMap(subject.id());
+
+    if (backup == accessRights)
+        return;
+
+    accessRightsManager->setOwnResourceAccessMap(subject.id(), accessRights);
+
+    auto handler =
+        [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
+        {
+            if (const bool error = errorCode != ec2::ErrorCode::ok)
+                systemContext()->accessRightsManager()->setOwnResourceAccessMap(subject.id(), backup);
+        };
+
+    vms::api::AccessRightsData accessRightsData;
+    accessRightsData.userId = subject.id();
+    accessRightsData.resourceRights.insert(
+        accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd());
+
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(
+        accessRightsData, makeReplyProcessor(this, handler), this);
 }
 
 void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role,

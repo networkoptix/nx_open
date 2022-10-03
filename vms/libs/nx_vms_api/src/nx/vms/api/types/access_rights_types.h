@@ -249,6 +249,18 @@ NX_REFLECTION_ENUM_CLASS(AccessRight,
 Q_DECLARE_FLAGS(AccessRights, AccessRight)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AccessRights)
 
+static constexpr AccessRights kAdminAccessRights{
+    AccessRight::viewLive
+    | AccessRight::listenToAudio
+    | AccessRight::viewArchive
+    | AccessRight::exportArchive
+    | AccessRight::viewBookmarks
+    | AccessRight::manageBookmarks
+    | AccessRight::controlVideowall
+    | AccessRight::userInput
+    | AccessRight::managePtz
+    | AccessRight::editSettings};
+
 inline AccessRights globalPermissionsToAccessRights(GlobalPermissions permissions)
 {
     AccessRights result = AccessRight::viewLive | AccessRight::listenToAudio;

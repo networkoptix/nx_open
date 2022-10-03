@@ -246,7 +246,7 @@ void RulesDialog::updateControlButtons()
     const bool hasSelection = ui->tableView->currentIndex().isValid();
     ui->deleteRuleButton->setEnabled(readOnly ? false : hasSelection);
 
-    const bool hasPermissions = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool hasPermissions = accessController()->hasAdminPermissions();
     const bool hasChanges = rulesTableModel->hasChanges();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges && hasPermissions);
@@ -393,7 +393,7 @@ void RulesDialog::rejectChanges()
 
 void RulesDialog::resetToDefaults()
 {
-    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (!accessController()->hasAdminPermissions())
         return;
 
     QnMessageBox dialog(

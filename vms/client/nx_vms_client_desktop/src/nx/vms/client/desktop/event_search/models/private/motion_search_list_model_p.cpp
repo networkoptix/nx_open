@@ -415,11 +415,8 @@ void MotionSearchListModel::Private::processReceivedTimePeriods(bool success, in
 
 QSharedPointer<QMenu> MotionSearchListModel::Private::contextMenu(const MotionChunk& chunk) const
 {
-    if (!q->accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::manageBookmarks))
-        return {};
-
     const auto camera = this->camera(chunk);
-    if (!camera)
+    if (!camera || !q->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
         return {};
 
     QSharedPointer<QMenu> menu(new QMenu());

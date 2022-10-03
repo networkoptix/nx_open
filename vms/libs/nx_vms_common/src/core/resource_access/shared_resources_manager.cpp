@@ -11,7 +11,16 @@
 
 namespace {
 
-static const std::map<QnUuid, nx::vms::api::AccessRights> kEmpty;
+using AccessRightsMap = std::map<QnUuid, nx::vms::api::AccessRights>;
+
+static const AccessRightsMap kEmpty;
+
+AccessRightsMap combine(AccessRightsMap&& left, AccessRightsMap&& right)
+{
+    auto result(left);
+    result.insert(std::move_iterator(right.begin()), std::move_iterator(right.end()));
+    return result;
+}
 
 } // namespace
 
@@ -64,7 +73,13 @@ void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& acces
     }
 }
 
-std::map<QnUuid, nx::vms::api::AccessRights> QnSharedResourcesManager::sharedResourceRights(
+AccessRightsMap QnSharedResourcesManager::sharedResourceRights(
+    const QnResourceAccessSubject& subject) const
+{
+    return combine(directAccessRights(subject), inheritedAccessRights(subject));
+}
+
+AccessRightsMap QnSharedResourcesManager::directAccessRights(
     const QnResourceAccessSubject& subject) const
 {
     NX_ASSERT(subject.isValid());
@@ -72,9 +87,24 @@ std::map<QnUuid, nx::vms::api::AccessRights> QnSharedResourcesManager::sharedRes
         return {};
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    std::map<QnUuid, nx::vms::api::AccessRights> result;
+    return m_sharedResources[subject.id()];
+}
+
+AccessRightsMap QnSharedResourcesManager::inheritedAccessRights(
+    const QnResourceAccessSubject& subject) const
+{
+    NX_ASSERT(subject.isValid());
+    if (!subject.isValid())
+        return {};
+
+    AccessRightsMap result;
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
     for (const auto& id: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
     {
+        if (id == subject.id())
+            continue;
+
         const auto& resources = m_sharedResources[id];
         result.insert(resources.begin(), resources.end());
     }
@@ -105,7 +135,7 @@ bool QnSharedResourcesManager::hasSharedResource(
 
 void QnSharedResourcesManager::setSharedResourceRights(
     const QnResourceAccessSubject& subject,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights)
+    const AccessRightsMap& resourceRights)
 {
     setSharedResourceRightsInternal(subject, resourceRights);
 }
@@ -122,7 +152,7 @@ void QnSharedResourcesManager::setSharedResources(
     const QSet<QnUuid>& resources,
     nx::vms::api::AccessRights accessRights)
 {
-    std::map<QnUuid, nx::vms::api::AccessRights> resourceAccessRights;
+    AccessRightsMap resourceAccessRights;
     for (const auto& r: resources)
         resourceAccessRights[r] = accessRights;
     setSharedResourceRights(subject, resourceAccessRights);
@@ -130,22 +160,25 @@ void QnSharedResourcesManager::setSharedResources(
 
 void QnSharedResourcesManager::setSharedResourceRightsInternal(
     const QnResourceAccessSubject& subject,
-    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceRights)
+    const AccessRightsMap& resourceRights)
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
 
-    std::map<QnUuid, nx::vms::api::AccessRights> oldValue;
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        auto& value = m_sharedResources[subject.id()];
-        if (value == resourceRights)
-            return;
-        oldValue = value;
-        value = resourceRights;
-    }
-    emit sharedResourcesChanged(subject, oldValue, resourceRights);
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    auto& value = m_sharedResources[subject.id()];
+    if (value == resourceRights)
+        return;
+
+    AccessRightsMap oldOwnRights = value;
+    value = resourceRights;
+
+    lk.unlock();
+
+    emit sharedResourcesChanged(subject,
+        combine(std::move(oldOwnRights), inheritedAccessRights(subject)),
+        sharedResourceRights(subject));
 }
 
 void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource)
@@ -180,15 +213,11 @@ void QnSharedResourcesManager::handleRoleRemoved(const nx::vms::api::UserRoleDat
 
 void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
-    std::map<QnUuid, nx::vms::api::AccessRights> oldValue;
-    auto id = subject.id();
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        if (!m_sharedResources.contains(id))
-            return;
-        oldValue = m_sharedResources.value(id);
-        m_sharedResources.remove(id);
-    }
+    const auto oldValue = sharedResourceRights(subject);
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_sharedResources.remove(subject.id());
+    lk.unlock();
 
     if (!oldValue.empty())
         emit sharedResourcesChanged(subject, oldValue, kEmpty);

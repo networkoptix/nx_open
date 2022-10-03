@@ -38,7 +38,7 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(tr("Overlapped ID..."))
-        .requiredGlobalPermission(GlobalPermission::viewArchive)
+        .requiredTargetPermissions(Qn::Permission::ViewFootagePermission)
         .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::any)
             && condition::scoped(
                 SceneScope,

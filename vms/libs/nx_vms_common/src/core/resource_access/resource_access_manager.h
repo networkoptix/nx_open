@@ -8,7 +8,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <core/resource_access/permissions_cache.h>
+#include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -36,13 +36,25 @@ class NX_VMS_COMMON_API QnResourceAccessManager:
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    typedef QObject base_type;
+    using base_type = QObject;
 
 public:
     QnResourceAccessManager(
-        nx::core::access::Mode mode,
         nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
+
+    // Helper functions to avoid direct GlobalPermissions checking.
+    bool hasAdminPermissions(const Qn::UserAccessData& accessData) const;
+    bool hasAdminPermissions(const QnResourceAccessSubject& subject) const;
+
+    nx::vms::api::AccessRights accessRights(
+        const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
+
+    bool hasAccessRights(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        nx::vms::api::AccessRights requiredAccessRights) const;
+
+    nx::vms::api::AccessRights commonAccessRights(
+        const QnResourceAccessSubject& subject) const;
 
     /**
      * @param subject User or role to get global permissions for.
@@ -60,11 +72,11 @@ public:
         GlobalPermission requiredPermission) const;
 
     /**
-     * @param accessRights Access rights descriptor.
+     * @param accessData Access rights descriptor.
      * @param requiredPermission Global permission to check.
      * @returns True if actual global permissions include required permission.
      */
-    bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
+    bool hasGlobalPermission(const Qn::UserAccessData& accessData,
         GlobalPermission requiredPermission) const;
 
     /**
@@ -87,15 +99,18 @@ public:
         Qn::Permissions requiredPermissions) const;
 
     /**
-     * @param accessRights Access rights descriptor.
+     * @param accessData Access rights descriptor.
      * @param resource Resource to get permissions for.
      * @param permissions Permission to check.
      * @returns True if actual permissions include required permission.
      */
     bool hasPermission(
-        const Qn::UserAccessData& accessRights,
+        const Qn::UserAccessData& accessData,
         const QnResourcePtr& resource,
         Qn::Permissions permissions) const;
+
+    using Notifier = nx::core::access::AccessRightsResolver::Notifier;
+    Notifier* createNotifier(QObject* parent = nullptr);
 
     template <typename ApiDataType>
     bool canCreateResourceFromData(
@@ -175,6 +190,7 @@ public:
     bool canCreateUser(
         const QnResourceAccessSubject& subject,
         GlobalPermissions targetPermissions,
+        const std::vector<QnUuid>& targetGroups,
         bool isOwner) const;
     bool canCreateUser(
         const QnResourceAccessSubject& subject,
@@ -205,69 +221,34 @@ public:
     bool canCreateWebPage(const QnResourceAccessSubject& subject) const;
 
 signals:
-    void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        Qn::Permissions permissions);
-    void allPermissionsRecalculated();
-
-protected:
-    virtual void beforeUpdate() override;
-    virtual void afterUpdate() override;
+    void resourceAccessReset();
 
 private:
     bool canCreateResourceInternal(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& target) const;
 
-    void recalculateAllPermissions();
+    nx::vms::api::GlobalPermissions accumulatePermissions(nx::vms::api::GlobalPermissions own,
+        const std::vector<QnUuid>& parentGroups) const;
 
-    void updatePermissions(const QnResourceAccessSubject& subject, const QnResourcePtr& target);
-    void updatePermissionsToResource(const QnResourcePtr& resource);
-    void updatePermissionsBySubject(const QnResourceAccessSubject& subject);
-
-    void handleResourceAdded(const QnResourcePtr& resource);
-    void handleResourceRemoved(const QnResourcePtr& resource);
-    void handleUserRoleRemoved(const QnResourceAccessSubject& subject);
-
-    Qn::Permissions calculatePermissions(
-        const QnResourceAccessSubject& subject,
-        const QnResourcePtr& target,
-        GlobalPermissions* globalPermissionsHint = nullptr,
-        bool* hasAccessToResourceHint = nullptr) const;
+    Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& target) const;
 
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVirtualCameraResourcePtr& camera,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnVirtualCameraResourcePtr& camera) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnMediaServerResourcePtr& server,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnMediaServerResourcePtr& server) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnStorageResourcePtr& storage,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnStorageResourcePtr& storage) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVideoWallResourcePtr& videoWall,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnVideoWallResourcePtr& videoWall) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnWebPageResourcePtr& webPage,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnWebPageResourcePtr& webPage) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnLayoutResourcePtr& layout,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
+        const QnLayoutResourcePtr& layout) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnUserResourcePtr& targetUser,
-        GlobalPermissions globalPermissions,
-        bool hasAccessToResource) const;
-
-    void setPermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource, Qn::Permissions permissions);
+        const QnUserResourcePtr& targetUser) const;
 
 private:
-    const nx::core::access::Mode m_mode;
-    mutable std::shared_mutex m_permissionsCacheMutex;
-    std::unique_ptr<nx::core::access::PermissionsCache> m_permissionsCache;
+    const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;
 };

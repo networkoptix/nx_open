@@ -76,7 +76,7 @@ public:
     static State setSelectedTab(State state, CameraSettingsTab value);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
-    static State setGlobalPermissions(State state, GlobalPermissions value);
+    static State setUserHasAdminPermissions(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
     static State setSingleCameraUserName(State state, const QString& text);

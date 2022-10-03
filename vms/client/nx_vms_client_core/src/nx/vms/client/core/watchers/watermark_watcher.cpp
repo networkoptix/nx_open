@@ -10,6 +10,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
@@ -140,8 +141,8 @@ QUrl WatermarkWatcher::watermarkImageUrl(const QnUuid& id) const
         return {};
 
     const auto user = systemContext()->userWatcher()->user();
-    const auto hasAdminPermission = systemContext()->globalPermissionsManager()
-        ->hasGlobalPermission(user, GlobalPermission::admin);
+    const auto hasAdminPermission = systemContext()->resourceAccessManager()->hasAdminPermissions(
+        user);
     if (hasAdminPermission)
         return {};
 

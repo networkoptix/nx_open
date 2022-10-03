@@ -962,8 +962,16 @@ void ActionHandler::at_openInLayoutAction_triggered()
         addParams.paused = false;
         addParams.speed = 1.0;
 
+        const bool canViewFootage = std::any_of(resources.begin(), resources.end(),
+            [this](auto resource)
+            {
+                return accessController()->hasPermissions(
+                    resource,
+                    Qn::Permission::ViewFootagePermission);
+            });
+
         // Live viewers must not open items on archive position
-        if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
+        if (canViewFootage)
         {
             using namespace std::chrono;
 
@@ -1249,7 +1257,7 @@ void ActionHandler::moveResourcesToServer(
     const auto webPages = resources.filtered<QnWebPageResource>();
 
     // Only admin can move webpages.
-    if (webPages.count() > 0 && !accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (webPages.count() > 0 && !accessController()->hasAdminPermissions())
     {
         resultCallback({});
         return;

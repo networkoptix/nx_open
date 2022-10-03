@@ -218,7 +218,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool hasChanges = false;
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
-    GlobalPermissions globalPermissions;
+    bool userHasAdminPermissions = false;
     CameraSettingsTab selectedTab = CameraSettingsTab::general;
 
     // Generic cameras info.

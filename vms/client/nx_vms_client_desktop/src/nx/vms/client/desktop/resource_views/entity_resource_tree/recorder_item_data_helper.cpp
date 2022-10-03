@@ -3,8 +3,12 @@
 #include "recorder_item_data_helper.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -47,6 +51,25 @@ bool RecorderItemDataHelper::isRecorder(const QString& recorderGroupId) const
 {
     const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
     return !camerasSet.empty() && !(*camerasSet.cbegin())->isMultiSensorCamera();
+}
+
+bool RecorderItemDataHelper::hasPermissions(
+    const QString& recorderGroupId,
+    const QnUserResourcePtr& user,
+    Qn::Permissions permissions) const
+{
+    if (user.isNull())
+        return false;
+
+    const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
+
+    return std::any_of(camerasSet.begin(), camerasSet.end(),
+        [user, &permissions](auto camera)
+        {
+            const auto accessManager = user->systemContext()->resourceAccessManager();
+            // TODO: Qt6 adds testFlags().
+            return (accessManager->permissions(user, camera) & permissions) == permissions;
+        });
 }
 
 void RecorderItemDataHelper::onCameraAdded(const QnResourcePtr& cameraResource)

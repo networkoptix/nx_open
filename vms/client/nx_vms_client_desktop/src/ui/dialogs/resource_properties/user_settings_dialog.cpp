@@ -291,7 +291,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget* parent):
     m_layoutsPage(new QnAccessibleLayoutsWidget(m_model, this)),
     m_userEnabledButton(new QPushButton(tr("Enabled"), this)),
     m_digestMenuButton(new QPushButton(this)),
-    m_digestMenu(new QMenu(this))
+    m_digestMenu(new QMenu(this)),
+    m_accessRightsNotifier(resourceAccessManager()->createNotifier(this))
 {
     NX_ASSERT(parent);
 
@@ -303,10 +304,10 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget* parent):
     addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
-        [this](const QnResourceAccessSubject& subject)
+    connect(m_accessRightsNotifier, &QnResourceAccessManager::Notifier::resourceAccessChanged, this,
+        [this](const QnUuid& subjectId)
         {
-            if (m_user && subject.user() == m_user)
+            if (NX_ASSERT(m_user && subjectId == m_user->getId()))
             {
                 updatePermissions();
                 updateButtonBox();
@@ -533,6 +534,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     m_user = user;
     m_model->setUser(user);
 
+    m_accessRightsNotifier->setSubjectId(m_user ? m_user->getId() : QnUuid{});
+
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         m_model->setDigestAuthorizationEnabled(false);
 
@@ -544,6 +547,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
                 if (resource == m_user && propertyName == cloudAuthInfoPropertyName)
                     forcedUpdate();
             });
+
         connect(m_user.get(), &QnUserResource::digestChanged, this,
             [this](const auto& /*user*/) { QnUserSettingsDialog::updateButtonBox(); });
     }

@@ -7,6 +7,7 @@
 #include <QtCore/QtMath>
 
 #include <business/business_resource_validation.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -36,7 +37,8 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
     m_helper(new vms::event::StringsHelper(systemContext)),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
-        GlobalPermission::userInput,
+        this->systemContext(),
+        Qn::SoftTriggerPermission,
         tr("User Input")))
 {
     ui->setupUi(this);
@@ -88,6 +90,13 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(Fields fields)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
+
+    if (fields.testFlag(Field::eventResources))
+    {
+        auto cameras =
+            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources());
+        m_validationPolicy->setCameras(cameras);
+    }
 
     if (fields.testFlag(Field::eventParams))
     {

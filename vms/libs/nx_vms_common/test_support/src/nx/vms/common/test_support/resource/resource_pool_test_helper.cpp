@@ -55,7 +55,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
     return layout;
 }
 
-void QnResourcePoolTestHelper::addToLayout(
+QnUuid QnResourcePoolTestHelper::addToLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourcePtr& resource)
 {
@@ -63,6 +63,7 @@ void QnResourcePoolTestHelper::addToLayout(
     item.uuid = QnUuid::createUuid();
     item.resource.id = resource->getId();
     layout->addItem(item);
+    return item.uuid;
 }
 
 nx::CameraResourceStubPtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
@@ -134,17 +135,29 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
     return videoWall;
 }
 
+QnUuid QnResourcePoolTestHelper::addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
+    const QnLayoutResourcePtr& itemLayout)
+{
+    QnVideoWallItem vwitem;
+    vwitem.uuid = QnUuid::createUuid();
+
+    if (itemLayout)
+    {
+        itemLayout->setParentId(videoWall->getId());
+        vwitem.layout = itemLayout->getId();
+    }
+
+    videoWall->items()->addItem(vwitem);
+    return vwitem.uuid;
+}
+
 QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
     const QnVideoWallResourcePtr& videoWall)
 {
     auto layout = createLayout();
     layout->setParentId(videoWall->getId());
     resourcePool()->addResource(layout);
-
-    QnVideoWallItem vwitem;
-    vwitem.layout = layout->getId();
-    videoWall->items()->addItem(vwitem);
-
+    addVideoWallItem(videoWall, layout);
     return layout;
 }
 
@@ -170,8 +183,27 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
 nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(
     GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds)
 {
-    const auto name = NX_FMT("Role for %1", nx::reflect::json::serialize(permissions));
+    return createRole(NX_FMT("Role for %1", nx::reflect::json::serialize(permissions)),
+        permissions, parentRoleIds);
+}
+
+nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(const QString& name,
+    GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds)
+{
     nx::vms::api::UserRoleData role{QnUuid::createUuid(), name, permissions, parentRoleIds};
     userRolesManager()->addOrUpdateUserRole(role);
     return role;
+}
+
+void QnResourcePoolTestHelper::removeRole(const QnUuid& roleId)
+{
+    userRolesManager()->removeUserRole(roleId);
+}
+
+void QnResourcePoolTestHelper::clear()
+{
+    resourcePool()->clear();
+
+    const QSignalBlocker blocker(userRolesManager());
+    userRolesManager()->resetUserRoles({});
 }

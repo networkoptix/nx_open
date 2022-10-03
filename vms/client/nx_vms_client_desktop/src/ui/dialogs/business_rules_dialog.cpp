@@ -555,7 +555,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (!accessController()->hasAdminPermissions())
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -655,7 +655,7 @@ void QnBusinessRulesDialog::createActions() {
 
 bool QnBusinessRulesDialog::hasEditPermissions() const
 {
-    return accessController()->hasGlobalPermission(GlobalPermission::admin);
+    return accessController()->hasAdminPermissions();
 }
 
 bool QnBusinessRulesDialog::hasChanges() const

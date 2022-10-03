@@ -24,7 +24,14 @@ class AbstractStateWatcher;
 class DescriptorContainer;
 } // namespace nx::analytics::taxonomy;
 
-namespace nx::core::access { class ResourceAccessProvider; }
+namespace nx::core::access {
+class AccessRightsManager;
+class DeprecatedAccessRightsConverter;
+class GlobalPermissionsWatcher;
+class ResourceAccessProvider;
+class ResourceAccessSubjectHierarchy;
+} // namespace nx::core::access
+
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
@@ -202,6 +209,9 @@ public:
      * Manages which Resources are directly shared with Users or Roles.
      */
     QnSharedResourcesManager* sharedResourcesManager() const;
+    nx::core::access::AccessRightsManager* accessRightsManager() const;
+    nx::core::access::GlobalPermissionsWatcher* globalPermissionsWatcher() const;
+    nx::core::access::DeprecatedAccessRightsConverter* deprecatedAccessRightsConverter() const;
 
     /**
      * Manages which permissions User has on each of its accessible Resources.
@@ -217,6 +227,7 @@ public:
      * Cache of Users by Roles.
      */
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
+    nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
 
     /**
      * Manages which Resources are accessible to Users and Roles.

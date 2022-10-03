@@ -292,8 +292,7 @@ void ResourceStatusHelper::Private::updateStatus()
     }
 
     status.setFlag(StatusFlag::canChangePasswords, qnRuntime->isDesktopMode()
-        && m_context->accessController()->hasGlobalPermission(
-            GlobalPermission::admin));
+        && m_context->accessController()->hasAdminPermissions());
 
     const auto resourceStatus = m_resource->getStatus();
     status.setFlag(StatusFlag::offline, resourceStatus == nx::vms::api::ResourceStatus::offline);

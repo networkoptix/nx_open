@@ -811,8 +811,7 @@ void applyColumnFilter(
     QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData)
-        && !commonModule->resourceAccessManager()->hasGlobalPermission(
-            accessData, GlobalPermission::admin))
+        && !commonModule->resourceAccessManager()->hasAdminPermissions(accessData))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -871,7 +870,7 @@ struct ReadResourceParamAccess
         const auto accessManager = commonModule->resourceAccessManager();
         if (accessData == Qn::kSystemAccess
             || accessData.access == Qn::UserAccessData::Access::ReadAllResources
-            || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+            || accessManager->hasAdminPermissions(accessData))
         {
             return Result();
         }
@@ -1011,7 +1010,7 @@ struct ModifyResourceParamAccess
 
         if (isNewApiCompoundTransaction)
         {
-            if (accessManager->hasGlobalPermission(userResource, GlobalPermission::admin))
+            if (accessManager->hasAdminPermissions(userResource))
                 return Result();
         }
 
@@ -1123,7 +1122,7 @@ struct ModifyCameraAttributesAccess
 
             if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
             {
-                if (accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+                if (accessManager->hasAdminPermissions(accessData))
                     return Result();
             }
         }
@@ -1247,7 +1246,7 @@ struct ModifyServerAttributesAccess
         }
         else if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
         {
-            if (accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+            if (accessManager->hasAdminPermissions(accessData))
                 return Result();
         }
 
@@ -1445,7 +1444,7 @@ struct ModifyAccessRightsChecker
         if (sharedResourceRights == param.resourceRights)
             return Result();
 
-        return accessManager->hasGlobalPermission(accessData, GlobalPermission::admin)
+        return accessManager->hasAdminPermissions(accessData)
             ? Result()
             : Result(ErrorCode::forbidden, ServerApiErrors::tr("Admin permissions required."));
     }

@@ -27,7 +27,7 @@ bool shouldDisplayServersInTree(QnWorkbenchContext* context)
 {
     auto systemContext = context->systemContext();
     const auto isAdmin =
-        systemContext->accessController()->hasGlobalPermission(GlobalPermission::admin);
+        systemContext->accessController()->hasAdminPermissions();
 
     const bool currentUserAllowedToShowServers =
         isAdmin || systemContext->globalSettings()->showServersInTreeForNonAdmins();

@@ -207,19 +207,26 @@ class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    explicit QnRequiredPermissionSubjectPolicy(GlobalPermission requiredPermission,
-        const QString& permissionName = QString(), bool allowEmptySelection = false);
+    explicit QnRequiredPermissionSubjectPolicy(
+        nx::vms::common::SystemContext* systemContext,
+        Qn::Permission requiredPermission,
+        const QString& permissionName = QString(),
+        bool allowEmptySelection = false);
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
     virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
 
+    QnSharedResourcePointerList<QnVirtualCameraResource> cameras() const;
+    void setCameras(const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras);
+
 private:
     bool isRoleValid(const QnUuid& roleId) const;
 
 private:
-    const GlobalPermission m_requiredPermission;
+    const Qn::Permission m_requiredPermission;
     const QString m_permissionName;
+    QnSharedResourcePointerList<QnVirtualCameraResource> m_cameras;
 };
 
 class QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy

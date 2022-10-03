@@ -158,6 +158,12 @@ Builder Builder::mode(ClientModes mode)
     return *this;
 }
 
+Builder Builder::requiredAdminPermissions()
+{
+    m_action->setAdminRequired();
+    return *this;
+}
+
 Builder Builder::requiredGlobalPermission(GlobalPermission permission)
 {
     m_action->setRequiredGlobalPermission(permission);

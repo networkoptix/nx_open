@@ -134,8 +134,8 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
     if (!NX_ASSERT(accessController))
         return {};
 
-    const bool hasAccess = accessController->hasGlobalPermission(GlobalPermission::viewArchive)
-        && accessController->hasPermissions(event.previewCamera, Qn::ViewContentPermission);
+    const bool hasAccess = accessController->hasPermissions(event.previewCamera, 
+	    Qn::ViewContentPermission | Qn::ViewFootagePermission);
 
     return hasAccess ? event.previewCamera : QnVirtualCameraResourcePtr();
 }

@@ -6,6 +6,9 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <business/business_resource_validation.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -123,8 +126,13 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
 
     if (forceAcknowledgement)
     {
-        setValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-            GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
+        auto validationPolicy = new QnRequiredPermissionSubjectPolicy(
+            systemContext(),
+            Qn::ManageBookmarksPermission,
+            tr("Manage Bookmarks"));
+        validationPolicy->setCameras(
+            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources()));
+        setValidationPolicy(validationPolicy);
     }
     else
     {

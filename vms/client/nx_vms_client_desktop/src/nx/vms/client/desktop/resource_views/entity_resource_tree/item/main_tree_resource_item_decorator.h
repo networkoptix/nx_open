@@ -6,6 +6,7 @@
 
 #include <nx/utils/uuid.h>
 
+#include <common/common_globals.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -18,9 +19,16 @@ class MainTreeResourceItemDecorator: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
+    struct Permissions
+    {
+        Qn::Permissions permissions;
+        bool hasAdminPermissions = false;
+    };
+
+public:
     MainTreeResourceItemDecorator(
         entity_item_model::AbstractItemPtr sourceItem,
-        nx::vms::api::GlobalPermissions permissions,
+        Permissions permissions,
         ResourceTree::NodeType nodeType,
         const std::optional<QnUuid>& itemUuid = std::optional<QnUuid>());
 
@@ -29,7 +37,7 @@ public:
 
 private:
     entity_item_model::AbstractItemPtr m_sourceItem;
-    nx::vms::api::GlobalPermissions m_permissions;
+    Permissions m_permissions;
     ResourceTree::NodeType m_nodeType;
     std::optional<QnUuid> m_itemUuid;
 };

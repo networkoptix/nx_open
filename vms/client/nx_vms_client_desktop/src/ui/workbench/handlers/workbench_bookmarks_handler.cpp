@@ -86,8 +86,18 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
             if (!bookmarksViewer)
                 return;
 
-            const bool readonly =
-                !accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks);
+            const auto bookmarks = bookmarksViewer->getDisplayedBookmarks();
+            const bool readonly = std::none_of(bookmarks.begin(), bookmarks.end(),
+                [this](auto bookmark)
+                {
+                    const auto camera =
+                        resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+                    if (!camera)
+                        return false;
+
+                    return accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission);
+                });
+
             bookmarksViewer->setReadOnly(readonly);
         };
 

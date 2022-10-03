@@ -246,10 +246,11 @@ void ControlWidget::initButton(
 void ControlWidget::updateBookButtonEnabled()
 {
     const auto currentWidget = navigator()->currentWidget();
+    const auto currentResource = currentWidget ? currentWidget->resource() : QnResourcePtr();
 
-    const bool bookmarksEnabled =
-        accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks)
-        && (currentWidget && currentWidget->resource()->flags().testFlag(Qn::live))
+    const bool bookmarksEnabled = currentResource
+        && accessController()->hasPermissions(currentResource, Qn::ViewBookmarksPermission)
+        && currentResource->flags().testFlag(Qn::live)
         && !qnRuntime->isAcsMode();
 
     const auto modeAction = action(action::BookmarksModeAction);

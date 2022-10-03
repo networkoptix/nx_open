@@ -205,10 +205,10 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
-void CameraSettingsDialogStore::setGlobalPermissions(GlobalPermissions value)
+void CameraSettingsDialogStore::setUserHasAdminPermissions(bool value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setGlobalPermissions(std::move(state), value); });
+        [&](State state) { return Reducer::setUserHasAdminPermissions(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setSingleVirtualCameraState(const VirtualCameraState& value)

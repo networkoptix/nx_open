@@ -6,6 +6,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -290,8 +291,12 @@ void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr&
     const auto currentUser = systemContext()->userWatcher()->user();
     DescriptionPtr newData;
 
-    if (systemContext()->globalPermissionsManager()
-        ->hasGlobalPermission(currentUser, GlobalPermission::userInput)
+    const auto resource = resourcePool()->getResourceById(m_resourceId);
+
+    if (systemContext()->resourceAccessManager()->hasPermission(
+            currentUser,
+            resource,
+            Qn::Permission::SoftTriggerPermission)
         && appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
     {
         newData = Description::create(rule);
@@ -305,8 +310,12 @@ void SoftwareTriggersWatcher::updateTriggerByVmsRule(const nx::vms::rules::Rule*
     const auto currentUser = systemContext()->userWatcher()->user();
     DescriptionPtr newData;
 
-    if (systemContext()->globalPermissionsManager()
-        ->hasGlobalPermission(currentUser, GlobalPermission::userInput)
+    const auto resource = resourcePool()->getResourceById(m_resourceId);
+
+    if (systemContext()->resourceAccessManager()->hasPermission(
+            currentUser,
+            resource,
+            Qn::Permission::SoftTriggerPermission)
         && appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
     {
         newData = Description::create(rule, systemContext()->vmsRulesEngine());

@@ -53,6 +53,8 @@ class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
 {
 public:
     ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+
+    virtual void TearDown() override { clear(); }
 };
 
 } // namespace nx::vms::common::test
