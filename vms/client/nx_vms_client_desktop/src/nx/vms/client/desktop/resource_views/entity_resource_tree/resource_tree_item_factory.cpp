@@ -168,9 +168,23 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
     result->connections()->add(QObject::connect(
         context,
         &CloudCrossSystemContext::statusChanged,
-        [invalidator = result.get()]
+        [invalidator = result.get(), systemId, status = context->status()]() mutable
         {
-            invalidator->invalidate();
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (!NX_ASSERT(context))
+                return;
+
+            const auto newStatus = context->status();
+            if (status == newStatus)
+                return;
+
+            // Only initial connecting state must affects system appearance in the resource tree.
+            if (newStatus != CloudCrossSystemContext::Status::connecting
+                || status == CloudCrossSystemContext::Status::uninitialized)
+            {
+                status = newStatus;
+                invalidator->invalidate();
+            }
         }));
 
     return result;
