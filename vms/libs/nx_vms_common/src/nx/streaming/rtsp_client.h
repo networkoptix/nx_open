@@ -329,7 +329,8 @@ private:
     bool parseSDP(const QByteArray& response);
 
     void addAdditionAttrs( nx::network::http::Request* const request );
-    bool processTextResponseInsideBinData();
+    bool processTextDataInsideBinData();
+    void processTextData(const QByteArray& textData);
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
