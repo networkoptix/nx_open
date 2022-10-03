@@ -163,36 +163,7 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="emailLabel">
-          <property name="text">
-           <string>Email</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>emailInput</cstring>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="passwordLabel">
-          <property name="text">
-           <string>Password</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>passwordInput</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="nx::vms::client::desktop::PasswordInputField" name="passwordInput" native="true"/>
-        </item>
-        <item row="1" column="0">
          <widget class="QLabel" name="userLabel">
           <property name="text">
            <string>User</string>
@@ -200,8 +171,15 @@
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
-          <property name="buddy">
-           <cstring>userInput</cstring>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="protocolLabel">
+          <property name="text">
+           <string>Security Protocol</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -218,7 +196,68 @@
           </property>
          </spacer>
         </item>
-        <item row="4" column="1">
+        <item row="0" column="1">
+         <widget class="nx::vms::client::desktop::InputField" name="emailInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="nx::vms::client::desktop::InputField" name="serverAddressInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="passwordLabel">
+          <property name="text">
+           <string>Password</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="serverAddressLabel">
+          <property name="text">
+           <string>Server Address</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="nx::vms::client::desktop::PasswordInputField" name="passwordInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QnWordWrappedLabel" name="emailInputHint" native="true"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="emailLabel">
+          <property name="text">
+           <string>Email</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="nx::vms::client::desktop::InputField" name="userInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
            <number>0</number>
@@ -241,37 +280,11 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="serverAddressLabel">
-          <property name="text">
-           <string>Server Address</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>serverAddressInput</cstring>
-          </property>
-         </widget>
+        <item row="4" column="1">
+         <widget class="QnWordWrappedLabel" name="passwordInputHint" native="true"/>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="protocolLabel">
-          <property name="text">
-           <string>Security Protocol</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="emailInput" native="true"/>
-        </item>
-        <item row="1" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="userInput" native="true"/>
-        </item>
-        <item row="3" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="serverAddressInput" native="true"/>
+        <item row="6" column="1">
+         <widget class="QnWordWrappedLabel" name="serverAddressInputHint" native="true"/>
         </item>
        </layout>
       </widget>
@@ -305,9 +318,6 @@
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
-          <property name="buddy">
-           <cstring>supportSignatureInput</cstring>
-          </property>
          </widget>
         </item>
         <item row="0" column="0">
@@ -317,9 +327,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>systemSignatureInput</cstring>
           </property>
          </widget>
         </item>
@@ -337,10 +344,18 @@
          </spacer>
         </item>
         <item row="0" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="systemSignatureInput" native="true"/>
+         <widget class="nx::vms::client::desktop::InputField" name="systemSignatureInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
         <item row="1" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="supportSignatureInput" native="true"/>
+         <widget class="nx::vms::client::desktop::InputField" name="supportSignatureInput" native="true">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -381,7 +396,22 @@
    <header location="global">nx/vms/client/desktop/common/widgets/busy_indicator.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>emailInput</tabstop>
+  <tabstop>userInput</tabstop>
+  <tabstop>passwordInput</tabstop>
+  <tabstop>serverAddressInput</tabstop>
+  <tabstop>protocolComboBox</tabstop>
+  <tabstop>systemSignatureInput</tabstop>
+  <tabstop>supportSignatureInput</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
