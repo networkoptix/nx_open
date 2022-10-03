@@ -361,6 +361,7 @@ void BaseInputField::setExternalControls(
     d->externalControls = true;
     d->title = titleLabel;
     d->hint = hintLabel;
+    d->hint->setHidden(true);
 
     d->initializeControls();
 }
