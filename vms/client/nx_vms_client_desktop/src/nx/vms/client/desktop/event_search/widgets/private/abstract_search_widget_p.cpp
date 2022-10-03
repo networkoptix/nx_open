@@ -136,6 +136,7 @@ AbstractSearchWidget::Private::Private(
     m_headIndicatorModel(new BusyIndicatorModel()),
     m_tailIndicatorModel(new BusyIndicatorModel()),
     m_visualModel(new ConcatenationListModel()),
+    m_placeholderWidget(new PlaceholderWidget(q)),
     m_togglePreviewsButton(createCheckableToolButton(q)),
     m_toggleFootersButton(createCheckableToolButton(q)),
     m_itemCounterLabel(new QLabel(q)),
@@ -381,27 +382,20 @@ void AbstractSearchWidget::Private::setupViewportHeader()
 
 void AbstractSearchWidget::Private::setupPlaceholder()
 {
-    ui->placeholder->setParent(ui->ribbonContainer);
-    anchorWidgetToParent(ui->placeholder);
+    anchorWidgetToParent(m_placeholderWidget);
 
-    auto effect = new QGraphicsOpacityEffect(ui->placeholder);
-    ui->placeholder->setGraphicsEffect(effect);
+    auto effect = new QGraphicsOpacityEffect(m_placeholderWidget);
+    m_placeholderWidget->setGraphicsEffect(effect);
 
     connect(effect, &QGraphicsOpacityEffect::opacityChanged, this,
         [this](qreal opacity)
         {
-            ui->placeholder->setHidden(qFuzzyIsNull(opacity));
-            ui->placeholder->graphicsEffect()->setEnabled(!qFuzzyIsNull(opacity - 1.0));
+            m_placeholderWidget->setHidden(qFuzzyIsNull(opacity));
+            m_placeholderWidget->graphicsEffect()->setEnabled(!qFuzzyIsNull(opacity - 1.0));
         });
 
     m_placeholderVisible = false;
     effect->setOpacity(0.0);
-
-    QFont font;
-    font.setPixelSize(kPlaceholderFontPixelSize);
-    ui->placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->placeholderText->setFont(font);
-    ui->placeholderText->setForegroundRole(QPalette::Mid);
 }
 
 void AbstractSearchWidget::Private::setupTimeSelection()
@@ -689,7 +683,7 @@ CommonObjectSearchSetup* AbstractSearchWidget::Private::commonSetup() const
 
 void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
 {
-    ui->placeholderIcon->setPixmap(value);
+    m_placeholderWidget->setPixmap(value);
 }
 
 SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
@@ -847,9 +841,9 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
 {
     m_placeholderVisible = m_visualModel->rowCount() == 0 && !m_mainModel->canFetchData();
     if (m_placeholderVisible)
-        ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
+        m_placeholderWidget->setText(q->placeholderText(m_mainModel->isConstrained()));
 
-    const auto effect = qobject_cast<QGraphicsOpacityEffect*>(ui->placeholder->graphicsEffect());
+    const auto effect = qobject_cast<QGraphicsOpacityEffect*>(m_placeholderWidget->graphicsEffect());
     if (!effect)
         return;
 
