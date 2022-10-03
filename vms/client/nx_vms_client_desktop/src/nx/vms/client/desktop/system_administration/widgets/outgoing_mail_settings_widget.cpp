@@ -27,8 +27,11 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/email/email.h>
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -42,11 +45,15 @@ static constexpr int kStatusHintLabelFontWeight = QFont::Normal;
 
 static constexpr auto kSmtpTestingTimeout = 5s;
 
-const bool isValidPort(int port) { return port >=1 && port <= 65535; };
+const bool isValidPort(int port) { return port >= 1 && port <= 65535; };
+
+void setupFocusRedirect(QLabel* label, InputField* inputField)
+{
+    installEventHandler(label, QEvent::MouseButtonRelease, label,
+        [inputField]{ inputField->setFocus(Qt::OtherFocusReason); });
+}
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 //-------------------------------------------------------------------------------------------------
 // OutgoingMailSettingsWidget::Private declaration.
@@ -59,7 +66,6 @@ public:
     Private(OutgoingMailSettingsWidget* owner);
 
     void setupDialogControls();
-    void setupTabOrder();
     void setReadOnly(bool readOnly);
 
     enum ConfigurationStatus
@@ -120,6 +126,17 @@ OutgoingMailSettingsWidget::Private::Private(OutgoingMailSettingsWidget* owner):
 
 void OutgoingMailSettingsWidget::Private::setupDialogControls()
 {
+    // Straightforward alternative to the setFocusProxy without setting actual Qt::ClickFocus
+    // policy to labels. Otherwise tab order doesn't work as expected if inputs belong to different
+    // parents (group boxes in this case).
+
+    setupFocusRedirect(ui->emailLabel, ui->emailInput);
+    setupFocusRedirect(ui->userLabel, ui->userInput);
+    setupFocusRedirect(ui->passwordLabel, ui->passwordInput);
+    setupFocusRedirect(ui->serverAddressLabel, ui->serverAddressInput);
+    setupFocusRedirect(ui->systemSingnatureLabel, ui->systemSignatureInput);
+    setupFocusRedirect(ui->supportSignatureLabel, ui->supportSignatureInput);
+
     // Setup layouts, margins and spacings.
 
     ui->formLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
@@ -192,6 +209,12 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
                 : ValidationResult(tr("URL is not valid."));
         });
 
+    // External hint labels for inputs with validators to keep right layout.
+
+    ui->emailInput->setExternalControls(ui->emailLabel, ui->emailInputHint);
+    ui->passwordInput->setExternalControls(ui->passwordLabel, ui->passwordInputHint);
+    ui->serverAddressInput->setExternalControls(ui->serverAddressLabel, ui->serverAddressInputHint);
+
     // Setup placeholders.
 
     ui->systemSignatureInput->setPlaceholderText(tr("Enter a short System description here."));
@@ -204,28 +227,6 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
         ->setData(/*useCloudService*/ true);
     m_serviceTypeDropdownMenu->addAction(serviceTypeDropdownText(/*useCloudService*/ false))
         ->setData(/*useCloudService*/ false);
-
-    // Workaround to keep widget layout neat without using Aligner, which doesn't fit there
-    // really well.
-
-    const auto labels = q->findChildren<QLabel*>();
-    for (const auto label: labels)
-    {
-        if (!label->buddy())
-            continue;
-
-        label->setFocusPolicy(Qt::ClickFocus);
-        label->setFocusProxy(label->buddy());
-        label->buddy()->setFocusPolicy(Qt::ClickFocus);
-
-        // Keep label aligned with input field when validation result message is shown.
-        label->setAlignment(Qt::AlignRight | Qt::AlignTop);
-        const int labelTopMargin =
-            std::round((label->buddy()->height() - label->minimumSizeHint().height()) / 2.0);
-        label->setContentsMargins({0, labelTopMargin, 0, 0});
-    }
-
-    setupTabOrder();
 
     // Setup interactions.
 
@@ -315,16 +316,6 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
                 setConfigurationStatusHint({});
             }
         });
-}
-
-void OutgoingMailSettingsWidget::Private::setupTabOrder()
-{
-    setTabOrder(ui->emailInput, ui->userInput);
-    setTabOrder(ui->userInput, ui->passwordInput);
-    setTabOrder(ui->passwordInput, ui->serverAddressInput);
-    setTabOrder(ui->serverAddressInput, ui->protocolComboBox);
-    setTabOrder(ui->protocolComboBox, ui->systemSignatureInput);
-    setTabOrder(ui->systemSignatureInput, ui->supportSignatureInput);
 }
 
 void OutgoingMailSettingsWidget::Private::setReadOnly(bool readOnly)
