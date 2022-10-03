@@ -27,7 +27,10 @@ class NX_VMS_CLIENT_DESKTOP_API MimeData
 public:
     MimeData();
     MimeData(const QMimeData* data);
-    MimeData(QByteArray serializedData);
+    MimeData(
+        QByteArray serializedData,
+        std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)>
+            createResourceCallback = {});
     ~MimeData();
 
     static QStringList mimeTypes();
@@ -62,7 +65,10 @@ public:
     bool isEmpty() const;
 
 private:
-    void load(const QMimeData* data);
+    void load(
+        const QMimeData* data,
+        std::function<QnResourcePtr(nx::vms::common::ResourceDescriptor)>
+            createResourceCallback = {});
 
 private:
     struct Private;

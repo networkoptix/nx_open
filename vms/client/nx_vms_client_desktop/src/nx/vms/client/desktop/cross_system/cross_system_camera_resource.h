@@ -27,9 +27,8 @@ public:
     api::ResourceStatus getStatus() const override;
     CloudCrossSystemContext* crossSystemContext() const;
     nx::vms::common::ResourceDescriptor descriptor() const;
-
-private:
-    void watchOnCrossSystemContext();
+    void setResourceName(const QString& name);
+    const std::optional<nx::vms::api::CameraDataEx>& source() const;
 
 private:
     struct Private;
