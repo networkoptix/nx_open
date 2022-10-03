@@ -13,6 +13,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
@@ -1114,7 +1115,46 @@ void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
         m_tcpSock->send(buffer, size);
 }
 
-bool QnRtspClient::processTextResponseInsideBinData()
+void QnRtspClient::processTextData(const QByteArray& textData)
+{
+    const int requestLineLen = textData.indexOf("\r\n");
+    if (requestLineLen == -1)
+        return;
+    nx::network::http::RequestLine requestLine;
+    requestLine.parse(std::string_view(textData.data(), requestLineLen));
+
+    if (requestLine.method == "SET_PARAMETER")
+    {
+        nx::network::http::Response response;
+        response.statusLine.version = nx::network::rtsp::rtsp_1_0;
+        response.statusLine.statusCode = 200;
+        response.statusLine.reasonPhrase = "OK";
+
+        response.headers.insert({"User-Agent", m_userAgent});
+
+        nx::network::http::Request request;
+        request.parse(std::string_view(textData.data(), textData.size()));
+        for (const auto& header: request.headers)
+        {
+            const QString lowerName = QString::fromStdString(header.first).toLower();
+            if (lowerName == "cseq" || lowerName == "session")
+                response.headers.insert(header);
+        }
+
+        nx::Buffer buffer;
+        response.serialize(&buffer);
+        if (m_tcpSock->send(buffer.data(), buffer.size()) <= 0)
+            NX_DEBUG(this, "Failed to send response: %1", SystemError::getLastOSErrorText());
+
+        return;
+    }
+
+    const QString range = extractRtspParam(textData, "Range:");
+    if (!range.isEmpty())
+        parseRangeHeader(range);
+}
+
+bool QnRtspClient::processTextDataInsideBinData()
 {
     // have text response or part of text response.
     if (!m_tcpSock)
@@ -1143,13 +1183,11 @@ bool QnRtspClient::processTextResponseInsideBinData()
 
     if (isReadyToProcess)
     {
-        QByteArray textResponse;
-        textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
+        QByteArray textData = QByteArray::fromRawData(
+            (const char*) m_responseBuffer, curPtr - m_responseBuffer);
+        processTextData(textData);
         memmove(m_responseBuffer, curPtr, bEnd - curPtr);
         m_responseBufferLen = bEnd - curPtr;
-        QString tmp = extractRtspParam(QLatin1String(textResponse), QLatin1String("Range:"));
-        if (!tmp.isEmpty())
-            parseRangeHeader(tmp);
     }
 
     return true;
@@ -1171,7 +1209,7 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
             break;
 
         // have text response or part of text response.
-        if (!processTextResponseInsideBinData())
+        if (!processTextDataInsideBinData())
             return -1;
     }
     int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
@@ -1220,7 +1258,7 @@ int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int
         }
         if (m_responseBuffer[0] == '$')
             break;
-        if (!processTextResponseInsideBinData())
+        if (!processTextDataInsideBinData())
             return -1;
     }
 
@@ -1606,7 +1644,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
         request.serialize( &requestBuf );
         if( m_tcpSock->send(requestBuf.data(), requestBuf.size()) <= 0 )
         {
-            NX_DEBUG(this, "Failed to send request: %2", SystemError::getLastOSErrorText());
+            NX_DEBUG(this, "Failed to send request: %1", SystemError::getLastOSErrorText());
             return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
         }
 
