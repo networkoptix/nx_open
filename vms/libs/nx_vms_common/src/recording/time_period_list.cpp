@@ -597,8 +597,8 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
                 eraseIter++;
         }
 
-        while (eraseIter != periods.end())
-            eraseIter = periods.erase(eraseIter);
+        if (eraseIter != periods.end())
+            periods.erase(eraseIter, periods.end());
     }
 
 
