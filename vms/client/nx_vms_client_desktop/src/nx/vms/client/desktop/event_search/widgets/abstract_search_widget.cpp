@@ -130,8 +130,7 @@ void AbstractSearchWidget::addSearchAction(QAction* action)
     d->addSearchAction(action);
 }
 
-QString AbstractSearchWidget::makePlaceholderText(
-    const QString& title, const QString& description) const
+QString AbstractSearchWidget::makePlaceholderText(const QString& title, const QString& description)
 {
     static const QString kTemplate = "<center><p>%1</p><p><font size='-1'>%2</font></p></center>";
     return kTemplate.arg(title, description);

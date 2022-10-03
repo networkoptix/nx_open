@@ -83,6 +83,9 @@ public:
     void setFooterToggled(bool value);
     bool footerToggled() const;
 
+    /** Form a rich placeholder text from a title and a description. */
+    static QString makePlaceholderText(const QString& title, const QString& description);
+
 signals:
     /** This signal is for displaying external tooltips. */
     void tileHovered(const QModelIndex& index, EventTile* tile, QPrivateSignal);
@@ -130,9 +133,6 @@ protected:
 
     /** Add a button to search edit. */
     void addSearchAction(QAction* action);
-
-    /** Form a rich placeholder text from a title and a description. */
-    QString makePlaceholderText(const QString& title, const QString& description) const;
 
 private:
     /**
