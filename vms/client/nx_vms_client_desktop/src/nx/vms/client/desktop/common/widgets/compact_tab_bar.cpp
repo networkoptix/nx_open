@@ -179,10 +179,17 @@ void CompactTabBar::Private::setCustomTabEnabledFunction(
 void CompactTabBar::Private::paintTab(int index, QPainter* painter)
 {
     // Get state.
-    const auto enabled = m_customTabEnabledFunction
-        ? m_customTabEnabledFunction(index)
-        : q->isTabEnabled(index);
     const auto current = q->currentIndex() == index;
+    bool enabled = q->isTabEnabled(index);
+    if (m_customTabEnabledFunction)
+    {
+        enabled = m_customTabEnabledFunction(index);
+        if (!enabled && current)
+        {
+            // If the tab is current it must be drawn as enabled, even if custom state is disabled.
+            enabled = true;
+        }
+    }
     const auto hovered = enabled && m_hoveredTab == index;
 
     // Get data.
