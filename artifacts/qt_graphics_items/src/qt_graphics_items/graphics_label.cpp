@@ -52,19 +52,27 @@ void GraphicsLabelPrivate::init() {
 void GraphicsLabelPrivate::updateSizeHint() {
     Q_Q(GraphicsLabel);
 
-    QRectF newRect;
+    QSizeF newPreferredSize;
+    QSizeF newMinimumSize;
     if (text.isEmpty()) {
-        newRect = QRectF();
+        newPreferredSize = QSizeF();
         pixmap = QPixmap();
     } else {
         QFontMetricsF metrics(q->font());
-        newRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignCenter, text);
-        newRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
+
+        auto newPreferredRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignCenter, text);
+        newPreferredRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
+        newPreferredSize = newPreferredRect.size();
+
+        constexpr auto kMinimumText = "...";
+        auto newMinimumRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignCenter, kMinimumText);
+        newMinimumRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
+        newMinimumSize = newMinimumRect.size();
     }
 
-    if (!qFuzzyEquals(newRect, rect)) {
-        rect = newRect;
-
+    if (!qFuzzyEquals(newPreferredSize, preferredSize) || !qFuzzyEquals(newMinimumSize, minimumSize)) {
+        preferredSize = newPreferredSize;
+        minimumSize = newMinimumSize;
         q->updateGeometry();
     }
 }
@@ -76,7 +84,7 @@ void GraphicsLabelPrivate::ensurePixmaps() {
         return;
 
     pixmap = QnTextPixmapCache::instance()->pixmap(
-        text, q->font(), q->palette().color(QPalette::WindowText), shadowRadius);
+        calculateText(), q->font(), q->palette().color(QPalette::WindowText), shadowRadius);
     pixmapDirty = false;
 }
 
@@ -84,7 +92,7 @@ void GraphicsLabelPrivate::ensureStaticText() {
     if(!staticTextDirty)
         return;
 
-    staticText.setText(text);
+    staticText.setText(calculateText());
     staticTextDirty = false;
 }
 
@@ -94,6 +102,14 @@ QColor GraphicsLabelPrivate::textColor() const {
     return q->palette().color(q->isEnabled() ? QPalette::Normal : QPalette::Disabled, QPalette::WindowText);
 }
 
+QString GraphicsLabelPrivate::calculateText() const
+{
+    if (elideMode == Qt::ElideNone)
+        return text;
+
+    QFontMetricsF metrics(q_func()->font());
+    return metrics.elidedText(text, elideMode, q_func()->size().width(), Qt::AlignCenter);
+}
 
 // -------------------------------------------------------------------------- //
 // GraphicsLabel
@@ -183,9 +199,33 @@ void GraphicsLabel::setShadowRadius(qreal radius)
     update();
 }
 
+Qt::TextElideMode GraphicsLabel::elideMode() const
+{
+    return d_func()->elideMode;
+}
+
+void GraphicsLabel::setElideMode(Qt::TextElideMode elideMode)
+{
+    Q_D(GraphicsLabel);
+
+    if (d->elideMode == elideMode)
+        return;
+
+    d->elideMode = elideMode;
+    d->pixmapDirty = true;
+    d->staticTextDirty = true;
+    setAcceptHoverEvents(d->elideMode != Qt::ElideNone);
+    update();
+}
+
 QSizeF GraphicsLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
-    if(which == Qt::MinimumSize || which == Qt::PreferredSize)
-        return d_func()->rect.size();
+    const auto impl = d_func();
+
+    if (which == Qt::MinimumSize)
+        return impl->elideMode == Qt::ElideNone ? impl->preferredSize : impl->minimumSize;
+
+    if (which == Qt::PreferredSize)
+        return impl->preferredSize;
 
     return base_type::sizeHint(which, constraint);
 }
@@ -209,10 +249,36 @@ void GraphicsLabel::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
+void GraphicsLabel::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    base_type::hoverEnterEvent(event);
+
+    if (d_func()->elideMode != Qt::ElideNone)
+        setToolTip(d_func()->text);
+}
+
+void GraphicsLabel::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    base_type::hoverLeaveEvent(event);
+
+    if (d_func()->elideMode != Qt::ElideNone)
+        setToolTip(QString{});
+}
+
 void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_D(GraphicsLabel);
     base_type::paint(painter, option, widget);
+
+    if (d->elideMode != Qt::ElideNone)
+    {
+        const auto currentSize = rect().size();
+        if (!qFuzzyEquals(d->cachedSize, currentSize))
+        {
+            d->cachedSize = currentSize;
+            d->staticTextDirty = d->pixmapDirty = true;
+        }
+    }
 
     if (d->performanceHint == PixmapCaching)
     {
@@ -228,7 +294,7 @@ void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
         if (d->performanceHint == NoCaching)
         {
-            painter->drawText(rect(), d->alignment, d->text);
+            painter->drawText(rect(), d->alignment, d->calculateText());
         }
         else
         {

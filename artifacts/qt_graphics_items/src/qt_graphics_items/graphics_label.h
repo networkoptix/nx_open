@@ -57,11 +57,14 @@ public:
 
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment alignment);
-    
+
     PerformanceHint performanceHint() const;
     void setPerformanceHint(PerformanceHint performanceHint);
 
     void setShadowRadius(qreal radius);
+
+    Qt::TextElideMode elideMode() const;
+    void setElideMode(Qt::TextElideMode elideMode);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -74,6 +77,8 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
     virtual void changeEvent(QEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
 private:
     Q_DISABLE_COPY(GraphicsLabel)
