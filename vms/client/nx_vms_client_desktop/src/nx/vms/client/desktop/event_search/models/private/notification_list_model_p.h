@@ -38,8 +38,9 @@ private:
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
     void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
-    void onCloudCrossSystemStatusChanged(const QString& systemId);
+ 
     void updateCloudItems(const QString& systemId);
+    void removeCloudItems(const QString& systemId);
 
     void setupAcknowledgeAction(EventData& eventData, const QnUuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);

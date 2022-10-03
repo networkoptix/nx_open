@@ -74,7 +74,7 @@ public:
     QnVirtualCameraResourcePtr createThumbCameraResource(QnUuid id);
 
 signals:
-    void statusChanged();
+    void statusChanged(Status oldStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);
 

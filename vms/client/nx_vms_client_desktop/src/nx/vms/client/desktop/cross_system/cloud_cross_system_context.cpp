@@ -130,7 +130,17 @@ struct CloudCrossSystemContext::Private
                     this,
                     "System 2fa support became %1",
                     this->systemDescription->is2FaEnabled() ? "enabled" : "disabled");
-                ensureConnection();
+
+                if (status == Status::connected
+                    && this->systemDescription->is2FaEnabled()
+                    && !qnCloudStatusWatcher->is2FaEnabledForUser())
+                {
+                    updateStatus(Status::unsupportedTemporary);
+                }
+                else
+                {
+                    ensureConnection();
+                }
             });
         connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, q,
             [this]
@@ -175,8 +185,10 @@ struct CloudCrossSystemContext::Private
         if (status == value)
             return;
 
+        const auto oldStatus = status;
         status = value;
-        emit q->statusChanged();
+
+        emit q->statusChanged(oldStatus);
     }
 
     /** Returns true if new connection is started. */

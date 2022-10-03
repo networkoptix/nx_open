@@ -123,6 +123,8 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnBaseSystemDescription::reachableStateChanged);
     connect(system.get(), &QnBaseSystemDescription::oauthSupportedChanged,
         this, &QnBaseSystemDescription::oauthSupportedChanged);
+    connect(system.get(), &QnBaseSystemDescription::system2faEnabledChanged,
+        this, &QnBaseSystemDescription::system2faEnabledChanged);
 
     updateServers();
     emitSystemChanged();
@@ -136,6 +138,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit onlineStateChanged();
     emit reachableStateChanged();
     emit newSystemStateChanged();
+    emit system2faEnabledChanged();
 }
 
 void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
