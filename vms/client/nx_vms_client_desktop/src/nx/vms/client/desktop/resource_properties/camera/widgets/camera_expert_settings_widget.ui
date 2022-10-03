@@ -173,14 +173,14 @@
                 <item>
                  <widget class="QCheckBox" name="checkBoxPrimaryRecorder">
                   <property name="text">
-                   <string>Do not archive primary stream</string>
+                   <string>Do not record primary stream</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QCheckBox" name="checkBoxSecondaryRecorder">
                   <property name="text">
-                   <string>Do not archive secondary stream</string>
+                   <string>Do not record secondary stream</string>
                   </property>
                  </widget>
                 </item>
