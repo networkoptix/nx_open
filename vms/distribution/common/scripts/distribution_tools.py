@@ -15,6 +15,7 @@ import yaml
 import shlex
 from pathlib import Path
 from collections import namedtuple
+from typing import Generator
 
 
 def is_windows():
@@ -163,6 +164,10 @@ def icu_files(icu_lib_directory):
     for template in templates:
         for file in find_files_by_template(icu_lib_directory, template):
             yield file
+
+def shared_libraries(directory: str) -> Generator[str, None, None]:
+    for file in Path(directory).glob(f"*{_dynamic_library_extension()}"):
+        yield file
 
 
 def qt_libraries(dir, libs, extension=None):
