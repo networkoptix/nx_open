@@ -23,6 +23,7 @@ protected:
     Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
     Qn::ResourceOverlayButton calculateOverlayButton(
         Qn::ResourceStatusOverlay statusOverlay) const override;
+    QString calculateTitleText() const override;
 
 private:
     struct Private;
