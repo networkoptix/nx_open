@@ -21,6 +21,7 @@ GraphicsLabel* createGraphicsLabel()
     label->setAcceptedMouseButtons(Qt::NoButton);
     label->setPerformanceHint(GraphicsLabel::PixmapCaching);
     label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    label->setElideMode(Qt::ElideRight);
     QFont font(label->font());
     font.setBold(true);
     label->setFont(font);
@@ -47,11 +48,11 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     auto mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(4.0, 4.0, 4.0, 10.0);
     mainLayout->setSpacing(kLayoutSpacing);
-    mainLayout->addItem(leftButtonsBar());
-    mainLayout->addItem(titleLabel());
-    mainLayout->addItem(extraInfoLabel());
+    mainLayout->addItem(m_leftButtonsPanel);
+    mainLayout->addItem(m_nameLabel);
+    mainLayout->addItem(m_extraInfoLabel);
     mainLayout->addStretch();
-    mainLayout->addItem(rightButtonsBar());
+    mainLayout->addItem(m_rightButtonsPanel);
 
     static constexpr qreal kShadowRadius = 2.5;
 
