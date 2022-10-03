@@ -196,9 +196,6 @@ bool CameraReplacementDialog::Private::hasCompatibleApiResponce() const
 
 void CameraReplacementDialog::Private::reportFailureByMessageBox() const
 {
-    if (!NX_ASSERT(!hasCompatibleApiResponce()))
-        return;
-
     QString caption = tr("Failed to replace camera");
     QString message;
 
@@ -208,6 +205,12 @@ void CameraReplacementDialog::Private::reportFailureByMessageBox() const
         caption = reportItem.name;
         if (!reportItem.messages.empty())
             message = *reportItem.messages.begin();
+    }
+
+    if (!deviceReplacementResponce)
+    {
+        message =
+            tr("The Camera Replacement operation is not possible as the server is unavailable.");
     }
 
     QnMessageBox::critical(
