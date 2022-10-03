@@ -18,8 +18,17 @@ class AdvancedSystemSettingsWidget:
     using base_type = QnAbstractPreferencesWidget;
 
 public:
+    enum class Subpage
+    {
+        backup,
+        logs,
+    };
+
     explicit AdvancedSystemSettingsWidget(SystemContext* context, QWidget *parent = nullptr);
     ~AdvancedSystemSettingsWidget();
+
+    virtual bool activate(const QUrl& url) override;
+    static QUrl urlFor(Subpage page);
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
