@@ -1954,7 +1954,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
     /* Construct and add a new layout. */
     LayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
     layout->setIdUnsafe(QnUuid::createUuid());
-    if (accessController()->hasGlobalPermission(GlobalPermission::controlVideowall))
+    if (accessController()->hasPermissions(videoWall, Qn::Permission::VideoWallLayoutPermissions))
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
 
     QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;

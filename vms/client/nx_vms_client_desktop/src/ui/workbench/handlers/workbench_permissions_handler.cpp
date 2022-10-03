@@ -106,7 +106,7 @@ void PermissionsHandler::shareResourceWith(const QnUuid& resourceId,
     if (!NX_ASSERT(!resourceId.isNull() && subject.isValid()))
         return;
 
-    if (resourceAccessManager()->hasGlobalPermission(subject, GlobalPermission::admin))
+    if (resourceAccessManager()->hasAdminPermissions(subject))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(subject);

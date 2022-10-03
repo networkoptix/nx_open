@@ -49,6 +49,11 @@ public:
         return wasLast;
     }
 
+    bool empty() const
+    {
+        return m_hash.empty();
+    }
+
     bool contains(const T& key) const
     {
         return m_hash.contains(key);

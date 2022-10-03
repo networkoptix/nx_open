@@ -8,7 +8,10 @@
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 #include <core/resource/camera_history.h>
+#include <core/resource_access/access_rights_manager.h>
+#include <core/resource_access/deprecated_access_rights_converter.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/providers/intercom_layout_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -16,6 +19,7 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -36,6 +40,7 @@
 namespace nx::vms::common {
 
 using namespace nx::analytics;
+using namespace nx::core::access;
 
 struct SystemContext::Private
 {
@@ -55,9 +60,13 @@ struct SystemContext::Private
     std::unique_ptr<SystemSettings> globalSettings;
     std::unique_ptr<QnUserRolesManager> userRolesManager;
     std::unique_ptr<QnSharedResourcesManager> sharedResourceManager;
+    std::unique_ptr<ResourceAccessSubjectHierarchy> accessSubjectHierarchy;
+    std::unique_ptr<GlobalPermissionsWatcher> globalPermissionsWatcher;
+    std::unique_ptr<AccessRightsManager> accessRightsManager;
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
     std::unique_ptr<QnResourceAccessSubjectsCache> resourceAccessSubjectCache;
-    std::unique_ptr<nx::core::access::ResourceAccessProvider> resourceAccessProvider;
+    std::unique_ptr<DeprecatedAccessRightsConverter> deprecatedAccessRightsConverter;
+    std::unique_ptr<ResourceAccessProvider> resourceAccessProvider;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<QnLayoutTourManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
@@ -94,6 +103,16 @@ SystemContext::SystemContext(
     d->globalSettings = std::make_unique<SystemSettings>(this);
     d->userRolesManager = std::make_unique<QnUserRolesManager>(this);
 
+    d->accessSubjectHierarchy = std::make_unique<ResourceAccessSubjectHierarchy>(
+        d->resourcePool.get(),
+        d->userRolesManager.get());
+
+    d->globalPermissionsWatcher = std::make_unique<GlobalPermissionsWatcher>(
+        d->resourcePool.get(),
+        d->userRolesManager.get());
+
+    d->accessRightsManager = std::make_unique<AccessRightsManager>();
+
     // Depends on resource pool and roles.
     d->sharedResourceManager = std::make_unique<QnSharedResourcesManager>(this);
 
@@ -101,27 +120,33 @@ SystemContext::SystemContext(
     d->globalPermissionsManager =
         std::make_unique<QnGlobalPermissionsManager>(resourceAccessMode, this);
 
+    d->deprecatedAccessRightsConverter = std::make_unique<DeprecatedAccessRightsConverter>(
+        d->resourcePool.get(),
+        d->userRolesManager.get(),
+        d->sharedResourceManager.get(),
+        d->accessRightsManager.get());
+
     // Depends on resource pool, roles and global permissions.
     d->resourceAccessSubjectCache = std::make_unique<QnResourceAccessSubjectsCache>(this);
 
     // Depends on resource pool, roles and shared resources.
     d->resourceAccessProvider =
-        std::make_unique<nx::core::access::ResourceAccessProvider>(resourceAccessMode, this);
+        std::make_unique<ResourceAccessProvider>(resourceAccessMode, this);
 
     // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
     d->resourceAccessProvider->addBaseProvider(
-        new nx::core::access::PermissionsResourceAccessProvider(resourceAccessMode, this));
+        new PermissionsResourceAccessProvider(resourceAccessMode, this));
     d->resourceAccessProvider->addBaseProvider(
-        new nx::core::access::SharedResourceAccessProvider(resourceAccessMode, this));
+        new SharedResourceAccessProvider(resourceAccessMode, this));
     d->resourceAccessProvider->addBaseProvider(
-        new nx::core::access::SharedLayoutItemAccessProvider(resourceAccessMode, this));
+        new SharedLayoutItemAccessProvider(resourceAccessMode, this));
     d->resourceAccessProvider->addBaseProvider(
-        new nx::core::access::VideoWallItemAccessProvider(resourceAccessMode, this));
+        new VideoWallItemAccessProvider(resourceAccessMode, this));
     d->resourceAccessProvider->addBaseProvider(
         new core::access::IntercomLayoutAccessProvider(resourceAccessMode, this));
 
     // Depends on access provider.
-    d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(resourceAccessMode, this);
+    d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(this);
 
     d->showreelManager = std::make_unique<QnLayoutTourManager>();
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
@@ -259,6 +284,21 @@ QnSharedResourcesManager* SystemContext::sharedResourcesManager() const
     return d->sharedResourceManager.get();
 }
 
+GlobalPermissionsWatcher* SystemContext::globalPermissionsWatcher() const
+{
+    return d->globalPermissionsWatcher.get();
+}
+
+AccessRightsManager* SystemContext::accessRightsManager() const
+{
+    return d->accessRightsManager.get();
+}
+
+DeprecatedAccessRightsConverter* SystemContext::deprecatedAccessRightsConverter() const
+{
+    return d->deprecatedAccessRightsConverter.get();
+}
+
 QnResourceAccessManager* SystemContext::resourceAccessManager() const
 {
     return d->resourceAccessManager.get();
@@ -274,7 +314,12 @@ QnResourceAccessSubjectsCache* SystemContext::resourceAccessSubjectsCache() cons
     return d->resourceAccessSubjectCache.get();
 }
 
-nx::core::access::ResourceAccessProvider* SystemContext::resourceAccessProvider() const
+ResourceAccessSubjectHierarchy* SystemContext::accessSubjectHierarchy() const
+{
+    return d->accessSubjectHierarchy.get();
+}
+
+ResourceAccessProvider* SystemContext::resourceAccessProvider() const
 {
     return d->resourceAccessProvider.get();
 }

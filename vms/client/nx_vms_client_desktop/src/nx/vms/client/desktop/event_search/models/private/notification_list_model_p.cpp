@@ -651,14 +651,15 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
     }
 
-    if (!accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
-        return;
-
     auto& actionParams = action->getParams();
     if (!actionParams.requireConfirmation(action->getRuntimeParams().eventType))
         return;
 
     if (!NX_ASSERT(!cameraId.isNull()))
+        return;
+
+    const auto camera = resourcePool()->getResourceById(cameraId);
+    if (!camera || !accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
         return;
 
     eventData.removable = false;
@@ -676,6 +677,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     const auto actionHandler =
         [this, cameraId, action]()
         {
+            // TODO: FIXME! Could permissions have changed by this moment?
             action::Parameters params;
             const auto camera = resourcePool()->getResourceById(cameraId);
             if (camera && camera->systemContext() && !camera->hasFlags(Qn::removed))

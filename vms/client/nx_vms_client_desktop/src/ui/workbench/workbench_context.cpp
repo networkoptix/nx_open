@@ -193,8 +193,8 @@ ResourceTreeSettings* QnWorkbenchContext::resourceTreeSettings() const
 nx::core::Watermark QnWorkbenchContext::watermark() const
 {
     if (systemSettings()->watermarkSettings().useWatermark
-        && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
         && user()
+        && !accessController()->hasAdminPermissions()
         && !user()->getName().isEmpty())
     {
         return {systemSettings()->watermarkSettings(), user()->getName()};

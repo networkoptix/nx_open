@@ -34,7 +34,7 @@ public:
 
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
-    void addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
+    QnUuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
 
     static constexpr auto kUseDefaultLicense = Qn::LC_Count;
     nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
@@ -49,6 +49,8 @@ public:
     QnVideoWallResourcePtr createVideoWall();
     QnVideoWallResourcePtr addVideoWall();
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall);
+    QnUuid addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
+        const QnLayoutResourcePtr& itemLayout);
 
     QnMediaServerResourcePtr addServer(nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
 
@@ -56,4 +58,11 @@ public:
 
     nx::vms::api::UserRoleData createRole(
         GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds = {});
+
+    nx::vms::api::UserRoleData createRole(const QString& name,
+        GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds = {});
+
+    void removeRole(const QnUuid& roleId);
+
+    void clear();
 };

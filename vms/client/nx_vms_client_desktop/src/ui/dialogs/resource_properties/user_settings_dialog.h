@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -75,6 +76,8 @@ private:
     QPushButton* m_userEnabledButton;
     QPushButton* m_digestMenuButton;
     QMenu* m_digestMenu;
+
+    QnResourceAccessManager::Notifier* const m_accessRightsNotifier;
 };
 
 Q_DECLARE_METATYPE(QnUserSettingsDialog::DialogPage)

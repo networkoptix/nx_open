@@ -681,11 +681,11 @@ void QnWorkbenchNavigator::updateFootageState()
 
 void QnWorkbenchNavigator::updateHasArchive()
 {
-    bool newValue = std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
-            [this](const QnMediaResourcePtr& resource)
-            {
-                return hasArchiveForCamera(resource.dynamicCast<QnSecurityCamResource>());
-            });
+    const bool newValue = std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
+        [this](const QnMediaResourcePtr& resource)
+        {
+            return hasArchiveForCamera(resource.dynamicCast<QnSecurityCamResource>());
+        });
 
     if (m_hasArchive == newValue)
         return;
@@ -708,8 +708,8 @@ void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
                 if (!NX_ASSERT(systemContext))
                     return false;
 
-                if (!systemContext->accessController()->hasGlobalPermission(
-                    GlobalPermission::viewArchive))
+                if (!systemContext->accessController()->hasPermissions(
+				    camera, Qn::ViewFootagePermission))
                 {
                     return false;
                 }

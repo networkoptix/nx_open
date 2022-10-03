@@ -50,6 +50,7 @@
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <health/system_health.h>
 #include <licensing/license.h>
@@ -250,9 +251,11 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
-
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
     qRegisterMetaType<nx::media::CameraTraits>();
+
+    qRegisterMetaType<std::map<QnUuid, nx::vms::api::AccessRights>>();
+    qRegisterMetaType<nx::core::access::ResourceAccessMap>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Ptz::Traits>();

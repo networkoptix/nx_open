@@ -29,6 +29,12 @@ public:
     std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights(
         const QnResourceAccessSubject& subject) const;
 
+    std::map<QnUuid, nx::vms::api::AccessRights> directAccessRights(
+        const QnResourceAccessSubject& subject) const;
+
+    std::map<QnUuid, nx::vms::api::AccessRights> inheritedAccessRights(
+        const QnResourceAccessSubject& subject) const;
+
     bool hasSharedResource(const QnResourceAccessSubject& subject, const QnUuid& resourceId) const;
 
     void setSharedResourceRights(

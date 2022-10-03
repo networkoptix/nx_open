@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -90,6 +91,11 @@ public:
         const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& accessibleResources,
         GlobalPermissions permissions);
+
+    /** Save accessible rights for the given subject. */
+    void saveAccessRights(
+        const QnResourceAccessSubject& subject,
+        const nx::core::access::ResourceAccessMap& accessRights);
 
     void saveUserRole(const nx::vms::api::UserRoleData& role,
         RoleCallbackFunction callback = RoleCallbackFunction());

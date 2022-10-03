@@ -81,9 +81,15 @@ bool SoftwareTriggersController::Private::setTriggerState(
         return false;
     }
 
+    const auto resource = resourcePool()->getResourceById(resourceId);
     const auto currentUser = systemContext()->userWatcher()->user();
-    if (!resourceAccessManager()->hasGlobalPermission(currentUser, GlobalPermission::userInput))
+    if (!resourceAccessManager()->hasPermission(
+        currentUser,
+        resource,
+        Qn::Permission::SoftTriggerPermission))
+    {
         return false;
+    }
 
     bool result = (trigger.version > 0)
         ? setVmsTriggerState(trigger, state)

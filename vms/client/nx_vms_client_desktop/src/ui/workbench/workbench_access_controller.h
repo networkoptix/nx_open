@@ -8,6 +8,7 @@
 #include <common/common_globals.h>
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
@@ -37,79 +38,88 @@ class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
-
-    typedef QObject base_type;
+    using base_type = QObject;
 
 public:
     QnWorkbenchAccessController(
         nx::vms::client::desktop::SystemContext* systemContext,
         nx::core::access::Mode resourceAccessMode,
         QObject* parent = nullptr);
-    virtual ~QnWorkbenchAccessController();
+
+    virtual ~QnWorkbenchAccessController() override;
 
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
 
+    /** @returns Whether the current user has admin permissions. */
+    bool hasAdminPermissions() const;
+
     /**
-     * \param resource                  Resource to get permissions for.
-     * \returns                         Permissions for the given resource.
+     * @param resource Resource to get permissions for.
+     * @returns Permissions for the given resource.
      */
     Qn::Permissions permissions(const QnResourcePtr& resource) const;
 
     /**
-     * \param resource                  Resource to check permissions for.
-     * \param requiredPermissions       Permissions to check.
-     * \returns                         Whether actual permissions for the given resource
-     *                                  include required permissions.
+     * @param resource Resource to check permissions for.
+     * @param requiredPermissions Permissions to check.
+     * @returns Whether actual permissions for the given resource include all required permissions.
      */
     bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
 
     /**
-     * \returns                         Global permissions of the current user,
-     *                                  adjusted to take deprecation and superuser status into account.
-     *                                  Same as <tt>permissions(context()->user())</tt>.
+     * @param requiredPermissions Check whether the current user has the specified permision
+     * to at least one resource in the resource pool.
+     */
+    bool anyResourceHasPermissions(Qn::Permissions requiredPermissions) const;
+
+    /**
+     * @returns Global permissions of the current user, adjusted to take deprecation and superuser
+     * status into account. Same as <tt>permissions(context()->user())</tt>.
      */
     GlobalPermissions globalPermissions() const;
 
     /**
-     * \param requiredPermissions       Global permissions to check.
-     * \returns                         Whether actual global permissions
-     *                                  include required permissions.
+     * @param requiredPermissions Global permissions to check.
+     * @returns Whether actual global permissions include required permissions.
      */
     bool hasGlobalPermission(GlobalPermission requiredPermission) const;
     bool hasGlobalPermissions(GlobalPermissions requiredPermissions) const;
 
     /**
-     * \param resource                  Resource to get permissions change notifier for.
-     * \returns                         Notifier that can be used to track permission changes for
-     *                                  the given resource.
+     * @param resource Resource to get permissions change notifier for.
+     * @returns Notifier that can be used to track permission changes for the given resource.
      */
-    QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr& resource) const;
+    QnWorkbenchPermissionsNotifier* notifier(const QnResourcePtr& resource) const;
 
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const nx::vms::api::LayoutData& layoutData) const;
-    bool canCreateUser(GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateUser(GlobalPermissions targetPermissions, const std::vector<QnUuid>& targetGroups,
+        bool isOwner) const;
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
 
-    /* Filter given list of resources to leave only accessible. */
+    /** Filter given list of resources to leave only accessible. */
     template <class Resource>
-    QnSharedResourcePointerList<Resource> filtered(const QnSharedResourcePointerList<Resource>& source,
+    QnSharedResourcePointerList<Resource> filtered(
+        const QnSharedResourcePointerList<Resource>& source,
         Qn::Permissions requiredPermissions) const
     {
         QnSharedResourcePointerList<Resource> result;
-        for (const QnSharedResourcePointer<Resource>& resource : source)
+        for (const QnSharedResourcePointer<Resource>& resource: source)
+        {
             if (hasPermissions(resource, requiredPermissions))
                 result.push_back(resource);
+        }
         return result;
     }
 
 signals:
-    /**
-     * \param resource                  Resource for which permissions have changed.
-     *                                  Guaranteed not to be null.
-     */
+    /** @param resource Resource for which permissions have changed. Guaranteed not to be null. */
     void permissionsChanged(const QnResourcePtr& resource);
+
+    /** Notify that current user's permissions has been recalculated. */
+    void permissionsReset();
 
     /** Notify that current user's global permissions were changed. */
     void globalPermissionsChanged();
@@ -147,5 +157,6 @@ private:
 
     QnUserResourcePtr m_user;
     GlobalPermissions m_globalPermissions;
+    QnResourceAccessManager::Notifier* const m_accessRightsNotifier;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

@@ -283,6 +283,30 @@ private:
     CheckDelegate m_delegate;
 };
 
+class ResourcesCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<bool(const QnResourceList&, QnWorkbenchContext*)>;
+
+    ResourcesCondition(CheckDelegate delegate):
+        m_delegate(std::move(delegate))
+    {
+        NX_ASSERT(m_delegate);
+    }
+
+    virtual ActionVisibility check(
+        const QnResourceList& resources,
+        QnWorkbenchContext* context) override
+    {
+        return m_delegate(resources, context)
+            ? EnabledAction
+            : InvisibleAction;
+    }
+
+private:
+    CheckDelegate m_delegate;
+};
+
 TimePeriodType periodType(const QnTimePeriod& period)
 {
     if (period.isNull())
@@ -1065,11 +1089,19 @@ ActionVisibility ToggleTitleBarCondition::check(const Parameters& /*parameters*/
     return context->action(action::EffectiveMaximizeAction)->isChecked() ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility NoArchiveCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility NoArchiveCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
 {
-    return context->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
-        ? InvisibleAction
-        : EnabledAction;
+    const bool noResouceWithArchiveAccess = std::none_of(resources.begin(), resources.end(),
+        [context](auto resource)
+        {
+            return context->accessController()->hasPermissions(
+                resource,
+                Qn::Permission::ViewFootagePermission);
+        });
+
+    return noResouceWithArchiveAccess ? EnabledAction : InvisibleAction;
 }
 
 ActionVisibility OpenInFolderCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
@@ -2293,8 +2325,7 @@ ConditionWrapper allowedToShowServersInResourceTree()
     return new CustomBoolCondition(
         [](const Parameters&, QnWorkbenchContext* context)
         {
-            return context->accessController()->hasGlobalPermission(
-                GlobalPermission::admin)
+            return context->accessController()->hasAdminPermissions()
                 || context->systemSettings()->showServersInTreeForNonAdmins();
         });
 }
@@ -2381,6 +2412,65 @@ ConditionWrapper canSaveLayoutAs()
     );
 }
 
+ConditionWrapper userHasCamerasWithEditableSettings()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto& cameras = context->resourcePool()->getAllCameras();
+            const auto& accessController = context->accessController();
+            return std::any_of(cameras.begin(), cameras.end(), 
+                [accessController](auto camera)
+                {
+                    return accessController->hasPermissions(
+                        camera,
+                        Qn::Permission::ReadWriteSavePermission);
+                });
+        }
+    );
+}
+
+ConditionWrapper allOpenedCamerasAllowExport()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto currentLayout = context->workbench()->currentLayout();
+            const auto cameras = currentLayout->itemResources().filtered<QnVirtualCameraResource>();
+            const auto& accessController = context->accessController();
+
+            return std::all_of(cameras.begin(), cameras.end(),
+                [accessController](auto camera)
+                {
+                    return accessController->hasPermissions(
+                        camera,
+                        Qn::ExportPermission);
+                });
+        }
+    );
+}
+
+ConditionWrapper resourcesHavePermissions(Qn::Permissions permissions)
+{
+    return new ResourcesCondition(
+        [permissions](const QnResourceList& resources, QnWorkbenchContext* context)
+        {
+            const auto& accessController = context->accessController();
+
+            if (resources.empty())
+                return accessController->anyResourceHasPermissions(permissions);
+
+            return std::all_of(resources.begin(), resources.end(),
+                [accessController](auto resource)
+                {
+                    return accessController->hasPermissions(
+                        resource,
+                        Qn::ExportPermission);
+                });
+        }
+    );
+
+}
 
 } // namespace condition
 } // namespace action

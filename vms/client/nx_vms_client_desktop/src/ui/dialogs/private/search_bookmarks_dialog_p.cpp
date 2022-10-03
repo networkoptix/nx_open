@@ -409,11 +409,6 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
     }
 }
 
-bool QnSearchBookmarksDialogPrivate::currentUserHasAllCameras()
-{
-    return accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
-}
-
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 {
     /* Fill action parameters: */

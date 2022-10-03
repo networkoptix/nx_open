@@ -18,6 +18,7 @@ namespace nx::vms::common {
  */
 class NX_VMS_COMMON_API AnalyticsPluginResource: public QnResource
 {
+    Q_OBJECT
     using base_type = QnResource;
 
 public:

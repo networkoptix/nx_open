@@ -139,7 +139,8 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
 
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsReset, this,
         &AnalyticsSearchWidget::updateAllowance);
 
     connect(action(action::ObjectSearchModeAction), &QAction::toggled, this,
@@ -186,7 +187,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
         return false;
 
     const bool hasPermissions = model()->isOnline()
-        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+        && accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
 
     return hasPermissions && !d->engines().empty();
 }

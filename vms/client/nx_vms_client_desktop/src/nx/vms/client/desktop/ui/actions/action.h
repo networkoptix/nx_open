@@ -82,6 +82,9 @@ public:
     */
     void setRequiredGlobalPermission(GlobalPermission requiredPermissions);
 
+    bool isAdminRequired() const;
+    void setAdminRequired(bool value = true);
+
     ClientModes mode() const;
     void setMode(ClientModes mode);
 
@@ -197,6 +200,7 @@ private:
     ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
     GlobalPermission m_globalPermission;
+    bool m_adminRequired = false;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     ConditionWrapper m_condition;

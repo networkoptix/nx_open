@@ -24,7 +24,7 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
     auto updateGlobalPermissions = nx::utils::guarded(store,
         [this, store]()
         {
-            store->setGlobalPermissions(accessController()->globalPermissions());
+            store->setUserHasAdminPermissions(accessController()->hasAdminPermissions());
         });
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,

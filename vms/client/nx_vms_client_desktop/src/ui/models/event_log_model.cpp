@@ -608,8 +608,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
     if (!camera)
         return false;
 
-    return resourceAccessProvider()->hasAccess(context()->user(), camera)
-        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+    return accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
 }
 
 int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData& action)

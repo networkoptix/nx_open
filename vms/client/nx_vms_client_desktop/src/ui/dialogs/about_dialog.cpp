@@ -105,7 +105,7 @@ void QnAboutDialog::generateServersReport()
 {
     using namespace nx::vms::common;
 
-    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool isAdmin = accessController()->hasAdminPermissions();
     QnMediaServerResourceList servers;
     QStringList report;
 

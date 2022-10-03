@@ -64,7 +64,7 @@ private:
     SystemInternetAccessWatcher* internetAccessWatcher() const;
     DefaultPasswordCamerasWatcher* defaultPasswordWatcher() const;
     UserEmailsWatcher* userEmailsWatcher() const;
-    bool isAdmin() const;
+    bool hasAdminPermissions() const;
 
     void updateCamerasWithDefaultPassword();
     void updateCamerasWithInvalidSchedule();
@@ -228,22 +228,14 @@ void SystemHealthState::Private::updateCamerasWithDefaultPassword()
 
 void SystemHealthState::Private::updateCamerasWithInvalidSchedule()
 {
-    // Quick check.
-    if (!q->accessController()->hasGlobalPermission(GlobalPermission::editCameras))
-    {
-        m_camerasWithInvalidSchedule.clear();
-    }
-    else
-    {
-        QnVirtualCameraResourceList cameras = m_invalidRecordingScheduleWatcher
-            ->camerasWithInvalidSchedule().values();
+    QnVirtualCameraResourceList cameras = m_invalidRecordingScheduleWatcher
+        ->camerasWithInvalidSchedule().values();
 
-        m_camerasWithInvalidSchedule = cameras.filtered(
-            [this](const QnVirtualCameraResourcePtr& camera)
-            {
-                return q->accessController()->hasPermissions(camera, Qn::ReadWriteSavePermission);
-            });
-    }
+    m_camerasWithInvalidSchedule = cameras.filtered(
+        [this](const QnVirtualCameraResourcePtr& camera)
+        {
+            return q->accessController()->hasPermissions(camera, Qn::ReadWriteSavePermission);
+        });
 
     if (!update(SystemHealthIndex::cameraRecordingScheduleIsInvalid))
         emit q->dataChanged(SystemHealthIndex::cameraRecordingScheduleIsInvalid, {});
@@ -332,19 +324,19 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
     switch (index)
     {
         case SystemHealthIndex::NoInternetForTimeSync:
-            return isAdmin()
+            return hasAdminPermissions()
                 && q->systemSettings()->isTimeSynchronizationEnabled()
                 && q->systemSettings()->primaryTimeServer().isNull()
                 && !internetAccessWatcher()->systemHasInternetAccess();
 
         case SystemHealthIndex::NoLicenses:
-            return isAdmin() && q->systemContext()->licensePool()->isEmpty();
+            return hasAdminPermissions() && q->systemContext()->licensePool()->isEmpty();
 
         case SystemHealthIndex::SmtpIsNotSet:
-            return isAdmin() && !q->systemSettings()->emailSettings().isValid();
+            return hasAdminPermissions() && !q->systemSettings()->emailSettings().isValid();
 
         case SystemHealthIndex::DefaultCameraPasswords:
-            return isAdmin() && !m_camerasWithDefaultPassword.empty();
+            return hasAdminPermissions() && !m_camerasWithDefaultPassword.empty();
 
         case SystemHealthIndex::EmailIsEmpty:
         {
@@ -363,9 +355,9 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
         case SystemHealthIndex::StoragesNotConfigured:
-            return isAdmin() && !m_serversWithoutStorages.empty();
+            return hasAdminPermissions() && !m_serversWithoutStorages.empty();
         case SystemHealthIndex::backupStoragesNotConfigured:
-            return isAdmin() && !m_serversWithoutBackupStorages.empty();
+            return hasAdminPermissions() && !m_serversWithoutBackupStorages.empty();
 
         case SystemHealthIndex::cameraRecordingScheduleIsInvalid:
             return !m_camerasWithInvalidSchedule.empty();
@@ -403,9 +395,9 @@ QVariant SystemHealthState::Private::data(SystemHealthIndex index) const
     }
 }
 
-bool SystemHealthState::Private::isAdmin() const
+bool SystemHealthState::Private::hasAdminPermissions() const
 {
-    return q->accessController()->hasGlobalPermission(GlobalPermission::admin);
+    return q->accessController()->hasAdminPermissions();
 }
 
 SystemInternetAccessWatcher* SystemHealthState::Private::internetAccessWatcher() const

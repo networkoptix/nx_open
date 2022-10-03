@@ -153,7 +153,7 @@ bool SimpleMotionSearchWidget::calculateAllowance() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
     return !model()->isOnline()
-        || accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+        || accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
 }
 
 } // namespace nx::vms::client::desktop

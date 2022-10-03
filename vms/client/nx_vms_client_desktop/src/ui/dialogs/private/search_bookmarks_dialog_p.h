@@ -52,8 +52,6 @@ private:
 
     bool fillActionParameters(nx::vms::client::desktop::ui::action::Parameters &params, QnTimePeriod &window);
 
-    bool currentUserHasAllCameras();
-
     void applyModelChanges();
 
     void reset();

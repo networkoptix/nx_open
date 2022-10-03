@@ -477,7 +477,7 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     if (flags.testFlag(Qn::desktop_camera))
         return false;
 
-    return accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
+    return accessController()->hasPermissions(resource, Qn::ViewFootagePermission)
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 

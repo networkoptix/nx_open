@@ -47,6 +47,7 @@ public:
     Builder toolTipFormat(const QString& toolTipFormat);
     Builder flags(ActionFlags flags);
     Builder mode(ClientModes mode);
+    Builder requiredAdminPermissions();
     Builder requiredGlobalPermission(GlobalPermission permission);
     Builder requiredTargetPermissions(int key, Qn::Permissions permissions);
     Builder requiredTargetPermissions(Qn::Permissions permissions);

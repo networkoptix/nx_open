@@ -617,7 +617,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setIOModule(d->camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
-            accessController()->hasGlobalPermission(GlobalPermission::userInput));
+            accessController()->hasPermissions(d->camera, Qn::DeviceInputPermission));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
         addOverlayWidget(m_ioModuleOverlayWidget,
             {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
@@ -877,7 +877,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
-    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
+    if (!accessController()->hasAdminPermissions())
         return QString();
 
     const auto watcher = windowContext()->workbenchContext()
@@ -1270,10 +1270,14 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
 
 bool QnMediaResourceWidget::capabilityButtonsAreVisible() const
 {
+    static const Qn::Permissions kInputPermissions = Qn::Permission::SoftTriggerPermission
+            | Qn::Permission::DeviceInputPermission
+            | Qn::Permission::WritePtzPermission;
+
     return !d->isPreviewSearchLayout
         && !qnRuntime->isVideoWallMode() //< Video wall has userInput permission but no actual user.
         && d->camera
-        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
+        && (accessController()->permissions(d->camera) & kInputPermissions) != 0;
 }
 
 void QnMediaResourceWidget::updateCapabilityButtons() const
@@ -2335,7 +2339,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo
         && d->camera
         && d->taxonomyManager
-        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
+        && accessController()->hasPermissions(d->camera, Qn::ViewFootagePermission)
         && !d->taxonomyManager->relevantEngines().empty()
         && !d->camera->compatibleAnalyticsEngines().empty())
     {
@@ -2516,7 +2520,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
-    const bool adminPermissions = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool adminPermissions = accessController()->hasAdminPermissions();
 
     const bool canChangeSettings = qnRuntime->isDesktopMode()
         && accessController()->hasPermissions(d->camera, Qn::SavePermission | Qn::WritePermission);
@@ -3169,11 +3173,8 @@ void QnMediaResourceWidget::updateWatermark()
     }
 
     // Do not set watermark for admins but ONLY if it is not embedded in layout.
-    if (accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
-        && !useLayoutWatermark)
-    {
+    if (accessController->hasAdminPermissions() && !useLayoutWatermark)
         return;
-    }
 
     m_watermarkPainter->setWatermark(watermark);
 }

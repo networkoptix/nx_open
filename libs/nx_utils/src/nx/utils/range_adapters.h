@@ -60,6 +60,22 @@ auto constKeyValueRange(KeyValueContainer& container)
 template<typename KeyValueContainer>
 auto constKeyValueRange(KeyValueContainer&& container) = delete;
 
+template<typename KeyValueContainer>
+auto keyRange(const KeyValueContainer& container)
+{
+    return rangeAdapter(container.keyBegin(), container.keyEnd());
+}
+
+template<typename KeyValueContainer>
+auto keyRange(KeyValueContainer& container)
+{
+    return rangeAdapter(container.keyBegin(), container.keyEnd());
+}
+
+// Avoid constructing from temporaries.
+template<typename KeyValueContainer>
+auto keyRange(KeyValueContainer&& container) = delete;
+
 template<typename Range>
 auto reverseRange(const Range& range)
 {

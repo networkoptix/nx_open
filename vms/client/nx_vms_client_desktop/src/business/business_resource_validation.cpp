@@ -650,7 +650,8 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
-    GlobalPermission requiredPermission,
+    nx::vms::common::SystemContext* systemContext,
+    Qn::Permission requiredPermission,
     const QString& permissionName,
     bool allowEmptySelection)
     :
@@ -662,7 +663,21 @@ QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
 
 bool QnRequiredPermissionSubjectPolicy::userValidity(const QnUserResourcePtr& user) const
 {
-    return resourceAccessManager()->hasGlobalPermission(user, m_requiredPermission);
+    const auto cameraHasPermission =
+        [this, &user](auto camera)
+        {
+            return resourceAccessManager()->hasPermission(user, camera, m_requiredPermission);
+        };
+
+    if (m_cameras.isEmpty())
+    {
+        const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras =
+            resourcePool()->getAllCameras();
+
+        return std::any_of(cameras.begin(), cameras.end(), cameraHasPermission);
+    }
+
+    return std::all_of(m_cameras.begin(), m_cameras.end(), cameraHasPermission);
 }
 
 QValidator::State QnRequiredPermissionSubjectPolicy::roleValidity(const QnUuid& roleId) const
@@ -670,29 +685,37 @@ QValidator::State QnRequiredPermissionSubjectPolicy::roleValidity(const QnUuid& 
     return isRoleValid(roleId) ? QValidator::Acceptable : QValidator::Invalid;
 }
 
+QnSharedResourcePointerList<QnVirtualCameraResource>
+    QnRequiredPermissionSubjectPolicy::cameras() const
+{
+    return m_cameras;
+}
+
+void QnRequiredPermissionSubjectPolicy::setCameras(
+    const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras)
+{
+    m_cameras = cameras;
+}
+
 bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
 {
-    const auto role = QnPredefinedUserRoles::enumValue(roleId);
-    switch (role)
+    const auto customRole = userRolesManager()->userRole(roleId);
+
+    const auto cameraHasPermission =
+        [this, &customRole](auto camera)
+        {
+            return resourceAccessManager()->hasPermission(customRole, camera, m_requiredPermission);
+        };
+
+    if (m_cameras.isEmpty())
     {
-        case Qn::UserRole::customPermissions:
-        {
-            NX_ASSERT(false); //< Should never happen.
-            return false;
-        }
+        const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras =
+            resourcePool()->getAllCameras();
 
-        case Qn::UserRole::customUserRole:
-        {
-            const auto customRole = userRolesManager()->userRole(roleId);
-            return customRole.permissions.testFlag(m_requiredPermission);
-        }
-
-        default:
-        {
-            const auto permissions = QnPredefinedUserRoles::permissions(role);
-            return permissions.testFlag(m_requiredPermission);
-        }
+        return std::any_of(cameras.begin(), cameras.end(), cameraHasPermission);
     }
+
+    return std::all_of(m_cameras.begin(), m_cameras.end(), cameraHasPermission);
 }
 
 QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,

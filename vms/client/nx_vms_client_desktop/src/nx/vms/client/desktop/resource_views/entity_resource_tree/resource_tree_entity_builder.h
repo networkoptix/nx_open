@@ -37,7 +37,6 @@ public:
 
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
-    nx::vms::api::GlobalPermissions userGlobalPermissions() const;
 
 public:
     AbstractEntityPtr createCurrentSystemEntity() const;
@@ -85,6 +84,9 @@ public:
     AbstractEntityPtr createSubjectLayoutsEntity(const QnResourceAccessSubject& subject) const;
 
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
+
+private:
+    bool userHasAdminPermissions() const;
 
 private:
     QScopedPointer<CameraResourceIndex> m_cameraResourceIndex;

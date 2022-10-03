@@ -102,7 +102,7 @@ bool SimpleMotionSearchListModel::hasAccessRights() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
     return !isOnline()
-        || accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+        || accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
 }
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const
@@ -449,11 +449,8 @@ QnTimePeriodList SimpleMotionSearchListModel::periods() const
 
 QSharedPointer<QMenu> SimpleMotionSearchListModel::contextMenu(const QnTimePeriod& chunk) const
 {
-    if (!accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::manageBookmarks))
-        return {};
-
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    if (!camera || !accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
         return {};
 
     QSharedPointer<QMenu> menu(new QMenu());

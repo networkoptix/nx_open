@@ -6,6 +6,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/system_context.h>
@@ -98,9 +99,13 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
             if (!user)
                 return false;
 
-            const auto manager = globalPermissionsManager();
-            if (!manager->hasGlobalPermission(user, GlobalPermission::userInput))
+            if (!systemContext()->resourceAccessManager()->hasPermission(
+                user,
+                m_camera,
+                Qn::Permission::DeviceInputPermission))
+            {
                 return false;
+            }
 
             if (!m_camera->isOnline())
                 return false;

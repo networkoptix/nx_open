@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
@@ -59,12 +60,27 @@ using UserdDefinedGroupItemCreator = std::function<AbstractItemPtr(const QString
 using RecorderCameraGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
 using RecorderGroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
 
+MainTreeResourceItemDecorator::Permissions permissionsSummary(
+    const QnUserResourcePtr& user,
+    const QnResourcePtr& resource)
+{
+    if (user.isNull())
+        return {.permissions = Qn::NoPermissions, .hasAdminPermissions = false};
+
+    const auto accessManager = user->systemContext()->resourceAccessManager();
+
+    return {
+        .permissions = accessManager->permissions(user, resource),
+        .hasAdminPermissions = accessManager->hasAdminPermissions(user)
+    };
+}
+
 ResourceItemCreator serverResourceItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions)
+    const QnUserResourcePtr& user)
 {
     return
-        [factory, permissions](const QnResourcePtr& resource)
+        [factory, user](const QnResourcePtr& resource)
         {
             const auto isEdgeCamera =
                 !resource->hasFlags(Qn::server) && resource.dynamicCast<QnVirtualCameraResource>();
@@ -72,7 +88,9 @@ ResourceItemCreator serverResourceItemCreator(
             const auto nodeType = isEdgeCamera ? NodeType::edge : NodeType::resource;
 
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource), permissions, nodeType);
+                factory->createResourceItem(resource),
+                permissionsSummary(user, resource),
+                nodeType);
         };
 }
 
@@ -84,51 +102,57 @@ ResourceItemCreator simpleResourceItemCreator(ResourceTreeItemFactory* factory)
 
 ResourceItemCreator resourceItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions)
+    const QnUserResourcePtr& user)
 {
     return
-        [factory, permissions](const QnResourcePtr& resource)
+        [factory, user](const QnResourcePtr& resource)
         {
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource), permissions, NodeType::resource);
+                factory->createResourceItem(resource),
+                permissionsSummary(user, resource),
+                NodeType::resource);
         };
 }
 
 ResourceItemCreator sharedResourceItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions)
+    const QnUserResourcePtr& user)
 {
     return
-        [factory, permissions](const QnResourcePtr& resource)
+        [factory, user](const QnResourcePtr& resource)
         {
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource), permissions, NodeType::sharedResource);
+                factory->createResourceItem(resource),
+                permissionsSummary(user, resource),
+                NodeType::sharedResource);
         };
 }
 
 ResourceItemCreator subjectLayoutItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions)
+    const QnUserResourcePtr& user)
 {
     return
-        [factory, permissions](const QnResourcePtr& resource)
+        [factory, user](const QnResourcePtr& resource)
         {
             const auto nodeType = resource.staticCast<QnLayoutResource>()->isShared()
                 ? NodeType::sharedLayout
                 : NodeType::resource;
 
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource), permissions, nodeType);
+                factory->createResourceItem(resource),
+                permissionsSummary(user, resource),
+                nodeType);
         };
 }
 
 LayoutItemCreator layoutItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions,
+    const QnUserResourcePtr& user,
     const QnLayoutResourcePtr& layout)
 {
     return
-        [factory, permissions, layout](const QnUuid& itemId) -> AbstractItemPtr
+        [factory, user, layout](const QnUuid& itemId) -> AbstractItemPtr
         {
             const auto itemData = layout->getItem(itemId);
 
@@ -138,7 +162,7 @@ LayoutItemCreator layoutItemCreator(
 
             return std::make_unique<MainTreeResourceItemDecorator>(
                 factory->createResourceItem(itemResource),
-                permissions,
+                permissionsSummary(user, itemResource),
                 NodeType::layoutItem,
                 itemData.uuid);
         };
@@ -162,13 +186,18 @@ RecorderCameraGroupIdGetter recorderCameraGroupIdGetter()
 RecorderGroupItemCreator recorderGroupItemCreator(
     ResourceTreeItemFactory* factory,
     const QSharedPointer<RecorderItemDataHelper>& recorderResourceIndex,
-    GlobalPermissions permissions)
+    const QnUserResourcePtr& user)
 {
     return
-        [factory, recorderResourceIndex, permissions](const QString& groupId) -> AbstractItemPtr
+        [factory, recorderResourceIndex, user](const QString& groupId) -> AbstractItemPtr
         {
             Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemIsDragEnabled};
-            flags.setFlag(Qt::ItemIsEditable, permissions.testFlag(GlobalPermission::editCameras));
+
+            flags.setFlag(Qt::ItemIsEditable,
+                recorderResourceIndex->hasPermissions(
+                    groupId,
+                    user,
+                    Qn::WriteNamePermission | Qn::SavePermission));
 
             return factory->createRecorderItem(groupId, recorderResourceIndex, flags);
         };
@@ -194,15 +223,15 @@ UserdDefinedGroupIdGetter userDefinedGroupIdGetter()
 
 UserdDefinedGroupItemCreator userDefinedGroupItemCreator(
     ResourceTreeItemFactory* factory,
-    GlobalPermissions permissions)
+    bool hasAdminPermissions)
 {
     return
-        [factory, permissions](const QString& compositeGroupId) -> AbstractItemPtr
+        [factory, hasAdminPermissions](const QString& compositeGroupId) -> AbstractItemPtr
         {
             Qt::ItemFlags result =
                 {Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemIsDragEnabled};
 
-            if (permissions.testFlag(GlobalPermission::admin))
+            if (hasAdminPermissions)
                 result |= {Qt::ItemIsEditable, Qt::ItemIsDropEnabled};
 
             return factory->createResourceGroupItem(compositeGroupId, result);
@@ -282,11 +311,11 @@ void ResourceTreeEntityBuilder::setUser(const QnUserResourcePtr& user)
     m_user = user;
 }
 
-GlobalPermissions ResourceTreeEntityBuilder::userGlobalPermissions() const
+bool ResourceTreeEntityBuilder::userHasAdminPermissions() const
 {
     return !user().isNull()
-        ? systemContext()->globalPermissionsManager()->globalPermissions(user())
-        : GlobalPermission::none;
+        ? systemContext()->resourceAccessManager()->hasAdminPermissions(user())
+        : false;
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
@@ -300,12 +329,15 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
         };
 
     auto serversGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
-        serverResourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        serverResourceItemCreator(m_itemFactory.get(), user()),
         serverExpander,
         serversOrder());
 
     const bool showReducedEdgeServers =
-        !userGlobalPermissions().testFlag(GlobalPermission::customUser);
+        user().isNull()
+        || !user()->systemContext()->resourceAccessManager()->hasGlobalPermission(
+            user(),
+            GlobalPermission::customUser);
 
     serversGroupList->installItemSource(
         m_itemKeySourcePool->serversSource(user(), showReducedEdgeServers));
@@ -319,7 +351,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity() const
 {
     Qt::ItemFlags camerasAndDevicesitemFlags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
-    if (userGlobalPermissions().testFlag(GlobalPermission::admin))
+    if (userHasAdminPermissions())
         camerasAndDevicesitemFlags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(
@@ -338,7 +370,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
     const auto recorderGroupCreator = recorderGroupItemCreator(
         m_itemFactory.get(),
         m_recorderItemDataHelper,
-        GlobalPermissions());
+        {});
 
     GroupingRuleStack groupingRuleStack;
 
@@ -354,7 +386,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), GlobalPermissions()),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -387,13 +419,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesE
     const auto recorderGroupCreator = recorderGroupItemCreator(
         m_itemFactory.get(),
         m_recorderItemDataHelper,
-        GlobalPermissions());
+        {});
 
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), GlobalPermissions()),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -430,13 +462,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogServerCamerasEntity(
     const auto recorderGroupCreator = recorderGroupItemCreator(
         m_itemFactory.get(),
         m_recorderItemDataHelper,
-        GlobalPermissions());
+        {});
 
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), GlobalPermissions()),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -512,7 +544,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableLayoutsEntity(
 AbstractEntityPtr ResourceTreeEntityBuilder::createAllServersEntity() const
 {
     auto allServersList = makeKeyList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()), numericOrder());
+        resourceItemCreator(m_itemFactory.get(), user()), numericOrder());
 
     allServersList->installItemSource(
         m_itemKeySourcePool->serversSource(user(), /*withEdgeServers*/ true));
@@ -528,7 +560,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllCamerasEntity() const
     const auto recorderGroupCreator = recorderGroupItemCreator(
         m_itemFactory.get(),
         m_recorderItemDataHelper,
-        userGlobalPermissions());
+        user());
 
     const GroupingRule recordersGroupingRule =
         {recorderCameraGroupIdGetter(),
@@ -538,7 +570,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllCamerasEntity() const
         numericOrder()};
 
     auto camerasGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         Qn::ResourceRole,
         serverResourcesOrder(),
         GroupingRuleStack{recordersGroupingRule});
@@ -552,7 +584,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllCamerasEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createAllLayoutsEntity() const
 {
     auto allLayoutsList = makeKeyList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         layoutsOrder());
 
     allLayoutsList->installItemSource(m_itemKeySourcePool->allLayoutsSource(user()));
@@ -569,13 +601,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
     const auto recorderGroupCreator = recorderGroupItemCreator(
         m_itemFactory.get(),
         m_recorderItemDataHelper,
-        userGlobalPermissions());
+        user());
 
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        userDefinedGroupItemCreator(m_itemFactory.get(), userHasAdminPermissions()),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -589,7 +621,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
     groupingRuleStack.push_back(recordersGroupingRule);
 
     auto camerasGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         Qn::ResourceRole,
         serverResourcesOrder(),
         groupingRuleStack);
@@ -632,13 +664,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutItemListEntity(
     const auto layout = layoutResource.staticCast<QnLayoutResource>();
 
     return std::make_unique<LayoutItemListEntity>(layout,
-        layoutItemCreator(m_itemFactory.get(), userGlobalPermissions(), layout));
+        layoutItemCreator(m_itemFactory.get(), user(), layout));
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
 {
     auto layoutsGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
         layoutsOrder());
     layoutsGroupList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
@@ -686,7 +718,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 {
     auto webPagesList = makeKeyList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         numericOrder());
 
     webPagesList->installItemSource(m_itemKeySourcePool->webPagesSource(
@@ -694,7 +726,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 
     Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
 
-    if (userGlobalPermissions().testFlag(GlobalPermission::admin))
+    if (userHasAdminPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(m_itemFactory->createWebPagesItem(flags), std::move(webPagesList));
@@ -703,14 +735,14 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalFilesGroupEntity() const
 {
     auto fileLayoutsGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
         numericOrder());
 
     fileLayoutsGroupList->installItemSource(m_itemKeySourcePool->fileLayoutsSource());
 
     auto mediaFilesList = makeKeyList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         locaResourcesOrder());
 
     mediaFilesList->installItemSource(m_itemKeySourcePool->localMediaSource());
@@ -741,7 +773,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createUsersGroupEntity() const
                 };
 
             auto roleUsersList = makeUniqueKeyGroupList<QnResourcePtr>(
-                resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+                resourceItemCreator(m_itemFactory.get(), user()),
                 roleUserExpander,
                 numericOrder());
 
@@ -764,7 +796,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createUsersGroupEntity() const
     rolesGroupList->installItemSource(m_itemKeySourcePool->userRolesSource());
 
     auto plainUsersList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         userExpander,
         layoutsOrder(),
         {Qn::GlobalPermissionsRole});
@@ -811,7 +843,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
         };
 
     auto videowallList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         videowallExpander,
         numericOrder());
 
@@ -850,7 +882,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() con
         numericOrder()};
 
     auto otherSystemsGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        resourceItemCreator(m_itemFactory.get(), user()),
         Qn::ResourceRole,
         numericOrder(),
         GroupingRuleStack{otherSystemsGroupingRule});
@@ -944,7 +976,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectDevicesEntity(
         return makeSingleItemEntity(m_itemFactory->createAllCamerasAndResourcesItem());
 
     const auto recorderGroupCreator = recorderGroupItemCreator(m_itemFactory.get(),
-        m_recorderItemDataHelper, userGlobalPermissions());
+        m_recorderItemDataHelper, user());
 
     const GroupingRule recordersGroupingRule =
         {recorderCameraGroupIdGetter(),
@@ -954,7 +986,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectDevicesEntity(
         numericOrder()};
 
     auto devicesList = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        sharedResourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        sharedResourceItemCreator(m_itemFactory.get(), user()),
         Qn::ResourceRole,
         layoutItemsOrder(),
         GroupingRuleStack{recordersGroupingRule});
@@ -971,7 +1003,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
     const QnResourceAccessSubject& subject) const
 {
     auto layoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
-        subjectLayoutItemCreator(m_itemFactory.get(), userGlobalPermissions()),
+        subjectLayoutItemCreator(m_itemFactory.get(), user()),
         [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
         layoutsOrder());
 

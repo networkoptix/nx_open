@@ -1147,32 +1147,34 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     QList<QnUuid> roles;
                     userRolesManager()->usersAndRoles(m_eventParams.metadata.instigators, users, roles);
 
+                    const auto eventResources = resourcePool()->getResourcesByIds(filtered);
+
                     const auto isUserValid =
-                        [this](const QnUserResourcePtr& user)
+                        [this, &eventResources](const QnUserResourcePtr& user)
                         {
-                            return user->isEnabled() && resourceAccessManager()->hasGlobalPermission(
-                                user, GlobalPermission::userInput);
+                            return user->isEnabled()
+                                && std::any_of(eventResources.begin(), eventResources.end(),
+                                    [this, &user](auto resource)
+                                    {
+                                        return resourceAccessManager()->hasPermission(
+                                            user,
+                                            resource,
+                                            Qn::Permission::SoftTriggerPermission);
+                                    });
                         };
 
                     const auto isRoleValid =
-                        [this](const QnUuid& roleId)
+                        [this, eventResources](const QnUuid& roleId)
                         {
-                            const auto role = QnPredefinedUserRoles::enumValue(roleId);
-                            switch (role)
-                            {
-                                case Qn::UserRole::customPermissions:
-                                    return false;
-                                case Qn::UserRole::customUserRole:
+                            const auto group = userRolesManager()->userRole(roleId);
+                            return std::any_of(eventResources.begin(), eventResources.end(),
+                                [this, &group](auto resource)
                                 {
-                                    const auto customRole = userRolesManager()->userRole(roleId);
-                                    return customRole.permissions.testFlag(GlobalPermission::userInput);
-                                }
-                                default:
-                                {
-                                    const auto permissions = QnPredefinedUserRoles::permissions(role);
-                                    return permissions.testFlag(GlobalPermission::userInput);
-                                }
-                            }
+                                    return resourceAccessManager()->hasPermission(
+                                        group,
+                                        resource,
+                                        Qn::Permission::SoftTriggerPermission);
+                                });
                         };
 
                     return std::any_of(users.cbegin(), users.cend(), isUserValid)
@@ -1210,8 +1212,11 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case ActionType::showPopupAction:
                 {
                     static const QnDefaultSubjectValidationPolicy defaultPolicy;
-                    static const QnRequiredPermissionSubjectPolicy acknowledgePolicy(
-                        GlobalPermission::manageBookmarks, QString());
+                    QnRequiredPermissionSubjectPolicy acknowledgePolicy(
+                        systemContext(), Qn::ManageBookmarksPermission, QString());
+                    acknowledgePolicy.setCameras(
+                        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                            filterEventResources(m_eventResources, m_eventType)));
 
                     const auto subjects = filterSubjectIds(m_actionParams.additionalResources);
                     const auto validationState = m_actionParams.needConfirmation

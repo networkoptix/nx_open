@@ -81,6 +81,16 @@ void Action::setRequiredGlobalPermission(GlobalPermission requiredPermission)
     m_globalPermission = requiredPermission;
 }
 
+bool Action::isAdminRequired() const
+{
+    return m_adminRequired;
+}
+
+void Action::setAdminRequired(bool value)
+{
+    m_adminRequired = value;
+}
+
 ClientModes Action::mode() const
 {
     return m_mode;
@@ -237,6 +247,9 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
         return InvisibleAction;
 
     if (m_flags.testFlag(DevMode) && !ini().developerMode)
+        return InvisibleAction;
+
+    if (m_adminRequired && !accessController()->hasAdminPermissions())
         return InvisibleAction;
 
     if (m_globalPermission != GlobalPermission::none &&

@@ -145,7 +145,7 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
 bool BookmarkSearchWidget::calculateAllowance() const
 {
     return model()->isOnline()
-        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewBookmarks);
+        && accessController()->anyResourceHasPermissions(Qn::Permission::ViewBookmarksPermission);
 }
 
 } // namespace nx::vms::client::desktop

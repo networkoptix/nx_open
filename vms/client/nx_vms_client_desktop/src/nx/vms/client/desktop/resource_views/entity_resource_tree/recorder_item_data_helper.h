@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
@@ -23,6 +24,11 @@ public:
     QString groupedDeviceName(const QString& recorderGroupId) const;
     bool isMultisensorCamera(const QString& recorderGroupId) const;
     bool isRecorder(const QString& recorderGroupId) const;
+
+    bool hasPermissions(
+        const QString& recorderGroupId,
+        const QnUserResourcePtr& user,
+        Qn::Permissions permissions) const;
 
 signals:
     void groupedDeviceNameChanged(const QString& recorderGroupId);

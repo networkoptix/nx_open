@@ -533,6 +533,21 @@ namespace Qn {
         // Permission to use camera's PTZ controls.
         WritePtzPermission = 1 << 16,
 
+        // Permission to view camera bookmarks.
+        ViewBookmarksPermission = 1 << 17,
+
+        // Permission to edit camera bookmarks.
+        ManageBookmarksPermission = 1 << 18,
+
+        // Permission to toggle I/O module inputs.
+        DeviceInputPermission = 1 << 19,
+
+        // Permission to invoke soft triggers.
+        SoftTriggerPermission = 1 << 20,
+
+        // Permission to use two-way audio.
+        TwoWayAudioPermission = 1 << 21,
+
         //-----------------------------------------------------------------------------------------
 
         //-----------------------------------------------------------------------------------------

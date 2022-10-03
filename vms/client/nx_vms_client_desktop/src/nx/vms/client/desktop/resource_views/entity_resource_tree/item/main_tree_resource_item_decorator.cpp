@@ -14,6 +14,9 @@ namespace {
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
 
+using Permissions =
+    nx::vms::client::desktop::entity_resource_tree::MainTreeResourceItemDecorator::Permissions;
+
 bool hasItemIsDragEnabledFlag(const QnResourcePtr& resource)
 {
     static constexpr Qn::ResourceFlags kDraggableTypeFlags =
@@ -27,16 +30,16 @@ bool hasItemIsDragEnabledFlag(const QnResourcePtr& resource)
     return (resource->flags() & kDraggableTypeFlags) != 0;
 }
 
-bool hasItemIsDropEnabledFlag(const QnResourcePtr& resource, GlobalPermissions permissions)
+bool hasItemIsDropEnabledFlag(const QnResourcePtr& resource, Permissions permissions)
 {
     if ((resource->hasFlags(Qn::server) || resource->hasFlags(Qn::user))
         && !resource->hasFlags(Qn::fake))
     {
-        return permissions.testFlag(GlobalPermission::admin);
+        return permissions.hasAdminPermissions;
     }
 
     if (resource->hasFlags(Qn::videowall))
-        return permissions.testFlag(GlobalPermission::controlVideowall);
+        return permissions.permissions.testFlag(Qn::ReadWriteSavePermission);
 
     return (resource->hasFlags(Qn::layout));
 }
@@ -44,7 +47,7 @@ bool hasItemIsDropEnabledFlag(const QnResourcePtr& resource, GlobalPermissions p
 bool hasItemIsEditableFlag(
     const QnResourcePtr& resource,
     ResourceTree::NodeType nodeType,
-    GlobalPermissions permissions)
+    Permissions permissions)
 {
     // Users or servers within 'Other Systems' group cannot be renamed.
     if (resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake_server))
@@ -64,17 +67,18 @@ bool hasItemIsEditableFlag(
     if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::exported))
     {
         const auto layout = resource.staticCast<QnLayoutResource>();
-        return permissions.testFlag(GlobalPermission::admin) || !layout->isShared();
+        return permissions.hasAdminPermissions || !layout->isShared();
     }
 
     if (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server))
-        return permissions.testFlag(GlobalPermission::admin);
+        return permissions.hasAdminPermissions;
 
-    if (resource->hasFlags(Qn::videowall))
-        return permissions.testFlag(GlobalPermission::controlVideowall);
-
-    if (resource.dynamicCast<QnVirtualCameraResource>())
-        return permissions.testFlag(GlobalPermission::editCameras);
+    if (resource.dynamicCast<QnVirtualCameraResource>()
+        || resource->hasFlags(Qn::videowall))
+    {
+        return permissions.permissions.testFlag(Qn::ReadWriteSavePermission)
+            && permissions.permissions.testFlag(Qn::WriteNamePermission);
+    }
 
     return false;
 }
@@ -88,7 +92,7 @@ using NodeType = ResourceTree::NodeType;
 
 MainTreeResourceItemDecorator::MainTreeResourceItemDecorator(
     entity_item_model::AbstractItemPtr sourceItem,
-    nx::vms::api::GlobalPermissions permissions,
+    Permissions permissions,
     NodeType nodeType,
     const std::optional<QnUuid>& itemUuid)
     :

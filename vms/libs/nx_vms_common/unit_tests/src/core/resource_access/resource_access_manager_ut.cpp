@@ -7,6 +7,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -14,22 +15,18 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 namespace nx::vms::common::test {
 
-class ResourceAccessManagerTest:
-    public ContextBasedTest,
-    public ::testing::WithParamInterface<nx::core::access::Mode>
-{
-public:
-    ResourceAccessManagerTest():
-        ContextBasedTest(GetParam())
-    {
-    }
+using namespace nx::core::access;
+using namespace nx::vms::api;
 
+class ResourceAccessManagerTest: public ContextBasedTest
+{
 protected:
     virtual void TearDown() override
     {
@@ -51,6 +48,26 @@ protected:
         return layout;
     }
 
+    UserRoleData addAdministrators()
+    {
+        return createRole(GlobalPermission::adminPermissions);
+    }
+
+    UserRoleData addLiveViewers()
+    {
+        return createRole(GlobalPermission::liveViewerPermissions);
+    }
+
+    UserRoleData addViewers()
+    {
+        return createRole(GlobalPermission::viewerPermissions);
+    }
+
+    void setAccessRights(const QnUuid& subjectId, const ResourceAccessMap accessRights)
+    {
+        systemContext()->accessRightsManager()->setOwnResourceAccessMap(subjectId, accessRights);
+    }
+
     void logout()
     {
         resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
@@ -70,6 +87,20 @@ protected:
     {
         logout();
         auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName);
+        ASSERT_FALSE(user->isOwner());
+        m_currentUser = user;
+    }
+
+    void loginAsMember(const QnUuid& groupId)
+    {
+        loginAsMember(std::vector<QnUuid>({groupId}));
+    }
+
+    void loginAsMember(const std::vector<QnUuid>& groupIds)
+    {
+        logout();
+        auto user = addUser(GlobalPermissions{}, QnResourcePoolTestHelper::kTestUserName);
+        user->setUserRoleIds(groupIds);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
     }
@@ -97,13 +128,13 @@ protected:
     static const char* invertedDigestAuthorizationEnabled(const QnUserResourcePtr& user)
     {
         return
-            user->digestAuthorizationEnabled() ? nx::vms::api::UserData::kHttpIsDisabledStub : "";
+            user->digestAuthorizationEnabled() ? UserData::kHttpIsDisabledStub : "";
     }
 
     void checkCanModifyUserDigestAuthorizationEnabled(
         const QnUserResourcePtr& source, QnUserResourcePtr target, bool allowed)
     {
-        nx::vms::api::UserData data;
+        UserData data;
         ec2::fromResourceToApi(target, data);
         data.digest = invertedDigestAuthorizationEnabled(target);
 
@@ -134,9 +165,25 @@ protected:
     void checkCanGrantUserAdminPermissions(
         const QnUserResourcePtr& source, QnUserResourcePtr target, bool allowed)
     {
-        nx::vms::api::UserData data;
+        UserData data;
         ec2::fromResourceToApi(target, data);
         data.permissions = GlobalPermission::admin;
+
+        auto info = nx::format("check: %1 -> %2", source->getName(), target->getName())
+            .toStdString();
+
+        if (allowed)
+            ASSERT_TRUE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
+        else
+            ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
+    }
+
+    void checkCanGrantUserAdminPermissionsViaInheritance(const QnUserResourcePtr& source,
+        QnUserResourcePtr target, const QnUuid& adminGroupId, bool allowed)
+    {
+        UserData data;
+        ec2::fromResourceToApi(target, data);
+        data.userRoleIds = {adminGroupId};
 
         auto info = nx::format("check: %1 -> %2", source->getName(), target->getName())
             .toStdString();
@@ -155,9 +202,10 @@ protected:
 /************************************************************************/
 
 /** Check permissions for common layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkLayoutAsAdmin)
 {
-    loginAsOwner();
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -169,9 +217,10 @@ TEST_P(ResourceAccessManagerTest, checkLayoutAsAdmin)
 }
 
 /** Check permissions for locked common layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkLockedLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsAdmin)
 {
-    loginAsOwner();
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -191,9 +240,10 @@ TEST_P(ResourceAccessManagerTest, checkLockedLayoutAsAdmin)
 /************************************************************************/
 
 /** Check permissions for common layout when the user is logged in as viewer. */
-TEST_P(ResourceAccessManagerTest, checkLayoutAsViewer)
+TEST_F(ResourceAccessManagerTest, checkLayoutAsViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -205,9 +255,10 @@ TEST_P(ResourceAccessManagerTest, checkLayoutAsViewer)
 }
 
 /** Check permissions for locked common layout when the user is logged in as viewer. */
-TEST_P(ResourceAccessManagerTest, checkLockedLayoutAsViewer)
+TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -222,7 +273,7 @@ TEST_P(ResourceAccessManagerTest, checkLockedLayoutAsViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
-TEST_P(ResourceAccessManagerTest, checkLockedChanged)
+TEST_F(ResourceAccessManagerTest, checkLockedChanged)
 {
     loginAs(GlobalPermission::none);
     auto user = m_currentUser;
@@ -237,9 +288,10 @@ TEST_P(ResourceAccessManagerTest, checkLockedChanged)
 /* Checking non-own remote layouts                                      */
 /************************************************************************/
 /** Check permissions for another viewer's layout when the user is logged in as viewer. */
-TEST_P(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
+TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
 
     auto anotherUser = addUser(GlobalPermission::liveViewerPermissions,
         QnResourcePoolTestHelper::kTestUserName2);
@@ -252,9 +304,10 @@ TEST_P(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 }
 
 /** Check permissions for another viewer's layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto anotherUser = addUser(GlobalPermission::liveViewerPermissions,
         QnResourcePoolTestHelper::kTestUserName2);
@@ -267,9 +320,10 @@ TEST_P(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
 }
 
 /** Check permissions for another admin's layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto anotherUser = addUser(GlobalPermission::admin, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
@@ -283,7 +337,7 @@ TEST_P(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
 }
 
 /** Check permissions for another admin's layout when the user is logged in as owner. */
-TEST_P(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
+TEST_F(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 {
     loginAsOwner();
 
@@ -300,9 +354,10 @@ TEST_P(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 /* Checking shared layouts                                              */
 /************************************************************************/
 /** Check permissions for shared layout when the user is logged in as viewer. */
-TEST_P(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
+TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
 
     auto layout = createLayout(Qn::remote);
     layout->setParentId(QnUuid());
@@ -317,9 +372,10 @@ TEST_P(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
 }
 
 /** Check permissions for shared layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkSharedLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto layout = createLayout(Qn::remote);
     layout->setParentId(QnUuid());
@@ -334,9 +390,10 @@ TEST_P(ResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 }
 
 /** Check permissions for new shared layout when the user is logged in as admin. */
-TEST_P(ResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto owner = createUser(GlobalPermission::admin);
     owner->setOwner(true);
@@ -356,7 +413,7 @@ TEST_P(ResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
     checkPermissions(layout, Qn::FullLayoutPermissions, Qn::NoPermissions);
 }
 
-TEST_P(ResourceAccessManagerTest, checkParentChanged)
+TEST_F(ResourceAccessManagerTest, checkParentChanged)
 {
     loginAs(GlobalPermission::none);
     auto user = m_currentUser;
@@ -370,9 +427,10 @@ TEST_P(ResourceAccessManagerTest, checkParentChanged)
 // Checking videowall-based layouts
 
 /** Admin can do anything with layout on videowall. */
-TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -384,9 +442,12 @@ TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 }
 
 /** Videowall-controller can do anything with layout on videowall. */
-TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
+TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 {
-    loginAs(GlobalPermission::controlVideowall);
+    loginAs(GlobalPermission::none);
+
+    setAccessRights(m_currentUser->getId(),
+        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -398,7 +459,7 @@ TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 }
 
 /** Viewer can't do anything with layout on videowall. */
-TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
+TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 {
     loginAs(GlobalPermission::advancedViewerPermissions);
 
@@ -412,9 +473,13 @@ TEST_P(ResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 }
 
 /** Locked layouts on videowall still can be removed if the user has control permissions. */
-TEST_P(ResourceAccessManagerTest, checkVideowallLockedLayout)
+TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
 {
-    loginAs(GlobalPermission::controlVideowall);
+    const auto group = createRole("Group", GlobalPermission::none);
+    loginAsMember(group.id);
+
+    setAccessRights(group.id,
+        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, true, videowall->getId());
@@ -429,9 +494,13 @@ TEST_P(ResourceAccessManagerTest, checkVideowallLockedLayout)
     checkPermissions(layout, desired, forbidden);
 }
 
-TEST_P(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
+TEST_F(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
 {
-    loginAs(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
+    const auto group = addLiveViewers();
+    loginAsMember(group.id);
+
+    setAccessRights(group.id,
+        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
 
     auto camera = addDesktopCamera(m_currentUser);
 
@@ -452,7 +521,7 @@ TEST_P(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
     ASSERT_TRUE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
 }
 
-TEST_P(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
+TEST_F(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
 {
     loginAsOwner();
     auto camera = addDesktopCamera(m_currentUser);
@@ -461,7 +530,7 @@ TEST_P(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
 }
 
 // User can push it's own screen on a new videowall layout.
-TEST_P(ResourceAccessManagerTest, canPushMyScreen)
+TEST_F(ResourceAccessManagerTest, canPushMyScreen)
 {
     loginAs(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
 
@@ -472,26 +541,30 @@ TEST_P(ResourceAccessManagerTest, canPushMyScreen)
     layout->setParentId(videoWall->getId());
     addToLayout(layout, ownScreen);
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     ASSERT_TRUE(resourceAccessManager()->canCreateLayout(m_currentUser, layoutData));
 }
 
 // User can push it's own screen on exising videowall layout.
-TEST_P(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
+TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
 {
-    loginAs(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
+    const auto group = addViewers();
+    loginAsMember(group.id);
+
+    setAccessRights(group.id,
+        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
     auto layout = addLayout();
     layout->setParentId(videoWall->getId());
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    nx::vms::api::LayoutItemData item;
+    LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -500,7 +573,7 @@ TEST_P(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
 }
 
 // Pushing screen is allowed only if layout belongs to videowall.
-TEST_P(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
+TEST_F(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
 {
     loginAsOwner();
 
@@ -508,7 +581,7 @@ TEST_P(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
     auto layout = QnResourcePoolTestHelper::createLayout();
     addToLayout(layout, ownScreen);
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     // Check shared layout.
@@ -520,17 +593,17 @@ TEST_P(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
 }
 
 // Pushing screen is allowed only if layout belongs to video wall.
-TEST_P(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowall)
+TEST_F(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowall)
 {
     loginAsOwner();
 
     auto ownScreen = addDesktopCamera(m_currentUser);
     auto layout = addLayout();
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    nx::vms::api::LayoutItemData item;
+    LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -539,9 +612,10 @@ TEST_P(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowa
 }
 
 // Pushing screen is allowed only if there are video wall permissions.
-TEST_P(ResourceAccessManagerTest, viewerCannotPushOwnScreen)
+TEST_F(ResourceAccessManagerTest, viewerCannotPushOwnScreen)
 {
-    loginAs(GlobalPermission::viewerPermissions);
+    const auto group = addViewers();
+    loginAsMember(group.id);
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -550,26 +624,27 @@ TEST_P(ResourceAccessManagerTest, viewerCannotPushOwnScreen)
     layout->setParentId(videoWall->getId());
     addToLayout(layout, ownScreen);
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     ASSERT_FALSE(resourceAccessManager()->canCreateLayout(m_currentUser, layoutData));
 }
 
 // Pushing screen is allowed only if there are video wall permissions.
-TEST_P(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
+TEST_F(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
 {
-    loginAs(GlobalPermission::viewerPermissions);
+    const auto group = addViewers();
+    loginAsMember(group.id);
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
     auto layout = addLayout();
     layout->setParentId(videoWall->getId());
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    nx::vms::api::LayoutItemData item;
+    LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -578,7 +653,7 @@ TEST_P(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
 }
 
 // Pushing screen is allowed only for own screen.
-TEST_P(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
+TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
 {
     loginAsOwner();
 
@@ -591,14 +666,14 @@ TEST_P(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
     layout->setParentId(videoWall->getId());
     addToLayout(layout, otherScreen);
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     ASSERT_FALSE(resourceAccessManager()->canCreateLayout(m_currentUser, layoutData));
 }
 
 // Pushing screen is allowed only for own screen.
-TEST_P(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
+TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
 {
     loginAsOwner();
 
@@ -609,10 +684,10 @@ TEST_P(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
     auto layout = addLayout();
     layout->setParentId(videoWall->getId());
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    nx::vms::api::LayoutItemData item;
+    LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = otherScreen->getId();
     layoutData.items.push_back(item);
@@ -621,7 +696,7 @@ TEST_P(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
 }
 
 // Pushing screen is allowed only if it is the only camera on layout.
-TEST_P(ResourceAccessManagerTest, cannotPushScreenWithCameras)
+TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCameras)
 {
     loginAsOwner();
 
@@ -634,14 +709,14 @@ TEST_P(ResourceAccessManagerTest, cannotPushScreenWithCameras)
     addToLayout(layout, ownScreen);
     addToLayout(layout, camera);
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     ASSERT_FALSE(resourceAccessManager()->canCreateLayout(m_currentUser, layoutData));
 }
 
 // Pushing screen is allowed only if it is the only camera on layout.
-TEST_P(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
+TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
 {
     loginAsOwner();
 
@@ -651,17 +726,17 @@ TEST_P(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
     auto layout = addLayout();
     layout->setParentId(videoWall->getId());
 
-    nx::vms::api::LayoutData layoutData;
+    LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
     {
-        nx::vms::api::LayoutItemData item;
+        LayoutItemData item;
         item.id = QnUuid::createUuid();
         item.resourceId = ownScreen->getId();
         layoutData.items.push_back(item);
     }
     {
-        nx::vms::api::LayoutItemData item;
+        LayoutItemData item;
         item.id = QnUuid::createUuid();
         item.resourceId = camera->getId();
         layoutData.items.push_back(item);
@@ -675,7 +750,7 @@ TEST_P(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
 /************************************************************************/
 
 /** Check user can edit himself (but cannot rename, remove and change access rights). */
-TEST_P(ResourceAccessManagerTest, checkUsedEditHimself)
+TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
 {
     loginAsOwner();
 
@@ -686,45 +761,46 @@ TEST_P(ResourceAccessManagerTest, checkUsedEditHimself)
     checkPermissions(m_currentUser, desired, forbidden);
 }
 
-TEST_P(ResourceAccessManagerTest, checkEditDisabledAdmin)
+TEST_F(ResourceAccessManagerTest, checkEditDisabledAdmin)
 {
-    loginAs(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
     auto otherAdmin = createUser(GlobalPermission::admin);
     otherAdmin->setEnabled(false);
     resourcePool()->addResource(otherAdmin);
     ASSERT_FALSE(hasPermission(m_currentUser, otherAdmin, Qn::WriteAccessRightsPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkEditDisabledOwner)
+TEST_F(ResourceAccessManagerTest, checkEditDisabledOwner)
 {
     const auto localOwner = createUser(
-        GlobalPermission::none, "admin", nx::vms::api::UserType::local);
+        GlobalPermission::none, "admin", UserType::local);
     localOwner->setOwner(true);
     localOwner->setEnabled(false);
     resourcePool()->addResource(localOwner);
 
     const auto cloudOwner = createUser(
-        GlobalPermission::none, "user@mail.com", nx::vms::api::UserType::cloud);
+        GlobalPermission::none, "user@mail.com", UserType::cloud);
     cloudOwner->setOwner(true);
     resourcePool()->addResource(cloudOwner);
 
     ASSERT_FALSE(hasPermission(cloudOwner, localOwner, Qn::WriteAccessRightsPermission));
 
-    nx::vms::api::UserData data;
+    UserData data;
     ec2::fromResourceToApi(localOwner, data);
     data.isEnabled = true;
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(cloudOwner, localOwner, data));
 }
 
-TEST_P(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
+TEST_F(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
 {
     const auto localOwner = createUser(
-        GlobalPermission::none, "admin", nx::vms::api::UserType::local);
+        GlobalPermission::none, "admin", UserType::local);
     localOwner->setOwner(true);
     resourcePool()->addResource(localOwner);
 
     const auto cloudOwner = createUser(
-        GlobalPermission::none, "user@mail.com", nx::vms::api::UserType::cloud);
+        GlobalPermission::none, "user@mail.com", UserType::cloud);
     cloudOwner->setOwner(true);
     resourcePool()->addResource(cloudOwner);
 
@@ -742,50 +818,67 @@ TEST_P(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
     }
 }
 
-TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledHimself)
+TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledHimself)
 {
     loginAs(GlobalPermission::liveViewerPermissions);
+    checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
+
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
     loginAs(GlobalPermission::admin);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
+    checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
+
     loginAsOwner();
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ true);
 
-    nx::vms::api::UserData data;
+    UserData data;
     ec2::fromResourceToApi(m_currentUser, data);
     data.digest = invertedDigestAuthorizationEnabled(m_currentUser);
     data.name += "_changed";
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, m_currentUser, data));
 }
 
-TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledAdmin)
+TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledAdmin)
 {
-    auto admin = createUser(GlobalPermission::admin);
+    const auto admins = addAdministrators();
+    auto admin = createUser(GlobalPermission::none);
+    admin->setUserRoleIds({admins.id});
     admin->removeFlags(Qn::remote); //< Prevent removing of this user by loginAs();
     resourcePool()->addResource(admin);
 
     loginAs(GlobalPermission::liveViewerPermissions);
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ true);
 
+    const auto viewers = addLiveViewers();
+    loginAsMember(viewers.id);
+    checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ true);
+
     loginAs(GlobalPermission::admin);
+    checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
+
+    loginAsMember(admins.id);
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
 
     loginAsOwner();
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
 }
 
-TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
+TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
 {
     auto owner = addUser(GlobalPermission::none, "owner");
     owner->setOwner(true);
-    auto cloud = addUser(GlobalPermission::none, "cloud", nx::vms::api::UserType::cloud);
+    auto cloud = addUser(GlobalPermission::none, "cloud", UserType::cloud);
     auto cloudOwner =
-        addUser(GlobalPermission::none, "cloud owner", nx::vms::api::UserType::cloud);
+        addUser(GlobalPermission::none, "cloud owner", UserType::cloud);
     cloudOwner->setOwner(true);
     auto admin = addUser(GlobalPermission::admin, "admin");
-    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap, "cn=ldap");
+    auto ldap = addUser(GlobalPermission::none, "ldap", UserType::ldap, "cn=ldap");
     auto other = addUser(GlobalPermission::none, "other");
 
     QnUserResourceList users = {owner, cloudOwner, admin, cloud, ldap, other};
@@ -812,39 +905,121 @@ TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
     }
 }
 
-TEST_P(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
+TEST_F(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
 {
-    auto owner = addUser(GlobalPermission::none, "owner");
+    const auto admins = addAdministrators();
+    const auto adminsToo = addAdministrators();
+    const auto owner = addUser(GlobalPermission::none, "owner");
     owner->setOwner(true);
-    auto cloud = addUser(GlobalPermission::none, "cloud", nx::vms::api::UserType::cloud);
-    auto cloudOwner =
-        addUser(GlobalPermission::none, "cloud owner", nx::vms::api::UserType::cloud);
+    const auto cloud = addUser(GlobalPermission::none, "cloud", UserType::cloud);
+    const auto cloudOwner =
+        addUser(GlobalPermission::none, "cloud owner", UserType::cloud);
     cloudOwner->setOwner(true);
-    auto admin = addUser(GlobalPermission::admin, "admin");
-    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap, "cn=ldap");
-    auto other = addUser(GlobalPermission::none, "other");
+    const auto admin = addUser(GlobalPermission::admin, "admin");
+    const auto inheritedAdmin = addUser(GlobalPermission::none, "inherited_admin");
+    inheritedAdmin->setUserRoleIds({adminsToo.id});
+    const auto ldap = addUser(GlobalPermission::none, "ldap", UserType::ldap, "cn=ldap");
+    const auto other = addUser(GlobalPermission::none, "other");
 
-    QnUserResourceList users = { owner, cloudOwner, admin, cloud, ldap, other };
+    QnUserResourceList users = {owner, cloudOwner, admin, inheritedAdmin, cloud, ldap, other};
     QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
         {owner, admin},
+        {owner, inheritedAdmin},
         {owner, ldap},
         {owner, other},
         {owner, cloud},
         {cloudOwner, admin},
+        {cloudOwner, inheritedAdmin},
         {cloudOwner, cloud},
         {cloudOwner, ldap},
-        {cloudOwner, other},
-        {admin, admin}
+        {cloudOwner, other}
     };
 
-    for (const auto source : users)
+    for (const auto source: users)
     {
-        for (const auto target : users)
+        for (const auto target: users)
         {
-            const bool allowed = allowedScenarios.contains({ source, target });
+            const bool allowed = allowedScenarios.contains({source, target});
             checkCanGrantUserAdminPermissions(source, target, allowed);
+            checkCanGrantUserAdminPermissionsViaInheritance(source, target, admins.id, allowed);
         }
     }
+}
+
+TEST_F(ResourceAccessManagerTest, checkWhatUsersCanViewerCreate)
+{
+    const auto admins = addAdministrators();
+    const auto viewers = addViewers();
+    loginAsMember(viewers.id);
+
+    // Cannot create viewers.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::liveViewerPermissions, {}, false));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {viewers.id}, false));
+
+    // Cannot create admins.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, false));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {admins.id}, false));
+
+    // Cannot create owners.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, true));
+}
+
+TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdminCreate)
+{
+    const auto admins = addAdministrators();
+    const auto viewers = addViewers();
+    loginAsMember(admins.id);
+
+    // Can create viewers.
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::liveViewerPermissions, {}, false));
+
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {viewers.id}, false));
+
+    // Cannot create admins.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, false));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {admins.id}, false));
+
+    // Cannot create owners.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, true));
+}
+
+TEST_F(ResourceAccessManagerTest, checkWhatUsersCanOwnerCreate)
+{
+    const auto admins = addAdministrators();
+    const auto viewers = addViewers();
+
+    loginAsOwner();
+
+    // Can create viewers.
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::liveViewerPermissions, {}, false));
+
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {viewers.id}, false));
+
+    // Can create admins.
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, false));
+
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {admins.id}, false));
+
+    // Cannot create owners.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::admin, {}, true));
 }
 
 /************************************************************************/
@@ -852,7 +1027,7 @@ TEST_P(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
 /************************************************************************/
 
 // Nobody can view desktop camera footage.
-TEST_P(ResourceAccessManagerTest, checkDesktopCameraFootage)
+TEST_F(ResourceAccessManagerTest, checkDesktopCameraFootage)
 {
     loginAsOwner();
 
@@ -865,7 +1040,7 @@ TEST_P(ResourceAccessManagerTest, checkDesktopCameraFootage)
 }
 
 /** Check owner can remove non-owned desktop camera, but cannot view it. */
-TEST_P(ResourceAccessManagerTest, checkDesktopCameraRemove)
+TEST_F(ResourceAccessManagerTest, checkDesktopCameraRemove)
 {
     loginAsOwner();
 
@@ -880,26 +1055,30 @@ TEST_P(ResourceAccessManagerTest, checkDesktopCameraRemove)
     checkPermissions(camera, desired, forbidden);
 }
 
-TEST_P(ResourceAccessManagerTest, checkRemoveCameraAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsAdmin)
 {
-    auto user = addUser(GlobalPermission::admin);
-    auto target = addCamera();
+    const auto admins = addAdministrators();
+    loginAsMember(admins.id);
 
-    ASSERT_TRUE(hasPermission(user, target, Qn::RemovePermission));
+    const auto target = addCamera();
+    ASSERT_TRUE(hasPermission(m_currentUser, target, Qn::RemovePermission));
 }
 
 // EditCameras is not enough to be able to remove cameras
-TEST_P(ResourceAccessManagerTest, checkRemoveCameraAsEditor)
+TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsEditor)
 {
-    auto user = addUser(GlobalPermission::accessAllMedia | GlobalPermission::editCameras);
+    auto user = addUser(GlobalPermission::none);
     auto target = addCamera();
+
+    setAccessRights(user->getId(), {{target->getId(),
+        AccessRight::viewLive | AccessRight::editSettings}});
 
     ASSERT_TRUE(hasPermission(user, target, Qn::WritePermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::RemovePermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkViewCameraPermission)
+TEST_F(ResourceAccessManagerTest, checkViewCameraPermission)
 {
     auto admin = addUser(GlobalPermission::admin);
     auto advancedViewer = addUser(GlobalPermission::advancedViewerPermissions);
@@ -919,8 +1098,7 @@ TEST_P(ResourceAccessManagerTest, checkViewCameraPermission)
     ASSERT_FALSE(hasPermission(live, target, Qn::ViewFootagePermission));
 }
 
-
-TEST_P(ResourceAccessManagerTest, checkExportCameraPermission)
+TEST_F(ResourceAccessManagerTest, checkExportCameraPermission)
 {
     auto admin = addUser(GlobalPermission::admin);
     auto advancedViewer = addUser(GlobalPermission::advancedViewerPermissions);
@@ -939,7 +1117,7 @@ TEST_P(ResourceAccessManagerTest, checkExportCameraPermission)
     ASSERT_FALSE(hasPermission(live, target, exportPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkUserRemoved)
+TEST_F(ResourceAccessManagerTest, checkUserRemoved)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
@@ -949,19 +1127,19 @@ TEST_P(ResourceAccessManagerTest, checkUserRemoved)
     ASSERT_FALSE(hasPermission(user, camera, Qn::RemovePermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkUserRoleChange)
+TEST_F(ResourceAccessManagerTest, checkUserRoleChange)
 {
     auto target = addCamera();
 
     auto user = addUser(GlobalPermission::none);
-    auto role = createRole(GlobalPermission::accessAllMedia);
+    auto group = createRole(GlobalPermission::accessAllMedia);
+    user->setUserRoleIds({group.id});
 
-    user->setUserRoleIds({role.id});
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkUserEnabledChange)
+TEST_F(ResourceAccessManagerTest, checkUserEnabledChange)
 {
     auto target = addCamera();
 
@@ -974,7 +1152,7 @@ TEST_P(ResourceAccessManagerTest, checkUserEnabledChange)
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkRoleAccessChange)
+TEST_F(ResourceAccessManagerTest, checkRoleAccessChange)
 {
     auto target = addCamera();
 
@@ -992,7 +1170,7 @@ TEST_P(ResourceAccessManagerTest, checkRoleAccessChange)
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkInheritedRoleAccessChange)
+TEST_F(ResourceAccessManagerTest, checkInheritedRoleAccessChange)
 {
     auto target = addCamera();
 
@@ -1023,7 +1201,7 @@ TEST_P(ResourceAccessManagerTest, checkInheritedRoleAccessChange)
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
+TEST_F(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
 {
     auto cameraOfParentRole1 = addCamera();
     auto cameraOfParentRole2 = addCamera();
@@ -1106,7 +1284,7 @@ TEST_P(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
     EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkEditAccessChange)
+TEST_F(ResourceAccessManagerTest, checkEditAccessChange)
 {
     auto target = addCamera();
 
@@ -1117,7 +1295,7 @@ TEST_P(ResourceAccessManagerTest, checkEditAccessChange)
     ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkRoleRemoved)
+TEST_F(ResourceAccessManagerTest, checkRoleRemoved)
 {
     auto target = addCamera();
 
@@ -1133,7 +1311,7 @@ TEST_P(ResourceAccessManagerTest, checkRoleRemoved)
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkCameraOnVideoWall)
+TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
 {
     loginAs(GlobalPermission::admin);
     auto target = addCamera();
@@ -1152,7 +1330,7 @@ TEST_P(ResourceAccessManagerTest, checkCameraOnVideoWall)
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkShareLayoutToRole)
+TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 {
     loginAs(GlobalPermission::admin);
 
@@ -1182,7 +1360,7 @@ TEST_P(ResourceAccessManagerTest, checkShareLayoutToRole)
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
 }
 
-TEST_P(ResourceAccessManagerTest, checkShareLayoutToParentRole)
+TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
 {
     loginAs(GlobalPermission::admin);
 
@@ -1219,7 +1397,7 @@ TEST_P(ResourceAccessManagerTest, checkShareLayoutToParentRole)
  * Viewing footage: temporary allowed
  * Export video: temporary allowed
  */
-TEST_P(ResourceAccessManagerTest, checkVMaxWithoutLicense)
+TEST_F(ResourceAccessManagerTest, checkVMaxWithoutLicense)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
@@ -1248,7 +1426,7 @@ TEST_P(ResourceAccessManagerTest, checkVMaxWithoutLicense)
  * Viewing footage: forbidden
  * Export video: forbidden
  */
-TEST_P(ResourceAccessManagerTest, checkNvrWithoutLicense)
+TEST_F(ResourceAccessManagerTest, checkNvrWithoutLicense)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
@@ -1272,14 +1450,14 @@ TEST_P(ResourceAccessManagerTest, checkNvrWithoutLicense)
 /**
 * Camera with default auth (if can be changed) must not be viewable.
 */
-TEST_P(ResourceAccessManagerTest, checkDefaultAuthCamera)
+TEST_F(ResourceAccessManagerTest, checkDefaultAuthCamera)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
     camera->setCameraCapabilities(
-        nx::vms::api::DeviceCapabilities(nx::vms::api::DeviceCapability::setUserPassword)
-        | nx::vms::api::DeviceCapability::isDefaultPassword);
+        DeviceCapabilities(DeviceCapability::setUserPassword)
+        | DeviceCapability::isDefaultPassword);
 
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
@@ -1287,7 +1465,7 @@ TEST_P(ResourceAccessManagerTest, checkDefaultAuthCamera)
     ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 
     // Password changed
-    camera->setCameraCapabilities(nx::vms::api::DeviceCapability::setUserPassword);
+    camera->setCameraCapabilities(DeviceCapability::setUserPassword);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
@@ -1297,12 +1475,12 @@ TEST_P(ResourceAccessManagerTest, checkDefaultAuthCamera)
 /**
 * Camera with default auth must be viewable if password cannot be changed.
 */
-TEST_P(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
+TEST_F(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
 
-    camera->setCameraCapabilities(nx::vms::api::DeviceCapability::isDefaultPassword);
+    camera->setCameraCapabilities(DeviceCapability::isDefaultPassword);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
@@ -1314,7 +1492,7 @@ TEST_P(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
 /************************************************************************/
 
 /* Admin must have full permissions for servers. */
-TEST_P(ResourceAccessManagerTest, checkServerAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkServerAsAdmin)
 {
     loginAsOwner();
 
@@ -1327,7 +1505,7 @@ TEST_P(ResourceAccessManagerTest, checkServerAsAdmin)
 }
 
 /* Custom users can't view health monitors by default. */
-TEST_P(ResourceAccessManagerTest, checkServerAsCustom)
+TEST_F(ResourceAccessManagerTest, checkServerAsCustom)
 {
     loginAs(GlobalPermission::customUser);
 
@@ -1341,7 +1519,7 @@ TEST_P(ResourceAccessManagerTest, checkServerAsCustom)
 }
 
 /* User with live viewer permissions can view health monitors by default. */
-TEST_P(ResourceAccessManagerTest, checkServerAsLiveViewer)
+TEST_F(ResourceAccessManagerTest, checkServerAsLiveViewer)
 {
     loginAs(GlobalPermission::liveViewerPermissions);
 
@@ -1359,7 +1537,7 @@ TEST_P(ResourceAccessManagerTest, checkServerAsLiveViewer)
 /************************************************************************/
 
 /* Admin must have full permissions for storages. */
-TEST_P(ResourceAccessManagerTest, checkStoragesAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkStoragesAsAdmin)
 {
     loginAsOwner();
 
@@ -1373,7 +1551,7 @@ TEST_P(ResourceAccessManagerTest, checkStoragesAsAdmin)
 }
 
 /* Non-admin users should not have access to storages. */
-TEST_P(ResourceAccessManagerTest, checkStoragesAsCustom)
+TEST_F(ResourceAccessManagerTest, checkStoragesAsCustom)
 {
     loginAs(GlobalPermission::customUser);
 
@@ -1388,7 +1566,7 @@ TEST_P(ResourceAccessManagerTest, checkStoragesAsCustom)
 }
 
 /* Non-admin users should not have access to storages. */
-TEST_P(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
+TEST_F(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
 {
     loginAs(GlobalPermission::liveViewerPermissions);
 
@@ -1407,7 +1585,7 @@ TEST_P(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
 /************************************************************************/
 
 /* Admin must have full permissions for videowalls. */
-TEST_P(ResourceAccessManagerTest, checkVideowallAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkVideowallAsAdmin)
 {
     loginAsOwner();
 
@@ -1420,7 +1598,7 @@ TEST_P(ResourceAccessManagerTest, checkVideowallAsAdmin)
 }
 
 /* Videowall control user must have almost full permissions for videowalls. */
-TEST_P(ResourceAccessManagerTest, checkVideowallAsController)
+TEST_F(ResourceAccessManagerTest, checkVideowallAsController)
 {
     loginAs(GlobalPermission::customUser | GlobalPermission::controlVideowall);
 
@@ -1433,7 +1611,7 @@ TEST_P(ResourceAccessManagerTest, checkVideowallAsController)
 }
 
 /* Videowall is inaccessible for default user. */
-TEST_P(ResourceAccessManagerTest, checkVideowallAsViewer)
+TEST_F(ResourceAccessManagerTest, checkVideowallAsViewer)
 {
     loginAs(GlobalPermission::advancedViewerPermissions);
 
@@ -1444,10 +1622,5 @@ TEST_P(ResourceAccessManagerTest, checkVideowallAsViewer)
 
     checkPermissions(videowall, desired, forbidden);
 }
-
-INSTANTIATE_TEST_SUITE_P(
-    ResourceAccessManagerTests,
-    ResourceAccessManagerTest,
-    ::testing::Values(nx::core::access::Mode::direct, nx::core::access::Mode::cached));
 
 } // namespace nx::vms::common::test

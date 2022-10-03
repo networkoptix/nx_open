@@ -352,7 +352,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     else
     {
         /* Only admins can see system health events handled here. */
-        if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
+        if (!accessController()->hasAdminPermissions())
             canShow = false;
     }
 
