@@ -696,6 +696,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("User Management..."))
         .condition(condition::treeNodeType(ResourceTree::NodeType::users));
 
+    factory(LogsManagementAction)
+        .flags(NoTarget)
+        .requiredGlobalPermission(GlobalPermission::admin);
+
     factory(PreferencesGeneralTabAction)
         .flags(Main)
         .text(ContextMenu::tr("Local Settings..."))

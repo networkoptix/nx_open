@@ -4,6 +4,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtWidgets/QAction>
 
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
@@ -18,6 +19,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -424,18 +426,26 @@ struct LogsManagementWatcher::Private
 
     void initNotificationManager()
     {
-        if (!notificationManager)
-        {
-            notificationManager = appContext()->mainWindowContext()->workbenchContext()
-                ->instance<workbench::LocalNotificationsManager>();
+        if (notificationManager)
+            return;
 
-            q->connect(notificationManager, &workbench::LocalNotificationsManager::cancelRequested, q,
-                [this](const QnUuid& notificationId)
-                {
-                    NX_MUTEX_LOCKER lock(&mutex);
-                    hideNotification(notificationId);
-                });
-        }
+        const auto context = appContext()->mainWindowContext()->workbenchContext();
+        notificationManager = context->instance<workbench::LocalNotificationsManager>();
+
+        q->connect(
+            notificationManager, &workbench::LocalNotificationsManager::cancelRequested, q,
+            [this](const QnUuid& notificationId)
+            {
+                NX_MUTEX_LOCKER lock(&mutex);
+                hideNotification(notificationId);
+            });
+
+        q->connect(
+            notificationManager, &workbench::LocalNotificationsManager::interactionRequested, q,
+            [this, context](const QnUuid& notificationId)
+            {
+                context->action(ui::action::LogsManagementAction)->trigger();
+            });
     }
 
     void updateClientLogLevelWarning()
