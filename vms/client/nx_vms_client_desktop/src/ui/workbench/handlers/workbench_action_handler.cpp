@@ -98,6 +98,7 @@
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/widgets/advanced_system_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
@@ -251,6 +252,13 @@ ActionHandler::ActionHandler(QObject *parent) :
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
     connect(action(action::UserManagementAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
+    connect(action(action::LogsManagementAction), &QAction::triggered, this,
+        [this]
+        {
+            openSystemAdministrationDialog(
+                QnSystemAdministrationDialog::Advanced,
+                AdvancedSystemSettingsWidget::urlFor(AdvancedSystemSettingsWidget::Subpage::logs));
+        });
     connect(action(action::AnalyticsEngineSettingsAction), &QAction::triggered, this,
         [this]
         {

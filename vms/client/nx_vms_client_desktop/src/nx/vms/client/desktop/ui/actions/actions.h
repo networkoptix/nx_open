@@ -496,6 +496,11 @@ enum IDType
     UserManagementAction,
 
     /**
+     * System administration dialog - logs management subpage in advanced settings.
+     */
+    LogsManagementAction,
+
+    /**
      * Advanced updates settings dialog.
      */
     AdvancedUpdateSettingsAction,
