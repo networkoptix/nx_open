@@ -8,7 +8,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -17,9 +16,11 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/animation/opacity_animator.h>
@@ -184,6 +185,7 @@ VisualizerData generateEmptyData(qint64 elapsedMs)
 
 QnTwoWayAudioWidget::Private::Private(
     const QString& sourceId,
+    const QnSecurityCamResourcePtr& camera,
     QnTwoWayAudioWidget* owner)
     :
     base_type(),
@@ -191,8 +193,20 @@ QnTwoWayAudioWidget::Private::Private(
     hint(new GraphicsLabel(owner)),
     q(owner),
     m_sourceId(sourceId),
+    m_camera(camera),
     m_hintTimer(new QTimer(this))
 {
+    m_controller = std::make_unique<nx::vms::client::core::TwoWayAudioController>(
+        SystemContext::fromResource(m_camera));
+    m_controller->setSourceId(sourceId);
+    connect(m_controller.get(),
+        &nx::vms::client::core::TwoWayAudioController::availabilityChanged,
+        this,
+        &Private::updateState);
+    m_controller->setResourceId(m_camera->getId());
+
+    connect(m_camera.get(), &QnResource::statusChanged, this, &Private::updateState);
+
     hint->setAcceptedMouseButtons(Qt::NoButton);
     hint->setPerformanceHint(GraphicsLabel::PixmapCaching);
     hint->setAlignment(Qt::AlignCenter);
@@ -204,9 +218,6 @@ QnTwoWayAudioWidget::Private::Private(
 
     button->setIcon(qnSkin->icon("soft_triggers/user_selectable/mic.png"));
     button->setCheckable(false);
-
-    m_controller.setSourceId(sourceId);
-
     connect(button, &QnImageButtonWidget::pressed, this,
         [this]()
         {
@@ -260,8 +271,7 @@ QnTwoWayAudioWidget::Private::Private(
             setState(HintState::ok);
     });
 
-    connect(&m_controller, &nx::vms::client::core::TwoWayAudioController::availabilityChanged,
-        this, &Private::updateState);
+    updateState();
 }
 
 QnTwoWayAudioWidget::Private::~Private()
@@ -279,40 +289,21 @@ void QnTwoWayAudioWidget::Private::updateState()
     q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
 }
 
-void QnTwoWayAudioWidget::Private::updateCamera(const QnSecurityCamResourcePtr& camera)
-{
-    if (m_camera == camera)
-        return;
-
-    if (m_camera)
-        m_camera->disconnect(this);
-
-    m_camera = camera;
-
-    if (camera)
-        connect(camera.get(), &QnResource::statusChanged, this, &Private::updateState);
-
-    m_controller.setResourceId(m_camera->getId());
-    updateState();
-}
-
 bool QnTwoWayAudioWidget::Private::isAllowed() const
 {
-    return m_controller.available();
+    return m_controller->available();
 }
 
 void QnTwoWayAudioWidget::Private::startStreaming()
 {
-    if (!isAllowed() || !m_camera || m_controller.started())
+    if (!isAllowed() || !m_camera || m_controller->started())
         return;
 
-    const auto currentSession = qnClientCoreModule->networkModule()->session();
-    if (!currentSession)
+    auto systemContext = SystemContext::fromResource(m_camera);
+    if (!NX_ASSERT(systemContext))
         return;
 
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-        currentSession->connection()->moduleInformation().id);
-
+    const auto server = systemContext->currentServer();
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
@@ -340,7 +331,7 @@ void QnTwoWayAudioWidget::Private::startStreaming()
             stopStreaming();
         };
 
-    if (!m_controller.start(requestCallback))
+    if (!m_controller->start(requestCallback))
     {
         setHint(tr("Network error"));
         setState(HintState::error);
@@ -349,7 +340,7 @@ void QnTwoWayAudioWidget::Private::startStreaming()
 
 void QnTwoWayAudioWidget::Private::stopStreaming()
 {
-    if (!m_controller.started())
+    if (!m_controller->started())
         return;
 
     if (m_unmuteAudioOnStreamingStop)
@@ -362,7 +353,7 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
     if (m_state != HintState::error)
         setState(HintState::released);
 
-    m_controller.stop();
+    m_controller->stop();
     appContext()->voiceSpectrumAnalyzer()->reset();
     m_visualizerData = VisualizerData();
 }
