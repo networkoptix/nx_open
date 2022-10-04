@@ -22,21 +22,6 @@ struct CrossSystemCameraResource::Private
     CrossSystemCameraResource* const q;
     std::optional<nx::vms::api::CameraDataEx> source;
     QPointer<CloudCrossSystemContext> crossSystemContext;
-
-    QString calculateName() const
-    {
-        if (crossSystemContext->isSystemReadyToUse() && NX_ASSERT(source))
-            return source->name;
-
-        const auto crossSystemContextStatus = crossSystemContext->status();
-        if (crossSystemContextStatus == CloudCrossSystemContext::Status::connecting
-            || crossSystemContextStatus == CloudCrossSystemContext::Status::connectionFailure)
-        {
-            return toString(crossSystemContextStatus);
-        }
-
-        return toString(CloudCrossSystemContext::Status::uninitialized);
-    }
 };
 
 CrossSystemCameraResource::CrossSystemCameraResource(
@@ -68,8 +53,6 @@ CrossSystemCameraResource::CrossSystemCameraResource(
 
     if (source.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
         addFlags(Qn::virtual_camera);
-
-    watchOnCrossSystemContext();
 }
 
 CrossSystemCameraResource::CrossSystemCameraResource(
@@ -84,10 +67,6 @@ CrossSystemCameraResource::CrossSystemCameraResource(
 {
     setIdUnsafe(descriptor.id);
     addFlags(Qn::cross_system | Qn::fake);
-
-    m_name = d->calculateName(); //< Set resource name, but not camera name.
-
-    watchOnCrossSystemContext();
 }
 
 CrossSystemCameraResource::~CrossSystemCameraResource() = default;
@@ -176,31 +155,14 @@ nx::vms::common::ResourceDescriptor CrossSystemCameraResource::descriptor() cons
     return nx::vms::client::desktop::descriptor(getId(), d->crossSystemContext->systemId());
 }
 
-void CrossSystemCameraResource::watchOnCrossSystemContext()
+void CrossSystemCameraResource::setResourceName(const QString &name)
 {
-    const auto update =
-        [this]
-        {
-            QnResource::setName(d->calculateName());
-            if (d->crossSystemContext->isSystemReadyToUse())
-                removeFlags(Qn::fake);
-            else
-                addFlags(Qn::fake);
+    QnResource::setName(name);
+}
 
-            statusChanged(toSharedPointer(), Qn::StatusChangeReason::Local);
-        };
-
-    connect(
-        d->crossSystemContext,
-        &CloudCrossSystemContext::statusChanged,
-        this,
-        update);
-
-    connect(
-        d->crossSystemContext->systemDescription(),
-        &QnBaseSystemDescription::onlineStateChanged,
-        this,
-        update);
+const std::optional<api::CameraDataEx>& CrossSystemCameraResource::source() const
+{
+    return d->source;
 }
 
 } // namespace nx::vms::client::desktop

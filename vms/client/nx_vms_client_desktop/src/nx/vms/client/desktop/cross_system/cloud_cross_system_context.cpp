@@ -362,6 +362,7 @@ struct CloudCrossSystemContext::Private
         auto resourcePool = systemContext->resourcePool();
         auto camerasToRemove = resourcePool->getAllCameras();
         QnResourceList newlyCreatedCameras;
+        const bool systemIsReadyToUse = q->isSystemReadyToUse();
         for (const auto& cameraData: cameras)
         {
             if (auto existingCamera = resourcePool->getResourceById<CrossSystemCameraResource>(
@@ -374,6 +375,7 @@ struct CloudCrossSystemContext::Private
             {
                 auto camera = CrossSystemCameraResourcePtr(
                     new CrossSystemCameraResource(q, cameraData));
+                camera->setResourceName(calculateCameraName(camera, systemIsReadyToUse));
                 newlyCreatedCameras.push_back(camera);
             }
         }
@@ -426,7 +428,7 @@ struct CloudCrossSystemContext::Private
     {
         // Required to find all the cloud resource descriptors inside the cross system layouts
         // that still not have an actual Resource. It might be happen by the various
-        // reasons(system not found at the time or system found, but user action required or
+        // reasons (system not found at the time or system found, but user action required or
         // system is loading). Than create a thumb resource in the resource pool until the real
         // resource is appeared. When the real resource is appeared, the thumb resources must be
         // updated.
@@ -447,10 +449,38 @@ struct CloudCrossSystemContext::Private
     {
         const auto camera = CrossSystemCameraResourcePtr(
             new CrossSystemCameraResource(q, descriptor));
-
+        camera->setResourceName(calculateCameraName(camera, q->isSystemReadyToUse()));
         systemContext->resourcePool()->addResource(camera);
 
         return camera;
+    }
+
+    QString calculateCameraName(
+        const CrossSystemCameraResourcePtr& camera,
+        bool isSystemReadyToUse) const
+    {
+        const auto& source = camera->source();
+        if (isSystemReadyToUse && NX_ASSERT(source))
+            return source->name;
+
+        if (status == Status::connecting || status == Status::connectionFailure)
+            return desktop::toString(status);
+
+        return desktop::toString(Status::uninitialized);
+    }
+
+    void updateCameras()
+    {
+        const auto systemIsReadyToUse = q->isSystemReadyToUse();
+        for (const auto& camera:
+            systemContext->resourcePool()->getResources<CrossSystemCameraResource>())
+        {
+            camera->setResourceName(calculateCameraName(camera, systemIsReadyToUse));
+            if (systemIsReadyToUse)
+                camera->removeFlags(Qn::fake);
+            else
+                camera->addFlags(Qn::fake);
+        }
     }
 };
 
@@ -471,6 +501,11 @@ CloudCrossSystemContext::CloudCrossSystemContext(
         },
         this
     );
+
+    const auto update = [this]() { d->updateCameras(); };
+
+    connect(this, &CloudCrossSystemContext::statusChanged, this, update);
+    connect(systemDescription.data(), &QnBaseSystemDescription::onlineStateChanged, this, update);
 }
 
 CloudCrossSystemContext::~CloudCrossSystemContext() = default;

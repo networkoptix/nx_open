@@ -16,6 +16,7 @@
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
@@ -30,10 +31,14 @@
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
@@ -242,7 +247,18 @@ void StartupActionsHandler::submitDelayedDrops()
             resources.append(layout);
     }
 
-    const MimeData mimeData(d->delayedDrops.raw);
+    const auto createResourceCallback =
+        [this](nx::vms::common::ResourceDescriptor descriptor)
+        {
+            const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
+            if (context)
+                return QnResourcePtr(context->createThumbCameraResource(descriptor.id));
+
+            return QnResourcePtr();
+        };
+
+    const MimeData mimeData(d->delayedDrops.raw, createResourceCallback);
 
     for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
         tours.push_back(tour);
