@@ -22,6 +22,8 @@ public:
 
     static qreal cellSpacingValue(Qn::CellSpacing spacing);
 
+    LayoutResource();
+
     void setPredefinedCellSpacing(Qn::CellSpacing spacing);
 
     /**
@@ -85,6 +87,9 @@ public:
     /** Whether this layout is a Video Wall review layout. */
     bool isVideoWallReviewLayout() const;
 
+    /** Whether this Layout belongs to an Intercom Camera. Is valid for removed intercom. */
+    bool isIntercomLayout() const;
+
 signals:
     void dataChanged(Qn::ItemDataRole role);
     void itemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
@@ -93,14 +98,20 @@ protected:
     /** Make sure `clone` method will create instance of the same class. */
     virtual LayoutResourcePtr createClonedInstance() const;
 
+    virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
+
 private:
     /** @return Whether data value was changed. */
     bool setItemDataUnderLock(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
+    void updateIsIntercomState();
 
 private:
     QnTimePeriod m_localRange;
     DataHash m_data;
     QHash<QnUuid, DataHash> m_itemData;
+
+    bool m_isIntercomLayout = false;
 };
 
 } // namespace nx::vms::client::desktop

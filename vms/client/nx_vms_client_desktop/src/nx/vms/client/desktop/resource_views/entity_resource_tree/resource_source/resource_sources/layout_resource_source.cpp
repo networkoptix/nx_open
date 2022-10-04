@@ -72,7 +72,8 @@ void LayoutResourceSource::onResourceRemoved(const QnResourcePtr& resource)
 
     if (resource->hasFlags(Qn::layout))
     {
-        if (!nx::vms::common::isIntercomLayout(resource))
+        const auto layout = resource.dynamicCast<LayoutResource>();
+        if (NX_ASSERT(layout) && !layout->isIntercomLayout())
             emit resourceRemoved(resource);
     }
 }
@@ -98,7 +99,7 @@ void LayoutResourceSource::processResource(
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return;
 
-    const auto layout = resource.staticCast<LayoutResource>();
+    const auto layout = resource.dynamicCast<LayoutResource>();
 
     if (layout->isServiceLayout())
         return;
@@ -112,7 +113,7 @@ void LayoutResourceSource::processResource(
     connect(resource.get(), &QnResource::parentIdChanged,
         this, &LayoutResourceSource::onLayoutParentIdChanged);
 
-    if (nx::vms::common::isIntercomLayout(layout))
+    if (layout->isIntercomLayout())
         return;
 
     if (!m_parentUser

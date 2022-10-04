@@ -833,7 +833,7 @@ bool LayoutsHandler::confirmLayoutChange(
         return confirmChangeSharedLayout(change);
 
     /* Never ask for intercom layouts. */
-    if (nx::vms::common::isIntercomLayout(change.layout))
+    if (change.layout->isIntercomLayout())
         return true;
 
     return confirmChangeLocalLayout(layoutOwner, change);

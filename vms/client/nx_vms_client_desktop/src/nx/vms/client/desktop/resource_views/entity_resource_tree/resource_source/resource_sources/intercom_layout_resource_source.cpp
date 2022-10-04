@@ -6,6 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <client/client_globals.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
@@ -60,7 +61,8 @@ void IntercomLayoutResourceSource::onResourcesRemoved(const QnResourceList& reso
         }
         else if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
         {
-            if (nx::vms::common::isIntercomLayout(resource))
+            LayoutResourcePtr layout = resource.dynamicCast<LayoutResource>();
+            if (NX_ASSERT(layout) && layout->isIntercomLayout())
                 emit resourceRemoved(resource);
         }
     }
@@ -95,7 +97,8 @@ bool IntercomLayoutResourceSource::processResource(const QnResourcePtr& resource
         return true;
     }
 
-    return nx::vms::common::isIntercomLayout(resource);
+    const auto layout = resource.dynamicCast<LayoutResource>();
+    return NX_ASSERT(layout) && layout->isIntercomLayout();
 }
 
 } // namespace entity_resource_tree
