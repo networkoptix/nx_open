@@ -53,6 +53,9 @@ enum MessageType
     RemoteArchiveSyncStopSchedule = 25,
     RemoteArchiveSyncStopAutoMode = 26,
 
+    metadataStorageNotSet = 27, //< Generated on the client side.
+    metadataOnSystemStorage = 28, //< Generated on the client side.
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 

@@ -43,6 +43,10 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("The System has no internet access for time synchronization");
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
             return tr("Camera recording schedule is invalid");
+        case QnSystemHealth::metadataStorageNotSet:
+            return tr("Storage for analytics data is not set");
+        case QnSystemHealth::metadataOnSystemStorage:
+            return tr("System storage is used for analytics data");
         default:
             break;
     }
@@ -134,6 +138,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
 
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::backupStoragesNotConfigured:
+        case QnSystemHealth::metadataStorageNotSet:
             return QString(); //< Server list is displayed separately.
 
         case QnSystemHealth::NoInternetForTimeSync:
@@ -162,6 +167,11 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::RemoteArchiveSyncFinished:
             messageParts << tr("Remote archive synchronization has been finished for the following device:") << resourceName;
+            break;
+        case QnSystemHealth::metadataOnSystemStorage:
+            messageParts << tr("Analytics data can take up large amounts of space.");
+            messageParts << tr("We recommend to choose another location for it instead of the "
+                "system partition.");
             break;
         default:
             break;
