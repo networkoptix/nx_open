@@ -221,14 +221,14 @@ QString SystemHealthListModel::Private::text(int index) const
         case QnSystemHealth::RemoteArchiveSyncAvailable:
             return tr("On-device recordings were found");
         case QnSystemHealth::RemoteArchiveSyncProgress:
-            return tr("Export in progress...");
+            return tr("Import in progress...");
         case QnSystemHealth::RemoteArchiveSyncFinished:
-            return tr("Export archive from %1 completed").arg(resourceName);
+            return tr("Import archive from %1 completed").arg(resourceName);
         case QnSystemHealth::RemoteArchiveSyncError:
-            return tr("Export archive from %1 failed").arg(resourceName);
+            return tr("Import archive from %1 failed").arg(resourceName);
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-            return tr("Export archive from %1 stopped").arg(resourceName);
+            return tr("Import archive from %1 stopped").arg(resourceName);
 
         default:
             return QnSystemHealthStringsHelper::messageText(item.message,
@@ -342,11 +342,11 @@ QString SystemHealthListModel::Private::description(int index) const
             return QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
                 QnCameraDeviceStringSet(
-                    tr("Not exported archive found on Device %1").arg(resourceName),
-                    tr("Not exported archive found on Camera %1").arg(resourceName)),
+                    tr("Not imported archive found on Device %1").arg(resourceName),
+                    tr("Not imported archive found on Camera %1").arg(resourceName)),
                 camera);
         case QnSystemHealth::RemoteArchiveSyncProgress:
-            return tr("Export archive from %1").arg(resourceName);
+            return tr("Import archive from %1").arg(resourceName);
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
             return tr("The archive stream settings have been changed by user");
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
