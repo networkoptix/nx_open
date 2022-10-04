@@ -5,7 +5,6 @@
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -13,13 +12,13 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 
 namespace nx::vms::client::core {
 
-struct TwoWayAudioController::Private: RemoteConnectionAware
+struct TwoWayAudioController::Private
 {
     Private(TwoWayAudioController* q);
     void setStarted(bool value);
@@ -53,7 +52,7 @@ void TwoWayAudioController::Private::setStarted(bool value)
 
 bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& callback)
 {
-    const bool available = connection() && q->available();
+    const bool available = q->connection() && q->available();
     setStarted(active && available);
     if (!available)
         return false;
@@ -73,15 +72,19 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
                 callback(ok);
         });
 
-    orderedRequestsHelper.postJsonResult(connectedServerApi(),
-        "/api/transmitAudio", params, requestCallback, QThread::currentThread());
+    orderedRequestsHelper.postJsonResult(q->connectedServerApi(),
+        "/api/transmitAudio",
+        params,
+        requestCallback,
+        QThread::currentThread());
     return true;
 }
 
 //--------------------------------------------------------------------------------------------------
 
-TwoWayAudioController::TwoWayAudioController(QObject* parent):
+TwoWayAudioController::TwoWayAudioController(SystemContext* systemContext, QObject* parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
 }
@@ -93,7 +96,9 @@ TwoWayAudioController::~TwoWayAudioController()
 
 void TwoWayAudioController::registerQmlType()
 {
-    qmlRegisterType<TwoWayAudioController>("nx.client.core", 1, 0, "TwoWayAudioController");
+    qmlRegisterUncreatableType<TwoWayAudioController>(
+        "nx.client.core", 1, 0, "TwoWayAudioController",
+        "Cannot create an instance of TwoWayAudioController without a system context.");
 }
 
 bool TwoWayAudioController::started() const
@@ -140,9 +145,8 @@ void TwoWayAudioController::setResourceId(const QnUuid& id)
 
     stop();
 
-    const auto pool = resourcePool();
-    d->camera = pool->getResourceById<QnVirtualCameraResource>(id);
-    d->availabilityWatcher->setResourceId(id);
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    d->availabilityWatcher->setCamera(d->camera);
     emit resourceIdChanged();
 }
 

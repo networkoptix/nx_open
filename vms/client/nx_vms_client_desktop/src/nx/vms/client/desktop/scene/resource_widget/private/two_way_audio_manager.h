@@ -5,7 +5,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
+
+namespace nx::vms::client::core { class TwoWayAudioController; }
 
 namespace nx::vms::client::desktop {
 
@@ -36,7 +37,7 @@ signals:
     void streamingStateChanged(StreamingState state);
 
 private:
-    nx::vms::client::core::TwoWayAudioController m_controller;
+    std::unique_ptr<core::TwoWayAudioController> m_controller;
     bool m_unmuteAudioOnStreamingStop = false;
 
     QnSecurityCamResourcePtr m_camera;
