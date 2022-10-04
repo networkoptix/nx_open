@@ -70,6 +70,8 @@ bool isMessageLocked(MessageType message)
         case RemoteArchiveSyncError:
         case RemoteArchiveSyncStopSchedule:
         case RemoteArchiveSyncStopAutoMode:
+        case metadataStorageNotSet:
+        case metadataOnSystemStorage:
             return true;
         default:
             return false;

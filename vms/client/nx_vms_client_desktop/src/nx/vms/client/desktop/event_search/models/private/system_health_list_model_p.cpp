@@ -43,7 +43,7 @@ namespace nx::vms::client::desktop {
 using namespace ui;
 
 //-------------------------------------------------------------------------------------------------
-// SystemHealthListModel::Private::Item
+// SystemHealthListModel::Private::Item definition.
 
 SystemHealthListModel::Private::Item::Item(
     QnSystemHealth::MessageType message,
@@ -77,9 +77,9 @@ bool SystemHealthListModel::Private::Item::operator<(const Item& other) const
 }
 
 //-------------------------------------------------------------------------------------------------
-// SystemHealthListModel::Private
+// SystemHealthListModel::Private definition.
 
-SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
+SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
@@ -103,10 +103,21 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
         &QnUserResource::nameChanged,
         [this](const QnUserResourcePtr& user)
         {
-            if (m_usersWithInvalidEmail.contains(user))
-                updateItem(QnSystemHealth::MessageType::UsersEmailIsEmpty);
+            if (getResourceSet(QnSystemHealth::UsersEmailIsEmpty).contains(user))
+                updateItem(QnSystemHealth::UsersEmailIsEmpty);
         });
     usernameChangesListener->start();
+
+    const auto cameraNameChangesListener =
+        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+    cameraNameChangesListener->addOnSignalHandler(
+        &QnVirtualCameraResource::nameChanged,
+        [this](const QnVirtualCameraResourcePtr& camera)
+        {
+            if (getResourceSet(QnSystemHealth::cameraRecordingScheduleIsInvalid).contains(camera))
+                updateItem(QnSystemHealth::cameraRecordingScheduleIsInvalid);
+        });
+    cameraNameChangesListener->start();
 
     // Handle system health notifications.
 
@@ -139,28 +150,6 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
 
             m_popupSystemHealthFilter = filter;
         });
-
-    auto cachesCleaner = new core::SessionResourcesSignalListener<QnResource>(this);
-    cachesCleaner->setOnRemovedHandler(
-        [this](const QnResourceList& resources)
-        {
-            for (const auto& resource: resources)
-            {
-                if (auto user = resource.dynamicCast<QnUserResource>())
-                    m_usersWithInvalidEmail.removeAll(user);
-                if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-                {
-                    m_camerasWithDefaultPassword.removeAll(camera);
-                    m_camerasWithInvalidSchedule.removeAll(camera);
-                }
-                if (auto server = resource.dynamicCast<QnMediaServerResource>())
-                {
-                    m_serversWithoutStorages.removeAll(server);
-                    m_serversWithoutBackupStorages.removeAll(server);
-                }
-            }
-        });
-    cachesCleaner->start();
 }
 
 SystemHealthListModel::Private::~Private()
@@ -190,13 +179,16 @@ QString SystemHealthListModel::Private::text(int index) const
     switch (item.message)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Email address is not set for %n users", "", m_usersWithInvalidEmail.size());
+            return tr("Email address is not set for %n users", "",
+                getResourceSet(item.message).size());
+
+        case QnSystemHealth::backupStoragesNotConfigured:
+            return tr("Backup storage is not configured on %n server", "",
+                getResourceSet(item.message).size());
 
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
-        {
             return tr("Recording schedule is invalid for %n cameras", "",
-                m_camerasWithInvalidSchedule.size());
-        }
+                getResourceSet(item.message).size());
 
         case QnSystemHealth::replacedDeviceDiscovered:
         {
@@ -220,15 +212,27 @@ QString SystemHealthListModel::Private::text(int index) const
 
         case QnSystemHealth::RemoteArchiveSyncAvailable:
             return tr("On-device recordings were found");
+
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Import in progress...");
+
         case QnSystemHealth::RemoteArchiveSyncFinished:
             return tr("Import archive from %1 completed").arg(resourceName);
+
         case QnSystemHealth::RemoteArchiveSyncError:
             return tr("Import archive from %1 failed").arg(resourceName);
+
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
             return tr("Import archive from %1 stopped").arg(resourceName);
+
+        case QnSystemHealth::metadataStorageNotSet:
+            return tr("Storage for analytics data is not set on %n server", "",
+                getResourceSet(item.message).size());
+
+        case QnSystemHealth::metadataOnSystemStorage:
+            return tr("System storage is used for analytics data on %n server", "",
+                getResourceSet(item.message).size());
 
         default:
             return QnSystemHealthStringsHelper::messageText(item.message,
@@ -238,20 +242,16 @@ QString SystemHealthListModel::Private::text(int index) const
 
 QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) const
 {
-    const auto& item = m_items[index];
-    switch (item.message)
+    const auto message = messageType(index);
+    switch (message)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
-            return m_usersWithInvalidEmail;
-
         case QnSystemHealth::StoragesNotConfigured:
-            return m_serversWithoutStorages;
-
         case QnSystemHealth::backupStoragesNotConfigured:
-            return m_serversWithoutBackupStorages;
-
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
-            return m_camerasWithInvalidSchedule;
+        case QnSystemHealth::metadataStorageNotSet:
+        case QnSystemHealth::metadataOnSystemStorage:
+            return getSortedResourceList(message);
 
         default:
             return {};
@@ -270,8 +270,16 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         result << tr("Recording schedule on some cameras contains recording modes that are not "
             "supported.");
         result << ""; //< Additional line break by design.
-        for (const auto& camera: m_camerasWithInvalidSchedule)
+
+        const auto cameraResources =
+            getSortedResourceList(QnSystemHealth::cameraRecordingScheduleIsInvalid);
+
+        for (const auto& cameraResource: cameraResources)
         {
+            const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
+            if (!NX_ASSERT(camera))
+                continue;
+
             result << colored(camera->getName(), colorTheme()->color("light8"))
                 + " "
                 + colored(camera->getHostAddress(), colorTheme()->color("light16"));
@@ -339,24 +347,25 @@ QString SystemHealthListModel::Private::description(int index) const
     switch (item.message)
     {
         case QnSystemHealth::RemoteArchiveSyncAvailable:
-        {
             return QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not imported archive found on Device %1").arg(resourceName),
                     tr("Not imported archive found on Camera %1").arg(resourceName)),
                 camera);
-        }
+
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Import archive from %1").arg(resourceName);
+
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
             return tr("The archive stream settings have been changed by user");
+
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
             return tr("The recording settings have been changed by user");
+
         default:
-            break;
+            return {};
     }
-    return {};
 }
 
 QVariant SystemHealthListModel::Private::progress(int index) const
@@ -365,12 +374,12 @@ QVariant SystemHealthListModel::Private::progress(int index) const
     switch (item.message)
     {
         case QnSystemHealth::RemoteArchiveSyncProgress:
-        {
             return QVariant::fromValue(
                 ProgressState(item.serverData->getRuntimeParams().progress));
-        }
+
+        default:
+            return {};
     }
-    return {};
 }
 
 QVariant SystemHealthListModel::Private::timestamp(int index) const
@@ -382,12 +391,12 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-        {
             return QVariant::fromValue(std::chrono::microseconds(
                 item.serverData->getRuntimeParams().eventTimestampUsec));
-        }
+
+        default:
+            return {};
     }
-    return {};
 }
 
 int SystemHealthListModel::Private::helpId(int index) const
@@ -423,9 +432,9 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             connect(action.data(), &QAction::triggered, this,
                 [this]
                 {
-                    const auto state = context()->instance<SystemHealthState>();
-                    const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
-                        .withArgument(Qn::ForceShowCamerasList, true);
+                    const auto parameters = action::Parameters(
+                        getSortedResourceList(QnSystemHealth::DefaultCameraPasswords))
+                            .withArgument(Qn::ForceShowCamerasList, true);
 
                     menu()->triggerIfPossible(
                         action::ChangeDefaultCameraPasswordAction, parameters);
@@ -471,7 +480,8 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
 
 action::IDType SystemHealthListModel::Private::action(int index) const
 {
-    switch (m_items[index].message)
+    const auto message = messageType(index);
+    switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
             return action::UserSettingsAction;
@@ -493,6 +503,8 @@ action::IDType SystemHealthListModel::Private::action(int index) const
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::metadataStorageNotSet:
+        case QnSystemHealth::metadataOnSystemStorage:
             return action::ServerSettingsAction;
 
          case QnSystemHealth::NoInternetForTimeSync:
@@ -511,7 +523,8 @@ action::IDType SystemHealthListModel::Private::action(int index) const
 
 action::Parameters SystemHealthListModel::Private::parameters(int index) const
 {
-    switch (m_items[index].message)
+    const auto message = messageType(index);
+    switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
             return action::Parameters(context()->user())
@@ -520,11 +533,11 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
 
         case QnSystemHealth::UsersEmailIsEmpty:
         {
-            const auto user = m_usersWithInvalidEmail.empty()
-                ? QnUserResourcePtr()
-                : m_usersWithInvalidEmail.front();
+            const auto users = getSortedResourceList(message);
+            if (!NX_ASSERT(!users.empty()))
+                return {};
 
-            return action::Parameters(user)
+            return action::Parameters(users.front())
                 .withArgument(Qn::FocusElementRole, lit("email"))
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
         }
@@ -536,20 +549,15 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
                     int(QnSystemAdministrationDialog::TimeServerSelection));
 
         case QnSystemHealth::StoragesNotConfigured:
-        {
-            if (!NX_ASSERT(!m_serversWithoutStorages.empty()))
-                return {};
-
-            return action::Parameters(m_serversWithoutStorages.front())
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
-        }
-
         case QnSystemHealth::backupStoragesNotConfigured:
+        case QnSystemHealth::metadataStorageNotSet:
+        case QnSystemHealth::metadataOnSystemStorage:
         {
-            if (!NX_ASSERT(!m_serversWithoutBackupStorages.empty()))
+            const auto servers = getSortedResourceList(message);
+            if (!NX_ASSERT(!servers.empty()))
                 return {};
 
-            return action::Parameters(m_serversWithoutBackupStorages.front())
+            return action::Parameters(servers.front())
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
         }
 
@@ -562,11 +570,11 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
 
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
         {
-            QnVirtualCameraResourcePtr camera;
-            if (NX_ASSERT(!m_camerasWithInvalidSchedule.empty()))
-                camera = m_camerasWithInvalidSchedule.front();
+            const auto cameras = getSortedResourceList(message);
+            if (!NX_ASSERT(!cameras.empty()))
+                return {};
 
-            return action::Parameters(camera)
+            return action::Parameters(cameras.front())
                 .withArgument(Qn::FocusTabRole, CameraSettingsTab::recording);
         }
 
@@ -585,6 +593,32 @@ void SystemHealthListModel::Private::addItem(
     QnSystemHealth::MessageType message, const QVariant& params)
 {
     doAddItem(message, params, false /*initial*/);
+}
+
+QSet<QnResourcePtr> SystemHealthListModel::Private::getResourceSet(
+    QnSystemHealth::MessageType message) const
+{
+    const auto systemHealthState = context()->instance<SystemHealthState>();
+    return systemHealthState->data(message).value<QSet<QnResourcePtr>>();
+}
+
+QnResourceList SystemHealthListModel::Private::getSortedResourceList(
+    QnSystemHealth::MessageType message) const
+{
+    QCollator collator;
+    collator.setNumericMode(true);
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+
+    const auto resourceNameLessThan =
+        [collator = std::move(collator)](const QnResourcePtr& lhs, const QnResourcePtr& rhs)
+        {
+            return collator.compare(lhs->getName(), rhs->getName()) < 0;
+        };
+
+    const auto resourceSet = getResourceSet(message);
+    QnResourceList result(resourceSet.cbegin(), resourceSet.cend());
+    std::sort(result.begin(), result.end(), resourceNameLessThan);
+    return result;
 }
 
 void SystemHealthListModel::Private::doAddItem(
@@ -662,8 +696,6 @@ void SystemHealthListModel::Private::doAddItem(
         return; //< Item already exists.
     }
 
-    updateCachedData(message);
-
     {
         // New item.
         ScopedInsertRows insertRows(q, index, index, !initial);
@@ -722,73 +754,8 @@ void SystemHealthListModel::Private::updateItem(QnSystemHealth::MessageType mess
     if (position == m_items.end() || *position != item)
         return; //< Item does not exist.
 
-    updateCachedData(message);
-
     const auto index = q->index(std::distance(m_items.cbegin(), position));
     emit q->dataChanged(index, index);
-}
-
-void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageType message)
-{
-    QCollator collator;
-    collator.setNumericMode(true);
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-
-    const auto lessResourceByName =
-        [&collator](const QnResourcePtr& left, const QnResourcePtr& right)
-        {
-            return collator.compare(left->getName(), right->getName()) < 0;
-        };
-
-    const auto systemHealthState = context()->instance<SystemHealthState>();
-    switch (message)
-    {
-        case QnSystemHealth::MessageType::UsersEmailIsEmpty:
-        {
-            m_usersWithInvalidEmail = systemHealthState->data(
-                QnSystemHealth::MessageType::UsersEmailIsEmpty).value<QnUserResourceList>();
-            std::sort(m_usersWithInvalidEmail.begin(), m_usersWithInvalidEmail.end(),
-                lessResourceByName);
-            break;
-        }
-
-        case QnSystemHealth::MessageType::DefaultCameraPasswords:
-        {
-            m_camerasWithDefaultPassword =
-                systemHealthState->data(QnSystemHealth::MessageType::DefaultCameraPasswords)
-                    .value<QnVirtualCameraResourceList>();
-            break;
-        }
-
-        case QnSystemHealth::MessageType::StoragesNotConfigured:
-        {
-            m_serversWithoutStorages =
-                systemHealthState->data(QnSystemHealth::MessageType::StoragesNotConfigured)
-                    .value<QnMediaServerResourceList>();
-            std::sort(m_serversWithoutStorages.begin(), m_serversWithoutStorages.end(),
-                lessResourceByName);
-            break;
-        }
-        case QnSystemHealth::MessageType::backupStoragesNotConfigured:
-        {
-            m_serversWithoutBackupStorages =
-                systemHealthState->data(QnSystemHealth::MessageType::backupStoragesNotConfigured)
-                .value<QnMediaServerResourceList>();
-            std::sort(m_serversWithoutBackupStorages.begin(), m_serversWithoutBackupStorages.end(),
-                lessResourceByName);
-            break;
-        }
-        case QnSystemHealth::MessageType::cameraRecordingScheduleIsInvalid:
-        {
-            m_camerasWithInvalidSchedule = systemHealthState->data(
-                QnSystemHealth::MessageType::cameraRecordingScheduleIsInvalid)
-                    .value<QnVirtualCameraResourceList>();
-            break;
-        }
-
-        default:
-            break;
-    }
 }
 
 void SystemHealthListModel::Private::clear()
@@ -867,6 +834,7 @@ QString SystemHealthListModel::Private::decorationPath(QnSystemHealth::MessageTy
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::metadataOnSystemStorage: //< TODO: #vbreus Probably should be changed to the 'analytics' icon.
             return "events/storage.png";
 
         case QnSystemHealth::CloudPromo:
