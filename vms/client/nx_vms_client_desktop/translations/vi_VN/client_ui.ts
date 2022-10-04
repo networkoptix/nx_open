@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <translation>Xuất từ thiết bị</translation>
     </message>
   </context>
   <context>

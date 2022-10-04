@@ -7187,7 +7187,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Cảnh quay từ camera này được sao lưu đến %1 %2</translation>
     </message>
   </context>
   <context>
@@ -7237,11 +7237,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Tắt tiếng</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Bật tiếng</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7249,7 +7249,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Bỏ</translation>
     </message>
   </context>
   <context>
@@ -7326,7 +7326,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>Video được ghi trên bộ nhớ nội bộ của camera sẽ không được tự động tải lên kho lưu trữ chính.</translation>
     </message>
   </context>
   <context>
@@ -8445,7 +8445,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>Bố cục %1</translation>
     </message>
   </context>
   <context>
@@ -9120,7 +9120,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Đang gọi...</translation>
     </message>
   </context>
   <context>
@@ -10215,7 +10215,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Đã tìm thấy bản ghi trên thiết bị</translation>
     </message>
   </context>
   <context>

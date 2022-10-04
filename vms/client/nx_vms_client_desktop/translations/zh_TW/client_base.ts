@@ -7329,7 +7329,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>在攝影機內的錄影資料，將不會自動被上傳到媒體伺服器。</translation>
     </message>
   </context>
   <context>
