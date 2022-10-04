@@ -10,26 +10,32 @@
 
 namespace nx::vms::common {
 
+static std::once_flag trustedCertificatesLoaded;
+
 AbstractCertificateVerifier::AbstractCertificateVerifier(QObject* parent): QObject(parent)
 {
-    constexpr auto kCaLogLevel = nx::utils::log::Level::verbose;
-    if (nx::utils::log::isToBeLogged(kCaLogLevel))
-    {
-        NX_UTILS_LOG(kCaLogLevel, this, "OS CA for now %1", nx::utils::utcTime());
-        for (const auto& c: QSslConfiguration::defaultConfiguration().caCertificates())
-            NX_UTILS_LOG(kCaLogLevel, this, c);
-    }
-    const QDir folder(":/trusted_certificates");
-    for (const auto& fileName: folder.entryList({"*.pem"}, QDir::Files))
-    {
-        QFile f(folder.absoluteFilePath(fileName));
-        if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+    std::call_once(trustedCertificatesLoaded,
+        [this]()
         {
-            NX_WARNING(this, "Cannot open file %1", folder.absoluteFilePath(fileName));
-            continue;
-        }
-        loadTrustedCertificate(f.readAll(), fileName);
-    }
+            constexpr auto kCaLogLevel = nx::utils::log::Level::verbose;
+            if (nx::utils::log::isToBeLogged(kCaLogLevel))
+            {
+                NX_UTILS_LOG(kCaLogLevel, this, "OS CA for now %1", nx::utils::utcTime());
+                for (const auto& c: QSslConfiguration::defaultConfiguration().caCertificates())
+                    NX_UTILS_LOG(kCaLogLevel, this, c);
+            }
+            const QDir folder(":/trusted_certificates");
+            for (const auto& fileName: folder.entryList({"*.pem"}, QDir::Files))
+            {
+                QFile f(folder.absoluteFilePath(fileName));
+                if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+                {
+                    NX_WARNING(this, "Cannot open file %1", folder.absoluteFilePath(fileName));
+                    continue;
+                }
+                loadTrustedCertificate(f.readAll(), fileName);
+            }
+        });
 }
 
 AbstractCertificateVerifier::~AbstractCertificateVerifier() {}
