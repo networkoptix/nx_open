@@ -11,6 +11,8 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,13 +24,15 @@ TwoWayAudioManager::TwoWayAudioManager(
     QObject(parent),
     m_camera(camera)
 {
-    m_controller.setSourceId(sourceId);
-    m_controller.setResourceId(m_camera->getId());
+    m_controller = std::make_unique<core::TwoWayAudioController>(
+        SystemContext::fromResource(m_camera));
+    m_controller->setSourceId(sourceId);
+    m_controller->setResourceId(m_camera->getId());
 
-    connect(&m_controller, &core::TwoWayAudioController::startedChanged,
+    connect(m_controller.get(), &core::TwoWayAudioController::startedChanged,
         [this]
         {
-            emit streamingStateChanged(m_controller.started()
+            emit streamingStateChanged(m_controller->started()
                 ? StreamingState::active
                 : StreamingState::disabled);
         });
@@ -41,7 +45,7 @@ TwoWayAudioManager::~TwoWayAudioManager()
 
 void TwoWayAudioManager::startStreaming()
 {
-    if (!m_controller.available() || !m_camera || m_controller.started())
+    if (!m_controller->available() || !m_camera || m_controller->started())
         return;
 
     auto server = m_camera->getParentServer();
@@ -67,7 +71,7 @@ void TwoWayAudioManager::startStreaming()
             }
         };
 
-    if (!m_controller.start(requestCallback))
+    if (!m_controller->start(requestCallback))
     {
         NX_WARNING(this, "Network error");
         streamingStateChanged(StreamingState::error);
@@ -76,13 +80,13 @@ void TwoWayAudioManager::startStreaming()
 
 void TwoWayAudioManager::stopStreaming()
 {
-    if (!m_controller.available() || !m_controller.started())
+    if (!m_controller->available() || !m_controller->started())
         return;
 
     if (m_unmuteAudioOnStreamingStop)
         m_unmuteAudioOnStreamingStop = false;
 
-    m_controller.stop();
+    m_controller->stop();
 }
 
 } // namespace nx::vms::client::desktop

@@ -15,21 +15,17 @@ namespace nx::vms::client::core {
 
 namespace {
 
-QnUserResourcePtr findUser(const QString& userName, SystemContext* systemContext)
+QnUserResourcePtr findUser(const QString& userName, const QnResourceList& resources)
 {
-    NX_ASSERT(systemContext);
-    if (!systemContext)
-        return QnUserResourcePtr();
-
-    const auto users = systemContext->resourcePool()->getResources<QnUserResource>();
-
-    for (const auto& user: users)
+    for (const auto& resource: resources)
     {
-        if (userName.compare(user->getName(), Qt::CaseInsensitive) == 0)
-            return user;
+        if (auto user = resource.dynamicCast<QnUserResource>())
+        {
+            if (userName.compare(user->getName(), Qt::CaseInsensitive) == 0)
+                return user;
+        }
     }
-
-    return QnUserResourcePtr();
+    return {};
 }
 
 } // namespace
@@ -38,35 +34,29 @@ UserWatcher::UserWatcher(SystemContext* systemContext, QObject* parent):
     QObject(parent),
     SystemContextAware(systemContext)
 {
-    const auto updateUserResource =
-        [this] { setUser(findUser(m_userName, this->systemContext())); };
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        this, [this](const QnResourcePtr& resource)
+    connect(resourcePool(), &QnResourcePool::resourcesAdded,
+        this,
+        [this](const QnResourceList& resources)
         {
-            const auto user = resource.dynamicCast<QnUserResource>();
-            if (user && user == m_user)
-                setUser(QnUserResourcePtr());
+            const auto username = QString::fromStdString(
+                this->systemContext()->connectionCredentials().username);
+
+            if (!m_user && !username.isEmpty())
+            {
+                if (const auto user = findUser(username, resources))
+                    setUser(user);
+            }
         }
     );
 
-    connect(this, &UserWatcher::userNameChanged, this, updateUserResource);
-
-    const auto updateUserName =
-        [this](const QnUserResourcePtr& user) { setUserName(user ? user->getName() : QString()); };
-    connect(this, &UserWatcher::userChanged, this, nx::utils::guarded(this, updateUserName));
-}
-
-void UserWatcher::setMessageProcessor(QnClientMessageProcessor* messageProcessor)
-{
-    const auto updateUserResource =
-        [this] { setUser(findUser(m_userName, this->systemContext())); };
-
-    if (messageProcessor)
-    {
-        connect(messageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
-            this, updateUserResource);
-    }
+    connect(resourcePool(), &QnResourcePool::resourcesRemoved,
+        this,
+        [this](const QnResourceList& resources)
+        {
+            if (m_user && resources.contains(m_user))
+                setUser(QnUserResourcePtr());
+        }
+    );
 }
 
 const QnUserResourcePtr& UserWatcher::user() const
@@ -82,20 +72,12 @@ void UserWatcher::setUser(const QnUserResourcePtr& user)
     m_user = user;
 
     emit userChanged(user);
-}
-
-const QString& UserWatcher::userName() const
-{
-    return m_userName;
-}
-
-void UserWatcher::setUserName(const QString& name)
-{
-    if (m_userName == name)
-        return;
-
-    m_userName = name;
     emit userNameChanged();
+}
+
+QString UserWatcher::userName() const
+{
+    return m_user ? m_user->getName() : QString();
 }
 
 } // namespace nx::vms::client::core

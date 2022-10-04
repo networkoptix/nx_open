@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 class SingleCamLicenseStatusHelper;
 
@@ -15,8 +15,7 @@ namespace nx::vms::client::core {
 class TwoWayAudioAvailabilityWatcher;
 class OrderedRequestsManager;
 
-class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public QObject,
-    public CommonModuleAware
+class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -26,7 +25,7 @@ class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public QObject,
     Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
-    TwoWayAudioController(QObject* parent = nullptr);
+    TwoWayAudioController(SystemContext* systemContext, QObject* parent = nullptr);
 
     virtual ~TwoWayAudioController();
 
