@@ -6,12 +6,17 @@
 #include <QtCore/QPointer>
 #include <QtQml/QtQml>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 
@@ -46,11 +51,14 @@ struct ResourceAccessInfoProvider::Private
     QPointer<AccessSubjectEditingContext> context;
     QVector<AccessRight> accessRightList;
     QnResourcePtr resource;
+    ResourceTree::NodeType nodeType = ResourceTree::NodeType::spacer;
+    bool collapsed = false;
     QVector<ResourceAccessInfo> info;
 
     nx::utils::ScopedConnections contextConnections;
 
     void updateInfo();
+    QnResourceList getResources() const;
 };
 
 ResourceAccessInfoProvider::ResourceAccessInfoProvider(QObject* parent):
@@ -136,6 +144,37 @@ void ResourceAccessInfoProvider::setResource(QnResource* value)
     d->updateInfo();
 
     emit resourceChanged();
+}
+
+ResourceTree::NodeType ResourceAccessInfoProvider::nodeType() const
+{
+    return d->nodeType;
+}
+
+void ResourceAccessInfoProvider::setNodeType(ResourceTree::NodeType value)
+{
+    if (d->nodeType == value)
+        return;
+
+    d->nodeType = value;
+
+    emit nodeTypeChanged();
+}
+
+bool ResourceAccessInfoProvider::collapsed() const
+{
+    return d->collapsed;
+}
+
+void ResourceAccessInfoProvider::setCollapsed(bool value)
+{
+    if (d->collapsed == value)
+        return;
+
+    d->collapsed = value;
+    emit collapsedChanged();
+
+    d->updateInfo();
 }
 
 QString ResourceAccessInfoProvider::accessDetailsText(
@@ -245,7 +284,7 @@ QVariant ResourceAccessInfoProvider::data(const QModelIndex& index, int role) co
 
 bool ResourceAccessInfoProvider::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (index.row() >= rowCount() || index.row() < 0 || role != isOwn || !d->resource)
+    if (index.row() >= rowCount() || index.row() < 0 || role != isOwn || !d->context)
         return false;
 
     if (value.toBool() == data(index, isOwn).toBool())
@@ -253,7 +292,14 @@ bool ResourceAccessInfoProvider::setData(const QModelIndex& index, const QVarian
 
     const auto accessRight = d->accessRightList.at(index.row());
 
-    d->context->setOwnAccessRight(d->resource->getId(), accessRight, value.toBool());
+    if (d->resource)
+        d->context->setOwnAccessRight(d->resource->getId(), accessRight, value.toBool());
+    else if (d->collapsed)
+        d->context->setOwnAccessRight({}, accessRight, value.toBool());
+
+    d->info[index.row()].providedVia = value.toBool()
+        ? ResourceAccessInfo::ProvidedVia::own
+        : ResourceAccessInfo::ProvidedVia::none;
 
     return true;
 }
@@ -331,12 +377,77 @@ void ResourceAccessInfoProvider::registerQmlTypes()
 // ------------------------------------------------------------------------------------------------
 // ResourceAccessInfoProvider::Private
 
+QnResourceList ResourceAccessInfoProvider::Private::getResources() const
+{
+    if (!context)
+        return {};
+
+    const auto resourcePool = context->systemContext()->resourcePool();
+
+    switch (nodeType)
+    {
+        case ResourceTree::NodeType::camerasAndDevices:
+            return resourcePool->getAllCameras(QnUuid{}, /*ignoreDesktopCameras*/ true);
+
+        case ResourceTree::NodeType::webPages:
+            return resourcePool->getResources<QnWebPageResource>();
+
+        case ResourceTree::NodeType::layouts:
+            return resourcePool->getResources<QnLayoutResource>().filtered(
+                [](const QnLayoutResourcePtr& layout)
+                {
+                    return !layout->isFile() && !layout->hasFlags(Qn::cross_system);
+                });
+
+        case ResourceTree::NodeType::servers:
+            return resourcePool->getResources<QnMediaServerResource>();
+
+        case ResourceTree::NodeType::videoWalls:
+            return resourcePool->getResources<QnVideoWallResource>();
+
+        default:
+            return resource ? QnResourceList{resource} : QnResourceList{};
+    }
+}
+
 void ResourceAccessInfoProvider::Private::updateInfo()
 {
     QVector<ResourceAccessInfo> newResourceAccessInfo;
 
     const int count = accessRightList.size();
     newResourceAccessInfo.resize(count);
+
+    if (!resource && context)
+    {
+        const auto accessMap = context->ownResourceAccessMap();
+
+        nx::vms::api::AccessRights rights;
+
+        if (collapsed)
+        {
+            rights = accessMap.value({});
+        }
+        else
+        {
+            QnResourceList resources = getResources();
+
+            if (!resources.empty())
+            {
+                rights = accessMap.value(resources.first()->getId());
+
+                for (const auto& resource: resources)
+                    rights &= accessMap.value(resource->getId());
+            }
+        }
+
+        for (int i = 0; i < count; ++i)
+        {
+            auto& newInfo = newResourceAccessInfo[i];
+            newInfo.providedVia = rights.testFlag(accessRightList.at(i))
+                ? ResourceAccessInfo::ProvidedVia::own
+                : ResourceAccessInfo::ProvidedVia::none;
+        }
+    }
 
     if (context && resource && !context->currentSubjectId().isNull())
     {

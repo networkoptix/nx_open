@@ -83,8 +83,9 @@ Item
                     onClicked:
                     {
                         const prev = control.editingContext.hasOwnAccessRight(
-                            null, modelData.accessRight)
-                        control.editingContext.setOwnAccessRight(null, modelData.accessRight, !prev)
+                            NxGlobals.uuid(""), modelData.accessRight)
+                        control.editingContext.setOwnAccessRight(
+                            NxGlobals.uuid(""), modelData.accessRight, !prev)
                     }
                 }
             }
@@ -215,9 +216,10 @@ Item
             text: qsTr("All permissions & resources")
             color: ColorTheme.colors.light10
 
-            checked: Array.prototype.every.call(AccessRightsList.items,
-                item => control.editingContext.hasOwnAccessRight(
-                    NxGlobals.uuid(""), item.accessRight))
+            checked: control.editingContext
+                && Array.prototype.every.call(AccessRightsList.items,
+                    item => control.editingContext.hasOwnAccessRight(
+                        NxGlobals.uuid(""), item.accessRight))
 
             onClicked:
             {
