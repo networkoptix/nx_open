@@ -103,7 +103,7 @@ struct NX_VMS_API SetupSystemData
     /**%apidoc New system name. */
     QString name;
 
-    /**%apidoc:object System settings to set when system is configured. */
+    /**%apidoc System settings to set when System is configured. */
     std::map<QString, QJsonValue> settings;
 
     /**%apidoc For local System only. */

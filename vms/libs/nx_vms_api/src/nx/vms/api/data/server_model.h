@@ -30,6 +30,8 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     /**%apidoc[opt] */
     std::vector<QString> endpoints;
     std::optional<QString> authKey;
+
+    /**%apidoc[readonly] */
     std::optional<nx::utils::OsInfo> osInfo;
     std::optional<QnUuid> metadataStorageId;
 

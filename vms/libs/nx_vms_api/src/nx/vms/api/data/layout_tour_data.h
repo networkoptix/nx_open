@@ -13,6 +13,8 @@ namespace api {
 struct NX_VMS_API LayoutTourItemData
 {
     QnUuid resourceId;
+
+    /**%apidoc[opt] */
     int delayMs = 0;
 
     LayoutTourItemData() = default;
