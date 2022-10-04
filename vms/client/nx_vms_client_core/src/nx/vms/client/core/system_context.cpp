@@ -244,7 +244,6 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     base_type::setMessageProcessor(messageProcessor);
 
     auto clientMessageProcessor = static_cast<QnClientMessageProcessor*>(messageProcessor);
-    d->userWatcher->setMessageProcessor(clientMessageProcessor);
     nx::vms::rules::EngineHolder::connectEngine(
         vmsRulesEngine(),
         clientMessageProcessor,

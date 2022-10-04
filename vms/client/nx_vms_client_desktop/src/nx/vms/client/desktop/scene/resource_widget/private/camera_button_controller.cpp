@@ -108,9 +108,10 @@ void CameraButtonController::createTwoWayAudioButton()
 
     if (!m_twoWayAudioWidget)
     {
-        m_twoWayAudioWidget =
-            new QnTwoWayAudioWidget(getDesktopUniqueId(), m_parentWidget);
-        m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
+        m_twoWayAudioWidget = new QnTwoWayAudioWidget(
+            getDesktopUniqueId(),
+            m_camera->audioOutputDevice(),
+            m_parentWidget);
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
         statisticsModule()->controls()->registerButton(
             "two_way_audio",
@@ -128,10 +129,6 @@ void CameraButtonController::createTwoWayAudioButton()
             });
 
         m_twoWayAudioWidgetId = m_buttonsContainer->addItem(m_twoWayAudioWidget);
-    }
-    else
-    {
-        m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
     }
 }
 

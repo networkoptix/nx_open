@@ -2,8 +2,6 @@
 
 #include "two_way_audio_availability_watcher.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -16,40 +14,23 @@
 namespace nx::vms::client::core {
 
 TwoWayAudioAvailabilityWatcher::TwoWayAudioAvailabilityWatcher(QObject* parent):
-    base_type(parent)
+    QObject(parent)
 {
-    const auto manager = globalPermissionsManager();
-    const UserWatcher* userWatcher = dynamic_cast<SystemContext*>(systemContext())->userWatcher();
-
-    connect(userWatcher, &UserWatcher::userChanged,
-        this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
-    connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
-        [this, userWatcher]
-            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
-        {
-            const auto user = userWatcher->user();
-            if (subject != user)
-                return;
-
-            updateAvailability();
-        });
 }
 
 TwoWayAudioAvailabilityWatcher::~TwoWayAudioAvailabilityWatcher()
 {
 }
 
-void TwoWayAudioAvailabilityWatcher::setResourceId(const QnUuid& uuid)
+void TwoWayAudioAvailabilityWatcher::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
     using namespace nx::vms::license;
 
-    if (m_camera && m_camera->getId() == uuid)
+    if (m_camera == camera)
         return;
 
-    if (m_camera)
-        m_camera->disconnect(this);
+    m_connections.reset();
 
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(uuid);
     m_camera = camera && camera->hasTwoWayAudio() ? camera : QnVirtualCameraResourcePtr();
     m_licenseHelper.reset(m_camera && m_camera->isIOModule()
         ? new SingleCamLicenseStatusHelper(m_camera)
@@ -57,17 +38,48 @@ void TwoWayAudioAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 
     if (m_camera)
     {
-        connect(m_camera.get(), &QnVirtualCameraResource::statusChanged,
-            this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
-        connect(m_camera.get(), &QnSecurityCamResource::twoWayAudioEnabledChanged,
-            this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
-        connect(m_camera.get(), &QnSecurityCamResource::audioOutputDeviceIdChanged,
-            this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        m_connections << connect(m_camera.get(),
+            &QnVirtualCameraResource::statusChanged,
+            this,
+            &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        m_connections << connect(m_camera.get(),
+            &QnSecurityCamResource::twoWayAudioEnabledChanged,
+            this,
+            &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        m_connections << connect(m_camera.get(), &QnSecurityCamResource::audioOutputDeviceIdChanged,
+            this,
+            &TwoWayAudioAvailabilityWatcher::updateAvailability);
 
         if (m_licenseHelper)
         {
-            connect(m_licenseHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
-                this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
+            m_connections << connect(m_licenseHelper.get(),
+                &SingleCamLicenseStatusHelper::licenseStatusChanged,
+                this,
+                &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        }
+
+        auto systemContext = SystemContext::fromResource(m_camera);
+        if (NX_ASSERT(systemContext))
+        {
+            const auto manager = systemContext->globalPermissionsManager();
+            const UserWatcher* userWatcher = systemContext->userWatcher();
+
+            m_connections << connect(userWatcher,
+                &UserWatcher::userChanged,
+                this,
+                &TwoWayAudioAvailabilityWatcher::updateAvailability);
+            m_connections << connect(manager,
+                &QnGlobalPermissionsManager::globalPermissionsChanged,
+                this,
+                [this, userWatcher]
+                    (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
+                {
+                    const auto user = userWatcher->user();
+                    if (subject != user)
+                        return;
+
+                    updateAvailability();
+                });
         }
     }
 
@@ -94,12 +106,16 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
             if (!audioOutput->hasTwoWayAudio())
                 return false;
 
-            const auto userWatcher = dynamic_cast<SystemContext*>(systemContext())->userWatcher();
+            auto systemContext = SystemContext::fromResource(m_camera);
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            const auto userWatcher = systemContext->userWatcher();
             const auto user = userWatcher->user();
             if (!user)
                 return false;
 
-            if (!systemContext()->resourceAccessManager()->hasPermission(
+            if (!systemContext->resourceAccessManager()->hasPermission(
                 user,
                 m_camera,
                 Qn::Permission::DeviceInputPermission))

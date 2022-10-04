@@ -10,8 +10,6 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/license/usage_helper.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
@@ -20,11 +18,12 @@ class GraphicsLabel;
 class VariantAnimator;
 class SingleCamLicenseStatusHelper;
 
+namespace nx::vms::client::core { class TwoWayAudioController; }
+
 typedef decltype(QnSpectrumData::data) VisualizerData;
 
 class QnTwoWayAudioWidget::Private:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware
+    public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -34,10 +33,11 @@ public:
     GraphicsLabel* const hint;
 
 public:
-    Private(const QString& sourceId, QnTwoWayAudioWidget* owner);
+    Private(
+        const QString& sourceId,
+        const QnSecurityCamResourcePtr& camera,
+        QnTwoWayAudioWidget* owner);
     virtual ~Private();
-
-    void updateCamera(const QnSecurityCamResourcePtr& camera);
 
     void startStreaming();
     void stopStreaming();
@@ -66,8 +66,9 @@ private:
 
 private:
     QnTwoWayAudioWidget* const q;
-    nx::vms::client::core::TwoWayAudioController m_controller;
     const QString m_sourceId;
+    QnSecurityCamResourcePtr m_camera;
+    std::unique_ptr<nx::vms::client::core::TwoWayAudioController> m_controller;
     HintState m_state = HintState::ok;
     QTimer* const m_hintTimer;
     VariantAnimator* m_hintAnimator = nullptr;
@@ -77,6 +78,4 @@ private:
 
     VisualizerData m_visualizerData;
     qint64 m_paintTimeStamp = 0;
-
-    QnSecurityCamResourcePtr m_camera;
 };

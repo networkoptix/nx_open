@@ -18,20 +18,17 @@ class NX_VMS_CLIENT_CORE_API UserWatcher: public QObject, public SystemContextAw
 public:
     UserWatcher(SystemContext* systemContext, QObject* parent = nullptr);
 
-    void setMessageProcessor(QnClientMessageProcessor* messageProcessor);
-
-    void setUser(const QnUserResourcePtr& currentUser);
     const QnUserResourcePtr& user() const;
+    QString userName() const;
 
-    void setUserName(const QString& name);
-    const QString& userName() const;
+private:
+    void setUser(const QnUserResourcePtr& currentUser);
 
 signals:
     void userChanged(const QnUserResourcePtr& user);
     void userNameChanged();
 
 private:
-    QString m_userName;
     QnUserResourcePtr m_user;
 };
 

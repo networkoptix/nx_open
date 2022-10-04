@@ -66,17 +66,13 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
 
     m_userWatcher = instance<ContextCurrentUserWatcher>();
 
-    // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = systemContext->userWatcher();
-
     // Desktop camera must work in the normal mode only.
     if (qnRuntime->isDesktopMode())
         instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_userWatcher, &ContextCurrentUserWatcher::userChanged, this,
-        [this, coreUserWatcher](const QnUserResourcePtr& user)
+        [this](const QnUserResourcePtr& user)
         {
-            coreUserWatcher->setUser(user);
             accessController()->setUser(user);
             emit userChanged(user);
             emit userIdChanged();

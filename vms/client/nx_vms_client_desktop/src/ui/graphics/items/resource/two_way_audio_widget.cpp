@@ -1,25 +1,29 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "two_way_audio_widget.h"
-#include "private/two_way_audio_widget_p.h"
 
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+#include <qt_graphics_items/graphics_label.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <ui/common/palette.h>
-#include <qt_graphics_items/graphics_label.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/common/palette.h>
-
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+
+#include "private/two_way_audio_widget_p.h"
 
 using namespace nx::vms::client::desktop;
 
-QnTwoWayAudioWidget::QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent):
+QnTwoWayAudioWidget::QnTwoWayAudioWidget(
+    const QString& sourceId,
+    const QnSecurityCamResourcePtr& camera,
+    QGraphicsWidget* parent)
+    :
     base_type(parent),
-    d(new Private(sourceId, this))
+    d(new Private(sourceId, camera, this))
 {
     auto audioLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     audioLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -37,11 +41,6 @@ QnTwoWayAudioWidget::QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidge
 
 QnTwoWayAudioWidget::~QnTwoWayAudioWidget()
 {
-}
-
-void QnTwoWayAudioWidget::setCamera(const QnSecurityCamResourcePtr &camera)
-{
-    d->updateCamera(camera);
 }
 
 void QnTwoWayAudioWidget::setFixedHeight(qreal height)
