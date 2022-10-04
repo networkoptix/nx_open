@@ -33,6 +33,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::RemoteArchiveSyncAvailable:
         case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::metadataOnSystemStorage:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
@@ -52,6 +53,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::replacedDeviceDiscovered:
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
+        case QnSystemHealth::metadataStorageNotSet:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.
