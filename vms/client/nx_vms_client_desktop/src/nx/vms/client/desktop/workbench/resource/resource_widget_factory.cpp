@@ -2,6 +2,7 @@
 
 #include "resource_widget_factory.h"
 
+#include <core/resource/client_camera.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
@@ -48,8 +49,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     // TODO: #sivanov Take Window Context from the workbench item.
     auto windowContext = appContext()->mainWindowContext();
 
+    const auto layoutResource = item->layout()->resource().dynamicCast<LayoutResource>();
     const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
-        && nx::vms::common::isIntercomLayout(item->layout()->resource());
+        && layoutResource && layoutResource->isIntercomLayout();
 
     const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
         ? Qn::ViewContentPermission
@@ -77,7 +79,8 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     if (resource->hasFlags(Qn::cross_system))
         return new QnCrossSystemCameraWidget(systemContext, windowContext, item);
 
-    if (itemIsIntercomLayout && nx::vms::common::isIntercom(resource))
+    QnClientCameraResourcePtr camera = resource.dynamicCast<QnClientCameraResource>();
+    if (itemIsIntercomLayout && camera && camera->isIntercom())
         return new IntercomResourceWidget(systemContext, windowContext, item);
 
     if (resource->hasFlags(Qn::media))

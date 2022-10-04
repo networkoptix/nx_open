@@ -331,7 +331,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
         if (isVideoWallReviewLayout)
             key = VideoWall;
-        else if (nx::vms::common::isIntercomLayout(layout))
+        else if (layout->isIntercomLayout())
             key = IntercomLayout;
         else if (layout->isShared())
             key = SharedLayout;
