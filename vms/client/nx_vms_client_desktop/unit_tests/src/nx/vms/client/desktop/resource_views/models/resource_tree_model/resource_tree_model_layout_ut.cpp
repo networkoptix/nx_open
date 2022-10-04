@@ -444,6 +444,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is not an intercom layout.
     ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
+    ASSERT_TRUE(!layout->isIntercomLayout());
 
     // When videowall is added to the resource pool.
     auto videowall = addVideoWall(kVideowallName);
@@ -453,6 +454,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is not an intercom layout.
     ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
+    ASSERT_TRUE(!layout->isIntercomLayout());
 
     // When intercom camera is added to the resource pool.
     const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
@@ -462,6 +464,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is an intercom layout.
     ASSERT_TRUE(nx::vms::common::isIntercomLayout(layout));
+    ASSERT_TRUE(layout->isIntercomLayout());
 }
 
 } // namespace test

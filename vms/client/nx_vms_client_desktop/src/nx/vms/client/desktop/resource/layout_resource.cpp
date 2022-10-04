@@ -4,6 +4,8 @@
 
 #include <nx/utils/qset.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/common/intercom/utils.h>
+#include <core/resource/client_camera.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,6 +24,14 @@ qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
     }
     NX_ASSERT(false, "Unhandled enum value");
     return nx::vms::api::LayoutData::kDefaultCellSpacing;
+}
+
+LayoutResource::LayoutResource():
+    m_isIntercomLayout(nx::vms::common::isIntercom(getParentResource()))
+{
+    connect(this, &LayoutResource::parentIdChanged,
+        this, &LayoutResource::updateIsIntercomState,
+        Qt::DirectConnection);
 }
 
 void LayoutResource::setPredefinedCellSpacing(Qn::CellSpacing spacing)
@@ -171,6 +181,11 @@ bool LayoutResource::isVideoWallReviewLayout() const
     return m_data.contains(Qn::VideoWallResourceRole);
 }
 
+bool LayoutResource::isIntercomLayout() const
+{
+    return m_isIntercomLayout;
+}
+
 bool LayoutResource::setItemDataUnderLock(
     const QnUuid& id,
     Qn::ItemDataRole role,
@@ -203,6 +218,22 @@ bool LayoutResource::setItemDataUnderLock(
 LayoutResourcePtr LayoutResource::create() const
 {
     return LayoutResourcePtr(new LayoutResource());
+}
+
+void LayoutResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
+{
+    QnLayoutResource::setSystemContext(systemContext);
+    updateIsIntercomState();
+}
+
+void LayoutResource::updateIsIntercomState()
+{
+    const auto parentCamera = getParentResource().dynamicCast<QnClientCameraResource>();
+    if (!parentCamera || !parentCamera->isIntercom())
+        return;
+
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    m_isIntercomLayout = true;
 }
 
 } // namespace nx::vms::client::desktop

@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
@@ -348,7 +349,7 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     const QnUuid& parentId,
     const QString& hostAddress) const
 {
-    QnVirtualCameraResourcePtr camera(new CameraResourceStub());
+    QnClientCameraResourcePtr camera(new ClientCameraResourceStub());
     camera->setName(name);
     camera->setIdUnsafe(QnUuid::createUuid());
     camera->setParentId(parentId);
@@ -376,6 +377,18 @@ LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     layout->setIdUnsafe(nx::vms::common::calculateIntercomLayoutId(parentId));
     layout->setParentId(parentId);
     resourcePool()->addResource(layout);
+
+    if (parentId.isNull())
+    {
+        NX_ASSERT(!nx::vms::common::isIntercomLayout(layout));
+        NX_ASSERT(!layout->isIntercomLayout());
+    }
+    else
+    {
+        NX_ASSERT(nx::vms::common::isIntercomLayout(layout));
+        NX_ASSERT(layout->isIntercomLayout());
+    }
+
     return layout;
 }
 

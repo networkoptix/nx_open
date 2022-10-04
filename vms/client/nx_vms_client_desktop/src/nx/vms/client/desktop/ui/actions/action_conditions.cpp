@@ -654,7 +654,8 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
             if (!resource || !resource->resourcePool())
                 return false;
 
-            if (nx::vms::common::isIntercomLayout(resource))
+            const auto layout = resource.dynamicCast<LayoutResource>();
+            if (layout && layout->isIntercomLayout())
                 return false;
 
             if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
