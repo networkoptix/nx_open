@@ -131,7 +131,9 @@ Item
 
         context: delegateRoot.editingContext
         resource: delegateRoot.resource
+        nodeType: delegateRoot.nodeType
         accessRightsList: Array.prototype.map.call(AccessRightsList.items, item => item.accessRight)
+        collapsed: delegateRoot.isCollapsed()
     }
 
     Row
@@ -201,13 +203,10 @@ Item
                             anchors.centerIn: parent
 
                             sourceSize: Qt.size(20, 20)
-                            property var providedVia: delegateRoot.isCollapsed()
-                                ? ResourceAccessInfo.ProvidedVia.own
-                                : model.providedVia
 
                             source:
                             {
-                                switch (providedVia)
+                                switch (model.providedVia)
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
                                         return "image://svg/skin/user_settings/sharing/own.svg"
@@ -226,7 +225,7 @@ Item
                                 }
                             }
 
-                            color: providedVia == ResourceAccessInfo.ProvidedVia.own
+                            color: model.providedVia == ResourceAccessInfo.ProvidedVia.own
                                 ? ColorTheme.colors.brand_core
                                 : ColorTheme.colors.light10
                         }

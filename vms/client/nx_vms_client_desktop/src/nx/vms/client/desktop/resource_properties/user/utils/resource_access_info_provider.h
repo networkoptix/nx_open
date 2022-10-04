@@ -6,9 +6,10 @@
 #include <QtCore/QVector>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/shared_resource_pointer.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+
 
 namespace nx::vms::client::desktop {
 
@@ -59,9 +60,11 @@ class ResourceAccessInfoProvider: public QAbstractListModel
     /** A resource of interest. */
     Q_PROPERTY(QnResource* resource READ resource WRITE setResource NOTIFY resourceChanged)
 
-    /** Access details per each access right from `accessRightList`. */
-    Q_PROPERTY(QVector<nx::vms::client::desktop::ResourceAccessInfo> info
-        READ info NOTIFY infoChanged)
+    /** Node type for current resource or top level tree item. */
+    Q_PROPERTY(nx::vms::client::desktop::ResourceTree::NodeType nodeType READ nodeType
+        WRITE setNodeType NOTIFY nodeTypeChanged)
+
+    Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed NOTIFY collapsedChanged)
 
     using base_type = QAbstractListModel;
 
@@ -84,6 +87,12 @@ public:
 
     QnResource* resource() const;
     void setResource(QnResource* value);
+
+    ResourceTree::NodeType nodeType() const;
+    void setNodeType(ResourceTree::NodeType value);
+
+    bool collapsed() const;
+    void setCollapsed(bool value);
 
     QVector<ResourceAccessInfo> info() const;
 
@@ -113,6 +122,8 @@ signals:
     void contextChanged();
     void accessRightsListChanged();
     void resourceChanged();
+    void nodeTypeChanged();
+    void collapsedChanged();
     void infoChanged();
 
 private:
