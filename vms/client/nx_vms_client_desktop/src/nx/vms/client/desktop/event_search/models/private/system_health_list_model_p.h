@@ -61,8 +61,10 @@ private:
     void removeItemForResource(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
     void toggleItem(QnSystemHealth::MessageType message, bool isOn);
     void updateItem(QnSystemHealth::MessageType message);
-    void updateCachedData(QnSystemHealth::MessageType message);
     void clear();
+
+    QSet<QnResourcePtr> getResourceSet(QnSystemHealth::MessageType message) const;
+    QnResourceList getSortedResourceList(QnSystemHealth::MessageType message) const;
 
     static int priority(QnSystemHealth::MessageType message);
     static QString decorationPath(QnSystemHealth::MessageType message);
@@ -88,11 +90,6 @@ private:
     QScopedPointer<vms::event::StringsHelper> m_helper;
     std::deque<Item> m_items; //< Kept sorted.
     QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
-    QnUserResourceList m_usersWithInvalidEmail;
-    QnVirtualCameraResourceList m_camerasWithDefaultPassword;
-    QnVirtualCameraResourceList m_camerasWithInvalidSchedule;
-    QnMediaServerResourceList m_serversWithoutStorages;
-    QnMediaServerResourceList m_serversWithoutBackupStorages;
 };
 
 } // namespace nx::vms::client::desktop
