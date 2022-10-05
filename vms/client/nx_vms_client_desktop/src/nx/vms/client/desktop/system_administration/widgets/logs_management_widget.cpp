@@ -97,7 +97,7 @@ void LogsManagementWidget::setupUi()
     ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
     ui->settingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
     ui->resetButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-    ui->openFolderButton->setIcon(qnSkin->icon("tree/local.png")); // FIXME
+    ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
 
     ui->resetButton->setFlat(true);
     ui->openFolderButton->setFlat(true);
