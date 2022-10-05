@@ -99,11 +99,17 @@ QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
     if (resourceId.isNull())
         return {};
 
-    const auto resourceDescriptor = cloudSystemId.isEmpty()
-        ? nx::vms::common::ResourceDescriptor{.id = resourceId}
-        : descriptor(resourceId, cloudSystemId);
+    SystemContext* systemContext = nullptr;
+    if (!cloudSystemId.isEmpty())
+        systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
 
-    return getResourceByDescriptor(resourceDescriptor);
+    if (!systemContext)
+        systemContext = appContext()->currentSystemContext();
+
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    return systemContext->resourcePool()->getResourceById(resourceId);
 }
 
 // TODO: #amalov Simplify device transfer logic using list only.
@@ -131,9 +137,8 @@ QnVirtualCameraResourceList getActionDevices(
 
         if (!device && context)
         {
-            device = context->createThumbCameraResource(deviceId);
-            if (deviceIds.count() == 1)
-                device->setName(action->sourceName());
+            const QString name = deviceIds.count() == 1 ? action->sourceName() : QString();
+            device = context->createThumbCameraResource(deviceId, name);
         }
 
         if (device)

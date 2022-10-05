@@ -249,12 +249,13 @@ void StartupActionsHandler::submitDelayedDrops()
     }
 
     const auto createResourceCallback =
-        [this](nx::vms::common::ResourceDescriptor descriptor)
+        [this](nx::vms::common::ResourceDescriptor descriptor) -> QnResourcePtr
         {
             const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
             auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
+
             if (context)
-                return QnResourcePtr(context->createThumbCameraResource(descriptor.id));
+                return context->createThumbCameraResource(descriptor.id, descriptor.name);
 
             return QnResourcePtr();
         };

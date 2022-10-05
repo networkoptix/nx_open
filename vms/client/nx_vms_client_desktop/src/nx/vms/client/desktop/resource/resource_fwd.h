@@ -16,4 +16,8 @@ using LayoutResourceList = QnSharedResourcePointerList<LayoutResource>;
 class LayoutItemIndex;
 using LayoutItemIndexList = QList<LayoutItemIndex>;
 
+class CrossSystemLayoutResource;
+using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;
+using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
+
 } // namespace nx::vms::client::desktop
