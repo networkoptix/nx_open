@@ -22,13 +22,15 @@ public:
     };
 
     explicit CloudLayoutsIntroDialog(
-        Mode mode = Mode::confirmation,
+        Mode mode,
         QWidget* parent = nullptr,
         Qt::WindowFlags windowFlags = {Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint});
 
     virtual ~CloudLayoutsIntroDialog() override;
 
     bool doNotShowAgainChecked() const;
+
+    static bool confirm();
 
 private:
     nx::utils::ImplPtr<Ui::CloudLayoutsIntroDialog> ui;
