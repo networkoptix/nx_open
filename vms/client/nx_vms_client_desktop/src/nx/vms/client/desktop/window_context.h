@@ -6,6 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 
+class QWidget;
 class QnWorkbenchContext;
 class QnWorkbenchRenderWatcher;
 class QnWorkbenchStreamSynchronizer;
@@ -26,6 +27,9 @@ public:
      */
     WindowContext(QnWorkbenchContext* workbenchContext, QObject* parent = nullptr);
     virtual ~WindowContext() override;
+
+    /** Main window. */
+    QWidget* mainWindowWidget() const;
 
     QnWorkbenchContext* workbenchContext() const;
 
