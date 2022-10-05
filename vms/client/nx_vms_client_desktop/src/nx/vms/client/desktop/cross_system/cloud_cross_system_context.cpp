@@ -131,16 +131,10 @@ struct CloudCrossSystemContext::Private
                     "System 2fa support became %1",
                     this->systemDescription->is2FaEnabled() ? "enabled" : "disabled");
 
-                if (status == Status::connected
-                    && this->systemDescription->is2FaEnabled()
-                    && !qnCloudStatusWatcher->is2FaEnabledForUser())
-                {
+                if (status == Status::connected && !is2FaCompatible())
                     updateStatus(Status::unsupportedTemporary);
-                }
                 else
-                {
                     ensureConnection();
-                }
             });
         connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, q,
             [this]
@@ -198,6 +192,9 @@ struct CloudCrossSystemContext::Private
             return false;
 
         if (status == Status::unsupportedPermanently)
+            return false;
+
+        if (status == Status::unsupportedTemporary && !is2FaCompatible())
             return false;
 
         if (systemContext->connection())
@@ -481,6 +478,11 @@ struct CloudCrossSystemContext::Private
                 camera->setStatus(dummyCameraStatus);
             }
         }
+    }
+
+    bool is2FaCompatible() const
+    {
+        return !systemDescription->is2FaEnabled() || qnCloudStatusWatcher->is2FaEnabledForUser();
     }
 };
 
