@@ -184,7 +184,7 @@ public:
 
         /** Allow computer entering sleep mode on idle while running client. */
         ALLOW_COMPUTER_ENTERING_SLEEP_MODE,
-        
+
         /** Approved urls that have access to a session token using jsapi. */
         AUTH_ALLOWED_URLS,
 
