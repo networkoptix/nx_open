@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -450,7 +451,7 @@ QnTimePeriodList SimpleMotionSearchListModel::periods() const
 QSharedPointer<QMenu> SimpleMotionSearchListModel::contextMenu(const QnTimePeriod& chunk) const
 {
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
-    if (!camera || !accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (!camera || !ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
         return {};
 
     QSharedPointer<QMenu> menu(new QMenu());

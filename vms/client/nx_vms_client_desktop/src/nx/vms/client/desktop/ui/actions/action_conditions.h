@@ -737,7 +737,7 @@ ConditionWrapper allOpenedCamerasAllowExport();
  * Checks if all resources have the permissions. If no resources are provided then if any
  * resource in resource pool has the permissions.
  */
-ConditionWrapper resourcesHavePermissions(Qn::Permissions permissions);
+ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions);
 
 } // namespace condition
 
