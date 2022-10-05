@@ -471,7 +471,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // ONVIF Profile G remote archive automatic export.
 
-    ui->remoteArchiveAutoExportGroupBox->setVisible(remoteArchiveMdSupported);
+    ui->remoteArchiveAutoExportGroupBox->setVisible(
+        ini().enableRemoteArchiveSynchronization && remoteArchiveMdSupported);
 
     check_box_utils::setupTristateCheckbox(
         ui->disableAutoExportCheckBox,

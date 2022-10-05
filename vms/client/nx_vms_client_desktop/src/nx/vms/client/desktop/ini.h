@@ -229,6 +229,10 @@ struct Ini: nx::kit::IniConfig
         " * \"high\" - all new layouts are opened with forced high resolution\n"
         " * \"low\" - all new layouts are opened with forced low resolution");
 
+    // VMS-32305
+    NX_INI_FLAG(false, enableRemoteArchiveSynchronization,
+        "[Feature] Enable ONVIF Profile G");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
