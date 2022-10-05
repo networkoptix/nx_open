@@ -30,10 +30,23 @@ public:
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 
+    virtual void hideEvent(QHideEvent* event) override;
+
 private:
+    enum class State
+    {
+        backupStarted,
+        backupFinished,
+        restoreStarted,
+        restoreFinished,
+        empty
+    };
+
     void backupDb();
     void restoreDb();
+    void updateVisible(bool operationSuccess = true);
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;
+    State m_state = State::empty;
 };
