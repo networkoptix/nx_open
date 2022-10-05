@@ -126,7 +126,7 @@ QString QnCrossSystemCameraWidget::calculateTitleText() const
     {
         const auto resourceName = QnResourceWidget::resource()->getName();
         const auto systemName = context->systemDescription()->name();
-        return QString("%1/%2").arg(systemName, resourceName);
+        return QString("%1 / %2").arg(systemName, resourceName);
     }
 
     return QnMediaResourceWidget::calculateTitleText();
