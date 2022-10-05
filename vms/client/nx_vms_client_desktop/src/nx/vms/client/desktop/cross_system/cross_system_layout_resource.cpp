@@ -2,8 +2,7 @@
 
 #include "cross_system_layout_resource.h"
 
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx/vms/api/data/layout_data.h>
+#include "cross_system_layout_data.h"
 
 namespace nx::vms::client::desktop {
 
@@ -12,11 +11,14 @@ CrossSystemLayoutResource::CrossSystemLayoutResource()
     addFlags(Qn::cross_system);
 }
 
-void CrossSystemLayoutResource::update(const nx::vms::api::LayoutData& layoutData)
+void CrossSystemLayoutResource::update(const CrossSystemLayoutData& layoutData)
 {
-    QnLayoutResourcePtr copy(new CrossSystemLayoutResource());
+    if (!NX_ASSERT(layoutData.id == this->getId()))
+        return;
+
+    CrossSystemLayoutResourcePtr copy(new CrossSystemLayoutResource());
+    fromDataToResource(layoutData, copy);
     copy->setFlags(flags()); //< Do not update current resource flags.
-    ec2::fromApiToResource(layoutData, copy);
     QnResource::update(copy);
 }
 

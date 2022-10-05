@@ -234,8 +234,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
     // with the appropriate informations.
     if (const auto crossSystemCameraResource = resource.dynamicCast<CrossSystemCameraResource>())
     {
-        const auto descriptor = crossSystemCameraResource->descriptor();
-        const auto systemId = nx::vms::client::desktop::crossSystemResourceSystemId(descriptor);
+        const auto systemId = crossSystemCameraResource->systemId();
         if (const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
             context && !context->isSystemReadyToUse())
         {

@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -303,12 +304,14 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
-    if (flags.testFlag(Qn::cross_system) && flags.testFlag(Qn::fake))
+    if (auto crossSystemCamera = resource.dynamicCast<CrossSystemCameraResource>())
     {
         key = CrossSystemStatus;
-        const auto crossSystemCamera = resource.dynamicCast<nx::vms::client::desktop::CrossSystemCameraResource>();
-        const auto systemStatus = NX_ASSERT(crossSystemCamera)
-            ? crossSystemCamera->crossSystemContext()->status()
+        const auto systemId = crossSystemCamera->systemId();
+        const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+        const auto systemStatus = context
+            ? context->status()
             : CloudCrossSystemContext::Status::uninitialized;
 
         if (systemStatus == CloudCrossSystemContext::Status::uninitialized)
