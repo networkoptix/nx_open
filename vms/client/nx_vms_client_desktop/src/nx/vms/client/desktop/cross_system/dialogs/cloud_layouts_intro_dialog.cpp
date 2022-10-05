@@ -5,6 +5,7 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <client/client_show_once_settings.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -13,6 +14,13 @@
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+/** Promo dialog for Cloud Layouts. */
+static const QString kCloudLayoutsPromoShowOnceKey("CloudLayoutsPromo");
+
+} // namespace
 
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     Mode mode,
@@ -67,6 +75,20 @@ CloudLayoutsIntroDialog::~CloudLayoutsIntroDialog()
 bool CloudLayoutsIntroDialog::doNotShowAgainChecked() const
 {
     return ui->doNotShowAgainCheckBox->isChecked();
+}
+
+bool CloudLayoutsIntroDialog::confirm()
+{
+    if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
+        return true;
+
+    CloudLayoutsIntroDialog introDialog(Mode::confirmation);
+    const bool result = (introDialog.exec() == QDialog::Accepted);
+
+    if (result && introDialog.doNotShowAgainChecked())
+        qnClientShowOnce->setFlag(kCloudLayoutsPromoShowOnceKey);
+
+    return result;
 }
 
 } // namespace nx::vms::client::desktop
