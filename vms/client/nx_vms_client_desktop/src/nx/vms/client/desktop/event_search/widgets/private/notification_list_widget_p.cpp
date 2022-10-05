@@ -29,7 +29,6 @@
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/event_search/widgets/placeholder_widget.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -61,13 +60,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_ribbonContainer(new QWidget(q)),
     m_filterSystemsButton(new SelectableTextButton(q)),
     m_eventRibbon(new EventRibbon(m_ribbonContainer)),
-    m_placeholder(PlaceholderWidget::create(
-        qnSkin->pixmap("left_panel/placeholders/notifications.svg"),
-        AbstractSearchWidget::makePlaceholderText(
-            tr("Not supported"), tr("This tab will be available in future versions")),
-        tr("Notifications Settings"),
-        [this] { menu()->trigger(ui::action::PreferencesNotificationTabAction); },
-        q)),
     m_model(new NotificationTabModel(context(), this)),
     m_filterModel(new QSortFilterProxyModel(q))
 {
@@ -97,7 +89,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     headerLayout->addWidget(m_filterSystemsButton);
     setupFilterSystemsButton();
 
-    anchorWidgetToParent(m_placeholder);
     anchorWidgetToParent(m_eventRibbon);
 
     const auto viewportHeader = new QWidget(q);
@@ -131,18 +122,15 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         q,
         &NotificationListWidget::unreadCountChanged);
 
-    const auto updatePlaceholderVisibility =
+    const auto updateCountLabel =
         [this](int count)
         {
             static constexpr int kMinimumCount = 1; //< Separator.
-            m_placeholder->setVisible(count <= kMinimumCount);
             m_itemCounterLabel->setText(
                 count <= kMinimumCount ? "" : tr("%n notifications", "", count - kMinimumCount));
         };
 
-    connect(m_eventRibbon, &EventRibbon::countChanged, this, updatePlaceholderVisibility);
-    updatePlaceholderVisibility(m_eventRibbon->count());
-
+    connect(m_eventRibbon, &EventRibbon::countChanged, this, updateCountLabel);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
@@ -152,7 +140,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
-    updatePlaceholderVisibility(m_eventRibbon->count());
+    updateCountLabel(m_eventRibbon->count());
 
     TileInteractionHandler::install(m_eventRibbon);
 
