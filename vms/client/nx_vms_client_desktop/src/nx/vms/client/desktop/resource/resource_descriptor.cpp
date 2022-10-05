@@ -41,7 +41,7 @@ QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
         return resourcePath(resource->getId(), kGenericCloudSystemId);
 
     if (const auto camera = resource.dynamicCast<CrossSystemCameraResource>())
-        return camera->descriptor().path;
+        return resourcePath(camera->getId(), camera->systemId());
 
     const auto systemContext = SystemContext::fromResource(resource);
     const bool belongsToOtherContext = (systemContext != appContext()->currentSystemContext());
@@ -72,13 +72,11 @@ nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource, bo
     if (!NX_ASSERT(resource))
         return {};
 
-    return {resource->getId(), resourcePath(resource, forceCloud)};
-}
-
-nx::vms::common::ResourceDescriptor descriptor(
-    const QnUuid& resourceId, const QString& cloudSystemId)
-{
-    return {resourceId, resourcePath(resourceId, cloudSystemId)};
+    return {
+        .id=resource->getId(),
+        .path=resourcePath(resource, forceCloud),
+        .name=resource->getName()
+    };
 }
 
 /** Find Resource in a corresponding System Context. */

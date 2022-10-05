@@ -4,6 +4,8 @@
 
 #include <core/resource/user_resource.h>
 #include <network/base_system_description.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -14,9 +16,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-using nx::vms::client::desktop::CloudCrossSystemContext;
-using nx::vms::client::desktop::CrossSystemCameraResource;
-using nx::vms::client::desktop::CrossSystemCameraResourcePtr;
+using namespace nx::vms::client::desktop;
 
 struct QnCrossSystemCameraWidget::Private
 {
@@ -24,11 +24,15 @@ struct QnCrossSystemCameraWidget::Private
 
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
-        const auto crossSystemContext = crossSystemCamera->crossSystemContext();
-        const auto status = crossSystemContext->status();
+        const auto systemId = crossSystemCamera->systemId();
+        const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+        const auto status = context
+            ? context->status()
+            : CloudCrossSystemContext::Status::uninitialized;
+
         if (status == CloudCrossSystemContext::Status::uninitialized
             || (status == CloudCrossSystemContext::Status::connected
-                && !crossSystemContext->isSystemReadyToUse()))
+                && !context->isSystemReadyToUse()))
         {
             return Qn::ResourceStatusOverlay::OfflineOverlay;
         }
@@ -66,7 +70,7 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
             if (!d->crossSystemCamera)
                 return;
 
-            const auto systemId = d->crossSystemCamera->crossSystemContext()->systemId();
+            const auto systemId = d->crossSystemCamera->systemId();
 
             menu()->trigger(
                 nx::vms::client::desktop::ui::action::ConnectToCloudSystemWithUserInteractionAction,
@@ -117,11 +121,12 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
 
 QString QnCrossSystemCameraWidget::calculateTitleText() const
 {
-    if (const auto context = d->crossSystemCamera->crossSystemContext())
+    const auto systemId = d->crossSystemCamera->systemId();
+    if (const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId))
     {
         const auto resourceName = QnResourceWidget::resource()->getName();
         const auto systemName = context->systemDescription()->name();
-        return QString("%1/%2").arg(resourceName).arg(systemName);
+        return QString("%1/%2").arg(systemName, resourceName);
     }
 
     return QnMediaResourceWidget::calculateTitleText();

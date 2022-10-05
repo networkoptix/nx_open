@@ -15,10 +15,6 @@ nx::vms::common::ResourceDescriptor descriptor(
     const QnResourcePtr& resource,
     bool forceCloud = false);
 
-/** Create resource descriptor for cloud resource. Works only for cloud resources.*/
-nx::vms::common::ResourceDescriptor descriptor(
-    const QnUuid& resourceId, const QString& cloudSystemId);
-
 /** Find Resource in a corresponding System Context. */
 QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor& descriptor);
 

@@ -128,9 +128,9 @@ bool LayoutSnapshotManager::save(
     if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
         synchronizer->submit();
 
-    if (layout.dynamicCast<CrossSystemLayoutResource>())
+    if (auto crossSystemLayout = layout.dynamicCast<CrossSystemLayoutResource>())
     {
-        appContext()->cloudLayoutsManager()->saveLayout(layout, internalCallback);
+        appContext()->cloudLayoutsManager()->saveLayout(crossSystemLayout, internalCallback);
         markBeingSaved(layout->getId(), true);
         return true;
     }
