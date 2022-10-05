@@ -7,9 +7,11 @@
 
 #include <client/client_show_once_settings.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 
@@ -82,7 +84,9 @@ bool CloudLayoutsIntroDialog::confirm()
     if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
         return true;
 
-    CloudLayoutsIntroDialog introDialog(Mode::confirmation);
+    CloudLayoutsIntroDialog introDialog(
+        Mode::confirmation,
+        appContext()->mainWindowContext()->mainWindowWidget());
     const bool result = (introDialog.exec() == QDialog::Accepted);
 
     if (result && introDialog.doNotShowAgainChecked())
