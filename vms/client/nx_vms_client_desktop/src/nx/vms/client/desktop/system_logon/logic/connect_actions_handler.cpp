@@ -672,7 +672,13 @@ void ConnectActionsHandler::storeConnectionRecord(
         qnClientCoreSettings->save();
     }
 
-    if (storePassword)
+    if (cloudConnection)
+    {
+        nx::network::url::Builder builder;
+        builder.setHost(info.cloudHost);
+        qnSettings->setLastUsedConnection({builder.toUrl(), QnUuid(info.cloudSystemId)});
+    }
+    else if (storePassword)
     {
         // AutoLogin may be enabled while we are connected to the system,
         // so we have to always save the last used connection info.
@@ -686,12 +692,6 @@ void ConnectActionsHandler::storeConnectionRecord(
         builder.setEndpoint(connectionInfo.address);
         builder.setUserName(credentials.username);
         qnSettings->setLastUsedConnection({builder.toUrl(), /*systemId*/ localId});
-    }
-    else if (cloudConnection)
-    {
-        nx::network::url::Builder builder;
-        builder.setHost(info.cloudHost);
-        qnSettings->setLastUsedConnection({builder.toUrl(), QnUuid(info.cloudSystemId)});
     }
     else
     {

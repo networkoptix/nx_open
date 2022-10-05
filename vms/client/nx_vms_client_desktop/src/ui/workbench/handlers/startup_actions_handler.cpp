@@ -112,12 +112,12 @@ struct StartupActionsHandler::Private
     {
     }
 
-    void onCloudStatusChanged(QnCloudStatusWatcher::Status status)
+    void onCloudSystemsChanged(const QnCloudSystemList& systems)
     {
         if (!delayedLogonParameters)
             return;
 
-        if (status == QnCloudStatusWatcher::Status::Online)
+        if (!systems.empty() && qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
         {
             context->menu()->trigger(
                 ConnectAction,
@@ -170,11 +170,11 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &StartupActionsHandler::handleUserLoggedIn);
 
-    connect(
-        qnCloudStatusWatcher,
-        &QnCloudStatusWatcher::statusChanged,
-        this,
-        [this](QnCloudStatusWatcher::Status status) { d->onCloudStatusChanged(status); });
+    // Delayed system connection may require information from qnSystemFinder,
+    // so let it process signal first, by queuing following connection.
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged, this,
+        [this](const QnCloudSystemList &systems) { d->onCloudSystemsChanged(systems); },
+        Qt::QueuedConnection);
 }
 
 StartupActionsHandler::~StartupActionsHandler()
@@ -547,40 +547,47 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
         return true;
 
     // Attempt auto-login, if needed.
-    const ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    nx::utils::Url url = lastUsedConnection.url;
-    const QnUuid localSystemId = lastUsedConnection.systemId;
-    if (qnSettings->autoLogin()
-        && qnSettings->saveCredentialsAllowed()
-        && url.isValid()
-        && !localSystemId.isNull())
+    return attemptAutoLogin();
+}
+
+bool StartupActionsHandler::attemptAutoLogin()
+{
+    if (!qnSettings->autoLogin() || !qnSettings->saveCredentialsAllowed())
+        return false;
+
+    const auto [url, systemId] = qnSettings->lastUsedConnection();
+
+    if (!url.isValid() || systemId.isNull())
+        return false;
+
+    auto storedCredentials = nx::vms::client::core::CredentialsManager::credentials(
+        systemId,
+        url.userName().toStdString());
+
+    LogonParameters logonParams;
+    logonParams.connectScenario = ConnectScenario::autoConnect;
+    auto& connectionInfo = logonParams.connectionInfo;
+
+    if (storedCredentials)
     {
-        auto storedCredentials = nx::vms::client::core::CredentialsManager::credentials(
-            localSystemId,
-            url.userName().toStdString());
+        connectionInfo.address = nx::network::SocketAddress::fromUrl(url);
+        connectionInfo.credentials = std::move(*storedCredentials);
 
-        if (storedCredentials)
-        {
-            const auto address = nx::network::SocketAddress::fromUrl(url);
+        NX_DEBUG(this, "Auto-login to the server %1", connectionInfo.address);
+        menu()->trigger(ConnectAction, Parameters()
+            .withArgument(Qn::LogonParametersRole, logonParams));
 
-            NX_DEBUG(this, "Auto-login to the server %1", address);
+        return true;
+    }
+    else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)
+    {
+        connectionInfo.userType = nx::vms::api::UserType::cloud;
+        connectionInfo.address = nx::network::SocketAddress(systemId.toSimpleStdString());
 
-            LogonParameters parameters({address, *storedCredentials});
-            parameters.connectScenario = ConnectScenario::autoConnect;
-            menu()->trigger(ConnectAction,
-                Parameters().withArgument(Qn::LogonParametersRole, parameters));
-            return true;
-        }
-        else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)
-        {
-            CloudSystemConnectData connectData =
-                {localSystemId.toSimpleString(), ConnectScenario::autoConnect};
+        NX_DEBUG(this, "Auto-login to the Cloud system %1", connectionInfo.address);
+        d->setDelayedLogon(std::make_unique<LogonParameters>(std::move(logonParams)));
 
-            menu()->trigger(ConnectToCloudSystemAction,
-                Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
-
-            return true;
-        }
+        return true;
     }
 
     return false;

@@ -45,6 +45,9 @@ private:
         const QnStartupParameters& startupParameters,
         bool haveInputFiles);
 
+    /** Tries to connect using stored previous connection info. */
+    bool attemptAutoLogin();
+
     /**
      * Connects to the cloud if needed.
      * @return Whether connection to the cloud was requsted in the command line. Does not check if
