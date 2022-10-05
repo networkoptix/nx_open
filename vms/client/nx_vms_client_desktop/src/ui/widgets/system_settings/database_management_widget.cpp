@@ -3,12 +3,15 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <api/server_rest_connection.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -35,11 +38,16 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
+    ui->progressBar->setTextVisible(false);
+    ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
+    ui->openFolderButton->setFlat(true);
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
     connect(ui->backupButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::backupDb);
     connect(ui->restoreButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::restoreDb);
+
+    updateVisible();
 }
 
 QnDatabaseManagementWidget::~QnDatabaseManagementWidget()
@@ -86,16 +94,11 @@ void QnDatabaseManagementWidget::backupDb()
     if (ownerSessionToken.empty())
         return;
 
-    QPointer<ProgressDialog> dialog(new ProgressDialog(this));
-    dialog->setInfiniteMode();
-    dialog->setWindowTitle(tr("Downloading Database Backup"));
-    dialog->setText(tr("Database backup is being downloaded from the server. Please wait."));
-    dialog->setModal(true);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    resetStyle(ui->labelMessage);
+    ui->labelMessage->setText(tr("Database backup is being downloaded from the server. Please wait."));
 
-    auto dumpDatabaseHandler = nx::utils::guarded(
-        dialog,
-        [this, dialog, fileName](
+    auto dumpDatabaseHandler = nx::utils::guarded(this,
+        [this, fileName](
             bool success,
             rest::Handle,
             rest::ErrorOrData<nx::vms::api::DatabaseDumpData> errorOrData)
@@ -108,12 +111,9 @@ void QnDatabaseManagementWidget::backupDb()
                     && file.write(data->data) == data->data.size();
             }
 
-            dialog->accept();
-
             if (success)
             {
-                QnSessionAwareMessageBox::success(
-                    this, tr("Database backed up to file"), fileName);
+                ui->labelMessage->setText(tr("Database backed up to file"));
             }
             else
             {
@@ -122,18 +122,34 @@ void QnDatabaseManagementWidget::backupDb()
                     NX_ERROR(
                         this, "Failed to dump Server database: %1", QJson::serialized(*error));
                 }
-                QnSessionAwareMessageBox::critical(this, tr("Failed to back up database"));
+                setWarningStyle(ui->labelMessage);
+                ui->labelMessage->setText(tr("Failed to back up database"));
             }
+            m_state = State::backupFinished;
+            updateVisible(success);
         });
-
-    dialog->open();
+    m_state = State::backupStarted;
+    updateVisible();
     auto handle = connection->dumpDatabase(
         ownerSessionToken.value, std::move(dumpDatabaseHandler), thread());
+
     connect(
-        dialog,
-        &ProgressDialog::canceled,
+        ui->cancelCreateBackupButton,
+        &QPushButton::clicked,
         this,
         [handle, connection]() { connection->cancelRequest(handle); });
+
+    connect(
+        ui->openFolderButton,
+        &QPushButton::clicked,
+        this,
+        [path = fileInfo.absolutePath()]
+        {
+            if (!NX_ASSERT(!path.isEmpty()))
+                return;
+
+            QDesktopServices::openUrl(path);
+        });
 }
 
 void QnDatabaseManagementWidget::restoreDb()
@@ -185,22 +201,18 @@ void QnDatabaseManagementWidget::restoreDb()
     data.data = file.readAll();
     file.close();
 
-    QPointer<ProgressDialog> dialog(new ProgressDialog(this));
-    dialog->setInfiniteMode();
-    dialog->setWindowTitle(tr("Restoring Database Backup"));
-    dialog->setText(tr("Database backup is being uploaded to the server. Please wait."));
-    dialog->setModal(true);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    resetStyle(ui->labelMessage);
+    ui->labelMessage->setText(tr("Database backup is being uploaded to the server. Please wait."));
 
-    auto restoreDatabaseHandler = nx::utils::guarded(dialog,
-        [this, dialog, fileName](bool, rest::Handle, rest::ErrorOrEmpty reply)
+    auto restoreDatabaseHandler = nx::utils::guarded(this,
+        [this, fileName](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
-            dialog->accept();
+            m_state = State::restoreFinished;
+            updateVisible();
             if (std::holds_alternative<rest::Empty>(reply))
             {
-                QnSessionAwareMessageBox::success(this,
-                    tr("Database successfully restored"),
-                    tr("Server application will restart shortly."));
+                ui->labelMessage->setText(tr(
+                    "Database successfully restored. Server application will restart shortly."));
                 return;
             }
 
@@ -208,22 +220,92 @@ void QnDatabaseManagementWidget::restoreDb()
                 "Failed to restore Server database from file '%1'. %2",
                 fileName,
                 std::get<nx::network::rest::Result>(reply).errorString);
-            QnSessionAwareMessageBox::critical(this, tr("Failed to restore database"));
+            setWarningStyle(ui->labelMessage);
+            ui->labelMessage->setText(tr("Failed to restore database"));
         });
 
-    dialog->open();
+    m_state = State::restoreStarted;
+    updateVisible();
     auto handle = connection->restoreDatabase(
         data, ownerSessionToken.value, std::move(restoreDatabaseHandler), thread());
     connect(
-        dialog,
-        &ProgressDialog::canceled,
+        ui->cancelRestoreBackupButton,
+        &QPushButton::clicked,
         this,
         [handle, connection]() { connection->cancelRequest(handle); });
+}
+
+void QnDatabaseManagementWidget::updateVisible(bool operationSuccess)
+{
+    switch (m_state)
+    {
+        case State::empty:
+        {
+            ui->frameProgress->hide();
+            ui->cancelCreateBackupButton->hide();
+            ui->cancelRestoreBackupButton->hide();
+            ui->openFolderButton->hide();
+            break;
+        }
+        case State::backupStarted:
+        {
+            ui->progressBar->setRange(0,0);
+            ui->cancelRestoreBackupButton->hide();
+            ui->cancelCreateBackupButton->show();
+            ui->openFolderButton->hide();
+            ui->frameMain->setDisabled(true);
+            ui->frameProgress->show();
+            break;
+        }
+        case State::backupFinished:
+        {
+            ui->progressBar->setRange(0, 100);
+            ui->progressBar->setValue(100);
+            ui->frameMain->setDisabled(false);
+            ui->cancelCreateBackupButton->hide();
+            if (operationSuccess)
+                ui->openFolderButton->show();
+
+            break;
+        }
+        case State::restoreStarted:
+        {
+            ui->progressBar->setRange(0, 0);
+            ui->cancelCreateBackupButton->hide();
+            ui->cancelRestoreBackupButton->show();
+            ui->openFolderButton->hide();
+            ui->frameMain->setDisabled(true);
+            ui->frameProgress->show();
+            break;
+        }
+        case State::restoreFinished:
+        {
+            ui->progressBar->setRange(0, 100);
+            ui->progressBar->setValue(100);
+            ui->frameMain->setDisabled(false);
+            ui->openFolderButton->hide();
+            ui->cancelRestoreBackupButton->hide();
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly)
 {
     ui->restoreButton->setEnabled(!readOnly);
+}
+
+void QnDatabaseManagementWidget::hideEvent(QHideEvent* event)
+{
+    base_type::hideEvent(event);
+    if (m_state == State::backupFinished || m_state == State::restoreFinished)
+    {
+        m_state = State::empty;
+        updateVisible();
+    }
 }
 
 void QnDatabaseManagementWidget::applyChanges()
