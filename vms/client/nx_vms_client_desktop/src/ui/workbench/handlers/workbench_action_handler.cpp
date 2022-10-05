@@ -183,9 +183,6 @@ namespace {
 /* Asking for update all outdated servers to the last version. */
 static const QString kVersionMismatchShowOnceKey("VersionMismatch");
 
-/** Promo dialog for Cloud Layouts. */
-static const QString kCloudLayoutsPromoShowOnceKey("CloudLayoutsPromo");
-
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
 constexpr int kSectionHeight = 20;
@@ -573,19 +570,26 @@ QnResourceList ActionHandler::addToResourcePool(const QString& file) const
 
 void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
 {
-    if (!resources.isEmpty())
-    {
-        MimeData data;
-        data.setResources(resources);
+    if (resources.isEmpty())
+        return;
 
-        std::optional<core::LogonData> logonData;
-        if (auto connection = this->connection())
-            logonData = connection->createLogonData();
+    const bool hasCrossSystemResources = std::any_of(
+        resources.cbegin(), resources.cend(),
+        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
-        appContext()->clientStateHandler()->createNewWindow(
-            logonData,
-            {data.serialized()});
-    }
+    if (hasCrossSystemResources && !CloudLayoutsIntroDialog::confirm())
+        return;
+
+    MimeData data;
+    data.setResources(resources);
+
+    std::optional<core::LogonData> logonData;
+    if (auto connection = this->connection())
+        logonData = connection->createLogonData();
+
+    appContext()->clientStateHandler()->createNewWindow(
+        logonData,
+        {data.serialized()});
 }
 
 void ActionHandler::rotateItems(int degrees) {
@@ -858,25 +862,12 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
             };
 
-        if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
-        {
-            convertLayout();
-            return;
-        }
-
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245).
         executeDelayedParented(
             [this, convertLayout]()
             {
-                CloudLayoutsIntroDialog introDialog;
-                const auto result = introDialog.exec();
-
-                if (result == QDialog::Accepted)
-                {
+                if (CloudLayoutsIntroDialog::confirm())
                     convertLayout();
-                    if (introDialog.doNotShowAgainChecked())
-                        qnClientShowOnce->setFlag(kCloudLayoutsPromoShowOnceKey);
-                }
             },
             this);
         return;
