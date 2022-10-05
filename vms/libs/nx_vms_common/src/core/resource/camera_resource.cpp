@@ -414,6 +414,10 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
             if (!isGotConfigured)
                 return false;
         }
+        else
+        {
+            return false;
+        }
 
         // override old data
         *it = bitrateInfo;
