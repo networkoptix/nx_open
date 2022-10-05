@@ -374,8 +374,7 @@ struct CloudCrossSystemContext::Private
             else
             {
                 auto camera = CrossSystemCameraResourcePtr(
-                    new CrossSystemCameraResource(q, cameraData));
-                camera->setResourceName(calculateCameraName(camera, systemIsReadyToUse));
+                    new CrossSystemCameraResource(systemDescription->id(), cameraData));
                 newlyCreatedCameras.push_back(camera);
             }
         }
@@ -439,47 +438,48 @@ struct CloudCrossSystemContext::Private
                 if (crossSystemResourceSystemId(item.resource) != systemDescription->id())
                     continue;
 
-                createThumbCameraResource(item.resource);
+                createThumbCameraResource(item.resource.id, item.resource.name);
             }
         }
     }
 
-    QnVirtualCameraResourcePtr createThumbCameraResource(
-        const nx::vms::common::ResourceDescriptor& descriptor)
+    QnVirtualCameraResourcePtr createThumbCameraResource(const QnUuid& id, const QString& name)
     {
         const auto camera = CrossSystemCameraResourcePtr(
-            new CrossSystemCameraResource(q, descriptor));
-        camera->setResourceName(calculateCameraName(camera, q->isSystemReadyToUse()));
+            new CrossSystemCameraResource(systemDescription->id(), id, name));
         systemContext->resourcePool()->addResource(camera);
 
         return camera;
     }
 
-    QString calculateCameraName(
-        const CrossSystemCameraResourcePtr& camera,
-        bool isSystemReadyToUse) const
-    {
-        const auto& source = camera->source();
-        if (isSystemReadyToUse && NX_ASSERT(source))
-            return source->name;
-
-        if (status == Status::connecting || status == Status::connectionFailure)
-            return desktop::toString(status);
-
-        return desktop::toString(Status::uninitialized);
-    }
-
     void updateCameras()
     {
         const auto systemIsReadyToUse = q->isSystemReadyToUse();
+        api::ResourceStatus dummyCameraStatus = api::ResourceStatus::offline;
+        if (!systemIsReadyToUse)
+        {
+            if (status == Status::connecting)
+                dummyCameraStatus = api::ResourceStatus::undefined;
+            else if (status == Status::connectionFailure)
+                dummyCameraStatus = api::ResourceStatus::unauthorized;
+        }
+
         for (const auto& camera:
             systemContext->resourcePool()->getResources<CrossSystemCameraResource>())
         {
-            camera->setResourceName(calculateCameraName(camera, systemIsReadyToUse));
             if (systemIsReadyToUse)
+            {
                 camera->removeFlags(Qn::fake);
+                if (NX_ASSERT(camera->source()))
+                    camera->setStatus(camera->source()->status);
+                else
+                    camera->setStatus(api::ResourceStatus::online);
+            }
             else
+            {
                 camera->addFlags(Qn::fake);
+                camera->setStatus(dummyCameraStatus);
+            }
         }
     }
 };
@@ -571,9 +571,11 @@ bool CloudCrossSystemContext::initializeConnectionWithUserInteraction()
     return d->ensureConnection(/*allowUserInteraction*/ true);
 }
 
-QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(QnUuid id)
+QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(
+    const QnUuid& id,
+    const QString& name)
 {
-    return d->createThumbCameraResource(descriptor(id, d->systemDescription->id()));
+    return d->createThumbCameraResource(id, name);
 }
 
 QString toString(CloudCrossSystemContext::Status status)

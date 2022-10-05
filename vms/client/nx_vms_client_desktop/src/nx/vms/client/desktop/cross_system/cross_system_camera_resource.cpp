@@ -20,19 +20,19 @@ const QnUuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
 struct CrossSystemCameraResource::Private
 {
     CrossSystemCameraResource* const q;
+    const QString systemId;
     std::optional<nx::vms::api::CameraDataEx> source;
-    QPointer<CloudCrossSystemContext> crossSystemContext;
 };
 
 CrossSystemCameraResource::CrossSystemCameraResource(
-    CloudCrossSystemContext* crossSystemContext,
+    const QString& systemId,
     const nx::vms::api::CameraDataEx& source)
     :
     QnClientCameraResource(source.typeId),
     d(new Private{
         .q = this,
-        .source = source,
-        .crossSystemContext = crossSystemContext
+        .systemId = systemId,
+        .source = source
     })
 {
     addFlags(Qn::cross_system);
@@ -56,16 +56,20 @@ CrossSystemCameraResource::CrossSystemCameraResource(
 }
 
 CrossSystemCameraResource::CrossSystemCameraResource(
-    CloudCrossSystemContext* crossSystemContext,
-    const nx::vms::common::ResourceDescriptor& descriptor)
+    const QString& systemId,
+    const QnUuid& id,
+    const QString& name)
     :
     QnClientCameraResource(kThumbCameraTypeId),
     d(new Private{
         .q = this,
-        .crossSystemContext = crossSystemContext
+        .systemId = systemId
     })
 {
-    setIdUnsafe(descriptor.id);
+    setIdUnsafe(id);
+    m_name = name.isEmpty() //< Set resource name, but not camera name.
+        ? tr("Unknown camera") //< Actually is a fallback and should never be seen.
+        : name;
     addFlags(Qn::cross_system | Qn::fake);
 }
 
@@ -128,36 +132,9 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
         notifier();
 }
 
-api::ResourceStatus CrossSystemCameraResource::getStatus() const
+QString CrossSystemCameraResource::systemId() const
 {
-    // Returns resource status only if the system contains it is connected and online, otherwise
-    // calculate status from the system status.
-    if (d->crossSystemContext->isSystemReadyToUse())
-        return QnClientCameraResource::getStatus();
-
-    const auto crossSystemContextStatus = d->crossSystemContext->status();
-    if (crossSystemContextStatus == CloudCrossSystemContext::Status::connecting)
-        return api::ResourceStatus::undefined;
-
-    if (crossSystemContextStatus == CloudCrossSystemContext::Status::connectionFailure)
-        return api::ResourceStatus::unauthorized;
-
-    return api::ResourceStatus::offline;
-}
-
-CloudCrossSystemContext* CrossSystemCameraResource::crossSystemContext() const
-{
-    return d->crossSystemContext;
-}
-
-nx::vms::common::ResourceDescriptor CrossSystemCameraResource::descriptor() const
-{
-    return nx::vms::client::desktop::descriptor(getId(), d->crossSystemContext->systemId());
-}
-
-void CrossSystemCameraResource::setResourceName(const QString &name)
-{
-    QnResource::setName(name);
+    return d->systemId;
 }
 
 const std::optional<api::CameraDataEx>& CrossSystemCameraResource::source() const

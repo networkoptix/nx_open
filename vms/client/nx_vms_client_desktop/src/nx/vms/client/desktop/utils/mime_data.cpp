@@ -184,7 +184,7 @@ struct MimeData::Private
             for (int i = 0; i < resourcesCount; i++)
             {
                 nx::vms::common::ResourceDescriptor descriptor;
-                stream >> descriptor.id >> descriptor.path;
+                stream >> descriptor.id >> descriptor.path >> descriptor.name;
 
                 auto resource = getResourceByDescriptor(descriptor);
                 if (!resource && createResourceCallback)
@@ -240,7 +240,7 @@ struct MimeData::Private
         for (const auto& resource: resources)
         {
             auto d = descriptor(resource);
-            stream << d.id << d.path;
+            stream << d.id << d.path << d.name;
         }
 
         // Entities.

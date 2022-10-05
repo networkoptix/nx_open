@@ -29,7 +29,7 @@ public:
     LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout);
 
     using SaveCallback = std::function<void(bool)>;
-    void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback = {});
+    void saveLayout(const CrossSystemLayoutResourcePtr& layout, SaveCallback callback = {});
 
     void deleteLayout(const QnLayoutResourcePtr& layout);
 

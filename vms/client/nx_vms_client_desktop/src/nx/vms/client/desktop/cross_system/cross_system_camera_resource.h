@@ -13,21 +13,26 @@ namespace nx::vms::client::desktop {
 
 class CrossSystemCameraResource: public QnClientCameraResource
 {
+    Q_OBJECT
+
 public:
+    /** Generic constructor called when full camera data is available. */
     CrossSystemCameraResource(
-        CloudCrossSystemContext* crossSystemContext,
+        const QString& systemId,
         const nx::vms::api::CameraDataEx& source);
+
+    /** Resource thumb constructor, used to create temporary camera replacement. */
     CrossSystemCameraResource(
-        CloudCrossSystemContext* crossSystemContext,
-        const nx::vms::common::ResourceDescriptor& descriptor);
+        const QString& systemId,
+        const QnUuid& id,
+        const QString& name);
     ~CrossSystemCameraResource() override;
 
     void update(nx::vms::api::CameraDataEx data);
 
-    api::ResourceStatus getStatus() const override;
-    CloudCrossSystemContext* crossSystemContext() const;
-    nx::vms::common::ResourceDescriptor descriptor() const;
-    void setResourceName(const QString& name);
+    /** Id of the system Camera belongs to. */
+    QString systemId() const;
+
     const std::optional<nx::vms::api::CameraDataEx>& source() const;
 
 private:

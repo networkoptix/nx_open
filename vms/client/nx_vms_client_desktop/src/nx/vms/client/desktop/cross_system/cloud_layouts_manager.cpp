@@ -31,6 +31,7 @@
 #include <utils/common/delayed.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include "cross_system_layout_data.h"
 #include "cross_system_layout_resource.h"
 
 using namespace std::chrono;
@@ -104,7 +105,7 @@ struct CloudLayoutsManager::Private
         return request;
     }
 
-    void addLayoutsToResourcePool(std::vector<nx::vms::api::LayoutData> layouts)
+    void addLayoutsToResourcePool(std::vector<CrossSystemLayoutData> layouts)
     {
         auto resourcePool = systemContext->resourcePool();
         auto layoutsToRemove = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
@@ -185,7 +186,7 @@ struct CloudLayoutsManager::Private
                         return;
                     }
 
-                    std::vector<nx::vms::api::LayoutData> updatedLayouts;
+                    std::vector<CrossSystemLayoutData> updatedLayouts;
                     const bool parsed = nx::reflect::json::deserialize(response.messageBody,
                         &updatedLayouts);
                     if (NX_ASSERT(parsed))
@@ -202,7 +203,7 @@ struct CloudLayoutsManager::Private
     }
 
     void sendSaveLayoutRequest(
-        const nx::vms::api::LayoutData& layout,
+        const CrossSystemLayoutData& layout,
         SaveCallback callback,
         bool isNewLayout)
     {
@@ -306,12 +307,9 @@ struct CloudLayoutsManager::Private
         return cloudLayout;
     }
 
-    void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
+    void saveLayout(const CrossSystemLayoutResourcePtr& layout, SaveCallback callback)
     {
         if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
-            return;
-
-        if (!NX_ASSERT(layout->hasFlags(Qn::cross_system)))
             return;
 
         auto internalCallback =
@@ -326,8 +324,8 @@ struct CloudLayoutsManager::Private
                     callback(success);
             };
 
-        nx::vms::api::LayoutData layoutData;
-        ec2::fromResourceToApi(layout, layoutData);
+        CrossSystemLayoutData layoutData;
+        fromResourceToData(layout, layoutData);
 
         sendSaveLayoutRequest(
             layoutData,
@@ -391,7 +389,9 @@ LayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const LayoutResourcePt
     return d->convertLocalLayout(layout);
 }
 
-void CloudLayoutsManager::saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
+void CloudLayoutsManager::saveLayout(
+    const CrossSystemLayoutResourcePtr& layout,
+    SaveCallback callback)
 {
     d->saveLayout(layout, callback);
 }
