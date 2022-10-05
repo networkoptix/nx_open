@@ -901,7 +901,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
             // Do not save position and state for cameras which footage we cannot see.
             if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
             {
-                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+                if (!ResourceAccessManager::hasPermissions(camera, Qn::ViewFootagePermission))
                     continue;
             }
 
@@ -954,8 +954,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
         const bool canViewFootage = std::any_of(resources.begin(), resources.end(),
             [this](auto resource)
             {
-                return accessController()->hasPermissions(
-                    resource,
+                return ResourceAccessManager::hasPermissions(resource,
                     Qn::Permission::ViewFootagePermission);
             });
 

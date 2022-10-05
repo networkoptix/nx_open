@@ -11,6 +11,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/icon.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -249,7 +250,7 @@ void ControlWidget::updateBookButtonEnabled()
     const auto currentResource = currentWidget ? currentWidget->resource() : QnResourcePtr();
 
     const bool bookmarksEnabled = currentResource
-        && accessController()->hasPermissions(currentResource, Qn::ViewBookmarksPermission)
+        && ResourceAccessManager::hasPermissions(currentResource, Qn::ViewBookmarksPermission)
         && currentResource->flags().testFlag(Qn::live)
         && !qnRuntime->isAcsMode();
 

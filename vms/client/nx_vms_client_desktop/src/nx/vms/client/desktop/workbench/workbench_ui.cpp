@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -477,7 +478,7 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     if (flags.testFlag(Qn::desktop_camera))
         return false;
 
-    return accessController()->hasPermissions(resource, Qn::ViewFootagePermission)
+    return ResourceAccessManager::hasPermissions(resource, Qn::ViewFootagePermission)
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 

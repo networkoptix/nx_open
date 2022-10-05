@@ -179,14 +179,14 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | ResourceTarget)
         .condition(
-            condition::resourcesHavePermissions(Qn::ManageBookmarksPermission)
+            condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
             && condition::hasFlags(Qn::live_cam, MatchMode::all));
 
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Control Video Wall"))
         .condition(
-            condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions)
+            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new StartVideoWallControlCondition())
         );
 
@@ -194,7 +194,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Push my screen"))
         .condition(
-            condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions)
+            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new DesktopCameraCondition())
         );
 
@@ -572,13 +572,13 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Ctrl+S"))
         .autoRepeat(false)
         .condition(
-            condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions)
+            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new SaveVideowallReviewCondition(true))
         );
 
     factory(DropOnVideoWallItemAction)
         .flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget)
-        .condition(condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions));
+        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions));
 
     factory()
         .flags(Main)
@@ -722,7 +722,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Bookmark Log..."))
         .shortcut(lit("Ctrl+B"))
         .condition(
-            condition::resourcesHavePermissions(Qn::ViewBookmarksPermission)
+            condition::hasPermissionsForResources(Qn::ViewBookmarksPermission)
             && !condition::tourIsRunning())
         .autoRepeat(false);
 
@@ -925,7 +925,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Archive filter..."))
         .childFactory(new ChunksFilterActionFactory(manager))
-        .condition(condition::resourcesHavePermissions(Qn::ViewFootagePermission));
+        .condition(condition::hasPermissionsForResources(Qn::ViewFootagePermission));
 
     factory()
         .flags(Slider)
@@ -994,7 +994,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget | ResourceTarget)
         .text(ContextMenu::tr("Delete Bookmarks...")) //< Copied to an internal context menu
         .condition(
-            condition::resourcesHavePermissions(Qn::ManageBookmarksPermission)
+            condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
             && ConditionWrapper(new RemoveBookmarksCondition())
         );
 
@@ -1113,7 +1113,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Identify"))
         .autoRepeat(false)
         .condition(
-            condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions)
+            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new IdentifyVideoWallCondition()));
 
     factory(AttachToVideoWallAction)
@@ -1153,12 +1153,12 @@ void initialize(Manager* manager, Action* root)
 
     factory(LoadVideowallMatrixAction)
         .flags(Tree | SingleTarget | VideoWallMatrixTarget)
-        .condition(condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions))
+        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
         .text(ContextMenu::tr("Load Matrix"));
 
     factory(DeleteVideowallMatrixAction)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
-        .condition(condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions))
+        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
         .text(ContextMenu::tr("Delete"))
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
@@ -1180,7 +1180,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Clear Screen"))
         .autoRepeat(false)
         .condition(
-            condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions)
+            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new DetachFromVideoWallCondition()));
 
     factory(SelectCurrentServerAction)
@@ -1194,7 +1194,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(VideoWallScreenSettingsAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | VideoWallItemTarget)
-        .condition(condition::resourcesHavePermissions(Qn::VideoWallLayoutPermissions))
+        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
         .text(ContextMenu::tr("Screen Settings..."));
 
     factory(ForgetLayoutPasswordAction)
@@ -1514,7 +1514,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(RenameVideowallEntityAction)
         .flags(Tree | SingleTarget | VideoWallItemTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
-        .condition(condition::resourcesHavePermissions(Qn::Permission::WriteNamePermission))
+        .condition(condition::hasPermissionsForResources(Qn::Permission::WriteNamePermission))
         .text(ContextMenu::tr("Rename"))
         .shortcut(lit("F2"))
         .autoRepeat(false);
@@ -1654,7 +1654,7 @@ void initialize(Manager* manager, Action* root)
                 ContextMenu::tr("I/O Module Settings..."), ContextMenu::tr("I/O Modules Settings...")
             ), manager))
         .condition(
-            condition::resourcesHavePermissions(
+            condition::hasPermissionsForResources(
                 Qn::ReadWriteSavePermission
                 | Qn::WriteNamePermission)
             && condition::hasFlags(
@@ -2084,7 +2084,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Bookmarks")) //< To be displayed on the button
         .toggledText(ContextMenu::tr("Hide Bookmarks"))
-        .condition(condition::resourcesHavePermissions(Qn::ViewBookmarksPermission));
+        .condition(condition::hasPermissionsForResources(Qn::ViewBookmarksPermission));
 
     factory(ToggleCalendarAction)
         .flags(NoTarget)

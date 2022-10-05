@@ -617,7 +617,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setIOModule(d->camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
-            accessController()->hasPermissions(d->camera, Qn::DeviceInputPermission));
+            ResourceAccessManager::hasPermissions(d->camera, Qn::DeviceInputPermission));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
         addOverlayWidget(m_ioModuleOverlayWidget,
             {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
@@ -2323,7 +2323,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             ? Qn::ViewLivePermission
             : Qn::ViewFootagePermission;
 
-        if (accessController()->hasPermissions(d->resource, requiredPermission))
+        if (ResourceAccessManager::hasPermissions(d->resource, requiredPermission))
             result |= Qn::ScreenshotButton;
     }
 
@@ -2339,7 +2339,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo
         && d->camera
         && d->taxonomyManager
-        && accessController()->hasPermissions(d->camera, Qn::ViewFootagePermission)
+        && ResourceAccessManager::hasPermissions(d->camera, Qn::ViewFootagePermission)
         && !d->taxonomyManager->relevantEngines().empty()
         && !d->camera->compatibleAnalyticsEngines().empty())
     {
@@ -2424,7 +2424,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
                 ? Qn::ViewLivePermission
                 : Qn::ViewFootagePermission;
 
-            if (!accessController()->hasPermissions(d->camera, requiredPermission))
+            if (!ResourceAccessManager::hasPermissions(d->camera, requiredPermission))
                 return Qn::AnalogWithoutLicenseOverlay;
         }
     }
@@ -2523,7 +2523,8 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     const bool adminPermissions = accessController()->hasAdminPermissions();
 
     const bool canChangeSettings = qnRuntime->isDesktopMode()
-        && accessController()->hasPermissions(d->camera, Qn::SavePermission | Qn::WritePermission);
+        && ResourceAccessManager::hasPermissions(d->camera,
+            Qn::SavePermission | Qn::WritePermission);
 
     switch (statusOverlay)
     {

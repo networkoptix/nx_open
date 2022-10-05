@@ -47,6 +47,7 @@ extern "C" {
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -704,15 +705,8 @@ void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
                 if (!camera)
                     return false;
 
-                auto systemContext = SystemContext::fromResource(camera);
-                if (!NX_ASSERT(systemContext))
+                if (!ResourceAccessManager::hasPermissions(camera, Qn::ViewFootagePermission))
                     return false;
-
-                if (!systemContext->accessController()->hasPermissions(
-				    camera, Qn::ViewFootagePermission))
-                {
-                    return false;
-                }
 
                 return camera->getStatus() == nx::vms::api::ResourceStatus::recording;
             });
@@ -2167,15 +2161,8 @@ void QnWorkbenchNavigator::updateThumbnailsLoader()
 
             if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
             {
-                auto systemContext = SystemContext::fromResource(camera);
-                if (!NX_ASSERT(systemContext))
+                if (!ResourceAccessManager::hasPermissions(camera, Qn::ViewFootagePermission))
                     return false;
-
-                if (!systemContext->accessController()->hasPermissions(camera,
-                    Qn::ViewFootagePermission))
-                {
-                    return false;
-                }
 
                 // Thumbnails are disabled for I/O modules.
                 if (camera->isIOModule())

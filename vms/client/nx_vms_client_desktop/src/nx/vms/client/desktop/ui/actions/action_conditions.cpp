@@ -1092,13 +1092,12 @@ ActionVisibility ToggleTitleBarCondition::check(const Parameters& /*parameters*/
 
 ActionVisibility NoArchiveCondition::check(
     const QnResourceList& resources,
-    QnWorkbenchContext* context)
+    QnWorkbenchContext* /*context*/)
 {
     const bool noResouceWithArchiveAccess = std::none_of(resources.begin(), resources.end(),
-        [context](auto resource)
+        [](auto resource)
         {
-            return context->accessController()->hasPermissions(
-                resource,
+            return ResourceAccessManager::hasPermissions(resource,
                 Qn::Permission::ViewFootagePermission);
         });
 
@@ -2420,11 +2419,11 @@ ConditionWrapper userHasCamerasWithEditableSettings()
         {
             const auto& cameras = context->resourcePool()->getAllCameras();
             const auto& accessController = context->accessController();
-            return std::any_of(cameras.begin(), cameras.end(), 
+
+            return std::any_of(cameras.begin(), cameras.end(),
                 [accessController](auto camera)
                 {
-                    return accessController->hasPermissions(
-                        camera,
+                    return accessController->hasPermissions(camera,
                         Qn::Permission::ReadWriteSavePermission);
                 });
         }
@@ -2438,39 +2437,30 @@ ConditionWrapper allOpenedCamerasAllowExport()
         {
             const auto currentLayout = context->workbench()->currentLayout();
             const auto cameras = currentLayout->itemResources().filtered<QnVirtualCameraResource>();
-            const auto& accessController = context->accessController();
 
             return std::all_of(cameras.begin(), cameras.end(),
-                [accessController](auto camera)
+                [](auto camera)
                 {
-                    return accessController->hasPermissions(
-                        camera,
-                        Qn::ExportPermission);
+                    return ResourceAccessManager::hasPermissions(camera, Qn::ExportPermission);
                 });
         }
     );
 }
 
-ConditionWrapper resourcesHavePermissions(Qn::Permissions permissions)
+ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
 {
     return new ResourcesCondition(
         [permissions](const QnResourceList& resources, QnWorkbenchContext* context)
         {
-            const auto& accessController = context->accessController();
-
             if (resources.empty())
-                return accessController->anyResourceHasPermissions(permissions);
+                return context->accessController()->anyResourceHasPermissions(permissions);
 
             return std::all_of(resources.begin(), resources.end(),
-                [accessController](auto resource)
+                [permissions](auto resource)
                 {
-                    return accessController->hasPermissions(
-                        resource,
-                        Qn::ExportPermission);
+                    return ResourceAccessManager::hasPermissions(resource, permissions);
                 });
-        }
-    );
-
+        });
 }
 
 } // namespace condition
