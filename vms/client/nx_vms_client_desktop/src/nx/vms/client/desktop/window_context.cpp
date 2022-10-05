@@ -42,6 +42,11 @@ WindowContext::~WindowContext()
 {
 }
 
+QWidget* WindowContext::mainWindowWidget() const
+{
+    return d->workbenchContext->mainWindowWidget();
+}
+
 QnWorkbenchContext* WindowContext::workbenchContext() const
 {
     return d->workbenchContext.data();
