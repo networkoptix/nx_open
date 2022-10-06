@@ -27,13 +27,13 @@ static constexpr char kResponseForDefaultBasicHeader[] = "Basic em9yel91c2VyOnpv
 static constexpr char kResponseForDefaultDigestHeader[] =
         "Digest username=\"zorz_user\", realm=\"VMS\", nonce=\"cUySLvm\", "
         "uri=\"/HttpAsyncClient_auth\", response=\"4a5ec2fdc1d7dd43dd6fb345944583c5\", "
-        "algorithm=\"MD5\"";
+        "algorithm=MD5";
 
 static constexpr char kResponseForLowercaseMd5DigestHeader[] =
         "Digest username=\"zorz_user\", realm=\"Http Server\", "
         "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", uri=\"/HttpAsyncClient_auth\", "
-        "response=\"900afe7b3e6d522346fcfaaa897b6b35\", algorithm=\"md5\", cnonce=\"0a4f113b\", "
-        "nc=\"00000001\", qop=\"auth\"";
+        "response=\"900afe7b3e6d522346fcfaaa897b6b35\", algorithm=md5, cnonce=\"0a4f113b\", "
+        "nc=00000001, qop=auth";
 
 } // namespace
 
