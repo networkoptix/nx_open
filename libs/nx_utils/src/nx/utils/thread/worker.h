@@ -69,6 +69,10 @@ public:
             m_overflowWaitCondition.wait(&m_mutex);
         }
 
+        NX_MUTEX_LOCKER lock(&m_taskMutex);
+        if (m_needStop)
+            return;
+
         m_tasks.push(std::move(task));
     }
 
@@ -77,6 +81,7 @@ public:
 private:
     SyncQueue<Worker::Task> m_tasks;
     nx::Mutex m_mutex;
+    nx::Mutex m_taskMutex;
     nx::WaitCondition m_overflowWaitCondition;
     const std::optional<size_t> m_maxTaskCount;
     std::thread::id m_workerThreadId = std::thread::id();
@@ -85,6 +90,7 @@ private:
 
     virtual void pleaseStop() override
     {
+        NX_MUTEX_LOCKER lock(&m_taskMutex);
         m_needStop = true;
         if (m_tasks.empty())
             m_tasks.push([](){});
@@ -94,10 +100,16 @@ private:
     {
         m_workerThreadId = std::this_thread::get_id();
         m_startedPromise.set_value();
-        while (!m_needStop)
+        while (true)
         {
             const auto task = m_tasks.pop();
             task();
+            {
+                NX_MUTEX_LOCKER lock(&m_taskMutex);
+                if (m_needStop && m_tasks.empty())
+                    break;
+            }
+
             NX_MUTEX_LOCKER lock(&m_mutex);
             m_overflowWaitCondition.wakeOne();
         }

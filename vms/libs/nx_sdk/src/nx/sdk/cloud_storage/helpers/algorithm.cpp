@@ -91,6 +91,59 @@ private:
     simd128i m_mask[kGridDataSizeBytes / sizeof(simd128i)];
 };
 
+bool hasAttributeWithName(const std::string& name, const std::vector<Attribute>& attributes)
+{
+    if (name.empty())
+        return false;
+
+    for (const auto& a: attributes)
+    {
+        if (a.name.empty() || name.size() > a.name.size())
+            continue;
+
+        size_t i = 0;
+        for (; i < name.size(); ++i)
+        {
+            if (name[i] != a.name[i])
+                break;
+        }
+
+        if (i == a.name.size() || a.name[i] == '.')
+            return true;
+    }
+
+    return false;
+}
+
+bool hasAttributeWithValue(const std::string& value, const std::vector<Attribute>& attributes)
+{
+    if (value.empty())
+        return true;
+
+    for (const auto& a: attributes)
+    {
+        if (a.value.find(value) != std::string::npos)
+            return true;
+    }
+
+    return false;
+}
+
+bool hasAttributeWithRange(
+    const nx::sdk::cloud_storage::NumericRange& range, const std::vector<Attribute>& attributes)
+{
+    for (const auto& a: attributes)
+    {
+        const auto maybeAttrRange = NumericRange::fromString(a.value);
+        if (maybeAttrRange && maybeAttrRange->intersects(range))
+            return true;
+    }
+
+    return false;
+}
+
+} // namespace
+
 std::vector<std::string> split(const std::string& original, const std::string& separator)
 {
     std::vector<std::string> result;
@@ -155,8 +208,6 @@ std::vector<std::string> split(const std::string& original, const std::string& s
 
     return result;
 }
-
-} // namespace
 
 bool bookmarkMatches(const Bookmark& bookmark, const BookmarkFilter& filter)
 {
@@ -355,7 +406,62 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
     if (filter.analyticsEngineId && filter.analyticsEngineId != objectTrack.analyticsEngineId)
         return false;
 
-    // #TODO. Implement other filtering types: (attributes, text).
+    if (filter.attributeSearchConditions.empty())
+        return true;
+
+    if (objectTrack.attributes.empty())
+        return false;
+
+    bool attributeMatch = true;
+    for (const auto& searchCondition: filter.attributeSearchConditions)
+    {
+        switch (searchCondition.type)
+        {
+            case AttributeSearchCondition::Type::attributePresenceCheck:
+                attributeMatch =
+                    hasAttributeWithName(searchCondition.name, objectTrack.attributes);
+                break;
+            case AttributeSearchCondition::Type::attributeValueMatch:
+                attributeMatch =
+                    hasAttributeWithName(searchCondition.name, objectTrack.attributes);
+                if (attributeMatch)
+                {
+                    attributeMatch =
+                        hasAttributeWithValue(searchCondition.value, objectTrack.attributes);
+                }
+                break;
+            case AttributeSearchCondition::Type::numericRangeMatch:
+                attributeMatch =
+                    hasAttributeWithName(searchCondition.name, objectTrack.attributes);
+                if (attributeMatch)
+                {
+                    attributeMatch =
+                        hasAttributeWithRange(searchCondition.range, objectTrack.attributes);
+                }
+                break;
+            case AttributeSearchCondition::Type::textMatch:
+                if (!searchCondition.text.empty())
+                {
+                    bool found = false;
+                    for (const auto& a: objectTrack.attributes)
+                    {
+                        if (a.name.find(searchCondition.text) != std::string::npos
+                            || a.value.find(searchCondition.text) != std::string::npos)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                        attributeMatch = false;
+                }
+                break;
+        }
+
+        if (!attributeMatch)
+            return false;
+    }
 
     return true;
 }
