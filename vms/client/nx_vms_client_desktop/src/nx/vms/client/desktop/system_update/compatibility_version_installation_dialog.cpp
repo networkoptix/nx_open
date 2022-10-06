@@ -39,11 +39,9 @@ struct CompatibilityVersionInstallationDialog::Private
 {
     core::LogonData logonData;
 
-    // Update info from mediaservers.
-    std::future<UpdateContents> updateInfoMediaserver;
-    // Update info from the Internet.
+    std::future<UpdateContents> installedUpdateInfoMediaserver;
+    std::future<UpdateContents> targetUpdateInfoMediaserver;
     std::future<UpdateContents> updateInfoInternet;
-    // Information about servers in the system.
     std::future<ClientUpdateTool::SystemServersInfo> systemServersInfo;
 
     int requestsLeft = 0;
@@ -251,31 +249,32 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 
     if (m_private->checkingUpdates)
     {
-        if (m_private->updateInfoInternet.valid()
-            && m_private->updateInfoInternet.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
-        {
-            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoInternet");
-            processUpdateContents(m_private->updateInfoInternet.get());
-            --m_private->requestsLeft;
-        }
+        const auto processInfoReply =
+            [this](std::future<UpdateContents>& future, const QString& logLabel)
+            {
+                if (!future.valid()
+                    || future.wait_for(kWaitForUpdateInfo) != std::future_status::ready)
+                {
+                    return;
+                }
 
-        if (m_private->updateInfoMediaserver.valid()
-            && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
-        {
-            auto updateContents = m_private->updateInfoMediaserver.get();
-            if (updateContents.info.version != m_versionToInstall)
-            {
-                NX_DEBUG(this, "atUpdateCurrentState() - updateInfoMediaserver mismatch. "
-                    "We need %1 but server returned %2.",
-                    m_versionToInstall, updateContents.info.version);
-            }
-            else
-            {
-                NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
-                processUpdateContents(updateContents);
-            }
-            --m_private->requestsLeft;
-        }
+                const auto updateContents = future.get();
+                if (updateContents.info.version != m_versionToInstall)
+                {
+                    NX_DEBUG(this, "Update information from %1 mismatch. Need: %2, got: %3.",
+                        logLabel, m_versionToInstall, updateContents.info.version);
+                }
+                else
+                {
+                    NX_DEBUG(this, "Got update information from %1", logLabel);
+                    processUpdateContents(updateContents);
+                }
+                --m_private->requestsLeft;
+            };
+
+        processInfoReply(m_private->updateInfoInternet, "Internet");
+        processInfoReply(m_private->installedUpdateInfoMediaserver, "Server (installed version)");
+        processInfoReply(m_private->targetUpdateInfoMediaserver, "Server (target version)");
 
         if (m_private->systemServersInfo.valid()
             && m_private->systemServersInfo.wait_for(kWaitForUpdateInfo)
@@ -319,15 +318,24 @@ void CompatibilityVersionInstallationDialog::startUpdate()
     const QString updateUrl = nx::vms::common::update::updateFeedUrl();
 
     m_private->checkingUpdates = true;
+
     // Starting check for update manifest from the Internet.
     m_private->updateInfoInternet = m_private->clientUpdateTool->requestInternetUpdateInfo(
         updateUrl, nx::vms::update::CertainVersionParams{m_versionToInstall, m_engineVersion});
     if (m_private->updateInfoInternet.valid())
         ++m_private->requestsLeft;
+
     // Checking update info from the mediaservers.
-    m_private->updateInfoMediaserver = m_private->clientUpdateTool->requestUpdateInfoFromServer(
-        nx::vms::common::update::InstalledVersionParams{});
-    if (m_private->updateInfoMediaserver.valid())
+    m_private->installedUpdateInfoMediaserver =
+        m_private->clientUpdateTool->requestUpdateInfoFromServer(
+            nx::vms::common::update::InstalledVersionParams{});
+    if (m_private->installedUpdateInfoMediaserver.valid())
+        ++m_private->requestsLeft;
+
+    m_private->targetUpdateInfoMediaserver =
+        m_private->clientUpdateTool->requestUpdateInfoFromServer(
+            nx::vms::common::update::TargetVersionParams{});
+    if (m_private->targetUpdateInfoMediaserver.valid())
         ++m_private->requestsLeft;
 
     m_private->systemServersInfo = std::async(
