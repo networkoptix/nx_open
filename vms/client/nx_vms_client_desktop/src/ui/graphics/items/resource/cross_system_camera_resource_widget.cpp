@@ -2,6 +2,8 @@
 
 #include "cross_system_camera_resource_widget.h"
 
+#include <qt_graphics_items/graphics_label.h>
+
 #include <core/resource/user_resource.h>
 #include <network/base_system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -12,6 +14,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -57,6 +61,9 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
     d(new Private{QnMediaResourceWidget::resource().dynamicCast<CrossSystemCameraResource>()})
 {
     NX_ASSERT(d->crossSystemCamera);
+
+    m_hudOverlay->title()->titleLabel()->setElideMode(Qt::ElideRight);
+    m_hudOverlay->title()->extraInfoLabel()->setElideMode(Qt::ElideRight);
 
     connect(
         statusOverlayController(),
