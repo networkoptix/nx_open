@@ -48,6 +48,7 @@ public:
     void deactivate();
 
 protected:
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
 private:
