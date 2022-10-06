@@ -1109,14 +1109,24 @@ void DigestCredentials::serialize(nx::Buffer* dest) const
 
     // TODO: #akolesnikov Re-write this function using nx::utils::join.
 
-    bool isFirst = true;
-    auto serializeParam = [&isFirst, dest](const std::string& name, const std::string& value)
+    auto needQuoteForParam = [](const auto& value)
     {
-        nx::utils::buildString(dest,
-            isFirst ? "" : ", ",
-            name, "=\"", value, "\"");
-        isFirst = false;
+        // According to RFC ( https://httpwg.org/specs/rfc7616.html ) fields 'algorithm', 'qop', and 'nc' must not be quoted.
+        if (value == "algorithm" || value == "qop" || value == "nc")
+            return false;
+        return true;
     };
+
+    bool isFirst = true;
+    auto serializeParam =
+        [&isFirst, dest](const std::string& name, const std::string& value, bool isQuoted)
+        {
+            std::string piece = isQuoted
+                ? nx::utils::buildString(name, "=\"", value, "\"")
+                : nx::utils::buildString(name, '=', value);
+            nx::utils::buildString(dest, isFirst ? "" : ", ", std::move(piece));
+            isFirst = false;
+        };
 
     auto params = this->params;
     for (const char* name: predefinedOrder)
@@ -1124,12 +1134,12 @@ void DigestCredentials::serialize(nx::Buffer* dest) const
         auto itr = params.find(name);
         if (itr != params.end())
         {
-            serializeParam(itr->first, itr->second);
+            serializeParam(itr->first, itr->second, needQuoteForParam(itr->first));
             params.erase(itr);
         }
     }
     for (auto itr = params.begin(); itr != params.end(); ++itr)
-        serializeParam(itr->first, itr->second);
+        serializeParam(itr->first, itr->second, needQuoteForParam(itr->first));
 }
 
 bool BearerCredentials::parse(const std::string_view& str)
