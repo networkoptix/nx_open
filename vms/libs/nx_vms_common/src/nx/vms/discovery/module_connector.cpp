@@ -121,8 +121,15 @@ void ModuleConnector::deactivate()
         });
 }
 
+void ModuleConnector::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    NX_CRITICAL(m_modules.empty(), "Not possible in runtime");
+}
+
 void ModuleConnector::stopWhileInAioThread()
 {
+    nx::network::aio::BasicPollable::stopWhileInAioThread();
     m_modules.clear();
 }
 
