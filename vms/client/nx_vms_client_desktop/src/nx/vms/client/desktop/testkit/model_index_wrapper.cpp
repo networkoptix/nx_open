@@ -67,6 +67,16 @@ bool ModelIndexWrapper::isSelected() const
     return false;
 }
 
+bool ModelIndexWrapper::isEnabled() const
+{
+    return m_index.flags().testFlag(Qt::ItemIsEnabled);
+}
+
+bool ModelIndexWrapper::isVisible() const
+{
+    return m_container->isVisible();
+}
+
 QVariantMap ModelIndexWrapper::metaInfo(QString name) const
 {
     return utils::getMetaInfo(&this->staticMetaObject, name);
