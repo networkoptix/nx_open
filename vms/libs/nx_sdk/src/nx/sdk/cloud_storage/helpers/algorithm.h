@@ -36,6 +36,8 @@ std::string dumpObjects(const std::vector<T>& objects)
     return nx::kit::Json(jsons).dump();
 }
 
+std::vector<std::string> split(const std::string& original, const std::string& separator);
+
 } // namespace cloud_storage
 } // namespace sdk
 } // namespace nx

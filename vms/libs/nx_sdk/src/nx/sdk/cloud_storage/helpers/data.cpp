@@ -8,6 +8,7 @@
 #include <nx/sdk/helpers/device_info.h>
 
 #include "media_data_packet.h"
+#include "algorithm.h"
 
 namespace nx {
 namespace sdk {
@@ -64,6 +65,15 @@ int64_t getIntValue(const nx::kit::Json& json, const std::string& key)
         throw std::logic_error("Value '" + key + "' is not a number");
 
     return (int64_t) value.number_value();
+}
+
+int64_t getDoubleValue(const nx::kit::Json& json, const std::string& key)
+{
+    const auto value = json[key];
+    if (!value.is_number())
+        throw std::logic_error("Value '" + key + "' is not a number");
+
+    return value.number_value();
 }
 
 bool getBoolValue(const nx::kit::Json& json, const std::string& key)
@@ -803,6 +813,214 @@ int AnalyticsFilter::optionsFromString(const std::string& s)
     return result;
 }
 
+RangePoint::RangePoint(const nx::kit::Json& json)
+{
+    value = getDoubleValue(json, "value");
+    inclusive = getBoolValue(json, "inclusive");
+}
+
+RangePoint::RangePoint(const char* jsonData): RangePoint(parseJson(jsonData))
+{
+}
+
+RangePoint::RangePoint(float value, bool inclusive): value(value), inclusive(inclusive)
+{
+}
+
+nx::kit::Json RangePoint::to_json() const
+{
+    return nx::kit::Json::object({{"value", value}, {"inclusive", inclusive}});
+}
+
+NumericRange::NumericRange(const nx::kit::Json& json)
+{
+    from = getOptionalObjectValue<RangePoint>(json, "from");
+    to = getOptionalObjectValue<RangePoint>(json, "to");
+}
+
+nx::kit::Json NumericRange::to_json() const
+{
+    auto result = nx::kit::Json::object();
+    if (from)
+        result["from"] = *from;
+
+    if (to)
+        result["to"] = *to;
+
+    return result;
+}
+
+NumericRange::NumericRange(const char* jsonData): NumericRange(parseJson(jsonData))
+{
+}
+
+std::optional<NumericRange> NumericRange::fromString(const std::string& s)
+{
+    try
+    {
+        float floatValue = std::stof(s);
+        return NumericRange(floatValue);
+    }
+    catch (...)
+    {
+    }
+
+    bool isValidRange = s.find("...") != std::string::npos;
+    if (!isValidRange)
+        return std::nullopt;
+
+    auto unquotedValue = s;
+    if (unquotedValue[0] == '(' || unquotedValue[0] == '[')
+        unquotedValue = unquotedValue.substr(1);
+    if (unquotedValue[unquotedValue.size() - 1] == ')'
+        || unquotedValue[unquotedValue.size() - 1] == ']')
+    {
+        unquotedValue = unquotedValue.substr(0, unquotedValue.size() - 1);
+    }
+
+    auto params = split(unquotedValue, "...");
+    if (params.size() != 2)
+        return std::nullopt;
+
+    std::optional<RangePoint> left, right;
+    if (params[0] != "-inf")
+    {
+        left = RangePoint();
+        try
+        {
+            left->value = std::stof(params[0]);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
+
+        left->inclusive = s[0] != '(';
+    }
+
+    if (params[1] != "inf")
+    {
+        right = RangePoint();
+        try
+        {
+            right->value = std::stof(params[1]);
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
+
+        right->inclusive = s[s.size() - 1] != ')';
+    }
+
+    return NumericRange(left, right);
+}
+
+bool NumericRange::intersects(const NumericRange& range) const
+{
+    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min()};
+    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max()};
+
+    RangePoint rangeLeft =
+        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min()};
+    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max()};
+
+    RangePoint maxLeft = (ownLeft.value > rangeLeft.value) ? ownLeft : rangeLeft;
+    RangePoint minRight = (ownRight.value < rangeRight.value) ? ownRight : rangeRight;
+
+    if (maxLeft.inclusive && minRight.inclusive)
+        return maxLeft.value <= minRight.value;
+    return maxLeft.value < minRight.value;
+}
+
+bool NumericRange::hasRange(const NumericRange& range) const
+{
+    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min()};
+    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max()};
+
+    RangePoint rangeLeft =
+        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min()};
+    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max()};
+
+    if (ownLeft.inclusive || !rangeLeft.inclusive)
+    {
+        if (ownLeft.value > rangeLeft.value)
+            return false;
+    }
+    else
+    {
+        if (ownLeft.value >= rangeLeft.value)
+            return false;
+    }
+
+    if (ownRight.inclusive || !rangeRight.inclusive)
+    {
+        if (ownRight.value < rangeRight.value)
+            return false;
+    }
+    else
+    {
+        if (ownRight.value <= rangeRight.value)
+            return false;
+    }
+    return true;
+}
+
+AttributeSearchCondition::AttributeSearchCondition(const nx::kit::Json& json)
+{
+    type = typeFromString(getStringValue(json, "type"));
+    name = getStringValue(json, "name");
+    value = getStringValue(json, "value");
+    text = getStringValue(json, "text");
+    range = getObjectValue<NumericRange>(json, "range");
+}
+
+AttributeSearchCondition::AttributeSearchCondition(const char* jsonData):
+    AttributeSearchCondition(parseJson(jsonData))
+{
+}
+
+std::string AttributeSearchCondition::typeToString(Type type)
+{
+    switch (type)
+    {
+        case Type::attributePresenceCheck:
+            return "attributePresenceCheck";
+        case Type::attributeValueMatch:
+            return "attributeValueMatch";
+        case Type::numericRangeMatch:
+            return "numericRangeMatch";
+        case Type::textMatch:
+            return "textMatch";
+    }
+
+    throw std::logic_error("Unknown AttributeSearchCondition::type " + std::to_string((int) type));
+}
+
+AttributeSearchCondition::Type AttributeSearchCondition::typeFromString(const std::string& s)
+{
+    if (s == "attributePresenceCheck")
+        return Type::attributePresenceCheck;
+    if (s == "attributeValueMatch")
+        return Type::attributeValueMatch;
+    if (s == "numericRangeMatch")
+        return Type::numericRangeMatch;
+    if (s == "textMatch")
+        return Type::textMatch;
+
+    throw std::logic_error("Unknown AttributeSearchCondition::type string " + s);
+}
+
+nx::kit::Json AttributeSearchCondition::to_json() const
+{
+    return nx::kit::Json::object(
+        {{"type", typeToString(type)},
+        {"name", name},
+        {"value", value},
+        {"text", text},
+        {"range", range}
+    });
+}
 
 AnalyticsFilter::AnalyticsFilter(const char* jsonData): AnalyticsFilter(parseJson(jsonData))
 {

@@ -385,6 +385,105 @@ using AnalyticsLookupResult = std::vector<ObjectTrack>;
 
 AnalyticsLookupResult analyticsLookupResultFromJson(const char* data);
 
+// Helper struct representing a range border point.
+struct RangePoint
+{
+    RangePoint() = default;
+    RangePoint(const nx::kit::Json& json);
+    RangePoint(const char* jsonData);
+
+    template<typename T>
+    RangePoint(const T&) = delete;
+
+    RangePoint(float value, bool inclusive = false);
+
+    nx::kit::Json to_json() const;
+
+    float value = 0.0;
+    bool inclusive = false;
+};
+
+// Numeric range representation. Used as one of the possible search conditions while querying
+// object tracks filtered by attributes.
+struct NumericRange
+{
+    NumericRange() = default;
+    NumericRange(const nx::kit::Json& json);
+    NumericRange(const char* jsonData);
+
+    template<typename T>
+    NumericRange(const T&) = delete;
+
+    NumericRange(float value): from(RangePoint{value, true}), to(RangePoint{value, true}) {}
+
+    NumericRange(std::optional<RangePoint> from, std::optional<RangePoint> to):
+        from(std::move(from)), to(std::move(to))
+    {
+    }
+
+    static std::optional<NumericRange> fromString(const std::string& s);
+
+    nx::kit::Json to_json() const;
+
+    bool intersects(const NumericRange& range) const;
+    bool hasRange(const NumericRange& range) const;
+
+    std::optional<RangePoint> from;
+    std::optional<RangePoint> to;
+};
+
+// A search condition representation specifying how exactly to filter queried object tracks
+// by their attributes.
+// Multiple condition match results are joined using AND logic. So for object track to be included
+// in the result its attributes (any of them) should match every condition present in the Filter.
+// I.e. bool objectTrackMatch = atLeastOneAttrMatch(condition_1) && ... && atLeastOneAttrMatch(condition_N)
+struct AttributeSearchCondition
+{
+    AttributeSearchCondition() = default;
+    AttributeSearchCondition(const nx::kit::Json& json);
+    AttributeSearchCondition(const char* jsonData);
+
+    template<typename T>
+    AttributeSearchCondition(const T&) = delete;
+
+    nx::kit::Json to_json() const;
+
+    // All search types except 'textMatch' assume that ObjectTrack attribute name matches
+    // the condition name only if the match starts from the beginning and lasts till the end
+    // or the point separator.
+    // For example, let one of the ObjectTrack attribute equals to 'car.color=blue'. Then the
+    // Search conditions with the following names should match: 'car', 'car.color'. But not the
+    // 'ca', 'car.co', 'carxx' or 'car.colov'.
+    // In case of the 'textMatch' for the attribute to match search condition it's enough that
+    // either attribute name or value contain AttributeSearchCondition::text. Condition name and
+    // value should be ignored in this case.
+    // 'numericRangeMatch' assumes that the attribute value contains valid NumericRange and
+    // it intersects AttributeSearchCondition::range.
+    enum class Type
+    {
+        attributePresenceCheck,
+        attributeValueMatch,
+        textMatch,
+        numericRangeMatch,
+    };
+
+    static std::string typeToString(Type type);
+    static Type typeFromString(const std::string& s);
+
+    Type type;
+    std::string name;
+    std::string value;
+    std::string text;
+
+    // If it is set to true than the ObjectTrack should be included in the result only if it does not
+    // match the given condition.
+    bool isNegative = false;
+
+    // Used when type == numericRangeMatch. Object track attribute value should contain numeric range
+    // value and it should intersect the given condition value for the Object track to be included in the result.
+    NumericRange range;
+};
+
 // Filter used to search for object tracks.
 struct AnalyticsFilter
 {
@@ -421,6 +520,7 @@ struct AnalyticsFilter
     // Bounding box area to search within. Search should be done similarly to motion data.
     std::optional<Rect> boundingBox;
     std::optional<int> maxObjectTracksToSelect;
+    std::vector<AttributeSearchCondition> attributeSearchConditions;
 
     /** Found tracks are sorted by the minimum track time using this order. */
     SortOrder order = SortOrder::descending;
