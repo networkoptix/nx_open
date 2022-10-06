@@ -69,7 +69,7 @@ QVariant QnSettings::value(
     if (m_systemSettings)
         return m_systemSettings->value(key, defaultValue);
 
-    return QVariant();
+    return defaultValue;
 }
 
 QVariant QnSettings::value(
@@ -104,15 +104,20 @@ void QnSettings::initializeSystemSettings()
 {
     if (const auto config = m_args.get("conf-file"))
     {
-        m_ownSettings.reset(new QSettings(*config, QSettings::IniFormat));
+        m_ownSettings = std::make_unique<QSettings>(*config, QSettings::IniFormat);
+    }
+    else if (m_args.contains("no-conf-file"))
+    {
+        // Not loading any config file. Application options are read from argv only.
     }
     else
     {
         #ifdef _WIN32
-            m_ownSettings.reset(new QSettings(m_scope, m_organizationName, m_applicationName));
+            m_ownSettings = std::make_unique<QSettings>(
+                m_scope, m_organizationName, m_applicationName);
         #else
-            m_ownSettings.reset(new QSettings(QString("/opt/%1/%2/etc/%2.conf")
-                .arg(m_organizationName).arg(m_moduleName), QSettings::IniFormat));
+            m_ownSettings = std::make_unique<QSettings>(QString("/opt/%1/%2/etc/%2.conf")
+                .arg(m_organizationName).arg(m_moduleName), QSettings::IniFormat);
         #endif
     }
 
