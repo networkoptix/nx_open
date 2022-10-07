@@ -4,10 +4,12 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QSettings>
 #include <QtWidgets/QAction>
 
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
+#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -15,8 +17,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/async_file_downloader.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -60,6 +65,63 @@ LogsManagementWatcher::State watcherState(Qt::CheckState state)
         : LogsManagementWatcher::State::hasSelection;
 }
 
+nx::vms::api::ServerLogSettings loadClientSettings()
+{
+    using namespace nx::utils::log;
+
+    nx::vms::api::ServerLogSettings result;
+    result.mainLog.primaryLevel = levelFromString(qnSettings->logLevel());
+
+    QSettings rawSettings;
+    result.maxVolumeSizeB = rawSettings.value(
+        kMaxLogVolumeSizeSymbolicName,
+        250 * 1024 * 1024).toUInt();
+    result.maxFileSizeB = rawSettings.value(
+        kMaxLogFileSizeSymbolicName,
+        10 * 1024 * 1024).toUInt();
+    result.maxFileTimePeriodS = std::chrono::seconds(rawSettings.value(
+        kMaxLogFileTimePeriodSymbolicName,
+        0).toUInt());
+
+    return result;
+}
+
+void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
+{
+    using namespace nx::log;
+    using namespace nx::utils::log;
+
+    const auto level = settings.mainLog.primaryLevel;
+    qnSettings->setLogLevel(LogsManagementModel::logLevelName(level));
+
+    QSettings rawSettings;
+    rawSettings.setValue(
+        kMaxLogVolumeSizeSymbolicName,
+        settings.maxVolumeSizeB);
+    rawSettings.setValue(
+        kMaxLogFileSizeSymbolicName,
+        settings.maxFileSizeB);
+    rawSettings.setValue(
+        kMaxLogFileTimePeriodSymbolicName,
+        (long long)settings.maxFileTimePeriodS.count()); //< Type cast from count() is ambigous.
+
+    LoggerSettings loggerSettings;
+    loggerSettings.maxVolumeSizeB = settings.maxVolumeSizeB;
+    loggerSettings.maxFileSizeB = settings.maxFileSizeB;
+    loggerSettings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
+    loggerSettings.level.primary = level;
+
+    // Initialize as a set in order to remove duplicates.
+    const std::set<std::shared_ptr<AbstractLogger>> loggers{
+        mainLogger(),
+        getExactLogger(kHttpTag),
+        getExactLogger(kSystemTag)};
+
+    for (auto logger: loggers)
+    {
+        logger->setSettings(loggerSettings);
+    }
+}
 
 } // namespace
 
@@ -754,9 +816,7 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
     d(new Private(this))
 {
     d->client = Unit::Private::createClientUnit();
-    nx::vms::api::ServerLogSettings settings;
-    settings.mainLog.primaryLevel = nx::utils::log::mainLogger()->defaultLevel();
-    d->client->data()->setSettings(settings);
+    d->client->data()->setSettings(loadClientSettings());
 
     connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
@@ -1056,6 +1116,7 @@ void LogsManagementWatcher::applySettings(
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::hasSelection);
 
+    std::optional<nx::vms::api::ServerLogSettings> newClientSettings;
     if (d->client->isChecked())
     {
         auto existing = d->client->settings();
@@ -1063,9 +1124,10 @@ void LogsManagementWatcher::applySettings(
             return;
 
         d->client->data()->setSettings(settings.applyTo(*existing));
-        //TODO: #spanasenko Store client settings.
-
         d->updateClientLogLevelWarning();
+
+        // Store value to apply it when the mutex is released.
+        newClientSettings = d->client->settings();
     }
 
     QList<UnitPtr> serversToStore;
@@ -1076,6 +1138,10 @@ void LogsManagementWatcher::applySettings(
     }
 
     lock.unlock();
+
+    if (newClientSettings)
+        storeAndApplyClientSettings(*newClientSettings);
+
     for (auto server: serversToStore)
     {
         d->api->storeServerSettings(token, server, settings);
