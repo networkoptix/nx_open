@@ -262,7 +262,7 @@ QJsonObject TestKit::execute(const QString& source)
     return response;
 }
 
-QByteArray TestKit::screenshot()
+QByteArray TestKit::screenshot(const char* format)
 {
     QScreen* screen = QGuiApplication::primaryScreen();
 
@@ -276,7 +276,7 @@ QByteArray TestKit::screenshot()
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "JPEG");
+    pixmap.save(&buffer, format);
     return bytes;
 }
 

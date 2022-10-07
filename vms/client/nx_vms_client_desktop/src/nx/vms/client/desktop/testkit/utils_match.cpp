@@ -5,9 +5,11 @@
 #include <QtCore/QRegularExpression>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
+#include <QtWidgets/QTabBar>
 #include <QtWidgets/QWidget>
 
 #include "model_index_wrapper.h"
+#include "tab_item_wrapper.h"
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -41,6 +43,11 @@ bool objectHasId(const QObject* object, const QString& id)
             return true;
     }
     return false;
+}
+
+bool valueIsTrue(const QJSValue& value)
+{
+    return value.toString() == "yes" || value.toInt() == 1 || value.toBool();
 }
 
 } // namespace
@@ -109,16 +116,14 @@ bool objectMatches(const QObject* object, QJSValue properties)
     }
     if (properties.hasOwnProperty("visible"))
     {
-        auto vis = properties.property("visible");
-        const bool propIsVisible = vis.toString() == "yes" || vis.toInt() == 1 || vis.toBool();
+        const bool propIsVisible = valueIsTrue(properties.property("visible"));
 
         if (propIsVisible != object->property("visible").toBool())
             return false;
     }
     if (properties.hasOwnProperty("enabled"))
     {
-        auto vis = properties.property("enabled");
-        const bool propIsVisible = vis.toString() == "yes" || vis.toInt() == 1 || vis.toBool();
+        const bool propIsVisible = valueIsTrue(properties.property("enabled"));
 
         if (propIsVisible != object->property("enabled").toBool())
             return false;
@@ -214,6 +219,46 @@ bool indexMatches(QModelIndex index, QJSValue properties)
             return false;
     }
 
+    return true;
+}
+
+bool tabItemMatches(const QTabBar* tabBar, int index, QJSValue properties)
+{
+    if (index < 0 || index >= tabBar->count())
+        return false;
+
+    if (properties.isString())
+        return textMatches(tabBar->tabText(index), properties.toString());
+
+    if (properties.hasOwnProperty("name"))
+        return false;
+
+    if (properties.hasOwnProperty("type"))
+    {
+        if (properties.property("type").toString() != TabItemWrapper::type())
+            return false;
+    }
+
+    if (properties.hasOwnProperty("visible"))
+    {
+        if (valueIsTrue(properties.property("visible")) != tabBar->isTabVisible(index))
+            return false;
+    }
+    if (properties.hasOwnProperty("enabled"))
+    {
+        if (valueIsTrue(properties.property("enabled")) != tabBar->isTabEnabled(index))
+            return false;
+    }
+    if (properties.hasOwnProperty("text"))
+    {
+        if (!textMatches(tabBar->tabText(index), properties.property("text").toString()))
+            return false;
+    }
+    if (properties.hasOwnProperty("toolTip"))
+    {
+        if (!textMatches(tabBar->tabToolTip(index), properties.property("toolTip").toString()))
+            return false;
+    }
     return true;
 }
 
