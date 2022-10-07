@@ -17,6 +17,7 @@
 namespace nx::network::test {
 
 static constexpr char hardToResolveHost[] = "takes_more_than_timeout_to_resolve";
+static constexpr char delayedResolveHost[] = "done_with_some_delay";
 static constexpr char easyToResolveHost[] = "resolved_immediately";
 
 class DnsResolver:
@@ -25,16 +26,12 @@ class DnsResolver:
 public:
     DnsResolver()
     {
-        m_dnsResolver.registerResolver(
-            makeCustomResolver([this](auto&&... args) {
-                return testResolve(std::forward<decltype(args)>(args)...);
-            }),
-            m_dnsResolver.maxRegisteredResolverPriority() + 1);
+        initializeResolver(1);
     }
 
     ~DnsResolver()
     {
-        m_dnsResolver.stop();
+        m_dnsResolver->stop();
     }
 
 protected:
@@ -43,16 +40,37 @@ protected:
         startResolveAsync(hardToResolveHost);
     }
 
-    void addRegularTask()
+    std::size_t addRegularTask()
     {
-        startResolveAsync(easyToResolveHost);
+        return startResolveAsync(easyToResolveHost);
     }
 
-    void assertIfRegularTaskDidNotTimeOut()
+    void givenMultithreadedResolver(int threadCount)
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        waitForResolveResult(&lock, easyToResolveHost);
-        ASSERT_EQ(SystemError::timedOut, m_hostNameToResolveResult[easyToResolveHost]);
+        initializeResolver(threadCount);
+    }
+
+    void postDelayedResolveTasks(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            startResolveAsync(delayedResolveHost);
+    }
+
+    void waitForResolveNResults(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            handleNextResolveResult();
+    }
+
+    bool resolveResultsReportedByNThreads(std::size_t count)
+    {
+        return m_resolveThreadIds.size() >= count;
+    }
+
+    void assertResolveTaskTimedOut(std::size_t taskId)
+    {
+        waitForResolveResult(taskId);
+        ASSERT_EQ(SystemError::timedOut, m_requestIdToResolveResult[taskId]);
     }
 
     void pipelineRequests()
@@ -66,32 +84,56 @@ protected:
 
     void assertIfNotAllRequestsHaveBeenCompleted()
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        waitForResolveResult(&lock, m_expectedResponseCount);
-        ASSERT_EQ(m_expectedResponseCount, m_hostNameToResolveResult.size());
+        waitForResolveResult(m_expectedResponseCount);
+
         ASSERT_EQ(m_expectedResponseCount, m_requestIdToResolveResult.size());
     }
 
 private:
-    network::DnsResolver m_dnsResolver;
+    struct Result
+    {
+        SystemError::ErrorCode resultCode = SystemError::noError;
+        std::size_t requestId = 0;
+        std::thread::id threadId = {};
+    };
+
+    std::unique_ptr<network::DnsResolver> m_dnsResolver;
     std::atomic<std::size_t> m_prevResolveRequestId{0};
     std::size_t m_expectedResponseCount = 0;
     nx::Mutex m_mutex;
-    std::map<std::string, SystemError::ErrorCode> m_hostNameToResolveResult;
     std::map<std::size_t, SystemError::ErrorCode> m_requestIdToResolveResult;
-    nx::WaitCondition m_cond;
     std::list<nx::utils::test::ScopedTimeShift> m_shiftedTime;
     std::list<std::string> m_pipelinedRequests;
     bool m_timeShifted = false;
+    nx::utils::SyncQueue<Result> m_resolveResults;
+    std::set<std::thread::id> m_resolveThreadIds;
+
+    void initializeResolver(int threadCount)
+    {
+        m_dnsResolver = std::make_unique<network::DnsResolver>(threadCount);
+
+        m_dnsResolver->registerResolver(
+            makeCustomResolver([this](auto&&... args) {
+                return testResolve(std::forward<decltype(args)>(args)...);
+            }),
+            m_dnsResolver->maxRegisteredResolverPriority() + 1);
+    }
 
     SystemError::ErrorCode testResolve(
         const std::string_view& hostName,
         int /*ipVersion*/,
         ResolveResult* resolved)
     {
+        if (hostName == delayedResolveHost)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            resolved->entries.push_back({AddressType::direct, HostAddress::localhost});
+            return SystemError::noError;
+        }
+
         if (hostName == hardToResolveHost)
         {
-            addRegularTask();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             shiftTimeIfNeeded(); //< Emulating delay in this method.
         }
 
@@ -110,39 +152,41 @@ private:
     }
 
     void onHostResolved(
-        const std::string& hostName,
         std::size_t requestId,
         SystemError::ErrorCode errorCode,
         std::deque<HostAddress> /*resolvedAddresses*/)
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_hostNameToResolveResult.emplace(hostName, errorCode);
-        m_requestIdToResolveResult.emplace(requestId, errorCode);
-        m_cond.wakeAll();
+        m_resolveResults.push({
+            .resultCode = errorCode,
+            .requestId = requestId,
+            .threadId = std::this_thread::get_id()});
     }
 
-    void startResolveAsync(const std::string& hostName)
+    std::size_t startResolveAsync(const std::string& hostName)
     {
         using namespace std::placeholders;
 
         const auto requestId = ++m_prevResolveRequestId;
-        m_dnsResolver.resolveAsync(
+        m_dnsResolver->resolveAsync(
             hostName,
-            std::bind(&DnsResolver::onHostResolved, this, hostName, requestId, _1, _2),
+            std::bind(&DnsResolver::onHostResolved, this, requestId, _1, _2),
             AF_INET,
             reinterpret_cast<network::DnsResolver::RequestId>(requestId));
+
+        return requestId;
     }
 
-    void waitForResolveResult(nx::Locker<nx::Mutex>* const lock, const std::string& hostName)
-    {
-        while (m_hostNameToResolveResult.find(hostName) == m_hostNameToResolveResult.end())
-            m_cond.wait(lock->mutex());
-    }
-
-    void waitForResolveResult(nx::Locker<nx::Mutex>* const lock, std::size_t requestId)
+    void waitForResolveResult(std::size_t requestId)
     {
         while (m_requestIdToResolveResult.find(requestId) == m_requestIdToResolveResult.end())
-            m_cond.wait(lock->mutex());
+            handleNextResolveResult();
+    }
+
+    void handleNextResolveResult()
+    {
+        const auto result = m_resolveResults.pop();
+        m_requestIdToResolveResult[result.requestId] = result.resultCode;
+        m_resolveThreadIds.insert(result.threadId);
     }
 
     void shiftTimeIfNeeded()
@@ -155,7 +199,7 @@ private:
 
         m_shiftedTime.push_back(ScopedTimeShift(
             ClockType::steady,
-            m_dnsResolver.resolveTimeout() + std::chrono::seconds(1)));
+            m_dnsResolver->resolveTimeout() + std::chrono::seconds(1)));
         m_timeShifted = true;
     }
 };
@@ -163,14 +207,28 @@ private:
 TEST_F(DnsResolver, resolve_fails_with_timeout)
 {
     addTaskThatTakesMoreThanResolveTimeout();
-    // Regular task will be added when executing "long" task.
-    assertIfRegularTaskDidNotTimeOut();
+    const auto taskId = addRegularTask();
+
+    assertResolveTaskTimedOut(taskId);
 }
 
 TEST_F(DnsResolver, pipelining_resolve_request)
 {
     pipelineRequests();
     assertIfNotAllRequestsHaveBeenCompleted();
+}
+
+TEST_F(DnsResolver, resolve_is_multithreaded)
+{
+    const int threadCount = 4;
+
+    givenMultithreadedResolver(threadCount);
+
+    while (!resolveResultsReportedByNThreads(threadCount))
+    {
+        postDelayedResolveTasks(threadCount * 5);
+        waitForResolveNResults(threadCount * 5);
+    }
 }
 
 TEST_F(DnsResolver, old_and_unclear_test_to_be_refactored)
