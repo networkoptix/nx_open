@@ -46,11 +46,10 @@ DnsResolver::ResolveTask::ResolveTask(
 //-------------------------------------------------------------------------------------------------
 // class DnsResolver
 
-static constexpr int kResolveThreadCount = 4;
 static constexpr auto kResolveCacheValueLifetime = std::chrono::minutes(1);
 static constexpr int kResolveCacheMaxSize = 1000;
 
-DnsResolver::DnsResolver():
+DnsResolver::DnsResolver(int resolveThreadCount):
     m_resolveCache(
         kResolveCacheValueLifetime,
         kResolveCacheMaxSize,
@@ -61,7 +60,10 @@ DnsResolver::DnsResolver():
     registerResolver(std::move(predefinedHostResolver), 1);
     registerResolver(std::make_unique<SystemResolver>(), 0);
 
-    for (int i = 0; i < kResolveThreadCount; ++i)
+    if (resolveThreadCount <= 0)
+        resolveThreadCount = kDefaultResolveThreadCount;
+
+    for (int i = 0; i < resolveThreadCount; ++i)
         m_resolveThreads.push_back(std::thread([this]() { resolveThreadMain(); }));
 
     // This thread reports the results of queries fulfilled by the cache only.

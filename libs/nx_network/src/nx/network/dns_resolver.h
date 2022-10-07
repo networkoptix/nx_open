@@ -36,7 +36,9 @@ public:
     using RequestId = void*;
     using Handler = utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)>;
 
-    DnsResolver();
+    static constexpr int kDefaultResolveThreadCount = 4;
+
+    DnsResolver(int resolveThreadCount = kDefaultResolveThreadCount);
     virtual ~DnsResolver();
 
     void stop();
