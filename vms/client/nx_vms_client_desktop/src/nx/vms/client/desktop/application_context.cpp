@@ -339,10 +339,13 @@ struct ApplicationContext::Private
         QSettings rawSettings;
         const auto maxVolumeSize = rawSettings.value(
             kMaxLogVolumeSizeSymbolicName,
-            100 * 1024 * 1024).toUInt();
+            250 * 1024 * 1024).toUInt();
         const auto maxFileSize = rawSettings.value(
             kMaxLogFileSizeSymbolicName,
             10 * 1024 * 1024).toUInt();
+        const auto maxFileTimePeriod = rawSettings.value(
+            kMaxLogFileTimePeriodSymbolicName,
+            0).toUInt();
 
         auto logLevel = startupParameters.logLevel;
         auto logFile = startupParameters.logFile;
@@ -362,6 +365,7 @@ struct ApplicationContext::Private
         auto& logger = logSettings.loggers.front();
         logger.maxVolumeSizeB = maxVolumeSize;
         logger.maxFileSizeB = maxFileSize;
+        logger.maxFileTimePeriodS = std::chrono::seconds(maxFileTimePeriod);
         logger.level.parse(logLevel);
         logger.logBaseName = logFile.isEmpty()
             ? ("client_log" + logFileNameSuffix)
