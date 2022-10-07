@@ -284,22 +284,19 @@ public:
 
     void whenMakeAsyncGetRequest(
         std::string path,
-        nx::utils::MoveOnlyFunc<void(http::AsyncClient*)> handler)
+        nx::utils::MoveOnlyFunc<void()> handler)
     {
-        AsyncRequestContext context{
-            std::make_unique<http::AsyncClient>(ssl::kAcceptAnyCertificate),
-            std::move(handler)
-        };
-
-        auto clientPtr = context.client.get();
-        m_asyncRequests.emplace(clientPtr, std::move(context));
+        auto client = std::make_unique<http::AsyncClient>(ssl::kAcceptAnyCertificate);
+        client->setTimeouts(AsyncClient::kInfiniteTimeouts);
+        auto clientPtr = client.get();
 
         clientPtr->doGet(
             url::Builder(m_httpServer->preferredUrl()).setPath(path),
-            [this, clientPtr]()
+            [client = std::move(client), handler = std::move(handler)]() mutable
             {
-                m_asyncRequests.at(clientPtr).handler(clientPtr);
-                m_asyncRequests.erase(clientPtr);
+                auto f = std::move(handler); //< handler is freed with lambda by client.reset().
+                client.reset();
+                f();
             });
     }
 
@@ -311,14 +308,6 @@ public:
 private:
     http::server::rest::MessageDispatcher m_httpDispatcher;
     std::unique_ptr<http::server::MultiEndpointServer> m_httpServer;
-
-    struct AsyncRequestContext
-    {
-        std::unique_ptr<http::AsyncClient> client;
-        nx::utils::MoveOnlyFunc<void(http::AsyncClient*)> handler;
-    };
-
-    std::map<http::AsyncClient*, AsyncRequestContext> m_asyncRequests;
 };
 
 TEST_F(MultiEndpointServerHttpStatistics, RequestPathStatistics_present_if_requestsServedPerMinute_is_not_0)
@@ -388,7 +377,7 @@ TEST_F(MultiEndpointServerHttpStatistics, percentiles_present)
     {
         whenMakeAsyncGetRequest(
             "/0",
-            [&requestsHandled](auto* /*httpClient*/) { ++requestsHandled; });
+            [&requestsHandled]() { ++requestsHandled; });
     }
 
     while (requestsHandled != 100)
