@@ -9,12 +9,16 @@
 class QAbstractItemModel;
 class QAction;
 class QMenu;
+class QTabBar;
 class QWindow;
 
 namespace nx::vms::client::desktop::testkit::utils {
 
 /** Returns true if object properties match with specified properties. */
 bool objectMatches(const QObject* object, QJSValue properties);
+
+/** Returns true if object properties match with tab item properties. */
+bool tabItemMatches(const QTabBar* tabBar, int index, QJSValue properties);
 
 /** Returns true if text from UI element (with/without shotcuts) matches with specified text. */
 bool textMatches(QString itemText, QString text);

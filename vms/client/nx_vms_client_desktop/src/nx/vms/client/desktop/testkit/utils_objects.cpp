@@ -9,6 +9,8 @@
 #include <QtQml/QJSValueIterator>
 
 #include "model_index_wrapper.h"
+#include "tab_item_wrapper.h"
+
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -62,25 +64,20 @@ QString getTextProperty(QJSValue parameters)
 }
 
 /**
- * Get rectangles for matching tabs of QTab* widget.
+ * Get matching tabs of QTab* widget.
  */
-QVariantList getMatchingTabRects(QObject* object, QString text)
+QVariantList findAllTabItems(QObject* object, QJSValue parameters)
 {
     QVariantList result;
 
-    const auto tabWidget = qobject_cast<const QTabWidget*>(object);
+    const auto tabWidget = qobject_cast<QTabWidget*>(object);
 
-    if (const auto w = tabWidget ? tabWidget->tabBar() : qobject_cast<const QTabBar*>(object))
+    if (const auto w = tabWidget ? tabWidget->tabBar() : qobject_cast<QTabBar*>(object))
     {
         for (int i = 0; i < w->count(); ++i)
         {
-            if (textMatches(w->tabText(i), text))
-            {
-                const auto r = w->tabRect(i);
-                const auto topLeft = w->mapToGlobal(r.topLeft());
-                const auto bottomRight = w->mapToGlobal(r.bottomRight());
-                result << QRect(topLeft, bottomRight);
-            }
+            if (tabItemMatches(w, i, parameters))
+                result << QVariant::fromValue(TabItemWrapper(i, w));
         }
     }
 
@@ -95,8 +92,7 @@ QVariantList findAllObjectsInContainer(
     QSet<QObject*>& visited)
 {
     // Check if we are trying to find children of QModelIndex.
-    const auto wrap = container.value<ModelIndexWrapper>();
-    if (wrap.isValid())
+    if (const auto wrap = container.value<ModelIndexWrapper>(); wrap.isValid())
         return findAllIndexes(wrap.index().model(), wrap.index(), wrap.container(), properties);
 
     // Setup visiting children of QObject.
@@ -106,12 +102,16 @@ QVariantList findAllObjectsInContainer(
 
     // Cache some values that would be checked when visiting children objects.
     const auto itemType = properties.property("type");
+    const bool unnamed = !properties.hasOwnProperty("name");
     const bool canBeIndex = (itemType.toString() == "QModelIndex" || itemType.isUndefined())
-        && !properties.hasOwnProperty("name");
+        && unnamed;
     const QString textProperty = getTextProperty(properties);
 
+    const bool canBeTabItem =
+        (itemType.toString() == TabItemWrapper::type() || itemType.isUndefined()) && unnamed;
+
     const auto selectMatchingObjects =
-        [&properties, &result, &visited, containerObject, canBeIndex, textProperty]
+        [&properties, &result, &visited, containerObject, canBeIndex, textProperty, canBeTabItem]
         (QObject* object) -> bool
         {
             // Remember visiting this object.
@@ -141,16 +141,23 @@ QVariantList findAllObjectsInContainer(
                 }
             }
 
-            // Support clicking on tabs using their text.
-            // Return rectangules for QTab* widgets if tab text matches
-            // the text we are looking for.
-            if (!textProperty.isNull() && object->isWidgetType())
-                result << getMatchingTabRects(object, textProperty);
+            // Tabs in QTabBar are not separate objects so handle them in a special function.
+            if (canBeTabItem && object->isWidgetType())
+                result << findAllTabItems(object, properties);
 
             return true;
         };
 
-    visitTree(containerObject, selectMatchingObjects);
+    // Check if we are trying to find children of a tab in QTabBar.
+    if (const auto wrap = container.value<TabItemWrapper>(); wrap.isValid())
+    {
+        visitTree(wrap.leftButton(), selectMatchingObjects);
+        visitTree(wrap.rightButton(), selectMatchingObjects);
+    }
+    else
+    {
+        visitTree(containerObject, selectMatchingObjects);
+    }
 
     return result;
 }
@@ -165,6 +172,16 @@ QVariantList findAllObjects(QJSValue properties)
     {
         containers << QVariant::fromValue(qobject);
         return containers;
+    }
+
+    // Return special wrappers directly.
+    if (const auto variantWrap = properties.toVariant(); variantWrap.isValid())
+    {
+        if (const auto wrap = variantWrap.value<TabItemWrapper>(); wrap.isValid())
+        {
+            containers << variantWrap;
+            return containers;
+        }
     }
 
     const bool hasContainer = properties.hasOwnProperty("container");
