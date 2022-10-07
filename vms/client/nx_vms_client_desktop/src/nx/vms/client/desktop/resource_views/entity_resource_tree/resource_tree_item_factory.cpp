@@ -196,16 +196,8 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
         [systemId]() -> Qt::ItemFlags
         {
             auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (NX_ASSERT(context))
-            {
-                const auto status = context->status();
-                if (status == CloudCrossSystemContext::Status::connecting
-                    || status == CloudCrossSystemContext::Status::connectionFailure
-                    || context->isSystemReadyToUse())
-                {
-                    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-                }
-            }
+            if (NX_ASSERT(context) && context->systemDescription()->isOnline())
+                return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
             return Qt::ItemIsSelectable;
         };
