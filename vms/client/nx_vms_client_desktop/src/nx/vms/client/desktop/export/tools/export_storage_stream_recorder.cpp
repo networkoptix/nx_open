@@ -257,8 +257,18 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
     const CodecParametersConstPtr& sourceCodecParams, const QString& container)
 {
     AVCodecID dstAudioCodec = AV_CODEC_ID_NONE;
-    if (container.toLower() == "avi" || container.toLower() == "mp4")
+    if (container.toLower() == "avi")
+    {
         dstAudioCodec = AV_CODEC_ID_MP3; //< Transcode audio to MP3.
+    }
+    else if (container.toLower() == "mp4")
+    {
+        if (sourceCodecParams->getCodecId() != AV_CODEC_ID_MP3
+            && sourceCodecParams->getCodecId() != AV_CODEC_ID_AAC)
+        {
+            dstAudioCodec = AV_CODEC_ID_MP3; //< Transcode audio to MP3.
+        }
+    }
 
     // In the case of MP2 We don't have information about bitrate until we get the first
     // audio packet. This leads to problems with playback in VLC, so we always
