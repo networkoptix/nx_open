@@ -52,11 +52,13 @@ public:
     QJsonObject execute(const QString& source);
 
     /**
-     * Takes screenshot of the primary screen and returns it as JPEG image data.
+     * Takes screenshot of the primary screen and returns its image data.
      * Screenshot is scaled down by application pixel ratio so coordinates
      * inside the image are directly mapped to top level widgets.
+     * Format name is one of the supported Qt formats for writing, see
+     * https://doc.qt.io/qt-6/qpixmap.html#reading-and-writing-image-files
      */
-    static QByteArray screenshot();
+    static QByteArray screenshot(const char* format);
 
     /**
      * Passes application events through a list of observers.

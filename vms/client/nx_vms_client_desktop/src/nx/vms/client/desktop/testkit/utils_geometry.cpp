@@ -13,6 +13,7 @@
 #include <QtWidgets/QAbstractItemView>
 
 #include "model_index_wrapper.h"
+#include "tab_item_wrapper.h"
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -101,19 +102,26 @@ QRect globalRect(QVariant object, QWindow** window)
     }
     else if (object.isValid())
     {
-        auto wrap = object.value<ModelIndexWrapper>();
-        if (!wrap.isValid())
-            return QRect();
+        if (auto wrap = object.value<ModelIndexWrapper>(); wrap.isValid())
+        {
+            auto view = qobject_cast<QAbstractItemView*>(wrap.container());
+            if (!view)
+                return QRect();
 
-        auto view = qobject_cast<QAbstractItemView*>(wrap.container());
-        if (!view)
-            return QRect();
-
-        const QRect rect = view->visualRect(wrap.index());
-        *window = view->window()->windowHandle();
-        return QRect(
-            view->viewport()->mapToGlobal(rect.topLeft()),
-            view->viewport()->mapToGlobal(rect.bottomRight()));
+            const QRect rect = view->visualRect(wrap.index());
+            *window = view->window()->windowHandle();
+            return QRect(
+                view->viewport()->mapToGlobal(rect.topLeft()),
+                view->viewport()->mapToGlobal(rect.bottomRight()));
+        }
+        else if (auto wrap = object.value<TabItemWrapper>(); wrap.isValid())
+        {
+            const auto container = wrap.container();
+            const auto r = container->tabRect(wrap.index());
+            const auto topLeft = container->mapToGlobal(r.topLeft());
+            const auto bottomRight = container->mapToGlobal(r.bottomRight());
+            return QRect(topLeft, bottomRight);
+        }
     }
     return QRect();
 }
