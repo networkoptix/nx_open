@@ -304,7 +304,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
-    if (auto crossSystemCamera = resource.dynamicCast<CrossSystemCameraResource>())
+    if (auto crossSystemCamera = resource.dynamicCast<CrossSystemCameraResource>();
+        crossSystemCamera && flags.testFlag(Qn::fake))
     {
         key = CrossSystemStatus;
         const auto systemId = crossSystemCamera->systemId();
