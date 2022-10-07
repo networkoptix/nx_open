@@ -136,10 +136,16 @@ void DirectorWebserver::processRequest(QtHttpRequest* request, QtHttpReply* repl
     if (requestPath == "/")
         requestPath = "/director/index.html";
 
-    if (requestPath == "/screenshot")
+    if (requestPath == "/screenshot"
+        || requestPath == "/screenshot.jpg"
+        || requestPath == "/screenshot.jpeg"
+        || requestPath == "/screenshot.png")
     {
         reply->setStatusCode(QtHttpReply::Ok);
-        const auto data = testkit::TestKit::screenshot();
+        const auto data = testkit::TestKit::screenshot(
+            requestPath.endsWith(".png")
+                ? "PNG"
+                : "JPEG");
         const auto mime = mimeDatabase.mimeTypeForData(data);
         reply->addHeader("Content-Type", mime.name().toUtf8());
         reply->appendRawData(data);

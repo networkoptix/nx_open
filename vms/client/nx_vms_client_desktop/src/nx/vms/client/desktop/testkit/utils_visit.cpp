@@ -8,6 +8,8 @@
 #include <QtWidgets/QGraphicsObject>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QTabBar>
+#include <QtWidgets/QTabWidget>
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -68,7 +70,15 @@ void visitTree(QObject* object, std::function<bool(QObject*)> onVisited, VisitOp
 
     // Step inside Qt Quick root object.
     if (const auto w = qobject_cast<const QQuickWidget*>(object))
-        visitTree(w->rootObject(), onVisited, flags | OnlyQuickItems);
+    {
+        // Try to skip visiting rootObject() if we can get to it via quickWindow().
+        if (w->quickWindow() && w->quickWindow()->contentItem()
+            && !w->quickWindow()->contentItem()->childItems().contains(w->rootObject()))
+        {
+            visitTree(w->rootObject(), onVisited, flags | OnlyQuickItems);
+        }
+        visitTree(w->quickWindow(), onVisited, flags);
+    }
 
     if (const auto w = qobject_cast<const QQuickWindow*>(object))
         visitTree(w->contentItem(), onVisited, flags | OnlyQuickItems);
@@ -81,6 +91,17 @@ void visitTree(QObject* object, std::function<bool(QObject*)> onVisited, VisitOp
         {
             if (const auto o = dynamic_cast<QGraphicsObject*>(item))
                 visitTree(o, onVisited, flags);
+        }
+    }
+
+    // Step inside QTabBar.
+    const auto maybeTab = qobject_cast<const QTabWidget*>(object);
+    if (const auto w = maybeTab ? maybeTab->tabBar() : qobject_cast<const QTabBar*>(object))
+    {
+        for (int i = 0; i < w->count(); ++i)
+        {
+            visitTree(w->tabButton(i, QTabBar::LeftSide), onVisited, flags);
+            visitTree(w->tabButton(i, QTabBar::RightSide), onVisited, flags);
         }
     }
 
