@@ -16,6 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="windowTitle">
+   <string>Introducing Cloud Layouts</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>
@@ -167,22 +170,6 @@ line-height: 16px;</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="bullet1">
             <property name="styleSheet">
@@ -231,6 +218,53 @@ line-height: 18px;</string>
             </property>
            </widget>
           </item>
+          <item row="0" column="2">
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="bullet3">
+            <property name="styleSheet">
+             <string notr="true">font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 18px;</string>
+            </property>
+            <property name="text">
+             <string notr="true">•</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="availableAction3Label">
+            <property name="styleSheet">
+             <string notr="true">font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 18px;</string>
+            </property>
+            <property name="text">
+             <string>PTZ</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="QLabel" name="availableAction1Label">
             <property name="styleSheet">
@@ -258,22 +292,8 @@ line-height: 18px;</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="availableAction3Label">
-            <property name="styleSheet">
-             <string notr="true">font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 18px;</string>
-            </property>
-            <property name="text">
-             <string>PTZ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="bullet3">
+          <item row="4" column="0">
+           <widget class="QLabel" name="bullet4">
             <property name="styleSheet">
              <string notr="true">font-family: 'Roboto';
 font-style: normal;
@@ -286,6 +306,20 @@ line-height: 18px;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="availableAction4Label">
+            <property name="styleSheet">
+             <string notr="true">font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 18px;</string>
+            </property>
+            <property name="text">
+             <string>Motion Search</string>
             </property>
            </widget>
           </item>
@@ -356,37 +390,6 @@ line-height: 16px;</string>
             </property>
            </spacer>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="inFuture1Label">
-            <property name="styleSheet">
-             <string notr="true">font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 18px;</string>
-            </property>
-            <property name="text">
-             <string>Searching Motions, Objects, Events</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="bullet4">
-            <property name="styleSheet">
-             <string notr="true">font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 18px;</string>
-            </property>
-            <property name="text">
-             <string notr="true">•</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="QLabel" name="inFuture2Label">
             <property name="styleSheet">
@@ -402,7 +405,7 @@ line-height: 18px;</string>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="bullet5">
+           <widget class="QLabel" name="bullet6">
             <property name="styleSheet">
              <string notr="true">font-family: 'Roboto';
 font-style: normal;
@@ -412,6 +415,37 @@ line-height: 18px;</string>
             </property>
             <property name="text">
              <string notr="true">•</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="inFuture1Label">
+            <property name="styleSheet">
+             <string notr="true">font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 18px;</string>
+            </property>
+            <property name="text">
+             <string>Searching Objects, Events</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="bullet5">
+            <property name="styleSheet">
+             <string notr="true">font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 18px;</string>
+            </property>
+            <property name="text">
+             <string>•</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
