@@ -186,6 +186,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
 
     // Cloud system.
     m_cache.insert(CloudSystem, loadIcon("tree/cloud_system.svg"));
+    m_cache.insert(CloudSystem | Offline, loadIcon("tree/cloud_system_offline.svg"));
     m_cache.insert(CloudSystem | Locked, loadIcon("tree/cloud_system_warning.svg"));
     m_cache.insert(CloudSystem | Incompatible, loadIcon("tree/cloud_system_incompatible.svg"));
 }
@@ -307,20 +308,23 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     if (auto crossSystemCamera = resource.dynamicCast<CrossSystemCameraResource>();
         crossSystemCamera && flags.testFlag(Qn::fake))
     {
-        key = CrossSystemStatus;
         const auto systemId = crossSystemCamera->systemId();
         const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-
-        const auto systemStatus = context
-            ? context->status()
-            : CloudCrossSystemContext::Status::uninitialized;
-
-        if (systemStatus == CloudCrossSystemContext::Status::uninitialized)
-            status = QnResourceIconCache::Offline;
-        else if (systemStatus == CloudCrossSystemContext::Status::connecting)
-            status = QnResourceIconCache::Control;
-        else if (systemStatus == CloudCrossSystemContext::Status::connectionFailure)
-            status = QnResourceIconCache::Unauthorized;
+        if (NX_ASSERT(context))
+        {
+            const auto systemStatus = context->status();
+            if (systemStatus == CloudCrossSystemContext::Status::connecting)
+            {
+                key = CrossSystemStatus;
+                status = QnResourceIconCache::Control;
+            }
+            else if (systemStatus == CloudCrossSystemContext::Status::connectionFailure
+                || systemStatus == CloudCrossSystemContext::Status::unsupportedPermanently
+                || systemStatus == CloudCrossSystemContext::Status::unsupportedTemporary)
+            {
+                status = QnResourceIconCache::Unauthorized;
+            }
+        }
     }
     // Fake servers
     else if (auto fakeServer = resource.dynamicCast<QnFakeMediaServerResource>())
