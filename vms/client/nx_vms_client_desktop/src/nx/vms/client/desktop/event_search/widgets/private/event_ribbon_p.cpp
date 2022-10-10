@@ -390,7 +390,7 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     if (previewResource->hasFlags(Qn::ResourceFlag::fake))
     {
-        widget->setPlaceholder(tr("CLICK TO SHOW"));
+        widget->setPlaceholder(tr("INFORMATION REQUIRED"));
         return;
     }
 
