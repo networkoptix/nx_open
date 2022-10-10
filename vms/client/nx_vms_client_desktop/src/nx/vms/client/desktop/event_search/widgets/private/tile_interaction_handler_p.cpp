@@ -179,10 +179,14 @@ void TileInteractionHandler::handleClick(
     if (!NX_ASSERT(index.isValid()))
         return;
 
-    switch (checkActionSupport(index))
+    const auto actionSupport = checkActionSupport(index);
+
+    switch (actionSupport)
     {
-        case ActionSupport::crossSystem:
-            showMessage(tr("This action is not supported for notifications from other Systems"));
+        case ActionSupport::supported:
+            break;
+
+        case ActionSupport::unsupported:
             return;
 
         case ActionSupport::interactionRequired:
@@ -196,10 +200,17 @@ void TileInteractionHandler::handleClick(
                     model->setData(index, true, Qn::ForcePreviewLoaderRole);
                 }
             }
-            return;
+
+            // Display connection UI along with banner.
+            [[fallthrough]];
         }
 
-        case ActionSupport::unsupported:
+        case ActionSupport::crossSystem:
+            showMessage(tr("This action is not supported for notifications from other Systems"));
+            return;
+
+        default:
+            NX_ASSERT(false, "Unexpected action support: %1", (int)actionSupport);
             return;
     }
 
@@ -218,7 +229,8 @@ void TileInteractionHandler::handleClick(
 
 void TileInteractionHandler::handleDoubleClick(const QModelIndex& index)
 {
-    openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
+    if (checkActionSupport(index) == ActionSupport::supported)
+        openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
 }
 
 void TileInteractionHandler::navigateToSource(
@@ -500,18 +512,22 @@ TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport
     if (cloudSystemId.isEmpty())
         return ActionSupport::supported;
 
-    if (const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        previewResource && previewResource->hasFlags(Qn::ResourceFlag::fake))
-    {
-        return ActionSupport::interactionRequired;
-    }
+    const auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
 
-    auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
     if (actionType == ui::action::BrowseUrlAction)
         return ActionSupport::unsupported;
 
     if (actionType != ui::action::NoAction)
+    {
+        const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+        // Show interaction dialog for tiles with preview and special action,
+        // different from adding a camera to the layout.
+        if (previewResource && previewResource->hasFlags(Qn::ResourceFlag::fake))
+            return ActionSupport::interactionRequired;
+
         return ActionSupport::crossSystem;
+    }
 
     return ActionSupport::supported;
 }
@@ -519,8 +535,7 @@ TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport
 void TileInteractionHandler::openSource(
     const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
 {
-    if (fromDoubleClick && checkActionSupport(index) != ActionSupport::supported)
-        return;
+    NX_ASSERT(checkActionSupport(index) == ActionSupport::supported);
 
     auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&QnResourceAccessFilter::isOpenableInLayout);
