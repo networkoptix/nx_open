@@ -723,7 +723,6 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
     saveLayout(cloudLayout);
     workbench()->replaceLayout(layout, cloudLayout);
-    removeLayouts({layout});
 }
 
 void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool autoSave)
