@@ -423,6 +423,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         eventData.actionParameters.setArgument(Qn::ActionDataRole, action);
         eventData.previewCamera = camera;
         eventData.removable = false;
+
+        // Recreate informer on the top in case of several calls in a short period.
+        q->removeEvent(eventData.id);
     }
     else
     {
