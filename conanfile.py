@@ -84,11 +84,15 @@ class NxOpenConan(ConanFile):
         if self.isMacos and self.settings.arch in ("armv8", "x86_64"):
             self.options["qt"].tools_target = "Macos_x86_64"
 
+
+        if self.isWindows or self.isLinux:
+            if self.settings.arch == "x86_64":
+                self.requires("cuda-toolkit/11.7" "#80ac1cecc6791af0562fbf0caa1aa406")
+
         if self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("libva/2.6" "#740a8e07c1ac1f7210fba99e2ec2283a")
                 self.requires("intel-media-sdk/19.4" "#b5fe1df9594326590fe81f28301e09d6")
-                self.requires("cuda-toolkit/11.7" "#3ac3f7e6e4011d5c67d3847cd89571c2")
 
             if not self.isArm32:
                 self.requires("os_deps_for_desktop_linux/ubuntu_xenial"
@@ -130,6 +134,7 @@ class NxOpenConan(ConanFile):
         copy_packages = [
             "openssl",
             "hidapi",
+            "cuda-toolkit"
         ]
 
         if self.isLinux:

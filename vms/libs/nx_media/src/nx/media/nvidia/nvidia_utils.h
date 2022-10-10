@@ -10,7 +10,7 @@ namespace nx::media::nvidia {
 
 inline std::string toString(CUresult error)
 {
-    const char *szErrName = NULL;
+    const char *szErrName = nullptr;
     NvidiaDriverApiProxy::instance().cuGetErrorName(error, &szErrName);
     return std::string(szErrName);
 }

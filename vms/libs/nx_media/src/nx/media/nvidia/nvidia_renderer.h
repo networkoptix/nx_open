@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <GL/gl.h>
+#include <QtGui/QOpenGLFunctions>
 #include <QtCore/QSize>
 
 class AbstractVideoSurface;

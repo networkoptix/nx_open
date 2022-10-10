@@ -2,23 +2,22 @@
 
 #include <gtest/gtest.h>
 
+#if 0 //This code is only for a fast debugging decoder without a desktop client rendering framework.
+
 #include <nx/utils/log/log.h>
 #include <utils/media/io_context.h>
 #include <nx/media/ffmpeg/demuxer.h>
-//#include <nx/media/nvidia/nvidia_video_decoder.h>
-//#include <nx/media/nvidia/nvidia_video_frame.h>
-
+#include <nx/media/nvidia/nvidia_video_decoder.h>
+#include <nx/media/nvidia/nvidia_video_frame.h>
 
 TEST(NvidiaVideoDecoderTest, SampleDecode)
 {
- /*   auto io = nx::media::ffmpeg::openFile("/home/lbusygin/test.mkv");
+    auto io = nx::media::ffmpeg::openFile("/home/lbusygin/test.mkv");
     ASSERT_TRUE(io);
     nx::media::ffmpeg::Demuxer demuxer;
     ASSERT_TRUE(demuxer.open(std::move(io)));
 
     auto decoder = std::make_shared<nx::media::nvidia::NvidiaVideoDecoder>();
-
-
     while(true)
     {
         auto packet = demuxer.getNextData();
@@ -34,5 +33,7 @@ TEST(NvidiaVideoDecoderTest, SampleDecode)
         NX_ERROR(this, "Decode packet");
         decoder->decode(videoPacket);
         auto frame = decoder->getFrame();
-    }*/
+    }
 }
+
+#endif
