@@ -2,8 +2,6 @@
 
 #pragma once
 
-#ifdef __linux__
-
 #include <QtCore/QSize>
 #include <QtGui/QOpenGLFunctions>
 
@@ -13,10 +11,6 @@
 namespace nx::media::nvidia {
 
 class NvidiaVideoFrame;
-
-}
-
-namespace nx::media::nvidia::linux {
 
 class Renderer : public QOpenGLFunctions
 {
@@ -34,11 +28,15 @@ private:
     void freeScaledFrame();
 
     QSize m_textureSize;
-    CUdeviceptr m_scaledFrame = 0; //< Buffer to upload scaled frame
+
+    /** Buffer to upload the scaled frame. */
+    CUdeviceptr m_scaledFrame = 0;
+
     CUgraphicsResource m_cuResource;
-    GLuint m_pbo = 0; //< Buffer object to upload texture data
+
+    /** Buffer object to upload the texture data. */
+    GLuint m_pbo = 0;
 };
 
-} // nx::media::nvidia::linux
+} // nx::media::nvidia
 
-#endif // __linux__

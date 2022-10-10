@@ -1,5 +1,4 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-#ifdef __linux__
 
 #include <nx/utils/log/log.h>
 
@@ -50,7 +49,7 @@ static QString glErrorString(GLenum err)
     }
 }
 
-namespace nx::media::nvidia::linux {
+namespace nx::media::nvidia {
 
 Renderer::~Renderer()
 {
@@ -150,7 +149,7 @@ bool Renderer::convertToRgb(
     }
 
     // Launch cuda kernels for colorspace conversion from raw video to raw image formats which
-    // OpenGL textures can work with
+    // OpenGL textures can work with.
     if (bitDepth == 8)
     {
         if (format == cudaVideoSurfaceFormat_YUV444)
@@ -230,6 +229,4 @@ bool Renderer::render(GLuint textureId, QSize textureSize, const NvidiaVideoFram
     return draw(textureId, textureSize.width(), textureSize.height());
 }
 
-} // namespace nx::media::nvidia::linux
-
-#endif // __linux__
+} // namespace nx::media::nvidia

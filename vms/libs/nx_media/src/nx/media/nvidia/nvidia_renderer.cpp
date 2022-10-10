@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
 #include <nx/media/nvidia/nvidia_video_decoder.h>
-#include <nx/media/nvidia/linux/renderer.h>
+#include <nx/media/nvidia/renderer.h>
 
 namespace nx::media::nvidia {
 

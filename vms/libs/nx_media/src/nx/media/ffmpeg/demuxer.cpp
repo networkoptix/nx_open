@@ -67,7 +67,7 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
         return nullptr;
     }
 
-    AVStream *stream = m_formatContext->streams[packet.stream_index];
+    AVStream* const stream = m_formatContext->streams[packet.stream_index];
 
     if (stream->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
         return QnAbstractMediaDataPtr(new QnEmptyMediaData());

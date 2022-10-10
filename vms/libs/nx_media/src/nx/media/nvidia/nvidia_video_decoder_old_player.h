@@ -5,9 +5,7 @@
 #include <decoders/video/abstract_video_decoder.h>
 #include <nx/streaming/video_data_packet.h>
 
-namespace nx::media::nvidia {
-    class NvidiaVideoDecoder;
-}
+namespace nx::media::nvidia { class NvidiaVideoDecoder; }
 
 class NvidiaVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
@@ -30,9 +28,11 @@ public:
 
     static bool isSupported(const QnConstCompressedVideoDataPtr& data);
     static int instanceCount();
+
 private:
+    static int m_instanceCount;
     std::shared_ptr<nx::media::nvidia::NvidiaVideoDecoder> m_impl;
     QSize m_resolution;
     int m_lastStatus = 0;
-    QnAbstractMediaData::MediaFlags m_lastFlags {};
+    QnAbstractMediaData::MediaFlags m_lastFlags{};
 };

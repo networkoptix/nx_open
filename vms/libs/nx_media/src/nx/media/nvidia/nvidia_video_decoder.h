@@ -11,10 +11,7 @@
 
 namespace nx::media::nvidia {
 
-namespace linux{
-    class Renderer;
-}
-
+class Renderer;
 class NvidiaVideoFrame;
 struct NvidiaVideoDecoderImpl;
 
@@ -31,12 +28,7 @@ public:
     static bool isCompatible(
         const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height);
 
-    static int instanceCount() { return m_instanceCount; }
-
-//    bool scaleFrame(
-  //      mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize);
-
-    linux::Renderer& getRenderer();
+    Renderer& getRenderer();
 
     void pushContext();
     void popContext();
@@ -45,7 +37,6 @@ private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
 
 private:
-    static int m_instanceCount;
     std::unique_ptr<NvidiaVideoDecoderImpl> m_impl;
 };
 

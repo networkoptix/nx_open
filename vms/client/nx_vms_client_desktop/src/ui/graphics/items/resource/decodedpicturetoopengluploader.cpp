@@ -31,9 +31,7 @@ extern "C"
 
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_video_frame.h>
-#ifndef WIN32
 #include <nx/media/nvidia/nvidia_renderer.h>
-#endif
 #endif //__QSV_SUPPORTED__
 
 
@@ -1195,7 +1193,6 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     bool isNewTexture = texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
-#ifndef WIN32
     if (frame->getVideoSurface()->type() == SurfaceType::Nvidia)
     {
         if (!nx::media::nvidia::renderToRgb(frame->getVideoSurface(), texture->m_id, displaySize))
@@ -1205,7 +1202,6 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
         }
     }
     else
-#endif
     {
         float cropWidth = 1;
         float cropHeight = 1;

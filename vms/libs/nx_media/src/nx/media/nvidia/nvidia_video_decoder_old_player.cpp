@@ -8,23 +8,32 @@
 
 #include "nvidia_video_decoder.h"
 
+static constexpr int kMaxDecoderCount = 2;
+
+int NvidiaVideoDecoderOldPlayer::m_instanceCount = 0;
+
 bool NvidiaVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
+    if (m_instanceCount >= kMaxDecoderCount)
+        return false;
+
     return nx::media::nvidia::NvidiaVideoDecoder::isCompatible(
         data, data->compressionType, data->height, data->width);
 }
 
 int NvidiaVideoDecoderOldPlayer::instanceCount()
 {
-    return nx::media::nvidia::NvidiaVideoDecoder::instanceCount();
+    return m_instanceCount;
 }
 
 NvidiaVideoDecoderOldPlayer::NvidiaVideoDecoderOldPlayer()
 {
+    m_instanceCount++;
 }
 
 NvidiaVideoDecoderOldPlayer::~NvidiaVideoDecoderOldPlayer()
 {
+    m_instanceCount--;
 }
 
 bool NvidiaVideoDecoderOldPlayer::decode(
@@ -99,17 +108,16 @@ MemoryType NvidiaVideoDecoderOldPlayer::targetMemoryType() const
 
 double NvidiaVideoDecoderOldPlayer::getSampleAspectRatio() const
 {
-    // TODO
+    //TODO #lbusygin: Implement sample acpect ratio parsing
     return 1.0;
 }
 
 void NvidiaVideoDecoderOldPlayer::setLightCpuMode(DecodeMode /*val*/)
 {
-    // TODO
+    //TODO #lbusygin: Implement light CPU mode for nvidia
 }
 
 void NvidiaVideoDecoderOldPlayer::setMultiThreadDecodePolicy(
     MultiThreadDecodePolicy /*mtDecodingPolicy*/)
 {
-
 }
