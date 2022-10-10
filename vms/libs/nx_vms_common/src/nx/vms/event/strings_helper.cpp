@@ -288,7 +288,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             NX_ASSERT(!eventName.isEmpty());
             // for example: "Car at camera 'Front' is detected"
             return tr("%1 at camera '%2'", " is detected")
-                .arg(params.getAnalyticsObjectTypeId())
+                .arg(eventName)
                 .arg(resourceName);
         }
         case EventType::pluginDiagnosticEvent:
