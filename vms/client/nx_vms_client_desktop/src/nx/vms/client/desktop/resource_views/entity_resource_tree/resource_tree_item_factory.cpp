@@ -129,6 +129,40 @@ InvalidatorPtr userRoleNameInvalidator(QnUserRolesManager* rolesManager, const Q
 //-------------------------------------------------------------------------------------------------
 // Icon data provider / invalidator and flags provider factory functions for the cloud system item.
 //-------------------------------------------------------------------------------------------------
+
+GenericItem::DataProvider cloudSystemNameProvider(const QString& systemId)
+{
+    return
+        [systemId]
+        {
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            if (NX_ASSERT(context))
+                return context->systemDescription()->name();
+
+            return QString{};
+        };
+}
+
+InvalidatorPtr cloudSystemNameInvalidator(const QString& systemId)
+{
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    auto result = std::make_shared<Invalidator>();
+
+    if (!NX_ASSERT(context))
+        return result;
+
+    result->connections()->add(QObject::connect(
+        context->systemDescription(),
+        &QnBaseSystemDescription::systemNameChanged,
+        [invalidator = result.get()]
+        {
+            invalidator->invalidate();
+        }));
+
+    return result;
+}
+
 GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
 {
     return
@@ -505,11 +539,13 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
     if (!NX_ASSERT(systemDescription && systemDescription->isCloudSystem()))
         return {};
 
+    const auto nameProvider = cloudSystemNameProvider(systemId);
+    const auto nameInvalidator = cloudSystemNameInvalidator(systemId);
     const auto iconProvider = cloudSystemIconProvider(systemId);
     const auto iconInvalidator = cloudSystemIconInvalidator(systemId);
 
     return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, systemDescription->name())
+        .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::CloudSystemIdRole, systemId)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
