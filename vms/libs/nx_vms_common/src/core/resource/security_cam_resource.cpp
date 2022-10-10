@@ -1123,28 +1123,38 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return m_userAttributes.preferredServerId;
 }
 
-void QnSecurityCamResource::synchronizeRemoteArchiveOnce()
+void QnSecurityCamResource::setRemoteArchiveSynchronizationMode(
+    nx::core::resource::RemoteArchiveSyncronizationMode mode)
 {
-    QString value;
-    QnLexical::serialize(true, &value);
-    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabledOnce, value);
+    setProperty(
+        ResourcePropertyKey::kRemoteArchiveSynchronizationMode,
+        QString::fromStdString(nx::reflect::enumeration::toString(mode)));
 }
 
-void QnSecurityCamResource::setRemoteArchiveSynchronizationEnabled(bool isEnabled)
+nx::core::resource::RemoteArchiveSyncronizationMode
+    QnSecurityCamResource::getRemoteArchiveSynchronizationMode() const
 {
-    QString value;
-    QnLexical::serialize(isEnabled, &value);
-    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled, value);
+    auto mode = nx::core::resource::RemoteArchiveSyncronizationMode::off;
+    nx::reflect::enumeration::fromString(
+        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationMode).toStdString(),
+        &mode);
+    return mode;
 }
 
-bool QnSecurityCamResource::isRemoteArchiveSynchronizationEnabled() const
+void QnSecurityCamResource::setManualRemoteArchiveSynchronizationTriggered(bool isTriggered)
 {
-    bool isEnabled = false;
+    QString value;
+    QnLexical::serialize(isTriggered, &value);
+    setProperty(ResourcePropertyKey::kManualRemoteArchiveSynchronizationTriggered, value);
+}
+
+bool QnSecurityCamResource::isManualRemoteArchiveSynchronizationTriggered() const
+{
+    bool isTriggered = false;
     QnLexical::deserialize(
-        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled),
-        &isEnabled);
-
-    return isEnabled;
+        getProperty(ResourcePropertyKey::kManualRemoteArchiveSynchronizationTriggered),
+        &isTriggered);
+    return isTriggered;
 }
 
 void QnSecurityCamResource::updatePreferredServerId()

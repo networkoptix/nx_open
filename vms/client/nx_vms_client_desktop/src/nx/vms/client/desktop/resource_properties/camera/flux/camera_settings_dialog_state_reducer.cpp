@@ -1255,7 +1255,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->forcedProfile(nx::vms::api::StreamIndex::secondary); });
 
     fetchFromCameras<bool>(state.expert.remoteArchiveAutoExportDisabled, cameras,
-        [](const Camera& camera) { return !camera->isRemoteArchiveSynchronizationEnabled(); });
+        [](const Camera& camera)
+        {
+            const auto mode = camera->getRemoteArchiveSynchronizationMode();
+            return mode != nx::core::resource::RemoteArchiveSyncronizationMode::automatic;
+        });
 
     bool firstStep = true;
     for (const auto& camera: cameras)

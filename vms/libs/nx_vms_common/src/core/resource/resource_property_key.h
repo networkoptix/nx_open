@@ -126,17 +126,17 @@ static const QString kLastSyncronizedRemoteArchiveTimestampMs(
     "lastSyncronizedRemoteArchiveTimestampMs");
 
 /**
- * Whether to download remote (i.e. on-camera) archives.
+ * Remote archive import mode.
  */
-static const QString kRemoteArchiveSynchronizationEnabled("remoteArchiveSynchronizationEnabled");
+static const QString kRemoteArchiveSynchronizationMode("remoteArchiveSynchronizationMode");
 
 /**
- * Whether to download remote (i.e. on-camera) archives.
+ * Whether manual remote archive import is triggered.
  */
-static const QString kRemoteArchiveSynchronizationEnabledOnce("remoteArchiveSynchronizationEnabledOnce");
+static const QString kManualRemoteArchiveSynchronizationTriggered("manualRemoteArchiveSynchronizationTriggered");
 
 /**
- * Whether to download remote (i.e. on-camera) archives.
+ * Whether time sync has been enabled once due to activation of remote archive sync.
  */
 static const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDueToRemoteArchiveSync");
 

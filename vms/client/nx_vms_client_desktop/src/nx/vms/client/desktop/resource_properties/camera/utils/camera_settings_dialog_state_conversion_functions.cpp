@@ -316,8 +316,12 @@ void setForcedSecondaryProfile(const QString& value, const Cameras& cameras)
 
 void setRemoteArchiveAutoExportDisabled(const bool& value, const Cameras& cameras)
 {
+    const auto mode = value 
+        ? nx::core::resource::RemoteArchiveSyncronizationMode::manual
+        : nx::core::resource::RemoteArchiveSyncronizationMode::automatic;
+
     for (const auto& camera: cameras)
-        camera->setRemoteArchiveSynchronizationEnabled(!value);
+        camera->setRemoteArchiveSynchronizationMode(mode);
 }
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
