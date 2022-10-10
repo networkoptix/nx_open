@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "io_context.h"
 
 #include <fstream>
@@ -75,7 +77,7 @@ IoContextPtr openFile(const std::string& fileName)
 
     auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/false);
     ioContext->readHandler =
-        [file] (uint8_t* buffer, int size)
+        [file](uint8_t* buffer, int size)
         {
             file->read((char*)buffer, size);
             return (int)file->gcount();
@@ -86,17 +88,17 @@ IoContextPtr openFile(const std::string& fileName)
         {
             switch (whence)
             {
-            case SEEK_SET:
-                file->seekg(pos, std::ios_base::beg);
-                break;
-            case SEEK_CUR:
-                file->seekg(pos, std::ios_base::cur);
-                break;
-            case SEEK_END:
-                file->seekg(pos, std::ios_base::end);
-                break;
-            default:
-                return AVERROR(ENOENT);
+                case SEEK_SET:
+                    file->seekg(pos, std::ios_base::beg);
+                    break;
+                case SEEK_CUR:
+                    file->seekg(pos, std::ios_base::cur);
+                    break;
+                case SEEK_END:
+                    file->seekg(pos, std::ios_base::end);
+                    break;
+                default:
+                    return AVERROR(ENOENT);
             }
             return (int)file->tellg();
         };
