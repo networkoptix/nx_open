@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <atomic>
+
+#include <QtCore/QThread>
+
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/log_settings.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -9,6 +13,28 @@
 namespace nx::vms::client::desktop {
 
 struct ConfigurableLogSettings;
+
+class ClientLogCollector: public QThread
+{
+    Q_OBJECT
+    using base_type = QThread;
+
+public:
+    ClientLogCollector(const QString& target, QObject *parent = nullptr);
+    void pleaseStop();
+
+protected:
+    virtual void run() override;
+
+signals:
+    void progressChanged(double progress);
+    void success();
+    void error();
+
+private:
+    const QString m_target;
+    std::atomic<bool> m_cancelled{false};
+};
 
 class NX_VMS_CLIENT_DESKTOP_API LogsManagementWatcher:
     public QObject,
