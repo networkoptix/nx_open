@@ -68,6 +68,16 @@ LogsManagementWatcher::State watcherState(Qt::CheckState state)
         : LogsManagementWatcher::State::hasSelection;
 }
 
+QString makeFileName(QnMediaServerResourcePtr server)
+{
+    const auto name = server ? server->getName() : "client";
+    const auto id = server ? server->getId().toSimpleString() : QnUuid().toSimpleString();
+    const auto time = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+    return server
+        ? nx::format("%1_%2_%3.zip", name, id, time)
+        : nx::format("%1_%2.zip", name, time);
+}
+
 nx::vms::api::ServerLogSettings loadClientSettings()
 {
     using namespace nx::utils::log;
@@ -375,7 +385,9 @@ struct LogsManagementWatcher::Unit::Private
         NX_MUTEX_LOCKER lock(&m_mutex);
         NX_ASSERT(m_state == DownloadState::none || m_state == DownloadState::error);
 
-        m_collector.reset(new ClientLogCollector(folder + "/client_log.zip"));
+        QDir dir(folder);
+        QString filename = makeFileName(m_server);
+        m_collector.reset(new ClientLogCollector(dir.absoluteFilePath(filename)));
         connect(m_collector.get(), &ClientLogCollector::success,
             [this, callback]
             {
@@ -422,17 +434,7 @@ struct LogsManagementWatcher::Unit::Private
         url.setPath(QString("/rest/v2/servers/%1/logArchive").arg(serverId));
 
         QDir dir(folder);
-        QString base = serverId;
-        QString filename;
-        for (int i = 0;; i++)
-        {
-            filename = i > 0
-                ? QString("%1 (%2).zip").arg(base).arg(i)
-                : QString("%1.zip").arg(base);
-
-            if (!dir.exists(filename))
-                break;
-        }
+        QString filename = makeFileName(m_server);
         auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
         file->open(QIODevice::WriteOnly);
 
