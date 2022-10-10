@@ -7,6 +7,9 @@
 #include <QtCore/QSettings>
 #include <QtWidgets/QAction>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
 #include <client/client_settings.h>
@@ -125,6 +128,184 @@ void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
 
 } // namespace
 
+ClientLogCollector::ClientLogCollector(const QString& target, QObject *parent):
+    base_type(parent),
+    m_target(target)
+{
+}
+
+void ClientLogCollector::pleaseStop()
+{
+    m_cancelled = true;
+}
+
+void ClientLogCollector::run()
+{
+    using namespace nx::utils::log;
+
+    auto file = std::make_unique<QFile>(m_target);
+    if (!file->open(QIODevice::ReadWrite))
+    {
+        NX_ERROR(this, "Could not open file for writing: %1", m_target);
+        emit error();
+        return;
+    }
+
+    QuaZip archive(&*file);
+    archive.setZip64Enabled(true);
+    if (!archive.open(QuaZip::Mode::mdCreate))
+    {
+        NX_ERROR(this, "Could not create zip archive: %1", archive.getZipError());
+        emit error();
+        return;
+    }
+
+    // TODO: support customized logs.
+    const auto name = "client_log";
+
+    for (int rotation = 0; !m_cancelled && rotation <= kMaxLogRotation; rotation++)
+    {
+        NX_VERBOSE(this, "Archiving %1 for %2", (rotation == 0)
+            ? "current log file" : NX_FMT("rotated log file %1", rotation), name);
+
+        auto logger = mainLogger();
+        std::optional<QString> baseFileName = logger->filePath();
+
+        if (!baseFileName)
+        {
+            NX_ERROR(this, "Log file for %1 is stderr", name);
+            emit error();
+            return;
+        }
+
+        const auto path = File::makeFileName(*baseFileName, rotation);
+        if (!QFile::exists(path))
+        {
+            NX_VERBOSE(this, "Log file for %1 does not exist at the path %2, skipping it", name, path);
+            continue;
+        }
+
+        static constexpr int kBufferSize = 64 * 1024;
+        if (rotation)
+        {
+            QuaZip rotatedArchive(path);
+            if (!rotatedArchive.open(QuaZip::Mode::mdUnzip))
+            {
+                NX_ERROR(this, "Could not open zipped log file for %1 at the path %2", name, path);
+                emit error();
+                return;
+            }
+            if (!rotatedArchive.goToFirstFile())
+            {
+                NX_ERROR(this, "Could not find a log file for %1 inside the archive at the path %2: %3",
+                    name, path, rotatedArchive.getZipError());
+                emit error();
+                return;
+            }
+
+            int method = Z_DEFLATED, level = Z_DEFAULT_COMPRESSION;
+            QuaZipFile deflatedLog(&rotatedArchive);
+            // Open for reading in raw mode to avoid uncompressing.
+            if (!deflatedLog.open(QIODevice::ReadOnly, &method, &level, true))
+            {
+                NX_ERROR(this, "Could not open the log file for %1 inside the archive at the path %2: %3",
+                    name, path, deflatedLog.getZipError());
+                emit error();
+                return;
+            }
+
+            QuaZipFileInfo64 info;
+            rotatedArchive.getCurrentFileInfo(&info);
+
+            QFileInfo fileName(path);
+            QuaZipNewInfo newInfo(fileName.fileName().replace(File::kRotateExtensionWithSeparator,
+                File::kExtensionWithSeparator), path);
+            newInfo.uncompressedSize = info.uncompressedSize;
+
+            QuaZipFile zip(&archive);
+            // Open for writing in raw mode to avoid compressing.
+            if (!zip.open(QIODevice::WriteOnly, newInfo, NULL, info.crc, method, level, true))
+            {
+                NX_ERROR(this, "Could not add the log file for %1 to the archive: %2",
+                    name, zip.getZipError());
+                emit error();
+                return;
+            }
+
+            while (!m_cancelled
+                && deflatedLog.pos() < deflatedLog.size()
+                && deflatedLog.getZipError() == 0 && zip.getZipError() == 0)
+            {
+                const auto buf = deflatedLog.read(kBufferSize);
+                if (!buf.isEmpty())
+                    zip.write(buf);
+            }
+            zip.close();
+
+            if (deflatedLog.getZipError() != 0)
+            {
+                NX_ERROR(this, "Error while reading the log file for %1 at the path %2: %3",
+                    name, path, deflatedLog.getZipError());
+                emit error();
+                return;
+            }
+            if (zip.getZipError() != 0)
+            {
+                NX_ERROR(this, "Error while zipping the log file for %1 at the path %2: %3",
+                    name, path, zip.getZipError());
+                emit error();
+                return;
+            }
+        }
+        else
+        {
+            QFile textLog(path);
+            if (!textLog.open(QIODevice::ReadOnly))
+            {
+                NX_ERROR(this, "Could not open the log file for %1 at path %2", name, path);
+                emit error();
+                return;
+            }
+
+            QuaZipFile zip(&archive);
+            if (!zip.open(QIODevice::WriteOnly, QuaZipNewInfo(File::makeBaseFileName(path), path)))
+            {
+                NX_ERROR(this, "Could not add the log file for %1 to the archive: %2",
+                    name, zip.getZipError());
+                emit error();
+                return;
+            }
+
+            while (!m_cancelled && !textLog.atEnd()
+                && textLog.error() == QFileDevice::NoError && zip.getZipError() == 0)
+            {
+                const auto buf = textLog.read(kBufferSize);
+                if (!buf.isEmpty())
+                    zip.write(buf);
+            }
+            zip.close();
+
+            if (textLog.error() != QFileDevice::NoError)
+            {
+                NX_ERROR(this, "Error while reading the log file for %1 at the path %2: %3",
+                        name, path, textLog.error());
+                emit error();
+                return;
+            }
+            if (zip.getZipError() != 0)
+            {
+                NX_DEBUG(this, "Error while zipping the log file for %1 at the path %2: %3",
+                    name, path, zip.getZipError());
+                emit error();
+                return;
+            }
+        }
+    }
+
+    archive.close();
+    emit success();
+}
+
 struct LogsManagementWatcher::Unit::Private
 {
     static std::shared_ptr<Unit> createClientUnit()
@@ -187,7 +368,41 @@ struct LogsManagementWatcher::Unit::Private
         m_state = state;
     }
 
-    void startDownload(
+    void startClientDownload(
+        const QString& folder,
+        std::function<void()> callback)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        NX_ASSERT(m_state == DownloadState::none || m_state == DownloadState::error);
+
+        m_collector.reset(new ClientLogCollector(folder + "/client_log.zip"));
+        connect(m_collector.get(), &ClientLogCollector::success,
+            [this, callback]
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                m_state = DownloadState::complete;
+
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+        connect(m_collector.get(), &ClientLogCollector::error,
+            [this, callback]
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                m_state = DownloadState::error;
+
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+
+        m_collector->start();
+        m_state = DownloadState::loading;
+
+    }
+
+    void startServerDownload(
         const QString& folder,
         const nx::utils::Url& apiUrl,
         const network::http::Credentials& credentials,
@@ -302,14 +517,20 @@ struct LogsManagementWatcher::Unit::Private
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
+        if (m_collector)
+        {
+            m_collector->pleaseStop();
+            m_collector->wait();
+            m_collector.reset();
+        }
         if (m_downloader)
         {
             // Downloader can receive some data and try to lock the mutex before it actually stops.
             lock.unlock();
             m_downloader->pleaseStopSync();
             lock.relock();
+            m_downloader.reset();
         }
-        m_downloader.reset();
         m_state = DownloadState::none;
     }
 
@@ -378,6 +599,7 @@ private:
     DownloadState m_state{DownloadState::none};
     std::optional<nx::vms::api::ServerLogSettings> m_settings;
 
+    std::unique_ptr<ClientLogCollector> m_collector;
     std::unique_ptr<nx::network::http::AsyncFileDownloader> m_downloader;
 
     size_t m_bytesLoaded{0};
@@ -1030,8 +1252,7 @@ void LogsManagementWatcher::cancelDownload()
     NX_ASSERT(d->state == State::loading);
     const auto newState = watcherState(d->selectionState());
 
-    //TODO: #spanasenko Stop client log collection.
-    d->client->data()->setState(Unit::DownloadState::none);
+    d->client->data()->stopDownload();
     for (auto server: d->servers)
     {
         server->data()->stopDownload();
@@ -1184,14 +1405,14 @@ void LogsManagementWatcher::onSentServerLogSettings(
 
 void LogsManagementWatcher::downloadClientLogs(const QString& folder, LogsManagementUnitPtr unit)
 {
-    unit->data()->setState(Unit::DownloadState::error);
-
-    executeLater([this]{ updateDownloadState(); }, this);
+    unit->data()->startClientDownload(
+        folder,
+        [this]{ executeInThread(thread(), [this]{ updateDownloadState(); }); });
 }
 
 void LogsManagementWatcher::downloadServerLogs(const QString& folder, LogsManagementUnitPtr unit)
 {
-    unit->data()->startDownload(
+    unit->data()->startServerDownload(
         folder,
         currentServer()->getApiUrl(),
         connection()->credentials(),
