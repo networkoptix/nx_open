@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -478,8 +479,13 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     if (flags.testFlag(Qn::desktop_camera))
         return false;
 
-    return ResourceAccessManager::hasPermissions(resource, Qn::ViewFootagePermission)
-        || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
+    if (const auto accessController = ResourceAccessManager::accessController(resource))
+    {
+        return accessController->hasGlobalPermission(GlobalPermission::viewArchive)
+            || !flags.testFlag(Qn::live); //< Show slider for local files.
+    }
+
+    return false;
 }
 
 action::ActionScope WorkbenchUi::currentScope() const
