@@ -6,7 +6,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <nx/media/nvidia/linux/library_loader.h>
+#include <nx/media/nvidia/library_loader.h>
 
 namespace nx::media::nvidia {
 
@@ -14,6 +14,7 @@ class NvidiaDriverDecoderProxy
 {
 public:
     bool load();
+
     static NvidiaDriverDecoderProxy& instance()
     {
         static NvidiaDriverDecoderProxy proxy;
@@ -21,43 +22,43 @@ public:
     }
 
 public:
-    using cuvidCreateDecoderType = CUresult (*)(CUvideodecoder*, CUVIDDECODECREATEINFO*);
-    using cuvidReconfigureDecoderType = CUresult (*)(CUvideodecoder, CUVIDRECONFIGUREDECODERINFO*);
-    using cuvidDestroyDecoderType = CUresult (*)(CUvideodecoder);
+    using CuvidCreateDecoderType = CUresult (*)(CUvideodecoder*, CUVIDDECODECREATEINFO*);
+    using CuvidReconfigureDecoderType = CUresult (*)(CUvideodecoder, CUVIDRECONFIGUREDECODERINFO*);
+    using CuvidDestroyDecoderType = CUresult (*)(CUvideodecoder);
 
-    using cuvidCreateVideoParserType = CUresult (*)(CUvideoparser*, CUVIDPARSERPARAMS*);
-    using cuvidParseVideoDataType = CUresult (*)(CUvideoparser, CUVIDSOURCEDATAPACKET*);
-    using cuvidDestroyVideoParserType = CUresult (*)(CUvideoparser);
+    using CuvidCreateVideoParserType = CUresult (*)(CUvideoparser*, CUVIDPARSERPARAMS*);
+    using CuvidParseVideoDataType = CUresult (*)(CUvideoparser, CUVIDSOURCEDATAPACKET*);
+    using CuvidDestroyVideoParserType = CUresult (*)(CUvideoparser);
 
-    using cuvidCtxLockCreateType = CUresult (*)(CUvideoctxlock*, CUcontext);
-    using cuvidCtxLockDestroyType = CUresult (*)(CUvideoctxlock);
+    using CuvidCtxLockCreateType = CUresult (*)(CUvideoctxlock*, CUcontext);
+    using CuvidCtxLockDestroyType = CUresult (*)(CUvideoctxlock);
 
-    using cuvidGetDecoderCapsType = CUresult (*)(CUVIDDECODECAPS*);
-    using cuvidDecodePictureType = CUresult (*)(CUvideodecoder, CUVIDPICPARAMS*);
-    using cuvidGetDecodeStatusType = CUresult (*)(CUvideodecoder, int, CUVIDGETDECODESTATUS*);
+    using CuvidGetDecoderCapsType = CUresult (*)(CUVIDDECODECAPS*);
+    using CuvidDecodePictureType = CUresult (*)(CUvideodecoder, CUVIDPICPARAMS*);
+    using CuvidGetDecodeStatusType = CUresult (*)(CUvideodecoder, int, CUVIDGETDECODESTATUS*);
 
-    using cuvidMapVideoFrameType = CUresult (*)(CUvideodecoder, int, unsigned long long*, unsigned int*, CUVIDPROCPARAMS*);
-    using cuvidUnmapVideoFrameType = CUresult (*)(CUvideodecoder, unsigned long long);
+    using CuvidMapVideoFrameType = CUresult (*)(CUvideodecoder, int, unsigned long long*, unsigned int*, CUVIDPROCPARAMS*);
+    using CuvidUnmapVideoFrameType = CUresult (*)(CUvideodecoder, unsigned long long);
 
-    cuvidCreateVideoParserType cuvidCreateVideoParser = nullptr;
-    cuvidParseVideoDataType cuvidParseVideoData = nullptr;
-    cuvidDestroyVideoParserType cuvidDestroyVideoParser = nullptr;
+    CuvidCreateVideoParserType cuvidCreateVideoParser = nullptr;
+    CuvidParseVideoDataType cuvidParseVideoData = nullptr;
+    CuvidDestroyVideoParserType cuvidDestroyVideoParser = nullptr;
 
-    cuvidCreateDecoderType cuvidCreateDecoder = nullptr;
-    cuvidReconfigureDecoderType cuvidReconfigureDecoder = nullptr;
-    cuvidGetDecoderCapsType cuvidGetDecoderCaps = nullptr;
-    cuvidDecodePictureType cuvidDecodePicture = nullptr;
-    cuvidGetDecodeStatusType cuvidGetDecodeStatus = nullptr;
-    cuvidDestroyDecoderType cuvidDestroyDecoder = nullptr;
+    CuvidCreateDecoderType cuvidCreateDecoder = nullptr;
+    CuvidReconfigureDecoderType cuvidReconfigureDecoder = nullptr;
+    CuvidGetDecoderCapsType cuvidGetDecoderCaps = nullptr;
+    CuvidDecodePictureType cuvidDecodePicture = nullptr;
+    CuvidGetDecodeStatusType cuvidGetDecodeStatus = nullptr;
+    CuvidDestroyDecoderType cuvidDestroyDecoder = nullptr;
 
-    cuvidUnmapVideoFrameType cuvidUnmapVideoFrame = nullptr;
-    cuvidMapVideoFrameType cuvidMapVideoFrame = nullptr;
+    CuvidUnmapVideoFrameType cuvidUnmapVideoFrame = nullptr;
+    CuvidMapVideoFrameType cuvidMapVideoFrame = nullptr;
 
-    cuvidCtxLockCreateType cuvidCtxLockCreate = nullptr;
-    cuvidCtxLockDestroyType cuvidCtxLockDestroy = nullptr;
+    CuvidCtxLockCreateType cuvidCtxLockCreate = nullptr;
+    CuvidCtxLockDestroyType cuvidCtxLockDestroy = nullptr;
 
 private:
-    linux::LibraryLoader m_loader;
+    LibraryLoader m_loader;
 };
 
 class NvidiaDriverApiProxy
@@ -71,46 +72,46 @@ public:
     }
 
 public:
-    using cuInitType = CUresult (*)(unsigned int);
-    using cuCtxCreateType = CUresult (*)(CUcontext*, unsigned int, CUdevice);
-    using cuCtxDestroyType = CUresult (*)(CUcontext);
-    using cuDeviceGetType = CUresult (*)(CUdevice*, int);
-    using cuCtxPopCurrentType = CUresult (*)(CUcontext*);
-    using cuCtxPushCurrentType = CUresult (*)(CUcontext);
-    using cuMemcpy2DAsyncType = CUresult (*)(const CUDA_MEMCPY2D*, CUstream);
-    using cuStreamSynchronizeType = CUresult (*)(CUstream);
-    using cuGetErrorNameType = CUresult (*)(CUresult, const char**);
-    using cuMemFreeType = CUresult (*)(CUdeviceptr);
-    using cuMemAllocType = CUresult (*)(CUdeviceptr*, size_t);
-    using cuMemAllocPitchType = CUresult (*)(CUdeviceptr*, size_t*, size_t, size_t, unsigned int);
-    using cuGraphicsUnregisterResourceType = CUresult (*)(CUgraphicsResource);
-    using cuGraphicsGLRegisterBufferType = CUresult (*)(CUgraphicsResource*, GLuint, unsigned int);
-    using cuGraphicsMapResourcesType = CUresult (*)(unsigned int, CUgraphicsResource*, CUstream);
-    using cuGraphicsUnmapResourcesType = CUresult (*)(unsigned int, CUgraphicsResource*, CUstream);
-    using cuGraphicsResourceGetMappedPointerType = CUresult (*)(CUdeviceptr*, size_t*, CUgraphicsResource);
-    using cuMemsetD8Type = CUresult (*)(CUdeviceptr, unsigned char, size_t);
+    using CuInitType = CUresult (*)(unsigned int);
+    using CuCtxCreateType = CUresult (*)(CUcontext*, unsigned int, CUdevice);
+    using CuCtxDestroyType = CUresult (*)(CUcontext);
+    using CuDeviceGetType = CUresult (*)(CUdevice*, int);
+    using CuCtxPopCurrentType = CUresult (*)(CUcontext*);
+    using CuCtxPushCurrentType = CUresult (*)(CUcontext);
+    using CuMemcpy2DAsyncType = CUresult (*)(const CUDA_MEMCPY2D*, CUstream);
+    using CuStreamSynchronizeType = CUresult (*)(CUstream);
+    using CuGetErrorNameType = CUresult (*)(CUresult, const char**);
+    using CuMemFreeType = CUresult (*)(CUdeviceptr);
+    using CuMemAllocType = CUresult (*)(CUdeviceptr*, size_t);
+    using CuMemAllocPitchType = CUresult (*)(CUdeviceptr*, size_t*, size_t, size_t, unsigned int);
+    using CuGraphicsUnregisterResourceType = CUresult (*)(CUgraphicsResource);
+    using CuGraphicsGLRegisterBufferType = CUresult (*)(CUgraphicsResource*, GLuint, unsigned int);
+    using CuGraphicsMapResourcesType = CUresult (*)(unsigned int, CUgraphicsResource*, CUstream);
+    using CuGraphicsUnmapResourcesType = CUresult (*)(unsigned int, CUgraphicsResource*, CUstream);
+    using CuGraphicsResourceGetMappedPointerType = CUresult (*)(CUdeviceptr*, size_t*, CUgraphicsResource);
+    using CuMemsetD8Type = CUresult (*)(CUdeviceptr, unsigned char, size_t);
 
-    cuInitType cuInit = nullptr;
-    cuCtxCreateType cuCtxCreate = nullptr;
-    cuCtxDestroyType cuCtxDestroy = nullptr;
-    cuDeviceGetType cuDeviceGet = nullptr;
-    cuMemFreeType cuMemFree = nullptr;
-    cuMemAllocType cuMemAlloc = nullptr;
-    cuMemAllocPitchType cuMemAllocPitch = nullptr;
-    cuMemsetD8Type cuMemsetD8 = nullptr;
-    cuGraphicsMapResourcesType cuGraphicsMapResources = nullptr;
-    cuGraphicsResourceGetMappedPointerType cuGraphicsResourceGetMappedPointer = nullptr;
-    cuGraphicsUnmapResourcesType cuGraphicsUnmapResources = nullptr;
-    cuGraphicsGLRegisterBufferType cuGraphicsGLRegisterBuffer = nullptr;
-    cuGraphicsUnregisterResourceType cuGraphicsUnregisterResource = nullptr;
-    cuCtxPopCurrentType cuCtxPopCurrent = nullptr;
-    cuCtxPushCurrentType cuCtxPushCurrent = nullptr;
-    cuMemcpy2DAsyncType cuMemcpy2DAsync = nullptr;
-    cuStreamSynchronizeType cuStreamSynchronize = nullptr;
-    cuGetErrorNameType cuGetErrorName = nullptr;
+    CuInitType cuInit = nullptr;
+    CuCtxCreateType cuCtxCreate = nullptr;
+    CuCtxDestroyType cuCtxDestroy = nullptr;
+    CuDeviceGetType cuDeviceGet = nullptr;
+    CuMemFreeType cuMemFree = nullptr;
+    CuMemAllocType cuMemAlloc = nullptr;
+    CuMemAllocPitchType cuMemAllocPitch = nullptr;
+    CuMemsetD8Type cuMemsetD8 = nullptr;
+    CuGraphicsMapResourcesType cuGraphicsMapResources = nullptr;
+    CuGraphicsResourceGetMappedPointerType cuGraphicsResourceGetMappedPointer = nullptr;
+    CuGraphicsUnmapResourcesType cuGraphicsUnmapResources = nullptr;
+    CuGraphicsGLRegisterBufferType cuGraphicsGLRegisterBuffer = nullptr;
+    CuGraphicsUnregisterResourceType cuGraphicsUnregisterResource = nullptr;
+    CuCtxPopCurrentType cuCtxPopCurrent = nullptr;
+    CuCtxPushCurrentType cuCtxPushCurrent = nullptr;
+    CuMemcpy2DAsyncType cuMemcpy2DAsync = nullptr;
+    CuStreamSynchronizeType cuStreamSynchronize = nullptr;
+    CuGetErrorNameType cuGetErrorName = nullptr;
 
 private:
-    linux::LibraryLoader m_loader;
+    LibraryLoader m_loader;
 };
 
 } // namespace nx::media::nvidia

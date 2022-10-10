@@ -36,8 +36,8 @@ void FrameQueue::configure(int widthInBytes, int bufferHeight)
     NX_DEBUG(this, "RECONFIGURE, m_emptyFrames: %1, m_readyFrames: %2 overall: %3",
             m_emptyFrames.size(), m_readyFrames.size(), m_frames.size());
 
-    // Keep frames (that wait for render) to delete if decoder will destroyed or release them on
-    // releaseFrame call.
+    // Keep the frames (that wait for rendering) to delete if the decoder is destroyed, or release
+    // them on releaseFrame() call.
     for (auto& frame: m_frames)
     {
         if (std::find(m_readyFrames.begin(), m_readyFrames.end(), frame) != m_readyFrames.end() &&
@@ -46,8 +46,8 @@ void FrameQueue::configure(int widthInBytes, int bufferHeight)
             m_otherSizeFrames.insert(frame);
         }
     }
-    // release all free frames that have different buffer size, frame that waiting for rendering
-    // will be released on releaseFrame call.
+    // Release all the free frames that have different buffer size; frame that are waiting for
+    // rendering will be released on releaseFrame() call.
     for (auto& frame: m_emptyFrames)
         freeFrame(frame);
 
@@ -129,7 +129,7 @@ uint8_t* FrameQueue::allocFrame()
 
 void FrameQueue::freeFrame(uint8_t* frame)
 {
-    auto status = NvidiaDriverApiProxy::instance().cuMemFree((CUdeviceptr)frame);
+    const auto status = NvidiaDriverApiProxy::instance().cuMemFree((CUdeviceptr)frame);
     if (status != CUDA_SUCCESS)
         NX_WARNING(this, "Failed to free frame buffer: %1", toString(status));
 }

@@ -29,9 +29,7 @@ extern "C" {
 
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
-#ifndef WIN32
-    #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
-#endif
+#include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
 
@@ -395,14 +393,12 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
 #ifdef __QSV_SUPPORTED__
     if (qnSettings->isHardwareDecodingEnabled() && !m_reverseMode)
     {
-    #ifndef WIN32
         if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
             && NvidiaVideoDecoderOldPlayer::isSupported(data))
         {
             decoder = new NvidiaVideoDecoderOldPlayer();
         }
         else
-    #endif // WIN32
         if (QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
             && QuickSyncVideoDecoderOldPlayer::isSupported(data))
         {

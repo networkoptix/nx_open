@@ -9,7 +9,12 @@
 *
 */
 
+#include <stdint.h>
+#include <stdio.h>
+
 #include <cuda_runtime.h>
+
+#include "NvCodecUtils.h"
 
 inline bool check(cudaError_t e, int iLine, const char *szFile) {
     if (e != cudaSuccess) {

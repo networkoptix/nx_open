@@ -31,11 +31,11 @@ private:
     int m_widthInBytes;
     int m_bufferHeight;
 
-    std::vector<uint8_t*> m_frames; //< keep them just for delete.
+    std::vector<uint8_t*> m_frames; //< Keep them just for deleting.
     std::deque<uint8_t*> m_readyFrames;
     std::deque<uint8_t*> m_emptyFrames;
 
-    std::set<uint8_t*> m_otherSizeFrames; // Frames that allocated before buffer size changed.
+    std::set<uint8_t*> m_otherSizeFrames; // Frames allocated before the buffer size had changed.
     std::mutex m_mutex;
 };
 
