@@ -115,7 +115,7 @@ class NxOpenConan(ConanFile):
         self._add_documentation_requirements()
 
     def _add_documentation_requirements(self):
-        self.requires(f"vms_help/5.0" "#27fcc774b8e172ad18bf04060934bf56")
+        self.requires(f"vms_help/5.0_patch" "#8ef6477cf684f14f582906a5633460ad")
         self.requires(f"vms_quick_start_guide/5.0" "#cf0e958c5edf4045eb6bbc41ee2cba5e")
 
     def imports(self):
