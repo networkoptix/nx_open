@@ -151,6 +151,12 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
                     return static_cast<int>(
                         QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
                 }
+
+                if (!context->systemDescription()->isOnline())
+                {
+                    return static_cast<int>(
+                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
+                }
             }
 
             return static_cast<int>(QnResourceIconCache::CloudSystem);
