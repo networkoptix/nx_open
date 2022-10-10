@@ -11,6 +11,7 @@
 
 #include <recording/time_period_list.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/reflect/enum_string_conversion.h>
 
 namespace nx {
 namespace core {
@@ -89,6 +90,12 @@ enum class ImportOrder
     Direct, //< From begin to end.
     Reverse, //< From rbegin to rend.
 };
+
+NX_REFLECTION_ENUM_CLASS(RemoteArchiveSyncronizationMode,
+    off,
+    manual,
+    automatic
+);
 
 /**
  * Allows to control archive on remote device (e.g. on camera SD card).

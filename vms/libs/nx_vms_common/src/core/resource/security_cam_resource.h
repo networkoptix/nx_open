@@ -431,9 +431,14 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
-    void synchronizeRemoteArchiveOnce();
-    void setRemoteArchiveSynchronizationEnabled(bool isEnabled);
-    bool isRemoteArchiveSynchronizationEnabled() const;
+    void setRemoteArchiveSynchronizationMode(
+        nx::core::resource::RemoteArchiveSyncronizationMode mode);
+
+    nx::core::resource::RemoteArchiveSyncronizationMode
+        getRemoteArchiveSynchronizationMode() const;
+
+    void setManualRemoteArchiveSynchronizationTriggered(bool isTriggered = true);
+    bool isManualRemoteArchiveSynchronizationTriggered() const;
 
     /**
      * If preferred server is not set, assigns current server as preferred.
