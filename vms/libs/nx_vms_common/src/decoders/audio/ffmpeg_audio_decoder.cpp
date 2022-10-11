@@ -89,7 +89,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
                 outbuf = (quint8*)result.data() + outbuf_len;
             }
 
-            if (!m_audioHelper)
+            if (!m_audioHelper || !m_audioHelper->isCompatible(m_audioDecoderCtx))
                 m_audioHelper.reset(new QnFfmpegAudioHelper(m_audioDecoderCtx));
             m_audioHelper->copyAudioSamples(outbuf, m_outFrame);
 
