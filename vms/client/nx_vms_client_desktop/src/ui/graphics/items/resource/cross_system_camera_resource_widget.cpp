@@ -62,9 +62,6 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
 {
     NX_ASSERT(d->crossSystemCamera);
 
-    m_hudOverlay->title()->titleLabel()->setElideMode(Qt::ElideRight);
-    m_hudOverlay->title()->extraInfoLabel()->setElideMode(Qt::ElideRight);
-
     connect(
         statusOverlayController(),
         &QnStatusOverlayController::buttonClicked,
