@@ -50,9 +50,9 @@ TEST_F(RestPathMatcher, find_handler)
     assertPathRegistered(systems, 1);
     assertPathRegistered(users, 2);
 
-    assertPathMatches("/account/vpupkin/systems", 1, {{{"accountId", "vpupkin"}}}, systems);
-    assertPathMatches("/account/vpu-pk.i_n/systems", 1, {{{"accountId", "vpu-pk.i_n"}}}, systems);
-    assertPathMatches("/systems/sys1/users", 2, {{{"systemId", "sys1"}}}, users);
+    assertPathMatches("/account/vpupkin/systems", 1, {{"accountId", "vpupkin"}}, systems);
+    assertPathMatches("/account/vpu-pk.i_n/systems", 1, {{"accountId", "vpu-pk.i_n"}}, systems);
+    assertPathMatches("/systems/sys1/users", 2, {{"systemId", "sys1"}}, users);
 }
 
 TEST_F(RestPathMatcher, find_handler_multiple_params)
@@ -63,14 +63,14 @@ TEST_F(RestPathMatcher, find_handler_multiple_params)
     assertPathMatches(
         "/account/akolesnikov/system/la_office_test/info",
         3,
-        {{{"accountId", "akolesnikov"}, {"systemName", "la_office_test"}}}, info);
+        {{"accountId", "akolesnikov"}, {"systemName", "la_office_test"}}, info);
 }
 
 TEST_F(RestPathMatcher, find_case_insensitive)
 {
     const std::string systems{"/account/{accountId}/systems"};
     assertPathRegistered(systems, 1);
-    assertPathMatches("/accOUNT/vpupkIN/SYSTems", 1, {{{"accountId", "vpupkIN"}}}, systems);
+    assertPathMatches("/accOUNT/vpupkIN/SYSTems", 1, {{"accountId", "vpupkIN"}}, systems);
 }
 
 TEST_F(RestPathMatcher, no_suitable_handler)
@@ -95,7 +95,7 @@ TEST_F(RestPathMatcher, registering_conflicting_handler)
     assertPathRegistered(systems, 1);
     assertPathNotRegistered("/account/{accountId}/systems", 2);
 
-    assertPathMatches("/account/vpupkin/systems", 1, {{{"accountId", "vpupkin"}}}, systems);
+    assertPathMatches("/account/vpupkin/systems", 1, {{"accountId", "vpupkin"}}, systems);
 }
 
 TEST_F(RestPathMatcher, path_with_same_name_attributes_cannot_be_registered)
@@ -114,7 +114,7 @@ TEST_F(RestPathMatcher, characters_supported_in_parameter_name)
     assertPathMatches(
         "/account/vpupkin/systems",
         1,
-        {{{kParamName, "vpupkin"}}}, systemsWithBigParam);
+        {{kParamName, "vpupkin"}}, systemsWithBigParam);
 }
 
 TEST_F(RestPathMatcher, sub_resource_path_is_not_matched_as_parent_resource_name)
@@ -123,8 +123,8 @@ TEST_F(RestPathMatcher, sub_resource_path_is_not_matched_as_parent_resource_name
     assertPathRegistered("/account/{accountId}/bills/", 2);
 
     assertPathNotMatched("/account/vpupkin/systems");
-    assertPathMatches("/account/vpupkin", 1, { {{"accountId", "vpupkin"}} }, "/account/{accountId}");
-    assertPathMatches("/account/vpupkin/bills/", 2, {{{"accountId", "vpupkin"}}}, "/account/{accountId}/bills/");
+    assertPathMatches("/account/vpupkin", 1, {{"accountId", "vpupkin"}}, "/account/{accountId}");
+    assertPathMatches("/account/vpupkin/bills/", 2, {{"accountId", "vpupkin"}}, "/account/{accountId}/bills/");
 }
 
 } // nx::network::http::server::rest::test
