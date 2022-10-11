@@ -75,8 +75,8 @@ public:
                         matched = false;
                         break;
                     }
-                    params.nameToValue.emplace(
-                        matchContext.paramNames[i - 1], matchResult[i]);
+
+                    params.emplace(matchContext.paramNames[i - 1], matchResult[i]);
                 }
 
                 if (!matched)

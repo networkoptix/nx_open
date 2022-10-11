@@ -1805,6 +1805,16 @@ struct StringHashTransparent
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
 
+struct StringEqualToTransparent
+{
+    using is_transparent = void;
+
+    constexpr bool operator()(const std::string_view& lhs, const std::string_view& rhs) const
+    {
+        return lhs == rhs;
+    }
+};
+
 //-------------------------------------------------------------------------------------------------
 
 /**

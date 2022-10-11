@@ -19,6 +19,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/url.h>
 
 /**
@@ -59,24 +60,18 @@ using HttpHeaders = std::multimap<std::string, std::string, nx::utils::ci_less>;
 using HttpHeader = HttpHeaders::value_type;
 
 /** map<name, value>. */
-struct RequestPathParams
+class RequestPathParams:
+    public nx::utils::stree::StringAttrDict
 {
-    std::map<std::string, std::string> nameToValue;
+    using base_type = nx::utils::stree::StringAttrDict;
+
+public:
+    using base_type::base_type;
 
     std::string getByName(const std::string& name) const
     {
-        auto it = nameToValue.find(name);
-        return it != nameToValue.end() ? it->second : std::string();
-    }
-
-    bool empty() const
-    {
-        return nameToValue.empty();
-    }
-
-    bool operator==(const RequestPathParams& right) const
-    {
-        return nameToValue == right.nameToValue;
+        auto it = find(name);
+        return it != end() ? it->second : std::string();
     }
 };
 

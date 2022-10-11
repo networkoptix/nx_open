@@ -315,7 +315,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using StringAttrDict = std::unordered_map<std::string, std::string,
-    nx::utils::StringHashTransparent, std::equal_to<>>;
+    nx::utils::StringHashTransparent, nx::utils::StringEqualToTransparent>;
 
 /**
  * Attributes container. Implements reading and saving attributes.
