@@ -342,6 +342,19 @@ QnFfmpegAudioHelper::QnFfmpegAudioHelper(AVCodecContext* decoderContext):
     av_opt_set_sample_fmt(m_swr, "out_sample_fmt",
         av_get_packed_sample_fmt(decoderContext->sample_fmt), 0);
     swr_init(m_swr);
+
+    m_channel_layout = decoderContext->channel_layout;
+    m_channels = decoderContext->channels;
+    m_sample_rate = decoderContext->sample_rate;
+    m_sample_fmt = decoderContext->sample_fmt;
+}
+
+bool QnFfmpegAudioHelper::isCompatible(AVCodecContext* decoderContext) const
+{
+    return m_channel_layout == decoderContext->channel_layout
+        && m_channels == decoderContext->channels
+        && m_sample_rate == decoderContext->sample_rate
+        && m_sample_fmt == decoderContext->sample_fmt;
 }
 
 QnFfmpegAudioHelper::~QnFfmpegAudioHelper()
