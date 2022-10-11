@@ -671,7 +671,6 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
     cloudLayout->setName(name);
     saveLayout(cloudLayout);
     workbench()->replaceLayout(layout, cloudLayout);
-    removeLayouts({layout});
 }
 
 void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
