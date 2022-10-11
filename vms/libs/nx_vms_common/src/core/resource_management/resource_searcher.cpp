@@ -19,8 +19,6 @@ QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonMod
 
 QnResourceList QnAbstractResourceSearcher::search()
 {
-    m_shouldStop = false;
-
     auto result = findResources();
     return result;
 }
