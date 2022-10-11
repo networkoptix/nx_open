@@ -21,6 +21,7 @@ GraphicsLabel* createGraphicsLabel()
     label->setAcceptedMouseButtons(Qt::NoButton);
     label->setPerformanceHint(GraphicsLabel::PixmapCaching);
     label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    label->setElideMode(Qt::ElideRight);
     QFont font(label->font());
     font.setBold(true);
     label->setFont(font);
@@ -114,5 +115,3 @@ GraphicsLabel* QnResourceTitleItem::extraInfoLabel()
 {
     return m_extraInfoLabel;
 }
-
-
