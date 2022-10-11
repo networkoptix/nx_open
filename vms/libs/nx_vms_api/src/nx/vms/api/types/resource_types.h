@@ -260,7 +260,9 @@ NX_REFLECTION_ENUM(ServerFlag,
     SF_HasFanMonitoringCapability = 0x8000000,
 
     // Server has a buzzer that can produce sound.
-    SF_HasBuzzer = 0x10000000
+    SF_HasBuzzer = 0x10000000,
+
+    SF_OwnerApiForAdmins = 0x20000000
 )
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
