@@ -296,7 +296,10 @@ std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getDecoder(
 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
-    if (!m_encoderCtx && video)
+    if (!video)
+        return 0;
+
+    if (!m_encoderCtx)
         open(video);
 
     if (!m_encoderCtx)
