@@ -703,10 +703,7 @@ void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
 
 QString QnServerResourceWidget::calculateTitleText() const
 {
-    static const auto kMaxNameLength = 30;
-    const auto name = nx::utils::elideString(
-        QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
-
+    const auto name = QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl);
     if (m_resource->getStatus() != nx::vms::api::ResourceStatus::online)
         return name;
 

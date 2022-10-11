@@ -608,8 +608,7 @@ void QnResourceWidget::setTitleTextInternal(const QString &titleText)
 
 QString QnResourceWidget::calculateTitleText() const
 {
-    constexpr auto kMaxNameLength = 30;
-    return nx::utils::elideString(m_resource->getName(), kMaxNameLength);
+    return m_resource->getName();
 }
 
 void QnResourceWidget::updateTitleText()
