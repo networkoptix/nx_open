@@ -70,6 +70,21 @@ TEST(Lexical, enumSerialization)
     EXPECT_EQ("media", nx::reflect::toString(StreamDataFilters(StreamDataFilter::media)));
 }
 
+TEST(Lexical, obsoleteServerFlags)
+{    
+    // The following Server Flags have been declared obsolete, but must be properly deserialized
+    // from their original names for compatibility.
+    
+    EXPECT_EQ(ServerFlag::SF_Obsolete_AutoSystemName,
+        nx::reflect::fromString<ServerFlag>("SF_AutoSystemName"));
+
+    EXPECT_EQ(ServerFlag::SF_Obsolete_RequiresEdgeLicense,
+        nx::reflect::fromString<ServerFlag>("SF_RequiresEdgeLicense"));
+        
+    EXPECT_EQ(ServerFlag::SF_Obsolete_Has_HDD,
+        nx::reflect::fromString<ServerFlag>("SF_Has_HDD"));
+}
+
 TEST(Lexical, simpleStringsEnumDeserialization)
 {
     using Quality = CameraBackupQuality;

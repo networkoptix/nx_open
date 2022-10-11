@@ -228,7 +228,14 @@ constexpr auto nxReflectVisitAllEnumItems(CameraBackupQuality*, Visitor&& visito
 }
 
 // TODO: #rvasilenko Write comments.
-NX_REFLECTION_ENUM(ServerFlag,
+/**
+ * ATTENTION: When removing unneeded Server Flags, their constants must be renamed to
+ * SF_Obsolete_... instead of being deleted, and a manual deserialization code must be added to_char_type
+ * be able to deserialize the flag from its original name - this is needed to make new Clients,
+ * including a Mobile Client, compatible with the old Servers which may produce these flags.
+ */
+enum ServerFlag
+{
     SF_None = 0x000,
     SF_Edge = 0x001,
     SF_RemoteEC = 0x002,
@@ -237,12 +244,11 @@ NX_REFLECTION_ENUM(ServerFlag,
     SF_timeCtrl = 0x010,
 
     //* System name is default, so it will be displayed as "Unassigned System' in NxTool. */
-    //SF_AutoSystemName = 0x020,
+    SF_Obsolete_AutoSystemName = 0x020,
 
     SF_ArmServer = 0x040,
 
-    // Value cannot be simply removed from here as it causes json compatibility to break.
-    SF_Has_HDD = 0x080, //< Removed in 5.1, was proprietary.
+    SF_Obsolete_Has_HDD = 0x080, //< Removed in 5.1, was proprietary.
 
     /**
      * System is just installed, it has default admin password and is not linked to the cloud.
@@ -254,8 +260,7 @@ NX_REFLECTION_ENUM(ServerFlag,
     SF_SupportsTranscoding = 0x200,
     SF_P2pSyncDone = 0x1000000, //< For UT purpose only
 
-    // Value cannot be simply removed from here as it causes json compatibility to break.
-    SF_RequiresEdgeLicense = 0x2000000, //< Removed in 5.1 - Edge-only licenses are gone.
+    SF_Obsolete_RequiresEdgeLicense = 0x2000000, //< Removed in 5.1 - Edge-only licenses are gone.
 
     // Server can provide information about built-in PoE block.
     SF_HasPoeManagementCapability = 0x4000000,
@@ -264,10 +269,35 @@ NX_REFLECTION_ENUM(ServerFlag,
     SF_HasFanMonitoringCapability = 0x8000000,
 
     // Server has a buzzer that can produce sound.
-    SF_HasBuzzer = 0x10000000
-)
+    SF_HasBuzzer = 0x10000000,
+};
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
+
+/** NOTE: Explicit deserialization is needed to enable obsolete Server Flags. */
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<ServerFlag>;
+    return visitor(
+        Item{ServerFlag::SF_None, "SF_None"},
+        Item{ServerFlag::SF_Edge, "SF_Edge"},
+        Item{ServerFlag::SF_RemoteEC, "SF_RemoteEC"},
+        Item{ServerFlag::SF_HasPublicIP, "SF_HasPublicIP"},
+        Item{ServerFlag::SF_IfListCtrl, "SF_IfListCtrl"},
+        Item{ServerFlag::SF_timeCtrl, "SF_timeCtrl"},
+        Item{ServerFlag::SF_Obsolete_AutoSystemName, "SF_AutoSystemName"},
+        Item{ServerFlag::SF_ArmServer, "SF_ArmServer"},
+        Item{ServerFlag::SF_Obsolete_Has_HDD, "SF_Has_HDD"},
+        Item{ServerFlag::SF_NewSystem, "SF_NewSystem"},
+        Item{ServerFlag::SF_SupportsTranscoding, "SF_SupportsTranscoding"},
+        Item{ServerFlag::SF_P2pSyncDone, "SF_P2pSyncDone"},
+        Item{ServerFlag::SF_Obsolete_RequiresEdgeLicense, "SF_RequiresEdgeLicense"},
+        Item{ServerFlag::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability"},
+        Item{ServerFlag::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability"},
+        Item{ServerFlag::SF_HasBuzzer, "SF_HasBuzzer"}
+    );
+}
 
 enum class IoModuleVisualStyle
 {
