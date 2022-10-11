@@ -104,9 +104,14 @@ public:
     ~QnFfmpegAudioHelper();
 
     void copyAudioSamples(quint8* dst, const AVFrame* src) const;
+    bool isCompatible(AVCodecContext* decoderContext) const;
 
 private:
-    SwrContext* m_swr;
+    SwrContext* m_swr = nullptr;
+    int m_channel_layout = 0;
+    int m_channels = 0;
+    int m_sample_rate = 0;
+    int m_sample_fmt = 0;
 };
 
 struct NX_VMS_COMMON_API QnFfmpegAvPacket: AVPacket //< TODO: #lbusygin Remove deprecated.
