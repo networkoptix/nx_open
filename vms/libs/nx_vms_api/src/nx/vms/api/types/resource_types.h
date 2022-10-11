@@ -270,6 +270,8 @@ enum ServerFlag
 
     // Server has a buzzer that can produce sound.
     SF_HasBuzzer = 0x10000000,
+
+    SF_OwnerApiForAdmins = 0x20000000,
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
@@ -295,7 +297,8 @@ constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
         Item{ServerFlag::SF_Obsolete_RequiresEdgeLicense, "SF_RequiresEdgeLicense"},
         Item{ServerFlag::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability"},
         Item{ServerFlag::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability"},
-        Item{ServerFlag::SF_HasBuzzer, "SF_HasBuzzer"}
+        Item{ServerFlag::SF_HasBuzzer, "SF_HasBuzzer"},
+        Item{ServerFlag::SF_OwnerApiForAdmins, "SF_OwnerApiForAdmins"}
     );
 }
 
