@@ -383,7 +383,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
 }
 
 int QnFfmpegTranscoder::transcodePacketInternal(
-    const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
+    const QnConstAbstractMediaDataPtr& media)
 {
     if (m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
@@ -399,31 +399,31 @@ int QnFfmpegTranscoder::transcodePacketInternal(
     else
         transcoder = m_aTranscoder;
 
-    bool doTranscoding = true;
-    do {
-        QnConstAbstractMediaDataPtr mediaPacket;
-        if (transcoder)
+    if (transcoder)
+    {
+        QnConstAbstractMediaDataPtr packet = media;
+        while (1) 
         {
-            // transcode media
             QnAbstractMediaDataPtr transcodedPacket;
-            int errCode = transcoder->transcodePacket(doTranscoding ? media : QnConstAbstractMediaDataPtr(), result ? &transcodedPacket : NULL);
+            int errCode = transcoder->transcodePacket(packet, &transcodedPacket);
             if (errCode != 0)
             {
                 NX_DEBUG(this, "Transcoding error: %1", QnFfmpegHelper::avErrorToString(errCode));
                 return errCode;
             }
-            mediaPacket = transcodedPacket;
+            if (!transcodedPacket || transcodedPacket->dataSize() == 0)
+                break;
+            muxPacket(transcodedPacket);
+            packet.reset();
         }
-        else
-        {
-            // direct stream copy
-            mediaPacket = media;
-        }
-        if (mediaPacket && mediaPacket->dataSize() > 0)
-            muxPacket(mediaPacket);
+    }
+    else
+    {
+        // direct stream copy
+        if (media && media->dataSize() > 0)
+            muxPacket(media);
+    }
 
-        doTranscoding = false;
-    } while (transcoder && transcoder->existMoreData());
     return 0;
 }
 

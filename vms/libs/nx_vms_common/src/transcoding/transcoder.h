@@ -77,7 +77,6 @@ public:
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
-    virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
     static QSize roundSize(const QSize& size);
 
@@ -224,10 +223,10 @@ protected:
     */
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
-    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
+    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media) = 0;
     virtual int finalizeInternal(QnByteArray* const result) = 0;
 private:
-    int openAndTranscodeDelayedData(QnByteArray* const result);
+    int openAndTranscodeDelayedData();
 
 protected:
 

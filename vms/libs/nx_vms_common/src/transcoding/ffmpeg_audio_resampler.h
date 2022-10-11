@@ -39,7 +39,6 @@ public:
     bool hasFrame() const;
 
 private:
-    uint64_t getOutputSampleCount(uint64_t inputSampleCount);
     bool allocSampleBuffers(uint64_t srcFrameSize);
 
 private:

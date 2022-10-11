@@ -58,7 +58,8 @@ bool FfmpegAudioResampler::init(const Config& config)
 
 bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
 {
-    uint64_t outSampleCount = getOutputSampleCount(inputFrame->nb_samples);
+    uint64_t outSampleCount = swr_get_out_samples(m_swrContext, inputFrame->nb_samples);
+
     uint8_t** sampleBuffer = m_buffer.startWriting(outSampleCount);
     if (!sampleBuffer)
     {
@@ -83,15 +84,6 @@ bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
     return true;
 }
 
-uint64_t FfmpegAudioResampler::getOutputSampleCount(uint64_t inputSampleCount)
-{
-    return av_rescale_rnd(
-        swr_get_delay(m_swrContext, m_config.srcSampleRate) + inputSampleCount,
-        m_config.dstSampleRate,
-        m_config.srcSampleRate,
-        AV_ROUND_UP);
-}
-
 bool FfmpegAudioResampler::hasFrame() const
 {
     return m_buffer.sampleCount() >= m_config.dstFrameSize;
@@ -107,6 +99,7 @@ AVFrame* FfmpegAudioResampler::nextFrame()
     m_frame->sample_rate = m_config.dstSampleRate;
     m_frame->format = m_config.dstSampleFormat;
     m_frame->channel_layout = m_config.dstChannelLayout;
+    m_frame->channels = m_config.dstChannelCount;
 
     if (m_samplePts.empty())
         return m_frame;
@@ -124,7 +117,7 @@ AVFrame* FfmpegAudioResampler::nextFrame()
     m_samplePts.front().sampleCount -= sampleCount;
     NX_ASSERT(m_samplePts.front().sampleCount > 0);
     m_samplePts.front().ptsUs +=
-        (1000000LL * sampleCount) / (m_config.dstSampleRate * m_config.dstChannelCount);
+        (1000000LL * sampleCount) / m_config.dstSampleRate;
 
     return m_frame;
 }

@@ -53,12 +53,6 @@ public:
     bool open(const CodecParametersConstPtr& context);
 
     /**
-     * \brief Tells if some amount of data can be encoded without providing additional packets.
-     * \returns true if some encoded data can be pulled out of encoder, false otherwise
-     */
-    virtual bool existMoreData() const override;
-
-    /**
      * \return true if last call for open returns true, false otherwise.
      */
     bool isOpened() const;
@@ -106,7 +100,6 @@ private:
 
     int m_dstSampleRate;
 
-    AVFrame* m_frameDecodeTo;
     bool m_isOpened;
     int m_channelNumber = 0;
     int m_dstFrameSize;

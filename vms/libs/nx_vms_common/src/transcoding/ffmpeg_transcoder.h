@@ -64,7 +64,7 @@ public:
     void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
 
 protected:
-    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
+    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media) override;
     virtual int finalizeInternal(QnByteArray* const result) override;
 
 private:
