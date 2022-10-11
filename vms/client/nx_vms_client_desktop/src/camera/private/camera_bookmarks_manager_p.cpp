@@ -26,7 +26,7 @@ namespace {
     const int minimimumRequestTimeoutMs = 10000;
 
     /** Timer precision to update all queries. */
-    const int queriesCheckTimoutMs = 1000;
+    const int queriesCheckTimeoutMs = 1000;
 
     /** Reserved value for invalid requests. */
     const int kInvalidRequestId = 0;
@@ -170,7 +170,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
      * update chunks on history change and bookmarks adding/deleting, then forcefully re-request required periods
      */
 
-    m_operationsTimer->setInterval(queriesCheckTimoutMs);
+    m_operationsTimer->setInterval(queriesCheckTimeoutMs);
     m_operationsTimer->setSingleShot(false);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
