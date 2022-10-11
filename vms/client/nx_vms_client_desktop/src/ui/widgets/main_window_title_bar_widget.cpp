@@ -234,14 +234,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &QnMainWindowTitleBarWidget::geometryChanged);
-
-    #if defined(Q_OS_MACOS) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
-        // Title bar sometimes in not rerendered on macOS in fullscreen when popup menu is shown.
-        // This does not happen in Qt 6, so just add a simple and safe workaround which should be
-        // removed after moving to Qt 6.
-        installEventHandler({parent}, {QEvent::FocusOut, QEvent::FocusIn},
-            this, [this]{ update(); });
-    #endif
 }
 
 QnMainWindowTitleBarWidget::~QnMainWindowTitleBarWidget()
