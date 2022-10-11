@@ -57,6 +57,13 @@ private:
 private:
     class StateDelegate;
 
+    struct SynchronizerData
+    {
+        QWidget* tab;
+        const AbstractSearchWidget* searchWidget;
+        AbstractSearchSynchronizer* synchronizer;
+    };
+
     EventPanel* const q;
     QTabWidget* m_tabs = nullptr;
 
@@ -68,7 +75,7 @@ private:
     OverlappableSearchWidget* m_eventsTab = nullptr;
     OverlappableSearchWidget* m_analyticsTab = nullptr;
 
-    QHash<AbstractSearchWidget*, AbstractSearchSynchronizer*> m_synchronizers;
+    QList<SynchronizerData> m_synchronizers;
     QHash<QWidget*, Tab> m_tabIds;
 
     QWidget* m_previousTab = nullptr;

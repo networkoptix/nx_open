@@ -213,11 +213,11 @@ EventPanel::Private::Private(EventPanel* q):
         m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context()), m_tabs);
 
         m_synchronizers = {
-            {m_motionTab, new MotionSearchSynchronizer(
+            {m_motionTab, m_motionTab, new MotionSearchSynchronizer(
                 context(), m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
-            {m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
+            {m_bookmarksTab, m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
                 context(), m_bookmarksTab->searchWidget()->commonSetup(), this)},
-            {m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
+            {m_analyticsTab, m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
                 context(),
                 m_analyticsTab->searchWidget()->commonSetup(),
                 static_cast<AnalyticsSearchWidget*>(m_analyticsTab->searchWidget())->analyticsSetup(),
@@ -256,13 +256,13 @@ EventPanel::Private::Private(EventPanel* q):
         m_tabs->setProperty(style::Properties::kTabBarShift, kTabBarShift);
         setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
 
-        for (auto [tab, synchronizer]: nx::utils::constKeyValueRange(m_synchronizers))
+        for (const auto& data: m_synchronizers)
         {
-            connect(synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
-                [this, tab = tab](bool isActive)
+            connect(data.synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
+                [this, &data](bool isActive)
                 {
-                    if (tab->isAllowed())
-                        setTabCurrent(tab, isActive);
+                    if (data.searchWidget->isAllowed())
+                        setTabCurrent(data.tab, isActive);
                 });
         }
 
@@ -282,8 +282,8 @@ EventPanel::Private::Private(EventPanel* q):
 
                 m_lastTab = currentTab;
 
-                for (auto [tab, synchronizer]: nx::utils::constKeyValueRange(m_synchronizers))
-                    synchronizer->setActive(m_tabs->currentWidget() == tab);
+                for (const auto& data: m_synchronizers)
+                    data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
 
                 NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
                     m_previousTab, m_lastTab);
