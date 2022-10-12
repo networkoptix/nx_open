@@ -2306,6 +2306,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->hasVideo
         && d->camera
+        && !d->camera->hasFlags(Qn::cross_system)
         && d->taxonomyManager
         && accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         && !d->taxonomyManager->relevantEngines().empty()
