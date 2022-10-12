@@ -9,7 +9,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/urlencoded.h>
 
-namespace nx::reflect::test {
+namespace nx::reflect::urlencoded::test {
 
 struct FlatData
 {
@@ -18,7 +18,7 @@ struct FlatData
     double doubleV = 0.;
     std::string strV;
     std::optional<int> optIntX;
-    std::chrono::seconds secondsV;
+    std::chrono::seconds secondsV = std::chrono::seconds::zero();
 
     void compare(const FlatData& r)
     {
@@ -116,7 +116,8 @@ struct ComplexObjData
     int intV = 0;
     FlatData testData1;
     ArrayData testData2;
-    EnumClass enumV;
+    EnumClass enumV = EnumClass::val0;
+
     void compare(const ComplexObjData& r)
     {
         ASSERT_EQ(intV, r.intV);
@@ -176,7 +177,20 @@ TYPED_TEST_P(Urlencoded, encodeDecode)
     val.compare(TypeParam::ParentT::data());
 }
 
-REGISTER_TYPED_TEST_SUITE_P(Urlencoded, encode, decode, encodeDecode);
+TYPED_TEST_P(Urlencoded, decoding_empty_string_produces_default_object)
+{
+    using DataType = typename TypeParam::ParentT;
+
+    auto [decoded, result] = urlencoded::deserialize<DataType>(std::string());
+    ASSERT_TRUE(result);
+    decoded.compare(DataType());
+}
+
+REGISTER_TYPED_TEST_SUITE_P(Urlencoded,
+    encode,
+    decode,
+    encodeDecode,
+    decoding_empty_string_produces_default_object);
 
 typedef ::testing::Types<
     FlatDataWithResultStr,
@@ -202,4 +216,60 @@ TEST(UrlencodedStr, BugCB339)
     ASSERT_EQ("cloud-test.hdw.mx cloud-test1.hdw.mx", val.str);
 }
 
-} // namespace nx::reflect::test
+//-------------------------------------------------------------------------------------------------
+
+struct Stringizable
+{
+    std::string text;
+
+    std::string toString() const { return text; }
+
+    static Stringizable fromString(const std::string_view& str)
+    {
+        return Stringizable{std::string(str)};
+    }
+};
+
+struct Foo1
+{
+    Stringizable str;
+};
+
+NX_REFLECTION_INSTRUMENT(Foo1, (str))
+
+TEST(UrlencodedStr, toString_is_used_to_serialize_a_value)
+{
+    const auto actual = urlencoded::serialize(Foo1{.str={.text="Hello_world"}});
+    ASSERT_EQ("str=Hello_world", actual);
+}
+
+TEST(UrlencodedStr, fromString_is_used_to_deserialize_a_value)
+{
+    const auto expected = Foo1{.str={.text="Hello_world"}};
+    const auto [actual, result] = urlencoded::deserialize<Foo1>("str=Hello_world");
+    ASSERT_TRUE(result);
+    ASSERT_EQ(expected.str.text, actual.str.text);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+struct Foo2
+{
+    bool bar = false;
+    std::optional<bool> optBar;
+
+    bool operator==(const Foo2&) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(Foo2, (bar)(optBar))
+
+TEST(Urlencoded, bool_flag_presence_is_handled_as_true)
+{
+    const auto [val, result] = urlencoded::deserialize<Foo2>("bar&optBar");
+    ASSERT_TRUE(result);
+
+    Foo2 expected{true, true};
+    ASSERT_EQ(expected, val);
+}
+
+} // namespace nx::reflect::urlencoded::test

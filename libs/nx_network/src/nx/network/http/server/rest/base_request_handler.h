@@ -140,7 +140,7 @@ inline static void convert(const StatusCode::Value& status, ApiRequestResult* ht
  *           nx::utils::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
  *
  *    // NOTE: requires getting the client's IP address from the http request
- *    void deleteFooAndLogClientEndoint(
+ *    void deleteFooAndLogClientEndpoint(
  *        std::string id,
  *        network::SocketAddress clientEndpoint,
  *        nx::utils::MoveOnlyFunc<void(FooResult)> handler);

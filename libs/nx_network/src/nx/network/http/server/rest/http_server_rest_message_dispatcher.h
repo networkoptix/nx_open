@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "base_request_handler.h"
 #include "http_server_rest_path_matcher.h"
 #include "../http_message_dispatcher.h"
 
@@ -25,6 +26,26 @@ public:
         const Method& method,
         const std::string_view& path,
         Func func);
+
+    template<
+        typename Result,
+        typename Input,
+        typename Output,
+        typename... RestArgFetchers,
+        typename Func
+    >
+    bool registerRestHandler(
+        const Method& method,
+        const std::string_view& path,
+        Func func)
+    {
+        using Handler = RequestHandler<Result, Input, Output, RestArgFetchers...>;
+
+        return registerRequestProcessor(
+            path,
+            [func]() { return std::make_unique<Handler>(func); },
+            method);
+    }
 };
 
 } // namespace nx::network::http::server::rest
