@@ -214,12 +214,12 @@ UsageHelper::UsageHelper(common::SystemContext* context, QObject* parent):
     m_dirty(true),
     m_validator(new Validator(context))
 {
-    connect(&m_invalidateTimer, &QTimer::timeout, this, &UsageHelper::invalidate);
-    m_invalidateTimer.start(kLicenseRefreshInterval);
+    m_invalidateTimer.start(kLicenseRefreshInterval, [this]() { invalidate(); });
 }
 
 UsageHelper::~UsageHelper()
 {
+    m_invalidateTimer.cancelSync();
 }
 
 LicenseUsageByDevice UsageHelper::borrowLicenses(const LicenseCompatibility& compat, LicensesArrayEx& licenses) const
