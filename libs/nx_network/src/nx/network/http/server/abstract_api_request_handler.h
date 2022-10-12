@@ -7,8 +7,8 @@
 #include <nx/utils/type_utils.h>
 
 #include "detail/abstract_api_request_handler_detail.h"
-#include "../http_types.h"
 #include "http_message_dispatcher.h"
+#include "../http_types.h"
 
 namespace nx::network::http {
 

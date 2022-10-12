@@ -71,17 +71,17 @@ class UrlencodedDeserializer;
 template<typename T>
 std::tuple<T, bool> tryDeserialize(const std::string_view& str);
 
-// this function allow to avoid compilation errors for not supported types
+// Type that cannot be deserialized is reported during compile time.
 template<typename T>
+std::tuple<T, bool> defaultDeserialize(const std::string_view& str) = delete;
+
+template<typename T>
+requires IsStdChronoDurationV<T>
 std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
 {
-    if constexpr (IsStdChronoDurationV<T>)
-    {
-        T result;
-        bool parsedSuccess = nx::reflect::detail::fromString(str, &result);
-        return {result, parsedSuccess};
-    }
-    return {T(), false};
+    T result;
+    bool parsedSuccess = nx::reflect::detail::fromString(str, &result);
+    return {result, parsedSuccess};
 }
 
 template<typename T>
@@ -90,7 +90,7 @@ constexpr bool isInternalDeserializable()
     constexpr bool isContainer =
         (IsSequenceContainerV<T> ||
         IsSetContainerV<T> ||
-        IsUnorderedSetContainerV<T>) 
+        IsUnorderedSetContainerV<T>)
         &&!IsStringAlikeV<T>;
     constexpr bool IsAssociativeContainer =
         (IsAssociativeContainerV<T> && !IsSetContainerV<T>)
@@ -165,7 +165,7 @@ std::tuple<T, bool> deserialize(
     std::enable_if_t<
         (IsSequenceContainerV<T> ||
         IsSetContainerV<T> ||
-        IsUnorderedSetContainerV<T>) 
+        IsUnorderedSetContainerV<T>)
         &&!IsStringAlikeV<T>
     >* = nullptr)
 {
@@ -275,18 +275,24 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
 
     for (const auto& token: requestTokenized)
     {
+        if (token.empty())
+            continue;
+
         auto pos = token.find('=');
         if (pos == std::string::npos)
         {
-            m_deserializationFailed = true;
-            return;
+            // Treating the token as a boolean flag.
+            m_request[std::string(token)] = "true";
+            continue;
         }
+
         const auto& [fieldName, success] = decode(token.substr(0, pos));
         if (!success)
         {
             m_deserializationFailed = true;
             return;
         }
+
         m_request[fieldName] = token.substr(pos + 1, token.length() - pos - 1);
     }
 }
@@ -295,9 +301,19 @@ template<typename T>
 std::tuple<T, bool> tryDeserialize(const std::string_view& str)
 {
     if constexpr (isInternalDeserializable<T>())
+    {
         return deserialize<T>(str);
+    }
+    else if constexpr (IsStringAlikeV<T>)
+    {
+        bool ok = false;
+        auto val = nx::reflect::fromString<T>(str, &ok);
+        return {std::move(val), ok};
+    }
     else
+    {
         return defaultDeserialize<T>(str);
+    }
 }
 
 } // namespace detail

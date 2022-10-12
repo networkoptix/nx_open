@@ -12,7 +12,7 @@ static constexpr char kSystemId[] = "systemId";
 static constexpr char kServerId[] = "serverId";
 
 static constexpr char kStatisticsMetricsPath[] = "/statistics/metrics/";
-static constexpr char kStatisticsListeningPeersPath[] = "/statistics/listening-peers/";
+static constexpr char kStatisticsListeningPeersPath[] = "/statistics/listening-peers";
 static constexpr char kStatisticsSystemPeersPath[] = "/statistics/system/{systemId}/servers/";
 
 /**
@@ -28,6 +28,12 @@ static constexpr char kConnectionSpeedUplinkPathV2[] =
     "/system/{systemId}/server/{serverId}/connection-speed/uplink";
 
 static constexpr char kApiDocPrefix[] = "/mediator/docs/api";
+
+static constexpr char kRelaysPath[] = "/maintenance/relays";
+static constexpr char kRelayPath[] = "/maintenance/relays/{id}";
+static constexpr char kRelayAttrsPath[] = "/maintenance/relays/{id}/attrs";
+
+static constexpr char kIdParam[] = "id";
 
 namespace deprecated {
 

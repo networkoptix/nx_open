@@ -82,15 +82,13 @@ private:
 
 /**
  * Caches a value and updates its value periodically from a given function.
- * Locks internal mutex when value update is needed only.
- * So, this class is suitable for multithreaded environment with a lot of concurrent value access.
- * Value type must be suitable for std::atomic<Value>.
+ * The class is not thread-safe!
  */
-template<typename Value>
-class AtomicValueCache
+template<typename Value, typename StorageType = Value>
+class ValueCacheUnSafe
 {
 public:
-    AtomicValueCache(
+    ValueCacheUnSafe(
         nx::utils::MoveOnlyFunc<Value()> generator,
         std::chrono::milliseconds valueUpdatePeriod)
         :
@@ -99,21 +97,21 @@ public:
     {
     }
 
+    virtual ~ValueCacheUnSafe() = default;
+
     Value get()
     {
         const auto now = std::chrono::steady_clock::now();
         if (now - m_lastUpdateTime.load() > m_valueUpdatePeriod)
             generateValue();
 
-        return m_value.load();
+        return m_value;
     }
 
-private:
-    void generateValue()
+protected:
+    virtual void generateValue()
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        auto newValue = m_generator();
-        m_value.store(std::move(newValue));
+        m_value = m_generator();
         m_lastUpdateTime.store(std::chrono::steady_clock::now());
     }
 
@@ -121,7 +119,34 @@ private:
     nx::utils::MoveOnlyFunc<Value()> m_generator;
     const std::chrono::milliseconds m_valueUpdatePeriod;
     std::atomic<std::chrono::steady_clock::time_point> m_lastUpdateTime;
-    std::atomic<Value> m_value;
+    StorageType m_value = {};
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Caches a value and updates its value periodically from a given function.
+ * Locks internal mutex when value update is needed only.
+ * So, this class is suitable for multithreaded environment with a lot of concurrent value access.
+ * Value type must be suitable for std::atomic<Value>.
+ */
+template<typename Value>
+class AtomicValueCache:
+    public ValueCacheUnSafe<Value, std::atomic<Value>>
+{
+    using base_type = ValueCacheUnSafe<Value, std::atomic<Value>>;
+
+public:
+    using base_type::base_type;
+
+protected:
+    virtual void generateValue() override
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        base_type::generateValue();
+    }
+
+private:
     nx::Mutex m_mutex;
 };
 

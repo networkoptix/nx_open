@@ -77,6 +77,7 @@ public:
     std::tuple<ResultCode, ListeningPeerStatistics> getListeningPeersStatistics();
 
     using base_type::makeAsyncCall;
+    using base_type::makeSyncCall;
 };
 
 } // namespace nx::hpm::api
