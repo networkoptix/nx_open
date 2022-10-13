@@ -30,24 +30,18 @@ struct QnCrossSystemCameraWidget::Private
     {
         const auto systemId = crossSystemCamera->systemId();
         const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-        const auto status = context
-            ? context->status()
-            : CloudCrossSystemContext::Status::uninitialized;
 
-        if (status == CloudCrossSystemContext::Status::uninitialized
-            || (status == CloudCrossSystemContext::Status::connected
-                && !context->isSystemReadyToUse()))
+        if (NX_ASSERT(context) && context->systemDescription()->isOnline())
         {
-            return Qn::ResourceStatusOverlay::OfflineOverlay;
+            const auto status = context->status();
+            if (status == CloudCrossSystemContext::Status::connecting)
+                return Qn::ResourceStatusOverlay::LoadingOverlay;
+
+            if (status == CloudCrossSystemContext::Status::connectionFailure)
+                return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
         }
 
-        if (status == CloudCrossSystemContext::Status::connecting)
-            return Qn::ResourceStatusOverlay::LoadingOverlay;
-
-        if (status == CloudCrossSystemContext::Status::connectionFailure)
-            return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
-
-        return Qn::EmptyOverlay;
+        return Qn::OfflineOverlay;
     }
 };
 

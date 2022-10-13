@@ -5,13 +5,14 @@
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 
 #include <client/client_globals.h>
+#include <network/base_system_description.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/utils/scoped_connections.h>
 
 #include "../../data/resource_tree_globals.h"
 
@@ -25,6 +26,7 @@ public:
     const QString systemId;
     QPointer<CloudCrossSystemContext> crossSystemContext;
     nx::utils::ScopedConnection crossSystemContextConnection;
+    nx::utils::ScopedConnection systemDescriptionConnection;
 
     QString text() const
     {
@@ -42,8 +44,9 @@ public:
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::connecting:
-            case CloudCrossSystemContext::Status::connectionFailure:
                 return true;
+            case CloudCrossSystemContext::Status::connectionFailure:
+                return crossSystemContext->systemDescription()->isOnline() ? true : false;
             default:
                 break;
         }
@@ -76,16 +79,14 @@ public:
 
         switch (crossSystemContext->status())
         {
-            case CloudCrossSystemContext::Status::uninitialized:
-                return {};
+            case CloudCrossSystemContext::Status::connecting:
+                return {Qt::ItemIsEnabled};
             case CloudCrossSystemContext::Status::connectionFailure:
                 // Set this flags combination to allow activate item by enter key and single click.
                 return {Qt::ItemIsEnabled | Qt::ItemIsSelectable};
             default:
-                break;
+                return {};
         }
-
-        return {Qt::ItemIsEnabled};
     }
 };
 
@@ -96,13 +97,22 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
         .crossSystemContext = appContext()->cloudCrossSystemManager()->systemContext(systemId)
     })
 {
-    d->crossSystemContextConnection.reset(QObject::connect(
-        d->crossSystemContext,
-        &CloudCrossSystemContext::statusChanged,
+
+    const auto notifyChanged =
         [this]
         {
             notifyDataChanged({Qt::DisplayRole, Qn::DecorationPathRole, Qn::FlattenedRole});
-        }));
+        };
+
+    d->crossSystemContextConnection.reset(QObject::connect(
+        d->crossSystemContext,
+        &CloudCrossSystemContext::statusChanged,
+        notifyChanged));
+
+    d->systemDescriptionConnection.reset(QObject::connect(
+        d->crossSystemContext->systemDescription(),
+        &QnBaseSystemDescription::onlineStateChanged,
+        notifyChanged));
 }
 
 CloudSystemStatusItem::~CloudSystemStatusItem() = default;
