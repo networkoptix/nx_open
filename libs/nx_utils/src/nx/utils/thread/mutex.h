@@ -30,6 +30,7 @@ public:
 
     void lock(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
     bool tryLock(const char* sourceFile = 0, int sourceLine = 0, int lockId = 0);
+    bool try_lock() { return tryLock(); }
 
     void unlock();
     bool isRecursive() const;
