@@ -372,6 +372,12 @@ struct LogsManagementWatcher::Unit::Private
         return m_state;
     }
 
+    ErrorType errorType() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_errorType;
+    }
+
     void setState(Unit::DownloadState state)
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -387,6 +393,19 @@ struct LogsManagementWatcher::Unit::Private
 
         QDir dir(folder);
         QString filename = makeFileName(m_server);
+        auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
+        if (!file->open(QIODevice::WriteOnly))
+        {
+            m_state = DownloadState::error;
+            m_errorType = ErrorType::local;
+            lock.unlock();
+            if (callback)
+                callback();
+            return;
+        }
+
+        file->close();
+
         m_collector.reset(new ClientLogCollector(dir.absoluteFilePath(filename)));
         connect(m_collector.get(), &ClientLogCollector::success,
             [this, callback]
@@ -436,7 +455,15 @@ struct LogsManagementWatcher::Unit::Private
         QDir dir(folder);
         QString filename = makeFileName(m_server);
         auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
-        file->open(QIODevice::WriteOnly);
+        if (!file->open(QIODevice::WriteOnly))
+        {
+            m_state = DownloadState::error;
+            m_errorType = ErrorType::local;
+            lock.unlock();
+            if (callback)
+                callback();
+            return;
+        }
 
         m_bytesLoaded = 0;
         m_fileSize = {};
@@ -599,6 +626,7 @@ private:
 
     bool m_checked{false};
     DownloadState m_state{DownloadState::none};
+    ErrorType m_errorType{ErrorType::remote};
     std::optional<nx::vms::api::ServerLogSettings> m_settings;
 
     std::unique_ptr<ClientLogCollector> m_collector;
@@ -636,6 +664,11 @@ std::optional<nx::vms::api::ServerLogSettings> LogsManagementWatcher::Unit::sett
 LogsManagementWatcher::Unit::DownloadState LogsManagementWatcher::Unit::state() const
 {
     return d->state();
+}
+
+bool LogsManagementWatcher::Unit::errorIsLocal() const
+{
+    return d->errorType() == Unit::ErrorType::local;
 }
 
 LogsManagementWatcher::Unit::Private* LogsManagementWatcher::Unit::data()
@@ -831,6 +864,7 @@ struct LogsManagementWatcher::Private
                     break;
 
                 case State::hasErrors:
+                case State::hasLocalErrors:
                     filter << Unit::DownloadState::error;
                     break;
             }
@@ -880,6 +914,7 @@ struct LogsManagementWatcher::Private
                 }
 
                 case State::hasErrors:
+                case State::hasLocalErrors:
                 {
                     level = QnNotificationLevel::Value::ImportantNotification;
 
@@ -1270,7 +1305,7 @@ void LogsManagementWatcher::cancelDownload()
 void LogsManagementWatcher::restartFailed()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    NX_ASSERT(d->state == State::hasErrors);
+    NX_ASSERT(d->state == State::hasLocalErrors || d->state == State::hasErrors);
     const auto newState = State::loading;
 
     auto path = d->path;
@@ -1304,7 +1339,8 @@ void LogsManagementWatcher::restartFailed()
 void LogsManagementWatcher::completeDownload()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    NX_ASSERT(d->state == State::finished || d->state == State::hasErrors);
+    NX_ASSERT(d->state == State::finished || d->state == State::hasLocalErrors
+        || d->state == State::hasErrors);
     const auto newState = watcherState(d->selectionState());
 
     //TODO: #spanasenko Clean-up.
@@ -1426,7 +1462,7 @@ void LogsManagementWatcher::updateDownloadState()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
-    int loadingCount = 0, successCount = 0, errorCount = 0;
+    int loadingCount = 0, successCount = 0, errorCount = 0, localErrorCount = 0;
 
     double totalProgress = 0;
     double totalSpeed = 0;
@@ -1445,8 +1481,13 @@ void LogsManagementWatcher::updateDownloadState()
                     successCount++;
                     break;
                 case State::error:
+                {
                     errorCount++;
+                    if (unit->errorIsLocal())
+                        localErrorCount++;
+
                     break;
+                }
             }
         };
 
@@ -1466,11 +1507,15 @@ void LogsManagementWatcher::updateDownloadState()
         updateProgress(server);
     }
 
-    auto newState = loadingCount
-        ? State::loading
-        : errorCount
-            ? State::hasErrors
-            : State::finished;
+    State newState;
+    if (loadingCount)
+        newState = State::loading;
+    else if (localErrorCount)
+        newState = State::hasLocalErrors;
+    else if (errorCount)
+        newState = State::hasErrors;
+    else
+        newState = State::finished;
 
     bool changed = (d->state != newState);
     d->state = newState;
