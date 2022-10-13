@@ -222,7 +222,7 @@
          <item>
           <widget class="QPushButton" name="retryButton">
            <property name="text">
-            <string>Retry failed</string>
+            <string>Retry</string>
            </property>
           </widget>
          </item>
