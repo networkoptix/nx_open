@@ -10,14 +10,14 @@ static constexpr char kAccountPasswordResetPath[] = "/cdb/account/resetPassword"
 static constexpr char kAccountReactivatePath[] = "/cdb/account/reactivate";
 static constexpr char kAccountCreateTemporaryCredentialsPath[] = "/cdb/account/createTemporaryCredentials";
 
-static constexpr char kAccountPath[] = "/cdb/account/{email}";
+static constexpr char kAccountPath[] = "/cdb/account/{accountEmail}";
 static constexpr char kAccountSelfPath[] = "/cdb/account/self";
-static constexpr char kAccountStatusPath[] = "/cdb/account/{email}/status";
+static constexpr char kAccountStatusPath[] = "/cdb/account/{accountEmail}/status";
 
-static constexpr char kAccountSecuritySettingsPath[] = "/cdb/account/{email}/settings/security";
-static constexpr char kAccountForSharingPath[] = "/cdb/account/{email}/sharing-data";
+static constexpr char kAccountSecuritySettingsPath[] = "/cdb/account/{accountEmail}/settings/security";
+static constexpr char kAccountForSharingPath[] = "/cdb/account/{accountEmail}/sharing-data";
 
-static constexpr char kAccountEmailParam[] = "email";
+static constexpr char kAccountEmailParam[] = "accountEmail";
 
 //-------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/heal
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
 static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
-static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{email}";
+static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
 
 static constexpr char kAuthGetNoncePath[] = "/cdb/auth/getNonce";
 static constexpr char kAuthGetAuthenticationPath[] = "/cdb/auth/getAuthentication";
