@@ -133,7 +133,7 @@ struct ResourceThumbnailProvider::Private
             {
                 const auto camera = value.resource.dynamicCast<QnVirtualCameraResource>();
                 NX_ASSERT(camera);
-                nx::api::CameraImageRequest cameraRequest(camera, request);
+                nx::api::CameraImageRequest cameraRequest(camera, request, request.objectTrackId);
 
                 if (auto provider = qobject_cast<CameraThumbnailProvider*>(baseProvider.get()))
                     provider->setRequestData(cameraRequest);
