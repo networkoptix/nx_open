@@ -50,7 +50,8 @@ public:
         hasSelection,
         loading,
         finished,
-        hasErrors,
+        hasLocalErrors,
+        hasErrors
     };
 
     class Unit
@@ -66,11 +67,18 @@ public:
             error,
         };
 
+        enum class ErrorType
+        {
+            local,
+            remote,
+        };
+
         QnUuid id() const;
         bool isChecked() const;
         QnMediaServerResourcePtr server() const;
         std::optional<nx::vms::api::ServerLogSettings> settings() const;
         DownloadState state() const;
+        bool errorIsLocal() const;
 
         struct Private;
         Private* data();
