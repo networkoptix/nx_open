@@ -338,8 +338,9 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
     if (enabled)
     {
         // FIXME: #sivanov Probably all managers should be permanently enabled.
-        auto systemContext = appContext()->currentSystemContext();
-        systemContext->cameraBookmarksManager()->setEnabled(true);
+        const auto systemContext = SystemContext::fromResource(currentResource());
+        if (NX_ASSERT(systemContext))
+            systemContext->cameraBookmarksManager()->setEnabled(true);
     }
     emit bookmarksModeEnabledChanged();
 }
