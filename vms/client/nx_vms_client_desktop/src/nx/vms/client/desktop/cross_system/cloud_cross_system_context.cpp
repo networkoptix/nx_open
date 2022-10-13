@@ -119,12 +119,6 @@ struct CloudCrossSystemContext::Private
             {
                 const bool isOnline = this->systemDescription->isOnline();
                 NX_VERBOSE(this, "System became %1", isOnline ? "online" : "offline");
-                if (!isOnline)
-                {
-                    updateStatus(Status::uninitialized);
-                    return;
-                }
-
                 ensureConnection();
             });
         connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, q,
