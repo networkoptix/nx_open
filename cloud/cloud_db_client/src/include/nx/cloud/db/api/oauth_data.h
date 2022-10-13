@@ -120,4 +120,31 @@ struct ValidateTokenResponse : public TokenInfo
     std::chrono::seconds time_since_password;
 };
 
+struct IssueStunTokenRequest
+{
+    /**%apidoc Stun server name */
+    std::string server_name;
+};
+
+struct IssueStunTokenResponse
+{
+    /**%apidoc The token itself.*/
+    std::string token;
+
+    /**%apidoc Mac code used by a VMS server.*/
+    std::string mac_code;
+
+    /**%apidoc An ephemeral and unique key identifier.*/
+    std::string kid;
+
+    /**%apidoc Token expiration time. Milliseconds since the epoch, UTC.*/
+    std::chrono::milliseconds expires_at;
+
+    /**%apidoc Number of seconds the token will expire in.*/
+    std::chrono::seconds expires_in;
+
+    /**%apidoc Error code.*/
+    std::optional<std::string> error;
+};
+
 } // namespace nx::cloud::db::api
