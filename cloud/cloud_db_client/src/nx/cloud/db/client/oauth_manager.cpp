@@ -81,4 +81,14 @@ void OauthManager::logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> complet
         std::move(completionHandler));
 }
 
+void OauthManager::issueStunToken(const api::IssueStunTokenRequest& request,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)> completionHandler)
+{
+    executeRequest<api::IssueStunTokenResponse>(
+        nx::network::http::Method::post,
+        kOauthStunTokenPath,
+        request,
+        std::move(completionHandler));
+}
+
 } // namespace nx::cloud::db::client
