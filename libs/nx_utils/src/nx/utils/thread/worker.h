@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/long_runnable.h>
-#include <nx/utils/thread/sync_queue.h>
+#include <future>
+#include <memory>
+#include <optional>
+
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
-
-#include <future>
-#include <optional>
-#include <memory>
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace nx::utils {
 
@@ -62,7 +62,8 @@ public:
             NX_MUTEX_LOCKER lock(&m_mutex);
             if (!m_reportOverflowTimer.isValid() || m_reportOverflowTimer.elapsed() > 30s)
             {
-                NX_WARNING(this, "%1: Task queue overflow detected. %2 records in the queue",
+                NX_WARNING(this,
+                    "%1: Task queue overflow detected. %2 records in the queue",
                     __func__, m_maxTaskCount);
                 m_reportOverflowTimer.restart();
             }
@@ -93,7 +94,7 @@ private:
         NX_MUTEX_LOCKER lock(&m_taskMutex);
         m_needStop = true;
         if (m_tasks.empty())
-            m_tasks.push([](){});
+            m_tasks.push([]() {});
     }
 
     virtual void run() override
