@@ -117,10 +117,14 @@ struct CloudCrossSystemContext::Private
         connect(systemDescription.get(), &QnBaseSystemDescription::onlineStateChanged, q,
             [this]
             {
-                NX_VERBOSE(
-                    this,
-                    "System became %1",
-                    this->systemDescription->isOnline() ? "online" : "offline");
+                const bool isOnline = this->systemDescription->isOnline();
+                NX_VERBOSE(this, "System became %1", isOnline ? "online" : "offline");
+                if (!isOnline)
+                {
+                    updateStatus(Status::uninitialized);
+                    return;
+                }
+
                 ensureConnection();
             });
         connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, q,
@@ -191,6 +195,9 @@ struct CloudCrossSystemContext::Private
         if (!ini().crossSystemLayouts)
             return false;
 
+        if (!systemDescription->isOnline())
+            return false;
+
         if (status == Status::unsupportedPermanently)
             return false;
 
@@ -253,7 +260,11 @@ struct CloudCrossSystemContext::Private
                 connectionProcess.reset();
             };
 
-        updateStatus(Status::connecting);
+        // To prevent icons and overlays blinking update status to the connecting state only when
+        // the system is not initialized or when a user initiated reconnection process(system
+        // status items and cross system cameras changes current icons to the loading icon)
+        if (status == Status::uninitialized || allowUserInteraction)
+            updateStatus(Status::connecting);
 
         NX_VERBOSE(this, "Initialize new connection");
 
@@ -452,14 +463,10 @@ struct CloudCrossSystemContext::Private
     void updateCameras()
     {
         const auto systemIsReadyToUse = q->isSystemReadyToUse();
-        api::ResourceStatus dummyCameraStatus = api::ResourceStatus::offline;
-        if (!systemIsReadyToUse)
-        {
-            if (status == Status::connecting)
-                dummyCameraStatus = api::ResourceStatus::undefined;
-            else if (status == Status::connectionFailure)
-                dummyCameraStatus = api::ResourceStatus::unauthorized;
-        }
+        api::ResourceStatus dummyCameraStatus =
+            (status == Status::connectionFailure && systemDescription->isOnline())
+                ? api::ResourceStatus::unauthorized
+                : api::ResourceStatus::offline;
 
         for (const auto& camera:
             systemContext->resourcePool()->getResources<CrossSystemCameraResource>())
@@ -475,7 +482,10 @@ struct CloudCrossSystemContext::Private
             else
             {
                 camera->addFlags(Qn::fake);
+                const bool forceNotifyStatusChanged = dummyCameraStatus == camera->getStatus();
                 camera->setStatus(dummyCameraStatus);
+                if (forceNotifyStatusChanged) //< For the context status dependent entities.
+                    camera->statusChanged(camera, Qn::StatusChangeReason::Local);
             }
         }
     }
@@ -569,7 +579,6 @@ bool CloudCrossSystemContext::initializeConnectionWithUserInteraction()
     }
 
     d->connectionProcess.reset();
-    d->updateStatus(Status::connecting);
     return d->ensureConnection(/*allowUserInteraction*/ true);
 }
 

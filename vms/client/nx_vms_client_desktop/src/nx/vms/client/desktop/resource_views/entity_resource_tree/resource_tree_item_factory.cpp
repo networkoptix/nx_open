@@ -172,6 +172,12 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
 
             if (NX_ASSERT(context))
             {
+                if (!context->systemDescription()->isOnline())
+                {
+                    return static_cast<int>(
+                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
+                }
+
                 const auto status = context->status();
                 if (status == CloudCrossSystemContext::Status::connectionFailure)
                 {
@@ -184,12 +190,6 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
                 {
                     return static_cast<int>(
                         QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
-                }
-
-                if (!context->systemDescription()->isOnline())
-                {
-                    return static_cast<int>(
-                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
                 }
             }
 
@@ -208,23 +208,9 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
     result->connections()->add(QObject::connect(
         context,
         &CloudCrossSystemContext::statusChanged,
-        [invalidator = result.get(), systemId, status = context->status()]() mutable
+        [invalidator = result.get()]
         {
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!NX_ASSERT(context))
-                return;
-
-            const auto newStatus = context->status();
-            if (status == newStatus)
-                return;
-
-            // Only initial connecting state must affects system appearance in the resource tree.
-            if (newStatus != CloudCrossSystemContext::Status::connecting
-                || status == CloudCrossSystemContext::Status::uninitialized)
-            {
-                status = newStatus;
-                invalidator->invalidate();
-            }
+            invalidator->invalidate();
         }));
 
     return result;
@@ -236,8 +222,12 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QString& systemId)
         [systemId]() -> Qt::ItemFlags
         {
             auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (NX_ASSERT(context) && context->systemDescription()->isOnline())
+            if (NX_ASSERT(context)
+                && context->systemDescription()->isOnline()
+                && context->status() != CloudCrossSystemContext::Status::uninitialized)
+            {
                 return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+            }
 
             return Qt::ItemIsSelectable;
         };

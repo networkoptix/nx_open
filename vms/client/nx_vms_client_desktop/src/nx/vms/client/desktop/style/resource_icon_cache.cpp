@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <network/base_system_description.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -319,8 +320,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
                 status = QnResourceIconCache::Control;
             }
             else if (systemStatus == CloudCrossSystemContext::Status::connectionFailure
-                || systemStatus == CloudCrossSystemContext::Status::unsupportedPermanently
-                || systemStatus == CloudCrossSystemContext::Status::unsupportedTemporary)
+                && context->systemDescription()->isOnline())
             {
                 status = QnResourceIconCache::Unauthorized;
             }
