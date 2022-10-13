@@ -27,8 +27,13 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
 
     CameraImageRequest() = default;
 
-    CameraImageRequest(const QnVirtualCameraResourcePtr& camera, const ImageRequest& request):
+    CameraImageRequest(
+        const QnVirtualCameraResourcePtr& camera,
+        const ImageRequest& request,
+        const QnUuid& objectTrackId = {})
+        :
         ImageRequest(request),
+        objectTrackId(objectTrackId),
         camera(camera)
     {
     }
