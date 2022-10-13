@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
+#include <network/base_system_description.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -169,28 +170,26 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
         [systemId]
         {
             auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-
-            if (NX_ASSERT(context))
+            if (!NX_ASSERT(context)
+                || !context->systemDescription()->isOnline()
+                || context->status() == CloudCrossSystemContext::Status::uninitialized)
             {
-                if (!context->systemDescription()->isOnline())
-                {
-                    return static_cast<int>(
-                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
-                }
+                return static_cast<int>(
+                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Offline);
+            }
 
-                const auto status = context->status();
-                if (status == CloudCrossSystemContext::Status::connectionFailure)
-                {
-                    return static_cast<int>(
-                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
-                }
+            const auto status = context->status();
+            if (status == CloudCrossSystemContext::Status::connectionFailure)
+            {
+                return static_cast<int>(
+                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
+            }
 
-                if (status == CloudCrossSystemContext::Status::unsupportedPermanently
-                    || status == CloudCrossSystemContext::Status::unsupportedTemporary)
-                {
-                    return static_cast<int>(
-                        QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
-                }
+            if (status == CloudCrossSystemContext::Status::unsupportedPermanently
+                || status == CloudCrossSystemContext::Status::unsupportedTemporary)
+            {
+                return static_cast<int>(
+                    QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
             }
 
             return static_cast<int>(QnResourceIconCache::CloudSystem);
@@ -205,13 +204,17 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
     if (!NX_ASSERT(context))
         return result;
 
+    const auto invalidate = [invalidator = result.get()] { invalidator->invalidate(); };
+
     result->connections()->add(QObject::connect(
         context,
         &CloudCrossSystemContext::statusChanged,
-        [invalidator = result.get()]
-        {
-            invalidator->invalidate();
-        }));
+        invalidate));
+
+    result->connections()->add(QObject::connect(
+        context->systemDescription(),
+        &QnBaseSystemDescription::onlineStateChanged,
+        invalidate));
 
     return result;
 }
