@@ -37,6 +37,11 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     virtual void logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+
+    void issueStunToken(
+        const api::IssueStunTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
+            completionHandler) override;
 };
 
 } // namespace nx::cloud::db::client

@@ -37,6 +37,9 @@ QN_FUSION_DECLARE_FUNCTIONS(IssueTokenRequest, (json))
 QN_FUSION_DECLARE_FUNCTIONS(IssueTokenResponse, (json))
 QN_FUSION_DECLARE_FUNCTIONS(ValidateTokenResponse, (json))
 QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
+QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
+QN_FUSION_DECLARE_FUNCTIONS(IssueStunTokenRequest, (json))
+QN_FUSION_DECLARE_FUNCTIONS(IssueStunTokenResponse, (json))
 
 #define Issue_token_response_Fields \
     (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(scope)(error)
@@ -47,10 +50,18 @@ QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
 
 #define Issue_code_response_Fields (access_code)(code)(error)
 
+#define Issue_stun_token_request_Fields (server_name)
+
+#define Issue_stun_token_response_Fields (token)(mac_code)(error)(kid)(expires_at)(expires_in)
+
 NX_REFLECTION_INSTRUMENT(IssueTokenResponse, Issue_token_response_Fields);
 
 NX_REFLECTION_INSTRUMENT(ValidateTokenResponse, Validate_token_response_Fields)
 
 NX_REFLECTION_INSTRUMENT(IssueCodeResponse, Issue_code_response_Fields);
+
+NX_REFLECTION_INSTRUMENT(IssueStunTokenRequest, Issue_stun_token_request_Fields);
+
+NX_REFLECTION_INSTRUMENT(IssueStunTokenResponse, Issue_stun_token_response_Fields);
 
 } // namespace nx::cloud::db::api
