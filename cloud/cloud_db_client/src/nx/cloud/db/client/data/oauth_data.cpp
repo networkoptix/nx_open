@@ -21,4 +21,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ValidateTokenResponse, (json), Validate_token_r
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IssueCodeResponse, (json), Issue_code_response_Fields)
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IssueStunTokenResponse, (json), Issue_stun_token_response_Fields)
 } // namespace nx::cloud::db::api

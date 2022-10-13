@@ -40,6 +40,9 @@ public:
         nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
     virtual void logout(nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+
+    virtual void issueStunToken(const IssueStunTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, IssueStunTokenResponse)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

@@ -46,6 +46,7 @@ static constexpr char kOauthTokenPath[] = "/cdb/oauth2/token";
 static constexpr char kOauthTokenValidatePath[] = "/cdb/oauth2/token/{token}";
 static constexpr char kOauthTokensDeletePath[] = "/cdb/oauth2/user/self/client/{clientId}";
 static constexpr char kOauthLogoutPath[] = "/cdb/oauth2/user/self";
+static constexpr char kOauthStunTokenPath[] = "/cdb/oauth2/stun-token";
 static constexpr char kTokenParam[] = "token";
 static constexpr char kClientIdParam[] = "clientId";
 
