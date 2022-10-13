@@ -9,6 +9,7 @@
 #include <QtWidgets/QFileDialog>
 
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
@@ -68,6 +69,8 @@ void LogsManagementWidget::hideEvent(QHideEvent* event)
 void LogsManagementWidget::setupUi()
 {
     ui->setupUi(this);
+
+    setWarningStyle(ui->errorLabel);
 
     connect(
         m_watcher, &LogsManagementWatcher::stateChanged,
@@ -241,9 +244,14 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     bool downloadStarted = false;
     bool downloadFinished = false;
     bool hasErrors = false;
+    bool hasLocalErrors = false;
 
     switch (state)
     {
+        case LogsManagementWatcher::State::hasLocalErrors:
+            hasLocalErrors = true;
+            [[fallthrough]];
+
         case LogsManagementWatcher::State::hasErrors:
             hasErrors = true;
             [[fallthrough]];
@@ -277,7 +285,8 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->resetButton->setEnabled(hasSelection);
 
     ui->cancelButton->setVisible(!downloadFinished);
-    ui->finishedLabel->setVisible(downloadFinished);
+    ui->errorLabel->setVisible(downloadFinished && hasLocalErrors);
+    ui->finishedLabel->setVisible(downloadFinished && !hasLocalErrors);
     ui->doneButton->setVisible(downloadFinished);
     ui->retryButton->setVisible(hasErrors);
 }
