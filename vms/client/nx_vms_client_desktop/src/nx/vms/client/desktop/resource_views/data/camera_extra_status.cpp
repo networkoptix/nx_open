@@ -13,7 +13,7 @@ CameraExtraStatus getCameraExtraStatus(const QnVirtualCameraResourcePtr& camera)
     using namespace nx::vms::api;
 
     CameraExtraStatus result;
-    if (!camera)
+    if (!camera || camera->hasFlags(Qn::cross_system))
         return result;
 
     if (camera->getStatus() == ResourceStatus::recording)
