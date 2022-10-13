@@ -26,6 +26,9 @@ const char* const kCloudUrlSchemeName = "cloud";
 
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Storing recent system connection id: %1, url: %2",
+        localSystemId, url);
+
     const auto cleanUrl = url.cleanUrl();
 
     auto connections = qnClientCoreSettings->recentLocalConnections();
@@ -40,6 +43,9 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
 
 void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Removing recent system connection id: %1, url: %2",
+        localSystemId, url);
+
     auto connections = qnClientCoreSettings->recentLocalConnections();
 
     if (!url.isValid())
