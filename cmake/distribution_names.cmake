@@ -28,10 +28,6 @@ function(set_distribution_names)
     set(vmsBenchmarkSuffix "${targetDevice}${publication_type_suffix}")
     set(sdkSuffix "universal${publication_type_suffix}")
     set(webadminSuffix "universal${publication_type_suffix}")
-    if(targetDevice STREQUAL "linux_arm32")
-        set(suffix_rpi "rpi${distribution_name_suffix}")
-        set(suffix_bananapi "bananapi${distribution_name_suffix}")
-    endif()
 
     set(client_distribution_name
         "${prefix}-client-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
@@ -45,13 +41,6 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
-
-    if(targetDevice STREQUAL "linux_arm32")
-        set(server_update_distribution_name_rpi
-            "${prefix}-server_update-${releaseVersion.full}-${suffix_rpi}" PARENT_SCOPE)
-        set(server_update_distribution_name_bananapi
-            "${prefix}-server_update-${releaseVersion.full}-${suffix_bananapi}" PARENT_SCOPE)
-    endif()
 
     set(cdb_distribution_name
         "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
