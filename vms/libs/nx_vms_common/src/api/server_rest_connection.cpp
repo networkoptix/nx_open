@@ -2092,24 +2092,29 @@ bool setupAuth(
 
     if (route.reverseConnect)
     {
-        auto connection = systemContext->messageBusConnection();
-        if (!NX_ASSERT(connection))
-            return false;
-
-        const auto address = connection->address();
-
         if (nx::vms::api::PeerData::isClient(qnStaticCommon->localPeerType()))
         {
+            const auto connection = systemContext->messageBusConnection();
+            if (!NX_ASSERT(connection))
+                return false;
+
+            const auto address = connection->address();
             request.url.setHost(address.address.toString());
+            if ((int16_t) address.port != -1)
+                request.url.setPort(address.port);
         }
         else //< Server-side option.
         {
             request.url.setHost("127.0.0.1");
+            auto currentServer = systemContext->resourcePool()
+                ->getResourceById<QnMediaServerResource>(systemContext->peerId());
+            if (NX_ASSERT(currentServer))
+            {
+                const auto url = nx::utils::Url(currentServer->getUrl());
+                if (url.port() > 0)
+                    request.url.setPort(url.port());
+            }
         }
-
-        if (NX_ASSERT(address.port > 0))
-            request.url.setPort(address.port);
-
     }
     else if (!route.addr.isNull())
     {

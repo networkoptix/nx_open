@@ -96,14 +96,8 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(
 
 void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    if (connection)
-    {
-        NX_VERBOSE(this, "init() - connecting to %1", connection->address());
-    }
-
     if (m_connection)
     {
-        NX_VERBOSE(this, "init() - clearing existing connection to %1", m_connection->address());
         // Safety check in case connection will not be deleted instantly.
         m_connection->stopReceivingNotifications();
         qnSyncTime->setTimeNotificationManager(nullptr);
