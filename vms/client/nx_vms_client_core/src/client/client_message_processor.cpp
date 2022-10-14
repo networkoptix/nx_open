@@ -35,6 +35,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (connection)
     {
+        NX_VERBOSE(this, "%1() - connecting to %2", __func__, connection->address());
+
         if (m_status.state() != QnConnectionState::Reconnecting)
         {
             NX_DEBUG(this, "init, state -> Connecting");
@@ -46,6 +48,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         NX_DEBUG(this, lit("init nullptr, state -> Disconnected"));
         m_status.setState(QnConnectionState::Disconnected);
     }
+
+    if (m_connection)
+        NX_VERBOSE(this, "%1() - clearing existing connection to %2", __func__, m_connection->address());
 
     if (connection)
     {
