@@ -6,6 +6,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
+#include <nx/utils/scoped_connections.h>
 #include <recording/time_period.h>
 
 #include "resource_fwd.h"
@@ -112,6 +113,8 @@ private:
     QHash<QnUuid, DataHash> m_itemData;
 
     bool m_isIntercomLayout = false;
+
+    nx::utils::ScopedConnection m_resourcePoolConnection;
 };
 
 } // namespace nx::vms::client::desktop
