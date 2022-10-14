@@ -17,6 +17,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource_directory_browser.h>
 #include <nx/build_info.h>
+#include <nx/media/hardware_acceleration_type.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -26,6 +27,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -42,12 +44,15 @@
 
 using namespace nx::vms::client::desktop;
 
-QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
+QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::AdvancedSettingsWidget)
 {
     ui->setupUi(this);
+
+    ui->dialogContentsLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+    ui->dialogContentsLayout->setSpacing(nx::style::Metrics::kDefaultLayoutSpacing.height());
 
     if (!nx::build_info::isMacOsX())
     {
@@ -92,27 +97,22 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this,
-        [this](bool toggled)
-        {
-            /* Show warning message if the user disables double buffering. */
-            // TODO: Being replaced by HintButton
-            //ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
-            emit hasChangesChanged();
-        });
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->autoFpsLimitCheckbox, &QCheckBox::toggled, this,
-        [this](bool toggled)
-        {
-            emit hasChangesChanged();
-        });
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->disableBlurCheckbox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->useHardwareDecodingCheckbox, &QCheckBox::toggled, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
+        [this]
+        {
+            emit hasChangesChanged();
+            updateNvidiaHardwareAccelerationWarning();
+        });
 
-    /* Live buffer lengths slider/spin logic: */
+    // Live buffer lengths slider/spin logic.
     connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
         [this](int value)
         {
@@ -252,6 +252,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setHardwareDecodingEnabled(qnSettings->isHardwareDecodingEnabled());
     setCertificateValidationLevel(nx::vms::client::core::settings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
+    updateNvidiaHardwareAccelerationWarning();
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
@@ -371,6 +372,10 @@ bool QnAdvancedSettingsWidget::isHardwareDecodingEnabled() const
 
 void QnAdvancedSettingsWidget::setHardwareDecodingEnabled(bool value)
 {
+    // TODO: #vbreus If nx::media::getHardwareAccelerationType returns 'none' then 'Use hardware
+    // video decoding check box should be unchecked and disabled.
+    // Also, in this case qnSettings->isHardwareDecodingEnabled() should return false disregarding
+    // previously set value, and there is no proper way to implement such behavior for now.
     ui->useHardwareDecodingCheckbox->setChecked(value);
 }
 
@@ -426,4 +431,14 @@ void QnAdvancedSettingsWidget::updateCertificateValidationLevelDescription()
         label,
         QPalette::WindowText,
         nx::vms::client::desktop::colorTheme()->color(isWarning ? "red_l2" : "dark14"));
+}
+
+void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
+{
+    const auto isNvidiaAcceleration =
+        nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::nvidia;
+
+    ui->alertBar->setText(ui->useHardwareDecodingCheckbox->isChecked() && isNvidiaAcceleration
+        ? tr("Nvidia hardware acceleration is in Beta mode")
+        : QString());
 }
