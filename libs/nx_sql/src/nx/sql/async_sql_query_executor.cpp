@@ -344,10 +344,12 @@ void AsyncSqlQueryExecutor::scheduleQuery(
     UpdateFunc updateFunc,
     CompletionHandler completionHandler)
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
 
-    if (isNewConnectionNeeded(lk))
-        openNewConnection(lk);
+        if (isNewConnectionNeeded(lk))
+            openNewConnection(lk);
+    }
 
     auto executor = std::make_unique<Executor>(
         std::move(updateFunc),
