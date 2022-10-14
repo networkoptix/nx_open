@@ -229,6 +229,26 @@ void LocalNotificationsManager::setAdditionalText(
     emit additionalTextChanged(notificationId, additionalText);
 }
 
+QString LocalNotificationsManager::tooltip(const QnUuid& notificationId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_lookup[notificationId].tooltip;
+}
+
+void LocalNotificationsManager::setTooltip(
+    const QnUuid& notificationId, QString tooltip)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    const auto iter = m_lookup.find(notificationId);
+    if (iter == m_lookup.end() || iter->tooltip == tooltip)
+        return;
+
+    iter->tooltip = tooltip;
+
+    lock.unlock();
+    emit tooltipChanged(notificationId, tooltip);
+}
+
 void LocalNotificationsManager::cancel(const QnUuid& notificationId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
