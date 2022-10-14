@@ -87,6 +87,7 @@
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
@@ -2338,7 +2339,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->hasVideo
         && d->camera
-        && !d->camera->hasFlags(Qn::cross_system)
+        && !workbench()->currentLayout()->resource()->hasFlags(Qn::cross_system)
         && d->taxonomyManager
         && ResourceAccessManager::hasPermissions(d->camera, Qn::ViewFootagePermission)
         && !d->taxonomyManager->relevantEngines().empty()
