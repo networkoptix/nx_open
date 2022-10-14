@@ -18,31 +18,28 @@ QueryQueue::QueryQueue():
 
 void QueryQueue::push(value_type value)
 {
-    nx::utils::ElapsedTimer t;
-    t.restart();
-
     std::size_t queueSize = 0;
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
+        // Adding query to the m_lightQueue first to minimize the mutex lock time.
+        NX_MUTEX_LOCKER lock(&m_lightQueueMutex);
 
-        const auto priority = getPriority(*value);
-        m_priorityToQueue[priority].push_back(ElementContext{
-            .value = std::move(value), .enqueueTime = nx::utils::monotonicTime()});
+        m_lightQueue.push_back({
+            .value = std::move(value),
+            .enqueueTime = nx::utils::monotonicTime()});
 
-        for (const auto& [p, q]: m_priorityToQueue)
-            queueSize += q.size();
+        queueSize = m_lightQueue.size();
     }
 
     m_cond.wakeAll();
 
-    NX_TRACE(this, "QueryQueue::push done in %1, queue size %2", t.elapsed(), queueSize);
+    NX_TRACE(this, "QueryQueue::push done, queue size %1", queueSize);
 }
 
 Stats QueryQueue::stats() const
 {
     using namespace std::chrono;
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
 
     std::size_t queueSize = 0;
     milliseconds oldestQueryAge = milliseconds::zero();
@@ -63,8 +60,6 @@ Stats QueryQueue::stats() const
 std::optional<QueryQueue::value_type> QueryQueue::pop(
     std::optional<std::chrono::milliseconds> timeout)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
     WaitConditionTimer waitTimer(
         &m_cond,
         timeout ? *timeout : std::chrono::milliseconds::max());
@@ -74,6 +69,21 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     std::vector<QueryQueue::value_type> resultingQueries;
     for (;;)
     {
+        Queries lightQueue;
+        {
+            NX_MUTEX_LOCKER lock(&m_lightQueueMutex);
+            std::swap(lightQueue, m_lightQueue);
+        }
+
+        NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
+
+        // Enqueing tasks.
+        for (auto& task: lightQueue)
+        {
+            const auto priority = getPriority(*task.value);
+            m_priorityToQueue[priority].push_back(std::move(task));
+        }
+
         removeExpiredElements(&lock);
 
         std::optional<FoundQueryContext> queryQueueElementContext =
@@ -124,7 +134,7 @@ int QueryQueue::concurrentModificationCount() const
 
 void QueryQueue::setQueryPriority(QueryType queryType, int newPriority)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
     m_customPriorities.emplace(queryType, newPriority);
 }
 

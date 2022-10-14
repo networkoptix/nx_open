@@ -78,7 +78,9 @@ private:
         std::vector<QueryType> forbiddenQueryTypes;
     };
 
-    mutable nx::Mutex m_mutex;
+    mutable nx::Mutex m_mainQueueMutex;
+    mutable nx::Mutex m_lightQueueMutex;
+    Queries m_lightQueue;
     nx::WaitCondition m_cond;
 
     std::map<QueryType, int> m_customPriorities;
