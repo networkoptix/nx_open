@@ -44,12 +44,14 @@ enum Type
     messageIntegrity = 0x0008,
     errorCode = 0x0009,
     unknown = 0x000A,
+    lifetime = 0x000D,
     xorPeerAddress = 0x0012,
     data = 0x0013,
     realm = 0x0014,
     nonce = 0x0015,
     xorRelayedAddress = 0x0016,
     requestedTransport = 0x0019,
+    accessToken = 0x001B,
     xorMappedAddress = 0x0020,
     priority = 0x0024,
     useCandidate = 0x0025,
@@ -59,6 +61,7 @@ enum Type
     fingerPrint = 0x8028,
     iceControlled = 0x8029,
     iceControlling = 0x802A,
+    thirdPartyAuthorization = 0x802E,
 
     // Starting value for custom NX attributes in the middle of unasigned range 0xC003-0xFFFF:
     // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
@@ -287,6 +290,15 @@ struct NX_NETWORK_API Priority: IntAttribute
     virtual int getType() const override { return TYPE; }
 };
 
+struct NX_NETWORK_API Lifetime: IntAttribute
+{
+    static const int TYPE = lifetime;
+
+    Lifetime(int value = 0);
+    virtual int getType() const override { return TYPE; }
+};
+
+
 struct NX_NETWORK_API UseCandidate: Unknown
 {
     static const int TYPE = useCandidate;
@@ -316,6 +328,23 @@ struct NX_NETWORK_API Realm: Unknown
     static const int TYPE = realm;
 
     Realm(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+
+struct NX_NETWORK_API ThirdPartyAuthorization: Unknown
+{
+    static const int TYPE = thirdPartyAuthorization;
+
+    ThirdPartyAuthorization(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API AccessToken: Unknown
+{
+    static const int TYPE = accessToken;
+
+    AccessToken(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
     virtual int getType() const override { return TYPE; }
 };
 
