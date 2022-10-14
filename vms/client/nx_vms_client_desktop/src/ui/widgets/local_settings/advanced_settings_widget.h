@@ -17,8 +17,8 @@ class QnAdvancedSettingsWidget : public QnAbstractPreferencesWidget, public QnWo
     typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnAdvancedSettingsWidget(QWidget *parent = 0);
-    ~QnAdvancedSettingsWidget();
+    explicit QnAdvancedSettingsWidget(QWidget* parent = nullptr);
+    virtual ~QnAdvancedSettingsWidget() override;
 
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
@@ -55,6 +55,7 @@ private:
     ServerCertificateValidationLevel certificateValidationLevel() const;
     void setCertificateValidationLevel(ServerCertificateValidationLevel value);
     void updateCertificateValidationLevelDescription();
+    void updateNvidiaHardwareAccelerationWarning();
 
 private:
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
