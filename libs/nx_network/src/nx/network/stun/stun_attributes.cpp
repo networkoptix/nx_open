@@ -331,6 +331,14 @@ Priority::Priority(int value):
 }
 
 //-------------------------------------------------------------------------------------------------
+// Lifetime
+
+Lifetime::Lifetime(int value):
+    IntAttribute(TYPE, value)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 // RequestedTransport
 
 RequestedTransport::RequestedTransport(Transport transport):
