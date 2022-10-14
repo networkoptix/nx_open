@@ -114,6 +114,8 @@ LocalNotificationsListModel::LocalNotificationsListModel(QnWorkbenchContext* con
         this, changed({Qt::ForegroundRole, Qt::DecorationRole}));
     connect(manager, &workbench::LocalNotificationsManager::additionalTextChanged,
         this, changed({Qn::AdditionalTextRole}));
+    connect(manager, &workbench::LocalNotificationsManager::tooltipChanged,
+        this, changed({Qt::ToolTipRole}));
 }
 
 int LocalNotificationsListModel::rowCount(const QModelIndex& parent) const
@@ -203,6 +205,9 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
 
         case Qn::AdditionalTextRole:
             return manager->additionalText(notificationId);
+
+        case Qt::ToolTipRole:
+            return manager->tooltip(notificationId);
 
         default:
             return QVariant();

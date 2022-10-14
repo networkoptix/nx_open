@@ -63,6 +63,9 @@ public:
     QString additionalText(const QnUuid& notificationId) const;
     void setAdditionalText(const QnUuid& notificationId, QString additionalText);
 
+    QString tooltip(const QnUuid& notificationId) const;
+    void setTooltip(const QnUuid& notificationId, QString tooltip);
+
     // Common UI should call this function to request activity cancellation.
     // Just emits cancelRequested after validity check.
     void cancel(const QnUuid& notificationId);
@@ -85,6 +88,7 @@ signals:
     void actionChanged(const QnUuid& notificationId, CommandActionPtr action);
     void levelChanged(const QnUuid& notificationId, QnNotificationLevel::Value level);
     void additionalTextChanged(const QnUuid& notificationId, const QString& additionalText);
+    void tooltipChanged(const QnUuid& notificationId, const QString& tooltip);
 
 private:
     struct State
@@ -98,6 +102,7 @@ private:
         QPixmap icon;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QString additionalText;
+        QString tooltip;
 
         State() = default;
         State(
