@@ -155,12 +155,20 @@ QN_FUSION_DECLARE_FUNCTIONS(ConnectToPeerRequest, (json), NX_NETWORK_API)
 
 struct Relay
 {
+    nx::utils::Url url;
     int listeningPeerCount = 0;
+    std::chrono::system_clock::time_point timestamp;
 
-    bool operator==(const Relay& rhs) const { return listeningPeerCount == rhs.listeningPeerCount; }
+    bool operator==(const Relay& rhs) const
+    {
+        return
+            url == rhs.url
+            && listeningPeerCount == rhs.listeningPeerCount
+            && timestamp == rhs.timestamp;
+    }
 };
 
-#define Relay_Fields (listeningPeerCount)
+#define Relay_Fields (url)(listeningPeerCount)(timestamp)
 
 NX_REFLECTION_INSTRUMENT(Relay, Relay_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(Relay, (json), NX_NETWORK_API)
