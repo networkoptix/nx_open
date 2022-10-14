@@ -6,6 +6,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <core/resource/client_camera.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
 
@@ -224,6 +225,19 @@ void LayoutResource::setSystemContext(nx::vms::common::SystemContext* systemCont
 {
     QnLayoutResource::setSystemContext(systemContext);
     updateIsIntercomState();
+
+    m_resourcePoolConnection.reset(connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
+        {
+            for (const QnResourcePtr& resource: resources)
+            {
+                if (resource->getId() == getId())
+                {
+                    updateIsIntercomState();
+                    return;
+                }
+            }
+        }));
 }
 
 void LayoutResource::updateIsIntercomState()
