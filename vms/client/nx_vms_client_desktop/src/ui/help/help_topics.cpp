@@ -68,6 +68,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "dual_streaming.html";
         case Qn::HelpTopic::CertificateValidation_Help:
             return "certificate-validation.html";
+        case Qn::CloudLayoutsIntroduction_help:
+            return "cloud-layouts.html";
         case Qn::HelpTopic::ConnectToCamerasOverOnlyHttps_Help:
             return "to-connect-to-cameras-over-onl.html";
         case Qn::HelpTopic::EnableArchiveEncryption_Help:

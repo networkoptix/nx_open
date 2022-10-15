@@ -12,16 +12,7 @@
 
 #include "help_topic_accessor.h"
 
-namespace {
-
-#ifdef Q_OS_MAC
-    const QString kRelativeHelpRootPath = "/../Resources/help/";
-#else
-    const QString kRelativeHelpRootPath = "/help/";
-#endif
-
-} // anonymous namespace
-
+#include <nx/vms/utils/external_resources.h>
 
 QnHelpHandler::QnHelpHandler(QObject* parent):
     QObject(parent),
@@ -56,22 +47,10 @@ void QnHelpHandler::openHelpTopic(Qn::HelpTopic topic)
 
 QUrl QnHelpHandler::urlForTopic(Qn::HelpTopic topic)
 {
-    QString topicPath = relativeUrlForTopic(topic);
-
-    auto appDirPath = qApp->applicationDirPath();
-
-    auto paths =
-    {
-        appDirPath + kRelativeHelpRootPath,
-        appDirPath + "/.." + kRelativeHelpRootPath,
-    };
-
-    for (const QString& helpRoot: paths)
-    {
-        QString filePath = helpRoot + topicPath;
-        if (QFile::exists(filePath))
-            return QUrl::fromLocalFile(filePath);
-    }
+    const auto helpRoot = nx::vms::utils::externalResourcesDirectory().absolutePath() + "/help/";
+    QString filePath = helpRoot + relativeUrlForTopic(topic);
+    if (QFile::exists(filePath))
+        return QUrl::fromLocalFile(filePath);
 
     return QUrl();
 }
