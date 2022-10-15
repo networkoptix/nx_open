@@ -38,6 +38,7 @@ enum HelpTopic
     CameraSettings_Rotation_Help,
     CameraSettings_SecondStream_Help,
     CertificateValidation_Help,
+    CloudLayoutsIntroduction_help,
     ConnectToCamerasOverOnlyHttps_Help,
     EnableArchiveEncryption_Help,
     EnableEncryptedVideoTraffic_Help,

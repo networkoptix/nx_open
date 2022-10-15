@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_handler.h>
 
 namespace nx::vms::client::desktop {
 
@@ -46,12 +47,9 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         .arg(nx::branding::shortCloudName()));
     ui->helpIconLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->helpLabel->setText(tr("Read more on the %1")
-        .arg(tr("help page")));
+        .arg(common::html::localLink(tr("help page"))));
     connect(ui->helpLabel, &QLabel::linkActivated,
-        [this]()
-        {
-            // TODO: #aivashchenko: Open help page which will be issued later.
-        });
+        [](){ QnHelpHandler::openHelpTopic(Qn::HelpTopic::CloudLayoutsIntroduction_help); });
 
     QColor captionTextColor = colorTheme()->color("light1");
     setPaletteColor(ui->captionLabel, QPalette::WindowText, captionTextColor);
