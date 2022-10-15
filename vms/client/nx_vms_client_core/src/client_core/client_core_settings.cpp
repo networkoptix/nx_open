@@ -164,6 +164,9 @@ void QnClientCoreSettings::storeRecentConnection(
     const QString& systemName,
     const nx::utils::Url& url)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Storing recent system connection id: %1, url: %2",
+        localSystemId, url);
+
     const auto cleanUrl = url.cleanUrl();
 
     auto connections = recentLocalConnections();
@@ -178,6 +181,8 @@ void QnClientCoreSettings::storeRecentConnection(
 
 void QnClientCoreSettings::removeRecentConnection(const QnUuid& localSystemId)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Removing recent system connection id: %1", localSystemId);
+
     auto connections = qnClientCoreSettings->recentLocalConnections();
     connections.remove(localSystemId);
     qnClientCoreSettings->setRecentLocalConnections(connections);
