@@ -171,7 +171,7 @@ void LogsManagementWidget::setupUi()
             if (!NX_ASSERT(m_watcher))
                 return;
 
-            auto dialog = new LogSettingsDialog();
+            auto dialog = QScopedPointer(new LogSettingsDialog());
             dialog->init(m_watcher->checkedItems());
 
             if (dialog->exec() == QDialog::Rejected)

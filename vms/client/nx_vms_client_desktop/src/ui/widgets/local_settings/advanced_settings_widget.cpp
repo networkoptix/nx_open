@@ -28,6 +28,10 @@
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -44,10 +48,19 @@
 
 using namespace nx::vms::client::desktop;
 
-QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
+struct QnAdvancedSettingsWidget::Private
+{
+    std::unique_ptr<ClientLogCollector> logsCollector;
+    QString path;
+    bool finished = false;
+    bool success = false;
+};
+
+QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::AdvancedSettingsWidget)
+    ui(new Ui::AdvancedSettingsWidget),
+    d(new Private())
 {
     ui->setupUi(this);
 
@@ -62,7 +75,6 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
 
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
-    setHelpTopic(ui->browseLogsButton, Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->doubleBufferCheckbox, Qn::SystemSettings_General_DoubleBuffering_Help);
 
     ui->doubleBufferCheckboxHint->setHintText(
@@ -84,10 +96,13 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     combobox->addItem(tr("Strict"),
         QVariant::fromValue(ServerCertificateValidationLevel::strict));
 
-    ui->browseLogsButton->setVisible(qnSettings->isBrowseLogsVisible());
+    ui->downloadLogsButton->setIcon(qnSkin->icon("text_buttons/download.png"));
+    ui->logsSettingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
+    ui->openLogsFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
+    ui->openLogsFolderButton->setFlat(true);
 
-    connect(ui->browseLogsButton, &QPushButton::clicked, this,
-        &QnAdvancedSettingsWidget::at_browseLogsButton_clicked);
+    ui->logsManagementBox->setVisible(qnSettings->isBrowseLogsVisible());
+
     connect(ui->clearCacheButton, &QPushButton::clicked, this,
         &QnAdvancedSettingsWidget::at_clearCacheButton_clicked);
     connect(ui->resetAllWarningsButton, &QPushButton::clicked, this,
@@ -133,6 +148,77 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(combobox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
         &QnAdvancedSettingsWidget::updateCertificateValidationLevelDescription);
 
+    connect(ui->downloadLogsButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QString dir = QFileDialog::getExistingDirectory(
+                this,
+                tr("Select folder..."),
+                QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+            if (dir.isEmpty())
+                return;
+
+            d->path = dir;
+
+            const auto time = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+            d->logsCollector.reset(new ClientLogCollector(
+                dir + QString("/client_%1.zip").arg(time)));
+
+            connect(d->logsCollector.get(), &ClientLogCollector::success, this,
+                [this]
+                {
+                    d->finished = d->success = true;
+                    updateLogsManagementWidgetsState();
+                });
+            connect(d->logsCollector.get(), &ClientLogCollector::error, this,
+                [this]
+                {
+                    d->finished = true;
+                    d->success = false;
+                    updateLogsManagementWidgetsState();
+                });
+            d->logsCollector->start();
+
+            updateLogsManagementWidgetsState();
+        });
+    connect(ui->logsSettingsButton, &QPushButton::clicked, this,
+        [this]
+        {
+            auto watcher = context()->systemContext()->logsManagementWatcher();
+            if (!NX_ASSERT(watcher))
+                return;
+
+            auto dialog = QScopedPointer(new LogSettingsDialog());
+            dialog->init({watcher->clientUnit()});
+
+            if (dialog->exec() == QDialog::Rejected)
+                return;
+
+            if (!dialog->hasChanges())
+                return;
+
+            watcher->storeClientSettings(dialog->changes());
+        });
+    connect(ui->openLogsFolderButton, &QPushButton::clicked, this,
+        [this]
+        {
+            if (!d->path.isEmpty())
+                QDesktopServices::openUrl(d->path);
+        });
+    auto resetLogsDownloadState =
+        [this]
+        {
+            d->logsCollector->pleaseStop();
+            d->logsCollector->wait();
+            d->logsCollector.reset(nullptr);
+            d->path.clear();
+            d->finished = d->success = false;
+
+            updateLogsManagementWidgetsState();
+        };
+    connect(ui->cancelLogsDownloadButton, &QPushButton::clicked, this, resetLogsDownloadState);
+    connect(ui->logsDownloadDoneButton, &QPushButton::clicked, this, resetLogsDownloadState);
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
@@ -276,17 +362,6 @@ bool QnAdvancedSettingsWidget::isRestartRequired() const
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnAdvancedSettingsWidget::at_browseLogsButton_clicked()
-{
-    const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-        + lit("/log");
-    if (!QDir(logsLocation).exists())
-    {
-        QnMessageBox::warning(this, tr("Folder not found"), logsLocation);
-        return;
-    }
-    QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
-}
 
 void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 {
@@ -433,6 +508,32 @@ void QnAdvancedSettingsWidget::updateCertificateValidationLevelDescription()
         nx::vms::client::desktop::colorTheme()->color(isWarning ? "red_l2" : "dark14"));
 }
 
+void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()
+{
+    bool downloadStarted = false;
+    bool downloadFinished = false;
+    bool hasErrors = false;
+
+    if (d->logsCollector)
+    {
+        downloadStarted = true;
+        downloadFinished = d->finished;
+        hasErrors = !d->success;
+    }
+
+    ui->logsManagementStack->setCurrentWidget(
+        downloadStarted ? ui->logsDownloadPage : ui->logsDefaultPage);
+
+    ui->logsDownloadProgressBar->setVisible(!downloadFinished);
+    ui->cancelLogsDownloadButton->setVisible(downloadStarted && !downloadFinished);
+    ui->logsDownloadDoneButton->setVisible(downloadFinished);
+
+    ui->logsDownloadStatusLabel->setVisible(downloadFinished);
+    ui->logsDownloadStatusLabel->setText(hasErrors
+        ? tr("Failed to save logs to selected folder")
+        : tr("Download is finished!"));
+    setWarningStyleOn(ui->logsDownloadStatusLabel, hasErrors);
+}
 void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
 {
     const auto isNvidiaAcceleration =

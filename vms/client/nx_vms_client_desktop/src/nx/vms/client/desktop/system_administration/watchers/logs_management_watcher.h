@@ -117,6 +117,9 @@ public:
 
     static const nx::utils::log::Level defaultLogLevel();
 
+    UnitPtr clientUnit() const;
+    void storeClientSettings(const ConfigurableLogSettings& settings);
+
 signals:
     void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
     void progressChanged(double progress);
