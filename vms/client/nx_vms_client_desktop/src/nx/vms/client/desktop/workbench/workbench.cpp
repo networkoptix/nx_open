@@ -470,11 +470,14 @@ void Workbench::setCurrentLayoutIndex(int index)
 
 void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
 {
+    if (!ini().enableMultiSystemTabBar)
+        return;
+
     auto systemDescription = qnSystemsFinder->getSystem(systemId.toString());
     if (systemDescription.isNull())
         systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
 
-    NX_ASSERT(systemDescription);
+    NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 
     windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
@@ -482,9 +485,12 @@ void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
 
 void Workbench::addSystem(const QString& systemId, const LogonData& logonData)
 {
+    if (!ini().enableMultiSystemTabBar)
+        return;
+
     auto systemDescription = qnSystemsFinder->getSystem(systemId);
 
-    NX_ASSERT(systemDescription);
+    NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
 
     windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
