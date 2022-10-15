@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -27,7 +28,6 @@ public:
     bool isRestartRequired() const;
 
 private slots:
-    void at_browseLogsButton_clicked();
     void at_clearCacheButton_clicked();
     void at_resetAllWarningsButton_clicked();
 
@@ -55,8 +55,12 @@ private:
     ServerCertificateValidationLevel certificateValidationLevel() const;
     void setCertificateValidationLevel(ServerCertificateValidationLevel value);
     void updateCertificateValidationLevelDescription();
+    void updateLogsManagementWidgetsState();
     void updateNvidiaHardwareAccelerationWarning();
 
 private:
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
+
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
