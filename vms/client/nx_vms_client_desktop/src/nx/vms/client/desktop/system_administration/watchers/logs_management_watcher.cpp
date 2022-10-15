@@ -1420,6 +1420,30 @@ const nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
     return nx::utils::log::Level::info;
 }
 
+LogsManagementUnitPtr LogsManagementWatcher::clientUnit() const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    return d->client;
+}
+
+void LogsManagementWatcher::storeClientSettings(const ConfigurableLogSettings& settings)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+
+    auto existing = d->client->settings();
+    if (!NX_ASSERT(existing))
+        return;
+
+    d->client->data()->setSettings(settings.applyTo(*existing));
+    const auto newClientSettings = d->client->settings();
+
+    if (d->notificationManager)
+        d->updateClientLogLevelWarning();
+
+    lock.unlock();
+    storeAndApplyClientSettings(*newClientSettings);
+}
+
 void LogsManagementWatcher::onReceivedServerLogSettings(
     const QnUuid& serverId,
     const nx::vms::api::ServerLogSettings& settings)
