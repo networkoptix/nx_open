@@ -51,6 +51,18 @@ struct NvidiaVideoDecoderImpl
     H2645Mp4ToAnnexB filterAnnexB;
 };
 
+bool NvidiaVideoDecoder::isAvailable()
+{
+    if (!NvidiaDriverApiProxy::instance().load())
+        return false;
+
+    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
+    if (status != CUDA_SUCCESS)
+        return false;
+
+    return true;
+}
+
 bool NvidiaVideoDecoder::isCompatible(
     const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID /*codec*/, int /*width*/, int /*height*/)
 {

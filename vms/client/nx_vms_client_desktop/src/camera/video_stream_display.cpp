@@ -32,14 +32,11 @@ extern "C" {
 #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
-
-
 #include "buffered_frame_displayer.h"
 #include "gl_renderer.h"
 
 using namespace std::chrono;
 using namespace nx::vms::client::desktop;
-
 
 static const double FPS_EPS = 1e-6;
 
@@ -393,16 +390,15 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
 #ifdef __QSV_SUPPORTED__
     if (qnSettings->isHardwareDecodingEnabled() && !m_reverseMode)
     {
-        if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
-            && NvidiaVideoDecoderOldPlayer::isSupported(data))
-        {
-            decoder = new NvidiaVideoDecoderOldPlayer();
-        }
-        else
         if (QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
             && QuickSyncVideoDecoderOldPlayer::isSupported(data))
         {
             decoder = new QuickSyncVideoDecoderOldPlayer();
+        }
+        else if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
+            && NvidiaVideoDecoderOldPlayer::isSupported(data))
+        {
+            decoder = new NvidiaVideoDecoderOldPlayer();
         }
     }
 #endif // __QSV_SUPPORTED__

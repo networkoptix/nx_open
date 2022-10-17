@@ -9,6 +9,8 @@
 #include <nx/media/ffmpeg/demuxer.h>
 #include <nx/media/nvidia/nvidia_video_decoder.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder.h>
+#include <nx/media/hardware_acceleration_type.h>
 
 TEST(NvidiaVideoDecoderTest, SampleDecode)
 {
@@ -34,6 +36,17 @@ TEST(NvidiaVideoDecoderTest, SampleDecode)
         decoder->decode(videoPacket);
         auto frame = decoder->getFrame();
     }
+}
+
+TEST(NvidiaVideoDecoderTest, TestIsAvailable)
+{
+    auto hwtype = nx::media::getHardwareAccelerationType();
+    std::cout << (int)hwtype << std::endl;
+
+    if (nx::media::quick_sync::QuickSyncVideoDecoder::isAvailable())
+        printf("quick_sync\n");
+    if (nx::media::nvidia::NvidiaVideoDecoder::isAvailable())
+        printf("nvidia\n");
 }
 
 #endif
