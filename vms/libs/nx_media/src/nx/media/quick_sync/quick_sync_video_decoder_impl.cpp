@@ -29,6 +29,18 @@ bool QuickSyncVideoDecoderImpl::isCompatible(
     return CompatibilityCache::isCompatible(frame, codec, width, height);
 }
 
+bool QuickSyncVideoDecoderImpl::isAvailable()
+{
+    MFXVideoSession mfxSession;
+    mfxIMPL impl = MFX_IMPL_HARDWARE;
+    mfxVersion version = { {0, 1} };
+    mfxStatus status = mfxSession.Init(impl, &version);
+    if (status < MFX_ERR_NONE)
+        return false;
+
+    return true;
+}
+
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
 {
     memset(&m_response, 0, sizeof(m_response));

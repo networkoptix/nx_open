@@ -23,6 +23,7 @@ public:
     ~QuickSyncVideoDecoder();
 
     static bool isCompatible(const AVCodecID codec, const QSize& resolution, bool allowOverlay);
+    static bool isAvailable();
     static QSize maxResolution(const AVCodecID codec);
 
     virtual int decode(

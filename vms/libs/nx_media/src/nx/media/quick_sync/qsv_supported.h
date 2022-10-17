@@ -7,4 +7,3 @@
         #define __QSV_SUPPORTED__
     #endif
 #endif
-
