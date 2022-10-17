@@ -729,6 +729,7 @@ struct LogsManagementWatcher::Private
 
     QString path;
     State state{State::empty};
+    bool cancelled{false};
     bool updatesEnabled{false};
 
     LogsManagementUnitPtr client;
@@ -877,7 +878,7 @@ struct LogsManagementWatcher::Private
         if (!NX_ASSERT(notificationManager))
             return;
 
-        bool show = (state != State::empty) && (state != State::hasSelection);
+        bool show = ((state != State::empty) && (state != State::hasSelection)) || cancelled;
 
         if (show)
         {
@@ -926,6 +927,18 @@ struct LogsManagementWatcher::Private
             std::optional<ProgressState> progress;
             switch (state)
             {
+                case State::empty:
+                case State::hasSelection:
+                {
+                    NX_ASSERT(cancelled, "Internal logic error");
+
+                    level = QnNotificationLevel::Value::ImportantNotification;
+
+                    title = tr("Logs downloading is cancelled");
+
+                    break;
+                }
+
                 case State::loading:
                 {
                     level = QnNotificationLevel::Value::ImportantNotification;
@@ -1310,6 +1323,7 @@ void LogsManagementWatcher::startDownload(const QString& path)
     d->path = path;
     auto units = d->checkedItems();
     d->state = newState;
+    d->cancelled = false;
 
     lock.unlock();
 
@@ -1339,6 +1353,7 @@ void LogsManagementWatcher::cancelDownload()
 
     d->path = "";
     d->state = newState;
+    d->cancelled = true;
 
     lock.unlock();
     emit stateChanged(newState);
@@ -1363,6 +1378,7 @@ void LogsManagementWatcher::restartFailed()
     }
 
     d->state = newState;
+    d->cancelled = false;
 
     lock.unlock();
 
@@ -1553,7 +1569,7 @@ void LogsManagementWatcher::updateDownloadState()
                         localErrorCount++;
 
                     break;
-                }
+            }
             }
         };
 
@@ -1573,29 +1589,40 @@ void LogsManagementWatcher::updateDownloadState()
         updateProgress(server);
     }
 
-    State newState;
-    if (loadingCount)
-        newState = State::loading;
-    else if (localErrorCount)
-        newState = State::hasLocalErrors;
-    else if (errorCount)
-        newState = State::hasErrors;
+    auto totalCount = loadingCount + successCount + errorCount;
+
+    auto newState = d->state;
+    double progress = 0;
+    if (totalCount)
+    {
+        if (loadingCount)
+            newState = State::loading;
+        else if (localErrorCount)
+            newState = State::hasLocalErrors;
+        else if (errorCount)
+            newState = State::hasErrors;
+        else
+            newState = State::finished;
+
+        d->speed = totalSpeed;
+        d->progress = progress = totalProgress / totalCount;
+    }
     else
-        newState = State::finished;
+    {
+        d->speed = 0;
+        d->progress = 0;
+    }
 
     bool changed = (d->state != newState);
     d->state = newState;
 
-    auto totalCount = loadingCount + successCount + errorCount;
-    d->speed = totalSpeed;
-    d->progress = totalProgress / totalCount;
     d->updateLogsDownloadNotification();
 
     lock.unlock();
     if (changed)
         emit stateChanged(newState);
 
-    emit progressChanged(totalProgress / totalCount);
+    emit progressChanged(progress);
 }
 
 } // namespace nx::vms::client::desktop
