@@ -521,9 +521,6 @@ struct LogsManagementWatcher::Unit::Private
 
                 m_state = m_downloader->failed() ? DownloadState::error : DownloadState::complete;
 
-                if (m_state == DownloadState::error)
-                    fixZipFileIfNeeded(filePath);
-
                 lock.unlock();
                 if (callback)
                     callback();
