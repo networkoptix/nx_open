@@ -117,13 +117,38 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
+// Statistics.
 
-struct Stats
+struct QueryQueueStats
 {
     int pendingQueryCount = 0;
     std::chrono::milliseconds oldestQueryAge = std::chrono::milliseconds::zero();
 };
 
-NX_REFLECTION_INSTRUMENT(Stats, (pendingQueryCount)(oldestQueryAge))
+NX_REFLECTION_INSTRUMENT(QueryQueueStats, (pendingQueryCount)(oldestQueryAge))
+
+struct DurationStatistics
+{
+    std::chrono::milliseconds min = std::chrono::milliseconds::max();
+    std::chrono::milliseconds max = std::chrono::milliseconds::min();
+    std::chrono::milliseconds average = std::chrono::milliseconds::zero();
+};
+
+NX_REFLECTION_INSTRUMENT(DurationStatistics, (min)(max)(average))
+
+struct QueryStatistics
+{
+    std::chrono::milliseconds statisticalPeriod;
+    int requestsSucceeded = 0;
+    int requestsFailed = 0;
+    int requestsCancelled = 0;
+    DurationStatistics requestExecutionTimes;
+    DurationStatistics waitingForExecutionTimes;
+    QueryQueueStats queryQueue;
+};
+
+NX_REFLECTION_INSTRUMENT(QueryStatistics,
+    (statisticalPeriod)(requestsSucceeded)(requestsFailed)(requestsCancelled) \
+    (requestExecutionTimes)(waitingForExecutionTimes)(queryQueue))
 
 } // namespace nx::sql

@@ -7,6 +7,7 @@
 #include <deque>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <limits>
 
 #include <nx/utils/move_only_func.h>
@@ -25,11 +26,14 @@ public:
 
     static constexpr int kDefaultPriority = 0;
 
-    QueryQueue();
-
     void push(value_type query);
 
-    Stats stats() const;
+    QueryQueueStats stats() const;
+
+    /**
+     * Wait-free version of stats().pendingQueryCount.
+     */
+    std::size_t pendingQueryCount() const;
 
     std::optional<value_type> pop(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
@@ -79,15 +83,18 @@ private:
     };
 
     mutable nx::Mutex m_mainQueueMutex;
-    mutable nx::Mutex m_lightQueueMutex;
-    Queries m_lightQueue;
+    // NOTE: It appears that using std::mutex here leads to 2-3x better throughput of tasks
+    // through this class in a multithreaded environment.
+    mutable std::mutex m_preliminaryQueueMutex;
+    Queries m_preliminaryQueue;
     nx::WaitCondition m_cond;
 
     std::map<QueryType, int> m_customPriorities;
-    std::atomic<int> m_currentModificationCount;
+    std::atomic<int> m_currentModificationCount{0};
     int m_concurrentModificationQueryLimit = 0;
     int m_aggregationLimit = -1;
     std::map<int, Queries, std::greater<int>> m_priorityToQueue;
+    std::atomic<std::size_t> m_pendingQueryCount{0};
 
     std::optional<std::chrono::milliseconds> m_itemStayTimeout;
     ItemStayTimeoutHandler m_itemStayTimeoutHandler;

@@ -4,6 +4,8 @@
 
 #include <nx/utils/time.h>
 
+#include "detail/query_queue.h"
+
 namespace nx::sql {
 
 StatisticsCollector::DurationStatisticsCalculationContext::DurationStatisticsCalculationContext(
@@ -20,9 +22,11 @@ StatisticsCollector::StatisticsRecordContext::StatisticsRecordContext(QueryExecu
 }
 
 StatisticsCollector::StatisticsCollector(
-    std::chrono::milliseconds period)
+    std::chrono::milliseconds period,
+    const detail::QueryQueue& queryQueue)
     :
     m_period(period),
+    m_queryQueue(queryQueue),
     m_requestExecutionTimesCalculationContext(&m_currentStatistics.requestExecutionTimes),
     m_waitingForExecutionTimesCalculationContext(&m_currentStatistics.waitingForExecutionTimes)
 {
@@ -39,9 +43,15 @@ void StatisticsCollector::recordQuery(QueryExecutionInfo queryStatistics)
 
 QueryStatistics StatisticsCollector::getQueryStatistics() const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    const_cast<StatisticsCollector*>(this)->removeExpiredRecords(lock);
-    return m_currentStatistics;
+    QueryStatistics result;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        const_cast<StatisticsCollector*>(this)->removeExpiredRecords(lock);
+        result = m_currentStatistics;
+    }
+
+    result.queryQueue = m_queryQueue.stats();
+    return result;
 }
 
 std::chrono::milliseconds StatisticsCollector::aggregationPeriod() const

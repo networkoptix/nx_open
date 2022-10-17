@@ -11,37 +11,38 @@
 
 namespace nx::sql::detail {
 
-QueryQueue::QueryQueue():
-    m_currentModificationCount(0)
-{
-}
-
 void QueryQueue::push(value_type value)
 {
     std::size_t queueSize = 0;
-    {
-        // Adding query to the m_lightQueue first to minimize the mutex lock time.
-        NX_MUTEX_LOCKER lock(&m_lightQueueMutex);
 
-        m_lightQueue.push_back({
+    {
+        // Adding query to the m_preliminaryQueue first to minimize the mutex lock time.
+        std::lock_guard<std::mutex> lock(m_preliminaryQueueMutex);
+
+        m_preliminaryQueue.push_back({
             .value = std::move(value),
             .enqueueTime = nx::utils::monotonicTime()});
 
-        queueSize = m_lightQueue.size();
+        queueSize = m_preliminaryQueue.size();
     }
 
     m_cond.wakeAll();
 
-    NX_TRACE(this, "QueryQueue::push done, queue size %1", queueSize);
+    NX_TRACE(this, "QueryQueue::push done. Preliminary queue size %1", queueSize);
 }
 
-Stats QueryQueue::stats() const
+QueryQueueStats QueryQueue::stats() const
 {
     using namespace std::chrono;
 
+    std::size_t queueSize = 0;
+    {
+        std::lock_guard<std::mutex> lock(m_preliminaryQueueMutex);
+        queueSize = m_preliminaryQueue.size();
+    }
+
     NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
 
-    std::size_t queueSize = 0;
     milliseconds oldestQueryAge = milliseconds::zero();
 
     const auto now = steady_clock::now();
@@ -52,9 +53,14 @@ Stats QueryQueue::stats() const
         queueSize += q.size();
     }
 
-    return Stats{
+    return QueryQueueStats{
         .pendingQueryCount = (int) queueSize,
         .oldestQueryAge = oldestQueryAge};
+}
+
+std::size_t QueryQueue::pendingQueryCount() const
+{
+    return m_pendingQueryCount.load();
 }
 
 std::optional<QueryQueue::value_type> QueryQueue::pop(
@@ -71,8 +77,8 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     {
         Queries lightQueue;
         {
-            NX_MUTEX_LOCKER lock(&m_lightQueueMutex);
-            std::swap(lightQueue, m_lightQueue);
+            std::lock_guard<std::mutex> lock(m_preliminaryQueueMutex);
+            std::swap(lightQueue, m_preliminaryQueue);
         }
 
         NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
@@ -82,6 +88,7 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
         {
             const auto priority = getPriority(*task.value);
             m_priorityToQueue[priority].push_back(std::move(task));
+            ++m_pendingQueryCount;
         }
 
         removeExpiredElements(&lock);
@@ -185,6 +192,7 @@ std::optional<QueryQueue::FoundQueryContext> QueryQueue::getNextSuitableQuery(
 void QueryQueue::pop(const FoundQueryContext& queryContext)
 {
     m_priorityToQueue[queryContext.priority].erase(queryContext.it);
+    --m_pendingQueryCount;
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
@@ -265,6 +273,7 @@ void QueryQueue::removeExpiredElements(nx::Locker<nx::Mutex>* lock)
         {
             auto value = std::exchange(queue.front().value, {});
             queue.pop_front();
+            --m_pendingQueryCount;
 
             nx::Unlocker<nx::Mutex> unlocker(lock);
             m_itemStayTimeoutHandler(std::move(value));

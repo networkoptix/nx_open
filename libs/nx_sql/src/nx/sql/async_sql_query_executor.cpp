@@ -34,7 +34,9 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
     m_connectionOptions(connectionOptions),
-    m_statisticsCollector(kDefaultStatisticsAggregationPeriod)
+    m_statisticsCollector(
+        kDefaultStatisticsAggregationPeriod,
+        m_queryQueue)
 {
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
@@ -77,7 +79,10 @@ void AsyncSqlQueryExecutor::pleaseStopSync()
     decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-        std::swap(m_dbThreadList, dbThreadPool);
+
+        std::swap(m_dbThreads, dbThreadPool);
+        m_dbThreadsSize = 0;
+
         std::swap(m_cursorProcessorContexts, cursorProcessorContexts);
         m_terminated = true;
     }
@@ -169,7 +174,7 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
         openNewConnection(lock);
 }
 
-Stats AsyncSqlQueryExecutor::stats() const
+QueryQueueStats AsyncSqlQueryExecutor::stats() const
 {
     return m_queryQueue.stats();
 }
@@ -236,13 +241,12 @@ void AsyncSqlQueryExecutor::setQueryPriority(
     m_queryQueue.setQueryPriority(queryType, newPriority);
 }
 
-bool AsyncSqlQueryExecutor::isNewConnectionNeeded(
-    const nx::Locker<nx::Mutex>& /*lk*/) const
+bool AsyncSqlQueryExecutor::isNewConnectionNeeded() const
 {
     // TODO: #akolesnikov Check for non-busy threads.
 
-    const auto effectiveDBConnectionCount = m_dbThreadList.size();
-    const auto queueSize = static_cast< size_t >(m_queryQueue.stats().pendingQueryCount);
+    const auto effectiveDBConnectionCount = m_dbThreadsSize.load();
+    const auto queueSize = m_queryQueue.pendingQueryCount();
     const auto maxDesiredQueueSize =
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
@@ -269,7 +273,9 @@ void AsyncSqlQueryExecutor::saveOpenedConnection(
 {
     connection->setOnClosedHandler(
         std::bind(&AsyncSqlQueryExecutor::onConnectionClosed, this, connection.get()));
-    m_dbThreadList.push_back(std::move(connection));
+
+    m_dbThreads.push_back(std::move(connection));
+    ++m_dbThreadsSize;
 }
 
 std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
@@ -315,7 +321,7 @@ void AsyncSqlQueryExecutor::onConnectionClosed(
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     dropConnectionAsync(lk, executorThreadPtr);
-    if (m_dbThreadList.empty() && !m_terminated)
+    if (m_dbThreads.empty() && !m_terminated)
         // Attempting to open a connection only after a delay.
         openNewConnection(lk, m_connectionOptions.reconnectAfterFailureDelay);
 }
@@ -325,17 +331,19 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
     detail::BaseQueryExecutor* const executorThreadPtr)
 {
     auto it = std::find_if(
-        m_dbThreadList.begin(),
-        m_dbThreadList.end(),
+        m_dbThreads.begin(),
+        m_dbThreads.end(),
         [executorThreadPtr](std::unique_ptr<detail::BaseQueryExecutor>& val)
         {
             return val.get() == executorThreadPtr;
         });
 
-    if (it == m_dbThreadList.end())
+    if (it == m_dbThreads.end())
         return; //< This can happen during AsyncSqlQueryExecutor destruction.
     m_connectionsToDropQueue.push(std::move(*it));
-    m_dbThreadList.erase(it);
+
+    m_dbThreads.erase(it);
+    --m_dbThreadsSize;
 }
 
 template<typename Executor, typename UpdateFunc, typename CompletionHandler>
@@ -344,10 +352,11 @@ void AsyncSqlQueryExecutor::scheduleQuery(
     UpdateFunc updateFunc,
     CompletionHandler completionHandler)
 {
+    if (isNewConnectionNeeded())
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
 
-        if (isNewConnectionNeeded(lk))
+        if (isNewConnectionNeeded())
             openNewConnection(lk);
     }
 
