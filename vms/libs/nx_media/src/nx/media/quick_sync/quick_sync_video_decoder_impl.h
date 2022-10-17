@@ -27,6 +27,7 @@ public:
 
     DeviceContext& getDevice() { return m_device; }
     static bool isCompatible(const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height);
+    static bool isAvailable();
 
     bool scaleFrame(
         mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize);

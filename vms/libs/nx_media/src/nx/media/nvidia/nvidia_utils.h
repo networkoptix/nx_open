@@ -15,4 +15,16 @@ inline std::string toString(CUresult error)
     return std::string(szErrName);
 }
 
+inline bool isNvidiaAvailable()
+{
+    if (!NvidiaDriverApiProxy::instance().load())
+        return false;
+
+    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
+    if (status != CUDA_SUCCESS)
+        return false;
+
+    return true;
+}
+
 } // namespace nx::media::nvidia
