@@ -39,6 +39,11 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
+const QString kFailedSuffix{"_failed"};
+const QString kNormalSuffix{""};
+const QString kPartialSuffix{"_partial"};
+
+
 bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
 {
     auto settings = unit->settings();
@@ -74,8 +79,8 @@ QString makeFileName(QnMediaServerResourcePtr server)
     const auto id = server ? server->getId().toSimpleString() : QnUuid().toSimpleString();
     const auto time = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
     return server
-        ? nx::format("%1_%2_%3.zip", name, id, time)
-        : nx::format("%1_%2.zip", name, time);
+        ? nx::format("%1_%2_%3%4.zip", name, id, time)
+        : nx::format("%1_%2%3.zip", name, time);
 }
 
 nx::vms::api::ServerLogSettings loadClientSettings()
@@ -392,8 +397,11 @@ struct LogsManagementWatcher::Unit::Private
         NX_ASSERT(m_state == DownloadState::none || m_state == DownloadState::error);
 
         QDir dir(folder);
-        QString filename = makeFileName(m_server);
-        auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
+        auto sourceFilePath = dir.absoluteFilePath(makeFileName(m_server));
+        // Immediately make the file with the "_partial" suffix, so as not to do an unnecessary
+        // re-opening of the file after renaming.
+        m_currentFilePath = sourceFilePath.arg(kPartialSuffix);
+        auto file = std::make_shared<QFile>(m_currentFilePath);
         if (!file->open(QIODevice::WriteOnly))
         {
             m_state = DownloadState::error;
@@ -406,24 +414,26 @@ struct LogsManagementWatcher::Unit::Private
 
         file->close();
 
-        m_collector.reset(new ClientLogCollector(dir.absoluteFilePath(filename)));
+        m_collector.reset(new ClientLogCollector(dir.absoluteFilePath(m_currentFilePath)));
         connect(m_collector.get(), &ClientLogCollector::success,
-            [this, callback]
+            [this, sourceFilePath, callback]
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
                 m_state = DownloadState::complete;
 
                 lock.unlock();
+                renameFileForCurrentState(sourceFilePath);
                 if (callback)
                     callback();
             });
         connect(m_collector.get(), &ClientLogCollector::error,
-            [this, callback]
+            [this, sourceFilePath, callback]
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
                 m_state = DownloadState::error;
 
                 lock.unlock();
+                renameFileForCurrentState(sourceFilePath);
                 if (callback)
                     callback();
             });
@@ -453,8 +463,11 @@ struct LogsManagementWatcher::Unit::Private
         url.setPath(QString("/rest/v2/servers/%1/logArchive").arg(serverId));
 
         QDir dir(folder);
-        QString filename = makeFileName(m_server);
-        auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
+        auto sourceFilePath = dir.absoluteFilePath(makeFileName(m_server));
+        // Immediately make the file with the "_partial" suffix, so as not to do an unnecessary
+        // re-opening of the file after renaming.
+        m_currentFilePath = sourceFilePath.arg(kPartialSuffix);
+        auto file = std::make_shared<QFile>(m_currentFilePath);
         if (!file->open(QIODevice::WriteOnly))
         {
             m_state = DownloadState::error;
@@ -473,7 +486,7 @@ struct LogsManagementWatcher::Unit::Private
         m_timer.start();
 
         m_downloader->setOnResponseReceived(
-            [this, filePath = dir.absoluteFilePath(filename), callback](std::optional<size_t> size)
+            [this, sourceFilePath, callback](std::optional<size_t> size)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -483,7 +496,7 @@ struct LogsManagementWatcher::Unit::Private
                     m_downloader->pleaseStopSync();
                     lock.relock();
                     m_state = DownloadState::error;
-                    fixZipFileIfNeeded(filePath);
+                    fixZipFileIfNeeded(m_currentFilePath);
                 }
                 else
                 {
@@ -492,6 +505,7 @@ struct LogsManagementWatcher::Unit::Private
                 }
 
                 lock.unlock();
+                renameFileForCurrentState(sourceFilePath);
                 if (callback)
                     callback();
             });
@@ -515,13 +529,14 @@ struct LogsManagementWatcher::Unit::Private
             });
 
         m_downloader->setOnDone(
-            [this, filePath = dir.absoluteFilePath(filename), callback]
+            [this, sourceFilePath, callback]
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
                 m_state = m_downloader->failed() ? DownloadState::error : DownloadState::complete;
 
                 lock.unlock();
+                renameFileForCurrentState(sourceFilePath);
                 if (callback)
                     callback();
             });
@@ -617,11 +632,34 @@ struct LogsManagementWatcher::Unit::Private
         }
     }
 
+    void renameFileForCurrentState(const QString& sourceFilePath)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        QString newFilePath;
+        switch (m_state)
+        {
+            case DownloadState::loading:
+                newFilePath = sourceFilePath.arg(kPartialSuffix);
+                break;
+            case DownloadState::error:
+                newFilePath = sourceFilePath.arg(kFailedSuffix);
+                break;
+            default:
+                newFilePath = sourceFilePath.arg(kNormalSuffix);
+                break;
+        }
+
+        QFile::rename(m_currentFilePath, newFilePath);
+        m_currentFilePath = newFilePath;
+    }
+
 private:
     mutable nx::Mutex m_mutex;
     QnMediaServerResourcePtr m_server;
 
     bool m_checked{false};
+    QString m_currentFilePath;
     DownloadState m_state{DownloadState::none};
     ErrorType m_errorType{ErrorType::remote};
     std::optional<nx::vms::api::ServerLogSettings> m_settings;
