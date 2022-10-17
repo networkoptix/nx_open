@@ -7,6 +7,8 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlEngine>
 
+#include <nx/vms/client/desktop/system_context.h>
+
 namespace nx::vms::client::desktop::test {
 
 class Context;
@@ -18,6 +20,8 @@ public:
     virtual ~QmlTestEnvironment() override;
 
     QQmlEngine* engine() const;
+
+    SystemContext* systemContext() const;
 
 private:
     std::unique_ptr<Context> m_testContext;

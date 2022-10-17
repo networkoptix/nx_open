@@ -38,5 +38,10 @@ QQmlEngine* QmlTestEnvironment::engine() const
     return appContext()->qmlEngine();
 }
 
+SystemContext* QmlTestEnvironment::systemContext() const
+{
+    return m_testContext->systemContext();
+}
+
 } // namespace test
 } // namespace nx::vms::client::desktop

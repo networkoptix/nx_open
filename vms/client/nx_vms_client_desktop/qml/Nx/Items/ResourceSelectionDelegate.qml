@@ -36,6 +36,8 @@ Item
         ? 0
         : (contentRow.implicitWidth + indicator.width + contentRow.spacing)
 
+    baselineOffset: contentRow.y + name.y + name.baselineOffset
+
     Row
     {
         id: contentRow
@@ -226,7 +228,7 @@ Item
         visible: delegateItem.isSeparator
     }
 
-    readonly property bool highlighted: indicator.checkState !== Qt.Unchecked
+    property bool highlighted: indicator.checkState !== Qt.Unchecked
 
     readonly property color color: highlighted
         ? ColorTheme.colors.light4

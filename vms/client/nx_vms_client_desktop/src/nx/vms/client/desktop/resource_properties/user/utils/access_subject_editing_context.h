@@ -28,6 +28,8 @@ public:
     QnUuid currentSubjectId() const;
     void setCurrentSubjectId(const QnUuid& subjectId);
 
+    nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
+
     /** Overrides current subject access rights. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& resourceAccessMap);
 
@@ -56,6 +58,19 @@ public:
 
     /** Reverts any changes. */
     void revert();
+
+    Q_INVOKABLE bool hasOwnAccessRight(
+        const QnUuid& resourceId,
+        nx::vms::api::AccessRight accessRight) const;
+
+    Q_INVOKABLE void setOwnAccessRight(
+        const QnUuid& resourceId,
+        nx::vms::api::AccessRight accessRight,
+        bool value = true);
+
+    nx::vms::api::GlobalPermissions globalPermissions() const;
+
+    QSet<QnUuid> globalPermissionSource(nx::vms::api::GlobalPermission perm) const;
 
 signals:
     void subjectChanged();

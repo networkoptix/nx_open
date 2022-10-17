@@ -26,6 +26,8 @@ TabButton
 
     property int animationDurationMs: 200
 
+    property real underlineOffset: 0
+
     property bool compact: true
 
     readonly property bool isCurrent: TabBar.tabBar && TabBar.index === TabBar.tabBar.currentIndex
@@ -152,7 +154,7 @@ TabButton
             anchors.bottom: parent.bottom
             // There are some visual bugs with tabButton positioning.
             // Underline is only 1 pixel height instead of 2, without this shift.
-            anchors.bottomMargin: tabButton.secondaryStyle ? 0 : 1
+            anchors.bottomMargin: (tabButton.secondaryStyle ? 0 : 1) - tabButton.underlineOffset
             width: content.implicitWidth
             height: tabButton.secondaryStyle ? 1 : 2
             visible: !tabButton.compact || tabButton.isCurrent || tabButton.hovered
