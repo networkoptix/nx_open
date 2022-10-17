@@ -448,4 +448,100 @@ TEST_F(QueryQueue, aggregation_limit)
     thenProvidedQueryCountIsNotGreaterThanAggregationLimit();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class DummyExecutor:
+    public BaseExecutor
+{
+protected:
+    using BaseExecutor::BaseExecutor;
+
+    virtual DBResult executeQuery(AbstractDbConnection* const /*connection*/) override
+    {
+        return DBResult::ok;
+    }
+
+    virtual void reportErrorWithoutExecution(DBResult /*errorCode*/) override {}
+    virtual void setExternalTransaction(Transaction* /*transaction*/) override {}
+};
+
+} // namespace
+
+class QueryQueueManualLoadTest:
+    public QueryQueue
+{
+public:
+    QueryQueueManualLoadTest()
+    {
+        queryQueue().setConcurrentModificationQueryLimit(1000);
+
+        queryQueue().enableItemStayTimeoutEvent(
+            std::chrono::seconds(35),
+            [](auto&&...) {});
+    }
+
+protected:
+    void createPopThreads(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_popThreads.push_back(std::thread([this]() { popThreadMain(); }));
+    }
+
+    void createPushThreads(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_pushThreads.push_back(std::thread([this]() { pushThreadMain(); }));
+    }
+
+private:
+    void popThreadMain()
+    {
+        while (!m_terminated)
+        {
+            if (queryQueue().pop(std::chrono::milliseconds(101)))
+                ++m_tasksPopped;
+        }
+    }
+
+    void pushThreadMain()
+    {
+        while (!m_terminated)
+        {
+            queryQueue().push(std::make_unique<DummyExecutor>(
+                (rand() & 1) ? QueryType::lookup : QueryType::modification,
+                (rand() & 1) ? "key" : ""));
+            ++m_tasksPushed;
+        }
+    }
+
+protected:
+    std::atomic<long long> m_tasksPushed{0};
+    std::atomic<long long> m_tasksPopped{0};
+
+private:
+    std::vector<std::thread> m_pushThreads;
+    std::vector<std::thread> m_popThreads;
+    bool m_terminated = false;
+};
+
+TEST_F(
+    QueryQueueManualLoadTest,
+    DISABLED_multiple_threads_can_push_into_queue_without_blocking_each_other)
+{
+    const int kPushThreadCount = 40;
+    const int kPopThreadCount = 10;
+
+    createPopThreads(kPopThreadCount);
+    createPushThreads(kPushThreadCount);
+
+    for (;;)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::cout << "tasks pushed/popped: " << std::setw(7)
+            << m_tasksPushed <<"/"<< m_tasksPopped << std::endl;
+    }
+}
+
 } // namespace nx::sql::detail::test

@@ -6,6 +6,7 @@
 #include <nx/utils/time.h>
 
 #include <nx/sql/db_statistics_collector.h>
+#include <nx/sql/detail/query_queue.h>
 
 namespace nx::sql::test {
 
@@ -14,7 +15,7 @@ class DbStatisticsCollector:
 {
 public:
     DbStatisticsCollector():
-        m_statisticsCollector(std::chrono::milliseconds(100))
+        m_statisticsCollector(std::chrono::milliseconds(100), m_queryQueue)
     {
     }
 
@@ -116,6 +117,7 @@ protected:
     }
 
 private:
+    detail::QueryQueue m_queryQueue;
     StatisticsCollector m_statisticsCollector;
     std::deque<nx::utils::test::ScopedTimeShift> m_timeShifts;
     std::deque<QueryExecutionInfo> m_records;
@@ -170,7 +172,7 @@ TEST_F(DbStatisticsCollector, wait_for_execution_time_min_max_average)
 
     recordRequestWithWaitForExecutionTime(one);
     recordRequestWithWaitForExecutionTime(two);
-    
+
     assertWaitForExecutionTimeMinMaxAverageEqualTo(
         std::min(one, two),
         std::max(one, two),

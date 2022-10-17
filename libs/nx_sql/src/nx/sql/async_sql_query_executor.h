@@ -75,7 +75,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
-    virtual Stats stats() const = 0;
+    virtual QueryQueueStats stats() const = 0;
 
     /**
      * Convenience overload for executeUpdate where DbFunc returns void or throws an exception
@@ -343,7 +343,7 @@ public:
         nx::sql::QueryContext* const queryContext,
         const std::string& script) override;
 
-    virtual Stats stats() const override;
+    virtual QueryQueueStats stats() const override;
 
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
@@ -376,9 +376,10 @@ private:
 
     const ConnectionOptions m_connectionOptions;
     mutable nx::Mutex m_mutex;
-    StatisticsCollector m_statisticsCollector;
     detail::QueryQueue m_queryQueue;
-    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadList;
+    StatisticsCollector m_statisticsCollector;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreads;
+    std::atomic<std::size_t> m_dbThreadsSize{0};
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated = false;
@@ -387,7 +388,7 @@ private:
     detail::QueryQueue m_cursorTaskQueue;
     std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContexts;
 
-    bool isNewConnectionNeeded(const nx::Locker<nx::Mutex>& /*lk*/) const;
+    bool isNewConnectionNeeded() const;
 
     void openNewConnection(
         const nx::Locker<nx::Mutex>& /*lk*/,

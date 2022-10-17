@@ -201,7 +201,7 @@ public:
         return m_delegate->setConcurrentModificationQueryLimit(limit);
     }
 
-    virtual Stats stats() const override
+    virtual QueryQueueStats stats() const override
     {
         return m_delegate->stats();
     }

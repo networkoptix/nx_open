@@ -13,45 +13,23 @@
 
 namespace nx::sql {
 
-struct NX_SQL_API QueryExecutionInfo
+namespace detail { class QueryQueue; }
+
+//-------------------------------------------------------------------------------------------------
+
+struct QueryExecutionInfo
 {
     std::optional<DBResult> result;
     std::chrono::milliseconds waitForExecutionDuration = std::chrono::milliseconds::zero();
     std::optional<std::chrono::milliseconds> executionDuration;
 };
 
-struct NX_SQL_API DurationStatistics
-{
-    std::chrono::milliseconds min = std::chrono::milliseconds::max();
-    std::chrono::milliseconds max = std::chrono::milliseconds::min();
-    std::chrono::milliseconds average = std::chrono::milliseconds::zero();
-};
-
-#define DurationStatistics_sql_Fields (min)(max)(average)
-
-NX_REFLECTION_INSTRUMENT(DurationStatistics, DurationStatistics_sql_Fields)
-
-struct NX_SQL_API QueryStatistics
-{
-    std::chrono::milliseconds statisticalPeriod;
-    int requestsSucceeded = 0;
-    int requestsFailed = 0;
-    int requestsCancelled = 0;
-    DurationStatistics requestExecutionTimes;
-    DurationStatistics waitingForExecutionTimes;
-};
-
-#define QueryStatistics_sql_Fields (statisticalPeriod)(requestsSucceeded)(requestsFailed) \
-    (requestsCancelled)(requestExecutionTimes)(waitingForExecutionTimes)
-
-NX_REFLECTION_INSTRUMENT(QueryStatistics, QueryStatistics_sql_Fields)
-
-//-------------------------------------------------------------------------------------------------
-
 class NX_SQL_API StatisticsCollector
 {
 public:
-    StatisticsCollector(std::chrono::milliseconds period);
+    StatisticsCollector(
+        std::chrono::milliseconds period,
+        const detail::QueryQueue& queryQueue);
 
     void recordQuery(QueryExecutionInfo queryStatistics);
     QueryStatistics getQueryStatistics() const;
@@ -80,6 +58,7 @@ private:
     };
 
     const std::chrono::milliseconds m_period;
+    const detail::QueryQueue& m_queryQueue;
     std::deque<StatisticsRecordContext> m_recordQueue;
     mutable nx::Mutex m_mutex;
     QueryStatistics m_currentStatistics;
