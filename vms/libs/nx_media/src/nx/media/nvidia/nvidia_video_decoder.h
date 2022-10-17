@@ -28,6 +28,8 @@ public:
     static bool isCompatible(
         const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height);
 
+    static bool isAvailable();
+
     Renderer& getRenderer();
 
     void pushContext();

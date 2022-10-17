@@ -13,6 +13,11 @@ bool QuickSyncVideoDecoder::isCompatible(
         nullptr, codec, resolution.width(), resolution.height());
 }
 
+bool QuickSyncVideoDecoder::isAvailable()
+{
+    return QuickSyncVideoDecoderImpl::isAvailable();
+}
+
 QSize QuickSyncVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 {
     return QSize(8192, 8192);
