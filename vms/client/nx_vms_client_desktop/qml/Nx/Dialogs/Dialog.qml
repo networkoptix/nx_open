@@ -43,8 +43,16 @@ Window
         item: rootItem
         onKeyPress: event =>
         {
-            if (event.key === Qt.Key_Escape)
-                reject()
+            switch (event.key)
+            {
+                case Qt.Key_Escape:
+                    reject()
+                    return
+                case Qt.Key_Return:
+                case Qt.Key_Enter:
+                    accept()
+                    return
+            }
         }
     }
 
@@ -69,7 +77,7 @@ Window
         buttonBox.parent = rootItem
         buttonBox.accepted.connect(dialog.accept)
         buttonBox.rejected.connect(dialog.reject)
-        buttonBox.applied.connect(dialog.applied)
+        buttonBox.applied.connect(dialog.apply)
     }
 
     onCustomButtonsChanged:
@@ -87,7 +95,11 @@ Window
         }
 
         if (result === undefined)
-            reject()
+        {
+            result = false
+            dialog.rejected()
+            // Do not close the dialog here - it won't open again.
+        }
     }
 
     function accept()
@@ -102,5 +114,10 @@ Window
         result = false
         dialog.rejected()
         close()
+    }
+
+    function apply()
+    {
+        dialog.applied()
     }
 }

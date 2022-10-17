@@ -36,13 +36,21 @@
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
+#include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_properties/fisheye/fisheye_calibrator.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/parent_groups_provider.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/resource_access_info_provider.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
-#include <nx/vms/client/desktop/resource/resource_status_helper.h>
+#include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
+#include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
+#include <nx/vms/client/desktop/system_administration/models/global_permissions_model.h>
+#include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
@@ -75,7 +83,6 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
-#include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -229,6 +236,7 @@ void QnClientMetaTypes::initialize()
 
 void QnClientMetaTypes::registerQmlTypes()
 {
+    AccessRightsList::registerQmlTypes();
     ColorTheme::registerQmlType();
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
@@ -244,6 +252,10 @@ void QnClientMetaTypes::registerQmlTypes()
     ListNavigationHelper::registerQmlType();
     ItemGrabber::registerQmlType();
     DragAndDrop::registerQmlType();
+    ResourceAccessInfoProvider::registerQmlTypes();
+    CustomAccessSummaryModel::registerQmlTypes();
+    ParentGroupsProvider::registerQmlTypes();
+    GlobalPermissionsModel::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
     LiveCameraThumbnail::registerQmlType();
     RoiCameraThumbnail::registerQmlType();
@@ -254,6 +266,8 @@ void QnClientMetaTypes::registerQmlTypes()
     WhatsThis::registerQmlType();
     MouseSpy::registerQmlType();
     AudioDispatcher::registerQmlType();
+    UserSettingsGlobal::registerQmlTypes();
+    MembersModel::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
@@ -273,6 +287,10 @@ void QnClientMetaTypes::registerQmlTypes()
     qmlRegisterUncreatableType<joystick::JoystickButtonActionChoiceModel>("nx.vms.client.desktop", 1, 0,
         "JoystickButtonActionChoiceModel",
         "JoystickButtonActionChoiceModel can be created from C++ code only.");
+
+    qmlRegisterUncreatableType<AccessSubjectEditingContext>("nx.vms.client.desktop", 1, 0,
+        "AccessSubjectEditingContext",
+        "AccessSubjectEditingContext can be created from C++ code only.");
 
     qmlRegisterUncreatableType<FilteredResourceProxyModel>("nx.vms.client.desktop", 1, 0,
         "FilteredResourceProxyModel",

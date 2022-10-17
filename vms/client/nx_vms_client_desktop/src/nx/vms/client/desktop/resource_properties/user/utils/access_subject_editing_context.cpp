@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include <core/resource/layout_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/global_permissions_watcher.h>
@@ -39,6 +41,7 @@ public:
 
 public:
     QnUuid currentSubjectId;
+    nx::vms::common::SystemContext* systemContext;
     const QPointer<SubjectHierarchy> systemSubjectHierarchy;
     const std::unique_ptr<Hierarchy> currentHierarchy;
     const std::unique_ptr<ProxyAccessRightsManager> accessRightsManager;
@@ -52,6 +55,7 @@ public:
         nx::vms::common::SystemContext* systemContext)
         :
         q(q),
+        systemContext(systemContext),
         systemSubjectHierarchy(systemContext->accessSubjectHierarchy()),
         currentHierarchy(new Hierarchy()),
         accessRightsManager(new ProxyAccessRightsManager(systemContext->accessRightsManager())),
@@ -71,13 +75,26 @@ public:
         connect(systemSubjectHierarchy, &SubjectHierarchy::reset,
             q, &AccessSubjectEditingContext::resetRelations);
 
+        connect(accessRightsManager.get(), &ProxyAccessRightsManager::ownAccessRightsChanged,
+            q, &AccessSubjectEditingContext::resourceAccessChanged);
+
         connect(systemSubjectHierarchy, &SubjectHierarchy::changed, this,
-            [this](const QSet<QnUuid>& /*added*/, const QSet<QnUuid>& removed)
+            [this](const QSet<QnUuid>& added, const QSet<QnUuid>& removed)
             {
                 if (!hierarchyChanged)
+                {
                     this->q->resetRelations();
+                }
                 else
+                {
+                    for (const auto& id: added)
+                    {
+                        const auto directParents = systemSubjectHierarchy->directParents(id);
+                        const auto directMembers = systemSubjectHierarchy->directMembers(id);
+                        currentHierarchy->addOrUpdate(id, directParents, directMembers);
+                    }
                     currentHierarchy->remove(removed);
+                }
 
                 if (removed.contains(currentSubjectId))
                 {
@@ -131,11 +148,65 @@ void AccessSubjectEditingContext::setCurrentSubjectId(const QnUuid& value)
     emit subjectChanged();
 }
 
+ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const
+{
+    if (!d->currentSubjectId.isNull())
+        return d->accessRightsManager->ownResourceAccessMap(d->currentSubjectId);
+
+    return {};
+}
+
 void AccessSubjectEditingContext::setOwnResourceAccessMap(
     const ResourceAccessMap& resourceAccessMap)
 {
     NX_DEBUG(this, "Setting access map to %1", resourceAccessMap);
     d->accessRightsManager->setOwnResourceAccessMap(resourceAccessMap);
+}
+
+bool AccessSubjectEditingContext::hasOwnAccessRight(
+        const QnUuid& resourceId,
+        nx::vms::api::AccessRight accessRight) const
+{
+    return ownResourceAccessMap().value(resourceId, {}).testFlag(accessRight);
+}
+
+void AccessSubjectEditingContext::setOwnAccessRight(
+        const QnUuid& resourceId,
+        nx::vms::api::AccessRight accessRight,
+        bool value)
+{
+    auto accessMap = ownResourceAccessMap();
+    auto accessRights = accessMap.value(resourceId, {});
+
+    accessRights.setFlag(accessRight, value);
+
+    if (accessRights == 0)
+        accessMap.remove(resourceId);
+    else
+        accessMap[resourceId] = accessRights;
+
+    setOwnResourceAccessMap(accessMap);
+}
+
+nx::vms::api::GlobalPermissions AccessSubjectEditingContext::globalPermissions() const
+{
+    return d->accessRightsResolver->globalPermissions(d->currentSubjectId);
+}
+
+QSet<QnUuid> AccessSubjectEditingContext::globalPermissionSource(
+    nx::vms::api::GlobalPermission perm) const
+{
+    QSet<QnUuid> result;
+
+    const auto directParents = subjectHierarchy()->directParents(d->currentSubjectId);
+
+    for (const auto& parentId: directParents)
+    {
+        if (d->accessRightsResolver->globalPermissions(parentId).testFlag(perm))
+            result << parentId;
+    }
+
+    return result;
 }
 
 void AccessSubjectEditingContext::resetOwnResourceAccessMap()
@@ -178,6 +249,7 @@ void AccessSubjectEditingContext::resetRelations()
         d->currentHierarchy->clear();
 
     d->hierarchyChanged = false;
+    emit hierarchyChanged();
 }
 
 const SubjectHierarchy* AccessSubjectEditingContext::subjectHierarchy() const

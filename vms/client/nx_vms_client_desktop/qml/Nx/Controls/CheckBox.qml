@@ -13,6 +13,7 @@ CheckBox
 
     property Item middleItem: null //< An optional item between indicator and text.
     property alias middleSpacing: middleContainer.rightPadding //< Between middleItem and text.
+    property alias textFormat: controlText.textFormat
 
     padding: 0
     topPadding: 0
@@ -23,7 +24,7 @@ CheckBox
     font.pixelSize: 13
     font.weight: Font.Normal
 
-    baselineOffset: text.baselineOffset + topPadding
+    baselineOffset: controlText.baselineOffset + topPadding
 
     indicator: CheckBoxImage
     {
@@ -48,7 +49,7 @@ CheckBox
 
         Text
         {
-            id: text
+            id: controlText
 
             leftPadding: 2
             rightPadding: 2
