@@ -29,24 +29,26 @@ inline std::strong_ordering operator<=>(const basic_string<CharT, Traits, Alloc>
     return std::strong_ordering::equal;
 }
 
+namespace chrono {
+
 template<typename Rep1, typename Period1, typename Rep2, typename Period2>
 constexpr auto operator<=>(
-    const std::chrono::duration<Rep1, Period1>& lhs,
-    const std::chrono::duration<Rep2, Period2>& rhs)
+    const duration<Rep1, Period1>& lhs,
+    const duration<Rep2, Period2>& rhs)
 {
-    using ct = common_type_t<
-        std::chrono::duration<Rep1, Period1>,
-        std::chrono::duration<Rep2, Period2>>;
+    using ct = common_type_t<duration<Rep1, Period1>, duration<Rep2, Period2>>;
     return ct(lhs).count() <=> ct(rhs).count();
 }
 
-template<typename Clock, typename Duration>
+template<typename Clock, typename Duration1, typename Duration2>
 constexpr auto operator<=>(
-    const std::chrono::time_point<Clock, Duration>& lhs,
-    const std::chrono::time_point<Clock, Duration>& rhs)
+    const time_point<Clock, Duration1>& lhs,
+    const time_point<Clock, Duration2>& rhs)
 {
     return lhs.time_since_epoch() <=> rhs.time_since_epoch();
 }
+
+} // namespace chrono
 
 template<class I1, class I2, class Cmp>
 constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp comp)
@@ -234,6 +236,22 @@ inline detail::synth3way_t<Tp> operator<=>(
         y.begin(),
         y.end(),
         detail::synth3way);
+}
+
+template <typename Tp>
+constexpr auto operator<=>(
+    const optional<Tp>& x,
+    const optional<Tp>& y)
+{
+    return x && y ? *x <=> y : bool(x) <=> bool(y);
+}
+
+template <typename Tp>
+constexpr auto operator<=>(
+    const optional<Tp>& x,
+    const Tp& v)
+{
+    return bool(x) ? *x <=> v : strong_ordering::less;
 }
 
 } // namespace std
