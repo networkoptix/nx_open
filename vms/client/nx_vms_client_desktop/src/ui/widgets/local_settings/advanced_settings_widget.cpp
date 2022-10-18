@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -72,6 +73,13 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         ui->autoFpsLimitCheckbox->setVisible(false);
         ui->autoFpsLimitCheckboxHint->setVisible(false);
     }
+
+    auto hardwareAccelerationType = nx::media::getHardwareAccelerationType();
+    if (!ini().nvidiaHardwareDecoding && hardwareAccelerationType == nx::media::HardwareAccelerationType::nvidia)
+        hardwareAccelerationType = nx::media::HardwareAccelerationType::none;
+
+    if (hardwareAccelerationType == nx::media::HardwareAccelerationType::none)
+        ui->useHardwareDecodingCheckbox->setEnabled(false);
 
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
@@ -246,7 +254,7 @@ void QnAdvancedSettingsWidget::applyChanges()
                 return (bool)connection();
             };
         const auto checkInstances =
-            [this]
+            []
             {
                 return appContext()->sharedMemoryManager()->runningInstancesIndices().size() > 1;
             };
@@ -255,7 +263,7 @@ void QnAdvancedSettingsWidget::applyChanges()
         const bool otherWindowsExist = checkInstances();
 
         const auto updateSecurityLevel =
-            [this, level=newCertificateValidationLevel]()
+            [level=newCertificateValidationLevel]()
             {
                 qnClientCoreModule->networkModule()->reinitializeCertificateStorage(level);
                 nx::vms::client::core::settings()->certificateValidationLevel.setValue(level);
