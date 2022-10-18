@@ -323,7 +323,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, playAudioForAllItems, setPlayAudioForAllItems, PLAY_AUDIO_FOR_ALL_ITEMS, false)
 
-        QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
+        QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabledProperty, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
         QN_DECLARE_RW_PROPERTY(bool, isPtzAimOverlayEnabled, setPtzAimOverlayEnabled, PTZ_AIM_OVERLAY_ENABLED, false)
         QN_DECLARE_RW_PROPERTY(int, maxHardwareDecoders, setMaxHardwareDecoders, MAX_HARDWARE_DECODERS, 8)
         QN_DECLARE_R_PROPERTY(bool, isBrowseLogsVisible, BROWSE_LOGS_VISIBLE, true)
@@ -343,6 +343,10 @@ private:
     void migrateLastUsedConnection();
     // Migration between 4.3 and 4.3.
     void migrateMediaFolders();
+
+public:
+    // Override getter
+    bool isHardwareDecodingEnabled();
 
 private:
     const bool m_readOnly;
