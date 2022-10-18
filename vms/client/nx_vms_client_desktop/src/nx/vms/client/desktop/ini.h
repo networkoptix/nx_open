@@ -124,6 +124,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, grayscaleDecoding,
         "[Dev] Use grayscale video decoding.");
 
+    NX_INI_FLAG(false, nvidiaHardwareDecoding,
+        "[Dev] Use NVIDIA hardware video decoding.");
+
     NX_INI_FLAG(0, disableVideoRendering,
         "[Dev] Completely disable video rendering to simplify memory leaks detection.");
 

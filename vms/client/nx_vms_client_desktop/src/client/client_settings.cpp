@@ -19,6 +19,8 @@
 
 #include <nx/network/http/http_types.h>
 
+#include <nx/media/hardware_acceleration_type.h>
+
 #include <nx/fusion/model_functions.h>
 
 #include <nx/reflect/json.h>
@@ -455,4 +457,16 @@ void QnClientSettings::migrate()
 QVariant QnClientSettings::iniConfigValue(const QString& paramName)
 {
     return nx::vms::client::desktop::ini().get(paramName);
+}
+
+bool QnClientSettings::isHardwareDecodingEnabled()
+{
+    static auto hardwareAccelerationType = nx::media::getHardwareAccelerationType();
+    if (!ini().nvidiaHardwareDecoding && hardwareAccelerationType == nx::media::HardwareAccelerationType::nvidia)
+        hardwareAccelerationType = nx::media::HardwareAccelerationType::none;
+
+    if (hardwareAccelerationType == nx::media::HardwareAccelerationType::none)
+        return false;
+
+    return isHardwareDecodingEnabledProperty();
 }
