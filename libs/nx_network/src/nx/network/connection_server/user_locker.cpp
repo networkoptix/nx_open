@@ -2,11 +2,29 @@
 
 #include "user_locker.h"
 
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/time.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx {
 namespace network {
 namespace server {
+
+void UserLockerSettings::load(const SettingsReader& settings)
+{
+    checkPeriod = nx::utils::parseTimerDuration(
+        settings.value("checkPeriod").toString(),
+        checkPeriod);
+
+    authFailureCount = settings.value("authFailureCount", authFailureCount).toInt();
+    maxLockerCount = settings.value("maxLockerCount", maxLockerCount).toInt();
+
+    lockPeriod = nx::utils::parseTimerDuration(
+        settings.value("lockPeriod").toString(),
+        lockPeriod);
+}
+
+//-------------------------------------------------------------------------------------------------
 
 UserLocker::UserLocker(
     const UserLockerSettings& settings)
