@@ -45,7 +45,7 @@ TreeView
     {
         id: resourceSelectionModel
 
-        context: workbenchContext
+        context: systemContext
         resourceTypes: resourceSelectionTree.resourceTypes
         selectionMode: resourceSelectionTree.selectionMode
         filterText: resourceSelectionTree.filterText

@@ -9,14 +9,15 @@
 #include <client/client_settings.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -29,7 +30,7 @@ struct ResourceSelectionModelAdapter::Private
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
     std::unique_ptr<entity_resource_tree::ResourceTreeEntityBuilder> treeEntityBuilder;
 
-    QnWorkbenchContext* context = nullptr;
+    SystemContext* context = nullptr;
     ResourceTree::ResourceFilters resourceTypes = 0;
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
@@ -136,12 +137,12 @@ ResourceSelectionModelAdapter::~ResourceSelectionModelAdapter()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnWorkbenchContext* ResourceSelectionModelAdapter::context() const
+SystemContext* ResourceSelectionModelAdapter::context() const
 {
     return d->context;
 }
 
-void ResourceSelectionModelAdapter::setContext(QnWorkbenchContext* context)
+void ResourceSelectionModelAdapter::setContext(SystemContext* context)
 {
     if (d->context == context)
         return;
@@ -154,17 +155,20 @@ void ResourceSelectionModelAdapter::setContext(QnWorkbenchContext* context)
     if (d->context)
     {
         d->treeEntityBuilder.reset(new entity_resource_tree::ResourceTreeEntityBuilder(
-            d->context->systemContext()));
+            d->context));
 
-        const auto setUser =
-            [this](const QnUserResourcePtr& user)
-            {
-                d->treeEntityBuilder->setUser(user);
-                d->updateRootEntity();
-            };
+        if (d->context->userWatcher()) //< UserWatcher does not exist in unit tests.
+        {
+            const auto setUser =
+                [this](const QnUserResourcePtr& user)
+                {
+                    d->treeEntityBuilder->setUser(user);
+                    d->updateRootEntity();
+                };
 
-        connect(d->context, &QnWorkbenchContext::userChanged, this, setUser);
-        setUser(d->context->user());
+            connect(d->context->userWatcher(), &core::UserWatcher::userChanged, this, setUser);
+            setUser(d->context->userWatcher()->user());
+        }
     }
 
     emit contextChanged();
