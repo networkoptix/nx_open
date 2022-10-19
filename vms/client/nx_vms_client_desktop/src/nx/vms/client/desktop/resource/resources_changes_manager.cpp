@@ -18,9 +18,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -604,6 +608,28 @@ void ResourcesChangesManager::saveAccessRights(
     {
         callback(true);
         return;
+    }
+
+    // Layouts require special handling.
+    const auto resourcePool = systemContext()->resourcePool();
+
+    const auto layouts = resourcePool->getResourcesByIds(nx::utils::keyRange(accessRights))
+        .filtered<LayoutResource>(
+            [](const QnLayoutResourcePtr& layout)
+            {
+                return !layout->isFile()
+                    && !layout->isShared()
+                    && !layout->hasFlags(Qn::cross_system);
+            });
+
+    for (const auto& layout: layouts)
+    {
+        layout->setParentId(QnUuid());
+        auto systemContext = SystemContext::fromResource(layout);
+        if (!NX_ASSERT(systemContext))
+            continue;
+
+        systemContext->layoutSnapshotManager()->save(layout);
     }
 
     accessRightsManager->setOwnResourceAccessMap(subject.id(), accessRights);
