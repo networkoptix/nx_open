@@ -179,11 +179,11 @@ void AsyncFileDownloader::onSomeMessageBodyAvailable()
 
     if (m_onProgressHasBeenMade)
     {
-        std::optional<double> percentage;
+        std::optional<double> progress;
         if (m_contentLength && *m_contentLength != 0)
-            percentage = (double)m_file->size() / *m_contentLength;
+            progress = (double) m_file->size() / *m_contentLength;
 
-        m_onProgressHasBeenMade(std::move(buf), percentage);
+        m_onProgressHasBeenMade(std::move(buf), progress);
     }
 }
 
