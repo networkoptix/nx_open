@@ -13,16 +13,20 @@
 
 #include "access_blocker_pool.h"
 
+class SettingsReader;
+
 namespace nx {
 namespace network {
 namespace server {
 
-struct UserLockerSettings
+struct NX_NETWORK_API UserLockerSettings
 {
     std::chrono::milliseconds checkPeriod = std::chrono::minutes(5);
     int authFailureCount = 10;
     int maxLockerCount = 10000;
     std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
+
+    void load(const SettingsReader&);
 };
 
 NX_REFLECTION_INSTRUMENT(UserLockerSettings, (checkPeriod)(authFailureCount)(maxLockerCount)(lockPeriod))
