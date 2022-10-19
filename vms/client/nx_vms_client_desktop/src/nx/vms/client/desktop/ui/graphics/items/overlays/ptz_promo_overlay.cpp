@@ -35,4 +35,11 @@ PtzPromoOverlay::~PtzPromoOverlay()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+void PtzPromoOverlay::setPagesVisibility(bool showBasics, bool showTargetLock)
+{
+    QMetaObject::invokeMethod(rootObject(), "setPagesVisibility",
+        Q_ARG(bool, showBasics),
+        Q_ARG(bool, showTargetLock));
+}
+
 } // namespace nx::vms::client::desktop

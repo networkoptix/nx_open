@@ -72,6 +72,7 @@ const qreal itemUnzoomThreshold = 0.975;
 static const char* kPtzRedirectLockedLayoutWarningKey = "__ptz_redirect_locked_warning";
 
 static const QString kPtzPromoShowOnceKey = "NewPtzMechanicPromoBlock";
+static const QString kAutoTrackingPromoShowOnceKey = "AutoTrackingPromoBlock";
 
 Vector truncate(const Vector& value)
 {
@@ -327,7 +328,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     connect(qnClientShowOnce, &nx::settings::ShowOnce::changed, this,
         [this](const QString& key, bool value)
         {
-            if (key != kPtzPromoShowOnceKey || value)
+            if (!(key == kPtzPromoShowOnceKey || key == kAutoTrackingPromoShowOnceKey) || value)
                 return;
 
             for (auto iter = m_dataByWidget.begin(); iter != m_dataByWidget.end(); ++iter)
@@ -471,8 +472,11 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
 
 void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 {
-    if (qnClientShowOnce->testFlag(kPtzPromoShowOnceKey))
+    if (qnClientShowOnce->testFlag(kPtzPromoShowOnceKey)
+        && qnClientShowOnce->testFlag(kAutoTrackingPromoShowOnceKey))
+    {
         return;
+    }
 
     PtzData& data = m_dataByWidget[widget];
     if (data.isFisheye())
@@ -484,10 +488,15 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
             return;
 
         data.promoOverlay = new PtzPromoOverlay();
+        data.promoOverlay->setPagesVisibility(
+            !qnClientShowOnce->testFlag(kPtzPromoShowOnceKey),
+            !qnClientShowOnce->testFlag(kAutoTrackingPromoShowOnceKey));
+
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
             [widget, overlay = data.promoOverlay.data()]()
             {
                 qnClientShowOnce->setFlag(kPtzPromoShowOnceKey);
+                qnClientShowOnce->setFlag(kAutoTrackingPromoShowOnceKey);
                 widget->removeOverlayWidget(overlay);
                 overlay->deleteLater();
             });
