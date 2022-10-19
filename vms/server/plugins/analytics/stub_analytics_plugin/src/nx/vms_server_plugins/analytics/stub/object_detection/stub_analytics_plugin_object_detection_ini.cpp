@@ -6,7 +6,7 @@ namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
-namespace deprecated_object_detection {
+namespace object_detection {
 
 Ini& ini()
 {
@@ -14,7 +14,7 @@ Ini& ini()
     return ini;
 }
 
-} // namespace deprecated_object_detection
+} // namespace object_detection
 } // namespace stub
 } // namespace analytics
 } // namespace vms_server_plugins

@@ -7,7 +7,7 @@
 
 #include "engine.h"
 #include "settings_model.h"
-#include "stub_analytics_plugin_object_detection_ini.h"
+#include "stub_analytics_plugin_deprecated_object_detection_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {

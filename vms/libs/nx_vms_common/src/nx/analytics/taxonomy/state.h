@@ -51,9 +51,9 @@ private:
     void refillCache() const;
 
 private:
-    mutable nx::Mutex m_mutex;
-
     InternalState m_internalState;
+
+    mutable nx::Mutex m_mutex;
 
     mutable std::vector<AbstractPlugin*> m_cachedPlugins;
     mutable std::vector<AbstractEngine*> m_cachedEngines;

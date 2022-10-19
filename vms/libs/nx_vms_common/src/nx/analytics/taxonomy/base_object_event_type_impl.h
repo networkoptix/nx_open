@@ -188,7 +188,7 @@ public:
         return m_isReachable;
     }
 
-    std::vector<AbstractScope*> scopes() const
+    const std::vector<AbstractScope*>& scopes() const
     {
         return m_scopes;
     }
@@ -197,8 +197,7 @@ public:
     {
         return m_descriptor;
     }
-
-    Descriptor descriptor() const
+    const Descriptor& descriptor() const
     {
         return m_descriptor;
     }

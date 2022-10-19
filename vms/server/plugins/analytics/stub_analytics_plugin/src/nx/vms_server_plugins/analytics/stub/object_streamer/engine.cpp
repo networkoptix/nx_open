@@ -3,6 +3,7 @@
 #include "engine.h"
 
 #include "device_agent.h"
+#include "stub_analytics_plugin_object_streamer_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -14,7 +15,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 Engine::Engine(Plugin* plugin):
-    nx::sdk::analytics::Engine(/*enableOutput*/ true),
+    nx::sdk::analytics::Engine(ini().enableOutput),
     m_plugin(plugin)
 {
 }

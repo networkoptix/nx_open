@@ -254,39 +254,44 @@ QString AttributeEx::stringValue() const
 AttributeEx::AttributeEx(const Attribute& attribute)
 {
     name = attribute.name;
-    if (isNumberOrRange(attribute.name, attribute.value))
-        value = parseRangeFromValue(attribute.value);
+
+    const auto range = parseRangeFromValue(attribute.value);
+    if (!range.isNull())
+        value = range;
     else
         value = attribute.value;
 }
 
+const static QString kRangeDelimiter("...");
+
 NumericRange AttributeEx::parseRangeFromValue(const QString& value)
 {
+
     bool ok = false;
     float floatValue = value.toFloat(&ok);
     if (ok)
         return NumericRange(floatValue);
 
-    bool isValidRange = value.contains("...");
+    bool isValidRange = value.contains(kRangeDelimiter);
     if (!isValidRange)
         return NumericRange();
 
     std::optional<RangePoint> left, right;
 
     auto unquotedValue = value;
-    if (unquotedValue.startsWith("(") || unquotedValue.startsWith("["))
+    if (unquotedValue.startsWith(L'(') || unquotedValue.startsWith(L'['))
         unquotedValue = unquotedValue.mid(1);
-    if (unquotedValue.endsWith(")") || unquotedValue.endsWith("]"))
+    if (unquotedValue.endsWith(L')') || unquotedValue.endsWith(L']'))
         unquotedValue.chop(1);
 
-    auto params = unquotedValue.split("...");
+    const auto params = unquotedValue.splitRef(kRangeDelimiter);
     if (params.size() != 2)
         return NumericRange(); //< Invalid value
     if (params[0] != "-inf")
     {
         left = RangePoint();
         left->value = params[0].toFloat(&ok);
-        left->inclusive = !value.startsWith("(");
+        left->inclusive = !value.startsWith(L'(');
         if (!ok)
             return NumericRange(); //< Invalid value
     }
@@ -294,7 +299,7 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
     {
         right = RangePoint();
         right->value = params[1].toFloat(&ok);
-        right->inclusive = !value.endsWith(")");
+        right->inclusive = !value.endsWith(L')');
         if (!ok)
             return NumericRange(); //< Invalid value
     }

@@ -26,6 +26,123 @@
 
 using namespace nx::vms::common;
 
+namespace nx::settings_names {
+
+const QString kNameDisabledVendors("disabledVendors");
+const QString kNameCameraSettingsOptimization("cameraSettingsOptimization");
+const QString kNameAutoUpdateThumbnails("autoUpdateThumbnails");
+const QString kMaxSceneItemsOverrideKey("maxSceneItems");
+const QString kUseTextEmailFormat("useTextEmailFormat");
+const QString kUseWindowsEmailLineFeed("useWindowsEmailLineFeed");
+const QString kNameAuditTrailEnabled("auditTrailEnabled");
+const QString kAuditTrailPeriodDaysName("auditTrailPeriodDays");
+const QString kNameTrafficEncryptionForced("trafficEncryptionForced");
+const QString kNameVideoTrafficEncryptionForced("videoTrafficEncryptionForced");
+const QString kNameInsecureDeprecatedApiEnabled("insecureDeprecatedApiEnabled");
+const QString kEventLogPeriodDaysName("eventLogPeriodDays");
+const QString kNameHost("smtpHost");
+const QString kNamePort("smtpPort");
+const QString kNameUser("smtpUser");
+const QString kNameSmtpPassword("smtpPassword");
+const QString kNameConnectionType("smtpConnectionType");
+const QString kNameSimple("smtpSimple");
+const QString kNameTimeout("smtpTimeout");
+const QString kNameFrom("emailFrom");
+const QString kNameSignature("emailSignature");
+const QString kNameSupportEmail("emailSupportEmail");
+const QString kNameUpdateNotificationsEnabled("updateNotificationsEnabled");
+
+const QString kNameTimeSynchronizationEnabled("timeSynchronizationEnabled");
+const QString kNamePrimaryTimeServer("primaryTimeServer");
+
+/* Max rtt for internet time synchronization request */
+const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
+    "maxDifferenceBetweenSynchronizedAndInternetTime");
+
+/* Max rtt for server to server or client to server time synchronization request */
+const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
+    "maxDifferenceBetweenSynchronizedAndLocalTimeMs");
+
+/* Period to check local time for changes */
+const QString kOsTimeChangeCheckPeriod("osTimeChangeCheckPeriodMs");
+
+/* Period to synchronize time via network */
+const QString kSyncTimeExchangePeriod("syncTimeExchangePeriod");
+const QString kSyncTimeEpsilon("syncTimeEpsilon");
+
+const QString kNameAutoDiscoveryEnabled("autoDiscoveryEnabled");
+const QString kNameAutoDiscoveryResponseEnabled("autoDiscoveryResponseEnabled");
+const QString kNameBackupSettings("backupSettings");
+const QString kNameCrossdomainEnabled("crossdomainEnabled");
+const QString kCloudHostName("cloudHost");
+
+const QString kNameStatisticsAllowed("statisticsAllowed");
+const QString kNameStatisticsReportLastTime("statisticsReportLastTime");
+const QString kNameStatisticsReportLastVersion("statisticsReportLastVersion");
+const QString kNameStatisticsReportLastNumber("statisticsReportLastNumber");
+const QString kNameStatisticsReportTimeCycle("statisticsReportTimeCycle");
+const QString kNameStatisticsReportUpdateDelay("statisticsReportUpdateDelay");
+const QString kNameLocalSystemId("localSystemId");
+const QString kNameLastMergeMasterId("lastMergeMasterId");
+const QString kNameLastMergeSlaveId("lastMergeSlaveId");
+const QString kNameSystemName("systemName");
+const QString kNameStatisticsReportServerApi("statisticsReportServerApi");
+const QString kNameSettingsUrlParam("clientStatisticsSettingsUrl");
+const QString kNameSpecificFeatures("specificFeatures");
+
+const QString ldapUri("ldapUri");
+const QString ldapAdminDn("ldapAdminDn");
+const QString ldapAdminPassword("ldapAdminPassword");
+const QString ldapSearchBase("ldapSearchBase");
+const QString ldapSearchFilter("ldapSearchFilter");
+const QString ldapPasswordExpirationPeriodMs("ldapPasswordExpirationPeriodMs");
+const QString ldapSearchTimeoutS("ldapSearchTimeoutS");
+
+const QString kNameCloudAccountName("cloudAccountName");
+const QString kNameCloudSystemId("cloudSystemID"); //< todo: rename it to cloudSystemId
+const QString kNameCloudAuthKey("cloudAuthKey");
+const QString kNameUpnpPortMappingEnabled("upnpPortMappingEnabled");
+const QString kConnectionKeepAliveTimeoutKey("ec2ConnectionKeepAliveTimeoutSec");
+const QString kKeepAliveProbeCountKey("ec2KeepAliveProbeCount");
+
+const QString kTargetUpdateInformationName = "targetUpdateInformation";
+const QString kInstalledUpdateInformationName = "installedUpdateInformation";
+const QString kTargetPersistentUpdateStorageName = "targetPersistentUpdateStorage";
+const QString kInstalledPersistentUpdateStorageName = "installedPersistentUpdateStorage";
+const QString kDownloaderPeersName = "downloaderPeers";
+const QString kClientUpdateSettings = "clientUpdateSettings";
+
+const QString kWatermarkSettingsName("watermarkSettings");
+const QString kDefaultVideoCodec("defaultVideoCodec");
+const QString kDefaultExportVideoCodec("defaultExportVideoCodec");
+const QString kLowQualityScreenVideoCodec("lowQualityScreenVideoCodec");
+const QString kForceLiveCacheForPrimaryStream("forceLiveCacheForPrimaryStream");
+const QString kMetadataStorageChangePolicyName("metadataStorageChangePolicy");
+
+const QString kShowServersInTreeForNonAdmins("showServersInTreeForNonAdmins");
+const QString kShowMouseTimelinePreview("showMouseTimelinePreview");
+
+const std::set<QString> kReadOnlyNames = {
+    kNameLocalSystemId,
+    kCloudHostName,
+    kNameCloudAccountName,
+    kNameCloudSystemId,
+    kNameCloudAuthKey,
+    kNameStatisticsReportLastTime,
+    kNameStatisticsReportLastVersion,
+    kNameStatisticsReportLastNumber,
+    kNamePrimaryTimeServer,
+};
+
+const std::set<QString> kWriteOnlyNames = {
+    kNameSmtpPassword,
+    ldapAdminPassword,
+    kNameCloudAuthKey,
+};
+
+} // namespace nx::settings_names
+
+
 #if defined(Q_OS_IOS) || defined(Q_OS_ANDROID)
 namespace nx::vms::common::update {
 

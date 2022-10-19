@@ -46,7 +46,7 @@ public:
 
     virtual bool isReachable() const override;
 
-    virtual std::vector<AbstractScope*> scopes() const override;
+    virtual const std::vector<AbstractScope*>& scopes() const override;
 
     virtual nx::vms::api::analytics::EventTypeDescriptor serialize() const override;
 

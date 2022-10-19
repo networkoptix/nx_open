@@ -120,7 +120,7 @@ bool ProxyObjectType::isNonIndexable() const
     return m_proxiedObjectType->isNonIndexable();
 }
 
-std::vector<AbstractScope*> ProxyObjectType::scopes() const
+const std::vector<AbstractScope*>& ProxyObjectType::scopes() const
 {
     return m_proxiedObjectType->scopes();
 }

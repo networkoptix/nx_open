@@ -12,6 +12,7 @@
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
 #include "settings.h"
+#include "stub_analytics_plugin_best_shots_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -42,7 +43,7 @@ static const std::string kObjectTypeId = "nx.stub.objectBestShotDemo";
 }
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput)
 {
 }
 

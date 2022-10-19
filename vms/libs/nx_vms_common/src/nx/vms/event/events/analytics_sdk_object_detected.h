@@ -17,12 +17,9 @@ class NX_VMS_COMMON_API AnalyticsSdkObjectDetected: public InstantEvent
 
 public:
     AnalyticsSdkObjectDetected(
-        QnResourcePtr resource,
-        QnUuid engineId,
-        QString objectTypeId,
-        nx::common::metadata::Attributes attributes,
-        QnUuid objectTrackId,
-        qint64 timeStampUsec);
+        const QnResourcePtr& resource,
+        const nx::common::metadata::ObjectMetadataPacketPtr& packet, 
+        const nx::common::metadata::ObjectMetadata& metadata);
 
     QnUuid engineId() const;
     const QString& objectTypeId() const;
@@ -39,10 +36,8 @@ public:
     const std::optional<QString> attribute(const QString& attributeName) const;
 
 private:
-    const QnUuid m_engineId;
-    const QString m_objectTypeId;
-    const nx::common::metadata::Attributes m_attributes;
-    const QnUuid m_objectTrackId;
+    const nx::common::metadata::ObjectMetadataPacketPtr m_packet;
+    const nx::common::metadata::ObjectMetadata& m_metadata;
 };
 
 } // namespace event

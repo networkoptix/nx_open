@@ -14,6 +14,7 @@
 #include <nx/kit/debug.h>
 
 #include "../utils.h"
+#include "stub_analytics_plugin_object_streamer_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -67,7 +68,7 @@ static std::string readFileToString(const std::string& filePath)
 }
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo, std::string pluginHomeDir):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true),
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput),
     m_pluginHomeDir(std::move(pluginHomeDir))
 {
 }

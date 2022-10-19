@@ -144,11 +144,14 @@ void ConsumingDeviceAgent::processMetadataPackets(
     }
 }
 
+static std::string packetIndexName(int packetIndex)
+{
+    return packetIndex == -1 ? "" : (std::string(" #") + nx::kit::utils::toString(packetIndex));
+}
+
 void ConsumingDeviceAgent::processMetadataPacket(
     IMetadataPacket* metadataPacket, int packetIndex = -1)
 {
-    const std::string packetIndexName =
-        (packetIndex == -1) ? "" : (std::string(" #") + nx::kit::utils::toString(packetIndex));
     if (!m_handler)
     {
         NX_PRINT << __func__ << "(): "
@@ -157,12 +160,12 @@ void ConsumingDeviceAgent::processMetadataPacket(
     }
     if (!metadataPacket)
     {
-        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName
+        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName(packetIndex)
             << " found; discarded.";
         return;
     }
 
-    logMetadataPacketIfNeeded(metadataPacket, packetIndexName);
+    logMetadataPacketIfNeeded(metadataPacket, packetIndex);
     NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
     m_handler->handleMetadata(metadataPacket);
 }
@@ -248,7 +251,7 @@ void ConsumingDeviceAgent::pushManifest(const std::string& manifest)
 
 void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     const IMetadataPacket* metadataPacket,
-    const std::string& packetIndexName) const
+    int packetIndex) const
 {
     if (!NX_DEBUG_ENABLE_OUTPUT || !NX_KIT_ASSERT(metadataPacket))
         return;
@@ -268,7 +271,7 @@ void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
             << " has unknown type.";
         packetName = "Unknown";
     }
-    packetName += " metadata packet" + packetIndexName;
+    packetName += " metadata packet" + packetIndexName(packetIndex);
 
     if (const auto compoundMetadataPacket =
         metadataPacket->queryInterface<const ICompoundMetadataPacket>())

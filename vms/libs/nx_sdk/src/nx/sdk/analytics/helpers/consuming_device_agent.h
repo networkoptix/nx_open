@@ -144,7 +144,7 @@ protected:
 private:
     void logMetadataPacketIfNeeded(
         const IMetadataPacket* metadataPacket,
-        const std::string& packetIndexName) const;
+        int packetIndex) const;
     void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
     void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
 

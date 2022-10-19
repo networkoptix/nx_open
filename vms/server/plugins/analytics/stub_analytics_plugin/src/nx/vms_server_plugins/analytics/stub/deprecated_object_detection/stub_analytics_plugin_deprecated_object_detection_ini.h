@@ -13,7 +13,7 @@ namespace deprecated_object_detection {
 
 struct Ini: public nx::kit::IniConfig
 {
-    Ini(): IniConfig("stub_analytics_plugin_object_detection.ini") { reload(); }
+    Ini(): IniConfig("stub_analytics_plugin_deprecated_object_detection.ini") { reload(); }
 
     NX_INI_FLAG(0, enableOutput, "");
 
