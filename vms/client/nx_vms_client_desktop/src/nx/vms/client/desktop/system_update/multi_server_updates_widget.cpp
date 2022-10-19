@@ -478,30 +478,28 @@ void MultiServerUpdatesWidget::initDropdownActions()
 
 void MultiServerUpdatesWidget::initDownloadActions()
 {
+    const common::update::PersistentUpdateStorage updateStorage =
+        systemContext()->globalSettings()->targetPersistentUpdateStorage();
+
+    const QString downloadUrl = generateUpdatePackageUrl(
+        appContext()->version(),
+        m_updateInfo,
+        m_stateTracker->allPeers(),
+        updateStorage.autoSelection || !updateStorage.servers.isEmpty(),
+        resourcePool()).toString();
+
     auto downloadLinkMenu = new QMenu(this);
     downloadLinkMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     downloadLinkMenu->addAction(tr("Download in External Browser"),
-        [this]()
+        [downloadUrl]()
         {
-            QSet<QnUuid> targets = m_stateTracker->allPeers();
-            auto url = generateUpdatePackageUrl(
-                appContext()->version(),
-                m_updateInfo, targets,
-                resourcePool()).toString();
-
-            QDesktopServices::openUrl(url);
+            QDesktopServices::openUrl(downloadUrl);
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
-        [this]()
+        [this, downloadUrl]()
         {
-            QSet<QnUuid> targets = m_stateTracker->allPeers();
-            auto url = generateUpdatePackageUrl(
-                appContext()->version(),
-                m_updateInfo,
-                targets,
-                resourcePool()).toString();
-            qApp->clipboard()->setText(url);
+            qApp->clipboard()->setText(downloadUrl);
 
             ui->linkCopiedWidget->show();
             fadeWidget(ui->linkCopiedWidget, 1.0, 0.0, kLinkCopiedMessageTimeoutMs, 1.0,
