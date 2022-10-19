@@ -431,7 +431,7 @@ font-size: 14px;
 line-height: 18px;</string>
             </property>
             <property name="text">
-             <string>Searching Objects, Events</string>
+             <string>Searching Bookmarks, Objects, Events</string>
             </property>
            </widget>
           </item>
