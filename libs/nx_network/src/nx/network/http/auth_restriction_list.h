@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <QtCore/QRegExp>
+#include <QtCore/QRegularExpression>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
@@ -106,7 +106,7 @@ private:
     {
         Filter filter;
         // TODO: #akolesnikov Replace with std::regex.
-        QRegExp pathRegexp;
+        QRegularExpression pathRegexp;
         AuthMethod::Values methods;
 
         Rule(const Filter& filter, AuthMethod::Values methods);
