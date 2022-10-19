@@ -1023,6 +1023,14 @@
         <source>Save Layout As Cloud...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Save Cloud Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Cloud Layout As...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1817,10 +1825,6 @@ License Key: %2</source>
 <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
-        <source>Folder not found</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
         <translation></translation>
     </message>
@@ -1875,6 +1879,22 @@ License Key: %2</source>
     <message>
         <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save logs to selected folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download is finished!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nvidia hardware acceleration is in Beta mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3110,19 +3130,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Downloading Database Backup</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Database backup is being downloaded from the server. Please wait.</source>
         <translation></translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Restoring Database Backup</source>
         <translation></translation>
     </message>
     <message>
@@ -3139,14 +3151,6 @@ to %1</source>
     </message>
     <message>
         <source>Failed to open file</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Database successfully restored</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server application will restart shortly.</source>
         <translation></translation>
     </message>
     <message>
@@ -3188,6 +3192,10 @@ to %1</source>
     <message>
         <source>System configuration will be restored from backup, Server application will be restarted.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Database successfully restored. Server application will restart shortly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5619,6 +5627,22 @@ If you intended to move analytics data to another storage location, please conta
         <source>Remote archive synchronization has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Storage for analytics data is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System storage is used for analytics data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics data can take up large amounts of space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We recommend to choose another location for it instead of the system partition.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
@@ -7344,10 +7368,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Open door</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Drop</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
@@ -7565,6 +7585,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Some data and settings may not be compatible with the new camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8177,6 +8201,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+        <source>Unknown camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
         <source>This camera requires password to be set up.</source>
@@ -8352,7 +8383,7 @@ We recommend you not to open this web page. If you understand the risks, you can
 <context>
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
-        <source>CLICK TO SHOW</source>
+        <source>INFORMATION REQUIRED</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8947,6 +8978,15 @@ Do not forget to return the Logging level to its default setting after you have 
         <source>Logs downloading failed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Debug Logging is enabled.
+System performance is degraded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs downloading is cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
@@ -9519,14 +9559,6 @@ You can force it, but it may significantly increase CPU load.</source>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message>
-        <source>No new notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Notifications Settings</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%n notifications</source>
         <translation type="unfinished">
@@ -9569,10 +9601,6 @@ You can force it, but it may significantly increase CPU load.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Local layouts can only be shown to their owners.</source>
         <translation></translation>
     </message>
@@ -9583,6 +9611,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>Some users do not have access to the selected layout. Action will not work for them.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10575,10 +10607,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export in progress...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Camera %1 has been replaced by %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10591,26 +10619,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export archive from %1 completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export archive from %1 failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not exported archive found on Device %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not exported archive found on Camera %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export archive from %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10619,15 +10627,60 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export archive from %1 stopped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The archive stream settings have been changed by user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The recording settings have been changed by user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Backup storage is not configured on %n server</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Import in progress...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import archive from %1 completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import archive from %1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import archive from %1 stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Storage for analytics data is not set on %n server</source>
+        <translation type="unfinished">
+            <numerusform>Storage for analytics data is not set on a server</numerusform>
+            <numerusform>Storage for analytics data is not set on %n servers</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>System storage is used for analytics data on %n server</source>
+        <translation type="unfinished">
+            <numerusform>System storage is used for analytics data on a server</numerusform>
+            <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Not imported archive found on Device %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not imported archive found on Camera %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import archive from %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
