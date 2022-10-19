@@ -6,6 +6,7 @@
 #include <nx/kit/debug.h>
 
 #include "device_agent.h"
+#include "stub_analytics_plugin_taxonomy_features_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -17,7 +18,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 Engine::Engine(Plugin* plugin):
-    nx::sdk::analytics::Engine(/*enableOutput*/ true, plugin->instanceId()),
+    nx::sdk::analytics::Engine(ini().enableOutput, plugin->instanceId()),
     m_plugin(plugin)
 {
 }

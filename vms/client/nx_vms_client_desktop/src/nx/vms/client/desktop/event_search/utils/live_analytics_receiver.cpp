@@ -40,6 +40,7 @@ public:
 private:
     virtual bool canAcceptData() const override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    virtual void clearUnprocessedData() override;
 
     void releaseArchiveReader();
 
@@ -97,6 +98,12 @@ bool LiveAnalyticsReceiver::Private::canAcceptData() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_buffer.size() < kMaximumBufferLength;
+}
+
+void LiveAnalyticsReceiver::Private::clearUnprocessedData()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_buffer.clear();
 }
 
 void LiveAnalyticsReceiver::Private::putData(const QnAbstractDataPacketPtr& data)

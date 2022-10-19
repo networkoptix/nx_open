@@ -80,18 +80,18 @@ bool ObjectType::isReachable() const
 
 bool ObjectType::isNonIndexable() const
 {
-    const ObjectTypeDescriptor descriptor = m_impl->descriptor();
+    const ObjectTypeDescriptor& descriptor = m_impl->descriptor();
     return descriptor.flags.testFlag(ObjectTypeFlag::nonIndexable)
         || descriptor.flags.testFlag(ObjectTypeFlag::liveOnly);
 }
 
 bool ObjectType::isLiveOnly() const
 {
-    const ObjectTypeDescriptor descriptor = m_impl->descriptor();
+    const ObjectTypeDescriptor& descriptor = m_impl->descriptor();
     return descriptor.flags.testFlag(ObjectTypeFlag::liveOnly);
 }
 
-std::vector<AbstractScope*> ObjectType::scopes() const
+const std::vector<AbstractScope*>& ObjectType::scopes() const
 {
     return m_impl->scopes();
 }

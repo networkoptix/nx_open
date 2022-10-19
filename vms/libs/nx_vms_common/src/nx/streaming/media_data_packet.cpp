@@ -124,14 +124,20 @@ QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, int initialValu
     :
     QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize + extraBufferSize)
 {
-    flags = {};
-    m_duration = 0;
-    m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = timestamp_.count();
     if (initialValue)
         m_data.writeFiller(0xff, m_data.capacity());
     else
         m_data.writeFiller(0, m_data.capacity());
+}
+
+QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, const char* buffer, int extraBufferSize)
+    :
+    QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize + extraBufferSize)
+{
+    timestamp = timestamp_.count();
+    m_data.write(buffer, kMotionDataBufferSize);
+    m_data.writeFiller(0, extraBufferSize);
 }
 
 QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
@@ -346,7 +352,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     addMotion((quint64*) m_data.data(), (quint64*) image);
 }
 
-void QnMetaDataV1::addMotion(quint64* dst64, quint64* src64)
+void QnMetaDataV1::addMotion(quint64* dst64, const quint64* src64)
 {
 #if defined(NX_SSE2_SUPPORTED)
 
@@ -370,6 +376,11 @@ void QnMetaDataV1::addMotion(quint64* dst64, quint64* src64)
         *dst64++ |= *src64++;
         *dst64++ |= *src64++;
     }
+}
+
+void QnMetaDataV1::addMotion(char* dst, const char* src)
+{
+    return addMotion((quint64*) dst, (const quint64*) src);
 }
 
 QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)

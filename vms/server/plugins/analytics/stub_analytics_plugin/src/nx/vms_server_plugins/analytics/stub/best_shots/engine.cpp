@@ -5,6 +5,7 @@
 #include "device_agent.h"
 
 #include "settings.h"
+#include "stub_analytics_plugin_best_shots_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -15,7 +16,7 @@ namespace best_shots {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(): nx::sdk::analytics::Engine(/*enableOutput*/ true)
+Engine::Engine(): nx::sdk::analytics::Engine(ini().enableOutput)
 {
 }
 
