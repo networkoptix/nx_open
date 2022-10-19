@@ -16,6 +16,8 @@ public:
     PtzPromoOverlay(QGraphicsItem* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
     virtual ~PtzPromoOverlay() override;
 
+    void setPagesVisibility(bool showBasics, bool showTargetLock);
+
 signals:
     void closeRequested();
 

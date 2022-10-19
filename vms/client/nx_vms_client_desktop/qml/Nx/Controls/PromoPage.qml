@@ -42,7 +42,7 @@ Item
             id: titleItem
 
             topPadding: 8
-            bottomPadding: 8
+            bottomPadding: imageItem.source ? 0 : 8
             width: promoPage.width
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
