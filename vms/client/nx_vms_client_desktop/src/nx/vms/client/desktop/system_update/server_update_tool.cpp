@@ -1107,14 +1107,6 @@ bool ServerUpdateTool::requestStartUpdate(
             emit startUpdateComplete(success, toString(error));
         };
 
-    if (ini().enableClientOfflineUpdate)
-    {
-        connection->postEmptyResult("/ec2/updatePersistentStorages",
-            network::rest::Params{{"version", common::update::kTargetKey}},
-            QJson::serialized(common::update::PersistentUpdateStorage({}, true)),
-            nx::utils::guarded(this, handleResponse));
-    }
-
     connection->postEmptyResult("/ec2/startUpdate",
         network::rest::Params{},
         QJson::serialized(info),
@@ -1637,6 +1629,7 @@ QUrl generateUpdatePackageUrl(
     const nx::vms::api::SoftwareVersion& engineVersion,
     const UpdateContents& contents,
     const QSet<QnUuid>& targets,
+    bool includeAllClientPackages,
     QnResourcePool* resourcePool)
 {
     const bool useLatest = contents.sourceType == UpdateSourceType::internet;
@@ -1685,7 +1678,7 @@ QUrl generateUpdatePackageUrl(
         osInfoList.insert(server->getOsInfo());
     }
 
-    query.addQueryItem("allClients", ini().enableClientOfflineUpdate ? "true" : "false");
+    query.addQueryItem("allClients", includeAllClientPackages ? "true" : "false");
     query.addQueryItem("components",
         compactPackagesQuery(componentsListToJson(nx::utils::OsInfo::current(), osInfoList)));
 
