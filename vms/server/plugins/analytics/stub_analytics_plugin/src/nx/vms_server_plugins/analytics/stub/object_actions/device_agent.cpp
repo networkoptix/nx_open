@@ -25,7 +25,7 @@ using namespace nx::sdk::analytics;
 static const int kTrackLength = 500;
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput)
 {
 }
 

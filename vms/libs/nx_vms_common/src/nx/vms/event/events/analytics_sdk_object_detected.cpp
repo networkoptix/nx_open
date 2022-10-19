@@ -18,43 +18,38 @@ namespace nx::vms:: event
 using namespace nx::vms::api::analytics;
 
 AnalyticsSdkObjectDetected::AnalyticsSdkObjectDetected(
-    QnResourcePtr resource,
-    QnUuid engineId,
-    QString objectTypeId,
-    nx::common::metadata::Attributes attributes,
-    QnUuid objectTrackId,
-    qint64 timeStampUsec)
+    const QnResourcePtr& resource,
+    const nx::common::metadata::ObjectMetadataPacketPtr& packet,
+    const nx::common::metadata::ObjectMetadata& metadata)
     :
-    base_type(EventType::analyticsSdkObjectDetected, resource, timeStampUsec),
-    m_engineId(engineId),
-    m_objectTypeId(std::move(objectTypeId)),
-    m_attributes(std::move(attributes)),
-    m_objectTrackId(objectTrackId)
+    base_type(EventType::analyticsSdkObjectDetected, resource, packet->timestampUs),
+    m_packet(packet),
+    m_metadata(metadata)
 {
 }
 
 QnUuid AnalyticsSdkObjectDetected::engineId() const
 {
-    return m_engineId;
+    return m_metadata.analyticsEngineId;
 }
 
 const QString& AnalyticsSdkObjectDetected::objectTypeId() const
 {
-    return m_objectTypeId;
+    return m_metadata.typeId;
 }
 
 QnUuid AnalyticsSdkObjectDetected::objectTrackId() const
 {
-    return m_objectTrackId;
+    return m_metadata.trackId;
 }
 
 EventParameters AnalyticsSdkObjectDetected::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.setAnalyticsEngineId(m_engineId);
-    params.setAnalyticsObjectTypeId(m_objectTypeId);
-    params.objectTrackId = m_objectTrackId;
-    params.attributes = m_attributes;
+    params.setAnalyticsEngineId(m_metadata.analyticsEngineId);
+    params.setAnalyticsObjectTypeId(m_metadata.typeId);
+    params.objectTrackId = m_metadata.trackId;
+    params.attributes = m_metadata.attributes;
     return params;
 }
 
@@ -67,7 +62,7 @@ EventParameters AnalyticsSdkObjectDetected::getRuntimeParamsEx(
 
 QString AnalyticsSdkObjectDetected::getExternalUniqueKey() const
 {
-    return m_objectTrackId.toString();
+    return m_metadata.trackId.toString();
 }
 
 bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params) const
@@ -77,27 +72,27 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
 
     const auto ruleTypeId = params.getAnalyticsObjectTypeId();
 
-    const bool isObjectTypeMatched = ruleTypeId == m_objectTypeId
+    const bool isObjectTypeMatched = ruleTypeId == m_metadata.typeId
         || nx::analytics::taxonomy::isBaseType(
             getResource()->systemContext()->analyticsTaxonomyState().get(),
-            ruleTypeId, m_objectTypeId);
+            ruleTypeId, m_metadata.typeId);
     if (!isObjectTypeMatched)
         return false;
 
     nx::analytics::db::TextMatcher textMatcher;
     textMatcher.parse(params.description);
-    textMatcher.matchAttributes(m_attributes);
+    textMatcher.matchAttributes(m_metadata.attributes);
     return textMatcher.matched();
 }
 
 const nx::common::metadata::Attributes& AnalyticsSdkObjectDetected::attributes() const
 {
-    return m_attributes;
+    return m_metadata.attributes;
 }
 
 const std::optional<QString> AnalyticsSdkObjectDetected::attribute(const QString& attributeName) const
 {
-    for (const auto& attribute: m_attributes)
+    for (const auto& attribute: m_metadata.attributes)
     {
         if (attribute.name == attributeName)
             return attribute.value;

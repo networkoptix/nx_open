@@ -16,6 +16,7 @@
 #include "../utils.h"
 #include "utils.h"
 #include "constants.h"
+#include "stub_analytics_plugin_object_streamer_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -29,7 +30,7 @@ using namespace nx::sdk::analytics;
 using nx::kit::Json;
 
 DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo, std::string pluginHomeDir):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true),
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput),
     m_pluginHomeDir(std::move(pluginHomeDir))
 {
 }

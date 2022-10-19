@@ -34,7 +34,7 @@ class NX_VMS_COMMON_API AbstractEventType: public QObject
     Q_PROPERTY(bool useTrackBestShotAsPreview READ useTrackBestShotAsPreview CONSTANT)
     Q_PROPERTY(bool hasEverBeenSupported READ hasEverBeenSupported CONSTANT)
     Q_PROPERTY(bool isReachable READ isReachable CONSTANT)
-    Q_PROPERTY(std::vector<AbstractScope*> scopes READ scopes CONSTANT)
+    Q_PROPERTY(const std::vector<AbstractScope*>& scopes READ scopes CONSTANT)
 
 public:
     AbstractEventType(QObject* parent = nullptr):
@@ -94,7 +94,7 @@ public:
      */
     virtual bool isReachable() const = 0;
 
-    virtual std::vector<AbstractScope*> scopes() const = 0;
+    virtual const std::vector<AbstractScope*>& scopes() const = 0;
 
     virtual nx::vms::api::analytics::EventTypeDescriptor serialize() const = 0;
 };

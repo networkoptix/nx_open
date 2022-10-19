@@ -3,6 +3,7 @@
 #include "recording_context_helpers.h"
 
 #include <QtCore/QDataStream>
+#include <QtCore/QtEndian>
 
 #include <utils/media/h264_utils.h>
 #include <utils/media/utils.h>
@@ -70,14 +71,22 @@ bool addStream(const CodecParametersConstPtr& codecParameters, AVFormatContext* 
 QByteArray serializeMetadataPacket(const QnConstAbstractCompressedMetadataPtr& data)
 {
     QByteArray result;
-    QDataStream stream(&result, QIODevice::WriteOnly);
-    stream.setByteOrder(QDataStream::LittleEndian);
-    stream << data->metadataType;
     if (auto motionPacket = std::dynamic_pointer_cast<const QnMetaDataV1>(data))
+    {
+        QDataStream stream(&result, QIODevice::WriteOnly);
+        stream.setByteOrder(QDataStream::LittleEndian);
+        stream << data->metadataType;
         stream << motionPacket->serialize();
-    else
-        stream.writeBytes(data->data(), data->dataSize());
+        return result;
+    }
 
+    static const int kHeaderSize = 8;
+    result.resize(data->dataSize() + kHeaderSize);
+    char* buffer = result.data();
+    uint32_t* metadataTypePtr = (uint32_t*) buffer;
+    *metadataTypePtr = qToLittleEndian((uint32_t) data->metadataType);
+    metadataTypePtr[1] = qToLittleEndian(data->dataSize());
+    memcpy(buffer + kHeaderSize, data->data(), data->dataSize());
     return result;
 }
 

@@ -28,6 +28,8 @@ public:
      */
     virtual void putData(const QnAbstractDataPacketPtr& data) = 0;
 
+    virtual void clearUnprocessedData() = 0;
+
     /** Sanity check. */
     std::atomic<size_t> consumers{0};
 };

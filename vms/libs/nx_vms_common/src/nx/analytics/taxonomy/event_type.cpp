@@ -98,7 +98,7 @@ bool EventType::isReachable() const
     return m_impl->isReachable();
 }
 
-std::vector<AbstractScope*> EventType::scopes() const
+const std::vector<AbstractScope*>& EventType::scopes() const
 {
     return m_impl->scopes();
 }

@@ -77,6 +77,7 @@ struct NX_VMS_COMMON_API NumericRange
     bool intersects(const NumericRange& range) const;
     bool hasRange(const NumericRange& range) const;
     QString stringValue() const;
+    bool isNull() const { return !from && !to; }
 
     std::optional<RangePoint> from;
     std::optional<RangePoint> to;

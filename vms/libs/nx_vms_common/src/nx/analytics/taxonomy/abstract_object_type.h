@@ -32,7 +32,7 @@ class NX_VMS_COMMON_API AbstractObjectType: public QObject
     Q_PROPERTY(bool isReachable READ isReachable CONSTANT)
     Q_PROPERTY(bool isNonIndexable READ isNonIndexable CONSTANT)
     Q_PROPERTY(bool isLiveOnly READ isLiveOnly CONSTANT)
-    Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractScope*> scopes READ scopes CONSTANT)
+    Q_PROPERTY(const std::vector<nx::analytics::taxonomy::AbstractScope*>& scopes READ scopes CONSTANT)
 
 public:
     AbstractObjectType(QObject* parent = nullptr):
@@ -88,7 +88,7 @@ public:
 
     virtual bool isLiveOnly() const = 0;
 
-    virtual std::vector<AbstractScope*> scopes() const = 0;
+    virtual const std::vector<AbstractScope*>& scopes() const = 0;
 
     virtual nx::vms::api::analytics::ObjectTypeDescriptor serialize() const = 0;
 };

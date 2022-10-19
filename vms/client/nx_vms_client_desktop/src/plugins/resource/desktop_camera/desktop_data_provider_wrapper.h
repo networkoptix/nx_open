@@ -25,6 +25,7 @@ public:
     virtual bool hasThread() const override { return false; }
     virtual bool canAcceptData() const override;
     virtual bool needConfigureProvider() const override;
+    void clearUnprocessedData() override {};
     const QnDesktopDataProviderBase* owner() const { return m_owner;  }
 
 protected:
