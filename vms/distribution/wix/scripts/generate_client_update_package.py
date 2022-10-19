@@ -69,6 +69,8 @@ nx_libraries = [
     'nx_vms_json_rpc',
     'vms_gateway_core',
     'udt',
+    'cudart64_110',
+    'libcolor_conversion',
     'qtkeychain'
 ]
 
