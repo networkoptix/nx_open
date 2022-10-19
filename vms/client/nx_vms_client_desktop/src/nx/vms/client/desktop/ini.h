@@ -268,10 +268,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableCameraHotspotsFeature,
         "[Feature] Makes Camera Hotspots feature available in the client.");
 
-    NX_INI_FLAG(false, enableClientOfflineUpdate,
-        "[Feature] Persistent storage servers will store client update packages for all supported "
-        "platforms.");
-
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
