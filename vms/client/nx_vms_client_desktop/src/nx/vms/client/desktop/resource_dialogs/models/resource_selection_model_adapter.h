@@ -6,6 +6,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 class QnResource;
 class QnWorkbenchContext;
@@ -15,7 +16,9 @@ namespace nx::vms::client::desktop {
 class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyModel>
 {
     Q_OBJECT
-    Q_PROPERTY(QnWorkbenchContext* context READ context WRITE setContext NOTIFY contextChanged)
+
+    Q_PROPERTY(nx::vms::client::desktop::SystemContext* context
+        READ context WRITE setContext NOTIFY contextChanged)
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceFilters resourceTypes
         READ resourceTypes WRITE setResourceTypes NOTIFY resourceTypesChanged)
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceSelection selectionMode
@@ -33,8 +36,8 @@ public:
     explicit ResourceSelectionModelAdapter(QObject* parent = nullptr);
     virtual ~ResourceSelectionModelAdapter() override;
 
-    QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* context);
+    SystemContext* context() const;
+    void setContext(SystemContext* context);
 
     ResourceTree::ResourceFilters resourceTypes() const;
     void setResourceTypes(ResourceTree::ResourceFilters value);
