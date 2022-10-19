@@ -85,10 +85,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Browse Logs</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Clear Local Cache</source>
         <translation></translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
         <source>Server certificate validation</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Logs Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open files folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -506,14 +526,6 @@
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-        <source>Do not archive primary stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do not archive secondary stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation></translation>
     </message>
@@ -647,6 +659,14 @@
     </message>
     <message>
         <source>Export From Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record primary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record secondary stream</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -897,10 +917,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Searching Motions, Objects, Events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Showreels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -910,6 +926,22 @@
     </message>
     <message>
         <source>Do not show this window again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Introducing Cloud Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching Bookmarks, Objects, Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>•</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -985,6 +1017,22 @@
     <message>
         <source>Restore from Backup...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Message&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open folder</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1569,10 +1617,6 @@
         <source>Shared layouts</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
@@ -1821,6 +1865,10 @@
     </message>
     <message>
         <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save logs to selected folder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
