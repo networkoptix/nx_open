@@ -1267,6 +1267,7 @@ void QnMediaResourceWidget::updateTwoWayAudioButton() const
 {
     const bool twoWayAudioButtonVisible =
         capabilityButtonsAreVisible()
+        && !d->camera->hasFlags(Qn::cross_system)
         && d->camera->audioOutputDevice()->hasTwoWayAudio()
         && d->camera->isTwoWayAudioEnabled()
         && !d->camera->isIntercom();
@@ -1279,7 +1280,12 @@ void QnMediaResourceWidget::updateTwoWayAudioButton() const
 
 void QnMediaResourceWidget::updateIntercomButtons()
 {
-    if (capabilityButtonsAreVisible() && d->camera->isIntercom())
+    const bool intercomButtonVisible =
+        capabilityButtonsAreVisible()
+        && !d->camera->hasFlags(Qn::cross_system)
+        && d->camera->isIntercom();
+
+    if (intercomButtonVisible)
         m_buttonController->createIntercomButtons();
     else
         m_buttonController->removeIntercomButtons();
