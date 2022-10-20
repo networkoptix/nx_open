@@ -527,11 +527,6 @@ AbstractItemPtr ResourceTreeItemFactory::createOtherSystemItem(const QString& sy
 
 AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& systemId)
 {
-    const auto systemDescription = qnSystemsFinder->getSystem(systemId);
-
-    if (!NX_ASSERT(systemDescription && systemDescription->isCloudSystem()))
-        return {};
-
     const auto nameProvider = cloudSystemNameProvider(systemId);
     const auto nameInvalidator = cloudSystemNameInvalidator(systemId);
     const auto iconProvider = cloudSystemIconProvider(systemId);
