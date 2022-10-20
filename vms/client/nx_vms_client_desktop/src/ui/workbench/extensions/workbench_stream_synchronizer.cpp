@@ -114,7 +114,7 @@ bool QnWorkbenchStreamSynchronizer::isRunning() const {
 }
 
 bool QnWorkbenchStreamSynchronizer::isEffective() const {
-    return m_widgetCount > 0;
+    return !m_syncedWidgets.isEmpty();
 }
 
 QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const
@@ -160,26 +160,15 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(!mediaWidget)
         return;
 
-    connect(mediaWidget->resource()->toResource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
+    const auto resource = mediaWidget->resource()->toResource();
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync)) {
-        m_queuedWidgets.insert(mediaWidget);
-        return;
-    }
+    connect(
+        resource,
+        &QnResource::flagsChanged,
+        this,
+        &QnWorkbenchStreamSynchronizer::at_resource_flagsChanged);
 
-    if(mediaWidget->display()->archiveReader() == nullptr)
-        return;
-
-    QnClientVideoCamera *camera = mediaWidget->display()->camera();
-    m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
-    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
-
-    m_counter->increment();
-    connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
-
-    m_widgetCount++;
-    if(m_widgetCount == 1)
-        emit effectiveChanged();
+    handleWidget(mediaWidget);
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -190,17 +179,13 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
     disconnect(mediaWidget->resource()->toResource(), nullptr, this, nullptr);
 
     m_queuedWidgets.remove(mediaWidget);
+    if (m_syncedWidgets.contains(mediaWidget))
+    {
+        m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
+        m_syncedWidgets.remove(mediaWidget);
+    }
 
-    if(!mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
-        return;
-
-    if(mediaWidget->display()->archiveReader() == nullptr)
-        return;
-
-    m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
-
-    m_widgetCount--;
-    if(m_widgetCount == 0)
+    if(m_syncedWidgets.isEmpty())
         emit effectiveChanged();
 }
 
@@ -218,17 +203,74 @@ void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged()
     m_syncPlay->setLiveModeEnabled(period.isEmpty());
 }
 
-void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
-    if(!(resource->flags() & Qn::sync))
-        return; // TODO: #sivanov Implement reverse handling?
+void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr& resource) {
+    std::list<QnMediaResourceWidget*> affectedWidgets;
+    const auto insertAffectedWidget =
+        [&affectedWidgets, &resource] (QnMediaResourceWidget* widget)
+        {
+            if(widget->resource()->toResourcePtr() == resource)
+                affectedWidgets.push_back(widget);
+        };
 
-    foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
-        if(widget->resource()->toResourcePtr() == resource) {
-            m_queuedWidgets.remove(widget);
+    for (const auto& widget: m_syncedWidgets)
+        insertAffectedWidget(widget);
 
-            m_widgetCount++;
-            if(m_widgetCount == 1)
-                emit effectiveChanged();
-        }
+    for (const auto& widget: m_queuedWidgets)
+        insertAffectedWidget(widget);
+
+    for (const auto& widget: affectedWidgets)
+        handleWidget(widget);
+}
+
+void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
+{
+    NX_ASSERT(!(m_syncedWidgets.contains(widget) && m_queuedWidgets.contains(widget)));
+
+    const auto resource = widget->resource()->toResource();
+    const bool hasArchiveReader = widget->display()->archiveReader() != nullptr;
+    const bool hasToBeSynced =
+        hasArchiveReader && resource->hasFlags(Qn::sync) && !resource->hasFlags(Qn::fake);
+    const bool isSyncedAlready = m_syncedWidgets.contains(widget);
+
+    if (hasToBeSynced && !isSyncedAlready)
+    {
+        // New or queued widget.
+        QnClientVideoCamera* camera = widget->display()->camera();
+        m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamDisplay());
+        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
+
+        m_counter->increment();
+        connect(
+            widget->display()->archiveReader(),
+            &QnAbstractArchiveStreamReader::destroyed,
+            m_counter,
+            &nx::utils::CounterWithSignal::decrement);
+
+        m_syncedWidgets.insert(widget);
+        m_queuedWidgets.remove(widget);
     }
+    else
+    {
+        if (isSyncedAlready)
+        {
+            // Stop sync.
+            const auto archiveReader = widget->display()->archiveReader();
+            if (NX_ASSERT(archiveReader))
+            {
+                m_syncPlay->removeArchiveReader(archiveReader);
+                widget->display()->camera()->getCamDisplay()->setExternalTimeSource(nullptr);
+
+                m_counter->decrement();
+                archiveReader->disconnect(m_counter);
+            }
+
+            m_syncedWidgets.remove(widget);
+        }
+
+        m_queuedWidgets.insert(widget);
+    }
+
+    const auto syncedWidgetsCount = m_syncedWidgets.size();
+    if(syncedWidgetsCount <= 1)
+        emit effectiveChanged();
 }

@@ -504,6 +504,7 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
             if (i->buffering)
                 d->bufferingCnt--;
             i->reader->disconnect(this);
+            i->reader->setArchiveDelegate(i->oldDelegate);
             d->readers.erase(i);
             if (d->readers.isEmpty())
                 d->initValues();
