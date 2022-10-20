@@ -92,9 +92,6 @@ protected slots:
     void at_resource_flagsChanged(const QnResourcePtr& resource);
 
 private:
-    /** Number of widgets that can be synchronized. */
-    int m_widgetCount = 0;
-
     /** Counter that is used to track the number of references to syncplay
      * instance. When it reaches zero, syncplay is destroyed. */
     nx::utils::CounterWithSignal* m_counter = nullptr;
@@ -105,5 +102,8 @@ private:
     /** Display state watcher. */
     QnWorkbenchRenderWatcher* m_watcher = nullptr;
 
+    QSet<QnMediaResourceWidget*> m_syncedWidgets;
     QSet<QnMediaResourceWidget*> m_queuedWidgets;
+
+    void handleWidget(QnMediaResourceWidget* widget);
 };

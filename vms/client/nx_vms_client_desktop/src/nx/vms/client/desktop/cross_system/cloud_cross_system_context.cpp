@@ -6,6 +6,7 @@
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
+#include <camera/camera_data_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +21,7 @@
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
@@ -468,18 +470,32 @@ struct CloudCrossSystemContext::Private
             if (systemIsReadyToUse)
             {
                 camera->removeFlags(Qn::fake);
+
                 if (NX_ASSERT(camera->source()))
                     camera->setStatus(camera->source()->status);
                 else
                     camera->setStatus(api::ResourceStatus::online);
+
+                const auto loader = systemContext->cameraDataManager()->loader(
+                    camera, /*createIfNotExists*/ false);
+
+                if (loader)
+                    loader->load(/*forced*/ true);
             }
             else
             {
                 camera->addFlags(Qn::fake);
+
                 const bool forceNotifyStatusChanged = dummyCameraStatus == camera->getStatus();
                 camera->setStatus(dummyCameraStatus);
                 if (forceNotifyStatusChanged) //< For the context status dependent entities.
                     camera->statusChanged(camera, Qn::StatusChangeReason::Local);
+
+                const auto loader = systemContext->cameraDataManager()->loader(
+                    camera, /*createIfNotExists*/ false);
+
+                if (loader)
+                    loader->discardCachedData();
             }
         }
     }
