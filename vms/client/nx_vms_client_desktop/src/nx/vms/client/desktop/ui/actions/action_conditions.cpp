@@ -1475,17 +1475,7 @@ ActionVisibility SaveVideowallReviewCondition::check(
     if (layouts.isEmpty())
         return InvisibleAction;
 
-    for (const LayoutResourcePtr& layout: std::as_const(layouts))
-    {
-        auto systemContext = SystemContext::fromResource(layout);
-        if (NX_ASSERT(systemContext)
-            && systemContext->layoutSnapshotManager()->isModified(layout))
-        {
-            return EnabledAction;
-        }
-    }
-
-    return DisabledAction;
+    return EnabledAction;
 }
 
 ActionVisibility RunningVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
