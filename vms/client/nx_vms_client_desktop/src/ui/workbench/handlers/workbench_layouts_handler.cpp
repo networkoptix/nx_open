@@ -514,7 +514,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
         return;
 
-    const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+    const bool isOwnLayout = (user->getId() == layout->getParentId());
     bool hasSavePermission = ResourceAccessManager::hasPermissions(layout, Qn::SavePermission);
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
@@ -543,7 +543,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
 
         // that's the case when user press "Save As" and enters the same name as this layout
         // already has
-        if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission)
+        if (name == layout->getName() && isOwnLayout && hasSavePermission)
         {
             if (layout->hasFlags(Qn::local))
             {
@@ -588,28 +588,34 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     resourcePool()->addResource(newLayout);
 
     const bool isCurrent = (layout == workbench()->currentLayout()->resource());
-    bool shouldDelete = layout->hasFlags(Qn::local) &&
-        (name == layout->getName() || isCurrent);
 
-    auto systemContext = SystemContext::fromResource(layout);
+    // We can "Save as" temporary layouts like Alarm layout or Preview Search or Audit Trail.
+    const bool isTemporaryLayout = !layout->systemContext();
+
+    const auto systemContext = isTemporaryLayout
+        ? appContext()->currentSystemContext()
+        : SystemContext::fromResource(layout);
+
     if (!NX_ASSERT(systemContext))
         return;
 
     auto snapshotManager = systemContext->layoutSnapshotManager();
 
-    /* If it is current layout, close it and open the new one instead. */
-    if (isCurrent &&
-        user == layoutOwnerUser)   //making current only new layout of current user
+    // Can replace only own or temporary layout.
+    const bool canReplaceLayout = isOwnLayout || isTemporaryLayout;
+
+    // Delete local layout when replacing it with a remote one.
+    const bool shouldDelete = layout->hasFlags(Qn::local)
+        && (name == layout->getName() || isCurrent);
+
+    // If it is current layout, close it and open the new one instead.
+    if (isCurrent && canReplaceLayout)
     {
         workbench()->replaceLayout(layout, newLayout);
 
         // If current layout should not be deleted then roll it back
-        if (!shouldDelete)
-        {
-            //(user == layoutOwnerUser) condition prevents clearing layout of another user (e.g., if copying layout from one user to another)
-                //user - is an owner of newLayout. It is not required to be owner of layout
+        if (!shouldDelete && !isTemporaryLayout)
             snapshotManager->restore(layout);
-        }
     }
 
     snapshotManager->save(newLayout);
