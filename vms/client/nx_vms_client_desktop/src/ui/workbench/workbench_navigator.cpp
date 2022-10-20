@@ -2060,6 +2060,9 @@ bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
     if (!resource)
         return false;
 
+    if (resource->hasFlags(Qn::fake))
+        return false;
+
     // Timeline is not relevant for desktop cameras.
     if (resource->hasFlags(Qn::desktop_camera))
         return false;
@@ -2697,6 +2700,7 @@ void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resourc
         return;
 
     updateCurrentWidgetFlags();
+    updateTimelineRelevancy();
 }
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
