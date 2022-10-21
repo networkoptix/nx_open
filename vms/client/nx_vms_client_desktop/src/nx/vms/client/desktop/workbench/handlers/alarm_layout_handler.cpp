@@ -2,6 +2,9 @@
 
 #include "alarm_layout_handler.h"
 
+#include <chrono>
+
+#include <QtCore/QList>
 #include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
@@ -9,13 +12,14 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -36,42 +40,76 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
 
-
 namespace {
 
-/* Processing actions are cleaned by this timeout. */
-const qint64 kProcessingActionTimeoutMs = 5000;
+using namespace std::chrono;
 
+/* Processing actions are cleaned by this timeout. */
+constexpr auto kProcessingActionTimeout = 5s;
+
+QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList)
+{
+    std::sort(cameraList.begin(), cameraList.end(),
+        [](const QnVirtualCameraResourcePtr& camera1, const QnVirtualCameraResourcePtr& camera2)
+        {
+            return camera1->getId() < camera2->getId();
+        });
+
+    return cameraList;
 }
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
+struct ActionKey
+{
+    QnUuid ruleId;
+    qint64 timestampUs = 0;
+
+    bool operator==(const ActionKey& other) const = default;
+};
+
+struct AlarmLayoutHandler::Private
+{
+    /**
+     * Actions that are currently handled.
+     * Current event rules actions implementation will send us 'Alarm' action once for every camera
+     * that is enumerated in action resources. But on the client side we are handling all cameras
+     * at once to make sure they will be displayed on layout in the same order. So we are keeping
+     * list of all recently handled actions to avoid duplicated method calls.
+     *
+     * List is cleaned up on timer.
+     */
+    QList<ActionKey> processingActions;
+
+    LayoutResourcePtr alarmLayout;
+};
+
 AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    d(new Private())
 {
-    connect(action(ui::action::OpenInAlarmLayoutAction), &QAction::triggered, this,
+    using namespace ui;
+
+    connect(action(action::OpenInAlarmLayoutAction), &QAction::triggered, this,
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
             auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
             cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
             if (!cameras.isEmpty())
-                openCamerasInAlarmLayout(cameras, /*switchToLayoutNeeded*/ true);
+                openCamerasInAlarmLayout(cameras, /*switchToLayoutNeeded*/ true, DATETIME_NOW);
         });
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
         [this]()
         {
-            if (m_alarmLayoutId.isNull())
-                return;
-
-            if (auto alarmLayout =
-                resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId))
+            if (d->alarmLayout)
             {
-                workbench()->removeLayout(alarmLayout);
-                resourcePool()->removeResource(alarmLayout);
-                m_alarmLayoutId = {};
+                workbench()->removeLayout(d->alarmLayout);
+                d->alarmLayout.clear();
             }
         });
 
@@ -96,22 +134,25 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
             auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 action->getResources());
             if (action->getParams().useSource)
+            {
                 targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                     action->getSourceResources(resourcePool()));
+            }
             targetCameras = nx::utils::toQSet(
                 accessController()->filtered(targetCameras, Qn::ViewContentPermission)).values();
 
             if (targetCameras.isEmpty())
                 return;
 
-            ActionKey key(action->getRuleId(), action->getRuntimeParams().eventTimestampUsec);
-            if (m_processingActions.contains(key))
-                return; /* See m_processingActions comment. */
+            ActionKey key{action->getRuleId(), action->getRuntimeParams().eventTimestampUsec};
+            if (d->processingActions.contains(key))
+                return; /* See d->processingActions comment. */
 
-            m_processingActions.append(key);
-            executeDelayedParented([this, key] {
-                m_processingActions.removeOne(key);
-            }, kProcessingActionTimeoutMs, this);
+            d->processingActions.append(key);
+            executeDelayedParented(
+                [this, key] { d->processingActions.removeOne(key); },
+                kProcessingActionTimeout,
+                this);
 
             using namespace std::chrono;
 
@@ -126,23 +167,11 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
             if ((params.forced && currentInstanceIsMain()) || alarmLayoutExists())
                 openCamerasInAlarmLayout(targetCameras, switchToLayoutNeeded, camerasPositionUs);
         });
-
-    connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
-        [this](const QnResourceList& resources)
-        {
-            const bool contains = std::any_of(resources.begin(), resources.end(),
-                [this](const QnResourcePtr& resource)
-                {
-                    return resource->getId() == m_alarmLayoutId;
-                });
-
-            if (contains)
-                m_alarmLayoutId = {};
-        });
 }
 
 AlarmLayoutHandler::~AlarmLayoutHandler()
-{}
+{
+}
 
 void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
 {
@@ -156,28 +185,11 @@ void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
         QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
 }
 
-QnVirtualCameraResourceList AlarmLayoutHandler::sortCameraResourceList(
-    const QnVirtualCameraResourceList& cameraList)
-{
-    QnVirtualCameraResourceList sortedCameras = cameraList;
-    std::sort(sortedCameras.begin(), sortedCameras.end(),
-        [](const QnVirtualCameraResourcePtr& camera1, const QnVirtualCameraResourcePtr& camera2)
-        {
-            return camera1->getId() < camera2->getId();
-        });
-
-    return sortedCameras;
-}
-
-void AlarmLayoutHandler::stopShowReelIfRunning()
-{
-    if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(ui::action::ToggleLayoutTourModeAction);
-}
-
 void AlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
 {
-    stopShowReelIfRunning();
+    // Stop showreel if it is runing.
+    if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(ui::action::ToggleLayoutTourModeAction);
 
     workbench()->setCurrentLayout(layout);
 }
@@ -191,18 +203,6 @@ void AlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
             QnAspectRatio::closestStandardRatio(aspect).toFloat());
         break; // Break after first camera aspect set.
     }
-}
-
-void AlarmLayoutHandler::addCameraOnLayout(QnWorkbenchLayout* layout,
-    QnVirtualCameraResourcePtr camera)
-{
-    if (!layout->resource())
-        return;
-
-    auto data = layoutItemFromResource(camera);
-    data.flags = Qn::PendingGeometryAdjustment;
-
-    layout->resource()->addItem(data);
 }
 
 void AlarmLayoutHandler::openCamerasInAlarmLayout(
@@ -222,13 +222,16 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
     disableSyncForLayout(alarmLayout);
 
     // Sort items before iterate to guarantee the same item placement for the same set of cameras.
-    for (const auto& camera: sortCameraResourceList(cameras))
+    for (const auto& camera: sortedCameras(cameras))
     {
         auto existingItems = alarmLayout->items(camera);
 
         if (existingItems.isEmpty())
-            addCameraOnLayout(alarmLayout, camera);
-
+        {
+            auto data = layoutItemFromResource(camera);
+            data.flags = Qn::PendingGeometryAdjustment;
+            d->alarmLayout->addItem(data);
+        }
         existingItems = alarmLayout->items(camera);
 
         if (!existingItems.isEmpty())
@@ -251,26 +254,24 @@ QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
     if (!context()->user())
         return nullptr;
 
-    auto alarmLayout = resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId);
-    if (!alarmLayout)
+    if (!d->alarmLayout)
     {
-        alarmLayout.reset(new LayoutResource());
-        alarmLayout->addFlags(Qn::local);
-        alarmLayout->setIdUnsafe(QnUuid::createUuid());
-        m_alarmLayoutId = alarmLayout->getId();
-        alarmLayout->setName(tr("Alarms"));
-        alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
-        alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
-        alarmLayout->setData(Qn::LayoutPermissionsRole,
+        d->alarmLayout.reset(new LayoutResource());
+        d->alarmLayout->addFlags(Qn::local);
+        d->alarmLayout->setIdUnsafe(QnUuid::createUuid());
+        d->alarmLayout->setName(tr("Alarms"));
+        d->alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
+        d->alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));
+        d->alarmLayout->setData(Qn::LayoutPermissionsRole,
             static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
     }
 
-    auto workbenchAlarmLayout = workbench()->layout(alarmLayout);
+    auto workbenchAlarmLayout = workbench()->layout(d->alarmLayout);
     if (!workbenchAlarmLayout)
     {
         // If user have closed alarm layout, all cameras must be removed.
-        alarmLayout->setItems(QnLayoutItemDataMap());
-        workbenchAlarmLayout = workbench()->addLayout(alarmLayout);
+        d->alarmLayout->setItems(QnLayoutItemDataMap());
+        workbenchAlarmLayout = workbench()->addLayout(d->alarmLayout);
     }
 
     return workbenchAlarmLayout;
@@ -281,18 +282,16 @@ bool AlarmLayoutHandler::alarmLayoutExists() const
     if (!context()->user())
         return false;
 
-    if (m_alarmLayoutId.isNull())
+    if (!d->alarmLayout)
         return false;
 
-    auto alarmLayout = resourcePool()->getResourceById<LayoutResource>(m_alarmLayoutId);
-    if (!alarmLayout)
-        return false;
-
-    return workbench()->layout(alarmLayout) != nullptr;
+    return workbench()->layout(d->alarmLayout) != nullptr;
 }
 
-void AlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *layout,
-    QnWorkbenchItem *item, qint64 positionUs)
+void AlarmLayoutHandler::setCameraItemPosition(
+    QnWorkbenchLayout* layout,
+    QnWorkbenchItem* item,
+    qint64 positionUs)
 {
     NX_ASSERT(layout && item, "Objects must exist here");
     if (!item)
