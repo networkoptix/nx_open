@@ -51,11 +51,9 @@ public: //< Overrides 'private:' in macro above.
             && sinceViewUpdated.hasExpired(kDelayAfterViewUpdate))
         {
             const auto range = q->view()->visibleRange();
-            if (range.isEmpty())
-                return;
-
             QnTimePeriod period;
-            if (range.upper() >= q->view()->count())
+
+            if (range.isEmpty() || range.upper() >= q->view()->count())
             {
                 period.setStartTime(0ms);
             }
@@ -65,7 +63,7 @@ public: //< Overrides 'private:' in macro above.
                     .data(Qn::TimestampRole).value<microseconds>()));
             }
 
-            if (range.lower() == 0)
+            if (range.isEmpty() || range.lower() == 0)
             {
                 period.durationMs = QnTimePeriod::kInfiniteDuration;
             }
