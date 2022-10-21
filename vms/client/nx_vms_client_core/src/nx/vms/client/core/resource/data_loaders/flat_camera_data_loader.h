@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
@@ -43,18 +44,21 @@ public:
 
 private:
     void at_timePeriodsReceived(bool success,
-        int requestHandle,
+        rest::Handle requestHandle,
         const MultiServerPeriodDataList &timePeriods);
 
 private:
-    int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
-    void handleDataLoaded(bool success, QnTimePeriodList&& periods, int requestHandle);
+    rest::Handle sendRequest(qint64 startTimeMs, qint64 resolutionMs);
+    void handleDataLoaded(bool success, QnTimePeriodList&& periods);
 
 private:
     struct LoadingInfo
     {
         /** Starting time of the request. */
         qint64 startTimeMs = 0;
+
+        /** Handle of the last request. */
+        rest::Handle handle = 0;
     };
 
     QString m_filter;
