@@ -75,7 +75,7 @@ void QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolution
     m_filter = filter;
 
     /* Check whether data is currently being loaded. */
-    if (m_loading.startTimeMs > 0)
+    if (m_loading.handle != 0)
     {
         NX_VERBOSE(this, "Data is already being loaded");
         return;
@@ -98,7 +98,7 @@ void QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolution
     }
 
     m_loading.startTimeMs = startTimeMs;
-    sendRequest(startTimeMs, resolutionMs);
+    m_loading.handle = sendRequest(startTimeMs, resolutionMs);
     NX_VERBOSE(this, "Loading period since %1 (%2), filter %3",
         startTimeMs,
         nx::utils::timestampToDebugString(startTimeMs),
@@ -122,7 +122,7 @@ void QnFlatCameraDataLoader::setStorageLocation(nx::vms::api::StorageLocation va
     discardCachedData();
 }
 
-int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
+rest::Handle QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 {
     auto systemContext = SystemContext::fromResource(m_resource);
     if (!NX_ASSERT(systemContext))
@@ -146,17 +146,24 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 
     return connection->recordedTimePeriods(requestData,
         nx::utils::guarded(this,
-            [this](bool success, int handle, const MultiServerPeriodDataList& timePeriods)
+            [this](bool success, rest::Handle handle, const MultiServerPeriodDataList& timePeriods)
             {
                 at_timePeriodsReceived(success, handle, timePeriods);
             }), thread());
 }
 
 void QnFlatCameraDataLoader::at_timePeriodsReceived(bool success,
-    int requestHandle,
+    rest::Handle requestHandle,
     const MultiServerPeriodDataList &timePeriods)
 {
     NX_VERBOSE(this, "Received answer for req %1 (%2)", requestHandle, m_dataType);
+    if (requestHandle != m_loading.handle)
+    {
+        NX_VERBOSE(this, "Drop outdated answer %1, awaiting for %2",
+            requestHandle,
+            m_loading.handle);
+        return;
+    }
 
     std::vector<QnTimePeriodList> rawPeriods;
 
@@ -170,13 +177,12 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(bool success,
 
     NX_VERBOSE(this, "Merged\n%1", periodsLogString(periods));
 
-    handleDataLoaded(success, std::move(periods), requestHandle);
+    handleDataLoaded(success, std::move(periods));
 }
 
 void QnFlatCameraDataLoader::handleDataLoaded(
     bool success,
-    QnTimePeriodList&& periods,
-    int requestHandle)
+    QnTimePeriodList&& periods)
 {
     NX_VERBOSE(this, "Loaded data for %1 (%2), actual filter %3",
         m_loading.startTimeMs,
@@ -186,7 +192,7 @@ void QnFlatCameraDataLoader::handleDataLoaded(
     if (!success)
     {
         NX_VERBOSE(this, "Load Failed");
-        emit failed(requestHandle);
+        emit failed(m_loading.handle);
         m_loading = LoadingInfo();
         return;
     }
