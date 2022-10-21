@@ -609,12 +609,20 @@ void uploadDataAsync(
     const AuthType authType,
     const std::string& user,
     const std::string& password,
-    const std::string_view& method)
+    const std::string_view& method,
+    std::optional<AsyncHttpClient::Timeouts> timeouts)
 {
     auto httpClientHolder = AsyncHttpClient::create(std::move(adapterFunc));
     httpClientHolder->setAdditionalHeaders(extraHeaders);
     httpClientHolder->setCredentials(PasswordCredentials(user, password));
     httpClientHolder->setAuthType(authType);
+
+    if (timeouts)
+    {
+        httpClientHolder->setSendTimeoutMs(timeouts->sendTimeout.count());
+        httpClientHolder->setResponseReadTimeoutMs(timeouts->responseReadTimeout.count());
+        httpClientHolder->setMessageBodyReadTimeoutMs(timeouts->messageBodyReadTimeout.count());
+    }
 
     auto completionFunc = [callback, httpClientHolder]
         (nx::network::http::AsyncHttpClientPtr httpClient) mutable
