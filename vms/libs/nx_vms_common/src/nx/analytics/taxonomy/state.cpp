@@ -179,7 +179,6 @@ std::vector<AbstractEventType*> State::rootEventTypes() const
 
 AbstractObjectType* State::objectTypeById(const QString& objectTypeId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<ObjectType>(objectTypeId);
 }
 
@@ -191,31 +190,26 @@ AbstractEventType* State::eventTypeById(const QString& eventTypeId) const
 
 AbstractPlugin* State::pluginById(const QString& pluginId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<Plugin>(pluginId);
 }
 
 AbstractEngine* State::engineById(const QString& engineId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<Engine>(engineId);
 }
 
 AbstractGroup* State::groupById(const QString& groupId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<Group>(groupId);
 }
 
 AbstractEnumType* State::enumTypeById(const QString& enumTypeId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<EnumType>(enumTypeId);
 }
 
 AbstractColorType* State::colorTypeById(const QString& colorTypeId) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<ColorType>(colorTypeId);
 }
 

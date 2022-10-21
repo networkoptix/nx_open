@@ -149,7 +149,6 @@ private:
 
     QString unescapeName(const QStringView& str);
 
-    nx::common::metadata::NumericRange parseRangeFromValue(const QString& value) const;
 private:
     struct TokenData
     {

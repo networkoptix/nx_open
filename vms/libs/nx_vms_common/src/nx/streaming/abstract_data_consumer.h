@@ -23,7 +23,7 @@ public:
       */
     virtual bool canAcceptData() const override;
     virtual void putData( const QnAbstractDataPacketPtr& data ) override;
-    virtual void clearUnprocessedData();
+    virtual void clearUnprocessedData() override;
     int queueSize() const;
     int maxQueueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}

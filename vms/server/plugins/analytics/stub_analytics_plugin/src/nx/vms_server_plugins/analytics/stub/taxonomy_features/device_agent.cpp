@@ -14,6 +14,7 @@
 #include "device_agent_manifest.h"
 #include "object_generators.h"
 #include "../utils.h"
+#include "stub_analytics_plugin_taxonomy_features_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -100,7 +101,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
 }
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true, engine->plugin()->instanceId()),
+    ConsumingDeviceAgent(deviceInfo, ini().enableOutput, engine->plugin()->instanceId()),
     m_engine(engine)
 {
 }

@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "device_agent.h"
 #include "device_agent_manifest.h"
+#include "stub_analytics_plugin_object_detection_ini.h"
 
 #include <nx/kit/json.h>
 
@@ -23,7 +24,7 @@ static const std::set<std::string> kObjectTypeIdsGeneratedByDefault = {
     "nx.base.Person"
 };
 
-Engine::Engine(): nx::sdk::analytics::Engine(/*enableOutput*/ true)
+Engine::Engine(): nx::sdk::analytics::Engine(ini().enableOutput)
 {
 }
 

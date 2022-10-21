@@ -287,6 +287,7 @@ public:
     static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
 
     QnMetaDataV1(std::chrono::microseconds timestamp, int initialValue = 0, int extraBufferSize = 0);
+    QnMetaDataV1(std::chrono::microseconds timestamp_, const char* buffer, int extraBufferSize);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
@@ -306,7 +307,8 @@ public:
 
     static QRect rectFromNormalizedRect(const QRectF& rectF);
 
-    static void addMotion(quint64* dst, quint64* src);
+    static void addMotion(quint64* dst, const quint64* src);
+    static void addMotion(char* dst, const char* src);
     static void addMotion(char* buffer, const QRectF& rectF);
     static void addMotion(char* buffer, const QRect& rect);
 
@@ -370,7 +372,7 @@ protected:
     void assign(const QnMetaDataV1* other);
 
 private:
-    qint64 m_firstTimestamp;
+    qint64 m_firstTimestamp = AV_NOPTS_VALUE;
 };
 
 using FrameMetadata = QVector<QnAbstractCompressedMetadataPtr>;
