@@ -65,6 +65,13 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
     setButtonBox(ui->buttonBox);
 
     d->store = new LayoutSettingsDialogStore(this);
+
+    auto generalTab = new LayoutGeneralSettingsWidget(d->store, ui->tabWidget);
+    d->backgroundTab = new LayoutBackgroundSettingsWidget(d->store, ui->tabWidget);
+
+    addPage((int) Tab::general, generalTab, tr("General"));
+    addPage((int) Tab::background, d->backgroundTab, tr("Background"));
+
     connect(d->store, &LayoutSettingsDialogStore::stateChanged, this,
         &LayoutSettingsDialog::loadState);
 
@@ -74,25 +81,12 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
         messageProcessor(),
         this);
 
-    auto generalTab = new LayoutGeneralSettingsWidget(d->store, ui->tabWidget);
-    d->backgroundTab = new LayoutBackgroundSettingsWidget(d->store, ui->tabWidget);
-
     connect(d->backgroundTab, &LayoutBackgroundSettingsWidget::newImageUploadedSuccessfully, this,
         [this]
         {
             d->applyChanges();
             base_type::accept();
         });
-
-    addPage(
-        (int) Tab::general,
-        generalTab,
-        tr("General"));
-
-    addPage(
-        (int) Tab::background,
-        d->backgroundTab,
-        tr("Background"));
 }
 
 LayoutSettingsDialog::~LayoutSettingsDialog()
