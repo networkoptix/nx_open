@@ -7249,7 +7249,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>切断</translation>
     </message>
   </context>
   <context>
