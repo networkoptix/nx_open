@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "workbench_alarm_layout_handler.h"
+#include "alarm_layout_handler.h"
 
 #include <QtWidgets/QAction>
 
