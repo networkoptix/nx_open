@@ -858,9 +858,6 @@ std::map<std::string, std::string> Response::getCookies() const
     for (auto it = setCookieHeaders.first; it != setCookieHeaders.second; ++it)
     {
         const auto& data = it->second;
-        if (data.find(std::string("=") + kDeletedCookieValue) != data.npos)
-            continue;
-
         const auto nameEnd = data.find('=');
         if (nameEnd == data.npos)
             continue;
