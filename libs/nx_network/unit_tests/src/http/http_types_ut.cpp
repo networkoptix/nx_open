@@ -966,6 +966,7 @@ static constexpr char kTestResponse[] =
 static const std::map<std::string, std::string> kTestCookie{
     {"username", "admin"},
     {"authorizationKey", "88d13fb76ea9"},
+    {"orderId", "_DELETED_COOKIE_VALUE_"},
 };
 
 TEST(HttpTypesResponse, parse)
