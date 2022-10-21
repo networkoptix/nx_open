@@ -12,13 +12,16 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 
-class QnWorkbenchAlarmLayoutHandler: public QObject, public QnWorkbenchContextAware {
+namespace nx::vms::client::desktop {
+
+class AlarmLayoutHandler: public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QObject base_type;
 public:
-    QnWorkbenchAlarmLayoutHandler(QObject *parent = nullptr);
-    virtual ~QnWorkbenchAlarmLayoutHandler();
+    AlarmLayoutHandler(QObject *parent = nullptr);
+    virtual ~AlarmLayoutHandler();
 
 private:
     void openCamerasInAlarmLayout(
@@ -66,3 +69,5 @@ private:
 
     QnUuid m_alarmLayoutId;
 };
+
+} // namespace nx::vms::client::desktop

@@ -280,7 +280,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<WorkbenchManualDeviceAdditionHandler>();
-    context->instance<QnWorkbenchAlarmLayoutHandler>();
+    context->instance<AlarmLayoutHandler>();
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<CloudActionsHandler>();
     context->instance<QnWorkbenchVirtualCameraHandler>();
