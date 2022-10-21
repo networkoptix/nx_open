@@ -45,6 +45,7 @@
 #include <nx/vms/client/desktop/system_merge/incompatible_servers_action_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -66,7 +67,6 @@
 #include <ui/workbench/handlers/resource_tree_settings_action_handler.h>
 #include <ui/workbench/handlers/startup_actions_handler.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
-#include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_executor.h>
