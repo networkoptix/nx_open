@@ -451,7 +451,8 @@ void NX_NETWORK_API uploadDataAsync(
     const AuthType authType = AuthType::authBasicAndDigest,
     const std::string& user = std::string(),
     const std::string& password = std::string(),
-    const std::string_view& method = std::string_view());
+    const std::string_view& method = std::string_view(),
+    std::optional<AsyncHttpClient::Timeouts> timeouts = std::nullopt);
 
 SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
     ssl::AdapterFunc adapterFunc,
