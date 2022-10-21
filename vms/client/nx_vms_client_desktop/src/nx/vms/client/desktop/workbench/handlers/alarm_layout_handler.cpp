@@ -36,9 +36,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
 
-using namespace nx;
-using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -47,11 +44,13 @@ const qint64 kProcessingActionTimeoutMs = 5000;
 
 }
 
-QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
+namespace nx::vms::client::desktop {
+
+AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::OpenInAlarmLayoutAction), &QAction::triggered, this,
+    connect(action(ui::action::OpenInAlarmLayoutAction), &QAction::triggered, this,
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
@@ -142,10 +141,10 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
         });
 }
 
-QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler()
+AlarmLayoutHandler::~AlarmLayoutHandler()
 {}
 
-void QnWorkbenchAlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
+void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
 {
     const auto syncDisabled = QnStreamSynchronizationState();
     if (workbench()->currentLayout() == layout)
@@ -157,7 +156,7 @@ void QnWorkbenchAlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layo
         QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
 }
 
-QnVirtualCameraResourceList QnWorkbenchAlarmLayoutHandler::sortCameraResourceList(
+QnVirtualCameraResourceList AlarmLayoutHandler::sortCameraResourceList(
     const QnVirtualCameraResourceList& cameraList)
 {
     QnVirtualCameraResourceList sortedCameras = cameraList;
@@ -170,20 +169,20 @@ QnVirtualCameraResourceList QnWorkbenchAlarmLayoutHandler::sortCameraResourceLis
     return sortedCameras;
 }
 
-void QnWorkbenchAlarmLayoutHandler::stopShowReelIfRunning()
+void AlarmLayoutHandler::stopShowReelIfRunning()
 {
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction);
+    if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(ui::action::ToggleLayoutTourModeAction);
 }
 
-void QnWorkbenchAlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
+void AlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
 {
     stopShowReelIfRunning();
 
     workbench()->setCurrentLayout(layout);
 }
 
-void QnWorkbenchAlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
+void AlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
 {
     for (auto widget: display()->widgets())
     {
@@ -194,7 +193,7 @@ void QnWorkbenchAlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayou
     }
 }
 
-void QnWorkbenchAlarmLayoutHandler::addCameraOnLayout(QnWorkbenchLayout* layout,
+void AlarmLayoutHandler::addCameraOnLayout(QnWorkbenchLayout* layout,
     QnVirtualCameraResourcePtr camera)
 {
     if (!layout->resource())
@@ -206,7 +205,7 @@ void QnWorkbenchAlarmLayoutHandler::addCameraOnLayout(QnWorkbenchLayout* layout,
     layout->resource()->addItem(data);
 }
 
-void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout(
+void AlarmLayoutHandler::openCamerasInAlarmLayout(
     const QnVirtualCameraResourceList& cameras,
     bool switchToLayoutNeeded,
     qint64 positionUs)
@@ -246,7 +245,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout(
         switchToLayout(alarmLayout);
 }
 
-QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
+QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
 {
     // Forbidden when we are logged out
     if (!context()->user())
@@ -277,7 +276,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
     return workbenchAlarmLayout;
 }
 
-bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const
+bool AlarmLayoutHandler::alarmLayoutExists() const
 {
     if (!context()->user())
         return false;
@@ -292,7 +291,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const
     return workbench()->layout(alarmLayout) != nullptr;
 }
 
-void QnWorkbenchAlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *layout,
+void AlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *layout,
     QnWorkbenchItem *item, qint64 positionUs)
 {
     NX_ASSERT(layout && item, "Objects must exist here");
@@ -334,7 +333,7 @@ void QnWorkbenchAlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *lay
     }
 }
 
-bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
+bool AlarmLayoutHandler::currentInstanceIsMain() const
 {
     auto runningInstancesManager = appContext()->runningInstancesManager();
     if (!NX_ASSERT(runningInstancesManager, "Instance Manager must exist here"))
@@ -369,3 +368,5 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     std::sort(connectedFromThisPc.begin(), connectedFromThisPc.end());
     return connectedFromThisPc.first() == currentInstanceGuid;
 }
+
+} // namespace nx::vms::client::desktop
