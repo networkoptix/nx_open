@@ -85,7 +85,7 @@ static std::string uncompressedVideoFrameToString(Ptr<const IUncompressedVideoFr
         frame->width(), frame->height(), pixelFormatToStdString(frame->pixelFormat()).c_str());
 }
 
-Engine::Engine(): nx::sdk::analytics::Engine(/*enableOutput*/ true)
+Engine::Engine(): nx::sdk::analytics::Engine(ini().enableOutput)
 {
 }
 

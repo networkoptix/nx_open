@@ -50,7 +50,7 @@ public:
 
     virtual bool isLiveOnly() const override;
 
-    virtual std::vector<AbstractScope*> scopes() const override;
+    virtual const std::vector<AbstractScope*>& scopes() const override;
 
     virtual nx::vms::api::analytics::ObjectTypeDescriptor serialize() const override;
 
