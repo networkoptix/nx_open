@@ -37,7 +37,7 @@ TEST_F(OwnResourceAccessResolverTest, noAccess)
 TEST_F(OwnResourceAccessResolverTest, notApplicableResource)
 {
     const auto user = createUser(GlobalPermission::none);
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::viewLive}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), AccessRights());
 }
 
@@ -45,14 +45,14 @@ TEST_F(OwnResourceAccessResolverTest, noDesktopCameraAccess)
 {
     const auto user = createUser(GlobalPermission::none);
     const auto camera = addDesktopCamera(user);
-    manager->setOwnResourceAccessMap(user->getId(), {{camera->getId(), AccessRight::viewLive}});
+    manager->setOwnResourceAccessMap(user->getId(), {{camera->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(user->getId(), camera), AccessRights());
 }
 
 TEST_F(OwnResourceAccessResolverTest, someAccessRights)
 {
     const auto camera = addCamera();
-    const AccessRights testAccessRights = AccessRight::viewLive;
+    const AccessRights testAccessRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{camera->getId(), testAccessRights}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testAccessRights);
 }
@@ -60,13 +60,13 @@ TEST_F(OwnResourceAccessResolverTest, someAccessRights)
 TEST_F(OwnResourceAccessResolverTest, accessDetails)
 {
     const auto camera = addCamera();
-    const AccessRights testAccessRights = AccessRight::viewLive;
+    const AccessRights testAccessRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{camera->getId(), testAccessRights}});
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, camera, AccessRight::viewLive),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, camera, AccessRight::view),
         ResourceAccessDetails({{kTestSubjectId, {camera}}}));
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, camera, AccessRight::listenToAudio),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, camera, AccessRight::viewArchive),
         ResourceAccessDetails());
 }
 
@@ -74,12 +74,12 @@ TEST_F(OwnResourceAccessResolverTest, notificationSignals)
 {
     // Add.
     const auto camera = addCamera();
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{camera->getId(), AccessRight::viewLive}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{camera->getId(), AccessRight::view}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     // Change.
     manager->setOwnResourceAccessMap(kTestSubjectId, {{camera->getId(),
-        AccessRight::viewLive | AccessRight::listenToAudio}});
+        AccessRight::view | AccessRight::viewArchive}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     // Remove.

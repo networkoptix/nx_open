@@ -15,7 +15,7 @@ namespace nx::vms::api {
  */
 enum class GlobalPermission
 {
-    // Will be superseded by AccessRight::viewLive.
+    // Will be superseded by AccessRight::view.
     // Description should be changed to "No global permissions" then.
     /**%apidoc
      * Only live video access.
@@ -33,7 +33,7 @@ enum class GlobalPermission
 
     /* Manager permissions. */
 
-    // Will be superseded by AccessRight::editSettings.
+    // Will be superseded by AccessRight::edit.
     /**%apidoc
      * Can edit Device settings of available devices.
      * %caption GlobalEditCamerasPermission
@@ -94,7 +94,7 @@ enum class GlobalPermission
 
     /* Resources access permissions. */
 
-    // Will be superseded by AccessRight::viewLive for any resource.
+    // Will be superseded by AccessRight::view for any resource.
     /**%apidoc
      * Has access to all media Resources (cameras and web pages).
      * %caption GlobalAccessAllMediaPermission
@@ -196,14 +196,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 NX_REFLECTION_ENUM_CLASS(AccessRight,
 
     /**%apidoc
-     * Can view live footage.
+     * Can see a resource. Can access live footage from a media resource.
      */
-    viewLive = 0x0001,
-
-    /**%apidoc
-     * Can listen to audio.
-     */
-    listenToAudio = 0x0002,
+    view = 0x0001,
 
     /**%apidoc
      * Can view archive.
@@ -236,36 +231,36 @@ NX_REFLECTION_ENUM_CLASS(AccessRight,
     userInput = 0x0080,
 
     /**%apidoc
-     * Can edit PTZ presets.
-     */
-    managePtz = 0x0100,
-
-    /**%apidoc
      * Can edit Device settings.
      */
-    editSettings = 0x0200
+    edit = 0x0200
 )
 
 Q_DECLARE_FLAGS(AccessRights, AccessRight)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AccessRights)
 
-static constexpr AccessRights kAdminAccessRights{
-    AccessRight::viewLive
-    | AccessRight::listenToAudio
+static constexpr AccessRights kNoAccessRights{};
+static constexpr AccessRights kViewAccessRights{AccessRight::view};
+
+static constexpr AccessRights kFullMediaAccessRights{
+    AccessRight::view
     | AccessRight::viewArchive
     | AccessRight::exportArchive
     | AccessRight::viewBookmarks
     | AccessRight::manageBookmarks
-    | AccessRight::controlVideowall
     | AccessRight::userInput
-    | AccessRight::managePtz
-    | AccessRight::editSettings};
+    | AccessRight::edit};
+
+static constexpr AccessRights kFullAccessRights = kFullMediaAccessRights
+    | AccessRight::controlVideowall;
+
+static constexpr AccessRights kAdminAccessRights = kFullAccessRights;
 
 inline AccessRights globalPermissionsToAccessRights(GlobalPermissions permissions)
 {
-    AccessRights result = AccessRight::viewLive | AccessRight::listenToAudio;
+    AccessRights result = AccessRight::view;
     if (permissions.testFlag(GlobalPermission::editCameras))
-        result |= AccessRight::editSettings;
+        result |= AccessRight::edit;
     if (permissions.testFlag(GlobalPermission::controlVideowall))
         result |= AccessRight::controlVideowall;
     if (permissions.testFlag(GlobalPermission::viewArchive))

@@ -358,7 +358,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::RemovePermission;
 
     const auto accessRights = this->accessRights(subject, camera);
-    if (!accessRights.testFlag(AccessRight::viewLive))
+    if (!accessRights.testFlag(AccessRight::view))
         return result;
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
@@ -419,7 +419,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             | Qn::TwoWayAudioPermission;
     }
 
-    if (accessRights.testFlag(AccessRight::editSettings))
+    if (accessRights.testFlag(AccessRight::edit))
         result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
 
     return result;
@@ -429,7 +429,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnMediaServerResourcePtr& server) const
 {
     Qn::Permissions result = Qn::ReadPermission;
-    if (!hasAccessRights(subject, server, AccessRight::viewLive))
+    if (!hasAccessRights(subject, server, AccessRight::view))
         return result;
 
     result |= Qn::ViewContentPermission;
@@ -482,13 +482,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnWebPageResourcePtr& webPage) const
 {
     const auto accessRights = this->accessRights(subject, webPage);
-    if (!accessRights.testFlag(AccessRight::viewLive))
+    if (!accessRights.testFlag(AccessRight::view))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
 
     // Web Page behaves totally like camera.
-    if (accessRights.testFlag(AccessRight::editSettings))
+    if (accessRights.testFlag(AccessRight::edit))
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     return result;
@@ -544,7 +544,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             // Simple check is enough, exported layouts are checked on the client side.
             if (layout->isShared())
             {
-                if (!accessRights.testFlag(AccessRight::viewLive))
+                if (!accessRights.testFlag(AccessRight::view))
                     return Qn::NoPermissions;
 
                 // Global layouts editor.

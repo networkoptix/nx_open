@@ -26,7 +26,7 @@ AccessRights cameraAccessRights(AccessRights accessRights)
 
 AccessRights viewOnlyAccessRights(AccessRights accessRights)
 {
-    return accessRights & AccessRights(AccessRight::viewLive);
+    return accessRights & AccessRights(AccessRight::view);
 }
 
 } // namespace

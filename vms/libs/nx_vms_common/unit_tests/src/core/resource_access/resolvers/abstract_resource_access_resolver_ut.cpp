@@ -52,35 +52,6 @@ public:
     {
         return {}; //< Out of scope of this test.
     }
-
-    static constexpr AccessRights kFullAccessRights =
-        AccessRight::viewLive
-        | AccessRight::listenToAudio
-        | AccessRight::viewArchive
-        | AccessRight::exportArchive
-        | AccessRight::viewBookmarks
-        | AccessRight::manageBookmarks
-        | AccessRight::controlVideowall
-        | AccessRight::userInput
-        | AccessRight::managePtz
-        | AccessRight::editSettings;
-
-    static constexpr AccessRights kMediaAccessRights =
-        AccessRight::viewLive
-        | AccessRight::listenToAudio
-        | AccessRight::viewArchive
-        | AccessRight::exportArchive
-        | AccessRight::viewBookmarks
-        | AccessRight::manageBookmarks
-        | AccessRight::userInput
-        | AccessRight::managePtz
-        | AccessRight::editSettings;
-
-    static constexpr AccessRights kViewAccessRights =
-        AccessRight::viewLive;
-
-    static constexpr AccessRights kNoAccessRights =
-        AccessRights{};
 };
 
 TEST_F(AbstractResourceAccessResolverTest, notApplicableResourceAccess)
@@ -115,13 +86,13 @@ TEST_F(AbstractResourceAccessResolverTest, resolveMediaAccess)
     testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
 
     const auto camera = addCamera();
-    ASSERT_EQ(accessRights({}, camera), kMediaAccessRights);
+    ASSERT_EQ(accessRights({}, camera), kFullMediaAccessRights);
 
     const auto layout = addLayout();
     testAccessMap[layout->getId()] = kFullAccessRights; //< Layout access rights must be explicit.
 
     ASSERT_TRUE(layout->isShared());
-    ASSERT_EQ(accessRights({}, layout), kMediaAccessRights);
+    ASSERT_EQ(accessRights({}, layout), kFullMediaAccessRights);
 }
 
 TEST_F(AbstractResourceAccessResolverTest, noPrivateLayoutAccess)
