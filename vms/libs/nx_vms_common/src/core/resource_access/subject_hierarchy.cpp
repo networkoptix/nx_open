@@ -258,6 +258,7 @@ bool SubjectHierarchy::addOrUpdate(
         subject, parentRemovedFrom, parentAddedTo);
 
     currentParents = parents;
+    currentMembers = members;
 
     for (const auto& group: memberRemovedFrom)
         d->directMembers[group].remove(subject);
@@ -273,8 +274,6 @@ bool SubjectHierarchy::addOrUpdate(
 
         d->directMembers[group].insert(subject);
     }
-
-    currentMembers = members;
 
     for (const auto& member: parentRemovedFrom)
         d->directParents[member].remove(subject);
