@@ -31,7 +31,7 @@ struct ResourceSelectionModelAdapter::Private
     std::unique_ptr<entity_resource_tree::ResourceTreeEntityBuilder> treeEntityBuilder;
 
     SystemContext* context = nullptr;
-    ResourceTree::ResourceFilters resourceTypes = 0;
+    ResourceTree::ResourceFilters resourceTypes;
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
     QSet<ResourceTree::NodeType> collapsedNodes;
