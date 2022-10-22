@@ -111,7 +111,7 @@ AccessRights LayoutItemAccessResolver::accessRights(
     const auto resourceLayouts = d->sharedLayoutItemsWatcher.resourceLayouts(resource->getId());
     lk.unlock();
 
-    constexpr AccessRights kAllowedRights = AccessRight::viewLive | AccessRight::listenToAudio;
+    constexpr AccessRights kAllowedRights = AccessRight::view;
 
     AccessRights result;
     for (const auto& layout: nx::utils::keyRange(resourceLayouts))

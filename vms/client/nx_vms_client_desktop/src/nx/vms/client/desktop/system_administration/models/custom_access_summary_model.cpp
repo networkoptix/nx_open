@@ -6,30 +6,29 @@
 
 #include <QtQml/QtQml>
 
-
 namespace nx::vms::client::desktop {
+
+using namespace nx::vms::api;
 
 namespace {
 
 struct PermissionFlagInfo
 {
-    std::variant<api::AccessRight, api::GlobalPermission> flag;
+    std::variant<AccessRight, GlobalPermission> flag;
     QString text;
 };
 
 const std::vector<PermissionFlagInfo> permissionSummary()
 {
-    using nx::vms::api::AccessRight;
     return {
-        {AccessRight::viewLive, CustomAccessSummaryModel::tr("View live")},
-        {AccessRight::listenToAudio, CustomAccessSummaryModel::tr("Access audio from camera")},
+        {AccessRight::view, CustomAccessSummaryModel::tr("View")},
         {AccessRight::viewArchive, CustomAccessSummaryModel::tr("View video archive")},
         {AccessRight::exportArchive, CustomAccessSummaryModel::tr("Export video archive")},
         {AccessRight::viewBookmarks, CustomAccessSummaryModel::tr("View bookmarks")},
         {AccessRight::manageBookmarks, CustomAccessSummaryModel::tr("Modify bookmarks")},
         {AccessRight::userInput, CustomAccessSummaryModel::tr("User input")},
-        {AccessRight::editSettings, CustomAccessSummaryModel::tr("Edit camera settings")},
-        {AccessRight::managePtz, CustomAccessSummaryModel::tr("Edit PTZ presets and tours")},
+        {AccessRight::edit, CustomAccessSummaryModel::tr("Edit camera settings")},
+        {GlobalPermission::viewLogs, CustomAccessSummaryModel::tr("View event log")},
     };
 };
 
@@ -47,9 +46,10 @@ CustomAccessSummaryModel::~CustomAccessSummaryModel()
 bool CustomAccessSummaryModel::testFlag(
     const std::variant<api::AccessRight, api::GlobalPermission>& flag) const
 {
-    if (const auto* accessRight = std::get_if<api::AccessRight>(&flag))
+    if (const auto* accessRight = std::get_if<AccessRight>(&flag))
         return m_customRights.testFlag(*accessRight);
-    else if (const auto* globalPermission = std::get_if<api::GlobalPermission>(&flag))
+
+    if (const auto* globalPermission = std::get_if<GlobalPermission>(&flag))
         return m_ownGlobalPermissions.testFlag(*globalPermission);
 
     return false;
@@ -92,7 +92,7 @@ QHash<int, QByteArray> CustomAccessSummaryModel::roleNames() const
     return names;
 }
 
-void CustomAccessSummaryModel::setOwnGlobalPermissions(nx::vms::api::GlobalPermissions permissions)
+void CustomAccessSummaryModel::setOwnGlobalPermissions(GlobalPermissions permissions)
 {
     if (m_ownGlobalPermissions == permissions)
         return;
@@ -104,7 +104,7 @@ void CustomAccessSummaryModel::setOwnGlobalPermissions(nx::vms::api::GlobalPermi
 void CustomAccessSummaryModel::setOwnSharedResources(
     const nx::core::access::ResourceAccessMap& resources)
 {
-    api::AccessRights customRights = {};
+    AccessRights customRights = {};
 
     for (const auto& accessRights: resources.values())
         customRights |= accessRights;

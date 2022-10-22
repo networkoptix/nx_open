@@ -25,23 +25,9 @@ namespace {
 
 using namespace nx::vms::api;
 
-AccessRights adminAccessRights()
-{
-    return AccessRight::viewLive
-        | AccessRight::listenToAudio
-        | AccessRight::viewArchive
-        | AccessRight::exportArchive
-        | AccessRight::viewBookmarks
-        | AccessRight::manageBookmarks
-        | AccessRight::controlVideowall
-        | AccessRight::userInput
-        | AccessRight::managePtz
-        | AccessRight::editSettings;
-}
-
 AccessRights convertPermissions(GlobalPermissions globalPermissions)
 {
-    AccessRights result = AccessRight::viewLive;
+    AccessRights result = AccessRight::view;
     if (globalPermissions.testFlag(GlobalPermission::viewArchive))
         result.setFlag(AccessRight::viewArchive);
     if (globalPermissions.testFlag(GlobalPermission::exportArchive))
@@ -55,7 +41,7 @@ AccessRights convertPermissions(GlobalPermissions globalPermissions)
     if (globalPermissions.testFlag(GlobalPermission::userInput))
         result.setFlag(AccessRight::userInput);
     if (globalPermissions.testFlag(GlobalPermission::editCameras))
-        result.setFlag(AccessRight::editSettings);
+        result.setFlag(AccessRight::edit);
     return result;
 }
 
@@ -232,7 +218,7 @@ void DeprecatedAccessRightsConverter::Private::updateSubject(const QnUuid& subje
     if (subjectGlobalPermissions.testFlag(GlobalPermission::admin))
     {
         accessRightsManager->setOwnResourceAccessMap(subjectId,
-            {{AccessRightsManager::kAnyResourceId, adminAccessRights()}});
+            {{AccessRightsManager::kAnyResourceId, kAdminAccessRights}});
         return;
     }
 

@@ -55,7 +55,7 @@ public:
     void setSharedResources(
         const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resources,
-        nx::vms::api::AccessRights accessRights = nx::vms::api::AccessRight::viewLive);
+        nx::vms::api::AccessRights accessRights = nx::vms::api::AccessRight::view);
 
 private:
     void setSharedResourceRightsInternal(

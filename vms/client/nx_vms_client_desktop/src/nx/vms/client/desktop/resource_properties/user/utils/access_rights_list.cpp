@@ -18,15 +18,10 @@ AccessRightsList::AccessRightsList(QObject* parent):
     QObject(parent),
     m_items({
         AccessRightDescriptor{
-            .accessRight = AccessRight::viewLive,
-            .name = tr("View Live"),
-            .description = tr("Can view live footage"),
+            .accessRight = AccessRight::view,
+            .name = tr("View"),
+            .description = tr("Has access to a resource, can view live footage from a camera"),
             .icon = QUrl(kIconsDir + "view_live.svg")},
-        AccessRightDescriptor{
-            .accessRight = AccessRight::listenToAudio,
-            .name = tr("Listen to Audio"),
-            .description = tr("Can listen to audio from devices"),
-            .icon = QUrl(kIconsDir + "listen_to_audio.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::viewArchive,
             .name = tr("View Archive"),
@@ -54,7 +49,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
                 tr("Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons"),
             .icon = QUrl(kIconsDir + "user_input.svg")},
         AccessRightDescriptor{
-            .accessRight = AccessRight::editSettings,
+            .accessRight = AccessRight::edit,
             .name = tr("Edit Settings"),
             .description = tr("Can edit device settings"),
             .icon = QUrl(kIconsDir + "edit_settings.svg")}})
@@ -76,7 +71,7 @@ void AccessRightsList::registerQmlTypes()
         "AccessRightDescriptor", "Cannot create an instance of AccessRightDescriptor");
 
     qmlRegisterSingletonType<AccessRightsList>(
-        "nx.vms.client.desktop", 1, 0, "AccessRightsList", 
+        "nx.vms.client.desktop", 1, 0, "AccessRightsList",
         [](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
         {
             return instance();

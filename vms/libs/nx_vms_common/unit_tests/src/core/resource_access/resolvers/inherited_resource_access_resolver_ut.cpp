@@ -117,7 +117,7 @@ public:
 TEST_F(InheritedResourceAccessResolverTest, inheritedAccessRights)
 {
     const AccessRights testAccessRights{
-        AccessRight::viewLive | AccessRight::viewArchive};
+        AccessRight::view | AccessRight::viewArchive};
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
         {{ensureId("Camera"), testAccessRights}});
@@ -146,16 +146,16 @@ TEST_F(InheritedResourceAccessResolverTest, mergedAccessRights)
     // For proper testing, each of the four permission sets should have an unique permission.
 
     const AccessRights testAccessRights1{
-        AccessRight::viewLive | AccessRight::viewArchive};
+        AccessRight::view | AccessRight::viewArchive};
 
     const AccessRights testAccessRights2{
-        AccessRight::viewLive | AccessRight::userInput};
+        AccessRight::view | AccessRight::userInput};
 
     const AccessRights testAccessRights3{
-        AccessRight::viewLive | AccessRight::editSettings};
+        AccessRight::view | AccessRight::edit};
 
     const AccessRights testAccessRights4{
-        AccessRight::viewLive | AccessRight::viewBookmarks};
+        AccessRight::view | AccessRight::viewBookmarks};
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
         {{ensureId("Camera 1"), testAccessRights1}});
@@ -190,7 +190,7 @@ TEST_F(InheritedResourceAccessResolverTest, mergedAccessRights)
 
 TEST_F(InheritedResourceAccessResolverTest, notificationSignals)
 {
-    const AccessRights testAccessRights{AccessRight::viewLive};
+    const AccessRights testAccessRights{AccessRight::view};
 
     using Notifier = AbstractResourceAccessResolver::Notifier;
     resolver->notifier()->subscribeSubjects(subjects->ids({
@@ -234,13 +234,13 @@ TEST_F(InheritedResourceAccessResolverTest, dynamicPermissionChanges)
 // This test is intended to check correct cache invalidation when inherited access rights change.
 {
     const AccessRights testAccessRights1{
-        AccessRight::viewLive | AccessRight::viewArchive};
+        AccessRight::view | AccessRight::viewArchive};
 
     const AccessRights testAccessRights2{
-        AccessRight::viewLive | AccessRight::userInput};
+        AccessRight::view | AccessRight::userInput};
 
     const AccessRights testAccessRights3{
-        AccessRight::viewLive | AccessRight::editSettings};
+        AccessRight::view | AccessRight::edit};
 
     //      Group 1
     //        |
@@ -305,17 +305,17 @@ TEST_F(InheritedResourceAccessResolverTest, dynamicPermissionChanges)
 
 TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
 {
-    //                                   Group 1 (Camera 1: live & viewArchive; ALL: live & audio)
+    //                           Group 1 (Camera 1: view & exportArchive; ALL: view & viewArchive)
     //                                       |
     //                                  +----+----+
     //                                  |         |
     //                                  v         v
-    //  (Camera 1: live & userInput) Group 2    Group 3 (Camera 2: live & editSettings)
+    //  (Camera 1: view & userInput) Group 2    Group 3 (Camera 2: view & edit)
     //                                  |         |  |
     //                                  +----+----+  |
     //                                       |       |
     //                                       v       v
-    //                                    User 1   User 2 (Camera 2: live & viewBookmarks)
+    //                                    User 1   User 2 (Camera 2: view & viewBookmarks)
 
     auto camera1 = addCamera();
     camera1->setName("Camera 1");
@@ -324,21 +324,21 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
     camera2->setName("Camera 2");
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
-        {{camera1->getId(), AccessRight::viewLive | AccessRight::viewArchive},
+        {{camera1->getId(), AccessRight::view | AccessRight::viewArchive},
         {AccessRightsManager::kAnyResourceId,
-            AccessRight::viewLive | AccessRight::listenToAudio}});
+            AccessRight::view | AccessRight::exportArchive}});
 
     manager->setOwnResourceAccessMap(subjects->id("Group 2"),
-        {{camera1->getId(), AccessRight::viewLive | AccessRight::userInput}});
+        {{camera1->getId(), AccessRight::view | AccessRight::userInput}});
 
     manager->setOwnResourceAccessMap(subjects->id("Group 3"),
-        {{camera2->getId(), AccessRight::viewLive | AccessRight::editSettings}});
+        {{camera2->getId(), AccessRight::view | AccessRight::edit}});
 
     manager->setOwnResourceAccessMap(subjects->id("User 2"),
-        {{camera2->getId(), AccessRight::viewLive | AccessRight::viewBookmarks}});
+        {{camera2->getId(), AccessRight::view | AccessRight::viewBookmarks}});
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("User 1"), camera1, AccessRight::viewLive)),
+        resolver->accessDetails(subjects->id("User 1"), camera1, AccessRight::view)),
         detailsToString({
             {subjects->id("Group 1"), {camera1}},
             {subjects->id("Group 2"), {camera1}}}));
@@ -348,21 +348,21 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
         detailsToString({{subjects->id("Group 2"), {camera1}}}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("User 1"), camera1, AccessRight::editSettings)),
+        resolver->accessDetails(subjects->id("User 1"), camera1, AccessRight::edit)),
         detailsToString({}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("User 1"), camera2, AccessRight::viewLive)),
+        resolver->accessDetails(subjects->id("User 1"), camera2, AccessRight::view)),
         detailsToString({
             {subjects->id("Group 1"), {camera2}},
             {subjects->id("Group 3"), {camera2}}}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("User 2"), camera1, AccessRight::viewLive)),
+        resolver->accessDetails(subjects->id("User 2"), camera1, AccessRight::view)),
         detailsToString({{subjects->id("Group 1"), {camera1}}}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("User 2"), camera2, AccessRight::viewLive)),
+        resolver->accessDetails(subjects->id("User 2"), camera2, AccessRight::view)),
         detailsToString({
             {subjects->id("User 2"), {camera2}},
             {subjects->id("Group 1"), {camera2}},
@@ -373,7 +373,7 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
         detailsToString({{subjects->id("User 2"), {camera2}}}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("Group 2"), camera1, AccessRight::viewLive)),
+        resolver->accessDetails(subjects->id("Group 2"), camera1, AccessRight::view)),
         detailsToString({
             {subjects->id("Group 1"), {camera1}},
             {subjects->id("Group 2"), {camera1}}}));
@@ -383,11 +383,11 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
         detailsToString({{subjects->id("Group 2"), {camera1}}}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("Group 2"), camera1, AccessRight::editSettings)),
+        resolver->accessDetails(subjects->id("Group 2"), camera1, AccessRight::edit)),
         detailsToString({}));
 
     ASSERT_EQ(detailsToString(
-        resolver->accessDetails(subjects->id("Group 2"), camera2, AccessRight::listenToAudio)),
+        resolver->accessDetails(subjects->id("Group 2"), camera2, AccessRight::exportArchive)),
         detailsToString({{subjects->id("Group 1"), {camera2}}}));
 }
 
@@ -397,7 +397,7 @@ TEST_F(InheritedResourceAccessResolverTest, noInheritedDesktopCameraAccess)
     auto camera = addDesktopCamera(user);
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
-        {{camera->getId(), AccessRight::viewLive}});
+        {{camera->getId(), AccessRight::view}});
 
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), camera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), camera), AccessRights());
@@ -415,9 +415,9 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
     addToLayout(layout, camera);
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
-        {{videowall->getId(), AccessRight::viewLive | AccessRight::controlVideowall}});
+        {{videowall->getId(), AccessRight::view | AccessRight::controlVideowall}});
 
-    const AccessRights expectedRights = AccessRight::viewLive;
+    const AccessRights expectedRights = AccessRight::view;
 
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), camera), expectedRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), camera), expectedRights);

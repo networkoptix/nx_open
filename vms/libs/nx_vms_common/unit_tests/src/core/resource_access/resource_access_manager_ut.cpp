@@ -1071,7 +1071,7 @@ TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsEditor)
     auto target = addCamera();
 
     setAccessRights(user->getId(), {{target->getId(),
-        AccessRight::viewLive | AccessRight::editSettings}});
+        AccessRight::view | AccessRight::edit}});
 
     ASSERT_TRUE(hasPermission(user, target, Qn::WritePermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
