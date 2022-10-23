@@ -80,6 +80,17 @@ public:
 struct LoginDialog::Private
 {
     RemoteConnectionFactory::ProcessPtr connectionProcess;
+    std::shared_ptr<QnStatisticsScenarioGuard> scenarioGuard;
+
+    void resetConnectionProcess(bool async)
+    {
+        if (async)
+            RemoteConnectionFactory::destroyAsync(std::move(connectionProcess));
+        else
+            connectionProcess.reset();
+
+        scenarioGuard.reset();
+    }
 };
 
 LoginDialog::LoginDialog(QWidget *parent):
@@ -216,12 +227,11 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
         url.userName().toLower().toStdString(),
         nx::network::http::PasswordAuthToken(url.password().toStdString()));
 
-    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
-        statisticsModule()->certificates()->beginScenario(
+    d->scenarioGuard = statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::connectFromDialog);
 
     auto callback = nx::utils::guarded(this,
-        [url, connectScenario, this] (RemoteConnectionFactory::ConnectionOrError result)
+        [url, this] (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (!d->connectionProcess)
                 return;
@@ -273,7 +283,8 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                     ui::action::Parameters().withArgument(Qn::RemoteConnectionRole, connection));
                 base_type::accept();
             }
-            d->connectionProcess.reset();
+
+            d->resetConnectionProcess(/*async*/ false);
             updateUsability();
         });
 
@@ -302,7 +313,7 @@ void LoginDialog::reject()
     }
     else
     {
-        RemoteConnectionFactory::destroyAsync(std::move(d->connectionProcess));
+        d->resetConnectionProcess(/*async*/ true);
     }
     updateUsability();
 }
