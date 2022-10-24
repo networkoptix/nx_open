@@ -3,6 +3,8 @@
 #pragma once
 
 #include <memory>
+#include <set>
+#include <vector>
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
@@ -33,6 +35,8 @@ public:
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractEngine*> engines
         READ engines NOTIFY enginesChanged);
 
+    Q_PROPERTY(QnVirtualCameraResourceSet selectedDevices WRITE setSelectedDevices)
+
     Q_PROPERTY(bool active WRITE setActive READ isActive NOTIFY activeChanged);
 
 public:
@@ -54,6 +58,11 @@ public:
     Q_INVOKABLE void setSelectedEngine(
         nx::analytics::taxonomy::AbstractEngine* engine,
         bool force = false);
+
+    /**
+     * Sets selected devices.
+     */
+    Q_INVOKABLE void setSelectedDevices(const QnVirtualCameraResourceSet& devices);
 
     /**
      * Sets whether to exclude live types.
@@ -93,6 +102,7 @@ private:
     void rebuild();
     void update(
         nx::analytics::taxonomy::AbstractEngine* engine,
+        const std::set<QnUuid>& devices,
         bool liveTypesExcluded,
         bool force = false);
 
@@ -101,6 +111,7 @@ private:
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
+    std::set<QnUuid> m_devices;
     bool m_liveTypesExcluded = false;
     std::vector<AbstractNode*> m_objectTypes;
     QMap<QString, AbstractNode*> m_objectTypesById;

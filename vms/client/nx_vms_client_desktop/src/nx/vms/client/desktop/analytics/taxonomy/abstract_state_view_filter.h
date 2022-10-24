@@ -30,7 +30,7 @@ public:
 
     /**
      * @return Id of the filter. For some filters id can hold some taxonomy information (see
-     * EngineStateViewFilter for example).
+     * ScopeStateViewFilter for example).
      */
     virtual QString id() const = 0;
 
