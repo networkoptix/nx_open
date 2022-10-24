@@ -172,6 +172,7 @@ Column
         width: analyticsFilters.width
         title: qsTr("Object Type")
         objectTypes: model.objectTypes
+        visible: model.objectTypes.length > 0
     }
 
     ObjectAttributes

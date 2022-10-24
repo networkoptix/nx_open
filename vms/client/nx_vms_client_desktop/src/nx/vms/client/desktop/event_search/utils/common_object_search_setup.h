@@ -29,6 +29,9 @@ class CommonObjectSearchSetup: public QObject
     Q_PROPERTY(nx::vms::client::desktop::RightPanel::CameraSelection cameraSelection
         READ cameraSelection WRITE setCameraSelection NOTIFY cameraSelectionChanged)
 
+    Q_PROPERTY(QnVirtualCameraResourceSet selectedCameras READ selectedCameras
+            NOTIFY selectedCamerasChanged)
+
     Q_PROPERTY(QnVirtualCameraResource* singleCamera READ singleCameraRaw
         NOTIFY selectedCamerasChanged)
 
@@ -81,3 +84,5 @@ private:
 };
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(QnVirtualCameraResourceSet)
