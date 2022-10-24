@@ -31,14 +31,24 @@ bool QuickSyncVideoDecoderImpl::isCompatible(
 
 bool QuickSyncVideoDecoderImpl::isAvailable()
 {
-    MFXVideoSession mfxSession;
-    mfxIMPL impl = MFX_IMPL_HARDWARE;
-    mfxVersion version = { {0, 1} };
-    mfxStatus status = mfxSession.Init(impl, &version);
-    if (status < MFX_ERR_NONE)
-        return false;
+    auto isAvalibaleImpl = []() {
+        MFXVideoSession mfxSession;
+        mfxIMPL impl = MFX_IMPL_HARDWARE;
+        mfxVersion version = { {0, 1} };
+        mfxStatus status = mfxSession.Init(impl, &version);
+        if (status < MFX_ERR_NONE)
+            return false;
 
-    return true;
+    #if defined(__linux__)
+        nx::media::quick_sync::DeviceContext device;
+        if (!device.initialize(mfxSession, /*width*/0, /*height*/0))
+            return false;
+    #endif //__linux__
+        return true;
+    };
+
+    static bool result = isAvalibaleImpl();
+    return result;
 }
 
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
