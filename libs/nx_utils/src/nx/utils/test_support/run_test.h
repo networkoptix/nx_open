@@ -83,6 +83,14 @@ inline int runTest(
     for (int i = 0; i < argc; ++i)
         extendedArgs.push_back(argv[i]);
 
+    /* Disable log rotation for unit tests. */
+    if (std::find_if(extendedArgs.begin(), extendedArgs.end(),
+        [](const auto& elem) { return QString(elem).startsWith("--log"); }) != extendedArgs.end())
+    {
+        extendedArgs.insert(extendedArgs.end(),
+            {"--log/maxLogVolumeSizeB=10737418240", "--log/maxLogFileSizeB=10737418240"});
+    }
+
     if (gtestRunFlags & TestRunFlag::throwOnFailure)
         testing::UnitTest::GetInstance()->listeners().Append(new ThrowListener);
     argc = (int)extendedArgs.size();
