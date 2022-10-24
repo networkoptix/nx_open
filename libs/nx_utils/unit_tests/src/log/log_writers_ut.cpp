@@ -61,12 +61,14 @@ public:
         QByteArray actualContent;
         if (suffix.isEmpty())
         {
+            ASSERT_TRUE(QFile::exists(fileName));
             QFile file(fileName);
             file.open(QFile::ReadOnly);
             actualContent = file.readAll();
         }
         else
         {
+            ASSERT_TRUE(QFile::exists(fileName));
             QuaZipFile file(fileName, fileNameInsideArchive);
             file.open(QIODevice::ReadOnly);
             actualContent = file.readAll();

@@ -82,6 +82,7 @@ private:
     nx::Mutex m_mutex;
     std::fstream m_file;
     QFileInfo m_fileInfo;
+    qint64 m_currentPos = 0;
     QDateTime m_fileOpenTime;
     QLockFile m_volumeLock;
     std::future<void> m_archive;
