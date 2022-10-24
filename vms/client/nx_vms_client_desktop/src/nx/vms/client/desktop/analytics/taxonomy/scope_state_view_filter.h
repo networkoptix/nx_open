@@ -2,7 +2,11 @@
 
 #pragma once
 
+#include <optional>
+#include <set>
+
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
 
 namespace nx::analytics::taxonomy { class AbstractEngine; }
@@ -10,16 +14,17 @@ namespace nx::analytics::taxonomy { class AbstractEngine; }
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 /**
- * Filters Object types by the taxonomy Engine.
+ * Filters Object types by the taxonomy Engine and devices.
  */
-class EngineStateViewFilter: public AbstractStateViewFilter
+class ScopeStateViewFilter: public AbstractStateViewFilter
 {
 public:
-    EngineStateViewFilter(
+    ScopeStateViewFilter(
         nx::analytics::taxonomy::AbstractEngine* engine = nullptr,
+        const std::optional<std::set<QnUuid>>& devices = {},
         QObject* parent = nullptr);
 
-    virtual ~EngineStateViewFilter() override;
+    virtual ~ScopeStateViewFilter() override;
 
     /** Id of the filter is id of the corresponding Engine. */
     virtual QString id() const override;
