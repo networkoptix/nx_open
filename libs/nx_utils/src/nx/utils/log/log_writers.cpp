@@ -64,7 +64,9 @@ void File::write(Level /*level*/, const QString& message)
         return;
     }
 
-    m_file << message.toStdString() << std::endl;
+    const auto out = message.toStdString();
+    m_file << out << std::endl;
+    m_currentPos += out.size() + 1;
     rotateIfNeeded(&lock);
 }
 
@@ -89,16 +91,32 @@ QString File::makeFileName(QString fileName, size_t backupNumber)
 
 QString File::makeBaseFileName(QString fullPath)
 {
-    // Remove the path and any log-related ending.
-    auto name = QFileInfo(fullPath).baseName();
+    // Remove the path.
+    auto name = QFileInfo(fullPath).fileName();
 
     // Remove the rotation counter if any.
-    if (name.right(4).startsWith('_'))
+    if (name.endsWith(kRotateExtensionWithSeparator) ||
+        name.endsWith(kRotateTmpExtensionWithSeparator) ||
+        name.endsWith(kTmpExtensionWithSeparator))
     {
-        bool ok = false;
-        name.right(3).toUInt(&ok);
-        if (ok)
-            name.chop(4);
+        if (name.endsWith(kRotateExtensionWithSeparator))
+            name.chop(strlen(kRotateExtensionWithSeparator));
+        else if (name.endsWith(kRotateTmpExtensionWithSeparator))
+            name.chop(strlen(kRotateTmpExtensionWithSeparator));
+        else if (name.endsWith(kTmpExtensionWithSeparator))
+            name.chop(strlen(kTmpExtensionWithSeparator));
+
+        if (name.right(4).startsWith('_'))
+        {
+            bool ok = false;
+            name.right(3).toUInt(&ok);
+            if (ok)
+                name.chop(4);
+        }
+    }
+    else if (name.endsWith(kExtensionWithSeparator))
+    {
+        return name;
     }
 
     // Return the base name with ".log" ending.
@@ -130,6 +148,7 @@ bool File::openFile()
         // File exists, prepare to append.
         m_file.seekp(std::streamoff(0), std::ios_base::end);
         m_fileOpenTime = QDateTime::currentDateTime();
+        m_currentPos = m_file.tellp();
         return !m_file.fail();
     }
 
@@ -145,6 +164,7 @@ bool File::openFile()
 
     // Ensure 1st char is UTF8 BOM.
     m_file.write("\xEF\xBB\xBF", 3);
+    m_currentPos = 3;
     return !m_file.fail();
 }
 
@@ -225,7 +245,8 @@ void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
 
     m_volumeLock.lock();
     auto dir = m_fileInfo.dir();
-    const auto pattern = m_fileInfo.baseName() + "_*" + kRotateExtensionWithSeparator;
+    const auto pattern = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator))
+        + "_*" + kRotateExtensionWithSeparator;
     const auto list = dir.entryList({pattern}, QDir::Files, QDir::Name);
 
     int removedCount = 0;
@@ -267,7 +288,7 @@ void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
 
 void File::archiveLeftOvers(nx::Locker<nx::Mutex>* /*lock*/)
 {
-    const auto stem = m_fileInfo.baseName();
+    const auto stem = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator));
     const auto dir = m_fileInfo.dir();
     if (!dir.exists())
         return;
@@ -306,10 +327,7 @@ bool File::queueToArchive(nx::Locker<nx::Mutex>* lock)
 
 bool File::isCurrentLimitReached(nx::Locker<nx::Mutex>* /*lock*/)
 {
-    m_fileInfo.refresh();
-
-    const auto currentPosition = m_fileInfo.size();
-    if (currentPosition >= m_settings.maxFileSizeB)
+    if (m_currentPos >= m_settings.maxFileSizeB)
         return true;
 
     if (m_settings.maxFileTimePeriodS != std::chrono::seconds::zero())
