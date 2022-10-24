@@ -6,11 +6,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <libavcodec/avcodec.h>
-
 #include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/datetime.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnResourceWidget;
@@ -22,13 +21,13 @@ class QnWorkbenchRenderWatcher;
 
 struct QnStreamSynchronizationState
 {
-    QnStreamSynchronizationState();
+    QnStreamSynchronizationState() = default;
     QnStreamSynchronizationState(bool started, qint64 time, qreal speed);
     static QnStreamSynchronizationState live();
 
-    bool isSyncOn;
-    qint64 timeUs;
-    qreal speed;
+    bool isSyncOn = false;
+    qint64 timeUs = DATETIME_INVALID;
+    qreal speed = 0.0;
 };
 QN_FUSION_DECLARE_FUNCTIONS(QnStreamSynchronizationState, (json)(metatype))
 
