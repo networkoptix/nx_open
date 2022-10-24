@@ -67,7 +67,7 @@ int64_t getIntValue(const nx::kit::Json& json, const std::string& key)
     return (int64_t) value.number_value();
 }
 
-int64_t getDoubleValue(const nx::kit::Json& json, const std::string& key)
+double getDoubleValue(const nx::kit::Json& json, const std::string& key)
 {
     const auto value = json[key];
     if (!value.is_number())
@@ -228,6 +228,12 @@ nx::kit::Json PluginManifest::to_json() const
         });
 }
 
+bool PluginManifest::operator==(const PluginManifest& other) const
+{
+    return other.description == description && other.id == id && other.name == name
+        && other.vendor == vendor && other.version == version;
+}
+
 bool TimePeriod::contains(std::chrono::milliseconds timestamp) const
 {
     return (timestamp >= startTimestamp)
@@ -318,6 +324,11 @@ nx::kit::Json KeyValuePair::to_json() const
         });
 }
 
+bool KeyValuePair::operator==(const KeyValuePair& other) const
+{
+    return other.name == name && other.value == value;
+}
+
 nx::kit::Json keyValuePairsToJson(const std::vector<KeyValuePair>& keyValuePairList)
 {
     auto result = nx::kit::Json::array();
@@ -358,6 +369,11 @@ DeviceDescription::DeviceDescription(const nx::sdk::IDeviceInfo* info)
     parameters.push_back(DeviceParameter{ "sharedId", info->sharedId() });
     parameters.push_back(DeviceParameter{ "url", info->url() });
     parameters.push_back(DeviceParameter{ "vendor", info->vendor() });
+}
+
+bool DeviceDescription::operator==(const DeviceDescription& other) const
+{
+    return other.parameters == parameters;
 }
 
 std::optional<std::string> DeviceDescription::deviceId() const
@@ -415,6 +431,14 @@ Bookmark::Bookmark(const nx::kit::Json& json)
     duration = milliseconds(getIntValue(json, "duration"));
     tags = getStringListValue(json, "tags");
     deviceId = getStringValue(json, "deviceId");
+}
+
+bool Bookmark::operator==(const Bookmark& other) const
+{
+    return other.creationTimestamp == creationTimestamp && other.creatorId == creatorId
+        && other.description == description && other.deviceId == deviceId && other.duration == duration
+        && other.id == id && other.name == name && other.startTimestamp == startTimestamp
+        && other.tags == tags && other.timeout == timeout;
 }
 
 nx::kit::Json Bookmark::to_json() const
@@ -528,9 +552,18 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
     order = sortOrderFromString(getStringValue(json, "order"));
     column = sortColumnFromString(getStringValue(json, "column"));
     minVisibleLength = getOptionalDurationValue<milliseconds>(json, "minVisibleLength");
-    std::vector<std::string> deviceIds = getStringListValue(json, "deviceIds");
+    deviceIds = getStringListValue(json, "deviceIds");
     creationStartTimestamp = getOptionalDurationValue<milliseconds>(json, "creationStartTimestamp");
     creationEndTimestamp = getOptionalDurationValue<milliseconds>(json, "creationEndTimestamp");
+}
+
+bool BookmarkFilter::operator==(const BookmarkFilter& other) const
+{
+    return other.column == column && other.creationEndTimestamp == creationEndTimestamp
+        && other.creationStartTimestamp == creationStartTimestamp && other.deviceIds == deviceIds
+        && other.endTimestamp == endTimestamp && other.id == id && other.limit == limit
+        && other.minVisibleLength == minVisibleLength && other.order == order
+        && other.startTimestamp == startTimestamp && other.text == text;
 }
 
 nx::kit::Json BookmarkFilter::to_json() const
@@ -581,6 +614,12 @@ Motion::Motion(const nx::kit::Json& json)
     dataBase64 = getStringValue(json, "dataBase64");
 }
 
+bool Motion::operator==(const Motion& other) const
+{
+    return other.channel == channel && other.dataBase64 == dataBase64 && other.deviceId == deviceId
+        && other.duration == duration && other.startTimestamp == startTimestamp;
+}
+
 nx::kit::Json Motion::to_json() const
 {
     return nx::kit::Json::object({
@@ -607,6 +646,11 @@ Rect::Rect(const nx::kit::Json& json)
 Rect::Rect(double x, double y, double w, double h):
     x(x), y(y), w(w), h(h)
 {}
+
+bool Rect::operator==(const Rect& other) const
+{
+    return other.h == h && other.w == w && other.x == x && other.y == y;
+}
 
 bool Rect::isInside(double x, double y) const
 {
@@ -686,6 +730,12 @@ MotionFilter::MotionFilter(const nx::kit::Json& json)
     limit = optionalLimit ? std::optional<int>((int)*optionalLimit) : std::nullopt;
     order = sortOrderFromString(getStringValue(json, "order"));
     detailLevel = milliseconds(getIntValue(json, "detailLevel"));
+}
+
+bool MotionFilter::operator==(const MotionFilter& other) const
+{
+    return other.detailLevel == detailLevel && other.deviceIds == deviceIds && other.limit == limit
+        && other.order == order && other.regions == regions && other.timePeriod == timePeriod;
 }
 
 nx::kit::Json MotionFilter::to_json() const
@@ -827,6 +877,11 @@ RangePoint::RangePoint(float value, bool inclusive): value(value), inclusive(inc
 {
 }
 
+bool RangePoint::operator==(const RangePoint& other) const
+{
+    return other.inclusive == inclusive && other.value == value;
+}
+
 nx::kit::Json RangePoint::to_json() const
 {
     return nx::kit::Json::object({{"value", value}, {"inclusive", inclusive}});
@@ -852,6 +907,11 @@ nx::kit::Json NumericRange::to_json() const
 
 NumericRange::NumericRange(const char* jsonData): NumericRange(parseJson(jsonData))
 {
+}
+
+bool NumericRange::operator==(const NumericRange& other) const
+{
+    return other.from == from && other.to == to;
 }
 
 std::optional<NumericRange> NumericRange::fromString(const std::string& s)
@@ -918,12 +978,12 @@ std::optional<NumericRange> NumericRange::fromString(const std::string& s)
 
 bool NumericRange::intersects(const NumericRange& range) const
 {
-    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min()};
-    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max()};
+    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min(), false};
+    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max(), false};
 
     RangePoint rangeLeft =
-        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min()};
-    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max()};
+        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min(), false};
+    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max(), false};
 
     RangePoint maxLeft = (ownLeft.value > rangeLeft.value) ? ownLeft : rangeLeft;
     RangePoint minRight = (ownRight.value < rangeRight.value) ? ownRight : rangeRight;
@@ -935,12 +995,12 @@ bool NumericRange::intersects(const NumericRange& range) const
 
 bool NumericRange::hasRange(const NumericRange& range) const
 {
-    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min()};
-    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max()};
+    RangePoint ownLeft = from ? *from : RangePoint{std::numeric_limits<float>::min(), false};
+    RangePoint ownRight = to ? *to : RangePoint{std::numeric_limits<float>::max(), false};
 
     RangePoint rangeLeft =
-        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min()};
-    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max()};
+        range.from ? *range.from : RangePoint{std::numeric_limits<float>::min(), false};
+    RangePoint rangeRight = range.to ? *range.to : RangePoint{std::numeric_limits<float>::max(), false};
 
     if (ownLeft.inclusive || !rangeLeft.inclusive)
     {
@@ -973,11 +1033,18 @@ AttributeSearchCondition::AttributeSearchCondition(const nx::kit::Json& json)
     value = getStringValue(json, "value");
     text = getStringValue(json, "text");
     range = getObjectValue<NumericRange>(json, "range");
+    isNegative = getBoolValue(json, "isNegative");
 }
 
 AttributeSearchCondition::AttributeSearchCondition(const char* jsonData):
     AttributeSearchCondition(parseJson(jsonData))
 {
+}
+
+bool AttributeSearchCondition::operator==(const AttributeSearchCondition& other) const
+{
+    return other.isNegative == isNegative && other.name == name && other.range == range
+        && other.text == text && other.type == type && other.value == value;
 }
 
 std::string AttributeSearchCondition::typeToString(Type type)
@@ -1018,7 +1085,8 @@ nx::kit::Json AttributeSearchCondition::to_json() const
         {"name", name},
         {"value", value},
         {"text", text},
-        {"range", range}
+        {"range", range},
+        {"isNegative", isNegative}
     });
 }
 
@@ -1042,6 +1110,19 @@ AnalyticsFilter::AnalyticsFilter(const nx::kit::Json& json)
     analyticsEngineId = getOptionalStringValue(json, "analyticsEngineId");
     options = optionsFromString(getStringValue(json, "options"));
     detailLevel = getDurationValue<milliseconds>(json, "detailLevel");
+    attributeSearchConditions =
+        getObjectListValue<AttributeSearchCondition>(json, "attributeSearchConditions");
+}
+
+bool AnalyticsFilter::operator==(const AnalyticsFilter& other) const
+{
+    return other.analyticsEngineId == analyticsEngineId
+        && other.attributeSearchConditions == attributeSearchConditions
+        && other.boundingBox == boundingBox && other.detailLevel == detailLevel
+        && other.deviceIds == deviceIds && other.maxObjectTracksToSelect == maxObjectTracksToSelect
+        && other.objectTrackId == objectTrackId && other.objectTypeIds == objectTypeIds
+        && other.options == options && other.order == order && other.timePeriod == timePeriod
+        && other.withBestShotOnly == withBestShotOnly;
 }
 
 nx::kit::Json AnalyticsFilter::to_json() const
@@ -1066,8 +1147,18 @@ nx::kit::Json AnalyticsFilter::to_json() const
 
     result["options"] = optionsToString(options);
     result["detailLevel"] = (double) detailLevel.count();
+    result["attributeSearchConditions"] = attributeSearchConditions;
 
     return result;
+}
+
+ObjectRegion::ObjectRegion(const char* jsonData): ObjectRegion(parseJson(jsonData))
+{
+}
+
+bool ObjectRegion::operator==(const ObjectRegion& other) const
+{
+    return other.boundingBoxGridBase64 == boundingBoxGridBase64;
 }
 
 ObjectRegion::ObjectRegion(const nx::kit::Json& json)
@@ -1089,6 +1180,11 @@ BestShot::BestShot(const nx::kit::Json& json)
 
 BestShot::BestShot(const char* jsonData): BestShot(parseJson(jsonData))
 {
+}
+
+bool BestShot::operator==(const BestShot& other) const
+{
+    return other.rect == rect && other.streamIndex == streamIndex && other.timestamp == timestamp;
 }
 
 nx::kit::Json BestShot::to_json() const
@@ -1114,6 +1210,16 @@ ObjectTrack::ObjectTrack(const nx::kit::Json & json)
     lastAppearanceTimestamp = microseconds(getIntValue(json, "lastAppearanceTimestamp"));
     objectPosition = getObjectValue<ObjectRegion>(json, "objectPosition");
     analyticsEngineId = getStringValue(json, "analyticsEngineId");
+    bestShot = getObjectValue<BestShot>(json, "bestShot");
+}
+
+bool ObjectTrack::operator==(const ObjectTrack& other) const
+{
+    return other.analyticsEngineId == analyticsEngineId && other.attributes == attributes
+        && other.bestShot == bestShot && other.deviceId == deviceId
+        && other.firstAppearanceTimestamp == firstAppearanceTimestamp && other.id == id
+        && other.lastAppearanceTimestamp == lastAppearanceTimestamp
+        && other.objectPosition == objectPosition && other.objectTypeId == objectTypeId;
 }
 
 nx::kit::Json ObjectTrack::to_json() const
@@ -1127,6 +1233,7 @@ nx::kit::Json ObjectTrack::to_json() const
         {"lastAppearanceTimestamp", (double) lastAppearanceTimestamp.count()},
         {"objectPosition", objectPosition},
         {"analyticsEngineId", analyticsEngineId},
+        {"bestShot", bestShot}
         });
 }
 
@@ -1139,6 +1246,12 @@ BestShotImage::BestShotImage(const nx::kit::Json& json)
 
 BestShotImage::BestShotImage(const char* jsonData): BestShotImage(parseJson(jsonData))
 {
+}
+
+bool BestShotImage::operator == (const BestShotImage& other) const
+{
+    return other.data64 == data64 && other.format == format
+        && other.objectTrackId == objectTrackId;
 }
 
 nx::kit::Json BestShotImage::to_json() const
@@ -1176,6 +1289,18 @@ CodecInfoData::CodecInfoData(const nx::kit::Json& json)
     channelLayout = getIntValue(json, "channelLayout");
     channelNumber = getIntValue(json, "channelNumber");
     extradataBase64 = getStringValue(json, "extradataBase64");
+}
+
+bool CodecInfoData::operator==(const CodecInfoData& other) const
+{
+    return other.bitRate == bitRate && other.bitsPerCodedSample == bitsPerCodedSample
+        && other.blockAlign == blockAlign && other.channelLayout == channelLayout
+        && other.channelNumber == channelNumber && other.channels == channels
+        && other.codecTag == codecTag && other.compressionType == compressionType
+        && other.extradataBase64 == extradataBase64 && other.frameSize == frameSize
+        && other.height == height && other.mediaType == mediaType
+        && other.pixelFormat == pixelFormat && other.sampleFormat == sampleFormat
+        && other.sampleRate == sampleRate && other.width == width;
 }
 
 nx::kit::Json CodecInfoData::to_json() const

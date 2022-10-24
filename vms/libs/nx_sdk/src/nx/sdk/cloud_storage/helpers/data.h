@@ -31,6 +31,8 @@ struct PluginManifest
     template<typename T>
     PluginManifest(const T&) = delete;
 
+    bool operator==(const PluginManifest&) const;
+
     // Plugin identificator. This is what will be displayed int the storage type field in
     // the storage dialog.
     std::string id;
@@ -82,6 +84,8 @@ struct KeyValuePair
     template<typename T>
     KeyValuePair(const T&) = delete;
 
+    bool operator==(const KeyValuePair&) const;
+
     nx::kit::Json to_json() const;
 
     std::string name;
@@ -89,11 +93,6 @@ struct KeyValuePair
 };
 
 nx::kit::Json keyValuePairsToJson(const std::vector<KeyValuePair>& keyValuePairList);
-
-inline bool operator==(const KeyValuePair& one, const KeyValuePair& two)
-{
-    return one.name == two.name && one.value == two.value;
-}
 
 using DeviceParameter = KeyValuePair;
 
@@ -108,17 +107,14 @@ struct DeviceDescription
     template<typename T>
     DeviceDescription(const T&) = delete;
 
+    bool operator==(const DeviceDescription&) const;
+
     std::vector<DeviceParameter> parameters;
 
     const char* getParamValue(const std::string& key) const;
     nx::kit::Json to_json() const;
     std::optional<std::string> deviceId() const;
 };
-
-inline bool operator==(const DeviceDescription& one, const DeviceDescription& two)
-{
-    return one.parameters == two.parameters;
-}
 
 std::string deviceId(nx::sdk::cloud_storage::IDeviceAgent* deviceAgent);
 int toStreamIndex(nxcip::MediaStreamQuality quality);
@@ -135,6 +131,8 @@ struct Bookmark
 
     template<typename T>
     Bookmark(const T&) = delete;
+
+    bool operator==(const Bookmark&) const;
 
     nx::kit::Json to_json() const;
 
@@ -186,6 +184,8 @@ struct BookmarkFilter
     template<typename T>
     BookmarkFilter(const T&) = delete;
 
+    bool operator==(const BookmarkFilter&) const;
+
     nx::kit::Json to_json() const;
 
     static std::string sortColumnToString(SortColumn column);
@@ -218,6 +218,8 @@ struct Motion
     template<typename T>
     Motion(const T&) = delete;
 
+    bool operator==(const Motion&) const;
+
     int channel = 0;
     std::chrono::milliseconds startTimestamp;
     std::chrono::milliseconds duration{};
@@ -241,6 +243,8 @@ struct Rect
 
     template<typename T>
     Rect(const T&) = delete;
+
+    bool operator==(const Rect&) const;
 
     nx::kit::Json to_json() const;
 
@@ -271,6 +275,8 @@ struct MotionFilter
     template<typename T>
     MotionFilter(const T&) = delete;
 
+    bool operator==(const MotionFilter&) const;
+
     nx::kit::Json to_json() const;
 
     std::vector<std::string> deviceIds;
@@ -298,9 +304,12 @@ struct ObjectRegion
 {
     ObjectRegion() = default;
     ObjectRegion(const nx::kit::Json & json);
+    ObjectRegion(const char* jsonData);
 
     template<typename T>
     ObjectRegion(const T&) = delete;
+
+    bool operator==(const ObjectRegion&) const;
 
     nx::kit::Json to_json() const;
 
@@ -321,6 +330,8 @@ struct BestShot
     template<typename T>
     BestShot(const T&) = delete;
 
+    bool operator==(const BestShot&) const;
+
     nx::kit::Json to_json() const;
     bool isNull() const;
 
@@ -337,6 +348,8 @@ struct ObjectTrack
 
     template<typename T>
     ObjectTrack(const T&) = delete;
+
+    bool operator==(const ObjectTrack&) const;
 
     nx::kit::Json to_json() const;
 
@@ -372,6 +385,8 @@ struct BestShotImage
     template<typename T>
     BestShotImage(const T&) = delete;
 
+    bool operator==(const BestShotImage&) const;
+
     nx::kit::Json to_json() const;
 
     std::string objectTrackId;
@@ -395,7 +410,9 @@ struct RangePoint
     template<typename T>
     RangePoint(const T&) = delete;
 
-    RangePoint(float value, bool inclusive = false);
+    RangePoint(float value, bool inclusive);
+
+    bool operator==(const RangePoint&) const;
 
     nx::kit::Json to_json() const;
 
@@ -413,6 +430,8 @@ struct NumericRange
 
     template<typename T>
     NumericRange(const T&) = delete;
+
+    bool operator==(const NumericRange&) const;
 
     NumericRange(float value): from(RangePoint{value, true}), to(RangePoint{value, true}) {}
 
@@ -445,6 +464,8 @@ struct AttributeSearchCondition
 
     template<typename T>
     AttributeSearchCondition(const T&) = delete;
+
+    bool operator==(const AttributeSearchCondition&) const;
 
     nx::kit::Json to_json() const;
 
@@ -494,6 +515,8 @@ struct AnalyticsFilter
     template<typename T>
     AnalyticsFilter(const T&) = delete;
 
+    bool operator==(const AnalyticsFilter&) const;
+
     nx::kit::Json to_json() const;
 
     enum Option
@@ -541,6 +564,8 @@ struct CodecInfoData
 
     template<typename T>
     CodecInfoData(const T&) = delete;
+
+    bool operator==(const CodecInfoData&) const;
 
     nxcip::CompressionType compressionType = nxcip::CompressionType::AV_CODEC_ID_NONE;
     nxcip::PixelFormat pixelFormat = nxcip::PixelFormat::AV_PIX_FMT_YUV420P;

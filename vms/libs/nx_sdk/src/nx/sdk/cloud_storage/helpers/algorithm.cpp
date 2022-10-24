@@ -459,7 +459,7 @@ bool objectTrackMatches(const ObjectTrack& objectTrack, const AnalyticsFilter& f
                 break;
         }
 
-        if (!attributeMatch)
+        if (!attributeMatch && !searchCondition.isNegative)
             return false;
     }
 
