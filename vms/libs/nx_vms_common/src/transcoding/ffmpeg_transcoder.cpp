@@ -255,15 +255,38 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         videoStream->first_dts = 0;
     }
 
-    if (audio && m_aTranscoder && !m_aTranscoder->open(audio))
+    if (audio)
     {
-        m_audioCodec = AV_CODEC_ID_NONE; // can't open transcoder. disable audio
+        if (m_audioCodec == AV_CODEC_ID_PROBE)
+        {
+            m_audioCodec = AV_CODEC_ID_NONE;
+            if (audio->context && isCodecSupported(audio->context->getCodecId()))
+            {
+                setAudioCodec(audio->context->getCodecId(), TranscodeMethod::TM_DirectStreamCopy);
+            }
+            else
+            { 
+                static const std::vector<AVCodecID> audioCodecs = 
+                    {AV_CODEC_ID_MP3, AV_CODEC_ID_VORBIS}; //< Audio codecs to transcode.
+                for (const auto& codec: audioCodecs)
+                {
+                    if (isCodecSupported(codec))
+                    {
+                        setAudioCodec(codec, TranscodeMethod::TM_FfmpegTranscode);
+                        break;
+                    }
+                }
+            }
+            NX_DEBUG(this, "Auto select audio codec %1 for format %2", 
+                m_audioCodec, m_container);
+        }
+
+        if (m_aTranscoder && !m_aTranscoder->open(audio))
+            m_audioCodec = AV_CODEC_ID_NONE; // can't open transcoder. disable audio
     }
 
     if (audio && m_audioCodec != AV_CODEC_ID_NONE)
     {
-        //NX_ASSERT(false, "Not implemented! Under construction!!!");
-
         AVStream* audioStream = avformat_new_stream(m_formatCtx, nullptr);
         if (audioStream == 0)
         {
