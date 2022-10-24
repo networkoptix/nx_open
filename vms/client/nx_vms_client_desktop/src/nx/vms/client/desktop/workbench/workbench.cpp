@@ -17,9 +17,9 @@
 #include <nx/utils/qset.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
@@ -263,7 +263,7 @@ WindowContext* Workbench::windowContext() const
     return appContext()->mainWindowContext();
 }
 
-void Workbench::clear()
+void Workbench::clear(bool doProcessRemovedLayouts)
 {
     setCurrentLayout(nullptr);
 
@@ -273,7 +273,9 @@ void Workbench::clear()
         removedLayouts.insert(layout->resource());
 
     d->layouts.clear();
-    d->processRemovedLayouts(removedLayouts);
+    if (doProcessRemovedLayouts)
+        d->processRemovedLayouts(removedLayouts);
+
     emit layoutsChanged();
 }
 
@@ -701,11 +703,18 @@ void Workbench::updateCentralRoleItem()
 
 void Workbench::update(const QnWorkbenchState& state)
 {
-    clear();
+    clear(/*doProcessRemovedLayouts*/ false);
 
     for (const auto& id: state.layoutUuids)
     {
         if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
+        {
+            addLayout(layout);
+            continue;
+        }
+
+        if (const auto layout = appContext()->cloudLayoutsPool()->
+            getResourceById<CrossSystemLayoutResource>(id))
         {
             addLayout(layout);
             continue;
@@ -727,23 +736,47 @@ void Workbench::update(const QnWorkbenchState& state)
 
     if (ini().enableMultiSystemTabBar && context()->user())
     {
+        auto initialFillLayoutFromState =
+            [](const LayoutResourcePtr& layout, const QnWorkbenchState::UnsavedLayout& state)
+            {
+                layout->addFlags(Qn::local);
+                layout->setParentId(state.parentId);
+                layout->setIdUnsafe(state.id);
+                layout->setName(state.name);
+            };
+
         const auto userId = context()->user()->getId();
         for (const auto& stateLayout: state.unsavedLayouts)
         {
-            if (stateLayout.parentId != userId)
-                continue;
-
-            auto layoutResource = resourcePool()->getResourceById<LayoutResource>(stateLayout.id);
-            if (!layoutResource)
+            LayoutResourcePtr layoutResource;
+            if (stateLayout.isCrossSystem)
             {
-                layoutResource.reset(new LayoutResource());
-                layoutResource->addFlags(Qn::local);
-                layoutResource->setParentId(stateLayout.parentId);
-                layoutResource->setIdUnsafe(stateLayout.id);
-                resourcePool()->addResource(layoutResource);
+                if (!ini().crossSystemLayouts)
+                    continue;
+
+                layoutResource = appContext()->cloudLayoutsPool()->
+                    getResourceById<LayoutResource>(stateLayout.id);
+                if (!layoutResource)
+                {
+                    layoutResource.reset(new CrossSystemLayoutResource());
+                    initialFillLayoutFromState(layoutResource, stateLayout);
+                    appContext()->cloudLayoutsPool()->addResource(layoutResource);
+                }
+            }
+            else
+            {
+                if (stateLayout.parentId != userId)
+                    continue;
+
+                layoutResource = resourcePool()->getResourceById<LayoutResource>(stateLayout.id);
+                if (!layoutResource)
+                {
+                    layoutResource.reset(new LayoutResource());
+                    initialFillLayoutFromState(layoutResource, stateLayout);
+                    resourcePool()->addResource(layoutResource);
+                }
             }
 
-            layoutResource->setName(stateLayout.name);
             layoutResource->setCellSpacing(stateLayout.cellSpacing);
             layoutResource->setCellAspectRatio(stateLayout.cellAspectRatio);
             layoutResource->setBackgroundImageFilename(stateLayout.backgroundImageFilename);
@@ -766,13 +799,24 @@ void Workbench::update(const QnWorkbenchState& state)
 
     if (!state.currentLayoutId.isNull())
     {
-        const auto layout =
-            resourcePool()->getResourceById<LayoutResource>(state.currentLayoutId);
-        if (layout)
-        {
-            if (const auto wbLayout = this->layout(layout))
-                setCurrentLayout(wbLayout);
-        }
+        auto restoreCurrentLayout =
+            [this](const QnResourcePool* pool, const QnUuid id)
+            {
+                const LayoutResourcePtr& layout = pool->getResourceById<LayoutResource>(id);
+                if (!layout)
+                    return false;
+
+                if (const auto wbLayout = this->layout(layout))
+                {
+                    setCurrentLayout(wbLayout);
+                    return true;
+                }
+
+                return false;
+            };
+
+        if (!restoreCurrentLayout(resourcePool(), state.currentLayoutId))
+            restoreCurrentLayout(appContext()->cloudLayoutsPool(), state.currentLayoutId);
     }
 
     // Empty workbench is not supported correctly.
@@ -791,7 +835,7 @@ void Workbench::update(const QnWorkbenchState& state)
 
 void Workbench::submit(QnWorkbenchState& state)
 {
-    auto isLayoutSupported = [](const LayoutResourcePtr& layout)
+    auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
     {
         // Support showreels.
         if (layout->isShowreelReviewLayout())
@@ -801,7 +845,7 @@ void Workbench::submit(QnWorkbenchState& state)
             return true;
 
         // Ignore other service layouts, e.g. videowall control layouts.
-        if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
+        if ((layout->hasFlags(Qn::local) && !allowLocals) || layout->isServiceLayout())
             return false;
 
         // Ignore temporary layouts such as preview search or audit trail.
@@ -825,7 +869,7 @@ void Workbench::submit(QnWorkbenchState& state)
 
     {
         auto currentResource = currentLayout()->resource();
-        if (currentResource && isLayoutSupported(currentResource))
+        if (currentResource && isLayoutSupported(currentResource, /*allowLocals*/ true))
             state.currentLayoutId = sourceId(currentResource);
     }
 
@@ -834,11 +878,10 @@ void Workbench::submit(QnWorkbenchState& state)
         auto resource = layout->resource();
         if (resource)
         {
-            if (isLayoutSupported(resource))
+            if (isLayoutSupported(resource, /*allowLocals*/ false))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (ini().enableMultiSystemTabBar && resource->hasFlags(Qn::local)
-                && !resource->hasFlags(Qn::cross_system))
+            if (ini().enableMultiSystemTabBar && resource->hasFlags(Qn::local))
             {
                 QnWorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
@@ -849,6 +892,7 @@ void Workbench::submit(QnWorkbenchState& state)
                 unsavedLayout.backgroundImageFilename = resource->backgroundImageFilename();
                 unsavedLayout.backgroundOpacity = resource->backgroundOpacity();
                 unsavedLayout.backgroundSize = resource->backgroundSize();
+                unsavedLayout.isCrossSystem = resource->hasFlags(Qn::cross_system);
 
                 for (const auto& itemData: resource->getItems().values())
                 {
