@@ -811,6 +811,11 @@ SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
     return {};
 }
 
+QnResourcePool* ApplicationContext::cloudLayoutsPool() const
+{
+    return cloudLayoutsSystemContext()->resourcePool();
+}
+
 RadassController* ApplicationContext::radassController() const
 {
     return d->radassController.get();

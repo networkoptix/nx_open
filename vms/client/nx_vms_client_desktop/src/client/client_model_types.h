@@ -54,6 +54,7 @@ public:
         qreal backgroundOpacity = 0.0;
         QSize backgroundSize;
         QnLayoutItemDataList items;
+        bool isCrossSystem = false;
     };
 
     QnWorkbenchState();
@@ -71,7 +72,7 @@ public:
     (zoomTargetUuid)(zoomRect)(rotation)(displayInfo)(controlPtz)(displayAnalyticsObjects) \
     (displayRoi)(contrastParams)(dewarpingParams)
 #define QnWorkbenchStateUnsavedLayout_Fields (id)(parentId)(name)(cellSpacing)(cellAspectRatio) \
-    (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)
+    (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)(isCrossSystem)
 #define QnWorkbenchState_Fields \
     (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)
 

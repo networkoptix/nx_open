@@ -9,6 +9,7 @@
 
 class QnClientCoreModule;
 class QnResourceDiscoveryManager;
+class QnResourcePool;
 
 struct QnStartupParameters;
 
@@ -174,6 +175,7 @@ public:
      * System context, containing Cloud Layouts.
      */
     SystemContext* cloudLayoutsSystemContext() const;
+    QnResourcePool* cloudLayoutsPool() const;
 
     RadassController* radassController() const;
 

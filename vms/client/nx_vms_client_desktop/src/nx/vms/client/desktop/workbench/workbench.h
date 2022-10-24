@@ -75,7 +75,7 @@ public:
      * values.
      * Note that this function does not reset parameters of the grid mapper.
      */
-    void clear();
+    void clear(bool doProcessRemovedLayouts = true);
 
     /**
      * Note that this function never returns nullptr.
