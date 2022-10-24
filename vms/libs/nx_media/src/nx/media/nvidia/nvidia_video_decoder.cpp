@@ -53,14 +53,18 @@ struct NvidiaVideoDecoderImpl
 
 bool NvidiaVideoDecoder::isAvailable()
 {
-    if (!NvidiaDriverApiProxy::instance().load())
-        return false;
+    auto isAvalibaleImpl = []() {
+        if (!NvidiaDriverApiProxy::instance().load())
+            return false;
 
-    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
-    if (status != CUDA_SUCCESS)
-        return false;
+        CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
+        if (status != CUDA_SUCCESS)
+            return false;
 
-    return true;
+        return true;
+    };
+    static bool result = isAvalibaleImpl();
+    return result;
 }
 
 bool NvidiaVideoDecoder::isCompatible(
