@@ -27,7 +27,6 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
 
-#include "extensions/workbench_stream_synchronizer.h"
 #include "workbench_context.h"
 #include "workbench_grid_walker.h"
 #include "workbench_item.h"
@@ -94,10 +93,6 @@ struct QnWorkbenchLayout::Private
 QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
     d(new Private{.resource = resource})
 {
-    // TODO: #sivanov This does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(
-        QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
-
     if (!NX_ASSERT(resource))
         return;
 

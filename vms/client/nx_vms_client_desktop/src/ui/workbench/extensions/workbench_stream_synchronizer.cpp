@@ -9,7 +9,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/datetime.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -25,11 +24,6 @@
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (isSyncOn)(timeUs)(speed))
 
 using namespace nx::vms::client::desktop;
-
-QnStreamSynchronizationState::QnStreamSynchronizationState():
-    QnStreamSynchronizationState(false, AV_NOPTS_VALUE, 0.0)
-{
-}
 
 QnStreamSynchronizationState::QnStreamSynchronizationState(bool isSyncOn, qint64 timeUs, qreal speed):
     isSyncOn(isSyncOn),
