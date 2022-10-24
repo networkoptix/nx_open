@@ -676,6 +676,13 @@ Window
             value: d.delayedAttributesFilter
         }
 
+        Binding
+        {
+            target: d.filterModel
+            property: "selectedDevices"
+            value: eventModel.commonSetup.selectedCameras
+        }
+
         Connections
         {
             target: analyticsFilters

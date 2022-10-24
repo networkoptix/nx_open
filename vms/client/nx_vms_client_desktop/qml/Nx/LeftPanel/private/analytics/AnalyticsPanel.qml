@@ -117,6 +117,13 @@ Item
                 bottomPadding: 16
 
                 model: Analytics.TaxonomyManager.createFilterModel()
+
+                Binding
+                {
+                    target: analyticsFilters.model
+                    property: "selectedDevices"
+                    value: eventModel.commonSetup.selectedCameras
+                }
             }
 
             onFiltersReset:

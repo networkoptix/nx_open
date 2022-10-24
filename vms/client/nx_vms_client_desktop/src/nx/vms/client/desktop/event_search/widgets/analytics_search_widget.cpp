@@ -97,6 +97,8 @@ private:
     void setupAreaSelection();
     void updateAreaButtonAppearance();
 
+    void setupDeviceSelection();
+
     bool ensureVisible(milliseconds timestamp, const QnUuid& trackId);
     void ensureVisibleAndFetchIfNeeded(
         milliseconds timestamp, const QnUuid& trackId, const QnTimePeriod& proposedTimeWindow);
@@ -233,6 +235,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     setupEngineSelection();
     setupTypeSelection();
     setupAreaSelection();
+    setupDeviceSelection();
 
     connect(analyticsSetup(), &AnalyticsSearchSetup::attributeFiltersChanged,
         this, &Private::updateTypeButton);
@@ -331,6 +334,7 @@ void AnalyticsSearchWidget::Private::updateTypeButton()
 
     const auto engine = engineById(m_analyticsSetup->engine());
     m_objectTypeModel->setEngine(engine);
+    m_typeSelectionButton->setVisible(!m_filterModel->objectTypes().empty());
 
     if (objectType)
     {
@@ -447,6 +451,16 @@ void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
     m_areaSelectionButton->setText(m_areaSelectionButton->accented()
         ? tr("Select some area on the video...")
         : tr("In selected area"));
+}
+
+void AnalyticsSearchWidget::Private::setupDeviceSelection()
+{
+    connect(q->commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged,
+        [this]
+        {
+            m_filterModel->setSelectedDevices(q->commonSetup()->selectedCameras());
+            updateTypeButton();
+        });
 }
 
 std::vector<AbstractEngine*> AnalyticsSearchWidget::Private::engines() const
