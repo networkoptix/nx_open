@@ -27,9 +27,9 @@ private:
     void freeFrame(uint8_t* frame);
 
 private:
-    size_t m_pitch;
-    int m_widthInBytes;
-    int m_bufferHeight;
+    size_t m_pitch = 0;
+    int m_widthInBytes = 0;
+    int m_bufferHeight = 0;
 
     std::vector<uint8_t*> m_frames; //< Keep them just for deleting.
     std::deque<uint8_t*> m_readyFrames;
