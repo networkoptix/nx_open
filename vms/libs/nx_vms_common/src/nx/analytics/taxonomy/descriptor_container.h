@@ -6,7 +6,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/analytics/taxonomy/property_watcher.h>
+#include <nx/core/resource/property_watcher.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -37,7 +37,7 @@ private:
 private:
     mutable nx::Mutex m_mutex;
 
-    PropertyWatcher m_propertyWatcher;
+    nx::core::resource::PropertyWatcher m_propertyWatcher;
     std::optional<nx::vms::api::analytics::Descriptors> m_cachedDescriptors;
 };
 

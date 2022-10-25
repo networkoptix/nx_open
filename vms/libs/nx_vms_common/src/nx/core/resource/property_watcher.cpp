@@ -5,7 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 
-namespace nx::analytics::taxonomy {
+namespace nx::core::resource {
 
 PropertyWatcher::PropertyWatcher(QnResourcePool* resourcePool):
     m_resourcePool(resourcePool)
@@ -84,4 +84,4 @@ void PropertyWatcher::at_propertyChanged(const QnResourcePtr& resource, const QS
     emit propertyChanged();
 }
 
-} // namespace nx::analytics::taxonomy
+} // namespace nx::core::resource

@@ -14,9 +14,9 @@
 
 class QnResourcePool;
 
-namespace nx::analytics::taxonomy {
+namespace nx::core::resource {
 
-class PropertyWatcher: public QObject
+class NX_VMS_COMMON_API PropertyWatcher: public QObject
 {
     Q_OBJECT
 
@@ -47,4 +47,4 @@ private:
     ResourceFilter m_resourceFilter;
 };
 
-} // namespace nx::analytics::taxonomy
+} // namespace nx::core::resource

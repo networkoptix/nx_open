@@ -20,7 +20,7 @@ DescriptorContainer::DescriptorContainer(
     nx::vms::common::SystemContextAware(context),
     m_propertyWatcher(context->resourcePool())
 {
-    connect(&m_propertyWatcher, &PropertyWatcher::propertyChanged,
+    connect(&m_propertyWatcher, &nx::core::resource::PropertyWatcher::propertyChanged,
         this, &DescriptorContainer::at_descriptorsUpdated);
 
     m_propertyWatcher.watch(

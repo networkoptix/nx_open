@@ -6,9 +6,10 @@
 #include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
-#include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_error.h>
 
 namespace nx::vms::api::analytics {
@@ -31,6 +32,10 @@ public: //< Required for Qt MOC run.
 
 QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json), NX_VMS_API)
 
+NX_REFLECTION_INSTRUMENT(PluginManifest, nx_vms_api_analytics_PluginManifest_Fields);
+
 NX_VMS_API std::vector<ManifestError> validate(const PluginManifest& pluginManifest);
+
+using IntegrationManifest = PluginManifest;
 
 } // namespace nx::vms::api::analytics
