@@ -83,7 +83,7 @@ nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource, bo
 QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor& descriptor)
 {
     SystemContext* systemContext = nullptr;
-    if (ini().crossSystemLayouts && isCrossSystemResource(descriptor))
+    if (isCrossSystemResource(descriptor))
     {
         const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
         // TODO: #sivanov Probably it worth improve systemContextByCloudSystemId instead.

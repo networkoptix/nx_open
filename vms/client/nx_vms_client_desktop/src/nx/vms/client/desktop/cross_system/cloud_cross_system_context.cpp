@@ -83,18 +83,15 @@ struct CloudCrossSystemContext::Private
                     emit q->camerasRemoved(cameras);
             });
 
-        if (ini().crossSystemLayouts)
-        {
-            connect(
-                appContext()->cloudLayoutsSystemContext()->resourcePool(),
-                &QnResourcePool::resourcesAdded,
-                q,
-                [this](const QnResourceList& resources)
-                {
-                    if (status != Status::connected)
-                        createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
-                });
-        }
+        connect(
+            appContext()->cloudLayoutsSystemContext()->resourcePool(),
+            &QnResourcePool::resourcesAdded,
+            q,
+            [this](const QnResourceList& resources)
+            {
+                if (status != Status::connected)
+                    createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
+            });
 
         auto timer = new QTimer(q);
         timer->setInterval(kUpdateConnectionInterval);
@@ -188,9 +185,6 @@ struct CloudCrossSystemContext::Private
     /** Returns true if new connection is started. */
     bool ensureConnection(bool allowUserInteraction = false)
     {
-        if (!ini().crossSystemLayouts)
-            return false;
-
         if (!systemDescription->isOnline())
             return false;
 

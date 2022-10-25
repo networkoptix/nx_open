@@ -696,15 +696,12 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
     auto layoutsComposition = std::make_unique<CompositionEntity>();
     layoutsComposition->addSubEntity(std::move(layoutsGroupList));
 
-    if (ini().crossSystemLayouts)
-    {
-        auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
-            cloudLayoutItemCreator,
-            [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
-            layoutsOrder());
-        cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
-        layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
-    }
+    auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
+        cloudLayoutItemCreator,
+        [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
+        layoutsOrder());
+    cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
+    layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
 
     return makeFlatteningGroup(
         m_itemFactory->createLayoutsItem(),
@@ -916,20 +913,11 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudOtherSystemsEntity() con
             return createCloudSystemCamerasEntity(systemId);
         };
 
-    if (ini().crossSystemLayouts)
-    {
-        auto cloudSystemsEntity =
-            makeUniqueKeyGroupList<QString>(systemItemCreator, cameraListCreator, numericOrder());
+    auto cloudSystemsEntity =
+        makeUniqueKeyGroupList<QString>(systemItemCreator, cameraListCreator, numericOrder());
 
-        cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
-        return cloudSystemsEntity;
-    }
-    else
-    {
-        auto cloudSystemsEntity = makeKeyList<QString>(systemItemCreator, numericOrder());
-        cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
-        return cloudSystemsEntity;
-    }
+    cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
+    return cloudSystemsEntity;
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(

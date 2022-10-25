@@ -540,7 +540,6 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::isLoggedIn()
             && condition::isLoggedInToCloud()
-            && condition::isTrue(ini().crossSystemLayouts)
             && condition::applyToCurrentLayout(
                 condition::canSaveLayoutAs()
                 && condition::hasFlags(Qn::cross_system, MatchMode::none))
@@ -1246,7 +1245,6 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::canSaveLayoutAs()
             && condition::isLoggedInToCloud()
-            && condition::isTrue(ini().crossSystemLayouts)
             && condition::hasFlags(Qn::cross_system, MatchMode::none)
         );
 
