@@ -40,7 +40,10 @@ struct NvidiaVideoDecoderImpl
 {
     ~NvidiaVideoDecoderImpl()
     {
+        NvidiaDriverApiProxy::instance().cuCtxPushCurrent(context);
+        renderer.reset();
         decoder.reset();
+        NvidiaDriverApiProxy::instance().cuCtxPopCurrent(nullptr);
         if (context)
             NvidiaDriverApiProxy::instance().cuCtxDestroy(context);
     }

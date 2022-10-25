@@ -60,7 +60,10 @@ Renderer::~Renderer()
 void Renderer::freeScaledFrame()
 {
     if (m_scaledFrame)
+    {
         NvidiaDriverApiProxy::instance().cuMemFree(m_scaledFrame);
+        m_scaledFrame = 0;
+    }
 }
 
 void Renderer::freePbo()
