@@ -209,7 +209,7 @@ copyLibs()
             libXss.so.1 \
             libxcb-xinerama.so.0 \
             libopenal.so.1
-        distrib_copySystemLibs "$STAGE_LIB" libpng12.so.0 \
+        distrib_copySystemLibs "$STAGE_LIB" libpng16.so.16 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
         distrib_copySystemLibs "$STAGE_LIB" \
@@ -224,10 +224,13 @@ copyLibs()
             libxkbcommon.so.0 \
             libxkbcommon-x11.so.0
 
+        local -r ARCH_DIR=$("${COMPILER}" ${CFLAGS} --print-multiarch)
         # GStreamer 0.10 is required for applauncher to run old clients (< 4.0).
         local -r OLD_GSTREAMER_LIBS_PATH="$STAGE_LIB/gstreamer-0.10"
         mkdir "$OLD_GSTREAMER_LIBS_PATH"
-        distrib_copySystemLibs "$OLD_GSTREAMER_LIBS_PATH" \
+        "$PYTHON" "$OPEN_SOURCE_DIR"/build_utils/linux/copy_system_library.py \
+            --dest-dir "$OLD_GSTREAMER_LIBS_PATH" \
+            -L "${LEGACY_OS_DEPS_DIR}/usr/lib/${ARCH_DIR}" \
             libgstreamer-0.10.so.0 \
             libgstapp-0.10.so.0 \
             libgstbase-0.10.so.0 \
