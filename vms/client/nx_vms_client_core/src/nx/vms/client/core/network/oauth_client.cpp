@@ -28,6 +28,7 @@ struct OauthClient::Private: public QObject
     const OauthViewType viewType = OauthViewType::desktop;
     const QString cloudSystem;
     const QString clientId;
+    QString locale;
     CloudAuthData authData;
     std::unique_ptr<Connection> m_connection;
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
@@ -171,6 +172,9 @@ QUrl OauthClient::url() const
     if (const auto email = d->email(); !email.empty())
         builder.addQueryItem("email", email);
 
+    if (!d->locale.isEmpty())
+        builder.addQueryItem("lang", d->locale);
+
     return builder.toUrl().toQUrl();
 }
 
@@ -179,6 +183,11 @@ void OauthClient::setCredentials(const nx::network::http::Credentials& credentia
     CloudAuthData authData;
     authData.credentials = credentials;
     d->authData = std::move(authData);
+}
+
+void OauthClient::setLocale(const QString& locale)
+{
+    d->locale = locale;
 }
 
 const CloudAuthData& OauthClient::authData() const
