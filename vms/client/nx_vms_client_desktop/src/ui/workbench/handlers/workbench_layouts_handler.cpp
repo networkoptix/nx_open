@@ -425,9 +425,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
 
     // This scenario is not very actual as it can be caused only if user places cross-system
     // cameras on a local layout using api.
-    if (ini().crossSystemLayouts
-        && !isCloudLayout(layout)
-        && hasCrossSystemItems(layout))
+    if (!isCloudLayout(layout) && hasCrossSystemItems(layout))
     {
         appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
         return;
@@ -448,7 +446,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
     {
         menu()->trigger(action::SaveLocalLayoutAction, layout);
     }
-    else if (ini().crossSystemLayouts && isCloudLayout(layout))
+    else if (isCloudLayout(layout))
     {
         snapshotManager->save(layout);
         return;
@@ -637,7 +635,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
 
 void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
 {
-    if (!NX_ASSERT(layout) || !NX_ASSERT(ini().crossSystemLayouts))
+    if (!NX_ASSERT(layout))
         return;
 
     NX_ASSERT(!isCloudLayout(layout));
