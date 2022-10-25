@@ -7,9 +7,9 @@ if(LINUX)
     include(${OS_DEPS_ROOT}/os_deps.cmake)
 
     if(arch STREQUAL "arm")
-        set(icu_version 52)
+        set(icu_version 57)
     else()
-        set(icu_version 55)
+        set(icu_version 60)
     endif()
 
     set(icu_runtime_libs

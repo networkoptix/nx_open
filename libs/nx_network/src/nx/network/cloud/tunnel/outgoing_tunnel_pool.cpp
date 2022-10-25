@@ -34,7 +34,7 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
 
     m_stopping = true;
     nx::utils::BarrierHandler tunnelsStoppedFuture(
-        [this, completionHandler = move(completionHandler)]() mutable
+        [this, completionHandler = std::move(completionHandler)]() mutable
         {
             tunnelsStopped(std::move(completionHandler));
         });
