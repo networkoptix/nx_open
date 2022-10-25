@@ -385,7 +385,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
         clear();
         m_listener.reset();
     }
-    else if (context()->user()->isCloud() && ini().crossSystemNotifications)
+    else if (context()->user()->isCloud())
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),

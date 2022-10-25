@@ -751,9 +751,6 @@ void Workbench::update(const QnWorkbenchState& state)
             LayoutResourcePtr layoutResource;
             if (stateLayout.isCrossSystem)
             {
-                if (!ini().crossSystemLayouts)
-                    continue;
-
                 layoutResource = appContext()->cloudLayoutsPool()->
                     getResourceById<LayoutResource>(stateLayout.id);
                 if (!layoutResource)

@@ -79,13 +79,10 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
         this,
         &QnLayoutTabBar::at_snapshotManager_flagsChanged);
 
-    if (nx::vms::client::desktop::ini().crossSystemLayouts)
-    {
-        connect(appContext()->cloudLayoutsSystemContext()->layoutSnapshotManager(),
-            &LayoutSnapshotManager::layoutFlagsChanged,
-            this,
-            &QnLayoutTabBar::at_snapshotManager_flagsChanged);
-    }
+    connect(appContext()->cloudLayoutsSystemContext()->layoutSnapshotManager(),
+        &LayoutSnapshotManager::layoutFlagsChanged,
+        this,
+        &QnLayoutTabBar::at_snapshotManager_flagsChanged);
 
     m_submit = m_update = true;
 }
