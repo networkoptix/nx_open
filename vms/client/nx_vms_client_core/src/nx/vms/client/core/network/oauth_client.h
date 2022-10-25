@@ -54,6 +54,9 @@ public:
     /** Set token and username for 2FA validation. */
     void setCredentials(const nx::network::http::Credentials& credentials);
 
+    /** Set locale code for URL construction. */
+    void setLocale(const QString& locale);
+
     /** Final authetication data. */
     const CloudAuthData& authData() const;
 
