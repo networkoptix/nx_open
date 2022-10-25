@@ -1739,7 +1739,7 @@
     </message>
     <message>
       <source>Link copied</source>
-      <translation>リンクのコピー</translation>
+      <translation>リンクをコピーしました</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
