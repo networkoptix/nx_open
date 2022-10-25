@@ -70,7 +70,6 @@ nx_libraries = [
     'vms_gateway_core',
     'udt',
     'cudart64_110',
-    'libcolor_conversion',
     'qtkeychain'
 ]
 

@@ -8,11 +8,22 @@ set(CMAKE_OBJCXX_STANDARD ${CMAKE_CXX_STANDARD})
 set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
 set(CMAKE_OBJCXX_EXTENSIONS OFF)
 
+set(CMAKE_CUDA_STANDARD 11)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_ARCHITECTURES 50)
+
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+
+function(nx_add_c_cxx_compile_options)
+    list(JOIN ARGV " " flags)
+    string(APPEND CMAKE_C_FLAGS " ${flags}")
+    string(APPEND CMAKE_CXX_FLAGS " ${flags}")
+    nx_expose_variables_to_parent_scope(CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endfunction()
 
 if(LINUX AND NOT ANDROID)
     option(useLdGold "Use ld.gold to link binaries" OFF)
@@ -24,7 +35,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(-fno-devirtualize)
+        nx_add_c_cxx_compile_options(-fno-devirtualize)
     endif()
 endif()
 
@@ -50,7 +61,8 @@ set(isEdgeServer "false")
 set(enabledSanitizers "" CACHE STRING "A semicolon-separated list of enabled sanitizers")
 
 if(NOT "${enabledSanitizers}" STREQUAL "" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options("-fsanitize-blacklist=${PROJECT_SOURCE_DIR}/sanitize-blacklist.txt")
+    nx_add_c_cxx_compile_options(
+        "-fsanitize-blacklist=${PROJECT_SOURCE_DIR}/sanitize-blacklist.txt")
 endif()
 
 foreach(sanitizer ${enabledSanitizers})
@@ -74,12 +86,12 @@ foreach(sanitizer ${enabledSanitizers})
             nx_copy("${asan_library_path}" DESTINATION "${PROJECT_BINARY_DIR}/bin")
 
             set(cl_link_flags /fsanitize=${sanitizer})
-            add_compile_options(/fsanitize=${sanitizer})
+            nx_add_c_cxx_compile_options(/fsanitize=${sanitizer})
             # Disable warning:
             #   C5059: runtime checks and address sanitizer is not currently supported - disabling runtime checks
-            add_compile_options(/wd5059)
+            nx_add_c_cxx_compile_options(/wd5059)
             # Disable the warning about missing debug info when compiled in release mode.
-            add_compile_options(/wd5072)
+            nx_add_c_cxx_compile_options(/wd5072)
 
             string(TOUPPER ${CMAKE_BUILD_TYPE} config)
             foreach(flag_var
@@ -95,12 +107,12 @@ foreach(sanitizer ${enabledSanitizers})
             string(APPEND CMAKE_EXE_LINKER_FLAGS " ${cl_link_flags}")
         endif()
     else()
-        add_compile_options(-fsanitize=${sanitizer})
+        nx_add_c_cxx_compile_options(-fsanitize=${sanitizer})
         string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${sanitizer}")
         string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${sanitizer}")
 
         if(sanitizer STREQUAL "address")
-            add_compile_options(-fno-omit-frame-pointer)
+            nx_add_c_cxx_compile_options(-fno-omit-frame-pointer)
             if(MACOSX)
                 execute_process(COMMAND ${CMAKE_CXX_COMPILER}
                     -print-file-name=lib
@@ -124,10 +136,10 @@ set(enableCoverage OFF CACHE BOOL "Enable source-based code coverage")
 
 if(enableCoverage)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+        nx_add_c_cxx_compile_options(-fprofile-instr-generate -fcoverage-mapping)
         add_link_options(-fprofile-instr-generate)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        add_compile_options(--coverage)
+        nx_add_c_cxx_compile_options(--coverage)
         add_link_options(--coverage)
     elseif(MSVC)
         add_link_options(/Profile)
@@ -193,16 +205,16 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(-Wall -Wextra)
+    nx_add_c_cxx_compile_options(-Wall -Wextra)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # Avoid multiple warnings with Singleton implementation.
-        add_compile_options(-Wno-undefined-var-template)
+        nx_add_c_cxx_compile_options(-Wno-undefined-var-template)
     endif()
 endif()
 
 if(MSVC)
-    add_compile_options(
+    nx_add_c_cxx_compile_options(
         /MP
         /bigobj
         /Zc:inline
@@ -251,11 +263,11 @@ if(MSVC)
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(/wd4250)
+        nx_add_c_cxx_compile_options(/wd4250)
 
         # Avoid unnamed objects with custom construction and destruction. Suppressing this warning
         # as it is displayed very frequently in common places, e.g. in `QObject::connect` calls.
-        add_compile_options(/wd26444)
+        nx_add_c_cxx_compile_options(/wd26444)
     endif()
 
     set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
@@ -273,7 +285,7 @@ if(MSVC)
 endif()
 
 if(UNIX)
-    add_compile_options(
+    nx_add_c_cxx_compile_options(
         -Werror=enum-compare
         -Werror=return-type
         -Wuninitialized
@@ -285,12 +297,12 @@ if(UNIX)
     )
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(
+        nx_add_c_cxx_compile_options(
             -Wno-error=maybe-uninitialized
             -Wno-psabi
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        add_compile_options(
+        nx_add_c_cxx_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
             -Werror=mismatched-tags
@@ -303,12 +315,12 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 if(LINUX)
     if("${arch}" STREQUAL "x86" OR "${arch}" STREQUAL "x64")
-        add_compile_options(-msse2)
+        nx_add_c_cxx_compile_options(-msse2)
     else()
-        add_compile_options(-Wno-error=type-limits) #< Fix warnings from RapidJSON on ARM.
+        nx_add_c_cxx_compile_options(-Wno-error=type-limits) #< Fix warnings from RapidJSON on ARM.
     endif()
 
-    add_compile_options(
+    nx_add_c_cxx_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
         -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
@@ -339,13 +351,13 @@ if(LINUX)
     string(APPEND CMAKE_SHARED_LINKER_FLAGS ${link_flags})
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_compile_options(-ggdb1 -fno-omit-frame-pointer)
+        nx_add_c_cxx_compile_options(-ggdb1 -fno-omit-frame-pointer)
     endif()
 endif()
 
 if(MACOSX)
     if("${arch}" STREQUAL "arm64")
-        add_compile_options(
+        nx_add_c_cxx_compile_options(
             -mmacosx-version-min=11.0
             -target arm64-apple-macos
         )
@@ -354,7 +366,7 @@ if(MACOSX)
             -target arm64-apple-macos
         )
     else()
-        add_compile_options(
+        nx_add_c_cxx_compile_options(
             -msse4.1
             -mmacosx-version-min=10.14
             -target x86_64-apple-macos
@@ -364,7 +376,7 @@ if(MACOSX)
             -target x86_64-apple-macos
         )
     endif()
-    add_compile_options(-Wno-unused-local-typedef)
+    nx_add_c_cxx_compile_options(-Wno-unused-local-typedef)
     list(APPEND CMAKE_INSTALL_RPATH @executable_path/../lib)
 endif()
 
@@ -374,7 +386,7 @@ endif()
 
 if(IOS)
     # For some reason, the following warning is automatically enabled only on iOS build.
-    add_compile_options(
+    nx_add_c_cxx_compile_options(
         -Wno-shorten-64-to-32
     )
 endif()
@@ -394,7 +406,7 @@ endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     option(compileTimeTracing "Enable compile time tracing (-ftime-trace)" OFF)
     if(compileTimeTracing)
-        add_compile_options(-ftime-trace)
+        nx_add_c_cxx_compile_options(-ftime-trace)
     endif()
 endif()
 
@@ -408,9 +420,9 @@ option(colorOutput "Always produce ANSI-colored output (GNU/Clang only)." OFF)
 
 if(${colorOutput})
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       add_compile_options(-fdiagnostics-color=always)
+       nx_add_c_cxx_compile_options(-fdiagnostics-color=always)
     elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-       add_compile_options(-fcolor-diagnostics)
+       nx_add_c_cxx_compile_options(-fcolor-diagnostics)
     endif()
 endif()
 

@@ -95,6 +95,8 @@ function(nx_go_build target working_dir package_path)
     if(GO_BUILD_C_GO_INCLUDE_DIRECTORY)
         file(GLOB_RECURSE all_go_files FOLLOW_SYMLINKS "${working_dir}/*.go")
 
+        string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-parameter")
+
         if(WIN32)
             set(target_lib "${target}.lib")
             set(target_dll "${target}.dll")
