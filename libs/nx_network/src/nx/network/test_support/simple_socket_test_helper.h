@@ -152,7 +152,6 @@ private:
 
         const auto startTime = std::chrono::steady_clock::now();
         const auto maxTimeout = kTestTimeout * testClientCount();
-        int acceptedConnectionCount = 0;
         while (!m_needToStop)
         {
             std::unique_ptr<AbstractStreamSocket> client(m_server->accept());
@@ -166,8 +165,6 @@ private:
                     continue;
                 }
             }
-
-            ++acceptedConnectionCount;
 
             ASSERT_TRUE(client.get()) << SystemError::getLastOSErrorText();
             ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));

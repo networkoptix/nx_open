@@ -7,8 +7,8 @@ arch=armv7hf
 libvpx:arch=armv7
 
 [options]
-gcc-toolchain:glibc_version=2.19
-gcc-toolchain:linux_version=3.16
+gcc-toolchain:glibc_version=2.24
+gcc-toolchain:linux_version=4.9
 
 [env]
 TOOLCHAIN_PREFIX=$TOOLCHAIN_PREFIX

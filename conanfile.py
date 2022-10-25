@@ -59,8 +59,8 @@ class NxOpenConan(ConanFile):
     ffmpeg_version = "4.4"
     requires = (
         f"ffmpeg/{ffmpeg_version}" "#25419419d970893ebb7b5213d879c77c",
-        "openssl/1.1.1k" "#1623dc1f92c8f1e59d56b49fe4ea32e5",
-        "qt/5.15.2" "#861711c85d38f586cf29066cd2c10336",
+        "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
+        "qt/5.15.6" "#d97b646432fba7e9dcc0b379d9e3f0d8",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
 
@@ -68,8 +68,8 @@ class NxOpenConan(ConanFile):
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/11.0.1" "#91163fed8b1b7ceffc1263afc4fc0770")
-            self.build_requires("sdk-gcc/5.5" "#01b5d38415be7bdd73ae29717c8f7741")
+                self.build_requires("clang/15.0.2" "#45bb425dbd1aa7774a5b552fcf2612a0")
+            self.build_requires("sdk-gcc/7.5" "#83954f923149a58ac3f3120853628875")
 
         if self.isWindows:
             self.build_requires("wix/3.11" "#a662d89b677af4a98ac8cd2371be63b8")
@@ -84,19 +84,20 @@ class NxOpenConan(ConanFile):
         if self.isMacos and self.settings.arch in ("armv8", "x86_64"):
             self.options["qt"].tools_target = "Macos_x86_64"
 
-
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/11.8" "#59b585ea25ee8e1b934ab8ce8976c9df")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.6" "#740a8e07c1ac1f7210fba99e2ec2283a")
-                self.requires("intel-media-sdk/19.4" "#b5fe1df9594326590fe81f28301e09d6")
+                self.requires("libva/2.6" "#55e3df61de15ccd0bed0848ee65e2e72")
+                self.requires("intel-media-sdk/19.4" "#860f17b9422f0baaa3c7a31163d408eb")
 
             if not self.isArm32:
-                self.requires("os_deps_for_desktop_linux/ubuntu_xenial"
-                    "#b4e7ff961f0fb8957c5d5a755d5eb55a")
+                self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
+                    "#213024de424e791691f2005f614a6aa4")
+                self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
+                    "#730216354f6a07350d2e251f91489d38")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#7251f4d4b67e96c946a3de8e205a4c07")

@@ -76,14 +76,14 @@ TEST(HttpAuthDigest, calcDigestResponse)
 {
     for (const auto& method: {Method::get, Method::post, Method::put})
     {
-        for (const std::string& user: {"user", "admin"})
+        for (const std::string user: {"user", "admin"})
         {
             using OptionalStr = std::optional<std::string>;
             for (const OptionalStr& password: {OptionalStr(), OptionalStr("admin")})
             {
-                for (const std::string& algorithm: {"", "MD5", "SHA-256"})
+                for (const std::string algorithm: {"", "MD5", "SHA-256"})
                 {
-                    for (const std::string& qop: {"", "auth", "auth,auth-int", "auth-int,auth"})
+                    for (const std::string qop: {"", "auth", "auth,auth-int", "auth-int,auth"})
                     {
                         NX_DEBUG(this,
                             "Test method='%1', user='%2', password='%3', algorithm='%4', qop='%5'",

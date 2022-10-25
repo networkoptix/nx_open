@@ -29,7 +29,7 @@ template<typename T>
 class MetadataCache
 {
 public:
-    MetadataCache<T>(size_t cacheSize = 1):
+    MetadataCache(size_t cacheSize = 1):
         m_cacheSize(cacheSize)
     {
     }

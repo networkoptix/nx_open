@@ -23,10 +23,10 @@ public:
     class RandomAccess
     {
     public:
-        RandomAccess<Q>(const RandomAccess<Q>&) = delete;
+        RandomAccess(const RandomAccess<Q>&) = delete;
         RandomAccess<Q>& operator=(const RandomAccess<Q>&) = delete;
 
-        RandomAccess<Q>(RandomAccess<Q>&& other)
+        RandomAccess(RandomAccess<Q>&& other)
         {
             m_q = other.m_q;
             other.m_q = nullptr;
@@ -37,13 +37,13 @@ public:
             other.m_q = nullptr;
         }
 
-        RandomAccess<Q>(Q* queue):
+        RandomAccess(Q* queue):
             m_q(queue)
         {
             m_q->lockInternal();
         }
 
-        ~RandomAccess<Q>()
+        ~RandomAccess()
         {
             if (m_q)
                 m_q->unlockInternal();
