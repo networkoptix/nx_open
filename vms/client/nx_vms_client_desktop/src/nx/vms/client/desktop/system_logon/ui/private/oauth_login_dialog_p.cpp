@@ -8,6 +8,7 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QStackedWidget>
 
+#include <client/client_runtime_settings.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
@@ -44,6 +45,8 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
         cloudSystem,
         kDesktopClientId))
 {
+    m_oauthClient->setLocale(qnRuntime->locale());
+
     connect(
         m_webViewWidget->controller(),
         &WebViewController::windowCloseRequested,
