@@ -239,12 +239,6 @@ struct Ini: nx::kit::IniConfig
         " * \"high\" - all new layouts are opened with forced high resolution\n"
         " * \"low\" - all new layouts are opened with forced low resolution");
 
-    // VMS-30447
-    NX_INI_FLAG(true, crossSystemLayouts, "[Feature] Enables cross-system layouts.");
-
-    // VMS-30455 Enabled by default in 5.1.
-    NX_INI_FLAG(true, crossSystemNotifications, "[Feature] Enables cross-system notifications");
-
     // VMS-30701
     NX_INI_FLAG(false, enableCameraReplacementFeature,
         "[Feature] Makes Camera Replacement feature available in the client.");

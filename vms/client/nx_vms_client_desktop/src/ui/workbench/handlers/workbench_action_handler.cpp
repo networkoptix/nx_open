@@ -849,9 +849,6 @@ void ActionHandler::at_openInLayoutAction_triggered()
         && std::any_of(resources.cbegin(), resources.cend(),
             [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); }))
     {
-        if (!ini().crossSystemLayouts)
-            return;
-
         NX_ASSERT(parameters.widgets().empty());
 
         auto convertLayout =
