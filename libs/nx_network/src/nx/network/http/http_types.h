@@ -152,8 +152,7 @@ bool parseRequestOrResponse(
     }
     state = readingMessageLine;
 
-    int lineNumber = 0;
-    for (size_t curPos = 0; curPos < data.size(); ++lineNumber)
+    for (size_t curPos = 0; curPos < data.size(); /*no increment*/)
     {
         if (state == readingMessageBody)
         {

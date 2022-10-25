@@ -123,9 +123,12 @@ function(nx_wix_heat target_file)
         message(STATUS "[Wix] Generated ${wxs_file}")
     endif()
 
+    file(GLOB_RECURSE source_files ${WXS_SOURCE_DIR}/*)
+
     nx_wix_candle_ext(${target_file}
         STATIC
         SOURCE_FILE ${wxs_file}
+        DEPENDS ${source_files}
         VARIABLES
             ${source_dir_var_name}=${WXS_SOURCE_DIR}
     )

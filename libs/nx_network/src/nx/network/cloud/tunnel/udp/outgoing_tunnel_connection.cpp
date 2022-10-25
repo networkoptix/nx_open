@@ -112,7 +112,7 @@ void OutgoingTunnelConnection::establishNewConnection(
         NX_DEBUG(this, nx::format("cross-nat %1. Failed to apply socket options to new connection. %2")
             .arg(m_connectionId).arg(SystemError::toString(errorCode)));
         post(
-            [this, handler = move(handler), errorCode]() mutable
+            [this, handler = std::move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr, m_controlConnection != nullptr);
             });
