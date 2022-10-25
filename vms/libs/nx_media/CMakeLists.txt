@@ -11,6 +11,9 @@ if(NOT APPLE AND arch STREQUAL "x64")
 endif()
 
 if(hardware_decoders_x64)
+    enable_language(CUDA)
+    find_package(CUDAToolkit)
+
     # Add allocators from artifacts/intel_media_sdk/.
     set(intel_media_sdk_dir ${artifacts_dir}/intel_media_sdk/samples/sample_common)
     list(APPEND additional_sources_include_dirs ${intel_media_sdk_dir}/include)
@@ -27,74 +30,25 @@ if(hardware_decoders_x64)
         ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/NvCodec/NvDecoder.cpp
     )
 
-    set(libcolor_conversion_src_path ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/Utils)
+    set(color_conversion_src_path ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/Utils)
+    list(APPEND additional_sources
+        ${color_conversion_src_path}/ColorSpace.cu
+        ${color_conversion_src_path}/Resize.cu
+    )
+    list(APPEND additional_libraries CUDA::cudart)
+
     if(LINUX)
         list(APPEND additional_sources
             ${intel_media_sdk_dir}/include/vaapi_allocator.h
             ${intel_media_sdk_dir}/src/vaapi_allocator.cpp
         )
-
-        set(libcolor_conversion_path ${CMAKE_BINARY_DIR}/lib/libcolor_conversion.so)
-
-        # Build libcolor_conversion using the cuda compiler.
-        set(libcolor_conversion_src_path ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/Utils)
-        set(NVCC_COMMAND
-            ${CONAN_CUDA-TOOLKIT_ROOT}/cuda-toolkit/usr/local/cuda-11.7/bin/nvcc
-            --compiler-bindir ${CMAKE_CXX_COMPILER}
-            --shared -o ${libcolor_conversion_path}
-            ${libcolor_conversion_src_path}/ColorSpace.cu
-            ${libcolor_conversion_src_path}/Resize.cu
-            -gencode arch=compute_50,code=\\"sm_50,compute_50\\" -std=c++11
-            --compiler-options -fPIC
-        )
-        add_custom_command(
-            OUTPUT ${libcolor_conversion_path}
-            DEPENDS
-                ${libcolor_conversion_src_path}/ColorSpace.cu
-                ${libcolor_conversion_src_path}/Resize.cu
-                ${libcolor_conversion_src_path}/ColorSpace.h
-            COMMAND ${NVCC_COMMAND}
-        )
-
-        list(APPEND additional_sources_include_dirs ${CONAN_CUDA-TOOLKIT_ROOT}/cuda-toolkit/usr/local/cuda-11.7/include)
-        list(APPEND additional_libraries
-            ${libcolor_conversion_path}
-            ${CMAKE_BINARY_DIR}/lib/libcudart.so)
     endif()
     if(WINDOWS)
         list(APPEND additional_sources
             ${intel_media_sdk_dir}/include/d3d_allocator.h
             ${intel_media_sdk_dir}/src/d3d_allocator.cpp
         )
-        set(libcolor_conversion_path ${CMAKE_BINARY_DIR}/bin/libcolor_conversion.dll)
-        set(nvcc_path ${CONAN_CUDA-TOOLKIT_ROOT}/bin/nvcc)
-        list(APPEND additional_sources_include_dirs ${CONAN_CUDA-TOOLKIT_ROOT}/include)
-
-        # Build libcolor_conversion using the cuda compiler.
-        set(NVCC_COMMAND ${nvcc_path}
-            --compiler-bindir ${CMAKE_CXX_COMPILER}
-            --shared -o ${libcolor_conversion_path}
-            ${libcolor_conversion_src_path}/ColorSpace.cu
-            ${libcolor_conversion_src_path}/Resize.cu
-            -gencode arch=compute_50,code=\\"sm_50,compute_50\\"
-            --compiler-options -DCOLOR_CONVERSION_EXPORT
-        )
-        set(libcolor_conversion_lib_path ${CMAKE_BINARY_DIR}/bin/libcolor_conversion.lib)
-        add_custom_command(
-            OUTPUT ${libcolor_conversion_path} ${libcolor_conversion_lib_path}
-            DEPENDS
-                ${libcolor_conversion_src_path}/ColorSpace.cu
-                ${libcolor_conversion_src_path}/Resize.cu
-                ${libcolor_conversion_src_path}/ColorSpace.h
-            COMMAND ${NVCC_COMMAND}
-        )
-        list(APPEND additional_libraries
-            ${libcolor_conversion_lib_path}
-            ${CONAN_CUDA-TOOLKIT_ROOT}/lib/x64/cudart.lib)
     endif()
-
-    add_custom_target(libcolor_conversion DEPENDS ${libcolor_conversion_path})
-    set_target_properties(libcolor_conversion PROPERTIES FOLDER libs)
 
     # Add sources from artifacts/libva/va/.
     if(LINUX)
@@ -151,8 +105,6 @@ if(hardware_decoders_x64)
         include("${CONAN_INTEL-MEDIA-SDK-BIN_ROOT}/intel_media_sdk.cmake")
         target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9 intel-media-sdk)
     endif()
-
-    add_dependencies(nx_media libcolor_conversion)
 else()
     nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)
     nx_exclude_sources_from_target(nx_media src/nx/media/quick_sync)

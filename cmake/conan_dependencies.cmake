@@ -87,6 +87,11 @@ if(CONAN_WINSDK-REDIST_ROOT)
     set(ucrt_directory ${CONAN_WINSDK-REDIST_ROOT})
 endif()
 
+if(CONAN_CUDA-TOOLKIT_ROOT)
+    set(CUDAToolkit_ROOT ${CONAN_CUDA-TOOLKIT_ROOT})
+    set(ENV{CUDA_PATH} ${CONAN_CUDA-TOOLKIT_ROOT})
+endif()
+
 if(CONAN_VMS_HELP_ROOT)
     set(help_directory ${CONAN_VMS_HELP_ROOT})
 endif()

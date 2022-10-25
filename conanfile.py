@@ -87,7 +87,7 @@ class NxOpenConan(ConanFile):
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/11.7" "#80ac1cecc6791af0562fbf0caa1aa406")
+                self.requires("cuda-toolkit/11.8" "#2e6f25908debaed4542705c159be3166")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
@@ -129,7 +129,7 @@ class NxOpenConan(ConanFile):
             self.copy("QtWebEngineProcess", "libexec", "libexec", root_package="qt")
 
         if self.isLinux and self.settings.arch == "x86_64":
-            self.copy("*.so*", "lib", "cuda-toolkit", root_package="cuda-toolkit", keep_path=False)
+            self.copy("*.so*", "lib", "lib64/", root_package="cuda-toolkit")
 
         copy_packages = [
             "openssl",
