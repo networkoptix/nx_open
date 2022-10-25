@@ -17,17 +17,20 @@ struct PermissionFlagInfo
     QString text;
 };
 
-static const std::vector<PermissionFlagInfo> kPermissionSummary = {
-    {api::AccessRight::viewLive, CustomAccessSummaryModel::tr("View live")},
-    {api::AccessRight::listenToAudio, CustomAccessSummaryModel::tr("Access audio from camera")},
-    {api::AccessRight::viewArchive, CustomAccessSummaryModel::tr("View video archive")},
-    {api::AccessRight::exportArchive, CustomAccessSummaryModel::tr("Export video archive")},
-    {api::AccessRight::viewBookmarks, CustomAccessSummaryModel::tr("View bookmarks")},
-    {api::AccessRight::manageBookmarks, CustomAccessSummaryModel::tr("Modify bookmarks")},
-    {api::AccessRight::userInput, CustomAccessSummaryModel::tr("User input")},
-    {api::AccessRight::editSettings, CustomAccessSummaryModel::tr("Edit camera settings")},
-    {api::AccessRight::managePtz, CustomAccessSummaryModel::tr("Edit PTZ presets and tours")},
-    {api::GlobalPermission::viewLogs, CustomAccessSummaryModel::tr("View event log")},
+const std::vector<PermissionFlagInfo> permissionSummary()
+{
+    using nx::vms::api::AccessRight;
+    return {
+        {AccessRight::viewLive, CustomAccessSummaryModel::tr("View live")},
+        {AccessRight::listenToAudio, CustomAccessSummaryModel::tr("Access audio from camera")},
+        {AccessRight::viewArchive, CustomAccessSummaryModel::tr("View video archive")},
+        {AccessRight::exportArchive, CustomAccessSummaryModel::tr("Export video archive")},
+        {AccessRight::viewBookmarks, CustomAccessSummaryModel::tr("View bookmarks")},
+        {AccessRight::manageBookmarks, CustomAccessSummaryModel::tr("Modify bookmarks")},
+        {AccessRight::userInput, CustomAccessSummaryModel::tr("User input")},
+        {AccessRight::editSettings, CustomAccessSummaryModel::tr("Edit camera settings")},
+        {AccessRight::managePtz, CustomAccessSummaryModel::tr("Edit PTZ presets and tours")},
+    };
 };
 
 } // namespace
@@ -54,17 +57,19 @@ bool CustomAccessSummaryModel::testFlag(
 
 QVariant CustomAccessSummaryModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() >= (int) kPermissionSummary.size())
+    const auto permissions = permissionSummary();
+
+    if (index.row() < 0 || index.row() >= (int) permissions.size())
         return {};
 
     switch (role)
     {
         case Qt::DisplayRole:
-            return kPermissionSummary.at(index.row()).text;
+            return permissions.at(index.row()).text;
 
         case Qt::CheckStateRole:
         {
-            return testFlag(kPermissionSummary.at(index.row()).flag)
+            return testFlag(permissions.at(index.row()).flag)
                 ? Qt::Checked
                 : Qt::Unchecked;
         }
@@ -75,7 +80,7 @@ QVariant CustomAccessSummaryModel::data(const QModelIndex& index, int role) cons
 
 int CustomAccessSummaryModel::rowCount(const QModelIndex&) const
 {
-    return m_hasDisplayableItems ? kPermissionSummary.size() : 0;
+    return m_hasDisplayableItems ? permissionSummary().size() : 0;
 }
 
 QHash<int, QByteArray> CustomAccessSummaryModel::roleNames() const
@@ -113,7 +118,9 @@ void CustomAccessSummaryModel::setOwnSharedResources(
 
 void CustomAccessSummaryModel::updateInfo()
 {
-    bool hasDisplayableItems = std::any_of(kPermissionSummary.begin(), kPermissionSummary.end(),
+    const auto permissions = permissionSummary();
+
+    bool hasDisplayableItems = std::any_of(permissions.begin(), permissions.end(),
         [this](const auto& it)
         {
             return testFlag(it.flag);
@@ -123,13 +130,13 @@ void CustomAccessSummaryModel::updateInfo()
     {
         if (hasDisplayableItems)
         {
-            beginInsertRows({}, 0, kPermissionSummary.size() - 1);
+            beginInsertRows({}, 0, permissions.size() - 1);
             m_hasDisplayableItems = hasDisplayableItems;
             endInsertRows();
         }
         else
         {
-            beginRemoveRows({}, 0, kPermissionSummary.size() - 1);
+            beginRemoveRows({}, 0, permissions.size() - 1);
             m_hasDisplayableItems = hasDisplayableItems;
             endRemoveRows();
         }
@@ -141,7 +148,7 @@ void CustomAccessSummaryModel::updateInfo()
 
     emit dataChanged(
         this->index(0, 0),
-        this->index(kPermissionSummary.size() - 1, 0));
+        this->index(permissions.size() - 1, 0));
 }
 
 void CustomAccessSummaryModel::registerQmlTypes()

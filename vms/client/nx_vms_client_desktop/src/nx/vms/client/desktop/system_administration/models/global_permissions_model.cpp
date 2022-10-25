@@ -17,8 +17,11 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-std::vector<std::pair<api::GlobalPermission, QString>> kGlobalPermissions = {
-    {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
+std::vector<std::pair<api::GlobalPermission, QString>> globalPermissions()
+{
+    return {
+        {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
+    };
 };
 
 } // namespace
@@ -65,7 +68,7 @@ void GlobalPermissionsModel::setOwnGlobalPermissions(nx::vms::api::GlobalPermiss
         emit globalPermissionsChanged();
         emit dataChanged(
             this->index(0, 0),
-            this->index(kGlobalPermissions.size() - 1, 0));
+            this->index(globalPermissions().size() - 1, 0));
     }
 }
 
@@ -76,16 +79,17 @@ nx::vms::api::GlobalPermissions GlobalPermissionsModel::ownGlobalPermissions() c
 
 QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() >= (int) kGlobalPermissions.size())
+    const auto permissions = globalPermissions();
+    if (index.row() < 0 || index.row() >= (int) permissions.size())
         return {};
 
     switch (role)
     {
         case Qt::DisplayRole:
-            return kGlobalPermissions.at(index.row()).second;
+            return permissions.at(index.row()).second;
 
         case isChecked:
-            return m_ownPermissions.testFlag(kGlobalPermissions.at(index.row()).first);
+            return m_ownPermissions.testFlag(permissions.at(index.row()).first);
 
         case Qt::ToolTipRole:
         {
@@ -95,7 +99,7 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
             using namespace nx::vms::common;
 
             const QSet<QnUuid> groupIds =
-                m_context->globalPermissionSource(kGlobalPermissions.at(index.row()).first);
+                m_context->globalPermissionSource(permissions.at(index.row()).first);
 
             QStringList result;
 
@@ -115,15 +119,16 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
 
 bool GlobalPermissionsModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
+    const auto permissions = globalPermissions();
     if (index.row() < 0
-        || index.row() >= (int) kGlobalPermissions.size()
+        || index.row() >= (int) permissions.size()
         || !m_context
         || role != isChecked)
     {
         return false;
     }
 
-    const auto permission = kGlobalPermissions.at(index.row()).first;
+    const auto permission = permissions.at(index.row()).first;
     const bool current = m_ownPermissions.testFlag(permission);
 
     if (value.toBool() == current)
@@ -137,7 +142,7 @@ bool GlobalPermissionsModel::setData(const QModelIndex& index, const QVariant& v
 
 int GlobalPermissionsModel::rowCount(const QModelIndex&) const
 {
-    return kGlobalPermissions.size();
+    return globalPermissions().size();
 }
 
 QHash<int, QByteArray> GlobalPermissionsModel::roleNames() const
@@ -173,7 +178,7 @@ void GlobalPermissionsModel::updateInfo()
 
     emit dataChanged(
         this->index(0, 0),
-        this->index(kGlobalPermissions.size() - 1, 0));
+        this->index(globalPermissions().size() - 1, 0));
 }
 
 void GlobalPermissionsModel::registerQmlTypes()
