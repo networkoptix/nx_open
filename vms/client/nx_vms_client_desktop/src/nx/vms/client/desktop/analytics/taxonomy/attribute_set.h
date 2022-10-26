@@ -10,10 +10,13 @@
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
+class AbstractStateViewFilter;
+
 class AttributeSet: public AbstractAttributeSet
 {
 public:
-    AttributeSet(QObject* parent);
+    // AttributeSet doesn't own the filter. The filter should live longer than the AttributeSet.
+    AttributeSet(const AbstractStateViewFilter* filter, QObject* parent);
 
     virtual ~AttributeSet() override;
 
