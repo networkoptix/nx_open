@@ -136,6 +136,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     setAccentStyle(exportButton);
 
     connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateAlerts);
+    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateWidgetsState);
 
     connect(this, &QDialog::accepted, d.get(), &Private::saveSettings);
 
