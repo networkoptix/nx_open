@@ -1022,6 +1022,40 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanOwnerCreate)
         m_currentUser, GlobalPermission::admin, {}, true));
 }
 
+TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
+{
+    loginAsOwner();
+
+    const auto predefinedId = QnPredefinedUserRoles::id(Qn::UserRole::viewer);
+    const auto customId = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::advancedViewer)}).id;
+
+    const auto zeroId = QnUuid{};
+    const auto unknownId = QnUuid::createUuid();
+
+    ASSERT_TRUE(resourceAccessManager()->canCreateUser(m_currentUser, GlobalPermission::none,
+        {predefinedId, customId}, /*isOwner*/ false));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(m_currentUser, GlobalPermission::none,
+        {predefinedId, zeroId, customId}, /*isOwner*/ false));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(m_currentUser, GlobalPermission::none,
+        {predefinedId, unknownId, customId}, /*isOwner*/ false));
+
+    const auto user = addUser(GlobalPermission::none);
+    UserData userData;
+    ec2::fromResourceToApi(user, userData);
+
+    userData.userRoleIds = {predefinedId, customId};
+    ASSERT_TRUE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
+
+    userData.userRoleIds = {predefinedId, zeroId, customId};
+    ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
+
+    userData.userRoleIds = {predefinedId, unknownId, customId};
+    ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
+}
+
 /************************************************************************/
 /* Checking cameras access rights                                       */
 /************************************************************************/

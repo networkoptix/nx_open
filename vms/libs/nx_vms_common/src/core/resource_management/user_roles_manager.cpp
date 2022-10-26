@@ -251,14 +251,12 @@ template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
 QnUserRolesManager::UserRoleDataList QnUserRolesManager::userRoles() const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    UserRoleDataList result;
-    result.reserve(m_roles.size());
-    for (const auto& role: m_roles)
-        result.push_back(role);
+    UserRoleDataList result = QnPredefinedUserRoles::list();
+    result.insert(result.end(), m_roles.cbegin(), m_roles.cend());
     return result;
 }
 
-void QnUserRolesManager::resetUserRoles(const UserRoleDataList& userRoles)
+void QnUserRolesManager::resetCustomUserRoles(const UserRoleDataList& userRoles)
 {
     UserRoleDataList removed;
     UserRoleDataList updated;
@@ -297,6 +295,9 @@ void QnUserRolesManager::resetUserRoles(const UserRoleDataList& userRoles)
 
 bool QnUserRolesManager::hasRole(const QnUuid& id) const
 {
+    if (QnPredefinedUserRoles::get(id))
+        return true;
+
     NX_MUTEX_LOCKER lk(&m_mutex);
     return m_roles.contains(id);
 }
@@ -304,23 +305,25 @@ bool QnUserRolesManager::hasRole(const QnUuid& id) const
 bool QnUserRolesManager::hasRoles(const std::vector<QnUuid>& ids) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    for (const auto& id: ids)
-    {
-        if (!m_roles.contains(id))
-            return false;
-    }
-    return true;
+    return std::all_of(ids.cbegin(), ids.cend(),
+        [this](const QnUuid& id)
+        {
+            return m_roles.contains(id) || QnPredefinedUserRoles::get(id);
+        });
 }
 
 QnUserRolesManager::UserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
 {
+    if (const auto predefined = QnPredefinedUserRoles::get(id))
+        return *predefined;
+
     NX_MUTEX_LOCKER lk(&m_mutex);
     return m_roles.value(id);
 }
 
 void QnUserRolesManager::addOrUpdateUserRole(const UserRoleData& role)
 {
-    if (!NX_ASSERT(!role.id.isNull()))
+    if (!NX_ASSERT(!role.id.isNull() && !QnPredefinedUserRoles::get(role.id)))
         return;
 
     {
@@ -336,7 +339,7 @@ void QnUserRolesManager::addOrUpdateUserRole(const UserRoleData& role)
 
 void QnUserRolesManager::removeUserRole(const QnUuid& id)
 {
-    NX_ASSERT(!id.isNull());
+    NX_ASSERT(!id.isNull() && !QnPredefinedUserRoles::get(id));
     UserRoleData role;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
@@ -352,7 +355,6 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
 
 QString QnUserRolesManager::userRoleName(const QnUuid& userRoleId)
 {
-    // TODO: Add support for translations for predefined roles.
     return userRole(userRoleId).name;
 }
 

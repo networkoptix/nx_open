@@ -798,9 +798,6 @@ bool QnResourceAccessManager::canModifyStorage(
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     const nx::vms::api::UserData& data) const
 {
-    if (!m_context->userRolesManager()->hasRoles(data.userRoleIds))
-        return false;
-
     if (data.isCloud && !data.fullName.isEmpty())
         return false; //< Full name for cloud users is allowed to modify via cloud portal only.
 
@@ -818,6 +815,9 @@ bool QnResourceAccessManager::canCreateUser(
 
     // Nobody can create owners.
     if (isOwner)
+        return false;
+
+    if (!userRolesManager()->hasRoles(targetGroups))
         return false;
 
     const auto effectivePermissions = accumulatePermissions(targetPermissions, targetGroups);
@@ -843,7 +843,7 @@ bool QnResourceAccessManager::canModifyUser(
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!m_context->userRolesManager()->hasRoles(update.userRoleIds))
+    if (!userRolesManager()->hasRoles(update.userRoleIds))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

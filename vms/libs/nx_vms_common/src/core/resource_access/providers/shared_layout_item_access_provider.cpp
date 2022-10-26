@@ -27,6 +27,9 @@ SharedLayoutItemAccessProvider::SharedLayoutItemAccessProvider(
             &QnSharedResourcesManager::sharedResourcesChanged,
             this,
             &SharedLayoutItemAccessProvider::handleSharedResourcesChanged);
+
+        for (const auto& predefinedRole: QnPredefinedUserRoles::list())
+            ensureAggregatorForSubject(predefinedRole);
     }
 }
 

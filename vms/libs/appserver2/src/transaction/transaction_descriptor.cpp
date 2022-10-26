@@ -1326,7 +1326,7 @@ struct SaveUserRoleAccess
         }
 
         auto userRoleManager = commonModule->userRolesManager();
-        const auto parentRoles = userRoleManager->userRoles(param.parentRoleIds);
+        const auto parentRoles = userRoleManager->userRolesWithParents(param.parentRoleIds);
         if (const auto cycledRole =
             nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
         {

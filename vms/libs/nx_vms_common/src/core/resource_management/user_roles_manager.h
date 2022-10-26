@@ -71,17 +71,17 @@ public:
     QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~QnUserRolesManager();
 
-    // Returns list of information structures for all custom user roles.
+    // Returns list of information structures for all predefined and custom user roles.
     UserRoleDataList userRoles() const;
 
-    // Returns list of information structures for custom user roles specified by their uuids as well
-    // as thir inherited roles.
+    // Returns list of information structures for predefined or custom user roles specified by
+    // their uuids, and all their inherited roles.
     template <class Ids>
-    UserRoleDataList userRoles(const Ids& roleIds) const
+    UserRoleDataList userRolesWithParents(const Ids& roleIds) const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         UserRoleDataList result;
-        appendUserRoles(&result, roleIds, lock);
+        appendUserRolesWithParents(&result, roleIds, lock);
         return result;
     }
 
@@ -93,10 +93,9 @@ public:
     bool hasRole(const QnUuid& id) const;
     bool hasRoles(const std::vector<QnUuid>& ids) const;
 
-    // Returns information structure for custom user role with specified uuid.
+    // Returns information structure for custom or predefined user role with specified uuid.
     UserRoleData userRole(const QnUuid& id) const;
 
-    // TODO: Remove usages to add multi-role support.
     // Returns human-readable name of specified user role.
     QString userRoleName(const QnUuid& userRoleId);
 
@@ -107,7 +106,7 @@ public:
 // Slots called by the message processor:
 
     // Sets new custom user roles handled by this manager.
-    void resetUserRoles(const UserRoleDataList& userRoles);
+    void resetCustomUserRoles(const UserRoleDataList& userRoles);
 
     // Adds or updates custom user role information:
     void addOrUpdateUserRole(const UserRoleData& role);
@@ -123,7 +122,7 @@ private:
     bool isValidRoleId(const QnUuid& id) const; //< This function is not thread-safe.
 
     template <class Ids>
-    void appendUserRoles(
+    void appendUserRolesWithParents(
         UserRoleDataList* list, const Ids& roleIds, const nx::MutexLocker& lock) const
     {
         for (const auto& id: roleIds)
@@ -132,7 +131,7 @@ private:
             if (itr != m_roles.end())
             {
                 list->push_back(itr.value());
-                appendUserRoles(list, itr.value().parentRoleIds, lock);
+                appendUserRolesWithParents(list, itr.value().parentRoleIds, lock);
             }
         }
     }

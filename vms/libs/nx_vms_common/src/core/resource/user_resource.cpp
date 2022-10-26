@@ -439,7 +439,7 @@ std::vector<QnUuid> QnUserResource::allUserRoleIds() const
         return {};
 
     std::vector<QnUuid> roleIds;
-    for (const auto& role: system->userRolesManager()->userRoles(userRoleIds()))
+    for (const auto& role: system->userRolesManager()->userRolesWithParents(userRoleIds()))
         roleIds.push_back(role.id);
     return roleIds;
 }
