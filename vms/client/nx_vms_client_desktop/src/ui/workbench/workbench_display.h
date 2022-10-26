@@ -300,7 +300,7 @@ public:
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QSet<QnWorkbenchItem*> draggedItems() const;
-    void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
+    void setDraggedItems(const QSet<QnWorkbenchItem*>& value, bool updateGeometry = true);
 
     bool animationAllowed() const;
 
