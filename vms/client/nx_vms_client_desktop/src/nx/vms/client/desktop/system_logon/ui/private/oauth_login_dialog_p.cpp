@@ -8,6 +8,7 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QStackedWidget>
 
+#include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
@@ -125,7 +126,8 @@ nx::utils::Url OauthLoginDialogPrivate::constructUrl(std::string_view cloudHost)
         .addQueryItem("client_type", m_clientType)
         .addQueryItem("client_id", "desktopclient")
         .addQueryItem("view_type", "desktop")
-        .addQueryItem("redirect_url", "redirect-oauth");
+        .addQueryItem("redirect_url", "redirect-oauth")
+        .addQueryItem("lang", qnRuntime->locale());
 
     if (m_authData.empty()) //< Request auth code.
         builder.addQueryItem("response_type", "code");
