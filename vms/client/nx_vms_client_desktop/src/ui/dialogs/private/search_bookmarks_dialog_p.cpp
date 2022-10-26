@@ -7,6 +7,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
@@ -21,6 +23,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -480,15 +483,37 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
                 action::Parameters(params).withArgument(Qn::ParentWidgetRole, parentWidget));
         });
 
-    connect(m_exportBookmarkAction, &QAction::triggered, this,
-        [this, params]
+    const auto initDataLoaders =
+        [](const action::Parameters& params)
         {
+            for (const auto& cameraResource: params.resources().filtered<QnVirtualCameraResource>())
+            {
+                const auto systemContext = SystemContext::fromResource(cameraResource);
+                if (!NX_ASSERT(systemContext))
+                    continue;
+
+                const auto loader = systemContext->cameraDataManager()->loader(
+                    cameraResource, /*createIfNotExists*/ true);
+                if (!NX_ASSERT(loader))
+                    continue;
+
+                auto allowedContent = loader->allowedContent();
+                allowedContent.insert(Qn::RecordingContent);
+                loader->setAllowedContent(allowedContent);
+            }
+        };
+
+    connect(m_exportBookmarkAction, &QAction::triggered, this,
+        [this, params, initDataLoaders]
+        {
+            initDataLoaders(params);
             menu()->triggerIfPossible(action::ExportBookmarkAction, params);
         });
 
     connect(m_exportBookmarksAction, &QAction::triggered, this,
-        [this, params]
+        [this, params, initDataLoaders]
         {
+            initDataLoaders(params);
             menu()->triggerIfPossible(action::ExportBookmarksAction, params);
         });
 
