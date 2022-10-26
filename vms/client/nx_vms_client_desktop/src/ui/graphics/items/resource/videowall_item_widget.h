@@ -70,7 +70,6 @@ protected:
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& item);
-    void at_doubleClicked(Qt::MouseButton button);
 
     void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
 
