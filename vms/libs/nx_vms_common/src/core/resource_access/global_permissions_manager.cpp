@@ -151,7 +151,7 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         [this](const auto& roleIds)
         {
             GlobalPermissions result;
-            for (const auto& role: m_context->userRolesManager()->userRoles(roleIds))
+            for (const auto& role: m_context->userRolesManager()->userRolesWithParents(roleIds))
                 result |= role.permissions;
             return filterDependentPermissions(result);
         };
