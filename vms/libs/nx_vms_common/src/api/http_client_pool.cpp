@@ -440,11 +440,11 @@ void ClientPool::stop(bool invokeCallbacks)
         d->awaitingRequests.clear(); //< We must not create new connections.
     }
 
+    for (const auto& [_, connection]: dataCopy)
+        connection->client->pleaseStopSync();
+
     if (invokeCallbacks)
     {
-        for (const auto& [_, connection]: dataCopy)
-            connection->client->pleaseStopSync();
-
         for (const auto& context: requests)
         {
             if (context && !context->targetThreadIsDead() && context->completionFunc)
