@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <variant>
-
 #include <QtCore/QAbstractListModel>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 
@@ -47,13 +46,8 @@ public:
     static void registerQmlTypes();
 
 private:
-    bool testFlag(const std::variant<api::AccessRight, api::GlobalPermission>& flag) const;
-    void updateInfo();
-
-private:
-    api::AccessRights m_customRights;
-    api::GlobalPermissions m_ownGlobalPermissions;
-    bool m_hasDisplayableItems = false;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop
