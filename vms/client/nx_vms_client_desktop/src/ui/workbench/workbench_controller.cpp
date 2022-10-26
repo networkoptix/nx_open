@@ -1460,7 +1460,9 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget* 
     if (m_draggedWorkbenchItems.contains(item))
     {
         m_draggedWorkbenchItems.removeOne(item);
-        updateDraggedItems();
+        display()->setDraggedItems(
+            nx::utils::toQSet(m_draggedWorkbenchItems),
+            /*updateGeometry*/ false);
         if (m_draggedWorkbenchItems.empty())
             m_moveInstrument->resetLater();
     }
