@@ -518,7 +518,7 @@ QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const
     return m_draggedItems;
 }
 
-void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value)
+void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value, bool updateGeometry)
 {
     if (m_draggedItems == value)
         return;
@@ -526,11 +526,16 @@ void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value)
     auto stoppedDragging = m_draggedItems - value;
     m_draggedItems = value;
 
-    for (auto item : stoppedDragging)
+    if (updateGeometry)
     {
-        if (!item)
-            continue;
-        synchronizeGeometry(item, true);
+        for (auto item: stoppedDragging)
+        {
+            const bool isValidItem = item && item->layout();
+            if (!NX_ASSERT(isValidItem))
+                continue;
+
+            synchronizeGeometry(item, true);
+        }
     }
 }
 
