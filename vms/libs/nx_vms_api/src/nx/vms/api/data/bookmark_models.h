@@ -30,8 +30,7 @@ NX_REFLECTION_ENUM_CLASS(BookmarkSortField,
     creator, //< Sorted manually!
     tags, //< Sorted manually!
     description, //< Sorted manually!
-    cameraName, //< Sorted manually!
-    cameraThenStartTime
+    cameraName //< Sorted manually!
 )
 
 struct NX_VMS_API BookmarkFilter
