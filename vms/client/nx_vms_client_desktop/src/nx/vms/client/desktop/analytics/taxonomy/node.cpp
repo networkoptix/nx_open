@@ -169,7 +169,7 @@ void Node::resolveAttributes()
             objectTypes.push_back(objectType);
     }
 
-    d->attributes = taxonomy::resolveAttributes(objectTypes, this);
+    d->attributes = taxonomy::resolveAttributes(objectTypes, d->filter, this);
 }
 
 QString Node::makeId(const QStringList& analyticsObjectTypeIds)
