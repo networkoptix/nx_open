@@ -114,34 +114,57 @@ bool objectMatches(const QObject* object, QJSValue properties)
         if (!matches && className != typeString)
             return false;
     }
-    if (properties.hasOwnProperty("visible"))
-    {
-        const bool propIsVisible = valueIsTrue(properties.property("visible"));
-
-        if (propIsVisible != object->property("visible").toBool())
-            return false;
-    }
-    if (properties.hasOwnProperty("enabled"))
-    {
-        const bool propIsVisible = valueIsTrue(properties.property("enabled"));
-
-        if (propIsVisible != object->property("enabled").toBool())
-            return false;
-    }
-    if (properties.hasOwnProperty("text"))
-    {
-        if (!textMatches(object->property("text").toString(), properties.property("text").toString()))
-            return false;
-    }
-    if (properties.hasOwnProperty("title"))
-    {
-        if (!textMatches(object->property("title").toString(), properties.property("title").toString()))
-            return false;
-    }
     if (properties.hasOwnProperty("window"))
     {
         const auto w = qobject_cast<const QWidget*>(object);
         if (!objectMatches(w->window(), properties.property("window")))
+            return false;
+    }
+
+    static const QList<const char*> strProperties{
+        "source",
+        "text",
+        "title",
+    };
+
+    for (auto i: strProperties)
+    {
+        if (!properties.hasOwnProperty(i))
+            continue;
+
+        if (!textMatches(object->property(i).toString(), properties.property(i).toString()))
+            return false;
+    }
+
+    static const QList<const char*> intProperties{
+        "column",
+        "x",
+        "y",
+        "z",
+    };
+
+    for (auto i: intProperties)
+    {
+        if (!properties.hasOwnProperty(i))
+            continue;
+
+        if (object->property(i).toInt() != properties.property(i).toInt())
+            return false;
+    }
+
+    static const QList<const char*> boolProperties{
+        "enabled",
+        "visible",
+    };
+
+    for (auto i: boolProperties)
+    {
+        if (!properties.hasOwnProperty(i))
+            continue;
+
+        const bool propValue = valueIsTrue(properties.property(i));
+
+        if (propValue != object->property(i).toBool())
             return false;
     }
 
