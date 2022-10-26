@@ -129,22 +129,6 @@ BinaryPredicate makePredByGetter(const GetterType &getter, bool isAscending)
     return isAscending ? ascPred : descPred;
 }
 
-bool compareCameraThenStartTimeAsc(const QnCameraBookmark &first, const QnCameraBookmark &second)
-{
-    // Convert to toRfc4122 to make order the same as for the SQL database.
-    if (first.cameraId != second.cameraId)
-        return first.cameraId.toRfc4122() < second.cameraId.toRfc4122();
-    return first.startTimeMs < second.startTimeMs;
-}
-
-bool compareCameraThenStartTimeDesc(const QnCameraBookmark &first, const QnCameraBookmark &second)
-{
-    // Convert to toRfc4122 to make order the same as for the SQL database.
-    if (first.cameraId != second.cameraId)
-        return first.cameraId.toRfc4122() > second.cameraId.toRfc4122();
-    return first.startTimeMs > second.startTimeMs;
-}
-
 BinaryPredicate createPredicate(SystemContext* systemContext, const QnBookmarkSortOrder &sortOrder)
 {
     const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
@@ -166,10 +150,6 @@ BinaryPredicate createPredicate(SystemContext* systemContext, const QnBookmarkSo
                 {
                     return bookmark.startTimeMs;
                 }, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::cameraThenStartTime:
-        {
-            return isAscending ? compareCameraThenStartTimeAsc : compareCameraThenStartTimeDesc;
         }
         case nx::vms::api::BookmarkSortField::duration:
         {
