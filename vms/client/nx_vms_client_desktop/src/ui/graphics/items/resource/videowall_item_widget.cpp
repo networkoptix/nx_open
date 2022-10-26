@@ -44,6 +44,7 @@
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
 
@@ -101,8 +102,23 @@ QnVideowallItemWidget::QnVideowallItemWidget(
 
     connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallItemWidget::at_videoWall_itemChanged);
+
+    // Using queued connection to avoid AV when widget is destroyed in the click handler.
     connect(this, &QnClickableWidget::doubleClicked, this,
-        &QnVideowallItemWidget::at_doubleClicked);
+        [this](Qt::MouseButton button)
+        {
+            if (button != Qt::LeftButton)
+                return;
+
+            executeLater(
+                [this]
+                {
+                    auto context = m_widget->windowContext()->workbenchContext();
+                    context->menu()->triggerIfPossible(
+                        action::StartVideoWallControlAction,
+                        m_indices);
+                }, this);
+        });
 
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
@@ -379,15 +395,6 @@ void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePt
         return;
     updateLayout();
     updateInfo();
-}
-
-void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
-{
-    if (button != Qt::LeftButton)
-        return;
-
-    auto context = m_widget->windowContext()->workbenchContext();
-    context->menu()->triggerIfPossible(action::StartVideoWallControlAction, m_indices);
 }
 
 void QnVideowallItemWidget::updateLayout()
