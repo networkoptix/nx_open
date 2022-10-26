@@ -51,7 +51,8 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     NX_ASSERT(m_videowall, "QnVideowallScreenWidget was created with a non-videowall resource.");
 
     setAcceptDrops(true);
-    setOption(QnResourceWidget::WindowRotationForbidden, true);
+    setOption(QnResourceWidget::AlwaysShowName);
+    setOption(QnResourceWidget::WindowRotationForbidden);
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
 
     m_layout->setContentsMargins(kMargin, kTopMargin, kMargin, kMargin);
@@ -65,8 +66,6 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     updateItems();
     updateButtonsVisibility();
     updateTitleText();
-    setInfoVisible(true, false);
-    updateInfoText();
 
     connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallScreenWidget::at_videoWall_itemChanged);
