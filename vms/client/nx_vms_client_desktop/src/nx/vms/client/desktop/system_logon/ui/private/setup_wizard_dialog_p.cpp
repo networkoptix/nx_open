@@ -7,8 +7,6 @@
 
 #include <client_core/client_core_module.h>
 #include <network/system_helpers.h>
-#include <nx/reflect/instrument.h>
-#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
@@ -17,9 +15,6 @@
 #include "../setup_wizard_dialog.h"
 
 namespace nx::vms::client::desktop {
-
-NX_REFLECTION_INSTRUMENT(SetupWizardDialogPrivate::LoginInfo,
-    (localLogin)(localPassword)(savePassword));
 
 SetupWizardDialogPrivate::SetupWizardDialogPrivate(
     SetupWizardDialog* parent)
@@ -34,7 +29,7 @@ SetupWizardDialogPrivate::SetupWizardDialogPrivate(
     webViewWidget->controller()->setRedirectLinksToDesktop(true);
     webViewWidget->controller()->setMenuNavigation(false);
 
-    static const QString kExportedName("setupDialog");
+    static const QString kExportedName("nativeClient");
     webViewWidget->controller()->registerObject(kExportedName, this);
 }
 
@@ -47,22 +42,6 @@ void SetupWizardDialogPrivate::load(const QUrl& url)
 
     const QString script = QString("window.location.replace(\'%1\')").arg(url.toString());
     webViewWidget->controller()->runJavaScript(script);
-}
-
-QString SetupWizardDialogPrivate::getCredentials() const
-{
-    return QString::fromStdString(nx::reflect::json::serialize(loginInfo));
-}
-
-void SetupWizardDialogPrivate::updateCredentials(
-    const QString& login,
-    const QString& password,
-    bool /*alwaysFalse*/, //< Waiting for webadmin fix.
-    bool savePassword)
-{
-    loginInfo.localLogin = login;
-    loginInfo.localPassword = password;
-    loginInfo.savePassword = savePassword;
 }
 
 void SetupWizardDialogPrivate::cancel()
@@ -94,24 +73,10 @@ void SetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
     QDesktopServices::openUrl(url);
 }
 
-QString SetupWizardDialogPrivate::refreshToken() const
+void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password, bool savePassword)
 {
-    if (auto watcher = qnCloudStatusWatcher; NX_ASSERT(watcher))
-        return QString::fromStdString(watcher->remoteConnectionCredentials().authToken.value);
-
-    return QString();
-}
-
-void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password)
-{
-    loginInfo.localLogin = helpers::kFactorySystemUser;
     loginInfo.localPassword = password;
-    loginInfo.savePassword = false;
-}
-
-void SetupWizardDialogPrivate::connectUsingCloud()
-{
-    // TODO: #GDM To be implemented.
+    loginInfo.savePassword = savePassword;
 }
 
 } // namespace nx::vms::client::desktop
