@@ -4,8 +4,6 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/credentials.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <ui/dialogs/common/dialog.h>
 
 namespace nx::vms::client::desktop {
@@ -29,12 +27,14 @@ public:
 
     void loadPage();
 
-    nx::vms::api::Credentials credentials() const;
+    /** Admin password for connection. */
+    QString password() const;
 
     bool savePassword() const;
 
 private:
     QScopedPointer<SetupWizardDialogPrivate> d;
+    const nx::network::SocketAddress m_address;
 };
 
 } // namespace nx::vms::client::desktop
