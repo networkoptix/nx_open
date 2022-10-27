@@ -977,7 +977,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
             else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
             {
                 const auto state =
-                    parameters.argument<QnStreamSynchronizationState>(Qn::LayoutSyncStateRole);
+                    parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
                 addParams.time = milliseconds(
                     state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
                 addParams.paused = qFuzzyIsNull(state.speed);
@@ -2119,14 +2119,15 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     }
 
     layout->setData(Qn::LayoutTimeLabelsRole, true);
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
     NX_ASSERT(layout->isPreviewSearchLayout());
-    menu()->trigger(action::OpenInNewTabAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, action::Parameters(layout)
+        .withArgument(Qn::LayoutSyncStateRole, QVariant::fromValue<StreamSynchronizationState>({}))
+    );
 }
 
 void ActionHandler::at_mediaFileSettingsAction_triggered() {

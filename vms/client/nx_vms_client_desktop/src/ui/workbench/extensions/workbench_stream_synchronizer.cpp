@@ -7,7 +7,6 @@
 #include <camera/resource_display.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/counter.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -21,21 +20,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (isSyncOn)(timeUs)(speed))
-
 using namespace nx::vms::client::desktop;
-
-QnStreamSynchronizationState::QnStreamSynchronizationState(bool isSyncOn, qint64 timeUs, qreal speed):
-    isSyncOn(isSyncOn),
-    timeUs(timeUs),
-    speed(speed)
-{
-}
-
-QnStreamSynchronizationState QnStreamSynchronizationState::live()
-{
-    return QnStreamSynchronizationState(true, DATETIME_NOW, 1.0);
-}
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(
     WindowContext* windowContext,
@@ -111,9 +96,9 @@ bool QnWorkbenchStreamSynchronizer::isEffective() const {
     return !m_syncedWidgets.isEmpty();
 }
 
-QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const
+StreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const
 {
-    QnStreamSynchronizationState result;
+    StreamSynchronizationState result;
 
     result.isSyncOn = m_syncPlay->isEnabled();
     if (result.isSyncOn)
@@ -125,7 +110,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const
     return result;
 }
 
-void QnWorkbenchStreamSynchronizer::setState(const QnStreamSynchronizationState &state)
+void QnWorkbenchStreamSynchronizer::setState(const StreamSynchronizationState &state)
 {
     if (state.isSyncOn)
         start(state.timeUs, state.speed);
@@ -135,7 +120,7 @@ void QnWorkbenchStreamSynchronizer::setState(const QnStreamSynchronizationState 
 
 void QnWorkbenchStreamSynchronizer::setState(QnResourceWidget* widget, bool useWidgetPausedState)
 {
-    QnStreamSynchronizationState state;
+    StreamSynchronizationState state;
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
         const auto display = mediaWidget->display();

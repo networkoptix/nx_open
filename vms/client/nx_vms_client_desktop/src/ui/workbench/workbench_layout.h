@@ -13,6 +13,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/workbench/layouts/workbench_layout_state.h>
 #include <utils/math/magnitude.h>
 #include <utils/rect_set.h>
 
@@ -47,6 +48,7 @@ class QnWorkbenchLayout: public QObject, public nx::vms::client::core::CommonMod
 
 public:
     using LayoutResourcePtr = nx::vms::client::desktop::LayoutResourcePtr;
+    using StreamSynchronizationState = nx::vms::client::desktop::StreamSynchronizationState;
     static constexpr auto kDefaultCellSpacing = Qn::CellSpacing::Small;
 
     /**
@@ -88,6 +90,17 @@ public:
      * @return Name of this layout.
      */
     QString name() const;
+
+    /**
+     * State of cameras synchronization on this layout.
+     */
+    StreamSynchronizationState streamSynchronizationState() const;
+
+    /**
+     * Set cameras syncronization state. It will be used when this layout become current. If it
+     * already is, no changes would be applied.
+     */
+    void setStreamSynchronizationState(StreamSynchronizationState value);
 
     /**
      * @param resource Resource to update layout from.
