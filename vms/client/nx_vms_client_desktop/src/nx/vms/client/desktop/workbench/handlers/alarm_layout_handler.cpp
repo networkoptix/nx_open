@@ -175,14 +175,12 @@ AlarmLayoutHandler::~AlarmLayoutHandler()
 
 void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
 {
-    const auto syncDisabled = QnStreamSynchronizationState();
     if (workbench()->currentLayout() == layout)
     {
         auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
-        streamSynchronizer->setState(syncDisabled);
+        streamSynchronizer->setState(StreamSynchronizationState::disabled());
     }
-    layout->setData(Qn::LayoutSyncStateRole,
-        QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
+    layout->setStreamSynchronizationState(StreamSynchronizationState::disabled());
 }
 
 void AlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)

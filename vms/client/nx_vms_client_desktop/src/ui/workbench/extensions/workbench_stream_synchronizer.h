@@ -7,10 +7,10 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/datetime.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
+#include <nx/vms/client/desktop/workbench/layouts/workbench_layout_state.h>
 
 class QnResourceWidget;
 class QnResourceDisplay;
@@ -18,18 +18,6 @@ typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
 class QnWorkbenchRenderWatcher;
-
-struct QnStreamSynchronizationState
-{
-    QnStreamSynchronizationState() = default;
-    QnStreamSynchronizationState(bool started, qint64 time, qreal speed);
-    static QnStreamSynchronizationState live();
-
-    bool isSyncOn = false;
-    qint64 timeUs = DATETIME_INVALID;
-    qreal speed = 0.0;
-};
-QN_FUSION_DECLARE_FUNCTIONS(QnStreamSynchronizationState, (json)(metatype))
 
 /**
  * This class manages the necessary machinery for synchronized playback of
@@ -42,6 +30,8 @@ class QnWorkbenchStreamSynchronizer:
     Q_OBJECT
 
 public:
+    using StreamSynchronizationState = nx::vms::client::desktop::StreamSynchronizationState;
+
     QnWorkbenchStreamSynchronizer(
         nx::vms::client::desktop::WindowContext* windowContext, QObject* parent = nullptr);
 
@@ -65,9 +55,9 @@ public:
      */
     bool isRunning() const;
 
-    QnStreamSynchronizationState state() const;
+    StreamSynchronizationState state() const;
 
-    void setState(const QnStreamSynchronizationState& state);
+    void setState(const StreamSynchronizationState& state);
 
     void setState(QnResourceWidget* widget, bool useWidgetPausedState = false);
 

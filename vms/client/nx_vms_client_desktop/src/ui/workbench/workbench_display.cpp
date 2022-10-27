@@ -2127,7 +2127,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
         layout->resource()->disconnect(this);
 
     auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
+    layout->setStreamSynchronizationState(streamSynchronizer->state());
 
     QVector<QnUuid> selectedUuids;
     foreach(QnResourceWidget *widget, widgets())
@@ -2182,8 +2182,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         && !workbenchLayout->items().empty();
 
     const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
-    streamSynchronizer->setState(
-        workbenchLayout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
+    streamSynchronizer->setState(workbenchLayout->streamSynchronizationState());
 
     // Sort items to guarantee the same item placement for each time the same new layout is opened.
     const auto items = workbenchLayout->items();
