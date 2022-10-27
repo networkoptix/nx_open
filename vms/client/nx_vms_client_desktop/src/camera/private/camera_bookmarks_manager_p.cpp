@@ -11,7 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/ubjson.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -181,27 +181,6 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 {}
 
-bool QnCameraBookmarksManagerPrivate::isEnabled() const
-{
-    return m_operationsTimer->isActive();
-}
-
-void QnCameraBookmarksManagerPrivate::setEnabled(bool value)
-{
-    if (isEnabled() == value)
-        return;
-
-    if (value)
-    {
-        m_operationsTimer->start();
-        checkQueriesUpdate();
-    }
-    else
-    {
-        m_operationsTimer->stop();
-    }
-}
-
 std::optional<QnUuid> QnCameraBookmarksManagerPrivate::getServerForBookmark(
     const QnCameraBookmark& bookmark)
 {
@@ -216,6 +195,15 @@ std::optional<QnUuid> QnCameraBookmarksManagerPrivate::getServerForBookmark(
         return {};
 
     return server->getId();
+}
+
+void QnCameraBookmarksManagerPrivate::startOperationsTimer()
+{
+    if (!m_operationsTimer->isActive())
+    {
+        m_operationsTimer->start();
+        checkQueriesUpdate();
+    }
 }
 
 int QnCameraBookmarksManagerPrivate::sendPostRequest(
@@ -307,7 +295,6 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
         return;
 
     const auto serverId = getServerForBookmark(bookmark);
-    setEnabled(true); // Forcefully enable on modifying operation
 
     const auto operationType = !eventRuleId.isNull()
         ? OperationInfo::OperationType::Acknowledge
@@ -344,8 +331,6 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
     if (!bookmark.isValid())
         return;
 
-    setEnabled(true); // Forcefully enable on modifying operation
-
     QnUpdateBookmarkRequestData request(bookmark);
     int handle = sendPostRequest("/ec2/bookmarks/update", request);
     m_operations[handle] = OperationInfo(
@@ -358,7 +343,6 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     const QnUuid &bookmarkId,
     OperationCallbackType callback)
 {
-    setEnabled(true); // Forcefully enable on modifying operation
     QnDeleteBookmarkRequestData request(bookmarkId);
     int handle = sendPostRequest("/ec2/bookmarks/delete", request);
     m_operations[handle] = OperationInfo(
@@ -441,6 +425,7 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
     });
 
     updateQueryAsync(queryId);
+    startOperationsTimer();
 }
 
 void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId)
@@ -575,6 +560,7 @@ void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackTy
 void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark &bookmark)
 {
     m_pendingBookmarks.insert(bookmark.guid, PendingInfo(bookmark, PendingInfo::AddBookmark));
+    startOperationsTimer();
 
     for (QueryInfo &info : m_queries)
     {
@@ -600,6 +586,7 @@ void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBoo
 void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid &bookmarkId)
 {
     m_pendingBookmarks.insert(bookmarkId, PendingInfo(bookmarkId, PendingInfo::RemoveBookmark));
+    startOperationsTimer();
 
     for (QueryInfo &info : m_queries)
     {

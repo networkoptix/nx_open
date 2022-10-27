@@ -20,16 +20,6 @@ QnCameraBookmarksManager::~QnCameraBookmarksManager()
 {
 }
 
-bool QnCameraBookmarksManager::isEnabled() const
-{
-    return d->isEnabled();
-}
-
-void QnCameraBookmarksManager::setEnabled(bool value)
-{
-    d->setEnabled(value);
-}
-
 int QnCameraBookmarksManager::getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
     BookmarksCallbackType callback)
 {

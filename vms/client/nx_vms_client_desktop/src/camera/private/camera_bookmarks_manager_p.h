@@ -37,9 +37,6 @@ public:
     using EmptyResponseCallback = std::function<void (bool success, int handle)>;
     using RawResponseType = std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)>;
 
-    bool isEnabled() const;
-    void setEnabled(bool value);
-
     /* Direct API section */
 
     /// @brief                  Asynchronously gathers bookmarks using specified filter.
@@ -146,6 +143,8 @@ private:
         RawResponseType callback);
 
     std::optional<QnUuid> getServerForBookmark(const QnCameraBookmark& bookmark);
+
+    void startOperationsTimer();
 
 private:
     QTimer* m_operationsTimer;

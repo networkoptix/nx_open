@@ -26,9 +26,6 @@ public:
 
     virtual ~QnCameraBookmarksManager();
 
-    bool isEnabled() const;
-    void setEnabled(bool value);
-
      /* Direct API section */
 
     /// @brief                  Asynchronously gathers bookmarks using specified filter.
