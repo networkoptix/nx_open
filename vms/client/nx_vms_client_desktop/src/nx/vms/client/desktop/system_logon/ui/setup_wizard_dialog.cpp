@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -49,10 +50,9 @@ SetupWizardDialog::SetupWizardDialog(
     QWidget* parent)
     :
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
-    d(new SetupWizardDialogPrivate(this))
+    d(new SetupWizardDialogPrivate(this)),
+    m_address(std::move(address))
 {
-    d->address = std::move(address);
-
     d->webViewWidget->controller()->setCertificateValidator(
         [serverId](const QString& certificateChain, const QUrl& url)
         {
@@ -66,15 +66,18 @@ SetupWizardDialog::SetupWizardDialog(
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
-#ifdef _DEBUG
-    QLineEdit* urlLineEdit = new QLineEdit(this);
-    layout->addWidget(urlLineEdit);
-    connect(urlLineEdit, &QLineEdit::returnPressed, this,
-        [this, urlLineEdit]()
-        {
-            d->load(urlLineEdit->text());
-        });
-#endif
+
+    if (ini().developerMode)
+    {
+        auto urlLineEdit = new QLineEdit(this);
+        layout->addWidget(urlLineEdit);
+        connect(urlLineEdit, &QLineEdit::returnPressed, this,
+            [this, urlLineEdit]()
+            {
+                d->load(urlLineEdit->text());
+            });
+    }
+
     layout->addWidget(d->webViewWidget);
     setFixedSize(kSetupWizardSize);
     setHelpTopic(this, Qn::Setup_Wizard_Help);
@@ -92,21 +95,22 @@ int SetupWizardDialog::exec()
 
 void SetupWizardDialog::loadPage()
 {
-    const auto url = constructUrl(d->address);
+    const auto url = constructUrl(m_address);
 
-    #if defined(_DEBUG)
+    if (ini().developerMode)
+    {
         if (const auto lineEdit = findChild<QLineEdit*>())
             lineEdit->setText(url.toString());
-    #endif
+    }
 
     NX_DEBUG(this, nx::format("Opening setup URL: %1").arg(url.toString(QUrl::RemovePassword)));
 
     d->load(url);
 }
 
-nx::vms::api::Credentials SetupWizardDialog::credentials() const
+QString SetupWizardDialog::password() const
 {
-    return {d->loginInfo.localLogin, d->loginInfo.localPassword};
+    return d->loginInfo.localPassword;
 }
 
 bool SetupWizardDialog::savePassword() const
