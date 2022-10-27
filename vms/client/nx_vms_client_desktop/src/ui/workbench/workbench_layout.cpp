@@ -88,6 +88,8 @@ struct QnWorkbenchLayout::Private
     QnLayoutFlags flags = QnLayoutFlag::Empty;
 
     QIcon icon;
+
+    StreamSynchronizationState streamSynchronizationState;
 };
 
 QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
@@ -193,6 +195,16 @@ QnWorkbenchLayoutSynchronizer* QnWorkbenchLayout::layoutSynchronizer() const
 QString QnWorkbenchLayout::name() const
 {
     return d->resource->getName();
+}
+
+StreamSynchronizationState QnWorkbenchLayout::streamSynchronizationState() const
+{
+    return d->streamSynchronizationState;
+}
+
+void QnWorkbenchLayout::setStreamSynchronizationState(StreamSynchronizationState value)
+{
+    d->streamSynchronizationState = std::move(value);
 }
 
 bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)

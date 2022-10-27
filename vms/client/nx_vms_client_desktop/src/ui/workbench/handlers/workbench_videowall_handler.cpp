@@ -35,6 +35,7 @@
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
@@ -1084,10 +1085,14 @@ void QnWorkbenchVideoWallHandler::handleMessage(
         }
         case QnVideoWallControlMessage::SynchronizationChanged:
         {
-            QByteArray value = message[valueKey].toUtf8();
-            auto state = QJson::deserialized<QnStreamSynchronizationState>(value);
-            workbench()->windowContext()->streamSynchronizer()->setState(state);
-            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+            const std::string value = message[valueKey].toStdString();
+            StreamSynchronizationState state;
+            const auto success = nx::reflect::json::deserialize(value, &state);
+            if (NX_ASSERT(success))
+            {
+                workbench()->windowContext()->streamSynchronizer()->setState(state);
+                menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+            }
             break;
         }
         case QnVideoWallControlMessage::MotionSelectionChanged:
@@ -3064,7 +3069,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged(
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::SynchronizationChanged);
-    message[valueKey] = QString::fromUtf8(QJson::serialized(
+    message[valueKey] = QString::fromStdString(nx::reflect::json::serialize(
         workbench()->windowContext()->streamSynchronizer()->state()));
     sendMessage(message);
 }

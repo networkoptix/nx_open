@@ -526,7 +526,7 @@ bool TabApiBackend::Private::isSyncedLayout() const
     const auto currentLayout = context->workbench()->currentLayout();
     const auto state = currentLayout == layout
         ? streamSynchronizer->state()
-        : layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>();
+        : layout->streamSynchronizationState();
     return state.isSyncOn;
 }
 
@@ -764,16 +764,13 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
 
 Error TabApiBackend::stopSyncPlay()
 {
-    static const QnStreamSynchronizationState kSyncDisabledState;
-    static const auto kDisabledData = QVariant::fromValue(kSyncDisabledState);
-
     if (d->context->workbench()->currentLayout() == d->layout)
     {
         auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();
-        streamSynchronizer->setState(kSyncDisabledState);
+        streamSynchronizer->setState(StreamSynchronizationState::disabled());
     }
 
-    d->layout->setData(Qn::LayoutSyncStateRole, kDisabledData);
+    d->layout->setStreamSynchronizationState(StreamSynchronizationState::disabled());
     return Error::success();
 }
 

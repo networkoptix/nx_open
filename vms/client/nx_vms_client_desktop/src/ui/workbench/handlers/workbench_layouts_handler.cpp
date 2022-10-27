@@ -1036,15 +1036,10 @@ bool LayoutsHandler::closeLayouts(const LayoutResourceList& resources)
 
 void LayoutsHandler::openLayouts(
     const LayoutResourceList& layouts,
-    const QnStreamSynchronizationState& playbackState)
+    const StreamSynchronizationState& playbackState)
 {
     if (!NX_ASSERT(!layouts.empty()))
         return;
-
-    static const QnStreamSynchronizationState kExportedLayoutDefaultState(
-        /*isLive*/ false,
-        /*position*/ 0,
-        /*speed*/ 1.0);
 
     QnWorkbenchLayout* lastLayout = nullptr;
     for (const auto& layout: layouts)
@@ -1058,11 +1053,11 @@ void LayoutsHandler::openLayouts(
             {
                 // Use zero position for nov files.
                 const auto state = layout->isFile()
-                    ? kExportedLayoutDefaultState
+                    ? StreamSynchronizationState::disabled()
                     : playbackState;
 
                 // Force playback state.
-                wbLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue(state));
+                wbLayout->setStreamSynchronizationState(state);
 
                 for (auto item: wbLayout->items())
                 {
@@ -1226,16 +1221,21 @@ void LayoutsHandler::at_openNewTabAction_triggered()
     if (context()->user())
         resource->setParentId(context()->user()->getId());
 
+    resourcePool()->addResource(resource);
+
     const auto parameters = menu()->currentParameters(sender());
+    QnWorkbenchLayout* layout = workbench()->addLayout(resource);
     if (parameters.hasArgument(Qn::LayoutSyncStateRole))
     {
         const auto syncState = parameters.argument(Qn::LayoutSyncStateRole);
-        resource->setData(Qn::LayoutSyncStateRole, syncState);
+        layout->setStreamSynchronizationState(
+            parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole));
+    }
+    else
+    {
+        layout->setStreamSynchronizationState(StreamSynchronizationState::live());
     }
 
-    resourcePool()->addResource(resource);
-
-    QnWorkbenchLayout* layout = workbench()->addLayout(resource);
     workbench()->setCurrentLayout(layout);
 }
 
@@ -1273,7 +1273,7 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     if (!currentMediaWidget || !isCameraWithFootage(currentMediaWidget))
     {
         // Switch to live if current item is not a camera or has no footage.
-        currentState = QnStreamSynchronizationState::live();
+        currentState = StreamSynchronizationState::live();
     }
     else if (calledFromScene)
     {
@@ -1283,7 +1283,7 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     else if (!currentState.isSyncOn)
     {
         // Open resources from tree in default state if current layouts is not synced.
-        currentState = QnStreamSynchronizationState::live();
+        currentState = StreamSynchronizationState::live();
     }
 
     // Stop showreel if it is running. Here widgets can be destroyed, so we should remove them
