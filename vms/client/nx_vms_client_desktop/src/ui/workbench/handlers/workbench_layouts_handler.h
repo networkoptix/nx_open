@@ -12,9 +12,11 @@
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
-struct QnStreamSynchronizationState;
 
 namespace nx::vms::client::desktop {
+
+struct StreamSynchronizationState;
+
 namespace ui {
 namespace workbench {
 
@@ -104,7 +106,7 @@ private:
      */
     void openLayouts(
         const LayoutResourceList& layouts,
-        const QnStreamSynchronizationState& playbackState);
+        const StreamSynchronizationState& playbackState);
 };
 
 } // namespace workbench
