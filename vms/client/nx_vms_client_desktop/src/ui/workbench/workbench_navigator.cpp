@@ -3,7 +3,6 @@
 #include "workbench_navigator.h"
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 
 #include <QtCore/QScopedValueRollback>
@@ -14,21 +13,14 @@
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QMenu>
 
-extern "C" {
-#include <libavutil/avutil.h> // TODO: remove
-}
-
 #include <camera/cam_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
@@ -336,14 +328,8 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
 
     m_timeSlider->setBookmarksVisible(enabled);
 
-    // Do not disable it anymore.
-    if (enabled)
-    {
-        // FIXME: #sivanov Probably all managers should be permanently enabled.
-        const auto systemContext = SystemContext::fromResource(currentResource());
-        if (NX_ASSERT(systemContext))
-            systemContext->cameraBookmarksManager()->setEnabled(true);
-    }
+    // Camera bookmark manager will be enabled automatically.
+
     emit bookmarksModeEnabledChanged();
 }
 
