@@ -697,35 +697,25 @@ void WelcomeScreen::setupFactorySystem(
                     if (!dialog->savePassword())
                         return;
 
-                    if (NX_ASSERT(dialog->credentials().user == helpers::kFactorySystemUser))
-                    {
-                        const auto credentials = nx::network::http::PasswordCredentials(
-                            dialog->credentials().user.toStdString(),
-                            dialog->credentials().password.toStdString());
-                        storeCredentialsWithoutConnection(address, credentials);
-                    }
+                    const auto credentials = nx::network::http::PasswordCredentials(
+                        helpers::kFactorySystemUser.toStdString(),
+                        dialog->password().toStdString());
+                    storeCredentialsWithoutConnection(address, credentials);
                 };
 
             const auto connectToSystem =
                 [this, dialog, address, serverId, controlsGuard]()
                 {
-                    if (dialog->credentials().user == helpers::kFactorySystemUser)
-                    {
-                        const auto credentials = nx::network::http::PasswordCredentials(
-                            dialog->credentials().user.toStdString(),
-                            dialog->credentials().password.toStdString());
-                        connectToSystemInternal(
-                            /*systemId*/ QString(),
-                            serverId,
-                            address,
-                            credentials,
-                            dialog->savePassword(),
-                            controlsGuard);
-                    }
-                    else
-                    {
-                        NX_DEBUG(this, "Unexpected user: %1", dialog->credentials().user);
-                    }
+                    const auto credentials = nx::network::http::PasswordCredentials(
+                        helpers::kFactorySystemUser.toStdString(),
+                        dialog->password().toStdString());
+                    connectToSystemInternal(
+                        /*systemId*/ QString(),
+                        serverId,
+                        address,
+                        credentials,
+                        dialog->savePassword(),
+                        controlsGuard);
                 };
 
             connect(dialog, &QDialog::rejected, this, saveCredentials);

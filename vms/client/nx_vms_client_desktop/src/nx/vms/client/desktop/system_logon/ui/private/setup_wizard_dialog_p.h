@@ -5,8 +5,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
-#include <nx/network/socket_common.h>
-
 namespace nx::vms::client::desktop {
 
 class SetupWizardDialog;
@@ -28,35 +26,9 @@ public slots:
     void openUrlInBrowser(const QString& urlString);
 
     /**
-     * Cloud refresh token if user is logged in to cloud, empty string otherwise.
-     */
-    QString refreshToken() const;
-
-    /**
      * Connect to the System using local administrator with the provided password.
      */
-    void connectUsingLocalAdmin(const QString& password);
-
-    /**
-     * Connect to the System using Cloud account.
-     */
-    void connectUsingCloud();
-
-    /**
-     * Json object with the LoginInfo structure.
-     * Method is deprecated and will be removed as soon as it is not needed.
-     */
-    QString getCredentials() const;
-
-    /**
-     * Fill LoginInfo structure with the provided values. Third parameter is ignored.
-     * Method is deprecated and will be removed in favor of `connect...` methods.
-     */
-    void updateCredentials(
-        const QString& login,
-        const QString& password,
-        bool /*isCloud*/ alwaysFalse,
-        bool savePassword);
+    void connectUsingLocalAdmin(const QString& password, bool savePassword);
 
     /**
      * Close dialog.
@@ -71,13 +43,11 @@ public slots:
 public:
     struct LoginInfo
     {
-        QString localLogin;
         QString localPassword;
         bool savePassword = false;
     };
 
     nx::vms::client::desktop::WebViewWidget* webViewWidget;
-    nx::network::SocketAddress address;
     LoginInfo loginInfo;
 };
 
