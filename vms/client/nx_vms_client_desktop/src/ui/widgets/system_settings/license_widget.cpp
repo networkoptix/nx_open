@@ -160,6 +160,11 @@ void QnLicenseWidget::setFreeLicenseAvailable(bool available)
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable);
 }
 
+bool QnLicenseWidget::isFreeLicenseKey() const
+{
+    return serialKey() == nx::branding::freeLicenseKey();
+}
+
 void QnLicenseWidget::setHardwareId(const QString& hardwareId)
 {
     ui->hardwareIdEdit->setText(hardwareId);

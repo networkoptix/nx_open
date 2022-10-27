@@ -34,6 +34,7 @@ public:
 
     bool isFreeLicenseAvailable() const;
     void setFreeLicenseAvailable(bool available);
+    bool isFreeLicenseKey() const;
 
     QString serialKey() const;
     void setSerialKey(const QString& serialKey);
