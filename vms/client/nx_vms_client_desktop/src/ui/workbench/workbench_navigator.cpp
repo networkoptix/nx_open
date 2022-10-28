@@ -416,6 +416,8 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
     if (bookmarksModeEnabled() == enabled)
         return;
 
+    NX_VERBOSE(this, "Setting bookmark mode %1", enabled ? "enabled" : "disabled");
+
     m_timeSlider->setBookmarksVisible(enabled);
     if (enabled)
         qnCameraBookmarksManager->setEnabled(true); //not disabling it anymore
