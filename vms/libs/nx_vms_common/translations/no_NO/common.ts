@@ -1096,6 +1096,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Bad request.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not found.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation type="unfinished">Unauthorized.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1106,87 +1167,83 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP-vert</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>E-post fra</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP-bruker</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP passord</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>E-post signatur</translation>
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Link for e-poststøtte</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP-tilkoblingstype</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP-port</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP-tidsavbrudd (sekunder)</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>SMTP Navn</translation>
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP Admin passord</translation>
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP-søkebase</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP-søkefilter</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>Utløp av LDAP-passord (millisekunder)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Tidsavbrudd for LDAP-søk (sekunder)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Anonym statistikkrapport tillatt</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Anonym statistikkrapport forrige gang</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Anonym statistikk rapporterer siste versjon</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
@@ -1194,15 +1251,15 @@
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Anonym statistikk tidssyklus</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Anonym statistikk rapporterer forsinkelse etter oppdatering</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Anonym Statistikk Rapport Server-URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
@@ -1210,55 +1267,55 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Oppdateringsintervall for systemet (sekunder, 1s-1t)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Tidsavbrudd for proxy-tilkobling (sekunder, 1s-1t)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Tidssynkronisering aktivert</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Primær tidssynkronisering Server ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Maks forskjell mellom lokal tid og kildetid (millisekunder)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>OS-tidsendring, sjekk periode</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Synkroniser tidssynkroniseringsintervall for nettverksforespørsler</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Synkroniser epsilon. Ny verdi blir ikke brukt hvis tidsavgrensningen er mindre enn epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Cloud eierkonto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Cloud system ID</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Cloud autorisasjonsnøkkel</translation>
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Systemnavn</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>Lokal System-ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1274,32 +1331,32 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optimaliser kamerainnstillinger</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Automatisk oppdatering av miniatyrbilder</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Bruk %1 -tjenesten for å sende e-poster i stedet for SMTP-klienten</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Maks sceneelementer (0 betyr standard)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Send e-post med vanlig tekst</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Bruk Windows-linjeinnmatning i e-post</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Aktiver revisjonslogg</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1307,7 +1364,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Hendelsesloggperiode (dager)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1323,31 +1380,27 @@
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Aktiver auto-oppdateringsvarsler</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Aktiver oppdateringsvarsler</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Aktiver UPNP port-mapping</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Innstillinger for sikkerhetskopiering</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
+      <translation>Overstyring av nettskyvert</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Aktiver RTSP for Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1367,7 +1420,7 @@
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
@@ -1379,7 +1432,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP timeout (millisekunder)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1399,11 +1452,7 @@
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
+      <translation>Aktiver opptak på EDGE</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1415,7 +1464,7 @@
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Installert oppdateringsinformasjon</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1423,7 +1472,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Klientoppdateringsinnstillinger</translation>
     </message>
     <message>
       <source>Thread count limit for Camera archive synchronization</source>
@@ -1431,7 +1480,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Vannmerkeinnstillinger</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1455,7 +1504,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Standard videokodek</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1463,11 +1512,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Skjermvideokodek i lav kvalitet</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Lisensserver</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1475,7 +1524,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maksimal hendelsesloggoppføringer for å oppbevare i databasen. Den reelle mengden ubemerkede poster kan være opptil 20% høyere enn den spesifiserte verdien.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1483,7 +1532,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Retningslinjer for endring av metadata-lagring</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -1498,24 +1547,12 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1534,10 +1571,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1546,20 +1579,53 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation type="unfinished">Language for Cloud notifications</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation type="unfinished">Enable 2fa for system</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
     </message>
   </context>
   <context>
@@ -1913,18 +1979,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Tilkobling til enheten ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (primær strøm) ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP-pakktap oppdaget.</translation>
     </message>
@@ -2068,24 +2122,8 @@
       <translation>Åpne visning</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Kunne ikke tvinge bruk av tid fra kamera, det henger for mye, systemtid vil bli brukt</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Kameratiden er tilbake til det normale</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Flere %1 hendelser har skjedd</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Multicast adresse konflikt oppdaget. Adresse %1 er allerede i bruk med %2 på %3 strøm</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Nettverksadresse %1 er ikke en multicast-adresse</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2161,14 +2199,6 @@
       <translation>I / O-modulen ble koblet fra</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>RTP-feil i primærstrøm (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>RTP-feil i sekundærstrøm (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Analyse Objekt Oppdaget</translation>
     </message>
@@ -2214,12 +2244,58 @@
       <translation>Server &quot;%1&quot; sertifikatfeil</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Klarte ikke å sikkerhetskopiere filen %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

@@ -216,52 +216,56 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Trust this server?</source>
-      <translation>是否信任此伺服器？</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>無法驗證 %1的身份</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>系統:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>伺服器:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>伺服器ID: </translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>請檢查憑證詳細內容以確保您連接到正確的伺服器。</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>無效的伺服器憑證。</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>首次連線至 %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <source>certificate details</source>
+      <translation>憑證詳情</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <source>help article</source>
+      <translation>詳細說明文件</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <source>Read this %1 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>請閱讀此%1 文件來了解關於憑證驗證的更多細節。</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+      <translation>請檢視憑證內容 %1 ，並確認此伺服器為可信任伺服器。%2</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>伺服器的憑證</translation>
+    </message>
+    <message>
+      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>請確認伺服器憑證 %1 狀態，或查看 %2 文件來了解更多資訊。</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+      <comment>%1 is the system name, %2 are possible extra details</comment>
+      <translation>這可能是由於伺服器憑證過期或有人試圖偽裝為 %1來截取您的個人訊息。%2</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>若連線至多台伺服器合併的系統，則此訊息可能會重複出現。</translation>
+    </message>
+    <message>
+      <source>To learn more about the current problem view the server&apos;s certificate:</source>
+      <translation>請檢視伺服器憑證內容，來了解更多關於此問題的可能原因:</translation>
     </message>
   </context>
 </TS>

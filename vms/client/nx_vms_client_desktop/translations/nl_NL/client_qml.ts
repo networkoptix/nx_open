@@ -153,20 +153,20 @@
       <translation>Camera analytics werken alleen wanneer de camera wordt bekeken. Schakel de opname in om het te laten werken.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
   </context>
   <context>
@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Log in op</translation>
     </message>
   </context>
   <context>
@@ -1052,7 +1052,7 @@ om PTZ te activeren</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation>Tijdlijn-ID, die wordt gemaakt wanneer de tijd achteruit wordt gewijzigd op een externe NVR. De nieuwe tijdlijn kan de bestaande overlappen.</translation>
+      <translation>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1068,6 +1068,17 @@ om PTZ te activeren</translation>
     <message>
       <source>Sensitivity</source>
       <translation>Gevoeligheid</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation type="unfinished">This action requires some parameters to be filled.</translation>
     </message>
   </context>
   <context>
@@ -1189,12 +1200,16 @@ om PTZ te activeren</translation>
       <source>Unsupported firmware version</source>
       <translation>Niet-ondersteunde firmwareversie</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logische ID</translation>
     </message>
   </context>
   <context>
@@ -1298,10 +1313,6 @@ om PTZ te activeren</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>U heeft geen toegang tot de %1. Controleer uw internetverbinding.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Officiële Website</translation>
     </message>
@@ -1312,6 +1323,10 @@ om PTZ te activeren</translation>
     <message>
       <source>Support</source>
       <translation>Ondersteuning</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>

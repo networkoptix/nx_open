@@ -151,20 +151,20 @@
       <translation>카메라 분석은 카메라를 볼 때만 작동합니다. 항상 작동하도록 녹음을 활성화하십시오.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
   </context>
   <context>
@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>
@@ -1061,6 +1061,17 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1178,12 +1189,16 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>지원되지 않는 펌웨어 버전</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>논리적 ID</translation>
     </message>
   </context>
   <context>
@@ -1286,10 +1301,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>%1에 접근할 수 없습니다. 인터넷 연결을 확인하십시오.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>공식 웹 사이트</translation>
     </message>
@@ -1300,6 +1311,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>지원</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>

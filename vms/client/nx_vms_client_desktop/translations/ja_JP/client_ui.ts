@@ -85,10 +85,6 @@
       <translation>ライブバッファー上限値</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>ログ参照</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>ローカルキャッシュのクリア</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>サーバー証明書の検証</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>ログ管理</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>ダウンロード</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation>ファイルフォルダーを開く</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完了</translation>
     </message>
   </context>
   <context>
@@ -320,10 +340,6 @@
       <translation>現在のキューをスキップ</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>バックアップキューの最大サイズ</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>すべてのファイルが正常にバックアップされました。新しいファイルは自動的にバックアップされます。</translation>
     </message>
@@ -510,14 +526,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>プライマリストリームを録画しない</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>セカンダリストリームを録画しない</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>自動</translation>
     </message>
@@ -635,23 +643,31 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF設定</translation>
     </message>
     <message>
       <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <translation>セカンダリストリームのプロファイル</translation>
     </message>
     <message>
       <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
-    </message>
-    <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>プライマリストリームのプロファイル</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>ビデオを自動的にエクスポートしない</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>デバイスからエクスポート</translation>
+    </message>
+    <message>
+      <source>Do not record primary stream</source>
+      <translation>プライマリストリームを録画しない</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation>セカンダリストリームを録画しない</translation>
     </message>
   </context>
   <context>
@@ -769,11 +785,11 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>カメラ交換</translation>
     </message>
     <message>
       <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>新しいデバイス</translation>
     </message>
     <message>
       <source>Name</source>
@@ -781,7 +797,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>戻る</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +805,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>次へ</translation>
     </message>
   </context>
   <context>
@@ -875,6 +891,61 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>ベータ</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>利用可能なアクション</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>映像エクスポート</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>ライブ映像とアーカイブ</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>In Future</source>
+      <translation>実装予定</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>シーケンス表示</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>詳しくはヘルプページをご覧ください</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>今後このウィンドウを表示しない</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>クラウドレイアウトのご紹介</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>モーション検索</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>ブックマーク、オブジェクト、イベントの検索</translation>
+    </message>
+    <message>
+      <source>•</source>
+      <translation>•</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -900,11 +971,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>このアクションはインスタントイベントにのみ設定できます</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>別のイベントまたはアクションを選択してください</translation>
     </message>
   </context>
   <context>
@@ -915,7 +986,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワードをスペースで区切る</translation>
+      <translation>キーワード (スペース区切り)</translation>
     </message>
     <message>
       <source>Caption contains:</source>
@@ -946,6 +1017,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>リストア...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>システム管理データのバックアップを作成、または既存のバックアップからシステム管理データを復元します</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open folder</source>
+      <translation>フォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -1076,7 +1163,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>汎用イベント</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1331,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>コメントを追加</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>スケジュールを設定</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>アクションをテスト</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation>コメントを追加</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1427,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>マイクがアクティブなときに音声をミュート</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation>アイドル時にコンピュータがスリープ モードに入るのを許可する</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>システム設定</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>バックアップと復元</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1617,6 @@
       <source>Shared layouts</source>
       <translation>共有レイアウト</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>このリストにローカル レイアウトを表示する単一のユーザーを選択します</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1788,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Logging level</source>
+      <translation>ログレベル</translation>
+    </message>
+    <message>
+      <source>Limit Max volume</source>
+      <translation>最大サイズを制限する</translation>
+    </message>
+    <message>
+      <source>Split file by time</source>
+      <translation>ファイルを時間で分割</translation>
+    </message>
+    <message>
+      <source>Split file by size</source>
+      <translation>ファイルをサイズで分割</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>有効化</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1831,45 @@
     <message>
       <source>Test</source>
       <translation>テスト</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>ダウンロード</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>初期設定にリセット</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation>ダウンロードが完了しました！</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation>ファイルフォルダを開く</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完了</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>再試行</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation>選択したフォルダにログを保存できませんでした</translation>
     </message>
   </context>
   <context>
@@ -1837,7 +1982,7 @@
     </message>
     <message>
       <source>Link copied</source>
-      <translation>リンクのコピー</translation>
+      <translation>リンクをコピーしました</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
@@ -1907,11 +2052,11 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>接続設定</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Eメール</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,27 +2064,27 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>ユーザー</translation>
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>サーバーアドレス</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>セキュリティプロトコル</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Eメール設定</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>サポート署名</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation>システム識別情報</translation>
     </message>
   </context>
   <context>
@@ -1973,7 +2118,7 @@
     </message>
     <message>
       <source>Play to users</source>
-      <translation>ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2201,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>プリセット</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2612,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>アラーム/イベントルール</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>新しいルール</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
-    </message>
-    <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <translation>ルールを削除</translation>
     </message>
     <message>
       <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <translation>デフォルトのルールにリセット</translation>
+    </message>
+    <message>
+      <source>Select a rule</source>
+      <translation>ルールを選択</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2705,7 @@
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴有効</translation>
+      <translation>操作履歴を有効にする</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2620,7 +2765,7 @@
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化</translation>
+      <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化する</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -2666,7 +2811,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>指紋</translation>
+      <translation>フィンガープリント</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2795,11 +2940,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>サウンド</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>管理</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2955,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>状態</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3080,8 @@
       <translation>注： 録画スケジュール内の映像品質・フレームレート (FPS) 設定は無視されます。</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>モバイル通知のカスタム言語</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>クラウド通知のカスタム言語</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3149,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ グループを追加</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>グループが見つかりません</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3164,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ ユーザーを追加</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>ユーザーが見つかりません</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3302,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>音量</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3184,7 +3329,7 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation>クライアントAPIの使用を許可</translation>
+      <translation>クライアント API の使用を許可する</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>

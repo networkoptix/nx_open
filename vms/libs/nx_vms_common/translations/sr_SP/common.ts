@@ -1142,6 +1142,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Bad request.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not found.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation type="unfinished">Unauthorized.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1185,10 +1246,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1388,10 +1445,6 @@
       <translation type="unfinished">Cloud host override</translation>
     </message>
     <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
-    </message>
-    <message>
       <source>Enable RTSP for Arecont</source>
       <translation type="unfinished">Enable RTSP for Arecont</translation>
     </message>
@@ -1446,10 +1499,6 @@
     <message>
       <source>Enable recording on EDGE</source>
       <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1544,24 +1593,12 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1580,10 +1617,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1592,20 +1625,53 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation type="unfinished">Language for Cloud notifications</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation type="unfinished">Enable 2fa for system</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
     </message>
   </context>
   <context>
@@ -1969,18 +2035,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation type="unfinished">RTP packet loss detected.</translation>
     </message>
@@ -2126,24 +2180,8 @@
       <translation type="unfinished">Open layout</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation type="unfinished">Multiple %1 events have occurred</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2219,14 +2257,6 @@
       <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation type="unfinished">Analytics Object Detected</translation>
     </message>
@@ -2272,12 +2302,58 @@
       <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

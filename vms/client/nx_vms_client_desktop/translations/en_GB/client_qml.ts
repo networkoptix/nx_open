@@ -153,20 +153,20 @@
       <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
   </context>
   <context>
@@ -1071,6 +1071,17 @@ to activate PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1189,6 +1200,10 @@ to activate PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation type="unfinished">Unsupported firmware version</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1298,10 +1313,6 @@ to activate PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation type="unfinished">Official Website</translation>
     </message>
@@ -1312,6 +1323,10 @@ to activate PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Support</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>

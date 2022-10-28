@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>説明(&amp;D)</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>属性</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -57,7 +53,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>解析オブジェクトの検出</translation>
+      <translation>分析オブジェクト検出</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -80,18 +76,18 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>バックアップが終了しました</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>不明なイベント</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 イベントが発生しました</translation>
     </message>
   </context>
   <context>
@@ -106,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>カメラのI/O入力</translation>
     </message>
     <message>
       <source>State</source>
@@ -125,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>デバッグイベント</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>値</translation>
     </message>
   </context>
   <context>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>IOモジュール %1 切断</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>
+        <numerusform>デバイス切断</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>デバイスID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>カメラ切断</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>カメラIPが %1 と重複</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>デバイスの IPの競合</translation>
+      <translation>
+        <numerusform>デバイスの IP競合</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>カメラのIP競合</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -223,11 +235,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワードをスペースで区切る</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>一般</translation>
+      <translation>キーワード (スペース区切り)</translation>
     </message>
     <message>
       <source>State</source>
@@ -254,15 +262,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>実行間隔</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>HTTP URL</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>HTTPコンテンツ</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +286,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>リクエストメソッド</translation>
     </message>
   </context>
   <context>
@@ -311,16 +319,16 @@
       <translation>動体検知ON %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状態</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>カメラのモーション</translation>
     </message>
   </context>
   <context>
@@ -333,12 +341,72 @@
       <source>Network Issue</source>
       <translation>ネットワーク障害</translation>
     </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>%n 秒間データを受信していません。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>プライマリストリームのRTPエラー (%1)。</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>セカンダリストリームのRTPエラー (%1)。</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>デバイスへの接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTPパケットロスが検出されました。</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。システム時刻が使用されます。</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>カメラ時刻が正常な状態に戻りました。</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>デバイスがネットワーク要求に応答しません。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>アドレス %1 は、すでに %2 のプライマリストリームとして使用されています。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>アドレス %1 は、すでに %2 のセカンダリストリームとして使用されています。</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>マルチキャストアドレスの競合が検出されました。</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>ネットワークアドレス %1 はマルチキャストアドレスではありません。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>通知を表示</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +414,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>実行間隔</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>確認を強制する</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +430,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>ツールチップ</translation>
     </message>
   </context>
   <context>
@@ -436,15 +504,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>実行間隔</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>追加の受信者</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>メールメッセージ</translation>
     </message>
   </context>
   <context>
@@ -492,6 +560,14 @@
     <message>
       <source>Server Failure</source>
       <translation>サーバー不良</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>サーバーへの接続が失われました。</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>サーバーが予期せず停止しました。</translation>
     </message>
   </context>
   <context>
@@ -556,7 +632,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>実行間隔</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +656,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>ストレージエラー</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>%1 でI/Oエラーが発生しました。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>%1 へのHDD/SSD書き込み速度が不十分です。</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSDディスク &quot;%1&quot; がいっぱいです。ディスク上にVMS管理外のデータが多すぎます。</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>分析ストレージ &quot;%1&quot; がオフラインです。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>分析ストレージ &quot;%1&quot; DB エラー: マウントポイントの権限が不足しています。</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>録画処理の際、AES暗号化を初期化できませんでした。データは暗号化されずに書き込まれます。</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>RAIDエラー。 %1。</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>アーカイブのバックアップに失敗しました。ファイル %1のバックアップに失敗しました。</translation>
     </message>
   </context>
   <context>
@@ -618,6 +734,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>プラグイン: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>キャプション: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>理由: %1</translation>
     </message>
   </context>
   <context>

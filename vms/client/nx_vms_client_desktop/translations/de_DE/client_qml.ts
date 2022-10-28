@@ -153,20 +153,20 @@
       <translation>Die Kameraanalytik funktioniert nur, wenn die Kamera betrachtet wird. Aktivieren Sie die Aufnahme, damit sie die ganze Zeit funktioniert.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation>Diese Integration hat keine Einstellungen für diese Kamera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation>Dieses Plugin hat keine Einstellungen für diese Kamera.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation>Prüfen Sie die Systemadministrationseinstellungen, um diese Integration zu konfigurieren.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Prüfen Sie die Kameraeinstellungen, um dieses Plugin zu konfigurieren.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation>Diese Integration hat keine Einstellungen auf Systemebene.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation>Prüfen Sie die Systemadministrationseinstellungen, um dieses Plugin zu konfigurieren.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation>Prüfen Sie die Kameraeinstellungen, um diese Integration zu konfigurieren.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation>Dieses Plugin hat keine Einstellungen auf der Systemebene.</translation>
     </message>
   </context>
   <context>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>joystick</source>
-      <translation>Joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
@@ -1071,6 +1071,17 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parameter eingeben</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>Für diese Aktion müssen einige Parameter ausgefüllt werden.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1189,6 +1200,10 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>Nicht unterstützte Firmwareversion</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>Zugriff verweigert</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1298,10 +1313,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>Sie haben keinen Zugriff auf die %1. Bitte überprüfe deine Internetverbindung.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Offizielle Webseite</translation>
     </message>
@@ -1312,6 +1323,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>Support</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation>Sie haben keinen Zugriff auf den %1. Bitte überprüfen Sie Ihre Internetverbindung.</translation>
     </message>
   </context>
 </TS>

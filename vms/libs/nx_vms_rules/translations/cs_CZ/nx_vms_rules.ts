@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Popis</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,27 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O modul %1 byl odpojen</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +201,23 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Konflikt IP adresy kamery %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -224,10 +248,6 @@
     <message>
       <source>Keywords separated by space</source>
       <translation>Klíčová slova oddělená mezerou</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>Obecný</translation>
     </message>
     <message>
       <source>State</source>
@@ -311,16 +331,16 @@
       <translation>Pohyb na %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Stav</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +352,69 @@
     <message>
       <source>Network Issue</source>
       <translation>Problém se sítí</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation type="unfinished">
+        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation type="unfinished">RTP packet loss detected.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation type="unfinished">Device does not respond to network requests.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
     </message>
   </context>
   <context>
@@ -493,6 +576,14 @@
       <source>Server Failure</source>
       <translation>Chyba serveru</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation type="unfinished">Connection to server is lost.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation type="unfinished">Server stopped unexpectedly.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +672,46 @@
       <source>Storage Issue</source>
       <translation>Problém s úložištěm</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation type="unfinished">I/O error has occurred at %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation type="unfinished">RAID error. %1.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +749,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation type="unfinished">Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation type="unfinished">Caption: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation type="unfinished">Reason: %1</translation>
     </message>
   </context>
   <context>

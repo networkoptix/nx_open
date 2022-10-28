@@ -1050,6 +1050,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Bad request.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not found.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation type="unfinished">Unauthorized.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1060,23 +1121,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP 호스트</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>전자 우편에서</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP 사용자</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP 암호</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>이메일 서명</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1084,19 +1145,15 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP 연결 유형</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP 포트</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1104,7 +1161,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1116,11 +1173,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP 검색 기준</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP 검색 필터</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1172,7 +1229,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>시간 동기화 활성화</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1184,19 +1241,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>OS 시간 변경 확인 기간</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>네트워크 요청에 대한 시간 동기화 간격 동기화</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>엡실론 시간 동기화. 시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>클라우드 소유자 계정</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1208,11 +1265,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>시스템 이름</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>내부 시스템 ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1241,19 +1298,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>최대 장면수(기본값 0)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>일반 텍스트로 이메일 보내기</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>이메일에 Windows 줄넘김 사용</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>검사 보고 설정</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1261,7 +1318,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>이벤트 로그 기간(일)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1294,10 +1351,6 @@
     <message>
       <source>Cloud host override</source>
       <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1333,7 +1386,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP 휴식시간 (1/1000초)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1354,10 +1407,6 @@
     <message>
       <source>Enable recording on EDGE</source>
       <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1385,7 +1434,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>카메라 설정</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1409,7 +1458,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>기본 내보내기 비디오 코덱</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1417,11 +1466,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>저품질 스크린 비디오 코덱</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>라이선스 서버</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1429,7 +1478,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>데이터베이스에 보관할 최대 이벤트 로그 레코드. 삭제되지 않은 실제 레코드 양은 지정된 값보다 최대 20 % 더 높을 수 있습니다.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1437,7 +1486,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>메타 데이터 스토리지 변경 정책</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -1452,24 +1501,12 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1488,10 +1525,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1500,20 +1533,53 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation type="unfinished">Language for Cloud notifications</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation type="unfinished">Enable 2fa for system</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
     </message>
   </context>
   <context>
@@ -1857,18 +1923,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>장치 연결이 예상치 못하게 끊김.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
@@ -2010,24 +2064,8 @@
       <translation>레이아웃 열기</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>시간차가 심해 강제로 카메라 시간을 사용하는데 실패하여 시스템 시간이 사용됩니다</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>카메라 시간이 정상으로 돌아 왔습니다.</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>멀티 캐스트 주소 충돌이 감지되었습니다. %2 가 %3 스트림으로 이미 %1 주소를 사용중 입니다.</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>네트워크 주소 %1 은 멀티 캐스트 주소가 아닙니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2103,14 +2141,6 @@
       <translation>I/O 모듈 연결이 끊어졌었습니다</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>기본 스트림의 RTP 오류 (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>보조 스트림의 RTP 오류 (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>분석 개체 감지됨</translation>
     </message>
@@ -2156,12 +2186,58 @@
       <translation>서버 &quot;%1&quot; 인증서 오류</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

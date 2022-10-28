@@ -85,10 +85,6 @@
       <translation>最大緩衝長度</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>瀏覽日誌</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>清除本地快取</translation>
     </message>
@@ -110,11 +106,35 @@
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation>使用硬體解碼影片</translation>
+      <translation>使用硬體加速進行影像解碼</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
       <translation>伺服器憑證驗證</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>下載</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -320,10 +340,6 @@
       <translation>跳過目前佇列</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>最大備份佇列容量</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>所有錄影資料已備份成功！後續新增檔案將會依照設定自動備份。</translation>
     </message>
@@ -367,7 +383,7 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation>區域寬度</translation>
+      <translation>書籤顯示寬度</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -375,7 +391,7 @@
     </message>
     <message>
       <source>Include description</source>
-      <translation>包含說明</translation>
+      <translation>包含書籤描述內容</translation>
     </message>
   </context>
   <context>
@@ -510,14 +526,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>不錄存主串流</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>不錄存第二串流</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>自動</translation>
     </message>
@@ -543,7 +551,7 @@
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation>停用次串流</translation>
+      <translation>停用攝影機的次串流</translation>
     </message>
     <message>
       <source>Motion Detection</source>
@@ -567,11 +575,11 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義 ID</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>信任攝影機的時間戳記</translation>
+      <translation>使用攝影機所提供的時間戳記</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
@@ -587,7 +595,7 @@
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation>在匯入檔案時偵測到移動</translation>
+      <translation>匯入檔案時，同時進行移動偵測。</translation>
     </message>
     <message>
       <source>Stream Settings</source>
@@ -595,7 +603,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>使用Media2服務取得串流設定</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -646,12 +654,20 @@
       <translation type="unfinished">Primary stream profile</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>從裝置匯出</translation>
+    </message>
+    <message>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
   </context>
   <context>
@@ -710,7 +726,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義 ID</translation>
     </message>
   </context>
   <context>
@@ -781,7 +797,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>上一步</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +805,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>下一個</translation>
     </message>
   </context>
   <context>
@@ -846,7 +862,7 @@
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation>編輯串流......</translation>
+      <translation>編輯串流網址......</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
@@ -857,7 +873,7 @@
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation>串流地址</translation>
+      <translation>串流網址</translation>
     </message>
   </context>
   <context>
@@ -872,6 +888,61 @@
     <message>
       <source>Change password</source>
       <translation>變更密碼</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation type="unfinished">BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation type="unfinished">Available Actions</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation type="unfinished">Video Export</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation type="unfinished">Live Video and Archive</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>In Future</source>
+      <translation type="unfinished">In Future</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation type="unfinished">Read more on the help page</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation type="unfinished">Motion Search</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>•</source>
+      <translation type="unfinished">•</translation>
     </message>
   </context>
   <context>
@@ -946,6 +1017,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>從備份回復…</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation type="unfinished">&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open folder</source>
+      <translation type="unfinished">Open folder</translation>
     </message>
   </context>
   <context>
@@ -1140,7 +1227,7 @@
     </message>
     <message>
       <source>Make read-only</source>
-      <translation>建立為唯獨模式</translation>
+      <translation>設定為唯讀模式</translation>
     </message>
   </context>
   <context>
@@ -1151,15 +1238,15 @@
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation>套用過濾器</translation>
+      <translation>套用影像強化設定</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>翻轉、魚眼攤平校正及影像強化等.</translation>
+      <translation>影像旋轉、魚眼攤平校正及影像強化等.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>套用的過濾器和新增的浮水印需要轉碼. 這會增加CPU使用率且可能需要很長時間.</translation>
+      <translation>若匯出時有套用影像強化設定或使用者自訂內容(如文字，圖片或書籤內容等)，則此影像需要重新編碼。CPU使用率會暫時提高且需要較長時間來完成。</translation>
     </message>
   </context>
   <context>
@@ -1181,7 +1268,7 @@
     </message>
     <message>
       <source>Single Camera</source>
-      <translation>單支攝影機</translation>
+      <translation>單ㄧ影像</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -1189,7 +1276,7 @@
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>多支影像</translation>
+      <translation>複數影像</translation>
     </message>
   </context>
   <context>
@@ -1255,8 +1342,8 @@
       <translation type="unfinished">Test Action</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1427,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>當麥克風啟用時則將音訊切換成靜音</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>系統設定</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>備份與還原</translation>
     </message>
   </context>
   <context>
@@ -1383,7 +1470,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation>透明度</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1413,7 +1500,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation>關於</translation>
+      <translation>資訊</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1497,7 +1584,7 @@
     </message>
     <message>
       <source>Width</source>
-      <translation>宽度</translation>
+      <translation>寬度</translation>
     </message>
     <message>
       <source>Height</source>
@@ -1505,7 +1592,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>邏輯 ID</translation>
+      <translation>自定義ID</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -1517,7 +1604,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation>最小網格尺寸</translation>
+      <translation>最小影像顯示網格尺寸</translation>
     </message>
   </context>
   <context>
@@ -1529,10 +1616,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>共享佈局</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中選擇單個使用者, 然後顯示本地佈局到&quot;</translation>
     </message>
   </context>
   <context>
@@ -1705,6 +1788,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Logging level</source>
+      <translation type="unfinished">Logging level</translation>
+    </message>
+    <message>
+      <source>Limit Max volume</source>
+      <translation type="unfinished">Limit Max volume</translation>
+    </message>
+    <message>
+      <source>Split file by time</source>
+      <translation type="unfinished">Split file by time</translation>
+    </message>
+    <message>
+      <source>Split file by size</source>
+      <translation type="unfinished">Split file by size</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>啟用</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1831,45 @@
     <message>
       <source>Test</source>
       <translation>測試</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>下載</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>還原為出廠預設值</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation type="unfinished">Download is finished!</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation type="unfinished">Failed to save logs to selected folder</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +2056,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +2064,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>使用者</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1935,11 +2080,11 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>支援簽章</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation type="unfinished">System Signature</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2201,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>預設</translation>
     </message>
   </context>
   <context>
@@ -2478,12 +2623,12 @@
       <translation type="unfinished">Delete Rule</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
-    </message>
-    <message>
       <source>Reset default rules</source>
       <translation type="unfinished">Reset default rules</translation>
+    </message>
+    <message>
+      <source>Select a rule</source>
+      <translation type="unfinished">Select a rule</translation>
     </message>
   </context>
   <context>
@@ -2584,7 +2729,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>僅使用HTTPS協定與攝影機進行連線</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2612,7 +2757,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>若攝影機不支援 HTTPS ，則無法與攝影機進行連線。</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2810,7 +2955,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>狀態</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3080,8 @@
       <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>自訂手機推播通知的語言</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3302,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>音量</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3226,7 +3371,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation>透明度</translation>
     </message>
     <message>
       <source>Frequency</source>

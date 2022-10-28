@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;敘述</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>屬性</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O 模組 %1 已離線</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>%1的攝影機IP衝突</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>設備 IP 衝突</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -224,10 +236,6 @@
     <message>
       <source>Keywords separated by space</source>
       <translation>關鍵字以空白鍵分隔</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>通用</translation>
     </message>
     <message>
       <source>State</source>
@@ -311,16 +319,16 @@
       <translation>%1 位移偵測</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>狀態</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>攝影機</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>攝影機位移偵測</translation>
     </message>
   </context>
   <context>
@@ -332,6 +340,66 @@
     <message>
       <source>Network Issue</source>
       <translation>網路問題</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>已有 %n 秒沒有收到任何資料。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>主串流的RTP錯誤( %1 )。</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>次串流的RTP錯誤( %1 )。</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>與攝影機的連線(主串流)無預期中斷。</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>與攝影機的連線(次串流)無預期中斷。</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>與設備的連線無預期中斷。</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>偵測到 RTP 封包丟失。</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>無法強制使用攝影機時間，因其延遲過久，將採用系統時間。</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>攝影機時間已恢復正常。</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>設備未回應網路請求。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>位址 %1 已被 %2 的主串流所使用。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>位址 %1 已被 %2 的次串流所使用。</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>偵測到衝突的群播位址。</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>網址 %1 並非群播位址。</translation>
     </message>
   </context>
   <context>
@@ -493,6 +561,14 @@
       <source>Server Failure</source>
       <translation>伺服器錯誤</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>與伺服器的連線中斷。</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>伺服器無預警停止。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +657,46 @@
       <source>Storage Issue</source>
       <translation>存儲問題</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>在寫入資料至 %1 時發生I/O錯誤問題。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>HDD/SSD %1 速度不足以錄影。</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSD &quot;%1&quot; 已滿。硬碟裡包含太多非VMS資料。</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>系統磁碟 &quot;%1&quot; 空間即將不足。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>儲存裝置 &quot;%1&quot; 處於離線狀態。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>儲存裝置 &quot;%1&quot; 容量即將不足。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>分析存儲 &quot;%1&quot; DB錯誤：掛載點權限不足。</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>錄影資料寫入時，無法初始化 AES 加密。錄影資料以未加密狀態寫入。</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>RAID錯誤，%1。</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>錄影資料備份失敗: 無法完成'檔案 %1 備份</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +734,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>擴充套件: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>說明: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>原因：%1</translation>
     </message>
   </context>
   <context>

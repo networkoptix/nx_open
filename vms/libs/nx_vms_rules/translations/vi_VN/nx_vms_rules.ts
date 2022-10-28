@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Miêu tả</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Các đặc tính</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -80,25 +76,25 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Đã hoàn tất sao lưu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Sự kiện không xác định</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>Đã xảy ra sự kiện %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>cổng đầu vào: %1</translation>
+      <translation>Cổng đầu vào: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -106,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Tín hiệu đầu vào trên camera</translation>
     </message>
     <message>
       <source>State</source>
@@ -125,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Sự kiện gỡ lỗi</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Giá trí</translation>
     </message>
   </context>
   <context>
@@ -152,7 +148,7 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>thiết bị %1 đã được ngắt kết nối</translation>
+      <translation>Thiết bị %1 đã được ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I / O Module %1 đã bị ngắt kết nối</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>
+        <numerusform>Thiết bị ngắt kết nối</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>ID thiết bị</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>Camera Ngắt kết nối</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Camera IP xung đột tại %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Thiết bị xung đột IP</translation>
+      <translation>
+        <numerusform>Xung đột IP của thiết bị</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Xung đột IP của camera</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -215,7 +227,7 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation>sự kiện chung</translation>
+      <translation>Sự kiện chung</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -224,10 +236,6 @@
     <message>
       <source>Keywords separated by space</source>
       <translation>Từ khóa ngăn cách bởi không gian</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>chung</translation>
     </message>
     <message>
       <source>State</source>
@@ -250,19 +258,19 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Do HTTP request</source>
-      <translation>gởi HTTP yêu cầu</translation>
+      <translation>Gởi HTTP yêu cầu</translation>
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>Nội dung HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +286,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>Phương thức yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -289,7 +297,7 @@
     </message>
     <message>
       <source>License Issue</source>
-      <translation>vấn đề giấy phép</translation>
+      <translation>Vấn đề giấy phép</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
@@ -311,16 +319,16 @@
       <translation>%1 phát hiện chuyển động</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Tiểu bang</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Máy chụp hình</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Chuyển động trên camera</translation>
     </message>
   </context>
   <context>
@@ -331,14 +339,74 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>vấn đề về mạng</translation>
+      <translation>Vấn đề về mạng</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng chính (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng phụ (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng chính) bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng phụ) bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Phát hiện mất gói RTP.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>Không thể bắt buộc sử dụng thời gian của camera, nó bị trễ quá nhiều, sẽ sử dụng thời gian hệ thống.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Thời gian camera trở lại bình thường.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng chính.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng phụ.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Đã phát hiện xung đột địa chỉ multicast.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Hiển thị thông báo</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +414,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Buộc xác nhận</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +430,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Chú giải công cụ</translation>
     </message>
   </context>
   <context>
@@ -373,7 +441,7 @@
     </message>
     <message>
       <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
+      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,15 +504,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Người nhận bổ sung</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Nội dung email</translation>
     </message>
   </context>
   <context>
@@ -480,7 +548,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>xung đột máy chủ</translation>
+      <translation>Xung đột máy chủ</translation>
     </message>
   </context>
   <context>
@@ -491,7 +559,15 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>máy chủ thất bại</translation>
+      <translation>Máy chủ thất bại</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Kết nối đến máy chủ bị mất.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Máy chủ dừng đột ngột.</translation>
     </message>
   </context>
   <context>
@@ -502,7 +578,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>máy chủ bắt đầu</translation>
+      <translation>Máy chủ bắt đầu</translation>
     </message>
   </context>
   <context>
@@ -548,7 +624,7 @@
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation>nói</translation>
+      <translation>Nói</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -556,7 +632,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +656,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>Vấn đề lưu trữ</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O lỗi tại %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Không đủ tốc độ HDD/SSD để ghi về %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Ổ HDD/SSD &quot;%1&quot; đã đầy. Ổ chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Ổ hệ thống &quot;%1&quot; gần đầy.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Lưu trữ phân tích &quot;%1&quot; đang ngoại tuyến.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Lưu trữ phân tích &quot;%1&quot; gần đầy.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>Không thể khởi tạo mã hóa AES trong khi ghi lưu trữ đa phương tiện. Dữ liệu không được mã hóa.</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Lỗi RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Sao lưu lưu trữ không thành công. Không sao lưu được tệp %1.</translation>
     </message>
   </context>
   <context>
@@ -609,15 +725,23 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation>biến cố：%1</translation>
+      <translation>Biến cố：%1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>nguồn：%1</translation>
+      <translation>Nguồn：%1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Chú thích: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Lý do: %1</translation>
     </message>
   </context>
   <context>
@@ -639,7 +763,7 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>thời gian：%1 trong %2</translation>
+      <translation>Thời gian：%1 trong %2</translation>
     </message>
   </context>
 </TS>

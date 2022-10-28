@@ -1188,6 +1188,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Bad request.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not found.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation type="unfinished">Unauthorized.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1198,95 +1259,91 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>Host SMTP</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Nadawca e-mail</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>Użytkownik SMTP</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Hasło SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Podpis e-mail</translation>
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Wsparcie e-mail</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Typ połączenia SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>Port SMTP</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>Limit czasu SMTP (sekundy)</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>Nazwa SMTP</translation>
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>Adres URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>Hasło administratora LDAP</translation>
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Podstawa wyszukiwania LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filtr wyszukiwania LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>Wygaśnięcie hasła LDAP (milisekundy)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Limit czasu wyszukiwania LDAP (sekundy)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Dozwolony anonimowy raport statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Ostatni anonimowy raport statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Ostatnia wersja anonimowego raportu statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Ostatni numer anonimowego raportu statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Cykl czasowy statystyk anonimowych</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
@@ -1310,47 +1367,47 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Synchronizacja czasu włączona</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Podstawowy serwer synchronizacji czasu</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Max różnica między czasem zsynchronizowanym a lokalnym (ms)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Okres sprawdzania zmiany czasu systemu</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Interwał synchronizacji czasu dla żądań sieciowych</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Wartość synchronizacji czasu epsilon. Nowa wartość nie jest stosowana jeśli czas delta jest mniejszy niż czas epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Konto właściciela chmury</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>ID systemu w chmurze</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Klucz autoryzacji w chmurze</translation>
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Nazwa systemu</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>ID lokalnego systemu</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1366,11 +1423,11 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optymalizuj ustawienia kamery</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Automatyczna aktualizacja miniatur</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
@@ -1379,19 +1436,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Max liczba elementów sceny (0 oznacza domyślną)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Wysyłaj e-maile czystym tekstem</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Używaj w e-mailach znaków końca linii zgodnych z Windows</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Zapisuj dziennik dostępu</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1399,7 +1456,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Okres dziennika zdarzeń (dni)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1411,7 +1468,7 @@
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Włącz automatyczne wykrywanie urządzeń</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1427,15 +1484,11 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Ustawienia kopii zapasowej</translation>
     </message>
     <message>
       <source>Cloud host override</source>
       <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1471,7 +1524,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Limit czasu RTP (ms)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1492,10 +1545,6 @@
     <message>
       <source>Enable recording on EDGE</source>
       <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1523,7 +1572,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Ustawienia znaku wodnego</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1547,19 +1596,19 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Domyślny kodek wideo</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Domyślny kodek do eksportu wideo</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Kodek ekranu wideo niskiej jakości</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Serwer licencji</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1567,7 +1616,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1575,7 +1624,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Polityka zmiany magazynu metadanych</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -1590,24 +1639,12 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1626,10 +1663,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1638,20 +1671,53 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation>Język powiadomień w chmurze</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>Rozmiar bufora mediów (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation>Rozmiar bufora mediów tylko dla urządzeń audio (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation type="unfinished">Enable 2fa for system</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
     </message>
   </context>
   <context>
@@ -2025,18 +2091,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Połączenie z urządzeniem zostało nieoczekiwanie zamknięte.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Połączenie z kamerą (pierwszy strumień) zostało nieoczekiwanie zamknięte.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Połączenie z kamerą (drugi strumień) zostało nieoczekiwanie zamknięte.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>Wykryto utratę pakietu RTP.</translation>
     </message>
@@ -2184,24 +2238,8 @@
       <translation>Otwórz układ</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Nie można wymusić użycia czasu kamery z powodu opóźnień, zostanie wykorzystany czas systemowy</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Czas kamery powrócił do normy</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Wystąpiło wiele zdarzeń %1</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Wykryto konflikt adresów multicastowych. Adres %1 jest już używany przez %2 na strumieniu %3</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Adres sieciowy %1 nie jest adresem multicastowym</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2277,14 +2315,6 @@
       <translation>Moduł I/O został odłączony</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>Błąd RTP w pierwszym strumieniu (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>Błąd RTP w drugim strumieniu (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Wykryto obiekt analityczny</translation>
     </message>
@@ -2330,12 +2360,58 @@
       <translation>Błąd certyfikatu serwera &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Błąd RTP w pierwszym strumieniu (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Błąd RTP w drugim strumieniu (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>Połączenie z kamerą (pierwszy strumień) zostało nieoczekiwanie zamknięte.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Połączenie z kamerą (drugi strumień) zostało nieoczekiwanie zamknięte.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>Połączenie z urządzeniem zostało nieoczekiwanie zamknięte.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>Nie można wymusić użycia czasu kamery z powodu opóźnień. Zostanie wykorzystany czas systemowy.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Czas kamery powrócił do normy.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adres %1 jest już używany przez %2 w strumieniu podstawowym.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adres %1 jest już używany przez %2 w strumieniu dodatkowym.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Wykryto konflikt adresów multiemisji.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Adres sieciowy %1 nie jest adresem multicastowym.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Nie udało się wykonać kopii zapasowej pliku %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Библиотеки с открытым исходным кодом</translation>
     </message>
   </context>
   <context>
@@ -85,10 +85,6 @@
       <translation>Максимальный размер буфера живого видео</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Просмотр журнала событий</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Очистить локальный кэш</translation>
     </message>
@@ -114,7 +110,31 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Проверка сертификата сервера</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Скачать</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Отмена</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -159,7 +179,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Атрибуты:</translation>
     </message>
     <message>
       <source>Object Type:</source>
@@ -174,15 +194,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Хранить архив в течение...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Макс</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Мин</translation>
     </message>
   </context>
   <context>
@@ -263,19 +283,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Без ограничений</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Фиксированный</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Запланировано</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Ограничить пропускную способность</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -283,33 +303,33 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Неограничено</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Ограничено до</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Без резервирования</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Сервер отключен. Настройки резервного копирования недоступны.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Резервное копирование еще не настроено.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Чтобы начать резервное копирование, включите его для некоторых камер и примените настройки.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -317,19 +337,15 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Пропустить текущую очередь</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Все файлы успешно скопированы! Новые файлы будут копироваться автоматически</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Резервное копирование остановлено из-за проблем с хранилищем. Резервное копирование возобновится автоматически после решения проблемы с хранилищем</translation>
     </message>
   </context>
   <context>
@@ -510,14 +526,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Не записывать первый поток</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Не записывать второй поток</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Авто</translation>
     </message>
@@ -591,7 +599,7 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Настройки потока</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
@@ -599,7 +607,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Используйте разные значения для панорамы и наклона</translation>
     </message>
     <message>
       <source>Tilt</source>
@@ -646,12 +654,20 @@
       <translation type="unfinished">Primary stream profile</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation type="unfinished">Export From Device</translation>
+    </message>
+    <message>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
   </context>
   <context>
@@ -781,7 +797,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Назад</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +805,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Далее</translation>
     </message>
   </context>
   <context>
@@ -875,6 +891,61 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation type="unfinished">BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation type="unfinished">Available Actions</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation type="unfinished">Video Export</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation type="unfinished">Live Video and Archive</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>In Future</source>
+      <translation type="unfinished">In Future</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation type="unfinished">Read more on the help page</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation type="unfinished">Motion Search</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>•</source>
+      <translation type="unfinished">•</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1017,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Восстановить...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Отмена</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation type="unfinished">&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open folder</source>
+      <translation type="unfinished">Open folder</translation>
     </message>
   </context>
   <context>
@@ -1255,8 +1342,8 @@
       <translation type="unfinished">Test Action</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1427,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>Отключить звук, когда микрофон активен</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>Системные настройки</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Резервное копирование и восстановление</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1617,6 @@
       <source>Shared layouts</source>
       <translation>Раскладки с общим доступом</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1788,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Logging level</source>
+      <translation type="unfinished">Logging level</translation>
+    </message>
+    <message>
+      <source>Limit Max volume</source>
+      <translation type="unfinished">Limit Max volume</translation>
+    </message>
+    <message>
+      <source>Split file by time</source>
+      <translation type="unfinished">Split file by time</translation>
+    </message>
+    <message>
+      <source>Split file by size</source>
+      <translation type="unfinished">Split file by size</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Включить</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1831,45 @@
     <message>
       <source>Test</source>
       <translation>Проверка</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Скачать</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Сброс по умолчанию</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Отмена</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation type="unfinished">Download is finished!</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation type="unfinished">Failed to save logs to selected folder</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +2056,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +2064,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Пользователь</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1935,11 +2080,11 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Информация о технической поддержке</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation type="unfinished">System Signature</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2201,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Предустановленное</translation>
     </message>
   </context>
   <context>
@@ -2478,12 +2623,12 @@
       <translation type="unfinished">Delete Rule</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
-    </message>
-    <message>
       <source>Reset default rules</source>
       <translation type="unfinished">Reset default rules</translation>
+    </message>
+    <message>
+      <source>Select a rule</source>
+      <translation type="unfinished">Select a rule</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2955,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Состояние</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3080,8 @@
       <translation>Внимание! Это сделает настройки "Качество" и "Частота кадров" (FPS) неактуальными в расписании.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Пользовательский язык для мобильных уведомлений</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3302,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Громкость</translation>
     </message>
     <message>
       <source>Test</source>

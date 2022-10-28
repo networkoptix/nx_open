@@ -153,20 +153,20 @@
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation>Este complemento no tiene configuraciones para esta cámara.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Verifique la configuración de administración del sistema para configurar este complemento.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
   </context>
   <context>
@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Inicie sesión en</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation>Intente usar otros criterios de búsqueda:</translation>
+      <translation>Intente usar otros criterios de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -1071,6 +1071,17 @@ para activar PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Introducir parametros</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>Esta acción requiere que se completen algunos parámetros.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1159,7 +1170,7 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation>Servidor no disponible.</translation>
+      <translation>Servidor no disponible</translation>
     </message>
     <message>
       <source>No access</source>
@@ -1189,12 +1200,16 @@ para activar PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Versión de firmware no compatible</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation type="unfinished">Access denied</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Lógico</translation>
     </message>
   </context>
   <context>
@@ -1298,10 +1313,6 @@ para activar PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>Usted no tiene acceso a la %1. Por favor revise su conexión a internet.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Sitio Web Oficial</translation>
     </message>
@@ -1312,6 +1323,10 @@ para activar PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Asistencia</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>

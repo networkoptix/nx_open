@@ -85,10 +85,6 @@
       <translation>Longueur maximale du tampon direct</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Parcourir les journaux</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Effacer le cache local</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>Validation du certificat du serveur</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Télécharger</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -320,10 +340,6 @@
       <translation>Ignorer la file d'attente actuelle</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Taille maximale de la file d'attente de sauvegarde</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Tous les fichiers sont sauvegardés avec succès ! Les nouveaux fichiers seront sauvegardés automatiquement</translation>
     </message>
@@ -510,14 +526,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Ne pas archiver le flux primaire</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Ne pas archiver le flux secondaire</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
@@ -635,23 +643,31 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Paramètres ONVIF</translation>
     </message>
     <message>
       <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <translation>Profil de flux secondaire</translation>
     </message>
     <message>
       <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
-    </message>
-    <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>Profil de flux principal</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Ne pas exporter automatiquement la vidéo</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>Exporter depuis l'appareil</translation>
+    </message>
+    <message>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
   </context>
   <context>
@@ -769,11 +785,11 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Remplacement de la caméra</translation>
     </message>
     <message>
       <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Nouveau périphérique</translation>
     </message>
     <message>
       <source>Name</source>
@@ -781,7 +797,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Précédent</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +805,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Suivant</translation>
     </message>
   </context>
   <context>
@@ -875,6 +891,61 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation type="unfinished">Available Actions</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation type="unfinished">Video Export</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation type="unfinished">Live Video and Archive</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>In Future</source>
+      <translation type="unfinished">In Future</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation type="unfinished">Read more on the help page</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation type="unfinished">Motion Search</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>•</source>
+      <translation type="unfinished">•</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -900,11 +971,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Cette action ne peut être définie que pour les événements instantanés</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Sélectionnez un autre événement ou une autre action</translation>
     </message>
   </context>
   <context>
@@ -946,6 +1017,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Restaurer une sauvegarde...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation type="unfinished">&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open folder</source>
+      <translation type="unfinished">Open folder</translation>
     </message>
   </context>
   <context>
@@ -1076,7 +1163,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Événement générique</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1331,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Ajouter un commentaire</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Définir le calendrier</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Tester l'action</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1427,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>Couper le son lorsque le micro est actif</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>Paramètres Système</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Sauvegarde et restauration</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1617,6 @@
       <source>Shared layouts</source>
       <translation>Mises en page partagées</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Sélectionnez un seul utilisateur dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1788,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Logging level</source>
+      <translation>Niveau des logs</translation>
+    </message>
+    <message>
+      <source>Limit Max volume</source>
+      <translation>Limiter le volume maximum</translation>
+    </message>
+    <message>
+      <source>Split file by time</source>
+      <translation>Diviser le fichier par temps</translation>
+    </message>
+    <message>
+      <source>Split file by size</source>
+      <translation>Diviser le fichier par taille</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Activer</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1831,45 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Télécharger</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Réglages</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Revenir à la valeur par défaut</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation>Le téléchargement est terminé !</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation>Ouvrir le dossier des fichiers</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Fait</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation type="unfinished">Failed to save logs to selected folder</translation>
     </message>
   </context>
   <context>
@@ -1907,11 +2052,11 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Paramètres de connexion</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Courriel</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,27 +2064,27 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Utilisateur</translation>
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Adresse du serveur</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Protocole de sécurité</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Paramètres courriel</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Signature Support</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation>Signature du système</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2201,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Préréglage</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2612,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Règles d'alarme/d'événement</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Nouvelle règle</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
-    </message>
-    <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <translation>Supprimer la règle</translation>
     </message>
     <message>
       <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <translation>Restaurer les règles par défaut</translation>
+    </message>
+    <message>
+      <source>Select a rule</source>
+      <translation type="unfinished">Select a rule</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2940,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Son</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Gérer</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2955,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>État</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3080,8 @@
       <translation>Attention! Cela rendra la qualité et l'image par seconde (IPS) de la programmation d'enregistrement non pertinent.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Langue personnalisée pour les notifications mobiles</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Langue personnalisée pour les notifications Cloud</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3149,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Ajouter un groupe</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Aucun groupe trouvé</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3164,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Ajouter Utilisateur</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Aucun utilisateur trouvé</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3302,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Volume</translation>
     </message>
     <message>
       <source>Test</source>

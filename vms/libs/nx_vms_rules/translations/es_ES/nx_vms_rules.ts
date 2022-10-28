@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;Descripción</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Atributos</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>El módulo de E/S %1 fue desconectado</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Conflicto de IP de la Cámara %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Conflicto de dispositivos IP</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -224,10 +240,6 @@
     <message>
       <source>Keywords separated by space</source>
       <translation>Palabras clave separadas por espacio</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>Genérico</translation>
     </message>
     <message>
       <source>State</source>
@@ -311,16 +323,16 @@
       <translation>Movimiento en %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Estado</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Camara</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Movimiento en cámara</translation>
     </message>
   </context>
   <context>
@@ -332,6 +344,67 @@
     <message>
       <source>Network Issue</source>
       <translation>Problema de red</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>No se recibieron datos durante los últimos %n segundos.</numerusform>
+        <numerusform>No se recibieron datos durante los últimos %n segundos.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Error de RTP en la transmisión principal (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Error de RTP en flujo secundario (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>La conexión a la cámara (transmisión principal) se cerró inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>La conexión a la cámara (transmisión secundaria) se cerró inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>Conexión al dispositivo se cerró inesperadamente.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Pérdida paquete RTP detectado.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>No se pudo forzar el uso del tiempo de la cámara, se demora demasiado, se usará el tiempo del sistema.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>El tiempo de la cámara ha vuelto a la normalidad.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>El dispositivo no responde a las solicitudes de red.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>La dirección %1 ya está en uso por %2 en el flujo principal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>La dirección %1 ya está en uso por %2 en el flujo principal.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Conflicto de direcciones multidifusión detectado.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>La dirección de red %1 no es una dirección de multidifusión.</translation>
     </message>
   </context>
   <context>
@@ -493,6 +566,14 @@
       <source>Server Failure</source>
       <translation>Falla en el servidor</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Se ha perdido la conexión al servidor.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>El servidor se detuvo inesperadamente.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +662,46 @@
       <source>Storage Issue</source>
       <translation>Problema con el almacenamiento</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Error de E/S ha ocurrido en %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>No hay suficiente velocidad HDD/SSD para grabar a %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>El disco HDD/SSD &quot;%1&quot; está lleno. El disco contiene demasiados datos que no son administrados por VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>El disco del sistema &quot;%1&quot; está casi lleno.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Almacenamiento analítico &quot;%1&quot; está desconectado.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>El almacenamiento de analiticas &quot;%1&quot; está casi lleno.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>Almacenamiento de análisis &quot;%1&quot; Error de base de datos: permisos insuficientes en el punto de montaje.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>No se puede inicializar el cifrado AES mientras se graba el archivo multimedia. Los datos se escriben sin cifrar.</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Error de RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>La copia de seguridad del archivo falló. No se pudo hacer la copia de seguridad del archivo %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +739,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Complemento: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Título: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Razón: %1</translation>
     </message>
   </context>
   <context>

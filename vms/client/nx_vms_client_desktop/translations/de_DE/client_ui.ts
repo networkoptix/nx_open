@@ -85,10 +85,6 @@
       <translation>Maximale Live-Pufferlänge</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Logs ansehen</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Lokalen Cache leeren</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>Server-Zertifikatsüberprüfung</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Download</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -320,10 +340,6 @@
       <translation>Aktuelle Warteschlange überspringen</translation>
     </message>
     <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maximale Größe der Backup-Warteschlange</translation>
-    </message>
-    <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>Alle Dateien werden erfolgreich gesichert! Neue Dateien werden automatisch gesichert</translation>
     </message>
@@ -510,14 +526,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Primären Stream nicht archivieren</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Sekundären Stream nicht archivieren</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
@@ -646,12 +654,20 @@
       <translation>Primäres Stream-Profil</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exportieren von SD-Karten</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Video nicht automatisch exportieren</translation>
+    </message>
+    <message>
+      <source>Export From Device</source>
+      <translation>Vom Gerät exportieren</translation>
+    </message>
+    <message>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
   </context>
   <context>
@@ -875,6 +891,61 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation type="unfinished">Available Actions</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation type="unfinished">Video Export</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation type="unfinished">Live Video and Archive</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>In Future</source>
+      <translation type="unfinished">In Future</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation type="unfinished">Read more on the help page</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation type="unfinished">Motion Search</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>•</source>
+      <translation type="unfinished">•</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1017,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Sicherung wiederherstellen...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation type="unfinished">&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open folder</source>
+      <translation type="unfinished">Open folder</translation>
     </message>
   </context>
   <context>
@@ -1255,8 +1342,8 @@
       <translation>Test-Aktion</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation>Kommentar hinzufügen</translation>
+      <source>Add a comment</source>
+      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1427,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>Audio stummschalten, wenn das Mikrofon aktiv ist</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>Systemeinstellungen</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Sicherung und Wiederherstellung</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1617,6 @@
       <source>Shared layouts</source>
       <translation>Freigegebene Layouts</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Wählen Sie einen einzelnen Benutzer in der Zeile &quot;Anzeigen auf&quot; aus, um seine lokalen Layouts in dieser Liste anzuzeigen</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1788,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Logging level</source>
+      <translation>Logging-Level</translation>
+    </message>
+    <message>
+      <source>Limit Max volume</source>
+      <translation>Grenzwert für Maximale Lautstärke</translation>
+    </message>
+    <message>
+      <source>Split file by time</source>
+      <translation>Datei nach Zeit aufteilen</translation>
+    </message>
+    <message>
+      <source>Split file by size</source>
+      <translation>Datei nach Größe aufteilen</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Aktivieren</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1831,45 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Download</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Auf Standardwerte zurücksetzen</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation>Der Download ist abgeschlossen!</translation>
+    </message>
+    <message>
+      <source>Open files folder</source>
+      <translation>Dateiordner öffnen</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Fertig</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation type="unfinished">Failed to save logs to selected folder</translation>
     </message>
   </context>
   <context>
@@ -1938,7 +2083,7 @@
       <translation>Supportsignatur</translation>
     </message>
     <message>
-      <source>System Singnature</source>
+      <source>System Signature</source>
       <translation>Systemsignatur</translation>
     </message>
   </context>
@@ -2478,12 +2623,12 @@
       <translation>Regel löschen</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation>Regel auswählen</translation>
-    </message>
-    <message>
       <source>Reset default rules</source>
       <translation>Standardregeln zurücksetzen</translation>
+    </message>
+    <message>
+      <source>Select a rule</source>
+      <translation type="unfinished">Select a rule</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3080,8 @@
       <translation>Warnung! Dadurch werden die Qualitäts- und Framerateneinstellungen (FPS) im Aufnahmezeitplan irrelevant.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Benutzerdefinierte Sprache für mobile Benachrichtigungen</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Benutzerdefinierte Sprache für Cloud-Benachrichtigungen</translation>
     </message>
   </context>
   <context>

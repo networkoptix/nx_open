@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;Descrição</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Atributos</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -80,33 +76,33 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Backup concluído</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Evento desconhecido</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 evento ocorreu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>Porta de entrada de alarme: %1</translation>
+      <translation>Porta de entrada: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>Input em %1</translation>
+      <translation>Entrada em %1</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Sinal de entrada na câmera</translation>
     </message>
     <message>
       <source>State</source>
@@ -118,14 +114,14 @@
     </message>
     <message>
       <source>Input ID</source>
-      <translation>ID de Input</translation>
+      <translation>ID de entrada</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Evento de depuração</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,14 +129,14 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device was disconnected</source>
-      <translation>Dispositivo desconectado</translation>
+      <translation>O dispositivo foi desconectado</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
@@ -152,23 +148,33 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>O Dispositivo %1 foi desligado</translation>
+      <translation>O dispositivo %1 foi desconectado</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>A CÂmara %1 foi desligada</translation>
+      <translation>A câmera %1 foi desconectada</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>O módulo I/O %1 foi desligado</translation>
+      <translation>O Módulo I/O foi desconectado</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>ID de dispositivo</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -179,7 +185,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Conflito IP da câmara no %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Conflito de IP do dispositivo</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +242,6 @@
       <translation>Palavras-chave separadas por espaço</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Genérico</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Estado</translation>
     </message>
@@ -254,15 +266,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>Conteúdo HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +290,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>Método de solicitação</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Detecção Movimento em %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Estado</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Câmera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Movimento na câmera</translation>
     </message>
   </context>
   <context>
@@ -333,12 +345,73 @@
       <source>Network Issue</source>
       <translation>Problema de Rede</translation>
     </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation type="unfinished">
+        <numerusform>Nenhum dado recebido durante os últimos %n segundos.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Erro de RTP no fluxo primário (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Erro de RTP no fluxo secundário (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>A conexão com a câmera (fluxo primário) foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>A conexão com a câmera (fluxo secundário) foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>A conexão com o dispositivo foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Perda de pacote RTP detectada.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>Falha ao forçar o uso do tempo da câmera, demora muito; A hora do sistema será usada.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>O tempo da câmera voltou ao normal.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>O dispositivo não responde a solicitações de rede.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>O endereço %1 já está em uso por %2 no fluxo primário.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>O endereço %1 já está em uso por %2 no fluxo secundário.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Conflito de endereço multicast detectado.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>O endereço de rede %1 não é um endereço multicast.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Mostrar notificação</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +419,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Forçar reconhecimento</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +435,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Dica de ferramenta</translation>
     </message>
   </context>
   <context>
@@ -373,7 +446,7 @@
     </message>
     <message>
       <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
+      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,15 +509,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Destinatários adicionais</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Mensagem de email</translation>
     </message>
   </context>
   <context>
@@ -467,12 +540,12 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Servidor %1 em conflito : %2</translation>
+      <translation>Servidor %1 em conflito: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
@@ -492,6 +565,14 @@
     <message>
       <source>Server Failure</source>
       <translation>Falha de Servidor</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>A conexão com o servidor foi perdida.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>O servidor parou inesperadamente.</translation>
     </message>
   </context>
   <context>
@@ -533,7 +614,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Utilizadores</translation>
+      <translation>Usuários</translation>
     </message>
     <message>
       <source>Name</source>
@@ -556,7 +637,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +661,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>Problema de armazenamento</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Ocorreu um erro de I / O em %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Velocidade de HDD/SSD insuficiente para gravação em %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>O disco HDD/SSD &quot;%1&quot; está cheio. O disco contém muitos dados que não são gerenciados pelo VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>O disco do sistema &quot;%1&quot; está quase cheio.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>O armazenamento de análise &quot;%1&quot; está offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>O armazenamento de análise &quot;%1&quot; está quase cheio.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>Armazenamento analítico &quot;%1&quot; Erro de banco de dados: permissões insuficientes no ponto de montagem.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>&apos;t pode inicializar a criptografia AES durante a gravação do arquivo de mídia. Os dados são gravados sem criptografia.</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Erro de RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Falha no backup do arquivo. Falha ao fazer backup do arquivo %1.</translation>
     </message>
   </context>
   <context>
@@ -618,6 +739,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Título: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Razão: %1</translation>
     </message>
   </context>
   <context>

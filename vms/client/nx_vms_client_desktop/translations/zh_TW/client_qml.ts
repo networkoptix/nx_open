@@ -151,20 +151,20 @@
       <translation>攝影機分析功能將只在觀看影像時有作用. 請啟用錄影來使其全時運作.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>This plugin has no settings for this Camera.</source>
+      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
   </context>
   <context>
@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>登入</translation>
     </message>
   </context>
   <context>
@@ -1062,6 +1062,17 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1179,12 +1190,16 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>不支援的韌體版本</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>拒絕存取</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>邏輯 ID</translation>
     </message>
   </context>
   <context>
@@ -1287,10 +1302,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>目前無法連線至 %1，請檢查您的網路連線。</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>官方網站</translation>
     </message>
@@ -1301,6 +1312,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>技術支援</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>
