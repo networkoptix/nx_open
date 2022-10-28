@@ -78,6 +78,7 @@ ServerCertificateViewer::ServerCertificateViewer(
     ui(new Ui::ServerCertificateViewer())
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     const int kScrollBarWidth = 6;
     const int kCertificateChainLineHeight = 20;
