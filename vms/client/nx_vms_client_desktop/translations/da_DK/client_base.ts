@@ -5644,7 +5644,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analysedata kan optage store mængder plads.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
@@ -6162,7 +6162,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Kunne ikke åbne filen &quot;%1&quot;. Tjek venligst om mappen er tilgængelig.</translation>
     </message>
   </context>
   <context>
@@ -8128,7 +8128,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Intern fejl, prøv igen senere.</translation>
     </message>
   </context>
   <context>
@@ -8894,7 +8894,7 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Gendan standardindstillinger</translation>
     </message>
   </context>
   <context>
@@ -8928,23 +8928,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>fejl</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>advarsel</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>information</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>fejlfinding</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>detaljeret</translation>
     </message>
   </context>
   <context>
@@ -9017,7 +9017,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Gem ændringer</translation>
     </message>
   </context>
   <context>
@@ -9588,7 +9588,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Alle systemer</translation>
     </message>
   </context>
   <context>

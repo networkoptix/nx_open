@@ -160,9 +160,9 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>Enheten är frånkopplad</numerusform>
+        <numerusform>Enheten är frånkopplad</numerusform>
       </translation>
     </message>
     <message>
@@ -199,9 +199,9 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Enheter i IP konflikt</numerusform>
+        <numerusform>Enheter i IP konflikt</numerusform>
       </translation>
     </message>
     <message numerus="yes">

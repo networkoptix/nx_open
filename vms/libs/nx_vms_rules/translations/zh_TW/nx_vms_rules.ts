@@ -197,14 +197,14 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>設備 IP 衝突</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>攝影機 IP 衝突</numerusform>
       </translation>
     </message>
   </context>

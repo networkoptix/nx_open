@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Gestion des logs</translation>
     </message>
     <message>
       <source>Download</source>
@@ -122,7 +122,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Paramètres</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -130,11 +130,11 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Ouvrir le dossier des fichiers</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Fait</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -934,7 +934,7 @@
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Recherche de mouvement</translation>
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open folder</source>
@@ -1865,7 +1865,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Réessayer</translation>
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>

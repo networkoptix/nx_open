@@ -1072,7 +1072,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>잘못된 요청입니다.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1082,11 +1082,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>내부 오류</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>허용되지 않음.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -2187,11 +2187,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>기본 스트림의 RTP 오류 (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>보조 스트림의 RTP 오류 (%1).</translation>
     </message>
     <message>
       <source>Connection to Camera (primary stream) was unexpectedly closed.</source>

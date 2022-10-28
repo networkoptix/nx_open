@@ -1074,7 +1074,7 @@ om PTZ te activeren</translation>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Voer parameters in</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>

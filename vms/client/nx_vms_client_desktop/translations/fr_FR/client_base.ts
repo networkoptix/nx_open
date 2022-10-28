@@ -1891,7 +1891,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>Le téléchargement est terminé !</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
@@ -5644,11 +5644,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Les données analytiques peuvent prendre beaucoup d’espace.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Nous vous recommandons de choisir un autre emplacement à la place de la partition système.</translation>
     </message>
   </context>
   <context>
@@ -6163,7 +6163,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Impossible d'ouvrir le fichier &quot;%1&quot;. Veuillez vérifier si le dossier est accessible.</translation>
     </message>
   </context>
   <context>
@@ -8035,7 +8035,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>page d'aide</translation>
     </message>
   </context>
   <context>
@@ -8129,7 +8129,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Erreur interne. Veuillez réessayer plus tard.</translation>
     </message>
   </context>
   <context>
@@ -8395,7 +8395,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>INFORMATIONS REQUISE</translation>
     </message>
   </context>
   <context>
@@ -9018,7 +9018,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Appliquer</translation>
     </message>
   </context>
   <context>
@@ -9589,7 +9589,7 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Tous les systèmes</translation>
     </message>
   </context>
   <context>
@@ -11459,7 +11459,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Impossible d’appliquer les changements.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
@@ -11481,7 +11481,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Sélectionnez au moins un utilisateur</translation>
     </message>
   </context>
   <context>

@@ -1072,7 +1072,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>การร้องขอไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1082,11 +1082,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>ไม่​พบ.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>หน้าเว็บไซต์ไม่ได้รับอนุญาต.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -2187,11 +2187,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>ข้อผิดพลาด RTP ในสตรีมหลัก (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>ข้อผิดพลาด RTP ในสตรีมสำรอง (%1).</translation>
     </message>
     <message>
       <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
@@ -2229,7 +2229,7 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>ที่อยู่เครือข่าย %1 ไม่ใช่ที่อยู่แบบหลายผู้รับ.</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>

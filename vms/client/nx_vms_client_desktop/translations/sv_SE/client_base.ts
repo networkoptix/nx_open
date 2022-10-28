@@ -1891,7 +1891,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>Nerladdning slutförd!</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
@@ -5644,11 +5644,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analysdata kan ta upp stora mängder utrymme.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
     </message>
   </context>
   <context>
@@ -6163,7 +6163,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Det gick inte att öppna filen &quot;%1&quot;. Kontrollera om mappen är tillgänglig.</translation>
     </message>
   </context>
   <context>
@@ -8129,7 +8129,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Internt fel. Vänligen försök igen.</translation>
     </message>
   </context>
   <context>
@@ -8395,7 +8395,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>INFORMATION KRÄVS</translation>
     </message>
   </context>
   <context>
@@ -9018,7 +9018,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Verkställ</translation>
     </message>
   </context>
   <context>
@@ -9589,7 +9589,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Alla system</translation>
     </message>
   </context>
   <context>
@@ -11457,7 +11457,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Det gick inte att tillämpa ändringar.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
@@ -11479,7 +11479,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Välj minst en användare</translation>
     </message>
   </context>
   <context>

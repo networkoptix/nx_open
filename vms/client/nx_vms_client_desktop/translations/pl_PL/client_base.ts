@@ -1923,7 +1923,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>Pobieranie zakończone!</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
@@ -5775,11 +5775,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Dane analityczne mogą zajmować dużą ilość przestrzeni.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Zalecane jest wybranie innej lokalizacji niż partycja systemowa.</translation>
     </message>
   </context>
   <context>
@@ -6303,7 +6303,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Nie można otworzyć pliku &quot;%1&quot;. Sprawdź, czy folder jest dostępny.</translation>
     </message>
   </context>
   <context>
@@ -8273,7 +8273,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>strona pomocy</translation>
     </message>
   </context>
   <context>
@@ -8367,7 +8367,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Błąd wewnętrzny. Spróbuj ponownie później.</translation>
     </message>
   </context>
   <context>
@@ -8639,7 +8639,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>WYMAGANE INFORMACJE</translation>
     </message>
   </context>
   <context>
@@ -9280,7 +9280,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Zastosuj</translation>
     </message>
   </context>
   <context>
@@ -9855,7 +9855,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Wszystkie systemy</translation>
     </message>
   </context>
   <context>
@@ -11761,7 +11761,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Nie udało się zapisać zmian.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

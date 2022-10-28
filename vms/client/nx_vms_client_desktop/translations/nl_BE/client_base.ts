@@ -5640,11 +5640,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analytics-gegevens kunnen grote hoeveelheden ruimte in beslag nemen.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>We raden aan om er een andere locatie voor te kiezen in plaats van de systeempartitie.</translation>
     </message>
   </context>
   <context>
@@ -6159,7 +6159,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Bestand &quot;%1&quot; kon niet worden geopend. Controleer of de map toegankelijk is.</translation>
     </message>
   </context>
   <context>
@@ -7001,7 +7001,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Backup en herstellen</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -8031,7 +8031,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>help pagina</translation>
     </message>
   </context>
   <context>
@@ -8125,7 +8125,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Interne fout. Probeer het later opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -8891,7 +8891,7 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Standaardinstellingen herstellen</translation>
     </message>
   </context>
   <context>
@@ -8925,23 +8925,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>fout</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>waarschuwing</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>info</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>debug</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>uitgebreid</translation>
     </message>
   </context>
   <context>
@@ -9014,7 +9014,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Toepassen</translation>
     </message>
   </context>
   <context>
@@ -9585,7 +9585,7 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Alle systemen</translation>
     </message>
   </context>
   <context>
@@ -11453,7 +11453,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Wijzigingen opslaan mislukt.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

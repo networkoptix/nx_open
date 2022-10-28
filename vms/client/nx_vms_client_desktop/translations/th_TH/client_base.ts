@@ -6894,7 +6894,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>สำรองและเรียกคืน</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -7908,7 +7908,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>หน้าความช่วยเหลือ</translation>
     </message>
   </context>
   <context>
@@ -8793,23 +8793,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>คำเตือน</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>ข้อมูล</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>การ​แก้ไข​จุด​บกพร่อง</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>ละเอียด</translation>
     </message>
   </context>
   <context>
@@ -8879,7 +8879,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>ยอมรับ</translation>
     </message>
   </context>
   <context>
@@ -9448,7 +9448,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>ระบบทั้งหมด</translation>
     </message>
   </context>
   <context>

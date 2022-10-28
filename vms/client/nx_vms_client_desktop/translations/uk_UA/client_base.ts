@@ -5780,7 +5780,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Дані аналітики можуть займати багато місця.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
@@ -7217,7 +7217,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Резервне копіювання і відновлення</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -8373,7 +8373,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Внутрішня помилка. Будь-ласка, спробуйте пізніше.</translation>
     </message>
   </context>
   <context>
@@ -9191,23 +9191,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>помилка</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>попередження</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>інформація</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>відладка</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>детальний</translation>
     </message>
   </context>
   <context>
@@ -9286,7 +9286,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Застосувати</translation>
     </message>
   </context>
   <context>
@@ -9861,7 +9861,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Всі системи</translation>
     </message>
   </context>
   <context>
@@ -11768,7 +11768,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Не вдалося зберегти зміни.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

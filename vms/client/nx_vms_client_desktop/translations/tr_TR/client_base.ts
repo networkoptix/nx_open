@@ -5639,7 +5639,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analitik verileri büyük miktarda yer kaplayabilir.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
@@ -7000,7 +7000,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Yedekleme ve Geri Yükleme</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -8030,7 +8030,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>yardım sayfası</translation>
     </message>
   </context>
   <context>
@@ -8890,7 +8890,7 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Varsayılana Sıfırla</translation>
     </message>
   </context>
   <context>
@@ -8924,23 +8924,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>hata</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>uyarı</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>bilgi</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>hata ayıklama</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>ayrıntılı</translation>
     </message>
   </context>
   <context>
@@ -9013,7 +9013,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Uygula</translation>
     </message>
   </context>
   <context>
@@ -9584,7 +9584,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Tüm sistemler</translation>
     </message>
   </context>
   <context>
@@ -11453,7 +11453,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Değişlikler uygulanamadı.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

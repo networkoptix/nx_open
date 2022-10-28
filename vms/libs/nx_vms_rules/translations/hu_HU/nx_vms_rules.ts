@@ -199,16 +199,16 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Eszköz IP ütközés</numerusform>
+        <numerusform>Eszköz IP ütközés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Kamera IP ütközés</numerusform>
+        <numerusform>Kamera IP ütközés</numerusform>
       </translation>
     </message>
   </context>
