@@ -23,7 +23,9 @@ Item
     readonly property real kMotionRegionOpacity: 0.3
     readonly property real kSelectionOpacity: 0.2
 
-    readonly property rect selectionMotionRect: itemToMotionRect(correctedSelectionRect)
+    readonly property rect selectionMotionRect: correctedSelectionRect === outOfRegionRect
+        ? outOfRegionRect
+        : itemToMotionRect(correctedSelectionRect)
 
     function motionToItemRect(motionRect)
     {
@@ -50,14 +52,16 @@ Item
 
     // Private.
 
+    readonly property rect outOfRegionRect: Qt.rect(0, 0, 0, 0)
+
     readonly property rect correctedSelectionRect:
     {
         var x = MathUtils.bound(0, selectionRect.left, width);
         var y = MathUtils.bound(0, selectionRect.top, height);
+        var w = MathUtils.bound(x, selectionRect.right, width) - x
+        var h = MathUtils.bound(y, selectionRect.bottom, height) - y
 
-        return Qt.rect(x, y,
-            MathUtils.bound(x, selectionRect.right, width) - x,
-            MathUtils.bound(y, selectionRect.bottom, height) - y);
+        return (w === 0 || h === 0) ? outOfRegionRect : Qt.rect(x, y, w, h)
     }
 
     readonly property vector2d motionCellSize:
