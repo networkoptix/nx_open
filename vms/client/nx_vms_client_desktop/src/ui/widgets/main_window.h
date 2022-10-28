@@ -2,30 +2,21 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QMainWindow>
 #include <QtCore/QScopedPointer>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QWidget>
+
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/graphics/view/graphics_scene.h>
-
-#include <ui/widgets/common/emulated_frame_widget.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/widgets/common/emulated_frame_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
-class QTabBar;
 class QBoxLayout;
 class QStackedLayout;
-class QSpacerItem;
-class QToolButton;
 
-class QnLayoutTabBar;
+class QnGraphicsScene;
 class QnGraphicsView;
-class QnWorkbenchContext;
 class QnWorkbenchController;
-class QnWorkbenchDisplay;
-class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;
 
 namespace nx::vms::client::desktop {
@@ -33,17 +24,6 @@ namespace nx::vms::client::desktop {
 class WorkbenchUi;
 class ScreenManager;
 class WelcomeScreen;
-
-/**
- * Session-specific state for main window.
- * It is saved and restored every time user starts new session.
- */
-struct MainWindowState
-{
-    QRect geometry;
-    bool fullScreen = false;
-    bool maximized = false;
-};
 
 class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 {
@@ -116,8 +96,6 @@ protected slots:
 
 private:
     void updateWidgetsVisibility();
-    /** Saves window state to a session storage. */
-    void saveWindowState();
 
     void showFullScreen();
     void showNormal();
