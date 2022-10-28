@@ -161,8 +161,8 @@
     <message numerus="yes">
         <source>Device Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device Disconnected</numerusform>
+            <numerusform>Devices Disconnected</numerusform>
         </translation>
     </message>
     <message>
@@ -172,8 +172,8 @@
     <message numerus="yes">
         <source>Camera Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera Disconnected</numerusform>
+            <numerusform>Cameras Disconnected</numerusform>
         </translation>
     </message>
 </context>
@@ -200,15 +200,15 @@
     <message numerus="yes">
         <source>Device IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device IP Conflict</numerusform>
+            <numerusform>Devices IP Conflict</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Camera IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera IP Conflict</numerusform>
+            <numerusform>Cameras IP Conflict</numerusform>
         </translation>
     </message>
 </context>
@@ -348,8 +348,8 @@
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>No data received during last %n second.</numerusform>
+            <numerusform>No data received during last %n seconds.</numerusform>
         </translation>
     </message>
     <message>
@@ -755,16 +755,16 @@
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n time: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>First occurrence: %1 on %2 (%n time total)</numerusform>
+            <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         </translation>
     </message>
     <message>
