@@ -62,9 +62,6 @@ public:
     static QnFileLayoutResourcePtr layoutFromFile(const QString& filename,
         const QPointer<QnResourcePool>& resourcePool);
 
-    static QnResourcePtr resourceFromFile(const QString& filename,
-        const QPointer<QnResourcePool>& resourcePool);
-
     static QnResourcePtr createArchiveResource(const QString& filename,
         const QPointer<QnResourcePool>& resourcePool);
 

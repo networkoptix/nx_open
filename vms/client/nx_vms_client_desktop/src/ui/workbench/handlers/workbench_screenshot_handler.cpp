@@ -604,6 +604,9 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         return;
     }
 
+    if (auto existing = QnFileProcessor::findResourceForFile(filename, resourcePool()))
+        resourcePool()->removeResource(existing);
+
     QnFileProcessor::createResourcesForFile(filename, resourcePool());
 }
 
