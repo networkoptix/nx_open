@@ -50,6 +50,9 @@ void CameraMotionHelper::addRect(int channel, int sensitivity, const QRect& rect
     NX_ASSERT(sensitivity >= 0 && sensitivity < QnMotionRegion::kSensitivityLevelCount);
     NX_ASSERT(channel >= 0 && channel < m_motionRegionList.size());
 
+    if (!rect.isValid())
+        return;
+
     m_motionRegionList[channel].addRect(sensitivity, rect);
     emit motionRegionListChanged(channel);
 }
