@@ -59,11 +59,6 @@ public:
         Running    /**< Performing kinetic motion. */
     };
 
-    enum {
-        DEFAULT_MAX_SHIFT_COUNT = 10,
-        DEFAULT_MAX_SHIFT_INTERVAL_MSEC = 200
-    };
-
     /**
      * Constructor.
      *

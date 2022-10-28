@@ -4,6 +4,9 @@
 
 #include "manager.h"
 
+#ifndef DIRECTINPUT_VERSION
+    #define DIRECTINPUT_VERSION 0x0800
+#endif
 #include <dinput.h>
 
 namespace nx::vms::client::desktop::joystick {
