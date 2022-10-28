@@ -9,7 +9,6 @@
 #include <QtCore/QRect>
 #include <QtCore/QTimer>
 
-#include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
@@ -18,23 +17,12 @@
 #include <ui/workbench/workbench_pane_settings.h>
 
 class QGraphicsWidget;
-class QGraphicsLinearLayout;
 
 class InstrumentManager;
 class ActivityListenerInstrument;
-class VariantAnimator;
-class AnimatorGroup;
-class HoverFocusProcessor;
 
 class QnProxyLabel;
 class QnDebugProxyLabel;
-
-class QnWorkbenchDisplay;
-class QnWorkbenchNavigator;
-class QnImageButtonWidget;
-class QnResourceWidget;
-class QnFramedWidget;
-class QnDayTimeWidget;
 struct QnPaneSettings;
 
 namespace nx::vms::client::desktop {

@@ -252,11 +252,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         int accepted = qnSettings->acceptedEulaVersion();
         int current = nx::branding::eulaVersion();
         const bool showEula = accepted < current && qgetenv("VMS_ACCEPT_EULA") != "YES";
-        if (showEula
-            && !EulaDialog::acceptEulaFromFile(
-                ":/license.html",
-                current,
-                workbenchContext->mainWindow()))
+
+        if (showEula && !EulaDialog::acceptEulaFromFile(":/license.html", current))
         {
             // We should exit completely.
             return 0;

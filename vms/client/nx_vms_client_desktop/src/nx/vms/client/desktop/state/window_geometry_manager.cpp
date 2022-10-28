@@ -253,6 +253,8 @@ WindowGeometryState WindowGeometryManager::windowGeometry() const
 
 void WindowGeometryManager::setWindowGeometry(const WindowGeometryState& value)
 {
+    NX_DEBUG(this, "Geometry: %1", nx::reflect::json::serialize(value));
+
     // In some scenarios, our window may be in Fullscreen mode already.
     // We must show it Normal before changing geometry.
     d->control->setWindowState(Qt::WindowNoState);
