@@ -18,6 +18,11 @@ public:
     static QStringList findAcceptedFiles(const QUrl &url)
     { return QnFileProcessor::findAcceptedFiles(QStringList() << url.toLocalFile()); }
 
+    /** Find existing resource for the given filename. */
+    static QnResourcePtr findResourceForFile(
+        const QString& fileName,
+        QnResourcePool* resourcePool);
+
     static QnResourcePtr createResourcesForFile(
         const QString& fileName,
         QnResourcePool* resourcePool);

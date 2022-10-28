@@ -261,25 +261,6 @@ QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(
     return QnFileLayoutResourcePtr();
 }
 
-QnResourcePtr ResourceDirectoryBrowser::resourceFromFile(
-    const QString& filename,
-    const QPointer<QnResourcePool>& resourcePool)
-{
-    const QString path = QDir::fromNativeSeparators(filename);
-    NX_ASSERT(path == filename);
-
-    if (resourcePool)
-    {
-        if (const auto& existing = resourcePool->getResourceByUrl(path))
-            return existing;
-    }
-
-    if (!QFileInfo::exists(path))
-        return QnResourcePtr();
-
-    return createArchiveResource(path, resourcePool);
-}
-
 QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(
     const QString& filename,
     const QPointer<QnResourcePool>& resourcePool)
