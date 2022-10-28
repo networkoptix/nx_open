@@ -8,6 +8,7 @@
 
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <ui/graphics/view/graphics_scene.h>
 #include <ui/widgets/main_window.h>
 
 #include "workbench_context.h"

@@ -16,7 +16,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/self_updater.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -24,7 +23,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -43,6 +41,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_merge/incompatible_servers_action_handler.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
@@ -118,13 +117,8 @@ static constexpr int kMinimalWindowWidth = 1024;
 static constexpr int kMinimalWindowHeight = 768;
 static constexpr int kSmallMinimalWindowWidth = 400;
 static constexpr int kSmallMinimalWindowHeight = 300;
-static const QString kMainWindowStateKey = "MainWindow";
 
 } // namespace
-
-#define MainWindowState_Fields (geometry)(fullScreen)(maximized)
-QN_FUSION_DECLARE_FUNCTIONS(MainWindowState, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MainWindowState, (json), MainWindowState_Fields)
 
 // These functions are used from mac_utils.mm
 #ifdef Q_OS_MACX
@@ -460,42 +454,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             });
 
     updateWidgetsVisibility();
-
-    //TODO: #spanasenko Load state.
-  /*  auto sessionManager = context->instanceManager();
-    NX_CRITICAL(sessionManager);
-    using SessionFlags = session::SessionManager::SessionFlags;
-    connect(sessionManager, &session::SessionManager::sessionStarted, this,
-        [this](const QnUuid& systemId, const QnUuid& user, SessionFlags flags)
-        {
-            if (auto stateManager = this->context()->instanceManager())
-            {
-                MainWindowState state;
-                if (flags.testFlag(session::SessionManager::SessionFlag::HasState)
-                    && stateManager->read(kMainWindowStateKey, state))
-                {
-                    //m_storedGeometry = state.geometry;
-
-                    if (!state.fullScreen)
-                    {
-                        setFullScreen(false);
-                        setGeometry(state.geometry);
-                    }
-                    if (state.fullScreen)
-                        setFullScreen(state.fullScreen);
-                    else if (state.maximized)
-                        showMaximized();
-                    else
-                        showNormal();
-                }
-            }
-        });
-
-    connect(sessionManager, &session::SessionManager::sessionEnding, this,
-        [this]()
-        {
-            saveWindowState();
-        });*/
 }
 
 MainWindow::~MainWindow()
@@ -618,7 +576,6 @@ void MainWindow::setMaximized(bool maximized)
         showMaximized();
     else if(isMaximized())
         showNormal();
-    saveWindowState();
 }
 
 bool MainWindow::isFullScreenMode() const
@@ -683,7 +640,6 @@ void MainWindow::showNormal() {
 void MainWindow::updateScreenInfo()
 {
     d->screenManager->updateCurrentScreens(this);
-    saveWindowState();
 }
 
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
@@ -938,26 +894,6 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
         vms::client::SelfUpdater::runNewClient(QStringList() << url.toString());
     else
         handleOpenFile(fileEvent->file());
-}
-
-void MainWindow::saveWindowState()
-{
-    MainWindowState state;
-    if (isFullScreenMode() || m_inFullscreenTransition)
-    {
-        state.geometry = normalGeometry();
-    }
-    else
-    {
-        state.geometry = geometry();
-    }
-
-    state.fullScreen = m_inFullscreen || m_inFullscreenTransition;
-    state.maximized = isMaximized();
-
-    //TODO: #spanasenko Save state.
-    //if (auto stateManager = context()->instanceManager())
-    //    stateManager->write(kMainWindowStateKey, state);
 }
 
 #ifdef Q_OS_WIN
