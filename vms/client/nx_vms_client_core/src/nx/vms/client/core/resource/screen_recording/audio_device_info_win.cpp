@@ -15,7 +15,8 @@
 #include <dsound.h>
 #include <MMSystem.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
-#include <Propvarutil.h>
+
+#include <QtCore/QUuid>
 
 #include <nx/utils/std/algorithm.h>
 
@@ -130,26 +131,8 @@ bool WinAudioDeviceInfo::Private::getDeviceInfo(IMMDevice* pMMDevice, bool isDef
     if (hr != S_OK)
         return false;
 
-    //PropVariantToGUID(pv, &m_jackSubType);
     const ushort* guidData16 = (const ushort*)pv.pbVal;
-    QByteArray arr = QString::fromUtf16(guidData16).toLatin1();
-    const char* data8 = arr.constData();
-    char guidBuffer[24];
-    sscanf(
-        data8,
-        "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
-        &guidBuffer[0],
-        &guidBuffer[4],
-        &guidBuffer[6],
-        &guidBuffer[8],
-        &guidBuffer[9],
-        &guidBuffer[10],
-        &guidBuffer[11],
-        &guidBuffer[12],
-        &guidBuffer[13],
-        &guidBuffer[14],
-        &guidBuffer[15]);
-    memcpy(&jackSubType, guidBuffer, 16);
+    jackSubType = QUuid(QString::fromUtf16(guidData16));
 
     hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
     if (hr != S_OK)

@@ -16,11 +16,9 @@
 
 namespace
 {
-    enum { kUpdateDelay = 150 };
+    static constexpr int kUpdateDelay = 150;
 
-    enum { kTopPositionIndex = 0 };
-
-    enum { kBookmarkFrameWidth = 250 };
+    static constexpr qreal kBookmarkFrameWidth = 250;
 
     enum
     {

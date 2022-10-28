@@ -108,9 +108,9 @@ private:
     {
         kLeftColumn,
         kRightColumn,
-
-        kColumnCount
+        Count
     };
+    static constexpr int kColumnCount = Columns::Count;
 
     std::array<int, kColumnCount> m_rowCounts{ { 0, 0 } };
 };

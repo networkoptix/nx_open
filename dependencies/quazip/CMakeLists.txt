@@ -4,7 +4,11 @@ set(quazip_dir ${open_source_root}/artifacts/quazip/quazip)
 
 file(GLOB sources CONFIGURE_DEPENDS "${quazip_dir}/*.c" "${quazip_dir}/*.cpp")
 file(GLOB headers CONFIGURE_DEPENDS "${quazip_dir}/*.h")
-qt5_wrap_cpp(moc_sources ${headers})
+qt5_wrap_cpp(moc_sources
+    ${quazip_dir}/quazipfile.h
+    ${quazip_dir}/quagzipfile.h
+    ${quazip_dir}/quaziodevice.h
+)
 
 add_definitions(-DQUAZIP_BUILD)
 

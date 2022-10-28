@@ -6,13 +6,20 @@
 
 #include <nx/utils/log/log.h>
 
+namespace {
+
+static constexpr qreal kDefaultMaxShiftIntervalMs = 200;
+static constexpr int kDefaultMaxShiftCount = 10;
+
+} // namespace
+
 KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),
     mState(Measuring),
     mType(type),
     mHandler(nullptr),
-    mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
-    mMaxShiftInterval(DEFAULT_MAX_SHIFT_INTERVAL_MSEC / 1000.0),
+    mMaxShiftCount(kDefaultMaxShiftCount),
+    mMaxShiftInterval(kDefaultMaxShiftIntervalMs / 1000.0),
     mMinSpeedMagnitude(0.0),
     mMaxSpeedMagnitude(std::numeric_limits<qreal>::max()),
     mFriction(1.0)
