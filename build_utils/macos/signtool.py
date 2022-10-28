@@ -16,29 +16,25 @@ def run_and_log_command(command, **kwargs):
 
 
 def prepare_keychain(keychain_name, keychain_password):
-    keychain = Path.home() / "Library" / "Keychains" \
-        / (keychain_name if keychain_name.endswith(".keychain") else keychain_name + ".keychain")
+    keychain = \
+        keychain_name if keychain_name.endswith(".keychain") else keychain_name + ".keychain"
+    keychain_file = Path.home() / "Library" / "Keychains" / keychain
 
     keychains = subprocess.check_output(
         ["security", "list-keychains", "-d", "user"], encoding="utf-8").splitlines()
     keychains = [s.strip()[1:-1] for s in keychains]  # Strip whitespace and remove quotes.
 
-    if str(keychain) in keychains or f"{keychain}-db" in keychains:
-        logging.info(f"Unlocking keychain {keychain}")
-        run_and_log_command(["security", "unlock-keychain", "-p", keychain_password, keychain])
-        run_and_log_command(["security", "set-keychain-settings", keychain])
-    else:
+    if str(keychain_file) not in keychains and f"{keychain_file}-db" not in keychains:
         logging.info(f"Creating keychain {keychain}")
         run_and_log_command(
             ["security", "create-keychain", "-p", keychain_password, keychain],
             stderr=None)
+        run_and_log_command(["security", "set-keychain-settings", keychain])
         run_and_log_command(
             ["security", "list-keychains", "-d", "user", "-s", keychain, *keychains])
 
-    run_and_log_command(
-        ["security", "set-key-partition-list", "-S", "apple:", "-k", keychain_password, keychain],
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL)
+    logging.info(f"Unlocking keychain {keychain}")
+    run_and_log_command(["security", "unlock-keychain", "-p", keychain_password, keychain])
 
     return keychain
 
@@ -61,6 +57,16 @@ def import_certificate(certificate_file, certificate_password, keychain=None, ig
             *certificate_password_args])
 
     return ignore_errors or process.returncode == 0
+
+
+def set_key_partition_list(keychain_name, keychain_password):
+    keychain = \
+        keychain_name if keychain_name.endswith(".keychain") else keychain_name + ".keychain"
+
+    run_and_log_command(
+        ["security", "set-key-partition-list", "-S", "apple-tool:,apple:", "-k", keychain_password, keychain],
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL)
 
 
 def run_and_retry_if_needed(command, attempts=5):
@@ -113,6 +119,7 @@ def command_import(args):
             keychain=keychain,
             ignore_errors=args.ignore_errors):
         exit(1)
+    set_key_partition_list(args.keychain, args.keychain_password)
 
 
 def command_sign(args):
