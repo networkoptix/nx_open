@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Description</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -69,7 +65,7 @@
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Attributs</translation>
     </message>
   </context>
   <context>
@@ -80,18 +76,18 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Sauvegarde terminée</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Événement inconnu</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 événement s'est produit</translation>
     </message>
   </context>
   <context>
@@ -106,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Signal d'entrée sur la caméra</translation>
     </message>
     <message>
       <source>State</source>
@@ -125,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Evénement de débogage</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valeur</translation>
     </message>
   </context>
   <context>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>Module I/O %1 à été déconnecté</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>ID de l'appareil</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Conflit IP Caméra sur %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Conflit IP Périphériques</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +242,6 @@
       <translation>Mots-clés séparés par des espaces</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Générique</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>État</translation>
     </message>
@@ -254,15 +266,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalle d'action</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>Contenu HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +290,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>Méthode de requête</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Mouvement sur %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>État</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Caméra</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Mouvement sur caméra</translation>
     </message>
   </context>
   <context>
@@ -333,12 +345,73 @@
       <source>Network Issue</source>
       <translation>Problème réseau</translation>
     </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Aucune donnée reçue au cours des %n dernières secondes.</numerusform>
+        <numerusform>Aucune donnée reçue au cours des %n dernières secondes.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Erreur RTP dans le flux primaire (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Erreur RTP dans le flux secondaire (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>La connexion à la caméra (flux principal) a été fermée de façon inattendue.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>La connexion à la caméra (flux secondaire) a été fermée de façon inattendue.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>Connexion au périphérique a été fermé de façon inattendue.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Perte de paquets RTP détectée.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, il y a trop de retard ; L'heure système sera utilisée.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>L'heure de la caméra est revenue à la normale.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>L'appareil ne répond pas aux requêtes réseau.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>L'adresse %1 est déjà utilisée par %2 sur le flux principal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>L'adresse %1 est déjà utilisée par %2 sur le flux secondaire.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Conflit d'adresse multicast détecté.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>L'adresse réseau %1 n'est pas une adresse multicast.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Afficher la notification</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +419,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalle d'action</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Forcer l'acquittement</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +435,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Info-bulle</translation>
     </message>
   </context>
   <context>
@@ -373,7 +446,7 @@
     </message>
     <message>
       <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
+      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,15 +509,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalle d'action</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Destinataires supplémentaires</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Courriel</translation>
     </message>
   </context>
   <context>
@@ -492,6 +565,14 @@
     <message>
       <source>Server Failure</source>
       <translation>Échec Serveur</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Connexion au serveur perdu.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Le serveur s'est arrêté de manière inattendue.</translation>
     </message>
   </context>
   <context>
@@ -556,7 +637,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalle d'action</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +661,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>Problème de stockage</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Une erreur d'E/S s'est produite à %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Vitesse HDD/SSD insuffisante pour l'enregistrement sur %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Le disque HDD/SSD &quot;%1&quot; est plein. Le disque contient trop de données qui ne sont pas gérées par le VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Le disque système &quot;%1&quot; est presque plein.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Le stockage analytique &quot;%1&quot; est hors ligne.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Le stockage analytique &quot;%1&quot; est presque plein.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>Stockage analytique &quot;%1&quot; Erreur de base de données : autorisations insuffisantes sur le point de montage.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation>Impossible d'initialiser le chiffrement AES lors de l'enregistrement de l'archive média. Les données sont écrites non chiffrées.</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Erreur RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>La sauvegarde de l'archive a échoué. Échec de la sauvegarde du fichier %1.</translation>
     </message>
   </context>
   <context>
@@ -618,6 +739,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Légende : %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Raison : %1</translation>
     </message>
   </context>
   <context>

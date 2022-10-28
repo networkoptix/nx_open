@@ -1096,6 +1096,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation>Erforderlicher Parameter fehlt: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation>Die Anfrage konnte nicht bearbeitet werden.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Verboten.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Konflikt.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ungültige Anforderung.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Nicht implementiert.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Nicht gefunden.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Interner Fehler.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation>Nicht unterstützter Medientyp.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation>Service nicht erreichbar.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation>Nicht autorisiert.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation>Session beendet.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1139,10 +1200,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation>SMTP-Timeout (Sekunden)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation>SMTP-Ansicht mit einfachen Einstellungen im Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1342,10 +1399,6 @@
       <translation>Cloud-Host überschreiben</translation>
     </message>
     <message>
-      <source>Enable crossdomain policy</source>
-      <translation>Domänenübergreifende Richtlinie aktivieren</translation>
-    </message>
-    <message>
       <source>Enable RTSP for Arecont</source>
       <translation>RTSP für Arecont aktivieren</translation>
     </message>
@@ -1400,10 +1453,6 @@
     <message>
       <source>Enable recording on EDGE</source>
       <translation>Aufzeichnung auf EDGE aktivieren</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation>WebSocket für p2p aktivieren</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1498,24 +1547,12 @@
       <translation>VMS-Server spezifische Versionsmerkmale</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation>Sprache für mobile Push-Benachrichtigungen</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation>Zusätzliche lokale FS-Speichertypen für die Aufzeichnung</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation>IO-Port-Status beibehalten, wenn der Server eine Verbindung zum Gerät herstellt</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation>Medienpuffergröße (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation>Medienpuffergröße für reine Audiogeräte (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1534,10 +1571,6 @@
       <translation>Aktueller Speicherverschlüsselungsschlüssel</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation>Server in der Objektleiste für Nicht-Administratoren anzeigen</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation>HTTP-Header: Ursprung</translation>
     </message>
@@ -1546,20 +1579,53 @@
       <translation>HTTP-Header: X-Frame-Optionen</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
+      <source>Show mouse timeline preview</source>
+      <translation>Maus-Zeitachsenvorschau anzeigen</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation>Sprache für Cloud-Benachrichtigungen</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>Medienpuffergröße (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation>Medienpuffergröße für reine Audiogeräte (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation>2FA für System aktivieren</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation>In VMS gespeicherte Gerätepasswörter für Administratoren anzeigen (für Webseiten)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation>Domänenübergreifende Richtlinie aktivieren</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation>WebSocket für P2P aktivieren</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation>Server in der Objektleiste für Nicht-Administratoren anzeigen</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
       <translation>Nur HTTPS für Kameras verwenden</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API</source>
-      <translation>Unsichere, veraltete API aktivieren</translation>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation>Aktivieren veralteter API-Funktionen (unsicher)</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation>Aktivieren unsicherer, veralteter API-Funktionen, die derzeit von Nx-Produkten verwendet werden</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Maus-Zeitachsenvorschau anzeigen</translation>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiviere veraltete API-Funktionen, die derzeit von %1-Software verwendet werden (unsicher)</translation>
     </message>
   </context>
   <context>
@@ -1913,18 +1979,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP-Paketverlust identifiziert.</translation>
     </message>
@@ -2068,24 +2122,8 @@
       <translation>Layout öffnen</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Die Kamerazeit konnte nicht erzwungen werden, die Verzögerung ist zu hoch, die Systemzeit wird verwendet</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Die Kamerazeit ist wieder normal</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Mehrere %1 Ereignisse sind aufgetreten</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Multicast-Adresskonflikt erkannt. Adresse %1 wird bereits von %2 auf %3 Stream verwendet</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2161,14 +2199,6 @@
       <translation>I/O-Modul wurde getrennt</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>RTP-Fehler im primären Stream (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>RTP-Fehler im sekundären Stream (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Analytics-Objekt erkannt</translation>
     </message>
@@ -2214,12 +2244,58 @@
       <translation>Server &quot;%1&quot; Zertifikatsfehler</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Intercom-Informant</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-Fehler im primären Stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Fehler beim Sichern der Datei</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-Fehler im sekundären Stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation>Die Verwendung der Kamerazeit konnte nicht erzwungen werden, sie hinkt zu sehr hinterher; es wird die Systemzeit verwendet.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Die Kamerazeit ist wieder normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im primären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im sekundären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-Adresskonflikt entdeckt.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Sicherung der Datei %1 fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

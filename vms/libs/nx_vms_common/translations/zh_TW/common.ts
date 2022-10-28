@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>從伺服器 %1: &quot;%2&quot; 接收到錯誤回應.</translation>
+      <translation>從伺服器 %1接收到錯誤回應:&quot;%2&quot;</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>最後, 試著更新分位. 若問題持續發生, 請連繫技術支援部門.</translation>
+      <translation>請嘗試更新韌體(分位)。 若問題持續或沒有解決， 請連繫技術支援部門.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -194,11 +194,11 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>請連繫技術支援部門.</translation>
+      <translation>請聯繫技術支援部門.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>I/O發生錯誤. 錯誤訊息為: &quot;%1&quot;.</translation>
+      <translation>作業系統發生I/O錯誤，錯誤訊息為: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -206,59 +206,59 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟裝置, 接著在裝置網頁上還原預設值.</translation>
+      <translation>請嘗試重啟裝置，然後在裝置網頁上還原至出廠預設值。</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟攝影機, 接著在攝影機網頁上還原預設值.</translation>
+      <translation>請嘗試重啟攝影機，接著在攝影機網頁上還原至出廠預設值。</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>請確認裝置已接入至網路. 請嘗試重啟此裝置.</translation>
+      <translation>請確認裝置已接至正確的網路，並請嘗試重啟此裝置。</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>請確認攝影機已接入至網路. 請嘗試重啟此攝影機.</translation>
+      <translation>請確認攝影機已接至正確的網路，並請嘗試重啟此裝置。</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>設備請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
+      <translation>設備請求&quot;%1&quot; 失敗，錯誤訊息 &quot;%2&quot;。</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>攝影機請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
+      <translation>攝影機請求&quot;%1&quot; 失敗，錯誤訊息 &quot;%2&quot;。</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>未知的裝置錯誤.</translation>
+      <translation>未知的裝置錯誤</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>未知的攝影機錯誤.</translation>
+      <translation>未知的攝影機錯誤</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>從裝置 %1 接收到無效的資料.</translation>
+      <translation>從裝置 %1 接收到無效的資料</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>從攝影機 %1 接收到無效的資料.</translation>
+      <translation>從攝影機 %1 接收到無效的資料</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟裝置問題表以取得更多資訊.</translation>
+      <translation>串流發生太多錯誤，請開啟事件列表確認裝置問題內容。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟攝影機問題表以取得更多資訊.</translation>
+      <translation>串流發生太多錯誤，請開啟事件列表確認攝影機問題內容</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>請試著重啟 I/O 模組, 接著至網頁界面上還原預設值.</translation>
+      <translation>請試著重啟 I/O 模組，並嘗試在網頁介面上還原至出廠預設值</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>請確認 I/O 裝置已連接至網路. 試著重啟 I/O 模組.</translation>
+      <translation>請確認 I/O 裝置已連接至正確的網路，然後嘗試重啟 I/O 模組。</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -266,79 +266,79 @@
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>未知的 I/O 模組問題.</translation>
+      <translation>未知的 I/O 模組問題</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>從 I/O 模組 %1 接收到無效資料.</translation>
+      <translation>從 I/O 模組 %1 接收到無效資料</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>過多媒體錯誤. 請開啟 I/O 模組問題列表以取得更多資訊.</translation>
+      <translation>I/O模組發生太多錯誤，請開啟事件列表確認I/O模組問題內容</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>裝置初始程序進行中.</translation>
+      <translation>裝置初始程序正在進行中</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>攝影機初始程序進行中.</translation>
+      <translation>攝影機初始程序正在進行中</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I/O 模組初始程序進行中.</translation>
+      <translation>I/O 模組初始程序正在進行中</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
+      <translation>請確認 %1 埠已允許連線 (例如：已建立通訊埠轉發規則)</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在設備網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>若無幫助, 請在攝影機 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在攝影機網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>若無幫助, 請在 I/O 模組 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在I/O模組網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>無法開啟媒體 URL %1. 連接到通訊埠 %2 失敗.</translation>
+      <translation>無法開啟媒體 URL %1，無法連接到通訊埠 %2</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>無法開啟媒體 URL %1. 與通訊埠 %2 的連線無預警關閉.</translation>
+      <translation>無法開啟媒體 URL %1，與通訊埠 %2 的連線無預警關閉。</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>無法分析設備回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析設備回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>無法分析攝影機回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析攝影機回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>無法分析 I/O 模組回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析I/O模組回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>不支援的媒體軌於 URL %1.</translation>
+      <translation>不支援從URL：%1獲取的媒體內容。</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>未認証. URL %1.</translation>
+      <translation>認証未通過。URL：%1</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>無法打開媒體 URL %1. 不支援的媒體協議 %2.</translation>
+      <translation>無法開啟媒體 URL：%1。不支援的協定：%2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
+      <translation>此攝影機來自離線錄影資料回復，若要瀏覽即時影像，請刪除相機並重新添加。</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -1050,6 +1050,67 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Bad request.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not found.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation type="unfinished">Unauthorized.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1060,23 +1121,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP 主機地址</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email寄件者</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP 使用者名稱</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP 密碼</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>電子郵件簽名檔</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1084,19 +1145,15 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP 連線類型</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP 埠號</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1104,7 +1161,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1116,11 +1173,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP 搜尋庫</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP 搜尋篩選</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1172,7 +1229,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>已啟用時間同步</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1184,19 +1241,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>作業系統時間會變更檢查時段</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>發送網路校時請求的時間間隔</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>容許誤差。如果時間最小誤差容許值小於目前誤差, 則不更新時間</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>雲端所有者帳號</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1208,11 +1265,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>系統名稱</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>本機系統 ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1241,19 +1298,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>最大場景項目 (預設為0)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>發送純文字電子郵件</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>在電子郵件中使用Windows換行字元</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>啟用使用者行為記錄</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1261,7 +1318,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>事件日誌天數 (天)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1294,10 +1351,6 @@
     <message>
       <source>Cloud host override</source>
       <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1333,7 +1386,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP 超時時間 (毫秒)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1354,10 +1407,6 @@
     <message>
       <source>Enable recording on EDGE</source>
       <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1385,7 +1434,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>浮水印設定</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1409,7 +1458,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>將影片編碼器還原預設值</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1417,11 +1466,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>低質量的螢幕影片編碼器</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>授權伺服器</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1429,7 +1478,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>要保留最多筆在資料庫中的事件日誌記錄。實際未刪除記錄的數量可能比預定高出20％。</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1437,7 +1486,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Meta數據儲存更改政策</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -1452,24 +1501,12 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
       <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1488,10 +1525,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1500,20 +1533,53 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation type="unfinished">Language for Cloud notifications</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2fa for system</source>
+      <translation type="unfinished">Enable 2fa for system</translation>
+    </message>
+    <message>
+      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
     </message>
   </context>
   <context>
@@ -1829,7 +1895,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1855,18 +1921,6 @@
       <translation>
         <numerusform>已有 %n 秒無接收資料.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>與裝置的連線無預期中斷.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(主串流)無預期中斷.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(次串流)無預期中斷.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -2010,24 +2064,8 @@
       <translation>開啟佈局</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>無法強制使用攝影機時間，會延遲過久，將採用系統時間</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>攝影機時間將恢復正常</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>發生了多個%1事件</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>檢測到多播地址衝突。地址 %1 已被 %2 對 %3 串流使用</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>網址 %1 不是多播地址</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2103,14 +2141,6 @@
       <translation>I/O 模組已斷線</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>主碼流的RTP錯誤（%1）</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>次碼流的RTP錯誤（%1）</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>已偵測到分析物件</translation>
     </message>
@@ -2156,12 +2186,58 @@
       <translation>伺服器&quot;%1&quot; 憑證錯誤</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to Device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>檔案備份失敗 %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

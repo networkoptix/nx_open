@@ -54,17 +54,6 @@
     </message>
   </context>
   <context>
-    <name>CloudSystemStatusItem::Private</name>
-    <message>
-      <source>Loading...</source>
-      <translation>Cargando...</translation>
-    </message>
-    <message>
-      <source>User interaction required</source>
-      <translation type="unfinished">User interaction required</translation>
-    </message>
-  </context>
-  <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
@@ -564,24 +553,12 @@
       <translation>Reglas del dispositivo...</translation>
     </message>
     <message>
-      <source>Devices Rules...</source>
-      <translation>Reglas de los dispositivos...</translation>
-    </message>
-    <message>
       <source>Camera Rules...</source>
       <translation>Reglas de la cámara...</translation>
     </message>
     <message>
-      <source>Cameras Rules...</source>
-      <translation>Reglas de las cámaras...</translation>
-    </message>
-    <message>
       <source>I/O Module Rules...</source>
       <translation>Reglas del Módulo I/O...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>Reglas de los Módulos de I/O...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -1032,11 +1009,27 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation>Seguridad de la cuenta</translation>
+      <translation>Seguridad de la cuenta...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
       <translation type="unfinished">Replace Camera...</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As Cloud...</source>
+      <translation>Guardar diseño actual como nube...</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud...</source>
+      <translation>Guardar diseño como nube...</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout</source>
+      <translation type="unfinished">Save Cloud Layout</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout As...</source>
+      <translation type="unfinished">Save Cloud Layout As...</translation>
     </message>
   </context>
   <context>
@@ -1317,16 +1310,8 @@
       <translation>Para activar la clave de licencia manualmente, comuníquese con su soporte regional / de licencia:</translation>
     </message>
     <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
-    </message>
-    <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
-    </message>
-    <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID de hardware</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1349,6 +1334,14 @@
 License Key: %2</source>
       <translation type="unfinished">Hardware ID: %1
 License Key: %2</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</translation>
     </message>
   </context>
   <context>
@@ -1497,7 +1490,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Compruebe</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1526,10 +1519,6 @@ License Key: %2</translation>
     <message>
       <source>Set your email address or SMTP server</source>
       <translation type="unfinished">Set your email address or SMTP server</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -1570,6 +1559,10 @@ License Key: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Error desconocido</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
+      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
     </message>
   </context>
   <context>
@@ -1833,10 +1826,6 @@ License Key: %2</translation>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
-      <source>Folder not found</source>
-      <translation>Carpeta no encontrada</translation>
-    </message>
-    <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
       <translation>Ayuda a evitar problemas con el dibujo de OpenGL que da como resultado una carga de CPU del 100%.</translation>
     </message>
@@ -1891,6 +1880,22 @@ License Key: %2</translation>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
       <translation>En la primera conexión al servidor, se solicitará su confirmación para aceptar el certificado si contiene errores</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Seleccione carpeta...</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to selected folder</source>
+      <translation type="unfinished">Failed to save logs to selected folder</translation>
+    </message>
+    <message>
+      <source>Download is finished!</source>
+      <translation type="unfinished">Download is finished!</translation>
+    </message>
+    <message>
+      <source>Nvidia hardware acceleration is in Beta mode</source>
+      <translation type="unfinished">Nvidia hardware acceleration is in Beta mode</translation>
     </message>
   </context>
   <context>
@@ -2516,6 +2521,14 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation type="unfinished">%1 Running</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -2887,7 +2900,7 @@ a %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>Se cerrará la sesión del usuario</translation>
+      <translation>Se cerrará la sesión del usuario.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -3121,20 +3134,12 @@ a %1</translation>
       <translation>Guardar copia de seguridad de base de datos...</translation>
     </message>
     <message>
-      <source>Downloading Database Backup</source>
-      <translation>Descargando base de datos</translation>
-    </message>
-    <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
       <translation>Copia de seguridad de base de datos está siendo descargado desde el servidor. Espere por favor.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
       <translation>Abrir copia de base de datos...</translation>
-    </message>
-    <message>
-      <source>Restoring Database Backup</source>
-      <translation>Restaurar copia de seguridad de base de datos</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
@@ -3151,14 +3156,6 @@ a %1</translation>
     <message>
       <source>Failed to open file</source>
       <translation>Fallo al abrir archivo</translation>
-    </message>
-    <message>
-      <source>Database successfully restored</source>
-      <translation>Base de datos restaurada exitosamente</translation>
-    </message>
-    <message>
-      <source>Server application will restart shortly.</source>
-      <translation>La aplicación del servidor se reiniciará en breve.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -3199,6 +3196,10 @@ a %1</translation>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>La configuración del sistema se restaurará de la copia de seguridad, la aplicación del servidor se reiniciará.</translation>
+    </message>
+    <message>
+      <source>Database successfully restored. Server application will restart shortly.</source>
+      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
     </message>
   </context>
   <context>
@@ -3609,14 +3610,6 @@ a %1</translation>
     <message>
       <source>Open Camera List</source>
       <translation>Abrir Lista de Cámaras</translation>
-    </message>
-    <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>La copia de seguridad incluye configuraciones de servidores y cámaras, usuarios, páginas web, reglas de eventos, etc. El video no se guarda.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Crea una copia de seguridad de la configuración del sistema que se puede restaurar en caso de error.</translation>
     </message>
   </context>
   <context>
@@ -4363,6 +4356,13 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+      <source>These settings apply only to the System you are logged in and will be removed in the future versions.</source>
+      <translation type="unfinished">These settings apply only to the System you are logged in and will be removed in the future versions.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
@@ -5005,16 +5005,16 @@ a %1</translation>
       </translation>
     </message>
     <message>
-      <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation>Certificado recibido del servidor, no coincide con el certificado al que este servidor está fijado.</translation>
-    </message>
-    <message>
       <source>Details</source>
       <translation>Detalles</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
       <translation>Los servidores con conmutación por error habilitada tomarán automáticamente las cámaras de los servidores fuera de línea con la misma ID de ubicación.</translation>
+    </message>
+    <message>
+      <source>Certificate received from the server does not match the certificate this server is pinned to.</source>
+      <translation type="unfinished">Certificate received from the server does not match the certificate this server is pinned to.</translation>
     </message>
   </context>
   <context>
@@ -5153,6 +5153,18 @@ a %1</translation>
     <message>
       <source>Unlock</source>
       <translation>Desbloquear</translation>
+    </message>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>INFORMACION REQUERIDA</translation>
+    </message>
+    <message>
+      <source>Provide</source>
+      <translation>Proporcionar</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -5448,14 +5460,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>Actualizaciones</translation>
     </message>
     <message>
-      <source>Routing Management</source>
-      <translation>Administración de enrutamiento</translation>
-    </message>
-    <message>
-      <source>Time Synchronization</source>
-      <translation>Sincronización de tiempo</translation>
-    </message>
-    <message>
       <source>Users</source>
       <translation>Usuarios</translation>
     </message>
@@ -5468,8 +5472,20 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation type="unfinished">User Management</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <source>Time Sync</source>
+      <translation>Sincronización de tiempo</translation>
+    </message>
+    <message>
+      <source>Routing</source>
+      <translation>Enrutamiento</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Avanzado</translation>
     </message>
   </context>
   <context>
@@ -5555,10 +5571,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>Error al enviar correo electrónico</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>Se ha iniciado la sincronización de archivos remotos</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>Se ha finalizado la sincronización de archivos remotos</translation>
     </message>
@@ -5567,16 +5579,8 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>La sincronización de archivos remotos está en curso</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Se ha iniciado la sincronización del archivo remoto para el siguiente dispositivo:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Se ha terminado la sincronización de archivos remotos para el siguiente dispositivo:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5623,6 +5627,26 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Remote archive synchronization available</source>
       <translation type="unfinished">Remote archive synchronization available</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+    </message>
+    <message>
+      <source>Storage for analytics data is not set</source>
+      <translation type="unfinished">Storage for analytics data is not set</translation>
+    </message>
+    <message>
+      <source>System storage is used for analytics data</source>
+      <translation type="unfinished">System storage is used for analytics data</translation>
+    </message>
+    <message>
+      <source>Analytics data can take up large amounts of space.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+    </message>
+    <message>
+      <source>We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -6026,13 +6050,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
   </context>
   <context>
-    <name>QnWorkbenchAlarmLayoutHandler</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Alarmas</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
@@ -6143,8 +6160,8 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>AVI (Audio / Video Interleaved)</translation>
     </message>
     <message>
-      <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation>No se pudo abrir el archivo &apos;%1&apos;. Verifique si la carpeta es accesible</translation>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
     </message>
   </context>
   <context>
@@ -6647,9 +6664,9 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Está a punto de mover estas páginas web al servidor &quot;%1&quot;. Estas páginas web proxy todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
+        <numerusform>Está a punto de mover estas páginas web al servidor &quot;%1&quot;. Estas páginas web proxy todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -6669,10 +6686,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Cancelar</translation>
     </message>
     <message>
-      <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation>Algunos dispositivos de %1 no se moverán a %2. ¿Mover de todos modos?</translation>
-    </message>
-    <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
       <translation>Las cámaras virtuales, USB o cámaras web no se pueden mover entre servidores. Estos dispositivos permanecerán en %1:</translation>
     </message>
@@ -6689,28 +6702,20 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Las cámaras virtuales, USB o cámaras web no pueden moverse entre servidores</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation>%1 no se puede mover entre servidores ya que contiene cámaras virtuales, USB o cámaras web</translation>
-    </message>
-    <message>
       <source>Virtual cameras cannot be moved between servers</source>
       <translation>Las cámaras virtuales no se pueden mover entre servidores</translation>
-    </message>
-    <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation>%1 no se puede mover entre servidores ya que contiene cámaras virtuales</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
       <translation>Las cámaras virtuales, USB o cámaras web no pueden moverse entre servidores</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation>%1 no se puede mover entre servidores ya que contiene cámaras virtuales, USB o cámaras web</translation>
+      <source>Only some of the selected devices can be moved to %1</source>
+      <translation>Solo algunos de los dispositivos seleccionados se pueden mover a %1</translation>
     </message>
     <message>
-      <source>Move Group without them</source>
-      <translation type="unfinished">Move Group without them</translation>
+      <source>Move Partially</source>
+      <translation>Mover parcialmente</translation>
     </message>
   </context>
   <context>
@@ -6995,6 +7000,24 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>Copia de seguridad y Restaurar</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Gestión de registros</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+      <source>Alarms</source>
+      <translation>Alarmas</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7138,44 +7161,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
       <translation>Seleccione las áreas de la programación para aplicar los parámetros seleccionados.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n semanas</numerusform>
-        <numerusform>%n semanas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n días</numerusform>
-        <numerusform>%n días</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n horas</numerusform>
-        <numerusform>%n horas</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minutos</numerusform>
-        <numerusform>%n minutos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n segundos</numerusform>
-        <numerusform>%n segundos</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -7327,6 +7312,11 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
         <numerusform>La copia de seguridad está habilitada para %n cámaras</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7373,6 +7363,18 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Wiper</source>
       <translation>Limpiaparabrisas</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Abrir puerta</translation>
     </message>
   </context>
   <context>
@@ -7446,7 +7448,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>predeterminado</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7454,12 +7456,13 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Auto</source>
+      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -7566,32 +7569,36 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Terminar</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
       <translation type="unfinished">Camera for Replacement</translation>
     </message>
     <message>
-      <source>%1 will be replaced by selected camera and removed from the system</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
-    </message>
-    <message>
       <source>Data for Transfer</source>
       <translation type="unfinished">Data for Transfer</translation>
     </message>
     <message>
-      <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
-    </message>
-    <message>
-      <source>Some data and settings may not supported for new Camera</source>
-      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
-    </message>
-    <message>
       <source>Camera replaced!</source>
       <translation type="unfinished">Camera replaced!</translation>
+    </message>
+    <message>
+      <source>%1 will be replaced by the selected camera and removed from the System</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be replaced by the selected camera and removed from the System</translation>
+    </message>
+    <message>
+      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be compatible with the new camera</source>
+      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
     </message>
   </context>
   <context>
@@ -7772,8 +7779,8 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Movimiento, objetos + baja resolución</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7995,6 +8002,54 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+      <source>Inaccessible</source>
+      <translation>Inaccesible</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Cargando...</translation>
+    </message>
+    <message>
+      <source>Click to show cameras</source>
+      <translation type="unfinished">Click to show cameras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+      <source>Introducing %1 Layouts</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Presentamos %1 diseños</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+    </message>
+    <message>
+      <source>Read more on the %1</source>
+      <translation type="unfinished">Read more on the %1</translation>
+    </message>
+    <message>
+      <source>help page</source>
+      <translation type="unfinished">help page</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+      <source>%1 (Copy)</source>
+      <comment>Original name will be substituted</comment>
+      <translation>%1 (Copiar)</translation>
+    </message>
+    <message>
+      <source>%1 (Copy %2)</source>
+      <comment>Original name will be substituted as %1, counter as %2</comment>
+      <translation>%1 (Copia %2)</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
@@ -8071,8 +8126,8 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>Conexión</translation>
     </message>
     <message>
-      <source>Internal server error. Please try again later.</source>
-      <translation>Error de servidor interno. Por favor, inténtelo de nuevo más tarde.</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation type="unfinished">Internal error. Please try again later.</translation>
     </message>
   </context>
   <context>
@@ -8152,6 +8207,13 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>El programa de grabación contiene modos de grabación que no son compatibles con las cámaras seleccionadas. Los modos de grabación no admitidos se cambiarán a &quot;Grabar siempre&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+      <source>Unknown camera</source>
+      <translation type="unfinished">Unknown camera</translation>
     </message>
   </context>
   <context>
@@ -8325,6 +8387,13 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <source>Objects</source>
       <comment>Analytics tab title</comment>
       <translation>Objetos</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation type="unfinished">INFORMATION REQUIRED</translation>
     </message>
   </context>
   <context>
@@ -8689,6 +8758,13 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -8796,9 +8872,28 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%d minutos restantes</numerusform>
+        <numerusform>%n minutos restantes</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+      <source>Notice: Not enough information could be collected on the current Logging level.
+The Logging level &quot;%1&quot; will provide more granular information.</source>
+      <translation>Aviso: No se pudo recopilar suficiente información en el nivel de registro actual.
+El nivel de registro &quot;%1&quot; proporcionará información más granular.</translation>
+    </message>
+    <message>
+      <source>Notice: The selected Logging level may degrade the performance of the system.
+Do not forget to return the Logging level to its default setting after you have collected enough logs.</source>
+      <translation>Aviso: El nivel de registro seleccionado puede degradar el rendimiento del sistema.
+No olvide regresar el nivel de registro a su configuración predeterminada después de haber recopilado suficientes registros.</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Restablecer a los valores predeterminados</translation>
     </message>
   </context>
   <context>
@@ -8810,6 +8905,118 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Version %1</source>
       <translation>Versión %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+      <source>Unit</source>
+      <translation>Unidad</translation>
+    </message>
+    <message>
+      <source>Current Level</source>
+      <translation>Nivel Actual</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Cliente</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <translation>ninguno</translation>
+    </message>
+    <message>
+      <source>error</source>
+      <translation>error</translation>
+    </message>
+    <message>
+      <source>warning</source>
+      <translation type="unfinished">warning</translation>
+    </message>
+    <message>
+      <source>info</source>
+      <translation type="unfinished">info</translation>
+    </message>
+    <message>
+      <source>debug</source>
+      <translation type="unfinished">debug</translation>
+    </message>
+    <message>
+      <source>verbose</source>
+      <translation type="unfinished">verbose</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... y %n más</numerusform>
+        <numerusform>... y %n más</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Debug Logging is enabled on Client</source>
+      <translation type="unfinished">Debug Logging is enabled on Client</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug Logging is enabled on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Debug Logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug Logging is enabled on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Descargando archivo...</translation>
+    </message>
+    <message>
+      <source>Pending download...</source>
+      <translation type="unfinished">Pending download...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidores</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloaded</source>
+      <translation type="unfinished">Logs downloaded</translation>
+    </message>
+    <message>
+      <source>Logs downloading failed</source>
+      <translation type="unfinished">Logs downloading failed</translation>
+    </message>
+    <message>
+      <source>Debug Logging is enabled.
+System performance is degraded.</source>
+      <translation type="unfinished">Debug Logging is enabled.
+System performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Logs downloading is cancelled</source>
+      <translation type="unfinished">Logs downloading is cancelled</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Select folder...</source>
+      <translation>Seleccione carpeta...</translation>
+    </message>
+    <message>
+      <source>Apply settings</source>
+      <translation type="unfinished">Apply settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation type="unfinished">Apply</translation>
     </message>
   </context>
   <context>
@@ -9360,16 +9567,27 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
       <source>Acknowledge</source>
       <translation>Reconocer</translation>
     </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message>
-      <source>No new notifications</source>
-      <translation>No hay notificaciones nuevas</translation>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation type="unfinished">
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Notifications Settings</source>
-      <translation>Configuración de notificaciones</translation>
+      <source>Current System</source>
+      <translation type="unfinished">Current System</translation>
+    </message>
+    <message>
+      <source>All Systems</source>
+      <translation type="unfinished">All Systems</translation>
     </message>
   </context>
   <context>
@@ -9398,10 +9616,6 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
       <translation>Seleccionar diseño...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Seleccione algún usuario individual en &quot;Mostrar a&quot; línea para mostrar sus diseños locales en esta lista</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Los diseños locales solo se pueden mostrar a sus propietarios.</translation>
     </message>
@@ -9412,6 +9626,25 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Algunos usuarios no tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+      <source>Not supported</source>
+      <translation>No soportado</translation>
+    </message>
+    <message>
+      <source>This tab will be available in future versions</source>
+      <translation type="unfinished">This tab will be available in future versions</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Aprenda más</translation>
     </message>
   </context>
   <context>
@@ -10073,11 +10306,6 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
       <translation>Duración ilimitada de la sesión de usuario amenaza la seguridad general del sistema y puede llevar a la degradación en el rendimiento del sistema</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Se recomienda tener el tiempo de la sesión del usuario no superior a %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Aprenda más.</translation>
     </message>
@@ -10088,6 +10316,11 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
         <numerusform>%n de %1 usuarios tienen permitido usar autenticación digest (no seguro).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>La duración máxima recomendada de la sesión de usuario es %1</translation>
     </message>
   </context>
   <context>
@@ -10104,16 +10337,8 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>El certificado está anclado a %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>El certificado fue presentado por %1</translation>
-    </message>
-    <message>
-      <source>Server Id: %1</source>
-      <translation>ID del servidor: %1$s</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -10122,10 +10347,6 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     <message>
       <source>Custom certificate</source>
       <translation>Certificado personalizado</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Certificado anclado</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10144,18 +10365,26 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
       <translation>Anclar</translation>
     </message>
     <message>
+      <source>Auto-generated certificate</source>
+      <translation>Certificado generado automáticamente</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>El certificado se genera automáticamente y se ancla a %1</translation>
+    </message>
+    <message>
+      <source>Server ID: %1</source>
+      <translation type="unfinished">Server ID: %1</translation>
+    </message>
+    <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+Do not pin this certificate if you did not modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Ver certificado</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Conéctese de todos modos</translation>
@@ -10163,6 +10392,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>I trust this server</source>
       <translation>Confío en este servidor</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Continuar</translation>
     </message>
   </context>
   <context>
@@ -10395,10 +10628,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation type="unfinished">Replaced camera discovered</translation>
     </message>
     <message>
-      <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
-    </message>
-    <message>
       <source>Camera %1 has been replaced by %2.</source>
       <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
     </message>
@@ -10409,6 +10638,71 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Undo Replace</source>
       <translation type="unfinished">Undo Replace</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportar</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation type="unfinished">On-device recordings were found</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n server</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n server</numerusform>
+        <numerusform>Backup storage is not configured on %n server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Import in progress...</source>
+      <translation type="unfinished">Import in progress...</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 completed</source>
+      <translation type="unfinished">Import archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 failed</source>
+      <translation type="unfinished">Import archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 stopped</source>
+      <translation type="unfinished">Import archive from %1 stopped</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n server</source>
+      <translation type="unfinished">
+        <numerusform>Storage for analytics data is not set on %n server</numerusform>
+        <numerusform>Storage for analytics data is not set on %n server</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n server</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n server</numerusform>
+        <numerusform>System storage is used for analytics data on %n server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on Device %1</source>
+      <translation type="unfinished">Not imported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on Camera %1</source>
+      <translation type="unfinished">Not imported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Import archive from %1</source>
+      <translation type="unfinished">Import archive from %1</translation>
     </message>
   </context>
   <context>
@@ -10468,20 +10762,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Descripción</translation>
     </message>
     <message>
-      <source>Enter parameters</source>
-      <translation>Introducir parametros</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
-    </message>
-    <message>
       <source>Open</source>
       <translation>Abrir</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
       <translation>Abrir en una nueva pestaña</translation>
+    </message>
+    <message>
+      <source>This action is not supported for notifications from other Systems</source>
+      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
     </message>
   </context>
   <context>
@@ -10666,7 +10956,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desactivar</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10674,7 +10964,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Forzar autenticación segura</translation>
     </message>
     <message>
       <source>All users</source>
@@ -11011,21 +11301,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Diseño de alarma de intercomunicador</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Intercomunicador Puerta Abierta</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Abrir puerta</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
@@ -11111,14 +11386,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
-      <source>Cannot find an item with the specified id</source>
-      <translation>No se puede encontrar un elemento con el id especificado</translation>
-    </message>
-    <message>
-      <source>Cannot find a resource with the specified id.</source>
-      <translation>No se puede encontrar un recurso con la identificación especificada.</translation>
-    </message>
-    <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
       <translation>No se puede especificar un parámetro de medios para el recurso sin flujo de medios.</translation>
     </message>
@@ -11129,6 +11396,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation>No se puede encontrar un widget correspondiente al elemento especificado.</translation>
+    </message>
+    <message>
+      <source>Cannot find an item with the specified ID</source>
+      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified ID.</source>
+      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
     </message>
   </context>
   <context>
@@ -11171,10 +11446,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>¿Aplicar los cambios antes de salir?</translation>
     </message>
     <message>
-      <source>Apply changes failed.</source>
-      <translation type="unfinished">Apply changes failed.</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>¿Restaurar todas las reglas a lo valores predeterminados?</translation>
     </message>
@@ -11183,8 +11454,12 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Esta acción no se puede deshacer.</translation>
     </message>
     <message>
-      <source>Restore rules failed.</source>
-      <translation type="unfinished">Restore rules failed.</translation>
+      <source>Failed to apply changes.</source>
+      <translation type="unfinished">Failed to apply changes.</translation>
+    </message>
+    <message>
+      <source>Failed to restore rules.</source>
+      <translation type="unfinished">Failed to restore rules.</translation>
     </message>
   </context>
   <context>
@@ -11657,6 +11932,10 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
       <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
     </message>
+    <message>
+      <source>Confirm undo replacement?</source>
+      <translation type="unfinished">Confirm undo replacement?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -11723,6 +12002,10 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     <message>
       <source>New Layout %1</source>
       <translation>Nuevo Diseño %1</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation type="unfinished">Save Layout As Cloud</translation>
     </message>
   </context>
   <context>
@@ -11896,8 +12179,8 @@ to view more bookmarks</source>
       <translation>Falta el paquete de actualización del cliente para la plataforma actual.</translation>
     </message>
     <message>
-      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation>La activación automática no está disponible. Comprueba tu conexión a Internet e inténtalo de nuevo.</translation>
+      <source>Cannot check client update availability. Check your internet connection and try again.</source>
+      <translation type="unfinished">Cannot check client update availability. Check your internet connection and try again.</translation>
     </message>
   </context>
 </TS>

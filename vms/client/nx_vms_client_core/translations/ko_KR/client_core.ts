@@ -216,52 +216,56 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Trust this server?</source>
-      <translation>이 서버를 신뢰하시겠습니까?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1의 신원을 확인할 수 없습니다</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>시스템:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>서버:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>서버 ID:</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>서버 인증서가 유효하지 않습니다.</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>처음으로 %1 에 연결하시겠습니까?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <source>certificate details</source>
+      <translation>인증서 정보</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <source>help article</source>
+      <translation>도움말</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <source>Read this %1 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>인증서 유효성 검사에 대해 자세히 알아보려면 이 %1 을 읽으십시오.</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+      <translation>%1 을 검토하여 연결 중인 서버를 신뢰할 수 있는지 확인하십시오.%2</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>서버 인증서</translation>
+    </message>
+    <message>
+      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>현재 문제에 대해 자세히 알아보려면 %1 을 보거나 이 %2 을 읽을 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+      <comment>%1 is the system name, %2 are possible extra details</comment>
+      <translation>만료된 서버 인증서 또는 누군가가 %1 을 가장하여 개인 정보를 도용하기 때문일 수 있습니다.%2</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>이 메시지는 다중 서버 시스템에 연결할 때 여러 번 표시될 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>To learn more about the current problem view the server&apos;s certificate:</source>
+      <translation>현재 문제에 대해 자세히 알아보려면 서버의 인증서를 확인하십시오.</translation>
     </message>
   </context>
 </TS>

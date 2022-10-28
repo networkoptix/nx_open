@@ -632,7 +632,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>Sidebjælke</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
@@ -1096,11 +1096,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Cache</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>Delte data</translation>
     </message>
     <message>
       <source>Runtime</source>
@@ -1145,15 +1145,15 @@ Do you want to delete it anyway?</translation>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Fortryd</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>Gendan</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Kli&amp;p</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -1161,7 +1161,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>Kopiér &amp;Link-placering</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
