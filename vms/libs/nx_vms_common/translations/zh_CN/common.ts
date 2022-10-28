@@ -1072,7 +1072,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>错误的请求。</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1082,11 +1082,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>找不到.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>内部错误.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>未经身分检证.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -2211,7 +2211,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>摄像机时间将恢复正常.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -2229,7 +2229,7 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>网址 %1 不是组播地址.</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>

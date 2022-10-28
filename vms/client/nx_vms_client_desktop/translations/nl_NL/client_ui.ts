@@ -122,7 +122,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Instellingen</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Voltooid</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -934,7 +934,7 @@
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Zoeken op beweging</translation>
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open folder</source>
@@ -1841,7 +1841,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Instellingen</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -1861,11 +1861,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Voltooid</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Opnieuw proberen</translation>
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
@@ -2084,7 +2084,7 @@
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>Systeem handtekening</translation>
     </message>
   </context>
   <context>

@@ -11320,7 +11320,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>少なくとも1人のユーザーを選択してください</translation>
     </message>
   </context>
   <context>

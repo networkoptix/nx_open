@@ -199,9 +199,9 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Enheds IP-konflikt</numerusform>
+        <numerusform>Enheds IP-konflikt</numerusform>
       </translation>
     </message>
     <message numerus="yes">

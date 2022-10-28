@@ -203,20 +203,20 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Konflikt urządzenia IP</numerusform>
+        <numerusform>Konflikt urządzenia IP</numerusform>
+        <numerusform>Konflikt urządzenia IP</numerusform>
+        <numerusform>Konflikt urządzenia IP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Konflikt kamery IP</numerusform>
+        <numerusform>Konflikt kamery IP</numerusform>
+        <numerusform>Konflikt kamery IP</numerusform>
+        <numerusform>Konflikt kamery IP</numerusform>
       </translation>
     </message>
   </context>

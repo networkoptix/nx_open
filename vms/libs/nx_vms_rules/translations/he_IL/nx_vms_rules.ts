@@ -203,20 +203,20 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>התנגשות כתובת רשת של התקן</numerusform>
+        <numerusform>התנגשות כתובת רשת של התקן</numerusform>
+        <numerusform>התנגשות כתובת רשת של התקן</numerusform>
+        <numerusform>התנגשות כתובת רשת של התקן</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>התנגשות כתובת רשת של מצלמה</numerusform>
+        <numerusform>התנגשות כתובת רשת של מצלמה</numerusform>
+        <numerusform>התנגשות כתובת רשת של מצלמה</numerusform>
+        <numerusform>התנגשות כתובת רשת של מצלמה</numerusform>
       </translation>
     </message>
   </context>

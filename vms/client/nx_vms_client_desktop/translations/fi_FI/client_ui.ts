@@ -122,7 +122,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Asetukset</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -918,7 +918,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -1841,7 +1841,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Asetukset</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -1865,7 +1865,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Yritä uudelleen</translation>
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
@@ -2084,7 +2084,7 @@
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>Järjestelmän allekirjoitus</translation>
     </message>
   </context>
   <context>

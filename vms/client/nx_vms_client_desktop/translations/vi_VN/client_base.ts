@@ -5571,11 +5571,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Dữ liệu phân tích có thể chiếm nhiều dung lượng.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Chúng tôi khuyến nghị chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -6894,7 +6894,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Sao lưu và khôi phục</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -7908,7 +7908,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>trang trợ giúp</translation>
     </message>
   </context>
   <context>
@@ -8002,7 +8002,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>
@@ -8759,7 +8759,7 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Khôi phục về mặc định</translation>
     </message>
   </context>
   <context>
@@ -8793,23 +8793,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>lỗi</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>sự phản đối</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>thông tin</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>gỡ rối</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>dài dòng</translation>
     </message>
   </context>
   <context>
@@ -8879,7 +8879,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>ứng dụng</translation>
     </message>
   </context>
   <context>
@@ -9448,7 +9448,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Tất cả Hệ thống</translation>
     </message>
   </context>
   <context>
@@ -11298,7 +11298,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Không thể lưu các thay đổi.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
@@ -11320,7 +11320,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Chọn ít nhất một người dùng</translation>
     </message>
   </context>
   <context>

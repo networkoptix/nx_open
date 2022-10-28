@@ -1118,7 +1118,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Solicitud incorrecta.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1128,11 +1128,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>No se ha encontrado.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Error interno.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1144,7 +1144,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>No autorizado.</translation>
     </message>
     <message>
       <source>Session expired.</source>

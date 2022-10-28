@@ -5642,11 +5642,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Los datos analíticos pueden ocupar grandes cantidades de espacio.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Recomendamos elegir otra ubicación para ella en lugar de la partición del sistema.</translation>
     </message>
   </context>
   <context>
@@ -6161,7 +6161,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>No se pudo abrir el archivo &quot;%1&quot;. Verifique si la carpeta es accesible.</translation>
     </message>
   </context>
   <context>
@@ -8033,7 +8033,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>página de ayuda</translation>
     </message>
   </context>
   <context>
@@ -8127,7 +8127,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Error interno. Por favor Inténtalo más tarde.</translation>
     </message>
   </context>
   <context>
@@ -8393,7 +8393,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>INFORMACION REQUERIDA</translation>
     </message>
   </context>
   <context>
@@ -8931,19 +8931,19 @@ No olvide regresar el nivel de registro a su configuración predeterminada despu
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>advertencia</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>descripción</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>depurar</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>verbose</translation>
     </message>
   </context>
   <context>
@@ -9016,7 +9016,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Aplicar</translation>
     </message>
   </context>
   <context>
@@ -9587,7 +9587,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Todos los Sistemas</translation>
     </message>
   </context>
   <context>
@@ -11455,7 +11455,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Error al aplicar cambios.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

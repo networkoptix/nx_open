@@ -1891,7 +1891,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>Der Download ist abgeschlossen!</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
@@ -5640,11 +5640,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analyticsdaten können viel Platz beanspruchen.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Wir empfehlen, anstelle der Systempartition einen anderen Speicherort zu wählen.</translation>
     </message>
   </context>
   <context>
@@ -8391,7 +8391,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>ERFORDERLICHE INFORMATIONEN</translation>
     </message>
   </context>
   <context>
@@ -11476,7 +11476,7 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Wählen Sie mindestens einen Benutzer aus</translation>
     </message>
   </context>
   <context>

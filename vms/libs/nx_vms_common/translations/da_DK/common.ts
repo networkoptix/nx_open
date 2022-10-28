@@ -1128,11 +1128,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Ikke fundet.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Intern fejl.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1144,7 +1144,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Uautoriseret.</translation>
     </message>
     <message>
       <source>Session expired.</source>

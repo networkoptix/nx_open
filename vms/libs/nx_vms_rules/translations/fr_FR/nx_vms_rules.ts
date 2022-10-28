@@ -160,9 +160,9 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>Appareil déconnecté</numerusform>
+        <numerusform>Appareil déconnecté</numerusform>
       </translation>
     </message>
     <message>
@@ -199,16 +199,16 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Conflit IP Périphériques</numerusform>
+        <numerusform>Conflit IP Périphériques</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Conflit IP Caméras</numerusform>
+        <numerusform>Conflit IP Caméras</numerusform>
       </translation>
     </message>
   </context>

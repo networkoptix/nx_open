@@ -1118,7 +1118,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Virheellinen pyyntö.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1128,11 +1128,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Ei löydy.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Sisäinen virhe.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1144,7 +1144,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Luvaton.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -2269,7 +2269,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Kameran aika on palautunut normaaliksi.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -2287,7 +2287,7 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Verkko-osoite %1 ei ole multicast-osoite.</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>

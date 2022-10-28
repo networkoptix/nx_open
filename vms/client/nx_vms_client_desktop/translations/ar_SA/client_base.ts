@@ -7429,7 +7429,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Backup and Restore</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -9453,11 +9453,11 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>error</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>warning</translation>
     </message>
     <message>
       <source>info</source>
@@ -9554,7 +9554,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>تطبيق</translation>
     </message>
   </context>
   <context>
@@ -12078,7 +12078,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Failed to apply changes.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>

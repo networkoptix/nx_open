@@ -1328,7 +1328,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>غير مصرح به.</translation>
     </message>
     <message>
       <source>Session expired.</source>

@@ -5573,7 +5573,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>분석 데이터는 많은 공간을 차지할 수 있습니다.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
@@ -6896,7 +6896,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>백업 및 복원</translation>
     </message>
     <message>
       <source>Logs Management</source>
@@ -7910,7 +7910,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>help page</source>
-      <translation type="unfinished">help page</translation>
+      <translation>도움말 페이지</translation>
     </message>
   </context>
   <context>
@@ -8004,7 +8004,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>내부 오류입니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
   </context>
   <context>
@@ -8761,7 +8761,7 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>기본값으로 재설정</translation>
     </message>
   </context>
   <context>
@@ -8795,23 +8795,23 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>error</source>
-      <translation type="unfinished">error</translation>
+      <translation>오류</translation>
     </message>
     <message>
       <source>warning</source>
-      <translation type="unfinished">warning</translation>
+      <translation>주의</translation>
     </message>
     <message>
       <source>info</source>
-      <translation type="unfinished">info</translation>
+      <translation>안내</translation>
     </message>
     <message>
       <source>debug</source>
-      <translation type="unfinished">debug</translation>
+      <translation>디버그</translation>
     </message>
     <message>
       <source>verbose</source>
-      <translation type="unfinished">verbose</translation>
+      <translation>세부내용</translation>
     </message>
   </context>
   <context>
@@ -8881,7 +8881,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>적용</translation>
     </message>
   </context>
   <context>
@@ -9450,7 +9450,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>모든 시스템</translation>
     </message>
   </context>
   <context>

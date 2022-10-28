@@ -122,7 +122,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Settings</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -918,7 +918,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -1841,7 +1841,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Settings</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -2084,7 +2084,7 @@
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>System Signature</translation>
     </message>
   </context>
   <context>

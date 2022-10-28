@@ -1072,7 +1072,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>錯誤的要求.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1082,11 +1082,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>找不到.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>內部錯誤.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1098,7 +1098,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>未驗證.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -2187,49 +2187,49 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>主串流的RTP錯誤( %1 )。</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>次串流的RTP錯誤( %1 )。</translation>
     </message>
     <message>
       <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
+      <translation>與攝影機的連線(主串流)無預期中斷。</translation>
     </message>
     <message>
       <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>與攝影機的連線(次串流)無預期中斷。</translation>
     </message>
     <message>
       <source>Connection to Device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
+      <translation>與設備的連線無預期中斷。</translation>
     </message>
     <message>
       <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
+      <translation>無法強制使用攝影機時間，因其延遲過久，將採用系統時間。</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>攝影機時間已恢復正常。</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>位址 %1 已被 %2 的主串流所使用。</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>位址 %1 已被 %2 的次串流所使用。</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>偵測到衝突的群播位址。</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>網址 %1 並非群播位址。</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>

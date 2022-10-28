@@ -1891,7 +1891,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>O download foi concluído!</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
@@ -5644,11 +5644,11 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Os dados analíticos podem ocupar grandes quantidades de espaço.</translation>
     </message>
     <message>
       <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Recomendamos escolher outro local para ele em vez da partição do sistema.</translation>
     </message>
   </context>
   <context>
@@ -6162,7 +6162,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Não foi possível abrir o arquivo &quot;%1&quot;. Verifique se a pasta está acessível.</translation>
     </message>
   </context>
   <context>
@@ -8128,7 +8128,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Erro interno. Por favor, tente novamente mais tarde.</translation>
     </message>
   </context>
   <context>
@@ -8394,7 +8394,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>INFORMAÇÃO NECESSÁRIA</translation>
     </message>
   </context>
   <context>
@@ -9017,7 +9017,7 @@ System performance is degraded.</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Aplicar</translation>
     </message>
   </context>
   <context>
@@ -9588,7 +9588,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Todos os sistemas</translation>
     </message>
   </context>
   <context>
@@ -11457,7 +11457,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <translation>Falha ao aplicar as alterações.</translation>
     </message>
     <message>
       <source>Failed to restore rules.</source>
@@ -11479,7 +11479,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Selecione pelo menos um usuário</translation>
     </message>
   </context>
   <context>
