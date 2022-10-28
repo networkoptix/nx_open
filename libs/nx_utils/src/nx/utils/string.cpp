@@ -42,12 +42,9 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
 
 qint64 parseDateTime(const QString& dateTimeStr)
 {
-    static const qint64 MIN_PER_HOUR = 60;
-    static const qint64 SEC_PER_MIN = 60;
-    static const qint64 HOUR_PER_DAY = 24;
-    static const qint64 DAY_PER_NON_LEAP_YEAR = 365;
-    static const qint64 MS_PER_SEC = 1000;
-    static const qint64 USEC_PER_MS = 1000;
+    constexpr qint64 kMSecPerSec = 1000;
+    constexpr qint64 kUSecPerMSec = 1000;
+    constexpr qint64 kSecPerYear = 365 * 24 * 60 * 60;
 
     if (dateTimeStr.toLower().trimmed() == "now")
     {
@@ -56,16 +53,20 @@ qint64 parseDateTime(const QString& dateTimeStr)
     else if (dateTimeStr.contains('T') || (dateTimeStr.contains('-') && !dateTimeStr.startsWith('-')))
     {
         QDateTime tmpDateTime = QDateTime::fromString(trimAndUnquote(dateTimeStr), Qt::ISODateWithMs);
-        return tmpDateTime.toMSecsSinceEpoch() * USEC_PER_MS;
+        return tmpDateTime.toMSecsSinceEpoch() * kUSecPerMSec;
     }
     else
     {
         auto somethingSinceEpoch = dateTimeStr.toLongLong();
-        //detecting millis or usec?
-        if (somethingSinceEpoch > 0 && somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS))
-            return somethingSinceEpoch * USEC_PER_MS;   //dateTime is in millis
-        else
+        // Detecting seconds, milliseconds or microseconds.
+        if (somethingSinceEpoch <= 0)
             return somethingSinceEpoch;
+        else if (somethingSinceEpoch < kSecPerYear * kMSecPerSec)
+            return somethingSinceEpoch * kMSecPerSec * kUSecPerMSec;   //< From seconds.
+        else if (somethingSinceEpoch < kSecPerYear * kMSecPerSec * kUSecPerMSec)
+            return somethingSinceEpoch * kUSecPerMSec; //< From milliseconds.
+        else
+            return somethingSinceEpoch; // It's a microseconds.
     }
 }
 

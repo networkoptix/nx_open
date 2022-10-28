@@ -14,14 +14,17 @@ TEST( parseDateTime, general )
 {
     const QString testDateStr( "2015-01-01T12:00:01" );
     static const qint64 USEC_PER_MS = 1000;
+    static const qint64 MSEC_PER_SEC = 1000;
 
     const QDateTime testDate = QDateTime::fromString( testDateStr, Qt::ISODate );
     const qint64 testTimestamp = testDate.toMSecsSinceEpoch();
     const qint64 testTimestampUSec = testTimestamp * USEC_PER_MS;
+    const qint64 testTimestampSec = testTimestamp / MSEC_PER_SEC;
 
     ASSERT_EQ( nx::utils::parseDateTime( testDateStr ), testTimestampUSec );
     ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestamp) ), testTimestampUSec );
     ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampUSec) ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampSec) ), testTimestampUSec );
 }
 
 TEST(removeMnemonics, general)
