@@ -390,7 +390,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
         {
             setConfigurationStatus(Error);
             setConfigurationStatusHint(tr("Unable to test email settings due to no internet"
-                "connection on any of the active servers"));
+                " connection on any of the active servers"));
             return;
         }
     }

@@ -1150,6 +1150,11 @@
         <source>Session expired.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid parameter `%1`: %2.</source>
+        <comment>%1 is name, %2 is value.</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SystemHelpers</name>
@@ -2239,10 +2244,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Intercom informer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>RTP error in primary stream (%1).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2290,6 +2291,10 @@
     </message>
     <message>
         <source>Failed to backup file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Intercom Informer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
