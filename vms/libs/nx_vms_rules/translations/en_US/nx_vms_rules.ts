@@ -39,10 +39,6 @@
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Attributes</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,23 @@
         <source>I/O Module %1 was disconnected</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Device Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>Device Disconnected</numerusform>
+            <numerusform>Devices Disconnected</numerusform>
+        </translation>
     </message>
     <message>
         <source>Device ID</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera Disconnected</source>
+        <translation type="unfinished">
+            <numerusform>Camera Disconnected</numerusform>
+            <numerusform>Cameras Disconnected</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -191,9 +197,19 @@
         <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>Device IP Conflict</numerusform>
+            <numerusform>Devices IP Conflict</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Camera IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform>Camera IP Conflict</numerusform>
+            <numerusform>Cameras IP Conflict</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -223,10 +239,6 @@
     </message>
     <message>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Generic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -311,15 +323,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>State</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion on Camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -331,6 +343,67 @@
     </message>
     <message>
         <source>Network Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform>No data received during last %n second.</numerusform>
+            <numerusform>No data received during last %n seconds.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>RTP error in primary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP error in secondary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Device was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP packet loss detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera time is back to normal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on primary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on secondary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicast address conflict detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network address %1 is not a multicast address.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -493,6 +566,14 @@
         <source>Server Failure</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server stopped unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +662,46 @@
         <source>Storage Issue</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>I/O error has occurred at %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough HDD/SSD speed for recording to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System disk &quot;%1&quot; is almost full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; is offline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; is almost full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAID error. %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed. Failed to backup file %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -619,6 +740,14 @@
         <source>Plugin: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::utils::StringHelper</name>
@@ -626,16 +755,16 @@
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n time: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>First occurrence: %1 on %2 (%n time total)</numerusform>
+            <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         </translation>
     </message>
     <message>

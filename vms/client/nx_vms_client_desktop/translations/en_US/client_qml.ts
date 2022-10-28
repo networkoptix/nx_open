@@ -153,19 +153,19 @@
         <translation></translation>
     </message>
     <message>
-        <source>This integration has no settings for this Camera.</source>
+        <source>This plugin has no settings for this Camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check System Administration Settings to configure this integration.</source>
+        <source>Check Camera Settings to configure this plugin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This integration has no settings at System level.</source>
+        <source>Check System Administration settings to configure this plugin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check Camera Settings to configure this integration.</source>
+        <source>This plugin has no settings at the System level.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -495,6 +495,155 @@
     </message>
 </context>
 <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+        <source>On system level user has permissions to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupCreateDialog</name>
+    <message>
+        <source>New Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupCreateTab</name>
+    <message>
+        <source>New Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupEditDialog</name>
+    <message>
+        <source>Group - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupGeneralTab</name>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not a member of any group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupMembersTab</name>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use controls on the left to add members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inherits membership in current group</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GroupsFlow</name>
+    <message>
+        <source>and %1 more...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HintItem</name>
     <message>
         <source>Hold %1 to activate actions</source>
@@ -534,6 +683,13 @@
     <message>
         <source>Refreshing...</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>InsecureWarning</name>
+    <message>
+        <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -761,6 +917,86 @@
     </message>
 </context>
 <context>
+    <name>ParentGroupsTab</name>
+    <message>
+        <source>Built In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use controls on the left to add to a group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP group membership is managed in LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PasswordChangeDialog</name>
+    <message>
+        <source>Change password - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PermissionSummary</name>
+    <message>
+        <source>No custom permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PermissionsTab</name>
+    <message>
+        <source>No resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try changing search criteria or enable showing all permissions and resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All permissions &amp; resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PluginsInformation</name>
     <message>
         <source>No plugins installed</source>
@@ -873,6 +1109,37 @@ to activate PTZ</source>
         <source>Go to Local Settings to enable a drag marker over the center of the video</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Target lock tracking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt + Click to follow the object</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuickIntervalPanel</name>
+    <message>
+        <source>Last</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RangeEditor</name>
@@ -904,6 +1171,13 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+        <source>All</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1068,6 +1342,17 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Enter parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action requires some parameters to be filled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SizeConstraints</name>
     <message>
         <source>MAX</source>
@@ -1186,6 +1471,10 @@ to activate PTZ</source>
         <source>Unsupported firmware version</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Access denied</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyledRadioButton</name>
@@ -1278,6 +1567,177 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>UserCreateDialog</name>
+    <message>
+        <source>New User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add User</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserCreateTab</name>
+    <message>
+        <source>New User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow insecure (digest) authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to specify only user&apos;s email address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserEditDialog</name>
+    <message>
+        <source>User - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserEnabledSwitch</name>
+    <message>
+        <source>Enabled user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled user</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserGeneralTab</name>
+    <message>
+        <source>Audit Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set password to enable insecure authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow insecure (digest) authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not a member of any group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user is not found in LDAP database and is not able to log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VisibilityMenu</name>
     <message>
         <source>Hidden</source>
@@ -1295,10 +1755,6 @@ to activate PTZ</source>
 <context>
     <name>WelcomeScreen</name>
     <message>
-        <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Official Website</source>
         <translation></translation>
     </message>
@@ -1309,6 +1765,10 @@ to activate PTZ</source>
     <message>
         <source>Support</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>You do not have access to the %1. Please check your internet connection.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
