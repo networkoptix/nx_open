@@ -2,7 +2,6 @@
 
 #include "manager_win.h"
 
-#include <dinput.h>
 #include <libloaderapi.h>
 
 #include <QtCore/QDir>

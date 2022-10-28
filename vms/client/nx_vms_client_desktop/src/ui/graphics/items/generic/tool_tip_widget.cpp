@@ -22,7 +22,7 @@ using nx::vms::client::core::Geometry;
 
 namespace  {
 
-    enum { kUseContentMargins = -1};
+    static constexpr qreal kUseContentMargins = -1;
 
     void addEdgeTo(qreal x, qreal y, const QPointF &tailPos, qreal tailWidth, bool useTail, QPainterPath *path) {
         if(!useTail) {

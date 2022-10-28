@@ -143,6 +143,7 @@ function(nx_wix_light target_file)
     cmake_parse_arguments(WXS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(light_command ${light_executable}
+        -nologo
         -cc ${CMAKE_CURRENT_BINARY_DIR}/cab_cache
         -reusecab
         -sval
