@@ -946,9 +946,9 @@
     </message>
     <message numerus="yes">
         <source>Show on Items</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="unfinished">
+            <numerusform>Show on Item</numerusform>
+            <numerusform>Show on Items</numerusform>
         </translation>
     </message>
     <message>
@@ -1520,10 +1520,6 @@ License Key: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 users are receiving emails</source>
         <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
         <translation type="unfinished"></translation>
@@ -1561,6 +1557,10 @@ License Key: %2</source>
     </message>
     <message>
         <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to test email settings due to no internet connection on any of the active servers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1732,27 +1732,27 @@ License Key: %2</source>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6042,13 +6042,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
-    <name>QnWorkbenchAlarmLayoutHandler</name>
-    <message>
-        <source>Alarms</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
         <source>Bookmark</source>
@@ -6664,8 +6657,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
         <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</numerusform>
+            <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
         </translation>
     </message>
     <message>
@@ -7006,6 +6999,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Logs Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+        <source>Alarms</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7448,11 +7448,12 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto</source>
+        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
+        <source>Auto</source>
+        <comment>Let server determine if Media2 should be used to fetch profiles</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8743,8 +8744,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
         <source>and %n more</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>and %n more</numerusform>
+            <numerusform>and %n more</numerusform>
         </translation>
     </message>
 </context>
@@ -8951,8 +8952,8 @@ Do not forget to return the Logging level to its default setting after you have 
     <message numerus="yes">
         <source>Debug Logging is enabled on %n Servers</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Debug Logging is enabled on %n Server</numerusform>
+            <numerusform>Debug Logging is enabled on %n Servers</numerusform>
         </translation>
     </message>
     <message>
@@ -9562,8 +9563,8 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
         <source>%n notifications</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n notification</numerusform>
+            <numerusform>%n notifications</numerusform>
         </translation>
     </message>
     <message>
@@ -10637,8 +10638,8 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     <message numerus="yes">
         <source>Backup storage is not configured on %n server</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Backup storage is not configured on %n server</numerusform>
+            <numerusform>Backup storage is not configured on %n servers</numerusform>
         </translation>
     </message>
     <message>
@@ -11449,6 +11450,13 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     </message>
     <message>
         <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
+    <message>
+        <source>Select at least one User</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -143,7 +143,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     ui->useMedia2ToFetchProfilesComboBox->clear();
     combo_box_utils::insertMultipleValuesItem(ui->useMedia2ToFetchProfilesComboBox);
-    ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Auto"),
+    ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Auto",
+        "Let server determine if Media2 should be used to fetch profiles"),
         QVariant::fromValue(nx::core::resource::UsingOnvifMedia2Type::autoSelect));
     ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Use if supported"),
         QVariant::fromValue(nx::core::resource::UsingOnvifMedia2Type::useIfSupported));
