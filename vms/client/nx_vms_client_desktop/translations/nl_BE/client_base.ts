@@ -5118,7 +5118,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>TOEGANG GEWEIGERD</translation>
     </message>
   </context>
   <context>
@@ -7298,7 +7298,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Van beelden van deze camera's wordt een back-up gemaakt tot en met %1 %2</translation>
     </message>
   </context>
   <context>
@@ -7349,11 +7349,11 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Dempen</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Dempen opheffen</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7361,7 +7361,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Weggooien</translation>
     </message>
   </context>
   <context>
@@ -7439,7 +7439,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>Video opgenomen op de interne camera&apos;s opslag wordt niet automatisch geüpload naar het hoofdarchief.</translation>
     </message>
   </context>
   <context>
@@ -8575,7 +8575,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Schermindeling</translation>
     </message>
   </context>
   <context>
@@ -9252,7 +9252,7 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Bellen...</translation>
     </message>
   </context>
   <context>
@@ -10359,7 +10359,7 @@ U kunt %2 bekijken of deze %3 lezen om meer te weten te komen over het huidige p
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Er zijn opnamen op het apparaat gevonden</translation>
     </message>
   </context>
   <context>
