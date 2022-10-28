@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Your System</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-        <source>Sample format of input device %1 is not supported.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Primary audio device is not selected.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnDirectSystemsFinder</name>
     <message>
         <source>System</source>
@@ -216,27 +193,7 @@
 <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-        <source>Trust this server?</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cannot verify the identity of %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>System:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server ID:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
         <translation></translation>
     </message>
     <message>
@@ -244,23 +201,58 @@
         <translation></translation>
     </message>
     <message>
-        <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+        <source>Connecting to %1 for the first time?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Someone may be impersonating this Server to steal your personal information.</source>
+        <source>certificate details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
+        <source>help article</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+        <source>Read this %1 to learn more about certificate validation.</source>
+        <comment>%1 is &lt;help article&gt; link</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+        <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+        <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the server&apos;s certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+        <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+        <comment>%1 is the system name, %2 are possible extra details</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To learn more about the current problem view the server&apos;s certificate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -243,14 +243,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Invalid data was received from the device %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid data was received from the camera %1.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation></translation>
     </message>
@@ -272,10 +264,6 @@
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid data was received from the I/O module %1.</source>
         <translation></translation>
     </message>
     <message>
@@ -372,6 +360,18 @@
     </message>
     <message>
         <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -753,6 +753,86 @@
             <numerusform>%n/%1 NVR Licenses</numerusform>
         </translation>
     </message>
+    <message>
+        <source>%1 Licenses</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 Licenses</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n/%1 %2 Licenses</source>
+        <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnPredefinedUserRoles</name>
+    <message>
+        <source>Owner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can manage all cameras and bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view all cameras and export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can view live video from all cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom user role.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnResourceNameStrings</name>
@@ -1037,62 +1117,59 @@
     </message>
 </context>
 <context>
-    <name>QnUserRolesManager</name>
+    <name>Result</name>
     <message>
-        <source>Owner</source>
-        <translation></translation>
+        <source>Missing required parameter: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Administrator</source>
-        <translation></translation>
+        <source>Failed to process request.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Advanced Viewer</source>
-        <translation></translation>
+        <source>Forbidden.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Viewer</source>
-        <translation></translation>
+        <source>Conflict.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Live Viewer</source>
-        <translation></translation>
+        <source>Bad request.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom Role</source>
-        <translation></translation>
+        <source>Not implemented.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom</source>
-        <translation></translation>
+        <source>Not found.</source>
+        <comment>Generic HTTP response</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can manage all cameras and bookmarks.</source>
-        <translation></translation>
+        <source>Internal error.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can view all cameras and export video.</source>
-        <translation></translation>
+        <source>Unsupported media type.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can view live video from all cameras.</source>
-        <translation></translation>
+        <source>Service unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom user role.</source>
-        <translation></translation>
+        <source>Unauthorized.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom permissions.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Has access to whole System and can do everything.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Has access to whole System and can manage it. Can create users.</source>
-        <translation></translation>
+        <source>Session expired.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1141,39 +1218,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SMTP use simple settings view in Client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>SMTP name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP URI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP Admin DN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP Admin password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP search base</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP search filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP password expiration (milliseconds)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP search timeout (seconds)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1342,10 +1387,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable crossdomain policy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable RTSP for Arecont</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1399,10 +1440,6 @@
     </message>
     <message>
         <source>Enable recording on EDGE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable WebSocket for p2p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1498,23 +1535,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for mobile push notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additional local FS storage types for recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Keep IO port state on when Server connects to the Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media buffer size (KB, 10KB-4Mb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1534,10 +1559,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Servers in tree for non-admins</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>HTTP header: Origin</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1546,19 +1567,56 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use only HTTPS for Cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable insecure deprecated API</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show mouse timeline preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable 2fa for system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cross-domain policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable WebSocket for P2P</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language for Cloud notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size (KB, 10KB-4MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Servers in the Resource Tree for non-admins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only HTTPS for cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions (unsecure)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+        <comment>%1 is a company name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1611,6 +1669,14 @@
     <message>
         <source>No data exported.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Archive is encrypted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive is unavailable now. Please try again later.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1913,18 +1979,6 @@
         </translation>
     </message>
     <message>
-        <source>Connection to device was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>RTP packet loss detected.</source>
         <translation></translation>
     </message>
@@ -2068,23 +2122,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failed to force using camera time, it lags too much, system time will be used</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera time is back to normal</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Multiple %1 events have occurred</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Network address %1 is not a multicast address</source>
         <translation></translation>
     </message>
     <message>
@@ -2161,14 +2199,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>RTP error in primary stream (%1)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>RTP error in secondary stream (%1)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Analytics Object Detected</source>
         <translation></translation>
     </message>
@@ -2214,11 +2244,57 @@
         <translation></translation>
     </message>
     <message>
-        <source>Intercom informer</source>
+        <source>Show Intercom Informer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to backup file</source>
+        <source>RTP error in primary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP error in secondary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Device was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera time is back to normal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on primary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on secondary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicast address conflict detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network address %1 is not a multicast address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to backup file %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
