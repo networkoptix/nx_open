@@ -26,6 +26,8 @@ OverlappableSearchWidget::OverlappableSearchWidget(
     QWidget(parent),
     d(new Private{searchWidget, new QStackedLayout})
 {
+    setLayout(d->stackedLayout);
+
     d->stackedLayout->addWidget(d->searchWidget);
     d->stackedLayout->addWidget(PlaceholderWidget::create(
         qnSkin->pixmap("misc/future.svg"),
@@ -39,8 +41,6 @@ OverlappableSearchWidget::OverlappableSearchWidget(
         },
         this
     ));
-
-    setLayout(d->stackedLayout);
 }
 
 OverlappableSearchWidget::~OverlappableSearchWidget() = default;
