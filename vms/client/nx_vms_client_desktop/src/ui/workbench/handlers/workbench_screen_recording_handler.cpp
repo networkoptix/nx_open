@@ -350,7 +350,14 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished()
                 if (!QnFileMessages::confirmOverwrite(mainWindowWidget(), filePath))
                     continue;
 
-                QFile::remove(filePath);
+                if (!QFile::remove(filePath))
+                {
+                    QnFileMessages::overwriteFailed(mainWindowWidget(), filePath);
+                    continue;
+                }
+
+                if (auto existing = QnFileProcessor::findResourceForFile(filePath, resourcePool()))
+                    resourcePool()->removeResource(existing);
             }
 
             if (!QFile::rename(m_recordedFileName, filePath))

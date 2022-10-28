@@ -5,18 +5,15 @@
 #include <QtCore/QDirIterator>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
-
 #include <QtWidgets/QApplication>
 
+#include <core/resource/avi/filetypesupport.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/avi/filetypesupport.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-
 #include <ui/workaround/mac_utils.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -25,9 +22,24 @@ QString fixSeparators(const QString& filePath)
     return QDir::fromNativeSeparators(filePath);
 }
 
-} // namespace
+QnResourcePtr resourceFromFile(
+    const QString& filename,
+    const QPointer<QnResourcePool>& resourcePool)
+{
+    const QString path = fixSeparators(filename);
+    if (resourcePool)
+    {
+        if (const auto& existing = resourcePool->getResourceByUrl(path))
+            return existing;
+    }
 
-using namespace nx::vms::client::desktop;
+    if (!QFileInfo::exists(path))
+        return QnResourcePtr();
+
+    return ResourceDirectoryBrowser::createArchiveResource(path, resourcePool);
+}
+
+} // namespace
 
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
@@ -68,12 +80,23 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl>& urls)
     return QnFileProcessor::findAcceptedFiles(files);
 }
 
+QnResourcePtr QnFileProcessor::findResourceForFile(
+    const QString& fileName,
+    QnResourcePool* resourcePool)
+{
+    if (resourcePool)
+    {
+        if (const auto& existing = resourcePool->getResourceByUrl(fixSeparators(fileName)))
+            return existing;
+    }
+    return {};
+}
+
 QnResourcePtr QnFileProcessor::createResourcesForFile(
     const QString& fileName,
     QnResourcePool* resourcePool)
 {
-    const auto path = fixSeparators(fileName);
-    const auto result = ResourceDirectoryBrowser::resourceFromFile(path, resourcePool);
+    const auto result = resourceFromFile(fileName, resourcePool);
     if (result)
         resourcePool->addResource(result);
     return result;
@@ -86,8 +109,7 @@ QnResourceList QnFileProcessor::createResourcesForFiles(
     QnResourceList result;
     for (const auto& fileName: files)
     {
-        const auto path = fixSeparators(fileName);
-        QnResourcePtr resource = ResourceDirectoryBrowser::resourceFromFile(path, resourcePool);
+        QnResourcePtr resource = resourceFromFile(fileName, resourcePool);
         if (resource)
             result << resource;
     }
@@ -117,7 +139,7 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
             mac_saveFileBookmark(url.path());
         #endif
 
-        auto resource = ResourceDirectoryBrowser::resourceFromFile(filePath, resourcePool);
+        auto resource = resourceFromFile(filePath, resourcePool);
         if (resource)
             result << resource;
 
