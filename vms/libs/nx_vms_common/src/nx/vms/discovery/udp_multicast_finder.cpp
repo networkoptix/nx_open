@@ -199,8 +199,7 @@ void UdpMulticastFinder::receiveModuleInformation()
         {
             if (code != SystemError::noError)
             {
-                NX_WARNING(this, nx::format("Failed to read reciever: %2").args(
-                    SystemError::toString(code)));
+                NX_WARNING(this, "Failed to read reciever: %1", SystemError::toString(code));
 
                 m_receiver.reset();
                 return;
@@ -210,11 +209,13 @@ void UdpMulticastFinder::receiveModuleInformation()
             nx::vms::api::ModuleInformationWithAddresses moduleInformation;
             if (!QJson::deserialize(m_inData, &moduleInformation))
             {
-                NX_WARNING(this, nx::format("From %1 unable to deserialize: %2").args(endpoint, m_inData));
+                NX_WARNING(this, "From %1 unable to deserialize: %2", endpoint, m_inData);
             }
             else
             {
-                if (moduleInformation.remoteAddresses.size() && m_moduleHandler)
+                moduleInformation.remoteAddresses.insert(
+                    QString::fromStdString(endpoint.address.toString()));
+                if (m_moduleHandler)
                     m_moduleHandler(moduleInformation, endpoint);
             }
 

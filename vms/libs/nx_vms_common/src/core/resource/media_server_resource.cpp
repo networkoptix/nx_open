@@ -632,7 +632,8 @@ nx::vms::api::ModuleInformationWithAddresses
     QnMediaServerResource::getModuleInformationWithAddresses() const
 {
     nx::vms::api::ModuleInformationWithAddresses information = getModuleInformation();
-    ec2::setModuleInformationEndpoints(information, getAllAvailableAddresses());
+    if (this->systemContext()->globalSettings()->exposeServerEndpoints())
+        ec2::setModuleInformationEndpoints(information, getAllAvailableAddresses());
     return information;
 }
 
