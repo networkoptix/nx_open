@@ -49,6 +49,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
+    DECLARE_SETTING_NAME(exposeServerEndpoints);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
@@ -469,6 +470,9 @@ public:
     QString frameOptionsHeader() const;
     void setFrameOptionsHeader(const QString& value);
 
+    bool exposeServerEndpoints() const;
+    void setExposeServerEndpoints(bool value);
+
     bool showMouseTimelinePreview() const;
     void setShowMouseTimelinePreview(bool value);
 
@@ -673,6 +677,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyCamerasAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;

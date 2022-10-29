@@ -69,14 +69,25 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
                 discoveryQueue.push(module, endpoint);
         });
 
-    const auto interfaceCount = (size_t) nx::network::getLocalIpV4AddressList().size();
+    const auto interfaces = nx::network::getLocalIpV4AddressList();
+    const auto removeInterface =
+        [&](nx::vms::api::ModuleInformationWithAddresses* information)
+        {
+            for (const auto& interface: interfaces)
+            {
+                if (information->remoteAddresses.remove(interface))
+                    return true;
+            }
+            return false;
+        };
     const auto waitForDiscovery =
         [&](const nx::vms::api::ModuleInformationWithAddresses& information)
         {
-            for (size_t i = 0; i < interfaceCount; ++i)
+            for (int i = 0; i < interfaces.size(); ++i)
             {
-                EXPECT_EQ(QJson::serialized(information),
-                    QJson::serialized(discoveryQueue.pop().first)) << discoveryQueue.size();
+                auto notification = discoveryQueue.pop().first;
+                EXPECT_TRUE(removeInterface(&notification)) << i;
+                EXPECT_EQ(QJson::serialized(information), QJson::serialized(notification)) << i;
             }
         };
 

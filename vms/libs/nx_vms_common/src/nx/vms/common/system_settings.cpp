@@ -704,6 +704,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
                 nx::branding::company());
         });
 
+    m_exposeServerEndpointsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::exposeServerEndpoints, true, this,
+        []() { return tr("Expose IP addresses for autodiscovery"); });
+
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
 
@@ -1078,6 +1082,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_frameOptionsHeaderAdaptor
         << m_showMouseTimelinePreviewAdaptor
         << m_ldapAdaptor
+        << m_exposeServerEndpointsAdaptor
     ;
 
     return result;
@@ -2115,6 +2120,16 @@ QString SystemSettings::frameOptionsHeader() const
 void SystemSettings::setFrameOptionsHeader(const QString& value)
 {
     m_frameOptionsHeaderAdaptor->setValue(value);
+}
+
+bool SystemSettings::exposeServerEndpoints() const
+{
+    return m_exposeServerEndpointsAdaptor->value();
+}
+
+void SystemSettings::setExposeServerEndpoints(bool value)
+{
+    m_exposeServerEndpointsAdaptor->setValue(value);
 }
 
 bool SystemSettings::showMouseTimelinePreview() const
