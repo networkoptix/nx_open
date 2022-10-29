@@ -53,9 +53,38 @@ public:
             writeString(std::to_string(val));
     }
 
+    template<typename... Args>
+    void writeValue(
+        const std::chrono::duration<Args...>& val)
+    {
+        if (m_serializeDurationAsNumber)
+            writeValue(val.count());
+        else
+            writeValue(std::to_string(val.count()));
+    }
+
+    template<typename... Args>
+    void writeValue(
+        const std::chrono::time_point<Args...>& val)
+    {
+        using namespace std::chrono;
+        writeValue(floor<milliseconds>(val.time_since_epoch()));
+    }
+
     virtual void writeAttributeName(const std::string_view& name) = 0;
 
     virtual Result take() = 0;
+
+    /**
+     * @return The previous value.
+     */
+    bool setSerializeDurationAsNumber(bool val)
+    {
+        return std::exchange(m_serializeDurationAsNumber, val);
+    }
+
+private:
+    bool m_serializeDurationAsNumber = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -192,7 +221,7 @@ void serialize(
     SerializationContext* ctx,
     const std::chrono::duration<Args...>& val)
 {
-    ctx->composer.writeValue(std::to_string(val.count()));
+    ctx->composer.writeValue(val);
 }
 
 template<typename SerializationContext, typename... Args>
@@ -200,8 +229,7 @@ void serialize(
     SerializationContext* ctx,
     const std::chrono::time_point<Args...>& val)
 {
-    using namespace std::chrono;
-    BasicSerializer::serialize(ctx, floor<milliseconds>(val.time_since_epoch()));
+    ctx->composer.writeValue(val);
 }
 
 template<typename SerializationContext, typename... Args>

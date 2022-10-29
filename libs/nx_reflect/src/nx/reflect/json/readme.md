@@ -61,6 +61,14 @@ Type T satisfies `ConvertibleToString` if it provides any of the following (in t
   * `ConvertibleToString toString(const T&);  // returns a type different from T.`
   * `void toString(const T&, std::string* str);`
 
+### Tags that effect serialization/deserialiation
+- `jsonSerializeChronoDurationAsNumber`. Causes `std::chrono::duration` types to be serialized
+as numeric values, not strings. Example:
+```
+NX_REFLECTION_TAG_TYPE(Foo, jsonSerializeChronoDurationAsNumber)
+```
+As a result, every `std::chrono::duration` field of the `struct Foo` will be serialized as a number.
+
 - - -
 
 To convert a type T from string serializer requires it to satisfy `ConvertibleFromString`.
