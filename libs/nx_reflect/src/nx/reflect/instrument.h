@@ -288,3 +288,23 @@ constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
             BOOST_PP_SEQ_FOR_EACH(NX_REFLECTION_EXPAND_GSN_FIELDS, _, FIELDS) \
             ::nx::reflect::detail::forward<Members>(members)...); \
     }
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Add a tag to the specified type.
+ * A tag presence may be checked by evaluating the constexpr boolean expression
+ * <pre><code>TAG((const TYPE*) nullptr)</code></pre>.
+ *
+ * Effectively, this macro defines the following function:
+ * <pre><code>static constexpr bool TAG(const TYPE*) { return true; }</code></pre>
+ * A default overload like
+ * <pre><code>template<typename T> static constexpr bool TAG(const T*) { return false; }</code></pre>
+ * should be defined for the ADL to work.
+ *
+ * Note: This macro MUST BE placed next to the NX_REFLECTION_INSTRUMENT macro. Otherwise,
+ * an undefined behavior may result due to different scopes of NX_REFLECTION_INSTRUMENT and
+ * NX_REFLECTION_TAG_TYPE macros for the same type.
+ */
+#define NX_REFLECTION_TAG_TYPE(TYPE, TAG) \
+    static constexpr bool TAG(const TYPE*) { return true; }

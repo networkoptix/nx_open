@@ -724,4 +724,21 @@ TEST_F(Json, simple_type_as_json)
     testSerialization("123", 123);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+struct DurationAsNumber
+{
+    std::chrono::milliseconds d = std::chrono::milliseconds::zero();
+
+    bool operator==(const DurationAsNumber& rhs) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(DurationAsNumber, (d))
+NX_REFLECTION_TAG_TYPE(DurationAsNumber, jsonSerializeChronoDurationAsNumber)
+
+TEST_F(Json, chrono_duration_is_serialized_as_number_if_asked_explicitely)
+{
+    testSerialization("{\"d\":123}", DurationAsNumber{.d = std::chrono::milliseconds(123)});
+}
+
 } // namespace nx::reflect::test
