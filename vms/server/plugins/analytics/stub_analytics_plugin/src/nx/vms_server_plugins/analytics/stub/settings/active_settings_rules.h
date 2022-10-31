@@ -18,7 +18,7 @@ extern const std::map<
     ActiveSettingsBuilder::ActiveSettingHandler> kActiveSettingsRules;
 
 extern const std::map<
-    /*activeSettingId*/ std::string,
+    /*activeSettingName*/ std::string,
     ActiveSettingsBuilder::ActiveSettingHandler> kDefaultActiveSettingsRules;
 
 void showAdditionalComboBox(

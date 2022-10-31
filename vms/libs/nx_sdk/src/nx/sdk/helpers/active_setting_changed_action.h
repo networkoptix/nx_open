@@ -22,7 +22,7 @@ public:
     void setSettingsValues(Ptr<const StringMap> value);
     void setParams(Ptr<const StringMap> value);
 
-    virtual const char* activeSettingId() const override;
+    virtual const char* activeSettingName() const override;
     virtual const char* settingsModel() const override;
 
 protected:
@@ -30,7 +30,7 @@ protected:
     virtual const IStringMap* getParams() const override;
 
 private:
-    std::string m_activeSettingId;
+    std::string m_activeSettingName;
     std::string m_settingsModel;
     Ptr<const StringMap> m_settingsValues;
     Ptr<const StringMap> m_params;

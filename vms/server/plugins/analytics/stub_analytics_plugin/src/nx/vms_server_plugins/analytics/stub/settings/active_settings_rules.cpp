@@ -57,7 +57,7 @@ const std::map<
 };
 
 const std::map<
-    /*activeSettingId*/ std::string,
+    /*activeSettingName*/ std::string,
     ActiveSettingsBuilder::ActiveSettingHandler> kDefaultActiveSettingsRules =
 {
     {kActiveComboBoxId, hideAdditionalComboBox},
@@ -84,7 +84,7 @@ static Json::array::iterator findSetting(
 void showAdditionalSetting(
     Json* inOutModel,
     std::map<std::string, std::string>* inOutValues,
-    const std::string activeSettingId,
+    const std::string activeSettingName,
     const std::string additionalSettingTemplate,
     const std::string additionalSettingValue)
 {
@@ -94,7 +94,7 @@ void showAdditionalSetting(
     Json newItem = Json::parse(additionalSettingTemplate, error);
     const std::string newItemName = newItem[kName].string_value();
 
-    const auto settingIt = findSetting(activeSettingId, &items);
+    const auto settingIt = findSetting(activeSettingName, &items);
     if (settingIt != items.end())
         items.insert(settingIt + 1, newItem);
 
@@ -121,12 +121,12 @@ void hideAdditionalSetting(
 void showAdditionalSettingOption(
     Json* inOutModel,
     std::map<std::string, std::string>* inOutValues,
-    const std::string& activeSettingId,
+    const std::string& activeSettingName,
     const std::string& additionalSettingOption)
 {
     Json::array items = inOutModel->array_items();
 
-    auto settingIt = findSetting(activeSettingId, &items);
+    auto settingIt = findSetting(activeSettingName, &items);
     if (settingIt != items.end())
     {
         Json::object settingWithRange = settingIt->object_items();
@@ -141,20 +141,20 @@ void showAdditionalSettingOption(
     }
 
     *inOutModel = Json(items);
-    const auto valueIt = inOutValues->find(activeSettingId);
+    const auto valueIt = inOutValues->find(activeSettingName);
     if (valueIt == inOutValues->cend())
-        inOutValues->emplace(activeSettingId, additionalSettingOption);
+        inOutValues->emplace(activeSettingName, additionalSettingOption);
 }
 
 void hideAdditionalSettingOption(
     Json* inOutModel,
     std::map<std::string, std::string>* inOutValues,
-    const std::string& activeSettingId,
+    const std::string& activeSettingName,
     const std::string& additionalSettingValue,
     const std::string& newAdditionalSettingValue)
 {
     Json::array items = inOutModel->array_items();
-    auto settingIt = findSetting(activeSettingId, &items);
+    auto settingIt = findSetting(activeSettingName, &items);
     if (settingIt != items.end())
     {
         Json::object settingWithRange = settingIt->object_items();
@@ -169,7 +169,7 @@ void hideAdditionalSettingOption(
     }
 
     *inOutModel = Json(items);
-    (*inOutValues)[activeSettingId] = newAdditionalSettingValue;
+    (*inOutValues)[activeSettingName] = newAdditionalSettingValue;
 }
 
 void showAdditionalComboBox(Json* inOutModel, std::map<std::string, std::string>* inOutValues)

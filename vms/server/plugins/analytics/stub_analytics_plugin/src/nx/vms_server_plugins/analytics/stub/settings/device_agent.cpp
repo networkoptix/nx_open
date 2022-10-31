@@ -34,7 +34,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo)
     {
         const ActiveSettingsBuilder::ActiveSettingKey key = entry.first;
         m_activeSettingsBuilder.addRule(
-            key.activeSettingId,
+            key.activeSettingName,
             key.activeSettingValue,
             /*activeSettingHandler*/ entry.second);
     }
@@ -42,7 +42,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo)
     for (const auto& entry: kDefaultActiveSettingsRules)
     {
         m_activeSettingsBuilder.addDefaultRule(
-            /*activeSettingId*/ entry.first,
+            /*activeSettingName*/ entry.first,
             /*activeSettingHandler*/ entry.second);
     }
 }
@@ -116,8 +116,8 @@ void DeviceAgent::dumpActiveSettingChangedAction(
 {
     NX_PRINT << "IActiveSettingChangedAction:";
     NX_PRINT << "{";
-    NX_PRINT << "    \"activeSettingId\": "
-        << nx::kit::utils::toString(activeSettingChangeAction->activeSettingId()) << ",";
+    NX_PRINT << "    \"activeSettingName\": "
+        << nx::kit::utils::toString(activeSettingChangeAction->activeSettingName()) << ",";
     NX_PRINT << "    \"settingsModel\": "
         << nx::kit::utils::toString(activeSettingChangeAction->settingsModel()) << ",";
     NX_PRINT << "    \"settingsValues\":";
@@ -155,7 +155,7 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
         return;
     }
 
-    const std::string settingId(activeSettingChangeAction->activeSettingId());
+    const std::string settingId(activeSettingChangeAction->activeSettingName());
     Json activeSettingsItems = (*activeSettingsSectionIt)[kItems];
     std::map<std::string, std::string> values = toStdMap(shareToPtr(
         activeSettingChangeAction->settingsValues()));
@@ -197,17 +197,17 @@ void DeviceAgent::processActiveSettings(
         return;
 
     Json activeSettingsItems = (*activeSettingsSectionIt)[kItems];
-    std::vector<std::string> activeSettingIds;
+    std::vector<std::string> activeSettingNames;
     for (const Json& item: activeSettingsItems.array_items())
     {
         if (item[kIsActive].bool_value())
-            activeSettingIds.push_back(item[kName].string_value());
+            activeSettingNames.push_back(item[kName].string_value());
     }
 
-    for (const std::string& activeSettingId: activeSettingIds)
+    for (const std::string& activeSettingName: activeSettingNames)
     {
         m_activeSettingsBuilder.updateSettings(
-            activeSettingId, &activeSettingsItems, inOutSettingsValues);
+            activeSettingName, &activeSettingsItems, inOutSettingsValues);
     }
 
     Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();

@@ -1260,7 +1260,7 @@ Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
 {
     nx::vms::api::analytics::EngineActiveSettingChangedRequest request;
     request.analyticsEngineId = engine->getId();
-    request.activeSettingId = activeElement;
+    request.activeSettingName = activeElement;
     request.settingsModel = settingsModel;
     request.settingsValues = settingsValues;
     request.paramValues = paramValues;
@@ -1324,7 +1324,7 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
     nx::vms::api::analytics::DeviceAgentActiveSettingChangedRequest request;
     request.analyticsEngineId = engine->getId();
     request.deviceId = device->getId().toString();
-    request.activeSettingId = activeElement;
+    request.activeSettingName = activeElement;
     request.settingsModel = settingsModel;
     request.settingsValues = settingsValues;
     request.paramValues = paramValues;

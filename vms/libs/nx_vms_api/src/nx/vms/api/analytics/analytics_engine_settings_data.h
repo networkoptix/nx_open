@@ -94,9 +94,9 @@ struct NX_VMS_API EngineActiveSettingChangedRequest
     QnUuid analyticsEngineId;
 
     /**%apidoc
-     * Id of a setting which triggered the notification.
+     * Name of a setting which triggered the notification.
      */
-    QString activeSettingId;
+    QString activeSettingName;
 
     /**%apidoc
      * Settings model.
@@ -117,7 +117,7 @@ struct NX_VMS_API EngineActiveSettingChangedRequest
 };
 #define nx_vms_api_analytics_EngineActiveSettingChangedRequest_Fields \
     (analyticsEngineId) \
-    (activeSettingId) \
+    (activeSettingName) \
     (settingsModel) \
     (settingsValues) \
     (paramValues)
