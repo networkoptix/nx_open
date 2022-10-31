@@ -109,7 +109,8 @@ AVCodec* QnFfmpegHelper::findAvCodec(AVCodecID codecId)
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
     QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
-    return reader->read((char*) buf, size);
+    auto bytesRead = reader->read((char*) buf, size);
+    return bytesRead == 0 ? AVERROR_EOF : bytesRead;
 }
 
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
