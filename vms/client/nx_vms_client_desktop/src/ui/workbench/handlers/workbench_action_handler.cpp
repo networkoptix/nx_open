@@ -1043,34 +1043,47 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
 void ActionHandler::at_openInNewTabAction_triggered()
 {
     const auto isCameraWithFootage =
-        [this](const QnResourceWidget* widget)
+        [this](const QnMediaResourceWidget* widget)
         {
             const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-            return camera && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+            return camera
+                && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
         };
 
     auto parameters = menu()->currentParameters(sender());
-    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
-    const auto currentWidget = navigator()->currentWidget();
+    const bool calledFromScene = parameters.widgets().size() > 0;
+    const QnMediaResourceWidget* currentMediaWidget = calledFromScene
+        ? qobject_cast<QnMediaResourceWidget*>(parameters.widgets().first())
+        : navigator()->currentMediaWidget();
+
     const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    // Update state depending on how the action was called.
     auto currentState = streamSynchronizer->state();
-    if (!currentState.isSyncOn
-        || currentState.timeUs == DATETIME_NOW
-        || !currentWidget
-        || !isCameraWithFootage(currentWidget))
+    if (!currentMediaWidget || !isCameraWithFootage(currentMediaWidget))
     {
-        // Get default value.
+        // Switch to live if current item is not a camera or has no footage.
+        currentState = QnStreamSynchronizationState::live();
+    }
+    else if (calledFromScene)
+    {
+        currentState.isSyncOn = true; //< Force sync if several cameras were selected.
+        currentState.timeUs = std::chrono::microseconds(currentMediaWidget->position()).count();
+    }
+    else if (!currentState.isSyncOn)
+    {
+        // Open resources from tree in default state if current layouts is not synced.
         currentState = QnStreamSynchronizationState::live();
     }
 
-    // Stop layout tour if it is running.
+    // Stop showreel if it is running. Here widgets can be destroyed, so we should remove them
+    // from parameters to avoid AV.
+    const auto resources = parameters.resources();
+    parameters.setResources(resources);
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
-    {
-        // Avoid keeping links to widgets as they are to be destroyed when the tour is stopped.
-        parameters = action::Parameters(parameters.resources());
         menu()->trigger(action::ToggleLayoutTourModeAction);
-    }
 
+    const auto layouts = resources.filtered<QnLayoutResource>();
     for (const auto& layout: layouts)
     {
         auto wbLayout = QnWorkbenchLayout::instance(layout);
@@ -1086,7 +1099,7 @@ void ActionHandler::at_openInNewTabAction_triggered()
                 if (layout->isFile())
                 {
                     state = QnStreamSynchronizationState(
-                        /*isLive*/ false, /*position*/ 0, /*speed*/ 1.0);
+                        /*isSyncOn*/ false, /*position*/ 0, /*speed*/ 1.0);
                 }
 
                 for (auto item: wbLayout->items())
@@ -1108,33 +1121,16 @@ void ActionHandler::at_openInNewTabAction_triggered()
         workbench()->setCurrentLayout(wbLayout);
     }
 
-    if (const auto widgets = parameters.widgets(); widgets.isEmpty())
-    {
-        // Called from resources tree view
-        const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
-        if (openable.empty())
-            return;
+    const auto openable = resources.filtered(QnResourceAccessFilter::isOpenableInLayout);
+    if (openable.empty())
+        return;
 
-        parameters.setResources(openable);
-        menu()->trigger(action::OpenNewTabAction);
+    menu()->trigger(action::OpenNewTabAction, ui::action::Parameters()
+        .withArgument(Qn::LayoutSyncStateRole, currentState));
 
-        parameters.setArgument(Qn::LayoutSyncStateRole, currentState);
-    }
-    else
-    {
-        // Action is called from the current layout context menu.
-
-        const bool hasViewFootagePermission = std::any_of(widgets.cbegin(), widgets.cend(),
-            isCameraWithFootage);
-        const auto state = hasViewFootagePermission
-            ? streamSynchronizer->state()
-            : QnStreamSynchronizationState::live();
-
-        action::Parameters params;
-        params.setArgument(Qn::LayoutSyncStateRole, state);
-        menu()->trigger(action::OpenNewTabAction, params);
-    }
-
+    // Remove layouts from the list of resources (if there were any).
+    parameters.setResources(openable);
+    parameters.setArgument(Qn::LayoutSyncStateRole, currentState);
     menu()->trigger(action::DropResourcesAction, parameters);
 }
 
