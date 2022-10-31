@@ -220,7 +220,7 @@ TreeView
                 if (!resourceTree.scene || !model)
                     return ResourceTree.ItemState.normal
 
-                switch (model.nodeType)
+                switch (Number(model.nodeType))
                 {
                     case ResourceTree.NodeType.currentSystem:
                     case ResourceTree.NodeType.currentUser:
