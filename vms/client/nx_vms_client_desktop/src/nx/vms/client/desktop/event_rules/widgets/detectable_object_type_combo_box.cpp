@@ -50,4 +50,13 @@ void DetectableObjectTypeComboBox::setSelectedMainObjectTypeId(const QString& ob
         setCurrentIndex(index);
 }
 
+void DetectableObjectTypeComboBox::setDevices(const QnUuidSet& devices)
+{
+    if (auto objectTypeModel = dynamic_cast<DetectableObjectTypeModel*>(model()))
+    {
+        objectTypeModel->sourceModel()->setSelectedDevices(
+            std::set<QnUuid>{devices.begin(), devices.end()});
+    }
+}
+
 } // namespace nx::vms::client::desktop

@@ -35,8 +35,6 @@ public:
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractEngine*> engines
         READ engines NOTIFY enginesChanged);
 
-    Q_PROPERTY(QnVirtualCameraResourceSet selectedDevices WRITE setSelectedDevices)
-
     Q_PROPERTY(bool active WRITE setActive READ isActive NOTIFY activeChanged);
 
 public:
@@ -63,6 +61,11 @@ public:
      * Sets selected devices.
      */
     Q_INVOKABLE void setSelectedDevices(const QnVirtualCameraResourceSet& devices);
+
+    /**
+     * Sets selected devices.
+     */
+    void setSelectedDevices(const std::set<QnUuid>& devices);
 
     /**
      * Sets whether to exclude live types.

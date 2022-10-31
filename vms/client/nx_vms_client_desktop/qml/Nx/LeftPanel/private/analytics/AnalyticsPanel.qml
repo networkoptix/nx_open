@@ -118,11 +118,14 @@ Item
 
                 model: Analytics.TaxonomyManager.createFilterModel()
 
-                Binding
+                Connections
                 {
-                    target: analyticsFilters.model
-                    property: "selectedDevices"
-                    value: eventModel.commonSetup.selectedCameras
+                    target: eventModel.commonSetup
+                    function onSelectedCamerasChanged()
+                    {
+                        analyticsFilters.model.setSelectedDevices(
+                            eventModel.commonSetup.selectedCameras)
+                    }
                 }
             }
 
