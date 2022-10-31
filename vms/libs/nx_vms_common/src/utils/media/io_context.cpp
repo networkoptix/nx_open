@@ -17,7 +17,7 @@ static int ffmpegRead(void *opaque, uint8_t* buffer, int size);
 static int ffmpegWrite(void *opaque, uint8_t* buf, int size);
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence);
 
-IoContext::IoContext(uint32_t bufferSize, bool writable)
+IoContext::IoContext(uint32_t bufferSize, bool writable, bool seekable)
 {
     m_buffer = (uint8_t*) av_malloc(bufferSize);
     m_avioContext = avio_alloc_context(
@@ -27,7 +27,7 @@ IoContext::IoContext(uint32_t bufferSize, bool writable)
         this,
         &ffmpegRead,
         &ffmpegWrite,
-        &ffmpegSeek);
+        seekable ? &ffmpegSeek : nullptr);
 }
 
 IoContext::~IoContext()
@@ -75,7 +75,7 @@ IoContextPtr openFile(const std::string& fileName)
     if (!file->is_open())
         return nullptr;
 
-    auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/false);
+    auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/false, /*seekable*/true);
     ioContext->readHandler =
         [file](uint8_t* buffer, int size)
         {
@@ -103,6 +103,51 @@ IoContextPtr openFile(const std::string& fileName)
             return (int)file->tellg();
         };
     return ioContext;
+}
+
+IoContextPtr NX_VMS_COMMON_API fromBuffer(const uint8_t* data, int size)
+{
+    struct MemoryFile
+    {
+        const uint8_t* data = nullptr;
+        int size = 0;
+        int pos = 0;
+    };
+    auto memoryFile = std::make_shared<MemoryFile>();
+    memoryFile->size = size;
+    memoryFile->data = data;
+
+    auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/false, /*seekable*/true);
+    ioContext->readHandler =
+        [memoryFile](uint8_t* buffer, int size)
+        {
+            auto actualSize = std::min(memoryFile->size - memoryFile->pos, size);
+            memcpy(buffer, memoryFile->data + memoryFile->pos, actualSize);
+            memoryFile->pos += actualSize;
+            return actualSize;
+        };
+
+    ioContext->seekHandler =
+        [memoryFile] (int64_t pos, int whence)
+        {
+            switch (whence)
+            {
+                case SEEK_SET:
+                    memoryFile->pos = pos;
+                    break;
+                case SEEK_CUR:
+                    memoryFile->pos += pos;
+                    break;
+                case SEEK_END:
+                    memoryFile->pos = memoryFile->size - pos;
+                    break;
+                default:
+                    return AVERROR(ENOENT);
+            }
+            return memoryFile->pos;
+        };
+    return ioContext;
+
 }
 
 } // namespace nx::media::ffmpeg
