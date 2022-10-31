@@ -12,7 +12,7 @@ namespace nx::media::ffmpeg {
 class NX_VMS_COMMON_API IoContext
 {
 public:
-    IoContext(uint32_t bufferSize, bool writable);
+    IoContext(uint32_t bufferSize, bool writable, bool seekable);
     IoContext(const IoContext&) = delete;
     IoContext& operator=(const IoContext&) = delete;
     virtual ~IoContext();
@@ -30,5 +30,6 @@ private:
 using IoContextPtr = std::unique_ptr<IoContext>;
 
 IoContextPtr NX_VMS_COMMON_API openFile(const std::string& fileName);
+IoContextPtr NX_VMS_COMMON_API fromBuffer(const uint8_t* data, int size);
 
 } // namespace nx::media::ffmpeg
