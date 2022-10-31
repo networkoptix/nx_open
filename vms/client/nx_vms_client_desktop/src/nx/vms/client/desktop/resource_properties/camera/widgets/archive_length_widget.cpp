@@ -199,7 +199,6 @@ void ArchiveLengthWidget::Private::setPeriodDataToControls(
     const RecordingPeriod& periodData,
     bool stateHasChanges)
 {
-    QSignalBlocker spinBoxSignalBlocker(valueSpinBox);
     QSignalBlocker comboBoxSignalBlocker(unitComboBox);
 
     valueSpinBox->setEnabled(periodData.isManualMode());
