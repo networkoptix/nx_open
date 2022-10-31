@@ -18,9 +18,9 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::IActiveSettingChangedAction"); }
 
     /**
-     * @return Id of a setting which has triggered this notification.
+     * @return Name of a setting which has triggered this notification.
      */
-    virtual const char* activeSettingId() const = 0;
+    virtual const char* activeSettingName() const = 0;
 
     /**
      * @return Model of settings the Active setting has been triggered on. Never null.

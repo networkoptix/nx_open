@@ -7,7 +7,7 @@ namespace sdk {
 
 void ActiveSettingChangedAction::setActiveSettingId(std::string value)
 {
-    m_activeSettingId = std::move(value);
+    m_activeSettingName = std::move(value);
 }
 
 void ActiveSettingChangedAction::setSettingsModel(std::string value)
@@ -25,9 +25,9 @@ void ActiveSettingChangedAction::setParams(Ptr<const StringMap> value)
     m_params = value;
 }
 
-const char* ActiveSettingChangedAction::activeSettingId() const
+const char* ActiveSettingChangedAction::activeSettingName() const
 {
-    return m_activeSettingId.c_str();
+    return m_activeSettingName.c_str();
 }
 
 const char* ActiveSettingChangedAction::settingsModel() const
