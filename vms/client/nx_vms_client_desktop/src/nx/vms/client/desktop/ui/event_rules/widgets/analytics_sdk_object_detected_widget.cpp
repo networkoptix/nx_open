@@ -62,6 +62,9 @@ void AnalyticsSdkObjectDetectedWidget::at_model_dataChanged(Fields fields)
             ui->attributesEdit->setText(attributes);
     }
 
+    if (fields.testFlag(Field::eventResources))
+        ui->detectableObjectTypeComboBox->setDevices(model()->eventResources());
+
     ui->detectableObjectTypeComboBox->setSelectedMainObjectTypeId(
         model()->eventParams().getAnalyticsObjectTypeId());
 
