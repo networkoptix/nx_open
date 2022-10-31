@@ -5,8 +5,10 @@
 #include <QtCore/QRegularExpression>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
+#include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QWidget>
+
 
 #include "model_index_wrapper.h"
 #include "tab_item_wrapper.h"
@@ -98,6 +100,22 @@ bool objectMatches(const QObject* object, QJSValue properties)
             return false;
     }
 
+    if (properties.hasOwnProperty("toolTip"))
+    {
+        const auto toolTip = object->property("toolTip").toString();
+        if (!toolTip.isEmpty())
+        {
+            if (!textMatches(toolTip, properties.property("toolTip").toString()))
+                return false;
+        }
+
+        if (const auto w = dynamic_cast<const QGraphicsItem*>(object))
+        {
+            if (!textMatches(w->toolTip(), properties.property("toolTip").toString()))
+                return false;
+        }
+    }
+
     if (properties.hasOwnProperty("type"))
     {
         const auto className = QString(object->metaObject()->className());
@@ -127,7 +145,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
         "title",
     };
 
-    for (auto i: strProperties)
+    for (const auto i: strProperties)
     {
         if (!properties.hasOwnProperty(i))
             continue;
@@ -143,7 +161,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
         "z",
     };
 
-    for (auto i: intProperties)
+    for (const auto i: intProperties)
     {
         if (!properties.hasOwnProperty(i))
             continue;
@@ -157,14 +175,12 @@ bool objectMatches(const QObject* object, QJSValue properties)
         "visible",
     };
 
-    for (auto i: boolProperties)
+    for (const auto i: boolProperties)
     {
         if (!properties.hasOwnProperty(i))
             continue;
 
-        const bool propValue = valueIsTrue(properties.property(i));
-
-        if (propValue != object->property(i).toBool())
+        if (object->property(i).toBool() != valueIsTrue(properties.property(i)))
             return false;
     }
 
