@@ -37,6 +37,8 @@ public:
                 ScopedReset reset(this->q);
                 updateData();
             });
+
+        updateData();
     }
 
     void updateData(const std::vector<AbstractNode*>& types)
