@@ -20,7 +20,7 @@ public:
     /**
      * @return Id of a setting which has triggered this notification.
      */
-    virtual const char* activeSettingId() const = 0;
+    virtual const char* activeSettingName() const = 0;
 
     /**
      * @return Model of settings the Active setting has been triggered on. Never null.

@@ -29,7 +29,7 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedRequest
     /**%apidoc
      * Id of a setting which triggered the notification.
      */
-    QString activeSettingId;
+    QString activeSettingName;
 
     /**%apidoc
      * Name-value map with setting values, using JSON types corresponding to each setting type.
@@ -49,7 +49,7 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedRequest
 #define nx_vms_api_analytics_DeviceAgentActiveSettingChangedRequest_Fields \
     (deviceId) \
     (analyticsEngineId) \
-    (activeSettingId) \
+    (activeSettingName) \
     (settingsValues) \
     (settingsModel) \
     (paramValues)

@@ -34,7 +34,7 @@ Engine::Engine(Plugin* plugin):
     {
         const ActiveSettingsBuilder::ActiveSettingKey key = entry.first;
         m_activeSettingsBuilder.addRule(
-            key.activeSettingId,
+            key.activeSettingName,
             key.activeSettingValue,
             /*activeSettingHandler*/ entry.second);
     }
@@ -42,7 +42,7 @@ Engine::Engine(Plugin* plugin):
     for (const auto& entry: kDefaultActiveSettingsRules)
     {
         m_activeSettingsBuilder.addDefaultRule(
-            /*activeSettingId*/ entry.first,
+            /*activeSettingName*/ entry.first,
             /*activeSettingHandler*/ entry.second);
     }
 }
@@ -105,8 +105,8 @@ bool Engine::processActiveSettings(
 
     Json activeSettingsItems = (*activeSettingsGroupBoxIt)[kItems];
 
-    std::vector<std::string> activeSettingIds = settingIdsToUpdate;
-    if (activeSettingIds.empty())
+    std::vector<std::string> activeSettingNames = settingIdsToUpdate;
+    if (activeSettingNames.empty())
     {
         for (const auto item : activeSettingsItems.array_items())
         {
@@ -114,11 +114,11 @@ bool Engine::processActiveSettings(
                 continue;
 
             std::string name = item[kName].string_value();
-            activeSettingIds.push_back(name);
+            activeSettingNames.push_back(name);
         }
     }
 
-    for (const auto& settingId: activeSettingIds)
+    for (const auto& settingId: activeSettingNames)
         m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, values);
 
     Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();
@@ -164,7 +164,7 @@ void Engine::doGetSettingsOnActiveSettingChange(
     Json::object model = Json::parse(
         activeSettingChangeAction->settingsModel(), parseError).object_items();
 
-    const std::string settingId(activeSettingChangeAction->activeSettingId());
+    const std::string settingId(activeSettingChangeAction->activeSettingName());
 
     std::map<std::string, std::string> values = toStdMap(shareToPtr(
         activeSettingChangeAction->settingsValues()));

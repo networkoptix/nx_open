@@ -11,30 +11,30 @@ namespace settings {
 using namespace nx::sdk;
 
 void ActiveSettingsBuilder::addRule(
-    const std::string& activeSettingId,
+    const std::string& activeSettingName,
     const std::string& activeSettingValue,
     ActiveSettingHandler activeSettingHandler)
 {
-    ActiveSettingKey key{activeSettingId, activeSettingValue};
+    ActiveSettingKey key{activeSettingName, activeSettingValue};
     m_rules[key] = activeSettingHandler;
 }
 
 void ActiveSettingsBuilder::addDefaultRule(
-    const std::string& activeSettingId,
+    const std::string& activeSettingName,
     ActiveSettingHandler activeSettingHandler)
 {
-    m_defaultRules[activeSettingId] = activeSettingHandler;
+    m_defaultRules[activeSettingName] = activeSettingHandler;
 }
 
 void ActiveSettingsBuilder::updateSettings(
-    const std::string& activeSettingId,
+    const std::string& activeSettingName,
     nx::kit::Json* inOutSettingsModel,
     std::map<std::string, std::string>* inOutSettingsValues) const
 {
-    ActiveSettingKey key{activeSettingId, (*inOutSettingsValues)[activeSettingId]};
+    ActiveSettingKey key{activeSettingName, (*inOutSettingsValues)[activeSettingName]};
 
     auto rulesIt = m_rules.find(key);
-    auto defaultRulesIt = m_defaultRules.find(activeSettingId);
+    auto defaultRulesIt = m_defaultRules.find(activeSettingName);
 
     if (rulesIt != m_rules.cend())
         rulesIt->second(inOutSettingsModel, inOutSettingsValues);
@@ -44,8 +44,8 @@ void ActiveSettingsBuilder::updateSettings(
 
 bool ActiveSettingsBuilder::ActiveSettingKey::operator<(const ActiveSettingKey& other) const
 {
-    if (activeSettingId != other.activeSettingId)
-        return activeSettingId < other.activeSettingId;
+    if (activeSettingName != other.activeSettingName)
+        return activeSettingName < other.activeSettingName;
 
     if (activeSettingValue != other.activeSettingValue)
         return activeSettingValue < other.activeSettingValue;

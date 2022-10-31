@@ -26,7 +26,7 @@ public:
 
     struct ActiveSettingKey
     {
-        std::string activeSettingId;
+        std::string activeSettingName;
         std::string activeSettingValue;
 
         bool operator<(const ActiveSettingKey& other) const;
@@ -36,22 +36,22 @@ public:
     ActiveSettingsBuilder() = default;
 
     void addRule(
-        const std::string& activeSettingId,
+        const std::string& activeSettingName,
         const std::string& activeSettingValue,
         ActiveSettingHandler activeSettingHandler);
 
     void addDefaultRule(
-        const std::string& activeSettingId,
+        const std::string& activeSettingName,
         ActiveSettingHandler activeSettingHandler);
 
     void updateSettings(
-        const std::string& activeSettingId,
+        const std::string& activeSettingName,
         nx::kit::Json* inOutSettingsModel,
         std::map<std::string, std::string>* inOutSettingsValues) const;
 
 private:
     std::map<ActiveSettingKey, ActiveSettingHandler> m_rules;
-    std::map</*activeSettingId*/ std::string, ActiveSettingHandler> m_defaultRules;
+    std::map</*activeSettingName*/ std::string, ActiveSettingHandler> m_defaultRules;
 };
 
 } // namespace settings
