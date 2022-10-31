@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include <nx/utils/uuid.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
 namespace nx::vms::client::desktop {
+
+class DetectableObjectTypeModel;
 
 /**
  * A combo box to select an analytics detectable object type from those available in the system.
@@ -16,6 +19,8 @@ class DetectableObjectTypeComboBox: public QnTreeComboBox
 
 public:
     DetectableObjectTypeComboBox(QWidget* parent = nullptr);
+
+    void setDevices(const QnUuidSet& devices);
 
     QStringList selectedObjectTypeIds() const;
     void setSelectedObjectTypeIds(const QStringList& objectTypeIds);

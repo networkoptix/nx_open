@@ -169,7 +169,12 @@ void AnalyticsFilterModel::setSelectedEngine(
 
 void AnalyticsFilterModel::setSelectedDevices(const QnVirtualCameraResourceSet& devices)
 {
-    update(m_engine, deviceIds(devices), m_liveTypesExcluded);
+    setSelectedDevices(deviceIds(devices));
+}
+
+void AnalyticsFilterModel::setSelectedDevices(const std::set<QnUuid>& devices)
+{
+    update(m_engine, devices, m_liveTypesExcluded);
 }
 
 void AnalyticsFilterModel::setLiveTypesExcluded(bool value)

@@ -676,11 +676,14 @@ Window
             value: d.delayedAttributesFilter
         }
 
-        Binding
+        Connections
         {
-            target: d.filterModel
-            property: "selectedDevices"
-            value: eventModel.commonSetup.selectedCameras
+            target: eventModel.commonSetup
+            function onSelectedCamerasChanged()
+            {
+                d.filterModel.setSelectedDevices(
+                    eventModel.commonSetup.selectedCameras)
+            }
         }
 
         Connections
