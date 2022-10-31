@@ -90,7 +90,7 @@ bool WindowGeometryManager::loadState(
                 geometry.isFullscreen = geometry.isMaximized = true;
 
             const auto surface = d->control->suitableSurface();
-            if (params.screen <= surface.size())
+            if (params.screen < surface.size())
             {
                 const auto screenRect = surface.at(params.screen);
                 if (!screenRect.contains(geometry.geometry))
