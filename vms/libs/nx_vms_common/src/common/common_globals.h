@@ -214,7 +214,9 @@ namespace Qn {
         AR_StorageInsert = 0x200000,
         AR_StorageUpdate = 0x400000,
         AR_StorageRemove = 0x800000,
-        AR_MitmAttack = 0x1000000
+        AR_MitmAttack = 0x1000000,
+        AR_CloudBind = 0x2000000,
+        AR_CloudUnbind = 0x4000000
     )
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
     Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)

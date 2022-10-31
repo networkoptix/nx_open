@@ -834,6 +834,7 @@ private:
         std::optional<Timeouts> timeouts = {});
 
     QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
+    QString prepareUserAgent() const;
 
     /**
      * Fills in http request header with parameters like authentication or proxy.

@@ -16,6 +16,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/branding.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
@@ -380,6 +381,12 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
             return tr("Update installed");
         case Qn::AR_MitmAttack:
             return tr("MitM Attack");
+        case Qn::AR_CloudBind:
+            return nx::format(tr("Connected to %1", "%1 is the Cloud name (like Nx Cloud)"),
+                nx::branding::cloudName());
+        case Qn::AR_CloudUnbind:
+            return nx::format(tr("Disconnected from %1", "%1 is the Cloud name (like Nx Cloud)"),
+                nx::branding::cloudName());
     }
     return QString();
 }
@@ -453,6 +460,23 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
         // TODO: add more info from certificates, like fingerprints.
         case Qn::AR_MitmAttack:
             result = nx::format(tr("MitM attack from server %1"), data->extractParam("serverId"));
+            break;
+        case Qn::AR_CloudBind:
+            result = nx::format(tr("Connected to %1 via %2",
+                "%1 is the Cloud name (like Nx Cloud), "
+                    "%2 is a description of the agent used for establishing the connection "
+                    "(like Nx Witness Desktop Client 5.2.0.0)"),
+                nx::branding::cloudName(),
+                data->extractParam("userAgent"));
+            break;
+        case Qn::AR_CloudUnbind:
+            result = nx::format(
+                tr("Disconnected from %1 via %2",
+                    "%1 is the Cloud name (like Nx Cloud), "
+                    "%2 is a description of the agent used for establishing the connection "
+                    "(like Nx Witness Desktop Client 5.2.0.0)"),
+                nx::branding::cloudName(),
+                data->extractParam("userAgent"));
             break;
         default:
             result = getResourcesString(data->resources);
