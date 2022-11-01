@@ -3422,13 +3422,15 @@ bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
 
 void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
     const QnVideoWallResourcePtr& videowall,
-    const QnLayoutResourcePtr& layout)
+    QnLayoutResourcePtr reviewLayout)
 {
-    QnWorkbenchLayout* workbenchLayout = layout
-        ? QnWorkbenchLayout::instance(layout)
-        : QnWorkbenchLayout::instance(videowall);
+    if (!reviewLayout)
+    {
+        if (const auto workbenchLayout = QnWorkbenchLayout::instance(videowall))
+            reviewLayout = workbenchLayout->resource();
+    }
 
-    if (const auto reviewLayout = workbenchLayout->resource())
+    if (reviewLayout)
     {
         auto callback =
             [this, id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
