@@ -20,6 +20,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <network/router.h>
 #include <nx/api/mediaserver/image_request.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/custom_headers.h>
@@ -250,6 +252,16 @@ rest::ServerConnection::Result<nx::network::rest::JsonResult>::type extractJsonR
             callback(success, requestId, result.deserialized<T>());
         };
 }
+
+std::map<nx::vms::api::PeerType, QString> peerTypeToUserAgentDict = {
+    {nx::vms::api::PeerType::server, "VMS Server"},
+    {nx::vms::api::PeerType::desktopClient, "Desktop Client"},
+    {nx::vms::api::PeerType::videowallClient, "VideoWall Client"},
+    {nx::vms::api::PeerType::oldMobileClient, "Old Mobile Client"},
+    {nx::vms::api::PeerType::mobileClient, "Mobile Client"},
+    {nx::vms::api::PeerType::cloudServer, "Cloud Server"},
+    {nx::vms::api::PeerType::oldServer, "Old VMS Server"},
+    {nx::vms::api::PeerType::notDefined, "Not Defined"}};
 
 } // namespace
 
@@ -496,7 +508,8 @@ Handle ServerConnection::bindSystemToCloud(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/cloudBind", /*params*/ {}),
+        prepareUrl("/rest/v1/system/cloudBind",
+            /*params*/ {{"userAgent", prepareUserAgent()}}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
@@ -523,7 +536,8 @@ Handle ServerConnection::unbindSystemFromCloud(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/cloudUnbind", /*params*/ {}),
+        prepareUrl("/rest/v1/system/cloudUnbind",
+            /*params*/ {{"userAgent", prepareUserAgent()}}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
@@ -1773,6 +1787,14 @@ QUrl ServerConnection::prepareUrl(const QString& path, const nx::network::rest::
     result.setPath(path);
     result.setQuery(params.toUrlQuery());
     return result;
+}
+
+QString ServerConnection::prepareUserAgent() const
+{
+    return NX_FMT("%1 %2 %3",
+        nx::branding::vmsName(),
+        peerTypeToUserAgentDict[qnStaticCommon->localPeerType()],
+        nx::build_info::vmsVersion());
 }
 
 template<typename CallbackType>
