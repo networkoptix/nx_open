@@ -160,7 +160,8 @@ struct StartupActionsHandler::Private
 
         if (delayedLogonParameters)
         {
-            context->mainWindow()->welcomeScreen()->setGlobalPreloaderVisible(true);
+            if (auto welcomeScreen = context->mainWindow()->welcomeScreen())
+                welcomeScreen->setGlobalPreloaderVisible(true);
 
             delayedLogonTimer = std::make_unique<QTimer>();
             delayedLogonTimer->setSingleShot(true);
@@ -176,7 +177,10 @@ struct StartupActionsHandler::Private
         delayedLogonParameters.reset();
 
         if (hidePreloader)
-            context->mainWindow()->welcomeScreen()->setGlobalPreloaderVisible(false);
+        {
+            if (auto welcomeScreen = context->mainWindow()->welcomeScreen())
+                welcomeScreen->setGlobalPreloaderVisible(false);
+        }
     }
 };
 
