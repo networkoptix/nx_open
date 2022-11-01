@@ -70,7 +70,13 @@ void ShowOnce::sync()
 void ShowOnce::reset()
 {
     const auto keys = m_storage->allKeys();
-    m_storage->clear();
+    const auto group = m_storage->group();
+
+    // Reset all the values in current group.
+    m_storage->endGroup();
+    m_storage->remove(group);
+    m_storage->beginGroup(group);
+
     m_storage->sync();
 
     for (const QString& key: keys)
