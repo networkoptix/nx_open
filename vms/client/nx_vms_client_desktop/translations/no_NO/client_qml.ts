@@ -828,30 +828,30 @@ new PTZ controls</translation>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Her er en rask presentasjon
+av hva som har endret seg</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Dra over en hvilken som helst del av videoen
+for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Trykk på piltastene for å flytte og pluss- eller minustastene for å zoome</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Bruk musehjulet for å zoome</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Klikk, dobbeltklikk eller dra musepekeren mens du trykker på Shift-tasten for å bruke avansert PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Gå til lokale innstillinger for å aktivere en dramarkør over midten av videoen</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@ to activate PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Tidslinjeidentifikator, som opprettes når tiden endres bakover på en ekstern NVR. Den nye tidslinjen kan overlappe den eksisterende.</translation>
     </message>
     <message>
       <source>Select</source>

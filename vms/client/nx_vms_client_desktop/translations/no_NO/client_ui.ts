@@ -628,7 +628,7 @@
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Ikke eksporter video automatisk</translation>
     </message>
     <message>
       <source>Export From Device</source>
