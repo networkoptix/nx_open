@@ -183,15 +183,6 @@ void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
     layout->setStreamSynchronizationState(StreamSynchronizationState::disabled());
 }
 
-void AlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
-{
-    // Stop showreel if it is runing.
-    if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(ui::action::ToggleLayoutTourModeAction);
-
-    workbench()->setCurrentLayout(layout);
-}
-
 void AlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
 {
     for (auto widget: display()->widgets())
@@ -210,6 +201,14 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
 {
     if (cameras.isEmpty())
         return;
+
+    // Stop showreel if it is runing. Should be executed before layout is created because tour
+    // stopping clears all existing workbench layouts.
+    if (switchToLayoutNeeded)
+    {
+        if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(ui::action::ToggleLayoutTourModeAction);
+    }
 
     auto alarmLayout = findOrCreateAlarmLayout();
     if (!alarmLayout)
@@ -243,7 +242,7 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
         adjustLayoutCellAspectRatio(alarmLayout);
 
     if (switchToLayoutNeeded)
-        switchToLayout(alarmLayout);
+        workbench()->setCurrentLayout(alarmLayout);
 }
 
 QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
