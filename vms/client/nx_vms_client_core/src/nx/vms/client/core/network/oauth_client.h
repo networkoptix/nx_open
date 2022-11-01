@@ -37,13 +37,15 @@ public:
      * @param user Optional user name to be used for authorization process
      * @param cloudSystem Optional cloud system id to define the scope of the token.
      * @param clientId Reserved for the future use.
+     * @param refreshTokenLifetime Lifetime of the refresh token.
      * @param parent Parent object.
      */
     OauthClient(
         OauthClientType clientType,
         OauthViewType viewType,
-        const QString& cloudSystem = QString(),
-        const QString& clientId = QString(),
+        const QString& cloudSystem = {},
+        const QString& clientId = {},
+        const std::chrono::seconds& refreshTokenLifetime = {},
         QObject* parent = nullptr);
 
     virtual ~OauthClient() override;
