@@ -230,7 +230,7 @@ private:
     void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false);
     void saveVideowallAndReviewLayout(
         const QnVideoWallResourcePtr& videowall,
-        const nx::vms::client::desktop::LayoutResourcePtr& layout = {});
+        nx::vms::client::desktop::LayoutResourcePtr reviewLayout = {});
 
 private:
     void showControlledByAnotherUserMessage() const;
