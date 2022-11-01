@@ -2291,7 +2291,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation>Klarte ikke å sikkerhetskopiere filen %1</translation>
+      <translation>Kunne ikke sikkerhetskopiere filen %1</translation>
     </message>
     <message>
       <source>Show Intercom Informer</source>

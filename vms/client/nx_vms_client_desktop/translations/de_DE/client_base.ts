@@ -1025,11 +1025,11 @@
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Cloud-Layout speichern</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Cloud-Layout speichern unter...</translation>
     </message>
   </context>
   <context>
@@ -1562,7 +1562,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>E-Mail-Einstellungen können nicht getestet werden, da auf keinem der aktiven Server eine Internetverbindung besteht</translation>
     </message>
   </context>
   <context>
@@ -1887,7 +1887,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <translation>Protokolle konnten nicht im ausgewählten Ordner gespeichert werden</translation>
     </message>
     <message>
       <source>Download is finished!</source>
@@ -1895,7 +1895,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
-      <translation type="unfinished">Nvidia hardware acceleration is in Beta mode</translation>
+      <translation>Nvidia-Hardwarebeschleunigung ist im Beta-Modus</translation>
     </message>
   </context>
   <context>
@@ -3196,7 +3196,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Datenbank erfolgreich wiederhergestellt. Die Serveranwendung wird in Kürze neu gestartet.</translation>
     </message>
   </context>
   <context>
@@ -5632,11 +5632,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Speicher für Analysedaten ist nicht eingestellt</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Systemspeicher wird für Analysedaten verwendet</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -7596,7 +7596,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Der Vorgang "Kameraaustausch" ist nicht möglich, da der Server nicht verfügbar ist.</translation>
     </message>
   </context>
   <context>
@@ -8211,7 +8211,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Unbekannte Kamera</translation>
     </message>
   </context>
   <context>
@@ -8990,12 +8990,12 @@ Vergessen Sie nicht, die Protokollierungsstufe auf die Standardeinstellung zurü
     <message>
       <source>Debug Logging is enabled.
 System performance is degraded.</source>
-      <translation type="unfinished">Debug Logging is enabled.
-System performance is degraded.</translation>
+      <translation>Die Debug-Protokollierung ist aktiviert.
+Die Systemleistung ist beeinträchtigt.</translation>
     </message>
     <message>
       <source>Logs downloading is cancelled</source>
-      <translation type="unfinished">Logs downloading is cancelled</translation>
+      <translation>Das Herunterladen von Protokollen wird abgebrochen</translation>
     </message>
   </context>
   <context>
@@ -9627,7 +9627,7 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Suchen Sie nach einem lokalen Layout? Wählen Sie nur einen Benutzer aus der Liste &quot;Anzeigen an&quot; aus, um dessen lokale Layouts hier als Option anzuzeigen.</translation>
     </message>
   </context>
   <context>
@@ -10656,52 +10656,52 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n server</numerusform>
-        <numerusform>Backup storage is not configured on %n server</numerusform>
+      <translation>
+        <numerusform>Sicherungsspeicher ist auf %n Server nicht konfiguriert</numerusform>
+        <numerusform>Sicherungsspeicher ist auf %n Server nicht konfiguriert</numerusform>
       </translation>
     </message>
     <message>
       <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
+      <translation>Import im Gange...</translation>
     </message>
     <message>
       <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
+      <translation>Archivimport aus %1 abgeschlossen</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
+      <translation>Archivimport von %1 fehlgeschlagen</translation>
     </message>
     <message>
       <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
+      <translation>Archivimport von %1 gestoppt</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
+      <translation>
+        <numerusform>Der Speicher für Analysedaten ist auf %n Server nicht eingestellt</numerusform>
+        <numerusform>Der Speicher für Analysedaten ist auf %n Server nicht eingestellt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n server</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
+      <translation>
+        <numerusform>Systemspeicher wird für Analysedaten auf %n Server verwendet</numerusform>
+        <numerusform>Systemspeicher wird für Analysedaten auf %n Server verwendet</numerusform>
       </translation>
     </message>
     <message>
       <source>Not imported archive found on Device %1</source>
-      <translation type="unfinished">Not imported archive found on Device %1</translation>
+      <translation>Nicht importiertes Archiv auf Gerät %1 gefunden</translation>
     </message>
     <message>
       <source>Not imported archive found on Camera %1</source>
-      <translation type="unfinished">Not imported archive found on Camera %1</translation>
+      <translation>Nicht importiertes Archiv auf Kamera %1 gefunden</translation>
     </message>
     <message>
       <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
+      <translation>Archiv von %1 importieren</translation>
     </message>
   </context>
   <context>

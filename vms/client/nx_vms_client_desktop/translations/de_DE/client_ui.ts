@@ -663,11 +663,11 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Primärstream nicht aufzeichnen</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Sekundärstream nicht aufzeichnen</translation>
     </message>
   </context>
   <context>
@@ -898,15 +898,15 @@
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Verfügbare Aktionen</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Video-Export</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Live-Video und Archiv</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>In Zukunft</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -922,15 +922,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Lesen Sie mehr auf der Hilfeseite</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Dieses Fenster nicht mehr anzeigen</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Einführung von Cloud-Layouts</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -938,11 +938,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Suche nach Lesezeichen, Objekten, Ereignissen</translation>
     </message>
     <message>
       <source>•</source>
-      <translation type="unfinished">•</translation>
+      <translation>•</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Erstellen Sie eine Sicherungskopie der Systemverwaltungsdaten, oder stellen Sie die Systemverwaltungsdaten von einer vorhandenen Sicherungskopie wieder her</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1032,7 +1032,7 @@
     </message>
     <message>
       <source>Open folder</source>
-      <translation type="unfinished">Open folder</translation>
+      <translation>Ordner öffnen</translation>
     </message>
   </context>
   <context>
@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Kommentar hinzufügen</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Allow computer entering sleep mode on idle</source>
-      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+      <translation>Ruhezustand des Computers bei Leerlauf zulassen</translation>
     </message>
   </context>
   <context>
@@ -1869,7 +1869,7 @@
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <translation>Protokolle konnten nicht im ausgewählten Ordner gespeichert werden</translation>
     </message>
   </context>
   <context>
@@ -2628,7 +2628,7 @@
     </message>
     <message>
       <source>Select a rule</source>
-      <translation type="unfinished">Select a rule</translation>
+      <translation>Regel auswählen</translation>
     </message>
   </context>
   <context>
