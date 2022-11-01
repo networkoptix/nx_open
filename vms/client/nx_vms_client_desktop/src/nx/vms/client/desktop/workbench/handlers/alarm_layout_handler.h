@@ -27,7 +27,6 @@ private:
         qint64 positionUs);
 
     void disableSyncForLayout(QnWorkbenchLayout* layout);
-    void switchToLayout(QnWorkbenchLayout* layout);
     void adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout);
     QnWorkbenchLayout* findOrCreateAlarmLayout();
     bool alarmLayoutExists() const;
