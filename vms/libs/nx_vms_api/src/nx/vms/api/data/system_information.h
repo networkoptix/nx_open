@@ -78,8 +78,11 @@ struct NX_VMS_API LocalSystemAuth
 {
     /**%apidoc New "admin" user password. */
     QString password;
+
+    /**%apidoc User agent of the client. */
+    std::optional<QString> userAgent;
 };
-#define LocalSystemAuth_Fields (password)
+#define LocalSystemAuth_Fields (password)(userAgent)
 NX_VMS_API_DECLARE_STRUCT_EX(LocalSystemAuth, (json))
 NX_REFLECTION_INSTRUMENT(LocalSystemAuth, LocalSystemAuth_Fields)
 
@@ -93,8 +96,11 @@ struct NX_VMS_API CloudSystemAuth
 
     /**%apidoc The cloud user, registered this system on the Cloud. */
     QString owner;
+
+    /**%apidoc User agent of the client. */
+    std::optional<QString> userAgent;
 };
-#define CloudSystemAuth_Fields (systemId)(authKey)(owner)
+#define CloudSystemAuth_Fields (systemId)(authKey)(owner)(userAgent)
 NX_VMS_API_DECLARE_STRUCT_EX(CloudSystemAuth, (json))
 NX_REFLECTION_INSTRUMENT(CloudSystemAuth, CloudSystemAuth_Fields)
 
