@@ -163,19 +163,6 @@ QnVirtualCameraResourceList QnWorkbenchAlarmLayoutHandler::sortCameraResourceLis
     return sortedCameras;
 }
 
-void QnWorkbenchAlarmLayoutHandler::stopShowReelIfRunning()
-{
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction);
-}
-
-void QnWorkbenchAlarmLayoutHandler::switchToLayout(QnWorkbenchLayout* layout)
-{
-    stopShowReelIfRunning();
-
-    workbench()->setCurrentLayout(layout);
-}
-
 void QnWorkbenchAlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
 {
     for (auto widget: display()->widgets(layout->resource()))
@@ -206,6 +193,14 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout(
     if (cameras.isEmpty())
         return;
 
+    // Stop showreel if it is runing. Should be executed before layout is created because tour
+    // stopping clears all existing workbench layouts.
+    if (switchToLayoutNeeded)
+    {
+        if (action(action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+    }
+
     auto alarmLayout = findOrCreateAlarmLayout();
     if (!alarmLayout)
         return;
@@ -235,7 +230,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout(
         adjustLayoutCellAspectRatio(alarmLayout);
 
     if (switchToLayoutNeeded)
-        switchToLayout(alarmLayout);
+        workbench()->setCurrentLayout(alarmLayout);
 }
 
 QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()

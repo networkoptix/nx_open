@@ -30,8 +30,6 @@ private:
     void disableSyncForLayout(QnWorkbenchLayout* layout);
     QnVirtualCameraResourceList sortCameraResourceList(
         const QnVirtualCameraResourceList& cameraList);
-    void stopShowReelIfRunning();
-    void switchToLayout(QnWorkbenchLayout* layout);
     void adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout);
     void addCameraOnLayout(QnWorkbenchLayout* layout, QnVirtualCameraResourcePtr camera);
     QnWorkbenchLayout* findOrCreateAlarmLayout();
