@@ -28,6 +28,7 @@ struct OauthClient::Private: public QObject
     const OauthViewType viewType = OauthViewType::desktop;
     const QString cloudSystem;
     const QString clientId;
+    const std::chrono::seconds refreshTokenLifetime;
     QString locale;
     CloudAuthData authData;
     std::unique_ptr<Connection> m_connection;
@@ -38,7 +39,8 @@ struct OauthClient::Private: public QObject
         OauthClientType clientType,
         OauthViewType viewType,
         const QString& cloudSystem,
-        const QString& clientId);
+        const QString& clientId,
+        const std::chrono::seconds& refreshTokenLifetime);
 
     void issueAccessToken();
     std::string email() const;
@@ -49,13 +51,15 @@ OauthClient::Private::Private(
     OauthClientType clientType,
     OauthViewType viewType,
     const QString& cloudSystem,
-    const QString& clientId)
+    const QString& clientId,
+    const std::chrono::seconds& refreshTokenLifetime)
     :
     q(q),
     clientType(clientType),
     viewType(viewType),
     cloudSystem(cloudSystem),
     clientId(clientId),
+    refreshTokenLifetime(refreshTokenLifetime),
     m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>())
 {
 }
@@ -94,6 +98,8 @@ void OauthClient::Private::issueAccessToken()
     IssueTokenRequest request;
     request.grant_type = GrantType::authorizationCode;
     request.code = authData.authorizationCode;
+    if (refreshTokenLifetime.count())
+        request.refresh_token_lifetime = refreshTokenLifetime;
     if (!cloudSystem.isEmpty())
         request.scope = nx::format("cloudSystemId=%1", cloudSystem).toStdString();
 
@@ -126,7 +132,7 @@ void OauthClient::registerQmlType()
 
 OauthClient::OauthClient(QObject* parent):
     OauthClient(OauthClientType::undefined, OauthViewType::desktop,
-        /*cloudSystem*/ {}, /*clienId*/ {}, parent)
+        /*cloudSystem*/ {}, /*clienId*/ {}, /*refreshTokenLifetime*/ {}, parent)
 {
 }
 
@@ -135,10 +141,11 @@ OauthClient::OauthClient(
     OauthViewType viewType,
     const QString& cloudSystem,
     const QString& clientId,
+    const std::chrono::seconds& refreshTokenLifetime,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, clientType, viewType, cloudSystem, clientId))
+    d(new Private(this, clientType, viewType, cloudSystem, clientId, refreshTokenLifetime))
 {
 }
 
