@@ -134,6 +134,9 @@ void LogsManagementWidget::setupUi()
     connect(ui->unitsTable, &QTableView::clicked, this,
         [this](const QModelIndex& index)
         {
+            if (ui->unitsTable->isColumnHidden(LogsManagementModel::Columns::CheckBoxColumn))
+                return;
+
             auto model = ui->unitsTable->model();
             const auto checkBoxIndex =
                 index.siblingAtColumn(LogsManagementModel::Columns::CheckBoxColumn);
