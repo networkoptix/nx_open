@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>451</width>
+    <width>466</width>
     <height>336</height>
    </rect>
   </property>
@@ -91,10 +91,20 @@
       <property name="spacing">
        <number>8</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="maxVolumeLabel">
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="maxVolumeValue">
+        <property name="maximum">
+         <number>10240</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="splitBySizeUnits"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="splitBySizeLabel">
         <property name="text">
-         <string>Limit Max volume</string>
+         <string>Split file by size</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -111,22 +121,18 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="maxVolumeValue">
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="splitByTimeValue">
         <property name="maximum">
-         <number>10240</number>
+         <number>10000</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="splitBySizeLabel">
-        <property name="text">
-         <string>Split file by size</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="splitByTimeUnits"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QComboBox" name="maxVolumeUnits"/>
       </item>
       <item row="1" column="1">
        <widget class="QSpinBox" name="splitBySizeValue">
@@ -142,21 +148,35 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="splitByTimeValue">
-        <property name="maximum">
-         <number>10000</number>
+      <item row="0" column="0">
+       <widget class="QLabel" name="maxVolumeLabel">
+        <property name="text">
+         <string>Limit Max volume</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QComboBox" name="maxVolumeUnits"/>
+      <item row="0" column="3">
+       <widget class="nx::vms::client::desktop::HintButton" name="maxVolumeHint" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="splitBySizeUnits"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="QComboBox" name="splitByTimeUnits"/>
+      <item row="1" column="3">
+       <widget class="nx::vms::client::desktop::HintButton" name="splitBySizeHint" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -197,6 +217,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::Panel</class>
    <extends>QWidget</extends>
