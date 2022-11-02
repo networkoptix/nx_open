@@ -91,7 +91,7 @@ void LogsManagementWidget::setupUi()
     header->setSectionResizeMode(
         LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(
-        LogsManagementModel::Columns::LogLevelColumn, QHeaderView::Stretch);
+        LogsManagementModel::Columns::LogLevelColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
         LogsManagementModel::Columns::CheckBoxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
