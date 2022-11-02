@@ -1562,7 +1562,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>Kan ikke teste e-postinnstillinger på grunn av manglende internettforbindelse på de aktive serverne</translation>
     </message>
   </context>
   <context>
@@ -11477,7 +11477,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Velg minst én bruker</translation>
     </message>
   </context>
   <context>
