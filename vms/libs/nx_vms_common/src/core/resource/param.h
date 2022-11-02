@@ -14,23 +14,23 @@
  */
 namespace ResourcePropertyKey
 {
-    NX_VMS_API extern const QString kAnalog;
-    NX_VMS_API extern const QString kIsAudioSupported;
-    NX_VMS_API extern const QString kForcedIsAudioSupported;
-    NX_VMS_API extern const QString kHasDualStreaming;
-    NX_VMS_API extern const QString kStreamFpsSharing;
-    NX_VMS_API extern const QString kDts;
+    NX_VMS_COMMON_API extern const QString kAnalog;
+    NX_VMS_COMMON_API extern const QString kIsAudioSupported;
+    NX_VMS_COMMON_API extern const QString kForcedIsAudioSupported;
+    NX_VMS_COMMON_API extern const QString kHasDualStreaming;
+    NX_VMS_COMMON_API extern const QString kStreamFpsSharing;
+    NX_VMS_COMMON_API extern const QString kDts;
 
     /**
      * kMaxFpsThis property key is for compatibility with vms 3.1 only.
      * Do not confuse it with ResourceDataKey::kMaxFps.
      */
-    NX_VMS_API extern const QString kMaxFps;
+    NX_VMS_COMMON_API extern const QString kMaxFps;
 
-    NX_VMS_API extern const QString kMediaCapabilities;
-    NX_VMS_API extern const QString kMotionWindowCnt;
-    NX_VMS_API extern const QString kMotionMaskWindowCnt;
-    NX_VMS_API extern const QString kMotionSensWindowCnt;
+    NX_VMS_COMMON_API extern const QString kMediaCapabilities;
+    NX_VMS_COMMON_API extern const QString kMotionWindowCnt;
+    NX_VMS_COMMON_API extern const QString kMotionMaskWindowCnt;
+    NX_VMS_COMMON_API extern const QString kMotionSensWindowCnt;
 
     /**
      * String parameter with following values allowed:
@@ -39,126 +39,126 @@ namespace ResourcePropertyKey
      * softwaregrid and hardwaregrid can be combined as list split with comma.
      * Empty string means no motion is allowed.
      */
-    NX_VMS_API extern const QString kSupportedMotion;
+    NX_VMS_COMMON_API extern const QString kSupportedMotion;
 
-    NX_VMS_API extern const QString kTrustCameraTime;
-    NX_VMS_API extern const QString kKeepCameraTimeSettings;
-    NX_VMS_API extern const QString kCredentials;
-    NX_VMS_API extern const QString kDefaultCredentials;
-    NX_VMS_API extern const QString kCameraCapabilities;
-    NX_VMS_API extern const QString kMediaStreams;
-    NX_VMS_API extern const QString kBitrateInfos;
-    NX_VMS_API extern const QString kStreamUrls;
-    NX_VMS_API extern const QString kAudioCodec;
-    NX_VMS_API extern const QString kPtzCapabilities;
-    NX_VMS_API extern const QString kPtzTargetId;
-    NX_VMS_API extern const QString kUserPreferredPtzPresetType;
-    NX_VMS_API extern const QString kDefaultPreferredPtzPresetType;
+    NX_VMS_COMMON_API extern const QString kTrustCameraTime;
+    NX_VMS_COMMON_API extern const QString kKeepCameraTimeSettings;
+    NX_VMS_COMMON_API extern const QString kCredentials;
+    NX_VMS_COMMON_API extern const QString kDefaultCredentials;
+    NX_VMS_COMMON_API extern const QString kCameraCapabilities;
+    NX_VMS_COMMON_API extern const QString kMediaStreams;
+    NX_VMS_COMMON_API extern const QString kBitrateInfos;
+    NX_VMS_COMMON_API extern const QString kStreamUrls;
+    NX_VMS_COMMON_API extern const QString kAudioCodec;
+    NX_VMS_COMMON_API extern const QString kPtzCapabilities;
+    NX_VMS_COMMON_API extern const QString kPtzTargetId;
+    NX_VMS_COMMON_API extern const QString kUserPreferredPtzPresetType;
+    NX_VMS_COMMON_API extern const QString kDefaultPreferredPtzPresetType;
 
-    NX_VMS_API extern const QString kPtzCapabilitiesUserIsAllowedToModify;
-    NX_VMS_API extern const QString kPtzCapabilitiesAddedByUser;
-    NX_VMS_API extern const QString kConfigurationalPtzCapabilities;
-    NX_VMS_API extern const QString kPtzPanTiltSensitivity;
-    NX_VMS_API extern const QString kForcedAudioStream;
+    NX_VMS_COMMON_API extern const QString kPtzCapabilitiesUserIsAllowedToModify;
+    NX_VMS_COMMON_API extern const QString kPtzCapabilitiesAddedByUser;
+    NX_VMS_COMMON_API extern const QString kConfigurationalPtzCapabilities;
+    NX_VMS_COMMON_API extern const QString kPtzPanTiltSensitivity;
+    NX_VMS_COMMON_API extern const QString kForcedAudioStream;
 
     // Used as default property only.
-    NX_VMS_API extern const QString kGroupPlayParamName;
-    NX_VMS_API extern const QString kNoRecordingParams;
+    NX_VMS_COMMON_API extern const QString kGroupPlayParamName;
+    NX_VMS_COMMON_API extern const QString kNoRecordingParams;
 
-    NX_VMS_API extern const QString kCanConfigureRemoteRecording;
+    NX_VMS_COMMON_API extern const QString kCanConfigureRemoteRecording;
 
-    NX_VMS_API extern const QString kFirmware;
-    NX_VMS_API extern const QString kDeviceType;
-    NX_VMS_API extern const QString kIoConfigCapability;
+    NX_VMS_COMMON_API extern const QString kFirmware;
+    NX_VMS_COMMON_API extern const QString kDeviceType;
+    NX_VMS_COMMON_API extern const QString kIoConfigCapability;
 
     // TODO: rename to kIoDisplayNames
-    NX_VMS_API extern const QString kIoDisplayName;
+    NX_VMS_COMMON_API extern const QString kIoDisplayName;
 
-    NX_VMS_API extern const QString kIoOverlayStyle;
+    NX_VMS_COMMON_API extern const QString kIoOverlayStyle;
 
     // The next three keys are used both as property keys and as data keys, so they are defined both
     // in ResourcePropertyKey and ResourceDataKey namespaces.
-    NX_VMS_API extern const QString kBitratePerGOP;
-    NX_VMS_API extern const QString kUseMedia2ToFetchProfiles;
-    NX_VMS_API extern const QString kIoSettings;
+    NX_VMS_COMMON_API extern const QString kBitratePerGOP;
+    NX_VMS_COMMON_API extern const QString kUseMedia2ToFetchProfiles;
+    NX_VMS_COMMON_API extern const QString kIoSettings;
 
-    NX_VMS_API extern const QString kVideoLayout;
+    NX_VMS_COMMON_API extern const QString kVideoLayout;
 
-    NX_VMS_API extern const QString kMotionStreamKey;
-    NX_VMS_API extern const QString kForcedMotionDetectionKey;
+    NX_VMS_COMMON_API extern const QString kMotionStreamKey;
+    NX_VMS_COMMON_API extern const QString kForcedMotionDetectionKey;
 
 /**
      * To use or not to use onvif media2 during camera initialization. The valid values are
      * "autoSelect" (by default), "useIfSupported", "neverUse".
      */
-    NX_VMS_API extern const QString kUseMedia2ToInitializeCamera;
+    NX_VMS_COMMON_API extern const QString kUseMedia2ToInitializeCamera;
 
-    NX_VMS_API extern const QString kForcedLicenseType;
+    NX_VMS_COMMON_API extern const QString kForcedLicenseType;
 
-    NX_VMS_API extern const QString kTwoWayAudioEnabled;
-    NX_VMS_API extern const QString kAudioInputDeviceId;
-    NX_VMS_API extern const QString kAudioOutputDeviceId;
+    NX_VMS_COMMON_API extern const QString kTwoWayAudioEnabled;
+    NX_VMS_COMMON_API extern const QString kAudioInputDeviceId;
+    NX_VMS_COMMON_API extern const QString kAudioOutputDeviceId;
 
     /**
      * Whether primary stream should be recorded on a camera. Empty if recording is allowed, any
      * positive integer value is treated as forbidden.
      */
-    NX_VMS_API extern const QString kDontRecordPrimaryStreamKey;
+    NX_VMS_COMMON_API extern const QString kDontRecordPrimaryStreamKey;
 
     /**
      * Whether secondary stream should be recorded on a camera. Empty if recording is allowed, any
      * positive integer value is treated as forbidden.
      */
-    NX_VMS_API extern const QString kDontRecordSecondaryStreamKey;
+    NX_VMS_COMMON_API extern const QString kDontRecordSecondaryStreamKey;
 
     /**
      * Remote archive before this time will not be synchronized.
      */
-    NX_VMS_API extern const QString kLastSyncronizedRemoteArchiveTimestampMs;
+    NX_VMS_COMMON_API extern const QString kLastSyncronizedRemoteArchiveTimestampMs;
 
     /**
      * Whether to download remote (i.e. on-camera) archives.
      */
-    NX_VMS_API extern const QString kRemoteArchiveSynchronizationEnabled;
+    NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationEnabled;
 
     /**
      * Whether to download remote (i.e. on-camera) archives.
      */
-    NX_VMS_API extern const QString kRemoteArchiveSynchronizationEnabledOnce;
+    NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationEnabledOnce;
 
-    NX_VMS_API extern const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync;
+    NX_VMS_COMMON_API extern const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync;
 
     namespace Onvif
     {
-        NX_VMS_API extern const QString kMediaUrl;
-        NX_VMS_API extern const QString kDeviceUrl;
-        NX_VMS_API extern const QString kDeviceID;
+        NX_VMS_COMMON_API extern const QString kMediaUrl;
+        NX_VMS_COMMON_API extern const QString kDeviceUrl;
+        NX_VMS_COMMON_API extern const QString kDeviceID;
     }
 
     namespace Server
     {
-        NX_VMS_API extern const QString kTimezoneUtcOffset;
-        NX_VMS_API extern const QString kCpuArchitecture;
-        NX_VMS_API extern const QString kCpuModelName;
-        NX_VMS_API extern const QString kPhysicalMemory;
-        NX_VMS_API extern const QString kGuidConflictDetected;
+        NX_VMS_COMMON_API extern const QString kTimezoneUtcOffset;
+        NX_VMS_COMMON_API extern const QString kCpuArchitecture;
+        NX_VMS_COMMON_API extern const QString kCpuModelName;
+        NX_VMS_COMMON_API extern const QString kPhysicalMemory;
+        NX_VMS_COMMON_API extern const QString kGuidConflictDetected;
         // TODO: #rvasilenko can we change the property text safely?
-        NX_VMS_API extern const QString kBrand;
-        NX_VMS_API extern const QString kFullVersion;
-        NX_VMS_API extern const QString kPublicationType;
-        NX_VMS_API extern const QString kPublicIp;
-        NX_VMS_API extern const QString kSystemRuntime;
-        NX_VMS_API extern const QString kNetworkInterfaces;
-        NX_VMS_API extern const QString kBookmarkCount;
-        NX_VMS_API extern const QString kUdtInternetTraffic_bytes;
-        NX_VMS_API extern const QString kHddList;
-        NX_VMS_API extern const QString kNvrPoePortPoweringModes;
-        NX_VMS_API extern const QString kCertificate;
-        NX_VMS_API extern const QString kUserProvidedCertificate;
-        NX_VMS_API extern const QString kWebCamerasDiscoveryEnabled;
+        NX_VMS_COMMON_API extern const QString kBrand;
+        NX_VMS_COMMON_API extern const QString kFullVersion;
+        NX_VMS_COMMON_API extern const QString kPublicationType;
+        NX_VMS_COMMON_API extern const QString kPublicIp;
+        NX_VMS_COMMON_API extern const QString kSystemRuntime;
+        NX_VMS_COMMON_API extern const QString kNetworkInterfaces;
+        NX_VMS_COMMON_API extern const QString kBookmarkCount;
+        NX_VMS_COMMON_API extern const QString kUdtInternetTraffic_bytes;
+        NX_VMS_COMMON_API extern const QString kHddList;
+        NX_VMS_COMMON_API extern const QString kNvrPoePortPoweringModes;
+        NX_VMS_COMMON_API extern const QString kCertificate;
+        NX_VMS_COMMON_API extern const QString kUserProvidedCertificate;
+        NX_VMS_COMMON_API extern const QString kWebCamerasDiscoveryEnabled;
     }
 
-    NX_VMS_API extern const std::set<QString> kWriteOnlyNames;
+    NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -175,106 +175,106 @@ namespace ResourcePropertyKey
  */
 namespace ResourceDataKey
 {
-    NX_VMS_API extern const QString kPossibleDefaultCredentials;
-    NX_VMS_API extern const QString kMaxFps;
-    NX_VMS_API extern const QString kPreferredAuthScheme;
-    NX_VMS_API extern const QString kForcedDefaultCredentials;
-    NX_VMS_API extern const QString kDesiredTransport;
-    NX_VMS_API extern const QString kOnvifInputPortAliases;
-    NX_VMS_API extern const QString kOnvifManufacturerReplacement;
-    NX_VMS_API extern const QString kTrustToVideoSourceSize;
+    NX_VMS_COMMON_API extern const QString kPossibleDefaultCredentials;
+    NX_VMS_COMMON_API extern const QString kMaxFps;
+    NX_VMS_COMMON_API extern const QString kPreferredAuthScheme;
+    NX_VMS_COMMON_API extern const QString kForcedDefaultCredentials;
+    NX_VMS_COMMON_API extern const QString kDesiredTransport;
+    NX_VMS_COMMON_API extern const QString kOnvifInputPortAliases;
+    NX_VMS_COMMON_API extern const QString kOnvifManufacturerReplacement;
+    NX_VMS_COMMON_API extern const QString kTrustToVideoSourceSize;
 
     // Used if we need to control fps via encoding interval (fps when encoding interval is 1).
-    NX_VMS_API extern const QString kfpsBase;
-    NX_VMS_API extern const QString kControlFpsViaEncodingInterval;
-    NX_VMS_API extern const QString kFpsBounds;
-    NX_VMS_API extern const QString kUseExistingOnvifProfiles;
-    NX_VMS_API extern const QString kForcedSecondaryStreamResolution;
-    NX_VMS_API extern const QString kDesiredH264Profile;
-    NX_VMS_API extern const QString kForceSingleStream;
-    NX_VMS_API extern const QString kHighStreamAvailableBitrates;
-    NX_VMS_API extern const QString kLowStreamAvailableBitrates;
-    NX_VMS_API extern const QString kHighStreamBitrateBounds;
-    NX_VMS_API extern const QString kLowStreamBitrateBounds;
-    NX_VMS_API extern const QString kUnauthorizedTimeoutSec;
-    NX_VMS_API extern const QString kAdvancedParameterOverloads;
-    NX_VMS_API extern const QString kShouldAppearAsSingleChannel;
-    NX_VMS_API extern const QString kPreStreamConfigureRequests;
-    NX_VMS_API extern const QString kConfigureAllStitchedSensors;
-    NX_VMS_API extern const QString kTwoWayAudio;
+    NX_VMS_COMMON_API extern const QString kfpsBase;
+    NX_VMS_COMMON_API extern const QString kControlFpsViaEncodingInterval;
+    NX_VMS_COMMON_API extern const QString kFpsBounds;
+    NX_VMS_COMMON_API extern const QString kUseExistingOnvifProfiles;
+    NX_VMS_COMMON_API extern const QString kForcedSecondaryStreamResolution;
+    NX_VMS_COMMON_API extern const QString kDesiredH264Profile;
+    NX_VMS_COMMON_API extern const QString kForceSingleStream;
+    NX_VMS_COMMON_API extern const QString kHighStreamAvailableBitrates;
+    NX_VMS_COMMON_API extern const QString kLowStreamAvailableBitrates;
+    NX_VMS_COMMON_API extern const QString kHighStreamBitrateBounds;
+    NX_VMS_COMMON_API extern const QString kLowStreamBitrateBounds;
+    NX_VMS_COMMON_API extern const QString kUnauthorizedTimeoutSec;
+    NX_VMS_COMMON_API extern const QString kAdvancedParameterOverloads;
+    NX_VMS_COMMON_API extern const QString kShouldAppearAsSingleChannel;
+    NX_VMS_COMMON_API extern const QString kPreStreamConfigureRequests;
+    NX_VMS_COMMON_API extern const QString kConfigureAllStitchedSensors;
+    NX_VMS_COMMON_API extern const QString kTwoWayAudio;
 
-    NX_VMS_API extern const QString kPtzTargetChannel;
-    NX_VMS_API extern const QString kOperationalPtzCapabilities;
-    NX_VMS_API extern const QString kConfigurationalPtzCapabilities;
+    NX_VMS_COMMON_API extern const QString kPtzTargetChannel;
+    NX_VMS_COMMON_API extern const QString kOperationalPtzCapabilities;
+    NX_VMS_COMMON_API extern const QString kConfigurationalPtzCapabilities;
 
     // Rename to kForceOnvif and kIgnoreOnvif
-    NX_VMS_API extern const QString kForceONVIF;
-    NX_VMS_API extern const QString kIgnoreONVIF;
+    NX_VMS_COMMON_API extern const QString kForceONVIF;
+    NX_VMS_COMMON_API extern const QString kIgnoreONVIF;
 
-    NX_VMS_API extern const QString kOnvifVendorSubtype;
+    NX_VMS_COMMON_API extern const QString kOnvifVendorSubtype;
 
-    NX_VMS_API extern const QString kCanShareLicenseGroup;
+    NX_VMS_COMMON_API extern const QString kCanShareLicenseGroup;
 
-    NX_VMS_API extern const QString kMediaTraits;
+    NX_VMS_COMMON_API extern const QString kMediaTraits;
 
     // TODO: rename to kDwRebrandedToIsd
-    NX_VMS_API extern const QString kIsdDwCam;
+    NX_VMS_COMMON_API extern const QString kIsdDwCam;
 
-    NX_VMS_API extern const QString kDoNotAddVendorToDeviceName;
+    NX_VMS_COMMON_API extern const QString kDoNotAddVendorToDeviceName;
 
-    NX_VMS_API extern const QString kMultiresourceVideoChannelMapping;
+    NX_VMS_COMMON_API extern const QString kMultiresourceVideoChannelMapping;
 
-    NX_VMS_API extern const QString kParseOnvifNotificationsWithHttpReader;
-    NX_VMS_API extern const QString kPullInputEventsAsOdm;
-    NX_VMS_API extern const QString kRenewIntervalForPullingAsOdm;
+    NX_VMS_COMMON_API extern const QString kParseOnvifNotificationsWithHttpReader;
+    NX_VMS_COMMON_API extern const QString kPullInputEventsAsOdm;
+    NX_VMS_COMMON_API extern const QString kRenewIntervalForPullingAsOdm;
 
-    NX_VMS_API extern const QString kDisableHevc;
-    NX_VMS_API extern const QString kIgnoreRtcpReports;
+    NX_VMS_COMMON_API extern const QString kDisableHevc;
+    NX_VMS_COMMON_API extern const QString kIgnoreRtcpReports;
 
-    NX_VMS_API extern const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS;
+    NX_VMS_COMMON_API extern const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS;
 
-    NX_VMS_API extern const QString kDoUpdatePortInSubscriptionAddress;
+    NX_VMS_COMMON_API extern const QString kDoUpdatePortInSubscriptionAddress;
 
-    NX_VMS_API extern const QString kUseInvertedActiveStateForOpenIdleState;
+    NX_VMS_COMMON_API extern const QString kUseInvertedActiveStateForOpenIdleState;
 
     // Rename?
-    NX_VMS_API extern const QString kNeedToReloadAllAdvancedParametersAfterApply;
+    NX_VMS_COMMON_API extern const QString kNeedToReloadAllAdvancedParametersAfterApply;
 
     // Storage
     // Rename?
-    NX_VMS_API extern const QString kSpace;
+    NX_VMS_COMMON_API extern const QString kSpace;
 
-    NX_VMS_API extern const QString kNoVideoSupport;
+    NX_VMS_COMMON_API extern const QString kNoVideoSupport;
 
     // The next three keys are used both as property keys and as data keys, so they are defined both
     // in ResourcePropertyKey and ResourceDataKey namespaces.
-    NX_VMS_API extern const QString kBitratePerGOP;
-    NX_VMS_API extern const QString kUseMedia2ToFetchProfiles;
-    NX_VMS_API extern const QString kIoSettings;
+    NX_VMS_COMMON_API extern const QString kBitratePerGOP;
+    NX_VMS_COMMON_API extern const QString kUseMedia2ToFetchProfiles;
+    NX_VMS_COMMON_API extern const QString kIoSettings;
 
-    NX_VMS_API extern const QString kVideoLayout;
+    NX_VMS_COMMON_API extern const QString kVideoLayout;
 
-    NX_VMS_API extern const QString kRepeatIntervalForSendVideoEncoderMS;
-    NX_VMS_API extern const QString kMulticastIsSupported;
-    NX_VMS_API extern const QString kOnvifIgnoreMedia2;
+    NX_VMS_COMMON_API extern const QString kRepeatIntervalForSendVideoEncoderMS;
+    NX_VMS_COMMON_API extern const QString kMulticastIsSupported;
+    NX_VMS_COMMON_API extern const QString kOnvifIgnoreMedia2;
 
-    NX_VMS_API extern const QString kFixWrongUri;
-    NX_VMS_API extern const QString kAlternativeSecondStreamSorter;
+    NX_VMS_COMMON_API extern const QString kFixWrongUri;
+    NX_VMS_COMMON_API extern const QString kAlternativeSecondStreamSorter;
 
-    NX_VMS_API extern const QString kOnvifTimeoutSeconds;
+    NX_VMS_COMMON_API extern const QString kOnvifTimeoutSeconds;
 
     // Add this many seconds to VMS system time before uploading it to ONVIF camera
-    NX_VMS_API extern const QString kOnvifSetDateTimeOffset;
+    NX_VMS_COMMON_API extern const QString kOnvifSetDateTimeOffset;
 
     // Holes in remote archive smaller than this many seconds will be patched up.
-    NX_VMS_API extern const QString kOnvifRemoteArchiveMinChunkDuration;
+    NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveMinChunkDuration;
 
     // Skip this many seconds at the start of remote archive when when downloading it.
-    NX_VMS_API extern const QString kOnvifRemoteArchiveStartSkipDuration;
+    NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveStartSkipDuration;
 
     // Do not attempt downloading remote archive faster than real-time. This is necessary since some
     // cameras cannot cope with that.
-    NX_VMS_API extern const QString kOnvifRemoteArchiveDisableFastDownload;
+    NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveDisableFastDownload;
 
 } // namespace ResourceDataKey
 
@@ -283,7 +283,7 @@ namespace ResourceDataKey
 namespace Qn
 {
 
-NX_VMS_API extern const QString USER_FULL_NAME;
-NX_VMS_API extern const QString kResourceDataParamName;
+NX_VMS_COMMON_API extern const QString USER_FULL_NAME;
+NX_VMS_COMMON_API extern const QString kResourceDataParamName;
 
 } // namespace Qn
