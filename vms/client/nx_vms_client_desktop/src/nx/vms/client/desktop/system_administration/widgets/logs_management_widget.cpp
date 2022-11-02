@@ -303,8 +303,8 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->resetButton->setEnabled(hasSelection);
 
     ui->cancelButton->setVisible(!downloadFinished);
-    ui->errorLabel->setVisible(downloadFinished && hasLocalErrors);
-    ui->finishedLabel->setVisible(downloadFinished && !hasLocalErrors);
+    ui->errorLabel->setVisible(downloadFinished && hasErrors);
+    ui->finishedLabel->setVisible(downloadFinished && !hasErrors);
     ui->doneButton->setVisible(downloadFinished);
     ui->retryButton->setVisible(hasErrors);
 }
