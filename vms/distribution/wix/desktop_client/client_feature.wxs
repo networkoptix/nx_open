@@ -40,13 +40,13 @@
             </Component>
 
             <Directory Id="ClientDir" Name="Client">
-                <Merge
-                    Id="client_help_module"
-                    Language="0"
-                    SourceFile="${modules_output_path}/client_help.msm"
-                    DiskId="3"/>
-
                 <Directory Id="InstallDirRoot" Name="${full_release_version}">
+
+                    <Merge
+                        Id="client_help_module"
+                        Language="0"
+                        SourceFile="${modules_output_path}/client_help.msm"
+                        DiskId="3"/>
 
                     <Merge
                         Id="client_qml_module"
