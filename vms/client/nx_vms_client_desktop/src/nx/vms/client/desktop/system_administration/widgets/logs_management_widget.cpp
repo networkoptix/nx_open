@@ -56,14 +56,28 @@ void LogsManagementWidget::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
     if (NX_ASSERT(m_watcher))
+    {
+        auto state = m_watcher->state();
+        if(state == LogsManagementWatcher::State::finished
+           || state == LogsManagementWatcher::State::hasErrors
+           || state == LogsManagementWatcher::State::hasLocalErrors)
+        {
+            needUpdateBeforeClosing = true;
+        }
         m_watcher->setUpdatesEnabled(true);
+    }
 }
 
 void LogsManagementWidget::hideEvent(QHideEvent* event)
 {
     base_type::hideEvent(event);
     if (NX_ASSERT(m_watcher))
+    {
+        if (needUpdateBeforeClosing)
+            m_watcher->completeDownload();
+
         m_watcher->setUpdatesEnabled(false);
+    }
 }
 
 void LogsManagementWidget::setupUi()
@@ -274,6 +288,10 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
         default:
             NX_ASSERT(false, "Unreachable");
     }
+
+    needUpdateBeforeClosing = false;
+    if(downloadFinished && isVisible())
+        needUpdateBeforeClosing = true;
 
     ui->stackedWidget->setCurrentWidget(downloadStarted ? ui->activePage : ui->defaultPage);
 
