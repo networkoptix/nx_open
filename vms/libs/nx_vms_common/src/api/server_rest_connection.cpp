@@ -1972,6 +1972,9 @@ Handle ServerConnection::sendRequest(
     auto certificateVerifier = d->directConnect
         ? d->directConnect->certificateVerifier
         : d->commonModule->certificateVerifier();
+    if (!NX_ASSERT(certificateVerifier))
+        return 0;
+
     ContextPtr context(new nx::network::http::ClientPool::Context(d->serverId,
         certificateVerifier->makeAdapterFunc(request.gatewayId.value_or(d->serverId))));
     context->request = request;
