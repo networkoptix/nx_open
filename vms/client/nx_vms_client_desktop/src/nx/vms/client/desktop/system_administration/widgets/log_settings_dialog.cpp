@@ -131,11 +131,13 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Mega), kMegabyte);
     ui->maxVolumeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Giga), kGigabyte);
+    ui->maxVolumeHint->addHintLine(tr("Has to be 2 times more than split by size"));
 
     ui->splitBySizeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Mega), kMegabyte);
     ui->splitBySizeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Giga), kGigabyte);
+    ui->splitBySizeHint->addHintLine(tr("Cannot be more than \"Max volume\" / 2"));
 
     using T = long long; // Fix ambigous type cast from long to QVariant.
     ui->splitByTimeUnits->addItem(
