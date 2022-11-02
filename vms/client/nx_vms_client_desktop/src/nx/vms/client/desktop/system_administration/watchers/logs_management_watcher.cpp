@@ -1495,6 +1495,12 @@ void LogsManagementWatcher::storeClientSettings(const ConfigurableLogSettings& s
     storeAndApplyClientSettings(*newClientSettings);
 }
 
+LogsManagementWatcher::State LogsManagementWatcher::state() const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    return d->state;
+}
+
 void LogsManagementWatcher::onReceivedServerLogSettings(
     const QnUuid& serverId,
     const nx::vms::api::ServerLogSettings& settings)
