@@ -122,6 +122,7 @@ public:
 
     UnitPtr clientUnit() const;
     void storeClientSettings(const ConfigurableLogSettings& settings);
+    nx::vms::client::desktop::LogsManagementWatcher::State state() const;
 
 signals:
     void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
