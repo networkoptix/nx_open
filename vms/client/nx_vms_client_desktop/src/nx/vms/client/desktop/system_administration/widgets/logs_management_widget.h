@@ -39,6 +39,7 @@ private:
 private:
     QScopedPointer<Ui::LogsManagementWidget> ui;
     QPointer<LogsManagementWatcher> m_watcher;
+    bool needUpdateBeforeClosing = false;
 };
 
 } // namespace nx::vms::client::desktop
