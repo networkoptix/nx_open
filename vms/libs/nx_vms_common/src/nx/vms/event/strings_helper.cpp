@@ -114,7 +114,7 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::executePtzPresetAction:  return tr("Execute PTZ preset");
         case ActionType::showTextOverlayAction:   return tr("Show text overlay");
         case ActionType::showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
-        case ActionType::execHttpRequestAction:   return tr("Do HTTP request");
+        case ActionType::execHttpRequestAction:   return tr("Do HTTP(S) request");
         case ActionType::acknowledgeAction:       return tr("Acknowledge");
         case ActionType::openLayoutAction:        return tr("Open layout");
         case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
