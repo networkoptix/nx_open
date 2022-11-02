@@ -6,17 +6,24 @@
     #include <ApplicationServices/ApplicationServices.h>
 #endif
 
+#include <QtCore/QAbstractEventDispatcher>
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWindow>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsObject>
-#include <QtWidgets/QApplication>
 #include <QtTest/QSpontaneKeyEvent>
+#include <QtTest/QTest>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsObject>
+#include <QtWidgets/QGraphicsView>
 
 namespace nx::vms::client::desktop::testkit::utils {
 
 namespace {
+
+int defaultMouseDelay()
+{
+    return 0;
+}
 
 /** Move OS cursor to specified position, requieres asking for permission on macOS. */
 static void setMousePosition(QPoint screenPos)
@@ -201,6 +208,8 @@ Qt::MouseButtons sendMouse(
     QPoint angleDelta,
     bool inverted)
 {
+    static int lastMouseTimestamp = 0;
+
     QPoint windowPos = windowHandle->mapFromGlobal(screenPos);
     QPoint localPos = windowPos;
 
@@ -220,8 +229,25 @@ Qt::MouseButtons sendMouse(
             }
             else
             {
-                mappedEvent = new QMouseEvent(
-                    type, localPos, windowPos, screenPos, button, buttons, modifiers);
+                // qt_handleMouseEvent() may not return until its inner event loop is finished, so
+                // put the call into window event loop like QCoreApplication::postEvent() does.
+                QMetaObject::invokeMethod(
+                    QAbstractEventDispatcher::instance(windowHandle->thread()),
+                    [window = QPointer(windowHandle), localPos = localPos, screenPos = screenPos,
+                        buttons = buttons, button = button, type = type, modifiers = modifiers]
+                    {
+                        if (!window)
+                            return;
+
+                        lastMouseTimestamp += qMax(1, defaultMouseDelay());
+
+                        qt_handleMouseEvent(window, localPos, screenPos, buttons, button, type,
+                            modifiers, lastMouseTimestamp);
+
+                    },
+                    Qt::QueuedConnection);
+
+                return;
             }
 
             QSpontaneKeyEvent::setSpontaneous(mappedEvent);
@@ -242,11 +268,13 @@ Qt::MouseButtons sendMouse(
     else if (eventType == "release")
     {
         postEvent(QEvent::MouseButtonRelease);
+        lastMouseTimestamp += QTest::mouseDoubleClickInterval;
     }
     else if (eventType == "click")
     {
         postEvent(QEvent::MouseButtonPress);
         postEvent(QEvent::MouseButtonRelease);
+        lastMouseTimestamp += QTest::mouseDoubleClickInterval;
     }
     else if (eventType == "doubleclick")
     {
@@ -254,8 +282,7 @@ Qt::MouseButtons sendMouse(
         postEvent(QEvent::MouseButtonRelease);
         postEvent(QEvent::MouseButtonPress);
         postEvent(QEvent::MouseButtonRelease);
-
-        postEvent(QEvent::MouseButtonDblClick);
+        lastMouseTimestamp += QTest::mouseDoubleClickInterval;
     }
     else if (eventType == "wheel")
     {
