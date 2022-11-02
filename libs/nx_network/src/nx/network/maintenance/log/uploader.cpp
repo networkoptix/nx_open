@@ -368,13 +368,17 @@ void UploaderManager::setLogBufferSize(std::size_t size)
     m_logBufferSize = size;
 }
 
-std::string UploaderManager::start(std::chrono::milliseconds timeLimit)
+std::string UploaderManager::start(
+    std::chrono::milliseconds timeLimit,
+    const std::string& forceSessionId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (m_sessionId.empty())
     {
-        m_sessionId = QnUuid::createUuid().toSimpleStdString();
+        m_sessionId = forceSessionId.empty()
+            ? QnUuid::createUuid().toSimpleStdString()
+            : forceSessionId;
         m_aioBinder.post([this, sessionId = m_sessionId, timeLimit]() {
             startLogUpload(sessionId, timeLimit);
         });

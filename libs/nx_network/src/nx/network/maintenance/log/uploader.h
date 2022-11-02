@@ -168,9 +168,12 @@ public:
     /**
      * Starts log upload which will last for the given time.
      * If invoked when there is a running session already, then the current session id is returned.
+     * @param timeLimit Duration for the logging process
+     * @param forceSessionId Specific session identifier. Could be used to continue logging process
+     * after application restart.
      * @return Session id.
      */
-    std::string start(std::chrono::milliseconds timeLimit);
+    std::string start(std::chrono::milliseconds timeLimit, const std::string& forceSessionId = {});
 
     bool isRunning() const;
 
