@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>Intercom informant</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>
