@@ -17,12 +17,12 @@ const ItemDescriptor& HttpAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<HttpAction>(),
-        .displayName = tr("Do HTTP request"),
+        .displayName = tr("Do HTTP(S) request"),
         .description = "",
         .fields = {
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            makeFieldDescriptor<TextWithFields>("url", tr("HTTP Url")),
-            makeFieldDescriptor<TextWithFields>("content", tr("HTTP Content")),
+            makeFieldDescriptor<TextWithFields>("url", tr("HTTP(S) URL")),
+            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) content")),
             makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
             makeFieldDescriptor<ActionTextField>("login", tr("Login")),
             makeFieldDescriptor<PasswordField>("password", tr("Password")),

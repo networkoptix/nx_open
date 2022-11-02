@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="httpUrlLabel">
      <property name="text">
-      <string>HTTP URL</string>
+      <string>HTTP(S) URL</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -30,7 +30,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="contentLabel">
      <property name="text">
-      <string>HTTP content</string>
+      <string>HTTP(S) content</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
