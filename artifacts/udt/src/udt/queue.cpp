@@ -341,8 +341,7 @@ void CSndUList::remove_(CSNode* n)
 //
 CSndQueue::CSndQueue(AbstractUdpChannel* c, CTimer* t):
     m_pSndUList(std::make_unique<CSndUList>(t, &m_mutex, &m_cond)),
-    m_channel(c),
-    m_timer(t)
+    m_channel(c)
 {
 }
 
@@ -645,11 +644,6 @@ CRcvQueue::CRcvQueue(
 CRcvQueue::~CRcvQueue()
 {
     stop();
-
-    m_pRendezvousQueue.reset();
-
-    // remove all queued messages
-    m_packets.clear();
 }
 
 void CRcvQueue::start()

@@ -133,7 +133,6 @@ enum UDTOpt
     UDT_MSS,             // the Maximum Transfer Unit
     UDT_SNDSYN,          // if sending is blocking
     UDT_RCVSYN,          // if receiving is blocking
-    UDT_CC,              // custom congestion control algorithm
     UDT_FC,        // Flight flag size (window size)
     UDT_SNDBUF,          // maximum buffer in sending queue
     UDT_RCVBUF,          // UDT receiving buffer size

@@ -429,12 +429,13 @@ private: // Options
     bool m_bReuseAddr = true;                // reuse an exiting port or not, for UDP multiplexer
     int64_t m_llMaxBW = -1;                // maximum data transfer rate (threshold)
 
-private: // congestion control
-    CCCVirtualFactory* m_pCCFactory = nullptr;             // Factory class to create a specific CC instance
-    CCC* m_pCC = nullptr;                                  // congestion control class
+private:
+    // congestion control
+    std::unique_ptr<CCCVirtualFactory> m_pCCFactory;             // Factory class to create a specific CC instance
+    CUDTCC m_congestionControl;                                  // congestion control class
     CCache<CInfoBlock>* m_pCache = nullptr;        // network information cache
 
-private: // Status
+    // Status
     volatile bool m_bListening = false;                  // If the UDT entit is listening to connection
     volatile bool m_bConnecting = false;            // The short phase when connect() is called but not yet completed
     volatile bool m_bConnected = false;                  // Whether the connection is on or off
