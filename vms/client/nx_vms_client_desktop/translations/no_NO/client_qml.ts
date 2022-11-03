@@ -822,8 +822,8 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Vi introduserer deg for
+nye PTZ-kontrollere</translation>
     </message>
     <message>
       <source>Here is a quick presentation
