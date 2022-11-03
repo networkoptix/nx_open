@@ -118,6 +118,11 @@ Result::Result(Error error, QString errorString):
 {
 }
 
+QString Result::invalidParameterTemplate()
+{
+    return tr("Invalid parameter `%1`: %2.", /*comment*/ "%1 is name, %2 is value.");
+}
+
 Result Result::missingParameter(const QString& name)
 {
     return Result{MissingParameter, tr("Missing required parameter: %1.").arg(name)};
