@@ -12,9 +12,9 @@
 /**
  * Abstraction over a section of an INI file. Much easier to use than <tt>QSettings</tt>,
  * but doesn't support multi-section INI files.
- * 
- * Motivation for creating this class is that this is the format some of the 
- * cameras return data in (e.g. axis, vista).
+ *
+ * Motivation for creating this class is that this is the format some of the
+ * cameras return data in.
  */
 class QnIniSection {
 public:
