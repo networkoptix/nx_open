@@ -14,6 +14,7 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/oauth_client.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
@@ -224,6 +225,11 @@ void OauthLoginDialogPrivate::openUrlInBrowser(const QString &path)
     }
 
     QDesktopServices::openUrl(externalUrl.toQUrl());
+}
+
+QString OauthLoginDialogPrivate::username()
+{
+    return QString::fromStdString(settings()->cloudCredentials().user);
 }
 
 OauthClient* OauthLoginDialogPrivate::oauthClient() const

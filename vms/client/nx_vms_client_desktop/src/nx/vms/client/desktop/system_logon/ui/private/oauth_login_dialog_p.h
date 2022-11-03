@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE void setCode(const QString& code);
     Q_INVOKABLE void twoFaVerified(const QString& code);
     Q_INVOKABLE void openUrlInBrowser(const QString& path);
+    Q_INVOKABLE QString username();
 
     core::OauthClient * oauthClient() const;
 

@@ -87,8 +87,13 @@ CloudAuthData loadCloudCredentials()
 
 void saveCloudCredentials(const CloudAuthData& authData)
 {
+    // Save username so it can be restored for future connections to cloud.
+    const std::string username = authData.credentials.username.empty()
+        ? settings()->cloudCredentials().user
+        : authData.credentials.username;
+
     settings()->cloudCredentials = nx::network::http::Credentials(
-        authData.credentials.username, nx::network::http::BearerAuthToken(authData.refreshToken));
+        username, nx::network::http::BearerAuthToken(authData.refreshToken));
 }
 
 void forgetSavedCloudPassword()
