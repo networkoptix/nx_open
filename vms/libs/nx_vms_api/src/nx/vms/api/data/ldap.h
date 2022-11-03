@@ -91,10 +91,24 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     /**%apidoc[opt] LDAP users and groups are collected using all these filters. */
     std::vector<LdapSettingSearchFilter> filters;
 
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Sync,
+        disabled,
+        groupsOnly,
+        usersAndGroups);
+
+    /**%apidoc[opt] */
+    Sync continuousSync = Sync::disabled;
+
+    /**%apidoc[opt]
+     * %example 0
+     */
+    std::chrono::seconds continuousSyncIntervalS;
+
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
 };
-#define LdapSettings_Fields LdapSettingsBase_Fields(filters)
+#define LdapSettings_Fields LdapSettingsBase_Fields \
+    (filters)(continuousSync)(continuousSyncIntervalS)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 
 // TODO: Remove this struct after `/api/testLdapSettings` support is dropped.
