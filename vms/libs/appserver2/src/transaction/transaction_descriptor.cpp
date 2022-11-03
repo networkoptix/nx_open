@@ -502,14 +502,14 @@ static Result checkExistingResourceAccess(
     const QnUuid& resourceId,
     Qn::Permissions permissions)
 {
-    const auto& resPool = commonModule->resourcePool();
+    const auto resPool = commonModule->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+
     // Null resource Id can not be handled by permissions engine, since there is no such resource.
     // System settings are stored as admin user properties
     if ((resourceId.isNull() || resourceId == QnUserResource::kAdminGuid)
         && userResource
-        && (userResource->userRole() == Qn::UserRole::owner
-            || userResource->userRole() == Qn::UserRole::administrator))
+        && commonModule->resourceAccessManager()->hasAdminPermissions(userResource))
     {
         return Result();
     }
@@ -952,15 +952,12 @@ struct ModifyResourceParamAccess
                 userNameOrId(accessData, commonModule), accessData.access, param.name));
         }
 
-        const auto& resPool = commonModule->resourcePool();
-        auto userResource =
-            resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        const auto accessManager = commonModule->resourceAccessManager();
+        const auto hasAdminPermissions = accessManager->hasAdminPermissions(accessData);
 
         // System properties are stored in resource unrelated places and should be handled
         // differently.
-        if (userResource
-            && (userResource->userRole() == Qn::UserRole::owner
-                || userResource->userRole() == Qn::UserRole::administrator))
+        if (hasAdminPermissions)
         {
             // Null resource Id can not be handled by permissions engine, since there is no such resource.
             if (param.resourceId.isNull())
@@ -973,8 +970,9 @@ struct ModifyResourceParamAccess
                 return Result();
         }
 
-        auto accessManager = commonModule->resourceAccessManager();
-        auto target = resPool->getResourceById(param.resourceId);
+        const auto resPool = commonModule->resourcePool();
+        const auto target = resPool->getResourceById(param.resourceId);
+
         if (!isRemove && param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
         {
             if (param.resourceId != commonModule->peerId())
@@ -1008,21 +1006,18 @@ struct ModifyResourceParamAccess
             }
         }
 
-        if (isNewApiCompoundTransaction)
-        {
-            if (accessManager->hasAdminPermissions(userResource))
-                return Result();
-        }
+        if (isNewApiCompoundTransaction && hasAdminPermissions)
+            return Result();
 
         Qn::Permissions permissions = Qn::SavePermission;
         if (param.name == Qn::USER_FULL_NAME)
             permissions |= Qn::WriteFullNamePermission;
 
-        return accessManager->hasPermission(userResource, target, permissions)
+        return accessManager->hasPermission(accessData, target, permissions)
             ? Result()
             : Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User '%1' with %2 permissions is not allowed to modify Resource parameter of %3."),
-                userNameOrId(userResource, accessData), accessData.access, param.resourceId));
+                userNameOrId(accessData, commonModule), accessData.access, param.resourceId));
     }
 
     bool isRemove;

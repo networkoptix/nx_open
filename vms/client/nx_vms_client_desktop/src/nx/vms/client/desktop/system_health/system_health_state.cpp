@@ -396,7 +396,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::CloudPromo:
             return q->context()->user()
-                && q->context()->user()->userRole() == Qn::UserRole::owner
+                && q->context()->user()->isOwner()
                 && q->systemSettings()->cloudSystemId().isEmpty()
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
