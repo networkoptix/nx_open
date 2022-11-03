@@ -17,6 +17,7 @@
 #include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
+#include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -67,7 +68,7 @@ private:
 
     QnElidedLabel* label{};
     QComboBox* comboBox{};
-    const QString kAutoValue = tr("Auto");
+    const QString kAutoValue = DropdownTextPickerWidgetStrings::autoValue();
 
     virtual void onDescriptorSet() override
     {

@@ -222,7 +222,7 @@ Item
 
         placeholderItem: SettingsPlaceholder
         {
-            header: qsTr("This plugin has no settings for this Camera.")
+            header: qsTr("This plugin has no settings for this camera.")
             description:
                 qsTr("Check System Administration settings to configure this plugin.")
         }

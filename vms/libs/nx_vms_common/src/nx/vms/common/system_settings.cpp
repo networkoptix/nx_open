@@ -650,7 +650,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_keepIoPortStateIntactOnInitializationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "keepIoPortStateIntactOnInitialization", false, this,
-        [] { return tr("Keep IO port state on when Server connects to the Device"); });
+        [] { return tr("Keep IO port state on when Server connects to the device"); });
 
     m_mediaBufferSizeKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeKb", 256,
@@ -660,7 +660,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeForAudioOnlyDeviceKb", 16,
         [](auto v) { return v >= 1 && v <= 1024; }, this,
-        [] { return tr("Media buffer size for audio only Devices (KB, 1KB-1MB)"); });
+        [] { return tr("Media buffer size for audio only devices (KB, 1KB-1MB)"); });
 
     m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "forceAnalyticsDbStoragePermissions", true,  this,
