@@ -26,7 +26,6 @@ class NX_NETWORK_API AddressResolver:
 {
 public:
     static constexpr auto kDnsCacheTimeout = std::chrono::seconds(10);
-    static constexpr auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
     using ResolveHandler = utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)>;
@@ -109,67 +108,54 @@ public:
      */
     void setDnsCacheTimeout(std::chrono::milliseconds timeout);
 
-    /**
-     * By default, kMediatorCacheTimeout.
-     */
-    void setMediatorCacheTimeout(std::chrono::milliseconds timeout);
-
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {
         explicit HostAddressInfo(
-            bool _isLikelyCloudAddress,
-            std::chrono::milliseconds dnsCacheTimeout,
-            std::chrono::milliseconds mediatorCacheTimeout);
+            std::chrono::milliseconds dnsCacheTimeout);
 
-        const bool isLikelyCloudAddress;
-        std::vector<AddressEntry> fixedEntries;
         std::set<void*> pendingRequests;
 
         enum class State { unresolved, resolved, inProgress };
 
         State dnsState() const { return m_dnsState; }
         void dnsProgress() { m_dnsState = State::inProgress; }
-        void setDnsEntries(std::vector<AddressEntry> entries = {});
-
-        State mediatorState() const { return m_mediatorState; }
-        void mediatorProgress() { m_mediatorState = State::inProgress; }
-        void setMediatorEntries(std::vector< AddressEntry > entries = {});
+        void setDnsEntries(std::deque<AddressEntry> entries = {});
 
         void checkExpirations();
-        bool isResolved(NatTraversalSupport natTraversalSupport) const;
+        bool isResolved() const;
         std::deque<AddressEntry> getAll() const;
 
     private:
-        State m_dnsState;
+        State m_dnsState = State::unresolved;
         std::chrono::steady_clock::time_point m_dnsResolveTime;
-        std::vector<AddressEntry> m_dnsEntries;
+        std::optional<std::deque<AddressEntry>> m_dnsEntries;
         const std::chrono::milliseconds m_dnsCacheTimeout;
-
-        State m_mediatorState;
-        std::chrono::steady_clock::time_point m_mediatorResolveTime;
-        std::vector<AddressEntry> m_mediatorEntries;
-        const std::chrono::milliseconds m_mediatorCacheTimeout;
     };
 
-    using HostInfoMap = std::map<
-        std::tuple<int /*ipVersion*/, HostAddress, NatTraversalSupport>,
-        HostAddressInfo>;
+    struct ResolveTaskKey
+    {
+        int ipVersion = AF_INET;
+        std::string hostname;
+
+        std::string toString() const;
+
+        // TODO: #akolesnikov replace with operator<=> after upgrading compiler.
+        bool operator<(const ResolveTaskKey&) const;
+    };
+
+    using HostInfoMap = std::map<ResolveTaskKey, HostAddressInfo>;
 
     using HaInfoIterator = HostInfoMap::iterator;
 
     struct RequestInfo
     {
-        const HostAddress address;
-        bool inProgress;
-        NatTraversalSupport natTraversalSupport;
+        const std::string hostname;
         ResolveHandler handler;
+        bool handlerAboutToBeInvoked = false;
         nx::utils::Guard guard;
 
-        RequestInfo(
-            HostAddress address,
-            NatTraversalSupport natTraversalSupport,
-            ResolveHandler handler);
+        RequestInfo(std::string hostname, ResolveHandler handler);
     };
 
     bool resolveNonBlocking(
@@ -179,28 +165,30 @@ protected:
         ResolveResult* resolved);
 
     void dnsResolve(
-        HaInfoIterator info, nx::Locker<nx::Mutex>* lk, bool needMediator, int ipVersion);
+        HaInfoIterator info, nx::Locker<nx::Mutex>* lk, int ipVersion);
 
-    void mediatorResolve(
-        HaInfoIterator info, nx::Locker<nx::Mutex>* lk, bool needDns, int ipVersion);
+    void reportResult(
+        HaInfoIterator info,
+        SystemError::ErrorCode lastErrorCode,
+        std::deque<AddressEntry> entries);
 
-    std::vector<nx::utils::Guard> grabHandlers(
-        SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
+    std::vector<std::multimap<void*, RequestInfo>::iterator>
+        selectRequestsToComplete(const nx::Locker<nx::Mutex>&, HaInfoIterator info);
 
 protected:
     mutable nx::Mutex m_mutex;
-    mutable nx::WaitCondition m_condition;
-    HostInfoMap m_info;
+    HostInfoMap m_dnsCache;
     std::multimap<void*, RequestInfo> m_requests;
-    bool m_isCloudResolveEnabled = false;
     std::chrono::milliseconds m_dnsCacheTimeout = kDnsCacheTimeout;
-    std::chrono::milliseconds m_mediatorCacheTimeout = kMediatorCacheTimeout;
 
     DnsResolver m_dnsResolver;
 
     std::vector<std::unique_ptr<AbstractResolver>> m_nonBlockingResolvers;
     CloudAddressResolver* m_cloudAddressResolver = nullptr;
     PredefinedHostResolver* m_predefinedHostResolver = nullptr;
+
+private:
+    static std::string_view toString(HostAddressInfo::State state);
 };
 
 } // namespace nx::network
