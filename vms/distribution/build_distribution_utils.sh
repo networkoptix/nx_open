@@ -211,14 +211,281 @@ distrib_copyMediaserverPlugins() # plugins-folder-name target-dir plugin_lib_nam
     done
 }
 
+# Copy the specified file to the proper location, creating the symlink if necessary: if
+# ALT_LIB_INSTALL_PATH is unset, or the file is a symlink, just copy it to STAGE/LIB_INSTALL_PATH;
+# otherwise, put it to STAGE/ALT_LIB_INSTALL_PATH, and create a symlink from
+# STAGE/LIB_INSTALL_PATH to the file basename in /ALT_LIB_INSTALL_PATH. If an optional parameter
+# library_subdirectory is passed to the function, it adds it as a suffix to both LIB_INSTALL_PATH
+# and ALT_LIB_INSTALL_PATH.
+#
+# [in] STAGE
+# [in] LIB_INSTALL_PATH
+# [in] ALT_LIB_INSTALL_PATH Path to the alternative lib directory in the distribution creation
+#      directory.
+distrib_copyLib() # file [library_subdirectory]
+{
+    local -r file="$1"
+    local -r lib_subdir="${2-}" #< The default value for lib_subdir is an empty string.
+
+    # Create a temporary variable which value is the same as the value of the
+    # ALT_LIB_INSTAL_PATH variable if it is set, or empty otherwise.
+    local -r alt_lib_instal_path_local="${ALT_LIB_INSTALL_PATH-}"
+
+    if [[ -z "${lib_subdir}" ]]; then
+        local -r lib_dir="${LIB_INSTALL_PATH}"
+        local -r alt_lib_dir="${alt_lib_instal_path_local}"
+    else
+        local -r lib_dir="${LIB_INSTALL_PATH}/${LIB_SUBDIR}"
+        local -r alt_lib_dir="${alt_lib_instal_path_local}/${LIB_SUBDIR}"
+    fi
+
+    local -r stage_lib="${STAGE}/${lib_dir}"
+
+    if [[ ! -z "${alt_lib_instal_path_local}" && ! -L "${FILE}" ]]; then
+        # FILE is not a symlink - put to the alt location, and create a symlink to it.
+        cp -r "${file}" "${STAGE}/${alt_lib_dir}/"
+        local -r file_name=$(basename "${file}")
+        ln -s "/${alt_lib_dir}/${file_name}" "${stage_lib}/${file_name}"
+    else
+        # FILE is a symlink, or the alt location is not defined - put to the regular location.
+        cp -r "${file}" "${stage_lib}/"
+    fi
+}
+
+# Copy Server libs to the distribution creation folder using distrib_copyLib() to ensure the
+# correct directory structure (libraries and symlinks to them in different directories if
+# necessary).
+#
+# ATTENTION: We explicitly add all the necessary libraries to the list, so this function is
+# version-specific and must be reviewed every time when a new library is added to the Server
+# distribution.
+#
+# [in] BUILD_DIR
+# [in] STAGE
+# [in] LIB_INSTALL_PATH
+# [in] ALT_LIB_INSTALL_PATH
+distrib_copyServerLibs() # additional_libs_to_copy...
+{
+    local -a additional_server_libs=("$@")
+
+    echo ""
+    echo "Copying libs"
+
+    local -a libs_to_copy=(
+        # vms
+        libappserver2
+        libcloud_db_client
+        libnx_vms_server
+        libnx_vms_server_db
+        libnx_speech_synthesizer
+        libnx_email
+        libnx_fusion
+        libnx_reflect
+        libnx_kit
+        libnx_branding
+        libnx_build_info
+        libnx_monitoring
+        libnx_network
+        libnx_utils
+        libnx_vms_utils
+        libnx_zip
+        libnx_sql
+        libnx_vms_api
+        libnx_analytics_db
+        libnx_vms_common
+        libnx_vms_rules
+        libnx_vms_update
+        libnx_onvif
+        libnx_ldap
+
+        # third-party
+        libquazip
+        libudt
+
+        # additional libraries
+        "${additional_server_libs[@]}"
+    )
+
+    local -r optional_libs_to_copy=(
+        libvpx
+    )
+
+    # OpenSSL.
+    libs_to_copy+=(
+        libssl
+        libcrypto
+    )
+
+    mkdir -p "${STAGE}/${LIB_INSTALL_PATH}"
+    # if ALT_LIB_INSTALL_PATH is not set, consider it to be an empty string.
+    if [[ ! -z "${ALT_LIB_INSTALL_PATH-}" ]]; then
+        mkdir -p "${STAGE}/${ALT_LIB_INSTALL_PATH}"
+    fi
+
+    local lib
+    for lib in "${libs_to_copy[@]}"; do
+        local file
+        for file in "${BUILD_DIR}/lib/${lib}".so*; do
+            if [[ "${file}" != *.debug ]]; then
+                echo "    Copying $(basename "${file}")"
+                distrib_copyLib "${file}"
+            fi
+        done
+    done
+    for lib in "${optional_libs_to_copy[@]}"; do
+        local file
+        for file in "${BUILD_DIR}/lib/${lib}".so*; do
+            if [[ -f "${file}" ]]; then
+                echo "    Copying (optional) $(basename "${file}")"
+                distrib_copyLib "${file}"
+            fi
+        done
+    done
+}
+
+# Copy ffmpeg libs to the distribution creation directory.
+#
+# [in] STAGE
+# [in] LIB_INSTALL_PATH
+# [in] ALT_LIB_INSTALL_PATH
+distrib_copyFfmpegLibs() # source_directory [distribution_libs_ffmpeg_subdirectory]
+{
+    local -r source_directory="$1"
+    local -r ffmpeg_subdirectory="${2-}" #< The default value for this argument is an empty string.
+
+    local -r ffmpeg_libs=(
+        libavcodec.so.58
+        libavfilter.so.7
+        libavformat.so.58
+        libavutil.so.56
+        libswscale.so.5
+        libswresample.so.3
+        libavdevice.so.58
+    )
+
+    if [[ ! -z "${ffmpeg_subdirectory}" ]]; then
+        mkdir -p "${STAGE}/${LIB_INSTALL_PATH}/${ffmpeg_subdirectory}"
+        # if ALT_LIB_INSTALL_PATH is not set, consider it to be an empty string.
+        if [[ ! -z "${ALT_LIB_INSTALL_PATH-}" ]]; then
+            mkdir -p "${STAGE}/${ALT_LIB_INSTALL_PATH}/${ffmpeg_subdirectory}"
+        fi
+    fi
+
+    for lib in "${ffmpeg_libs[@]}"; do
+        local file
+        for file in "${source_directory}/${lib}"*; do
+            if [ -f "${file}" ]; then
+                echo "Copying $(basename "${file}")"
+                distrib_copyLib "${file}" "${ffmpeg_subdirectory}"
+            fi
+        done
+    done
+}
+
+# Copy Qt libs to the distribution creation directory.
+#
+# [in] QT_DIR
+distrib_copyQtLibs() # additional_libs_to_copy...
+{
+    local -a additional_qt_libs=("$@")
+
+    echo ""
+    echo "Copying Qt libs"
+
+    local qt_libs_to_copy=(
+        Concurrent
+        Core
+        Gui
+        Xml
+        Network
+        Sql
+        WebSockets
+        Qml
+
+        "${additional_qt_libs[@]}"
+    )
+
+    local qt_lib
+    for qt_lib in "${qt_libs_to_copy[@]}"; do
+        local lib_filename="libQt5${qt_lib}.so"
+        echo "  Copying (Qt) ${lib_filename}"
+        local file
+        for file in "${QT_DIR}/lib/${lib_filename}"*; do
+            distrib_copyLib "${file}"
+        done
+    done
+}
+
+# Copy Qt plugins to the distribution creation directory.
+#
+# [in] STAGE
+# [in] MODULE_INSTALL_PATH
+# [in] QT_DIR
+distrib_copyQtPlugins() # additional_plugins_to_copy...
+{
+    local -a plugins=("$@")
+
+    echo ""
+    echo "Copying Qt plugins for mediaserver"
+
+    local -r qt_plugins_install_dir="${STAGE}/${MODULE_INSTALL_PATH}/plugins"
+    mkdir -p "${qt_plugins_install_dir}"
+
+    local plugin
+    for plugin in "${plugins[@]}"; do
+        echo "  Copying (Qt plugin) ${plugin}"
+
+        mkdir -p "${qt_plugins_install_dir}/$(dirname "${plugin}")"
+        cp -r "${QT_DIR}/plugins/${plugin}" "${qt_plugins_install_dir}/${plugin}"
+    done
+}
+
+# Copy server binaries and other files that must reside next to them to the distribution creation
+# directory.
+#
+# [in] STAGE
+# [in] BIN_INSTALL_PATH
+# [in] BUILD_DIR
+# [in] CURRENT_BUILD_DIR
+# [in] ENABLE_ROOT_TOOL
+# [in] OPEN_SOURCE_DIR
+distrib_copyServerBins()
+{
+    echo ""
+    echo "Copying mediaserver binaries"
+
+    local -r stage_bin="${STAGE}/${BIN_INSTALL_PATH}"
+    mkdir -p "${stage_bin}"
+
+    install -m 755 "${BUILD_DIR}/bin/mediaserver" "${stage_bin}/"
+    install -m 755 "${BUILD_DIR}/bin/external.dat" "${stage_bin}/" #< TODO: Why "+x" is needed?
+
+    echo "Copying translations"
+    install -m 755 -d "${stage_bin}/translations"
+    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_common.dat" "${stage_bin}/translations/"
+
+    # if ENABLE_ROOT_TOOL is not set, consider it to be "false".
+    if [[ "${ENABLE_ROOT_TOOL-"false"}" == "true" ]]; then
+        echo "Copying root-tool"
+        install -m 750 "${BUILD_DIR}/bin/root_tool" "${stage_bin}/"
+        install -m 640 "${CURRENT_BUILD_DIR}/system_commands.conf" "${stage_bin}/"
+    fi
+
+    echo "Copying nx_log_viewer.html"
+    install -m 755 "${OPEN_SOURCE_DIR}/nx_log_viewer.html" "${stage_bin}/"
+
+    echo "Copying qt.conf"
+    install -m 644 "${CURRENT_BUILD_DIR}/qt.conf" "${stage_bin}/"
+}
+
 distrib_createArchive() # archive dir command...
 {
-    local -r ARCHIVE="$1"; shift
-    local -r DIR="$1"; shift
+    local -r archive="$1"; shift
+    local -r dir="$1"; shift
 
-    rm -rf "$ARCHIVE" #< Avoid updating an existing archive.
-    echo "  Creating $ARCHIVE"
-    ( cd "$DIR" && "$@" "$ARCHIVE" * ) #< Subshell prevents "cd" from changing the current dir.
+    rm -rf "${archive}" #< Avoid updating an existing archive.
+    echo "  Creating ${archive}"
+    ( cd "${dir}" && "$@" "${archive}" * ) #< Subshell prevents "cd" from changing the current dir.
     echo "  Done"
 }
 

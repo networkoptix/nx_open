@@ -9,7 +9,7 @@ set(flavors "" CACHE STRING "Comma-separated list of flavors (distribution packa
 # NOTE: Each targetDevice always has a `default` flavor.
 set(existing_flavors_linux_x64 "default")
 set(existing_flavors_linux_arm32 "default" "rpi" "bananapi")
-set(existing_flavors_linux_arm64 "default" "axis_acap")
+set(existing_flavors_linux_arm64 "default" "axis_acap" "hanwha_edge1")
 set(existing_flavors_macos_arm64 "default")
 set(existing_flavors_macos_x64 "default")
 set(existing_flavors_windows_x64 "default")
