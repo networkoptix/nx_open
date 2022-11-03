@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QInternal>
+
 namespace nx::vms::client::desktop {
 namespace node_view {
 namespace details {

@@ -98,23 +98,22 @@ TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
 
-    const auto lockedLayoutIconCondition = allOf(
-        iconStatusMatch(QnResourceIconCache::Locked), iconTypeMatch(QnResourceIconCache::Layout));
-
     const auto regularLayoutIconCondition = allOf(
         iconStatusMatch(QnResourceIconCache::Unknown), iconTypeMatch(QnResourceIconCache::Layout));
 
     // After layout locking...
     layout->setLocked(true);
 
-    // That node have locked layout icon.
-    ASSERT_TRUE(lockedLayoutIconCondition(layoutIndex));
+    // That node have locked layout extra status icon.
+    ASSERT_TRUE(regularLayoutIconCondition(layoutIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::locked)(layoutIndex));
 
     // After unlocking it back...
     layout->setLocked(false);
 
     // That node displays plain layout icon again.
     ASSERT_TRUE(regularLayoutIconCondition(layoutIndex));
+    ASSERT_FALSE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::locked)(layoutIndex));
 }
 
 TEST_F(ResourceTreeModelTest, layoutIsChildOfLayoutsNode)

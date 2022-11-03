@@ -123,15 +123,11 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     // Layouts.
     m_cache.insert(Layouts, loadIcon("tree/layouts.svg"));
     m_cache.insert(Layout, loadIcon("tree/layout.svg"));
-    m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.svg"));
-    m_cache.insert(ExportedLayout, loadIcon("tree/layout_exported.svg"));
-    m_cache.insert(ExportedLayout | Locked, loadIcon("tree/layout_exported_locked.svg"));
+    m_cache.insert(ExportedLayout, loadIcon("tree/layout.svg"));
     m_cache.insert(ExportedEncryptedLayout, loadIcon("tree/layout_exported_encrypted.svg"));
     m_cache.insert(IntercomLayout, loadIcon("tree/layouts_intercom.svg"));
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
-    m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.svg"));
     m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
-    m_cache.insert(CloudLayout | Locked, loadIcon("tree/layout_cloud_locked.svg"));
     m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.svg"));
     m_cache.insert(LayoutTour, loadIcon("tree/layout_tour.png"));
     m_cache.insert(LayoutTours, loadIcon("tree/layout_tours.png"));
@@ -350,9 +346,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         else
             key = Layout;
 
-        status = (layout->locked() && !isVideoWallReviewLayout)
-            ? Locked
-            : Unknown;
+        status = Unknown;
     }
     else if (resource->hasFlags(Qn::virtual_camera))
     {
@@ -360,7 +354,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
     {
-        if (status == Online && camera->needsToChangeDefaultPassword())
+        const auto isBuggy = getResourceExtraStatus(camera).testFlag(ResourceExtraStatusFlag::buggy);
+        if (status == Online && (camera->needsToChangeDefaultPassword() || isBuggy))
             status = Incompatible;
     }
 
@@ -370,15 +365,15 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     return Key(key | status);
 }
 
-QIcon QnResourceIconCache::cameraRecordingStatusIcon(CameraExtraStatus status)
+QIcon QnResourceIconCache::cameraRecordingStatusIcon(ResourceExtraStatus status)
 {
-    if (status.testFlag(CameraExtraStatusFlag::recording))
+    if (status.testFlag(ResourceExtraStatusFlag::recording))
         return qnSkin->icon("tree/recording.png");
 
-    if (status.testFlag(CameraExtraStatusFlag::scheduled))
+    if (status.testFlag(ResourceExtraStatusFlag::scheduled))
         return qnSkin->icon("tree/scheduled.png");
 
-    if (status.testFlag(CameraExtraStatusFlag::hasArchive))
+    if (status.testFlag(ResourceExtraStatusFlag::hasArchive))
         return qnSkin->icon("tree/has_archive.png");
 
     return QIcon();

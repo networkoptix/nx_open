@@ -191,29 +191,29 @@ Condition flagsMatch(Qt::ItemFlags flags)
         };
 }
 
-Condition hasCameraExtraStatusFlag(CameraExtraStatusFlag flag)
+Condition hasResourceExtraStatusFlag(ResourceExtraStatusFlag flag)
 {
     return
         [flag](const QModelIndex& index)
         {
-            const auto indexData = index.data(Qn::CameraExtraStatusRole);
+            const auto indexData = index.data(Qn::ResourceExtraStatusRole);
             if (indexData.isNull())
                 return false;
-            auto indexExtraStatusFlags = indexData.value<CameraExtraStatus>();
+            auto indexExtraStatusFlags = indexData.value<ResourceExtraStatus>();
             return indexExtraStatusFlags.testFlag(flag);
         };
 
 }
 
-Condition cameraExtraStatusFlagsMatch(CameraExtraStatus flags)
+Condition resourceExtraStatusFlagsMatch(ResourceExtraStatus flags)
 {
     return
         [flags](const QModelIndex& index)
         {
-            const auto indexData = index.data(Qn::CameraExtraStatusRole);
+            const auto indexData = index.data(Qn::ResourceExtraStatusRole);
             if (indexData.isNull())
                 return false;
-            auto indexExtraStatusFlags = indexData.value<CameraExtraStatus>();
+            auto indexExtraStatusFlags = indexData.value<ResourceExtraStatus>();
             return indexExtraStatusFlags == flags;
         };
 }

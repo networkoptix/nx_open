@@ -6,7 +6,7 @@
 
 #include <QtCore/QModelIndex>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -40,8 +40,8 @@ Condition hasFlag(Qt::ItemFlag flag);
 Condition flagsMatch(Qt::ItemFlags flags);
 
 // Extra status flags conditions.
-Condition hasCameraExtraStatusFlag(CameraExtraStatusFlag flag);
-Condition cameraExtraStatusFlagsMatch(CameraExtraStatus flags);
+Condition hasResourceExtraStatusFlag(ResourceExtraStatusFlag flag);
+Condition resourceExtraStatusFlagsMatch(ResourceExtraStatus flags);
 
 // Generic data conditions.
 Condition dataMatch(int role, const QVariant& data);

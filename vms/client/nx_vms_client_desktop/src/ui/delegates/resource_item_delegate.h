@@ -28,7 +28,7 @@ public:
     {
         NoOptions           = 0x0,
         RecordingIcons      = 0x1,
-        ProblemIcons        = 0x2,
+        LockedIcons         = 0x2,
         HighlightChecked    = 0x4,
         ValidateOnlyChecked = 0x8
     };
@@ -102,7 +102,7 @@ private:
     QPointer<nx::vms::client::desktop::Workbench> m_workbench;
     QIcon m_recordingIcon;
     QIcon m_scheduledIcon;
-    QIcon m_buggyIcon;
+    QIcon m_lockedIcon;
     int m_fixedHeight;
     int m_rowSpacing;
     Qn::ResourceInfoLevel m_customInfoLevel;

@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <client/client_globals.h>
 
 namespace nx::vms::client::desktop {
@@ -152,6 +152,8 @@ TEST_F(ResourceTreeModelTest, virtualCameraIconType)
 
 TEST_F(ResourceTreeModelTest, cameraIconStatus)
 {
+    using namespace nx::vms::api;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -164,23 +166,40 @@ TEST_F(ResourceTreeModelTest, cameraIconStatus)
     // When Offline status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::offline);
 
+    const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
+
     // Then camera icon has Offline decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(
-        uniqueMatchingIndex(kUniqueCameraNameCondition)));
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(cameraIndex));
 
     // When Unauthorized status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::unauthorized);
 
     // Then camera icon has Unauthorized decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Unauthorized)(
-        uniqueMatchingIndex(kUniqueCameraNameCondition)));
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Unauthorized)(cameraIndex));
 
     // When Incompatible status is set to the camera resource.
     camera->setStatus(nx::vms::api::ResourceStatus::incompatible);
 
     // Then camera icon has Incompatible decoration.
-    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(
-        uniqueMatchingIndex(kUniqueCameraNameCondition)));
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(cameraIndex));
+
+    // When Offline status is set to the camera resource.
+    camera->setStatus(nx::vms::api::ResourceStatus::offline);
+    // And issue occurred on the camera.
+    camera->addStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
+
+    // Than camera icon has Offline decoration.
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(cameraIndex));
+
+    // When status is changed to Online.
+    camera->setStatus(nx::vms::api::ResourceStatus::online);
+    // Than camera icon has Incompatible decoration
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(cameraIndex));
+
+    // When there is no more issue on the camera.
+    camera->removeStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
+    // Than camera icon has Online decoration
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Online)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraScheduledExtraStatus)
@@ -201,7 +220,7 @@ TEST_F(ResourceTreeModelTest, cameraScheduledExtraStatus)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And it provides scheduled extra status flag.
-    ASSERT_TRUE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::scheduled)(cameraIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::scheduled)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraBuggyExtraStatus)
@@ -221,31 +240,31 @@ TEST_F(ResourceTreeModelTest, cameraBuggyExtraStatus)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // It has no buggy status by default.
-    ASSERT_FALSE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::buggy)(cameraIndex));
+    ASSERT_FALSE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 
     // When issue occurred on the camera.
     camera->addStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
 
     // It provides buggy extra status flag.
-    ASSERT_TRUE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::buggy)(cameraIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 
     // When schedule is marked as invalid.
     camera->addStatusFlags(CameraStatusFlag::CSF_InvalidScheduleFlag);
 
     // Then camera is still buggy.
-    ASSERT_TRUE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::buggy)(cameraIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 
     // Even when camera issues stop.
     camera->removeStatusFlags(CameraStatusFlag::CSF_HasIssuesFlag);
 
     // Then camera is still buggy.
-    ASSERT_TRUE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::buggy)(cameraIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 
     // And when camera schedule is back to normal.
     camera->removeStatusFlags(CameraStatusFlag::CSF_InvalidScheduleFlag);
 
     // Then camera is not buggy anymore.
-    ASSERT_FALSE(hasCameraExtraStatusFlag(CameraExtraStatusFlag::buggy)(cameraIndex));
+    ASSERT_FALSE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
@@ -456,20 +475,20 @@ TEST_F(ResourceTreeModelTest, singleCameraRecorderGroupExtraStatus)
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
     // And it provides empty extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::empty)(recorderIndex));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(recorderIndex));
 
     // When setLicenseUsed flag set true for the camera resource.
     camera->setScheduleEnabled(true);
 
     // Then recorder node provides scheduled extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::scheduled)(recorderIndex));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(recorderIndex));
 
     // When status changed to Recording.
     camera->setStatus(nx::vms::api::ResourceStatus::recording);
 
     // Then recorder node provides recording extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch({CameraExtraStatusFlag::scheduled,
-        CameraExtraStatusFlag::recording})(recorderIndex));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch({ResourceExtraStatusFlag::scheduled,
+        ResourceExtraStatusFlag::recording})(recorderIndex));
 }
 
 TEST_F(ResourceTreeModelTest, twoCamerasRecorderGroupExtraStatus)
@@ -496,30 +515,30 @@ TEST_F(ResourceTreeModelTest, twoCamerasRecorderGroupExtraStatus)
     camera2->setScheduleEnabled(true);
 
     // Then second recorder camera provides scheduled extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::scheduled)(camera2Index));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(camera2Index));
 
     // As well as parent recorder group node.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::scheduled)(
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(
         camera2Index.parent()));
 
     // First recorder camera provides no extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::empty)(camera1Index));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera1Index));
 
     // When status of the second recorder camera changed to Recording.
     camera2->setStatus(nx::vms::api::ResourceStatus::recording);
 
     // Then second recorder camera also provides recording extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(
-        {CameraExtraStatusFlag::scheduled, CameraExtraStatusFlag::recording})(
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(
+        {ResourceExtraStatusFlag::scheduled, ResourceExtraStatusFlag::recording})(
         camera2Index));
 
     // As well as parent recorder group node.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(
-        {CameraExtraStatusFlag::scheduled, CameraExtraStatusFlag::recording})(
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(
+        {ResourceExtraStatusFlag::scheduled, ResourceExtraStatusFlag::recording})(
         camera2Index.parent()));
 
     // First recorder camera still provides no extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::empty)(camera1Index));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera1Index));
 }
 
 TEST_F(ResourceTreeModelTest, twoCamerasOnTwoServersRecorderGroupsExtraStatus)
@@ -550,18 +569,18 @@ TEST_F(ResourceTreeModelTest, twoCamerasOnTwoServersRecorderGroupsExtraStatus)
     camera1->setScheduleEnabled(true);
 
     // Then it provides scheduled extra status flag.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::scheduled)(
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(
         camera1Index));
 
     // As well as parent (recorder group) of the first recorder.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::scheduled)(
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(
         camera1Index.parent()));
 
     // Second recorder camera provides no extra status.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::empty)(camera2Index));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera2Index));
 
     // As well as parent (recorder group) of the second recorder.
-    ASSERT_TRUE(cameraExtraStatusFlagsMatch(CameraExtraStatusFlag::empty)(camera2Index.parent()));
+    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera2Index.parent()));
 }
 
 TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)

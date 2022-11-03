@@ -16,7 +16,7 @@ TreeView
 {
     id: resourceTree
 
-    readonly property real kRowHeight: 20
+    readonly property real kRowHeight: 24
     readonly property real kSeparatorRowHeight: 16
 
     property var scene: null

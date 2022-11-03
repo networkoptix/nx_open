@@ -12,7 +12,7 @@ enum ResourceNodeDataRole
     resourceColumnRole = details::lastViewNodeRole,
     resourceRole,
     resourceExtraTextRole,
-    cameraExtraStatusRole,
+    resourceExtraStatusRole,
 };
 
 enum ResourceNodeViewProperty
