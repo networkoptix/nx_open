@@ -56,68 +56,61 @@ void AddressResolver::removeFixedAddress(
 }
 
 void AddressResolver::resolveAsync(
-    const HostAddress& hostname,
+    const HostAddress& hostAddr,
     ResolveHandler handler,
     NatTraversalSupport natTraversalSupport,
     int ipVersion,
     void* requestId)
 {
-    if (hostname.isIpAddress())
+    if (hostAddr.isIpAddress())
     {
         std::deque<AddressEntry> result;
-        result.push_back(AddressEntry(AddressType::direct, hostname));
+        result.push_back(AddressEntry(AddressType::direct, hostAddr));
         return handler(SystemError::noError, std::move(result));
     }
 
-    if (SocketGlobals::instance().isHostBlocked(hostname))
+    if (SocketGlobals::instance().isHostBlocked(hostAddr))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
+    std::string hostname = hostAddr.toString();
+
     ResolveResult resolved;
-    if (resolveNonBlocking(hostname.toString(), natTraversalSupport, ipVersion, &resolved))
+    if (resolveNonBlocking(hostname, natTraversalSupport, ipVersion, &resolved))
         return handler(SystemError::noError, std::move(resolved.entries));
+
+    // Cloud addresses are already resolved in resolveNonBlocking.
+    // So, further resolving with DNS only.
 
     NX_MUTEX_LOCKER lk(&m_mutex);
 
-    auto info = m_info.emplace(
-        std::make_tuple(ipVersion, hostname, natTraversalSupport),
-        HostAddressInfo(
-            isCloudHostname(hostname.toString()),
-            m_dnsCacheTimeout,
-            m_mediatorCacheTimeout)).first;
+    auto info = m_dnsCache.emplace(
+        ResolveTaskKey{ipVersion, hostname},
+        HostAddressInfo(m_dnsCacheTimeout)).first;
     info->second.checkExpirations();
-    if (info->second.isResolved(natTraversalSupport))
+    if (info->second.isResolved())
     {
         auto entries = info->second.getAll();
 
-        // TODO: #muskov This is temporary fix for VMS-5777, should be properly fixed in 3.1.
-        if (info->second.isLikelyCloudAddress)
-        {
-            const bool cloudAddressEntryPresent =
-                std::count_if(
-                    entries.begin(), entries.end(),
-                    [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
-            if (!cloudAddressEntryPresent)
-                entries.push_back(AddressEntry(AddressType::cloud, hostname));
-        }
-
         lk.unlock();
 
-        NX_VERBOSE(this, nx::format("Address %1 resolved from cache: %2").arg(hostname).container(entries));
+        NX_VERBOSE(this, "Address %1 resolved from cache to %2", hostname, entries);
         const auto code = entries.size() ? SystemError::noError : SystemError::hostNotFound;
         return handler(code, std::move(entries));
     }
 
     info->second.pendingRequests.insert(requestId);
-    m_requests.insert(
-        std::make_pair(
-            requestId,
-            RequestInfo(std::get<1>(info->first), natTraversalSupport, std::move(handler))));
+    m_requests.emplace(
+        requestId,
+        RequestInfo(info->first.hostname, std::move(handler)));
 
-    NX_VERBOSE(this, nx::format("Address %1 will be resolved later by request %2").args(hostname, requestId));
-    if (info->second.isLikelyCloudAddress && natTraversalSupport == NatTraversalSupport::enabled)
-        mediatorResolve(info, &lk, true, ipVersion);
-    else
-        dnsResolve(info, &lk, natTraversalSupport == NatTraversalSupport::enabled, ipVersion);
+    if (info->second.dnsState() == HostAddressInfo::State::inProgress)
+    {
+        NX_VERBOSE(this, "Hostname %1 (request %2) resolve is already in progress", hostname, requestId);
+        return;
+    }
+
+    NX_VERBOSE(this, "Resolving hostname %1 (request %2) via DNS", hostname, requestId);
+    dnsResolve(info, &lk, ipVersion);
 }
 
 std::deque<AddressEntry> AddressResolver::resolveSync(
@@ -156,7 +149,7 @@ void AddressResolver::cancel(
         for (auto it = range.first; it != range.second;)
         {
             NX_ASSERT(!it->second.guard, "Cancel has already been called for this requestId");
-            if (it->second.inProgress && !it->second.guard)
+            if (it->second.handlerAboutToBeInvoked && !it->second.guard)
                 (it++)->second.guard = barrier.fork();
             else
                 it = m_requests.erase(it);
@@ -205,41 +198,21 @@ void AddressResolver::setDnsCacheTimeout(std::chrono::milliseconds timeout)
     m_dnsCacheTimeout = timeout;
 }
 
-void AddressResolver::setMediatorCacheTimeout(
-    std::chrono::milliseconds timeout)
-{
-    m_mediatorCacheTimeout = timeout;
-}
-
 //-------------------------------------------------------------------------------------------------
 
 AddressResolver::HostAddressInfo::HostAddressInfo(
-    bool _isLikelyCloudAddress,
-    std::chrono::milliseconds dnsCacheTimeout,
-    std::chrono::milliseconds mediatorCacheTimeout)
+    std::chrono::milliseconds dnsCacheTimeout)
     :
-    isLikelyCloudAddress(_isLikelyCloudAddress),
-    m_dnsState(State::unresolved),
-    m_dnsCacheTimeout(dnsCacheTimeout),
-    m_mediatorState(State::unresolved),
-    m_mediatorCacheTimeout(mediatorCacheTimeout)
+    m_dnsCacheTimeout(dnsCacheTimeout)
 {
 }
 
 void AddressResolver::HostAddressInfo::setDnsEntries(
-    std::vector<AddressEntry> entries)
+    std::deque<AddressEntry> entries)
 {
     m_dnsState = State::resolved;
     m_dnsResolveTime = std::chrono::steady_clock::now();
     m_dnsEntries = std::move(entries);
-}
-
-void AddressResolver::HostAddressInfo::setMediatorEntries(
-    std::vector<AddressEntry> entries)
-{
-    m_mediatorState = State::resolved;
-    m_mediatorResolveTime = std::chrono::steady_clock::now();
-    m_mediatorEntries = std::move(entries);
 }
 
 void AddressResolver::HostAddressInfo::checkExpirations()
@@ -248,63 +221,39 @@ void AddressResolver::HostAddressInfo::checkExpirations()
         m_dnsResolveTime + m_dnsCacheTimeout < std::chrono::steady_clock::now())
     {
         m_dnsState = State::unresolved;
-        m_dnsEntries.clear();
-    }
-
-    if (m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + m_mediatorCacheTimeout < std::chrono::steady_clock::now())
-    {
-        m_mediatorState = State::unresolved;
-        m_mediatorEntries.clear();
+        m_dnsEntries.reset();
     }
 }
 
-bool AddressResolver::HostAddressInfo::isResolved(
-    NatTraversalSupport natTraversalSupport) const
+bool AddressResolver::HostAddressInfo::isResolved() const
 {
-    if (!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
-        return true; // any address is better than nothing
-
-    return (m_dnsState == State::resolved)
-        && (natTraversalSupport == NatTraversalSupport::disabled
-            || m_mediatorState == State::resolved);
+    return m_dnsEntries != std::nullopt;
 }
 
 std::deque<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
 {
-    std::deque<AddressEntry> entries;
-    const auto endeque =
-        [&entries](const std::vector<AddressEntry>& v)
-        {
-            for (const auto& i: v)
-                entries.push_back(i);
-        };
+    return m_dnsEntries ? *m_dnsEntries : std::deque<AddressEntry>();
+}
 
-    endeque(fixedEntries);
-    if (isLikelyCloudAddress)
-    {
-        endeque(m_mediatorEntries);
-        endeque(m_dnsEntries);
-    }
-    else
-    {
-        endeque(m_dnsEntries);
-        endeque(m_mediatorEntries);
-    }
+//-------------------------------------------------------------------------------------------------
 
-    return entries;
+std::string AddressResolver::ResolveTaskKey::toString() const
+{
+    return nx::format("%1 (%2)", hostname, ipVersion == AF_INET ? "v4" : "v6").toStdString();
+}
+
+bool AddressResolver::ResolveTaskKey::operator<(const ResolveTaskKey& rhs) const
+{
+    return std::tie(ipVersion, hostname) < std::tie(rhs.ipVersion, rhs.hostname);
 }
 
 //-------------------------------------------------------------------------------------------------
 
 AddressResolver::RequestInfo::RequestInfo(
-    HostAddress address,
-    NatTraversalSupport natTraversalSupport,
+    std::string hostname,
     ResolveHandler handler)
 :
-    address(std::move(address)),
-    inProgress(false),
-    natTraversalSupport(natTraversalSupport),
+    hostname(std::move(hostname)),
     handler(std::move(handler))
 {
 }
@@ -320,7 +269,7 @@ bool AddressResolver::resolveNonBlocking(
     for (const auto& nonBlockingResolver: m_nonBlockingResolvers)
     {
         // TODO: Remove following if.
-        if ((natTraversalSupport == NatTraversalSupport::disabled || !m_isCloudResolveEnabled) &&
+        if (natTraversalSupport == NatTraversalSupport::disabled &&
             dynamic_cast<CloudAddressResolver*>(nonBlockingResolver.get()) != nullptr)
         {
             continue;
@@ -336,147 +285,116 @@ bool AddressResolver::resolveNonBlocking(
 }
 
 void AddressResolver::dnsResolve(
-    HaInfoIterator info, nx::Locker<nx::Mutex>* lk, bool needMediator, int ipVersion)
+    HaInfoIterator info, nx::Locker<nx::Mutex>* lk, int ipVersion)
 {
-    NX_VERBOSE(this, nx::format("dnsResolve. %1. %2")
-        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()));
-
-    switch (info->second.dnsState())
-    {
-        case HostAddressInfo::State::resolved:
-            if (needMediator) mediatorResolve(info, lk, false, ipVersion);
-            return;
-        case HostAddressInfo::State::inProgress:
-            return;
-        case HostAddressInfo::State::unresolved:
-            break; // continue
-    }
-
-    NX_VERBOSE(this, nx::format("dnsResolve async. %1").arg(std::get<1>(info->first)));
+    NX_VERBOSE(this, "Starting async DNS resolve for %1", info->first);
 
     info->second.dnsProgress();
     nx::Unlocker<nx::Mutex> ulk(lk);
+
     m_dnsResolver.resolveAsync(
-        std::get<1>(info->first).toString(),
-        [this, info, needMediator, ipVersion](
+        info->first.hostname,
+        [this, info](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
-            NX_VERBOSE(this, nx::format("dnsResolve async done. %1, %2").args(code, ips.size()));
+            NX_VERBOSE(this, "Async DNS resolve completed: %1. Found entries: %2", code, ips);
 
-            std::vector<nx::utils::Guard> guards;
+            std::deque<AddressEntry> entries;
+            for (auto& entry: ips)
+                entries.emplace_back(AddressType::direct, std::move(entry));
 
-            NX_MUTEX_LOCKER lk(&m_mutex);
-            std::vector<AddressEntry> entries;
-            while (!ips.empty())
-            {
-                entries.emplace_back(AddressType::direct, std::move(ips.front()));
-                ips.pop_front();
-            }
-
-            NX_VERBOSE(this, nx::format("Address %1 is resolved by DNS to %2")
-                .arg(std::get<1>(info->first)).container(entries));
-
-            info->second.setDnsEntries(std::move(entries));
-            guards = grabHandlers(code, info);
-            NX_VERBOSE(this, nx::format("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()));
-            if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
-                mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
+            reportResult(info, code, std::move(entries));
         },
         ipVersion,
         this);
 }
 
-void AddressResolver::mediatorResolve(
-    HaInfoIterator info, nx::Locker<nx::Mutex>* lk, bool needDns, int ipVersion)
+void AddressResolver::reportResult(
+    HaInfoIterator info,
+    SystemError::ErrorCode lastErrorCode,
+    std::deque<AddressEntry> entries)
 {
-    switch (info->second.mediatorState())
+    NX_MUTEX_LOCKER lk(&m_mutex);
+
+    auto requestsToCompleteIters = selectRequestsToComplete(lk, info);
+
+    info->second.setDnsEntries(entries);
+
+    NX_VERBOSE(this, "There is(are) %1 about to be notified: %2 is resolved to %3",
+        requestsToCompleteIters.size(), info->first, entries);
+
+    lk.unlock();
+
+    lastErrorCode = entries.empty() ? lastErrorCode : SystemError::noError;
+    for (const auto& it: requestsToCompleteIters)
+        it->second.handler(lastErrorCode, entries);
+
+    lk.relock();
+
+    std::vector<nx::utils::Guard> guards;
+    for (const auto& it: requestsToCompleteIters)
     {
-        case HostAddressInfo::State::resolved:
-            if (needDns) dnsResolve(info, lk, false, ipVersion);
-            return;
-        case HostAddressInfo::State::inProgress:
-            return;
-        case HostAddressInfo::State::unresolved:
-            break; // continue
+        NX_VERBOSE(this, "Address %1 is resolved by request %2 to %3",
+            info->first, it->first, entries);
+
+        guards.push_back(std::move(it->second.guard));
+        m_requests.erase(it);
     }
 
-    SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress)
-    {
-        info->second.setMediatorEntries(
-            {AddressEntry(AddressType::cloud, std::get<1>(info->first))});
-        resolveResult = SystemError::noError;
-    }
-    else
-    {
-        info->second.setMediatorEntries();
-        resolveResult = SystemError::hostNotFound;
-    }
+    lk.unlock();
 
-    const auto unlockedGuard = nx::utils::makeScopeGuard(
-        [lk, guards = grabHandlers(resolveResult, info)]() mutable
-        {
-            nx::Unlocker<nx::Mutex> ulk(lk);
-            guards.clear();
-        });
-
-    if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
-        return dnsResolve(info, lk, false, ipVersion);
+    // guards MUST fire out of the mutex scope.
+    for (auto& guard: guards)
+        guard.fire();
 }
 
-std::vector<nx::utils::Guard> AddressResolver::grabHandlers(
-    SystemError::ErrorCode lastErrorCode,
-    HaInfoIterator info)
+std::vector<std::multimap<void*, AddressResolver::RequestInfo>::iterator>
+    AddressResolver::selectRequestsToComplete(
+        const nx::Locker<nx::Mutex>&,
+        HaInfoIterator info)
 {
-    std::vector<nx::utils::Guard> guards;
+    std::vector<std::multimap<void*, AddressResolver::RequestInfo>::iterator> result;
 
-    auto entries = info->second.getAll();
-    for (auto req = info->second.pendingRequests.begin();
-         req != info->second.pendingRequests.end();)
+    for (auto reqIt = info->second.pendingRequests.begin();
+        reqIt != info->second.pendingRequests.end();)
     {
-        const auto range = m_requests.equal_range(*req);
+        const auto range = m_requests.equal_range(*reqIt);
         bool noPending = (range.first == range.second);
         for (auto it = range.first; it != range.second; ++it)
         {
-            if (it->second.address != std::get<1>(info->first) ||
-                it->second.inProgress ||
-                !info->second.isResolved(it->second.natTraversalSupport))
+            if (it->second.hostname != info->first.hostname ||
+                it->second.handlerAboutToBeInvoked)
             {
                 noPending = false;
                 continue;
             }
 
-            it->second.inProgress = true;
-            guards.push_back(nx::utils::Guard(
-                [this, it, entries, lastErrorCode, info]()
-                {
-                    nx::utils::Guard guard; //< Shall fire out of mutex scope
-                    auto code = entries.empty() ? lastErrorCode : SystemError::noError;
-                    it->second.handler(code, std::move(entries));
-
-                    NX_MUTEX_LOCKER lk(&m_mutex);
-                    NX_VERBOSE(this, nx::format("Address %1 is resolved by request %2 to %3")
-                        .args(std::get<1>(info->first), it->first).container(entries));
-
-                    guard = std::move(it->second.guard);
-                    m_requests.erase(it);
-                    m_condition.wakeAll();
-                }));
+            it->second.handlerAboutToBeInvoked = true;
+            result.push_back(it);
         }
 
-        if(noPending)
-            req = info->second.pendingRequests.erase(req);
+        if (noPending)
+            reqIt = info->second.pendingRequests.erase(reqIt);
         else
-            ++req;
+            ++reqIt;
     }
 
-    if (guards.size())
+    return result;
+}
+
+std::string_view AddressResolver::toString(HostAddressInfo::State state)
+{
+    switch (state)
     {
-        NX_VERBOSE(this, nx::format("There is(are) %1 about to be notified: %2 is resolved to %3")
-            .args(guards.size(), std::get<1>(info->first)).container(entries));
+        case HostAddressInfo::State::unresolved:
+            return "unresolved";
+        case HostAddressInfo::State::resolved:
+            return "resolved";
+        case HostAddressInfo::State::inProgress:
+            return "inProgress";
     }
 
-    return guards;
+    return "unknown";
 }
 
 } // namespace nx::network
