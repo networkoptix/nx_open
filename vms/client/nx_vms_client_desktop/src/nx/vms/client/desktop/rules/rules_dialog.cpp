@@ -122,7 +122,7 @@ bool RulesDialog::tryClose(bool force)
 
     const auto result = QnMessageBox::question(
         this,
-        tr("Apply changes before exit?"),
+        tr("Apply changes before exiting?"),
         QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
         QDialogButtonBox::Apply);

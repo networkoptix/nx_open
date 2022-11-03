@@ -38,6 +38,9 @@ struct NX_VMS_COMMON_API Result
 {
     Q_DECLARE_TR_FUNCTIONS(Result)
 
+    /** Template string with two parameters corresponding to name and value. */
+    static QString invalidParameterTemplate();
+
 public:
     // TODO: Move out and use NX_REFLECTION_ENUM.
     enum Error
@@ -144,8 +147,8 @@ public:
     template<typename Value>
     static Result invalidParameter(const QString& name, const Value& value)
     {
-        return Result{InvalidParameter, format(
-            tr("Invalid parameter `%1`: %2.", /*comment*/ "%1 is name, %2 is value."), name, value)};
+        return Result{InvalidParameter,
+            format(invalidParameterTemplate(), name, value)};
     }
 };
 
