@@ -205,7 +205,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
         d->connection->updateCredentials(credentials, d->connection->sessionTokenExpirationTime());
     }
 
-    auto callback =
+    auto callback = nx::utils::guarded(this,
         [this, credentials](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
@@ -233,7 +233,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
             }
             if (NX_ASSERT(d->messageProcessor))
                 d->messageProcessor->setHoldConnection(false);
-        };
+        });
 
     ConnectionInfo info = d->connection->connectionInfo();
     info.credentials = credentials;
@@ -440,7 +440,7 @@ void RemoteSession::reconnectStep()
     d->reconnectHelper->next();
     emit reconnectingToServer(d->reconnectHelper->currentServer());
 
-    auto reconnectRequestCallback =
+    auto reconnectRequestCallback = nx::utils::guarded(this,
         [this](RemoteConnectionFactory::ConnectionOrError result)
         {
             d->currentConnectionProcess.reset();
@@ -466,13 +466,14 @@ void RemoteSession::reconnectStep()
                     default:
                         break;
                 }
-                reconnectStep();
+                executeDelayedParented(
+                    [this] { reconnectStep(); }, this);
             }
             else
             {
                 establishConnection(std::get<RemoteConnectionPtr>(result));
             }
-        };
+        });
 
     // Reconnect to the current server occurs automatically in the message bus, so we don't need to
     // send additional request. Reconnect helper returns empty address in this case.
