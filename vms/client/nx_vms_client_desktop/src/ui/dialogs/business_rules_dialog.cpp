@@ -837,7 +837,8 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
 
     const auto result = QnMessageBox::question(this,
-        tr("Apply changes before exit?"), QString(),
+        tr("Apply changes before exiting?"),
+        QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
         QDialogButtonBox::Apply);
 

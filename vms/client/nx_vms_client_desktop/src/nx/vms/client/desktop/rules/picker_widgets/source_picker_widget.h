@@ -22,6 +22,7 @@
 #include <ui/widgets/select_resources_button.h>
 
 #include "picker_widget.h"
+#include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -144,7 +145,7 @@ private:
 
         if (resourceList.isEmpty() && !field->acceptAll())
         {
-            alertLabel->setText(tr("Select at least one User"));
+            alertLabel->setText(SourcePickerWidgetStrings::selectUser());
             alertLabel->setVisible(true);
         }
         else
@@ -195,17 +196,11 @@ void CameraPicker::updateUi()
 
     if (resourceList.isEmpty())
     {
-        static const QnCameraDeviceStringSet deviceStringSet{
-            tr("Select at least one Device"),
-            tr("Select at least one Camera"),
-            tr("Select at least one I/O module")
-        };
-
         const auto allCameras = resourcePool()->getAllCameras();
         const auto deviceType
             = QnDeviceDependentStrings::calculateDeviceType(resourcePool(), allCameras);
 
-        alertLabel->setText(deviceStringSet.getString(deviceType));
+        alertLabel->setText(SourcePickerWidgetStrings::selectDevice(deviceType));
         alertLabel->setVisible(true);
     }
     else
@@ -224,7 +219,7 @@ void ServerPicker::updateUi()
 
     if (resourceList.isEmpty())
     {
-        alertLabel->setText(tr("Select at least one Server"));
+        alertLabel->setText(SourcePickerWidgetStrings::selectServer());
         alertLabel->setVisible(true);
     }
     else
