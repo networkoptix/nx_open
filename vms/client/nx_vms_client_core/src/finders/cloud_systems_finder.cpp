@@ -107,7 +107,7 @@ struct CloudSystemsFinder::Private
             return;
 
         static const QnUuid kAdapterFuncId = QnUuid::createUuid();
-        NX_DEBUG(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
+        NX_VERBOSE(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
 
         ClientPool::Request request;
         request.method = nx::network::http::Method::get;
@@ -245,12 +245,12 @@ struct CloudSystemsFinder::Private
                 systemDescription->name(), systemDescription->id(), system.online);
             systemDescription->setOnline(system.online);
 
-            NX_DEBUG(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
+            NX_VERBOSE(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
                 systemDescription->name(), systemDescription->id(), system.newestServerVersion);
             const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
             systemDescription->updateLastKnownVersion(version);
 
-            NX_DEBUG(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
+            NX_VERBOSE(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
                 systemDescription->name(), systemDescription->id(), system.system2faEnabled);
             systemDescription->set2faEnabled(system.system2faEnabled);
         }
