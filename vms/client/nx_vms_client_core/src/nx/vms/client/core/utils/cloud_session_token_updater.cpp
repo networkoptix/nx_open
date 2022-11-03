@@ -87,6 +87,12 @@ void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
 
     NX_DEBUG(this, "Access token updated, expires at: %1, expiring/expired: %2",
         expirationTime, m_expirationTimer.hasExpired());
+
+    // Do not update already expiring token.
+    if (expirationTime - qnSyncTime->currentTimePoint() > kTokenUpdateThreshold)
+        m_timer->start();
+    else
+        m_timer->stop();
 }
 
 void CloudSessionTokenUpdater::issueToken(

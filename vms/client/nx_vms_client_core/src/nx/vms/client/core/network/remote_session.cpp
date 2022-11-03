@@ -300,6 +300,9 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
             return
                 [this, errorCode]
                 {
+                    NX_DEBUG(this, "Try to mark server invalid, error: %1, keep: %2",
+                        errorCode, keepCurrentServerOnError(errorCode));
+
                     d->activeServerReconnectErrorCode = errorCode;
                     if (d->reconnectHelper && !keepCurrentServerOnError(errorCode))
                     {
@@ -343,7 +346,7 @@ void RemoteSession::setState(State value)
     if (d->state == value)
         return;
 
-    NX_DEBUG(this, "Session state %1", value);
+    NX_DEBUG(this, "Setting new session state: %1", value);
     d->state = value;
     emit stateChanged(value);
 }
@@ -363,7 +366,7 @@ void RemoteSession::onInitialResourcesReceived()
 
 void RemoteSession::onMessageBusConnectionClosed()
 {
-    NX_VERBOSE(this, "Connection closed, trying to reconnect");
+    NX_DEBUG(this, "Connection closed, trying to reconnect");
     tryToRestoreConnection();
 }
 
@@ -461,12 +464,21 @@ void RemoteSession::reconnectStep()
             .userInteractionAllowed = false
         };
 
+        NX_DEBUG(this, "Performing reconnect attempt to: %1", address);
         d->currentConnectionProcess = d->remoteConnectionFactory->connect(
             logonData,
             reconnectRequestCallback);
     }
     else
     {
+        NX_DEBUG(this, "Scheduling reconnect attempt for: %1", kReconnectDelay);
+
+        if (d->activeServerReconnectErrorCode == RemoteConnectionErrorCode::cloudSessionExpired
+            && NX_ASSERT(d->cloudTokenUpdater))
+        {
+            d->cloudTokenUpdater->updateTokenIfNeeded();
+        }
+
         executeDelayedParented(
             [this] { reconnectStep(); }, kReconnectDelay, this);
     }
@@ -491,7 +503,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
     auto handler =
         [this](ResultCode result, IssueTokenResponse response)
         {
-            NX_DEBUG(this, "Issue token result: %1", result);
+            NX_DEBUG(this, "Reissue token result: %1", result);
             auto connection = this->connection();
             if (result == ResultCode::ok && connection)
             {
@@ -513,6 +525,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
         nx::format("cloudSystemId=%1", connection->moduleInformation().cloudSystemId).toStdString();
     request.refresh_token = qnCloudStatusWatcher->remoteConnectionCredentials().authToken.value;
 
+    NX_DEBUG(this, "Reissueing cloud access token");
     d->cloudTokenUpdater->issueToken(request, std::move(handler), this);
 }
 
