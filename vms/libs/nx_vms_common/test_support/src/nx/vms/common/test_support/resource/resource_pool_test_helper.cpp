@@ -205,5 +205,5 @@ void QnResourcePoolTestHelper::clear()
     resourcePool()->clear();
 
     const QSignalBlocker blocker(userRolesManager());
-    userRolesManager()->resetCustomUserRoles({});
+    userRolesManager()->resetUserRoles({});
 }

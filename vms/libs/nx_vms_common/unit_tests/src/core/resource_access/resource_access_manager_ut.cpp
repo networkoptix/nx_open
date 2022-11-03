@@ -78,17 +78,25 @@ protected:
     {
         logout();
         auto user = createUser(GlobalPermission::none);
+        user->setUserRoleIds({QnPredefinedUserRoles::id(Qn::UserRole::owner)});
         user->setOwner(true);
         resourcePool()->addResource(user);
         m_currentUser = user;
     }
 
-    void loginAs(GlobalPermissions globalPermissions)
+    void loginAsCustom(GlobalPermissions globalPermissions)
     {
         logout();
         auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
+    }
+
+    void loginAs(Qn::UserRole role)
+    {
+        const auto groupId = QnPredefinedUserRoles::id(role);
+        ASSERT_FALSE(groupId.isNull());
+        loginAsMember({groupId});
     }
 
     void loginAsMember(const QnUuid& groupId)
@@ -112,7 +120,8 @@ protected:
         return resourceAccessManager()->hasPermission(subject, resource, requiredPermissions);
     }
 
-    void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
+    void checkPermissions(
+        const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
         Qn::Permissions actual = resourceAccessManager()->permissions(m_currentUser, resource);
         ASSERT_EQ(desired, actual);
@@ -275,7 +284,7 @@ TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsViewer)
 
 TEST_F(ResourceAccessManagerTest, checkLockedChanged)
 {
-    loginAs(GlobalPermission::none);
+    loginAsCustom(GlobalPermission::none);
     auto user = m_currentUser;
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -415,7 +424,7 @@ TEST_F(ResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
 
 TEST_F(ResourceAccessManagerTest, checkParentChanged)
 {
-    loginAs(GlobalPermission::none);
+    loginAsCustom(GlobalPermission::none);
     auto user = m_currentUser;
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -444,7 +453,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 /** Videowall-controller can do anything with layout on videowall. */
 TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 {
-    loginAs(GlobalPermission::none);
+    loginAsCustom(GlobalPermission::none);
 
     setAccessRights(m_currentUser->getId(),
         {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
@@ -461,7 +470,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 /** Viewer can't do anything with layout on videowall. */
 TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 {
-    loginAs(GlobalPermission::advancedViewerPermissions);
+    loginAs(Qn::UserRole::advancedViewer);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -532,7 +541,7 @@ TEST_F(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
 // User can push it's own screen on a new videowall layout.
 TEST_F(ResourceAccessManagerTest, canPushMyScreen)
 {
-    loginAs(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
+    loginAsCustom(GlobalPermission::controlVideowall | GlobalPermission::viewerPermissions);
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -820,14 +829,14 @@ TEST_F(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
 
 TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledHimself)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(Qn::UserRole::liveViewer);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
     const auto viewers = addLiveViewers();
     loginAsMember(viewers.id);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
-    loginAs(GlobalPermission::admin);
+    loginAs(Qn::UserRole::administrator);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
     const auto admins = addAdministrators();
@@ -852,14 +861,14 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledAd
     admin->removeFlags(Qn::remote); //< Prevent removing of this user by loginAs();
     resourcePool()->addResource(admin);
 
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(Qn::UserRole::liveViewer);
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ true);
 
     const auto viewers = addLiveViewers();
     loginAsMember(viewers.id);
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ true);
 
-    loginAs(GlobalPermission::admin);
+    loginAs(Qn::UserRole::administrator);
     checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
 
     loginAsMember(admins.id);
@@ -1347,7 +1356,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleRemoved)
 
 TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
 {
-    loginAs(GlobalPermission::admin);
+    loginAs(Qn::UserRole::administrator);
     auto target = addCamera();
     auto videoWall = addVideoWall();
     auto user = addUser(GlobalPermission::controlVideowall);
@@ -1366,7 +1375,7 @@ TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
 
 TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 {
-    loginAs(GlobalPermission::admin);
+    loginAs(Qn::UserRole::administrator);
 
     auto target = addCamera();
 
@@ -1396,7 +1405,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 
 TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
 {
-    loginAs(GlobalPermission::admin);
+    loginAs(Qn::UserRole::administrator);
 
     auto target = addCamera();
 
@@ -1541,7 +1550,7 @@ TEST_F(ResourceAccessManagerTest, checkServerAsAdmin)
 /* Custom users can't view health monitors by default. */
 TEST_F(ResourceAccessManagerTest, checkServerAsCustom)
 {
-    loginAs(GlobalPermission::customUser);
+    loginAsCustom(GlobalPermission::customUser);
 
     auto server = addServer();
 
@@ -1555,7 +1564,7 @@ TEST_F(ResourceAccessManagerTest, checkServerAsCustom)
 /* User with live viewer permissions can view health monitors by default. */
 TEST_F(ResourceAccessManagerTest, checkServerAsLiveViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(Qn::UserRole::liveViewer);
 
     auto server = addServer();
 
@@ -1587,7 +1596,7 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsAdmin)
 /* Non-admin users should not have access to storages. */
 TEST_F(ResourceAccessManagerTest, checkStoragesAsCustom)
 {
-    loginAs(GlobalPermission::customUser);
+    loginAsCustom(GlobalPermission::customUser);
 
     auto server = addServer();
     auto storage = addStorage(server);
@@ -1602,7 +1611,7 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsCustom)
 /* Non-admin users should not have access to storages. */
 TEST_F(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(Qn::UserRole::liveViewer);
 
     auto server = addServer();
     auto storage = addStorage(server);
@@ -1634,7 +1643,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsAdmin)
 /* Videowall control user must have almost full permissions for videowalls. */
 TEST_F(ResourceAccessManagerTest, checkVideowallAsController)
 {
-    loginAs(GlobalPermission::customUser | GlobalPermission::controlVideowall);
+    loginAsCustom(GlobalPermission::customUser | GlobalPermission::controlVideowall);
 
     auto videowall = addVideoWall();
 
@@ -1647,7 +1656,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsController)
 /* Videowall is inaccessible for default user. */
 TEST_F(ResourceAccessManagerTest, checkVideowallAsViewer)
 {
-    loginAs(GlobalPermission::advancedViewerPermissions);
+    loginAs(Qn::UserRole::advancedViewer);
 
     auto videowall = addVideoWall();
 

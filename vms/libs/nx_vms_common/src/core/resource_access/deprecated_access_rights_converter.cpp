@@ -120,6 +120,9 @@ DeprecatedAccessRightsConverter::DeprecatedAccessRightsConverter(
 
     connect(d->sharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged,
         d.get(), &Private::handleSharedResourcesChanged);
+
+    for (const auto& group: QnPredefinedUserRoles::list())
+        d->handleGroupAddedOrUpdated(group);
 }
 
 DeprecatedAccessRightsConverter::~DeprecatedAccessRightsConverter()

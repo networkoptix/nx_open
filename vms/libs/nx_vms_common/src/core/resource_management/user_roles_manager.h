@@ -106,7 +106,7 @@ public:
 // Slots called by the message processor:
 
     // Sets new custom user roles handled by this manager.
-    void resetCustomUserRoles(const UserRoleDataList& userRoles);
+    void resetUserRoles(const UserRoleDataList& userRoles);
 
     // Adds or updates custom user role information:
     void addOrUpdateUserRole(const UserRoleData& role);
@@ -127,11 +127,17 @@ private:
     {
         for (const auto& id: roleIds)
         {
-            const auto itr = m_roles.find(id);
-            if (itr != m_roles.end())
+            auto role = QnPredefinedUserRoles::get(id);
+            if (!role)
             {
-                list->push_back(itr.value());
-                appendUserRolesWithParents(list, itr.value().parentRoleIds, lock);
+                if (const auto itr = m_roles.find(id); itr != m_roles.end())
+                    role = *itr;
+            }
+
+            if (role)
+            {
+                list->push_back(*role);
+                appendUserRolesWithParents(list, role->parentRoleIds, lock);
             }
         }
     }
