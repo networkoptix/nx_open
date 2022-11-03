@@ -547,6 +547,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     connect(session.get(), &RemoteSession::stateChanged, this,
         [this, logonData, systemId](RemoteSession::State state)
         {
+            NX_DEBUG(this, "Remote session state changed: %1", state);
+
             if (state == RemoteSession::State::reconnecting)
             {
                 if (d->reconnectDialog)
@@ -599,6 +601,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     connect(session.get(), &RemoteSession::reconnectingToServer, this,
         [this](const QnMediaServerResourcePtr& server)
         {
+            NX_DEBUG(this, "Reconnecting to server: %1", server ? server->getName() : "none");
+
             if (NX_ASSERT(d->reconnectDialog))
                 d->reconnectDialog->setCurrentServer(server);
         });
@@ -608,6 +612,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         this,
         [this, serverModuleInformation](RemoteConnectionErrorCode errorCode)
         {
+            NX_DEBUG(this, "Reconnect failed with error: %1", errorCode);
+
             executeDelayedParented(
                 [this, errorCode, serverModuleInformation]()
                 {

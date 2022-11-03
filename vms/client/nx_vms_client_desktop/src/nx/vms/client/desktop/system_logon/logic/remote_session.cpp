@@ -59,6 +59,8 @@ RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent)
     connect(this, &RemoteSession::stateChanged, this,
         [this, keepServerTimer](State state)
         {
+            NX_DEBUG(this, "Remote session state changed: %1, keep unauthorized server", state);
+
             m_keepUnauthorizedServer = true;
             if (state == State::reconnecting)
                 keepServerTimer->start();
@@ -120,8 +122,10 @@ void RemoteSession::autoTerminateIfNeeded()
 bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
 {
     // Session token can be updated using shared memory.
+    // Cloud acccess token may be reacquired from the refresh token.
     if (error == RemoteConnectionErrorCode::unauthorized
-        || error == RemoteConnectionErrorCode::sessionExpired)
+        || error == RemoteConnectionErrorCode::sessionExpired
+        || error == RemoteConnectionErrorCode::cloudSessionExpired)
     {
         return m_keepUnauthorizedServer;
     }
