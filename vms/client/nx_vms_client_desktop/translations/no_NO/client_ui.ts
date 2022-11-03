@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Bruk Media2 til å hente profiler</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -1421,7 +1421,7 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Spill av lyd fra alle kameraer på layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Eksportdato</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1924,7 +1924,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Vis måloverlegg for PTZ-kameraer</translation>
     </message>
   </context>
   <context>
@@ -2698,7 +2698,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Bevegelse &amp;&amp; Objekter</translation>
     </message>
   </context>
   <context>
@@ -2725,27 +2725,27 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Databeskyttelse</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Bruk kun HTTPS for å koble til kameraer</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Brukeraktivitet</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Vis servere i treet for ikke-administratorbrukere</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Arkivkryptering</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Arkivkryptering øker CPU-bruken</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2757,19 +2757,19 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Forbindelsen med kameraer som ikke støtter HTTPS vil gå tapt.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Tving servere til å akseptere kun krypterte tilkoblinger</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Krypter videotrafikk til stasjonære og mobile klienter</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Administrer brukere</translation>
     </message>
   </context>
   <context>
@@ -2787,7 +2787,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Serversertifikat</translation>
     </message>
     <message>
       <source>General</source>
@@ -2799,7 +2799,7 @@
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Selvsignert rotsertifikat</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2807,7 +2807,7 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Sertifikatet er utløpt</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -2819,11 +2819,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Fest til dette sertifikatet</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Vis festet sertifikat</translation>
     </message>
   </context>
   <context>
@@ -2861,7 +2861,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Oppdag innebygde og USB-webkameraer automatisk</translation>
     </message>
   </context>
   <context>
@@ -3216,7 +3216,7 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Denne brukeren kan bruke sammendragsgodkjenning.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -3317,7 +3317,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Proxy denne nettsiden via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3329,15 +3329,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>Tillat bruk av Client API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Fullmakt for alt etterspurt innhold</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Tillat åpning av nettside uten SSL-sertifikatkontroll</translation>
     </message>
   </context>
   <context>
