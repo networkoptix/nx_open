@@ -244,6 +244,9 @@ public:
     CSndQueue(AbstractUdpChannel* c, CTimer* t);
     ~CSndQueue();
 
+    CSndQueue(const CSndQueue&) = delete;
+    CSndQueue& operator=(const CSndQueue&) = delete;
+
     void start();
 
     // Functionality:
@@ -264,7 +267,9 @@ public:
 private:
     void worker();
 
-    std::thread m_WorkerThread;
+    int sendPacket(const detail::SocketAddress& addr, CPacket packet);
+    void postPacket(const detail::SocketAddress& addr, CPacket packet);
+    void sendPostedPackets();
 
 private:
     struct SendTask
@@ -277,8 +282,6 @@ private:
     std::unique_ptr<CSndUList> m_pSndUList;
     // The UDP channel for data sending
     AbstractUdpChannel* m_channel = nullptr;
-    // Timing facility
-    CTimer* m_timer = nullptr;
     std::vector<SendTask> m_sendTasks;
 
     std::mutex m_mutex;
@@ -286,13 +289,7 @@ private:
 
     volatile bool m_bClosing = false;        // closing the worker
 
-private:
-    int sendPacket(const detail::SocketAddress& addr, CPacket packet);
-    void postPacket(const detail::SocketAddress& addr, CPacket packet);
-    void sendPostedPackets();
-
-    CSndQueue(const CSndQueue&);
-    CSndQueue& operator=(const CSndQueue&);
+    std::thread m_WorkerThread;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -317,10 +314,11 @@ public:
         CTimer* t);
     ~CRcvQueue();
 
+    CRcvQueue(const CRcvQueue&) = delete;
+    CRcvQueue& operator=(const CRcvQueue&) = delete;
+
     void start();
     void stop();
-
-public:
 
     // Functionality:
     //    Read a packet for a specific UDT socket id.
@@ -361,7 +359,7 @@ private:
     Result<> processUnit(
         std::shared_ptr<Unit> unit, const detail::SocketAddress& addr);
 
-    std::thread m_WorkerThread;
+    void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
 
 private:
     UnitQueue m_UnitQueue;        // The received packet queue
@@ -382,10 +380,6 @@ private:
     // closing the workder
     volatile bool m_bClosing = false;
 
-private:
-    void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
-
-private:
     // pointer to the (unique, if any) listening UDT entity
     std::weak_ptr<ServerSideConnectionAcceptor> m_listener;
     // The list of sockets in rendezvous mode
@@ -399,9 +393,7 @@ private:
     // temporary buffer for rendezvous connection request
     std::map<int32_t, std::queue<std::unique_ptr<CPacket>>> m_packets;
 
-private:
-    CRcvQueue(const CRcvQueue&);
-    CRcvQueue& operator=(const CRcvQueue&);
+    std::thread m_WorkerThread;
 };
 
 #endif

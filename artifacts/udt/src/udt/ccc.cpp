@@ -46,28 +46,11 @@ Yunhong Gu, last updated 02/21/2013
 
 CCC::CCC():
     m_iSYNInterval(CUDT::m_iSYNInterval),
-    m_dPktSndPeriod(1.0),
-    m_dCWndSize(16.0),
-    m_iBandwidth(),
-    m_dMaxCWndSize(),
-    m_iMSS(),
-    m_iSndCurrSeqNo(),
-    m_iRcvRate(),
-    m_iRTT(),
-    m_pcParam(NULL),
-    m_iPSize(0),
-    m_UDT(),
-    m_iACKInterval(0),
-    m_bUserDefinedRTO(false),
-    m_iRTO(-1),
     m_PerfInfo()
 {
 }
 
-CCC::~CCC()
-{
-    delete[] m_pcParam;
-}
+CCC::~CCC() = default;
 
 void CCC::setACKTimer(std::chrono::microseconds msINT)
 {
@@ -127,26 +110,9 @@ void CCC::setRTT(std::chrono::microseconds rtt)
     m_iRTT = rtt;
 }
 
-void CCC::setUserParam(const char* param, int size)
+void CCC::setUserParam(std::string val)
 {
-    delete[] m_pcParam;
-    m_pcParam = new char[size];
-    memcpy(m_pcParam, param, size);
-    m_iPSize = size;
-}
-
-//
-CUDTCC::CUDTCC():
-    m_bSlowStart(),
-    m_iLastAck(),
-    m_bLoss(),
-    m_iLastDecSeq(),
-    m_dLastDecPeriod(),
-    m_iNAKCount(),
-    m_iDecRandom(),
-    m_iAvgNAKNum(),
-    m_iDecCount()
-{
+    m_pcParam = std::move(val);
 }
 
 void CUDTCC::init()

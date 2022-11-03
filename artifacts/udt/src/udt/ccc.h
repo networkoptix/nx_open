@@ -42,6 +42,7 @@ Yunhong Gu, last updated 02/28/2012
 #ifndef __UDT_CCC_H__
 #define __UDT_CCC_H__
 
+#include <string>
 
 #include "udt.h"
 #include "packet.h"
@@ -54,12 +55,6 @@ class UDT_API CCC
 public:
     CCC();
     virtual ~CCC();
-
-private:
-    CCC(const CCC&);
-    CCC& operator=(const CCC&) { return *this; }
-
-public:
 
     // Functionality:
     //    Callback function to be called (only) at the start of a UDT connection.
@@ -175,13 +170,10 @@ protected:
 
     // Functionality:
     //    Set user defined parameters.
-    // Parameters:
-    //    0) [in] param: the paramters in one buffer.
-    //    1) [in] size: the size of the buffer.
     // Returned value:
     //    None.
 
-    void setUserParam(const char* param, int size);
+    void setUserParam(std::string val);
 
 private:
     void setMSS(int mss);
@@ -192,30 +184,29 @@ private:
     void setRTT(std::chrono::microseconds rtt);
 
 protected:
-    const std::chrono::microseconds m_iSYNInterval;    // UDT constant parameter, SYN
+    std::chrono::microseconds m_iSYNInterval;    // UDT constant parameter, SYN
 
-    double m_dPktSndPeriod;              // Packet sending period, in microseconds
-    double m_dCWndSize;                  // Congestion window size, in packets
+    double m_dPktSndPeriod = 1.0;              // Packet sending period, in microseconds
+    double m_dCWndSize = 16.0;                  // Congestion window size, in packets
 
-    int m_iBandwidth;            // estimated bandwidth, packets per second
-    double m_dMaxCWndSize;               // maximum cwnd size, in packets
+    int m_iBandwidth = 0;            // estimated bandwidth, packets per second
+    double m_dMaxCWndSize = 0.0;               // maximum cwnd size, in packets
 
-    int m_iMSS;                // Maximum Packet Size, including all packet headers
-    int32_t m_iSndCurrSeqNo;        // current maximum seq no sent out
-    int m_iRcvRate;            // packet arrive rate at receiver side, packets per second
-    std::chrono::microseconds m_iRTT;                // current estimated RTT, microsecond
+    int m_iMSS = 0;                // Maximum Packet Size, including all packet headers
+    int32_t m_iSndCurrSeqNo = 0;        // current maximum seq no sent out
+    int m_iRcvRate = 0;            // packet arrive rate at receiver side, packets per second
+    std::chrono::microseconds m_iRTT = std::chrono::microseconds::zero();   // current estimated RTT, microsecond
 
-    char* m_pcParam;            // user defined parameter
-    int m_iPSize;            // size of m_pcParam
+    std::string m_pcParam;            // user defined parameter
 
 private:
-    UDTSOCKET m_UDT;                     // The UDT entity that this congestion control algorithm is bound to
+    UDTSOCKET m_UDT = 0;                     // The UDT entity that this congestion control algorithm is bound to
 
     std::chrono::microseconds m_iACKPeriod = std::chrono::microseconds::zero();                    // Periodical timer to send an ACK
-    int m_iACKInterval;                  // How many packets to send one ACK, in packets
+    int m_iACKInterval = 0;                  // How many packets to send one ACK, in packets
 
-    bool m_bUserDefinedRTO;              // if the RTO value is defined by users
-    std::chrono::microseconds m_iRTO;                          // RTO value, microseconds
+    bool m_bUserDefinedRTO = false;              // if the RTO value is defined by users
+    std::chrono::microseconds m_iRTO = std::chrono::microseconds(-1);   // RTO value, microseconds
 
     CPerfMon m_PerfInfo;                 // protocol statistics information
 };
@@ -225,8 +216,8 @@ class CCCVirtualFactory
 public:
     virtual ~CCCVirtualFactory() {}
 
-    virtual CCC* create() = 0;
-    virtual CCCVirtualFactory* clone() = 0;
+    virtual std::unique_ptr<CCC> create() = 0;
+    virtual std::unique_ptr<CCCVirtualFactory> clone() = 0;
 };
 
 template <class T>
@@ -235,16 +226,15 @@ class CCCFactory: public CCCVirtualFactory
 public:
     virtual ~CCCFactory() {}
 
-    virtual CCC* create() { return new T; }
-    virtual CCCVirtualFactory* clone() { return new CCCFactory<T>; }
+    virtual std::unique_ptr<CCC> create() { return std::make_unique<T>(); }
+    virtual std::unique_ptr<CCCVirtualFactory> clone() { return std::make_unique<CCCFactory<T>>(); }
 };
 
 class CUDTCC: public CCC
 {
 public:
-    CUDTCC();
+    CUDTCC() = default;
 
-public:
     virtual void init();
     virtual void onACK(int32_t);
     virtual void onLoss(const int32_t*, int);
@@ -253,15 +243,15 @@ public:
 private:
     std::chrono::microseconds m_iRCInterval = std::chrono::microseconds::zero();            // UDT Rate control interval
     std::chrono::microseconds m_LastRCTime = std::chrono::microseconds::zero();        // last rate increase time
-    bool m_bSlowStart;            // if in slow start phase
-    int32_t m_iLastAck;            // last ACKed seq no
-    bool m_bLoss;            // if loss happened since last rate increase
-    int32_t m_iLastDecSeq;        // max pkt seq no sent out when last decrease happened
-    double m_dLastDecPeriod;        // value of pktsndperiod when last decrease happened
-    int m_iNAKCount;                     // NAK counter
-    int m_iDecRandom;                    // random threshold on decrease by number of loss events
-    int m_iAvgNAKNum;                    // average number of NAKs per congestion
-    int m_iDecCount;            // number of decreases in a congestion epoch
+    bool m_bSlowStart = false;            // if in slow start phase
+    int32_t m_iLastAck = 0;            // last ACKed seq no
+    bool m_bLoss = false;            // if loss happened since last rate increase
+    int32_t m_iLastDecSeq = 0;        // max pkt seq no sent out when last decrease happened
+    double m_dLastDecPeriod = 0.0;        // value of pktsndperiod when last decrease happened
+    int m_iNAKCount = 0;                     // NAK counter
+    int m_iDecRandom = 0;                    // random threshold on decrease by number of loss events
+    int m_iAvgNAKNum = 0;                    // average number of NAKs per congestion
+    int m_iDecCount = 0;            // number of decreases in a congestion epoch
 };
 
 #endif

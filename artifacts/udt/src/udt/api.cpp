@@ -102,8 +102,6 @@ CUDTUnited::~CUDTUnited()
     for (auto& idAndMultiplexer: m_multiplexers)
         idAndMultiplexer.second->shutdown();
     m_multiplexers.clear();
-
-    m_cache.reset();
 }
 
 Result<> CUDTUnited::initializeUdtLibrary()
