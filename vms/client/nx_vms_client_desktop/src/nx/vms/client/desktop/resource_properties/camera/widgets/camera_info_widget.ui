@@ -115,7 +115,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string notr="true">&lt;ACTI&gt;</string>
+          <string notr="true">&lt;Vendor&gt;</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -237,7 +237,7 @@
              </size>
             </property>
             <property name="text">
-             <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
+             <string notr="true">&lt;rtsp://192.168.1.1:554/vendor-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -396,7 +396,7 @@
              </size>
             </property>
             <property name="text">
-             <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
+             <string notr="true">&lt;rtsp://192.168.1.1:554/vendor-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -469,7 +469,7 @@
           </size>
          </property>
          <property name="text">
-          <string notr="true">&lt;ACTI&gt;</string>
+          <string notr="true">&lt;Vendor&gt;</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -578,7 +578,7 @@
           </size>
          </property>
          <property name="text">
-          <string notr="true">&lt;A1D-500-V6.05.16-AC&gt;</string>
+          <string notr="true">&lt;FFF-500-V1.23.45-AC&gt;</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -701,7 +701,7 @@
           </size>
          </property>
          <property name="text">
-          <string notr="true">&lt;00-0F-7C-0C-76-E9&gt;</string>
+          <string notr="true">&lt;FF-FF-FF-0C-76-E9&gt;</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
