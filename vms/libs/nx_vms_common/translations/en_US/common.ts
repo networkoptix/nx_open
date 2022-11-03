@@ -1150,11 +1150,6 @@
         <source>Session expired.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Invalid parameter `%1`: %2.</source>
-        <comment>%1 is name, %2 is value.</comment>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>SystemHelpers</name>
@@ -1627,6 +1622,10 @@
         <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Expose IP addresses for autodiscovery</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::recording::Error</name>
@@ -1726,10 +1725,6 @@
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do HTTP request</source>
         <translation></translation>
     </message>
     <message>
@@ -2295,6 +2290,10 @@
     </message>
     <message>
         <source>Show Intercom Informer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do HTTP(S) request</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -2207,6 +2207,26 @@ License Key: %2</source>
         <source>MitM attack from server %1</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Connected to %1</source>
+        <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from %1</source>
+        <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected to %1 via %2</source>
+        <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from %1 via %2</source>
+        <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -8883,6 +8903,14 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
         <source>Reset to Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has to be 2 times more than split by size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot be more than &quot;Max volume&quot; / 2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
