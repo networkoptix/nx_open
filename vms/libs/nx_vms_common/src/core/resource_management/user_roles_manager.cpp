@@ -256,7 +256,7 @@ QnUserRolesManager::UserRoleDataList QnUserRolesManager::userRoles() const
     return result;
 }
 
-void QnUserRolesManager::resetCustomUserRoles(const UserRoleDataList& userRoles)
+void QnUserRolesManager::resetUserRoles(const UserRoleDataList& userRoles)
 {
     UserRoleDataList removed;
     UserRoleDataList updated;
@@ -266,6 +266,9 @@ void QnUserRolesManager::resetCustomUserRoles(const UserRoleDataList& userRoles)
         QSet<QnUuid> newRoles;
         for (const auto& role: userRoles)
         {
+            if (role.isPredefined || !NX_ASSERT(!QnPredefinedUserRoles::get(role.id)))
+                continue; //< Skip predefined roles.
+
             newRoles << role.id;
             if (m_roles[role.id] != role)
             {
@@ -286,6 +289,7 @@ void QnUserRolesManager::resetCustomUserRoles(const UserRoleDataList& userRoles)
         NX_DEBUG(this, "%1 removed", role);
         emit userRoleRemoved(role);
     }
+
     for (auto role: updated)
     {
         NX_DEBUG(this, "%1 added or updated", role);

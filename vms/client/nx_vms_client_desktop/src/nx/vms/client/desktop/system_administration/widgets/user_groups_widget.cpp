@@ -214,10 +214,11 @@ void UserGroupsWidget::loadDataToUi()
 
 void UserGroupsWidget::applyChanges()
 {
-    for (const auto& groupId: std::as_const(d->deletedGroupIds))
-        qnResourcesChangesManager->removeUserRole(groupId);
+    const auto deletedGroupIds = d->deletedGroupIds;
+    d->deletedGroupIds = {};
 
-    d->deletedGroupIds.clear();
+    for (const auto& groupId: deletedGroupIds)
+        qnResourcesChangesManager->removeUserRole(groupId);
 }
 
 bool UserGroupsWidget::hasChanges() const

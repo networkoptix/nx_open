@@ -925,7 +925,7 @@ void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& acc
 
 void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)
 {
-    m_context->userRolesManager()->resetCustomUserRoles(roles);
+    m_context->userRolesManager()->resetUserRoles(roles);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
