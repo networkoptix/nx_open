@@ -85,15 +85,16 @@ enum class ItemState
 };
 Q_ENUM_NS(ItemState);
 
-enum class CameraExtraStatusFlag
+enum class ResourceExtraStatusFlag
 {
     empty = 0,
     recording = 1 << 0,
     scheduled = 1 << 1,
     buggy = 1 << 2,
-    hasArchive = 1 << 3
+    hasArchive = 1 << 3,
+    locked = 1 << 4
 };
-Q_ENUM_NS(CameraExtraStatusFlag);
+Q_ENUM_NS(ResourceExtraStatusFlag);
 
 enum class FilterType
 {

@@ -68,7 +68,7 @@ namespace Qn
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (nx::vms::api::ResourceStatus). */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type int. */
 
-        CameraExtraStatusRole,                      /**< Custom camera status (recording, buggy, etc). Value of CameraExtraStatus. */
+        ResourceExtraStatusRole,                    /**< Custom resource status (recording, buggy, etc). Value of ResourceExtraStatus. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */

@@ -70,13 +70,13 @@ Item
                 x: -(width + (NxGlobals.hasChildren(modelIndex) ? 20 : 0))
                 visible: delegateItem.showResourceStatus
 
-                readonly property int flags: (model && model.cameraExtraStatus) || 0
+                readonly property int flags: (model && model.resourceExtraStatus) || 0
 
                 Image
                 {
                     id: problemsIcon
-                    visible: extras.flags & ResourceTree.CameraExtraStatusFlag.buggy
-                    source: "qrc:///skin/tree/buggy.png"
+                    visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.buggy
+                    source: "qrc:///skin/tree/locked.svg"
                 }
 
                 Image
@@ -85,13 +85,13 @@ Item
 
                     source:
                     {
-                        if (extras.flags & ResourceTree.CameraExtraStatusFlag.recording)
+                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording)
                             return "qrc:///skin/tree/recording.png"
 
-                        if (extras.flags & ResourceTree.CameraExtraStatusFlag.scheduled)
+                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
                             return "qrc:///skin/tree/scheduled.png"
 
-                        if (extras.flags & ResourceTree.CameraExtraStatusFlag.hasArchive)
+                        if (extras.flags & ResourceTree.ResourceExtraStatusFlag.hasArchive)
                             return "qrc:///skin/tree/has_archive.png"
 
                         return ""

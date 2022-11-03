@@ -217,10 +217,6 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
     }
 
-    QnLayoutResourcePtr resource = layout->resource();
-    if (resource && resource->locked())
-        return qnSkin->icon("layouts/locked.png");
-
     return QIcon();
 }
 

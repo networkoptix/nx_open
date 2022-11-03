@@ -9,11 +9,11 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 namespace {
 
-using CameraExtraStatus = nx::vms::client::desktop::CameraExtraStatus;
+using ResourceExtraStatus = nx::vms::client::desktop::ResourceExtraStatus;
 using AbstractEntity = nx::vms::client::desktop::entity_item_model::AbstractEntity;
 
 QVariant groupedDeviceExtraStatus(const AbstractEntity* childEntity)
@@ -21,12 +21,12 @@ QVariant groupedDeviceExtraStatus(const AbstractEntity* childEntity)
     if (!childEntity)
         return QVariant();
 
-    CameraExtraStatus result;
+    ResourceExtraStatus result;
     for (int row = 0; row < childEntity->rowCount(); ++row)
     {
-        const auto extraStatusData = childEntity->data(row, Qn::CameraExtraStatusRole);
+        const auto extraStatusData = childEntity->data(row, Qn::ResourceExtraStatusRole);
         if (!extraStatusData.isNull())
-            result |= extraStatusData.value<CameraExtraStatus>();
+            result |= extraStatusData.value<ResourceExtraStatus>();
     }
     return QVariant::fromValue(result);
 }
@@ -128,7 +128,7 @@ QVariant GroupEntity::data(int row, int role) const
     // TODO: #vbreus Should be provided as delegate by head item.
     using NodeType = ResourceTree::NodeType;
     if (row == 0
-        && role == Qn::CameraExtraStatusRole
+        && role == Qn::ResourceExtraStatusRole
         && m_headItem->data(Qn::NodeTypeRole).value<NodeType>() == NodeType::recorder)
     {
         return groupedDeviceExtraStatus(m_nestedEntity.get());

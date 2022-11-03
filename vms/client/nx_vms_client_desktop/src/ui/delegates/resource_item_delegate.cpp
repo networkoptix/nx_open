@@ -20,7 +20,7 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -59,7 +59,7 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
     m_recordingIcon(qnSkin->icon("tree/recording.png")),
     m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
-    m_buggyIcon(qnSkin->icon("tree/buggy.png")),
+    m_lockedIcon(qnSkin->icon("tree/locked.svg")),
     m_fixedHeight(nx::style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
     m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),
@@ -741,8 +741,8 @@ void QnResourceItemDelegate::paintExtraStatus(
     const QRect& iconRect,
     const QModelIndex& index) const
 {
-    const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
-    if (extraStatus == CameraExtraStatus())
+    const auto extraStatus = index.data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
+    if (extraStatus == ResourceExtraStatus())
         return;
 
     QRect extraIconRect(iconRect);
@@ -775,12 +775,12 @@ void QnResourceItemDelegate::paintExtraStatus(
         }
     }
 
-    // Draw "problems" icon.
-    if (m_options.testFlag(ProblemIcons) && extraStatus.testFlag(CameraExtraStatusFlag::buggy))
+    // Draw "locked" icon.
+    if (m_options.testFlag(LockedIcons) && extraStatus.testFlag(ResourceExtraStatusFlag::locked))
     {
         if (!shiftIconLeft())
             return;
 
-        m_buggyIcon.paint(painter, extraIconRect);
+        m_lockedIcon.paint(painter, extraIconRect);
     }
 }

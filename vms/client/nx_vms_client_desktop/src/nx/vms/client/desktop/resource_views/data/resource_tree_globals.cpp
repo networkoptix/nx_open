@@ -75,7 +75,7 @@ void registerQmlType()
 
     qRegisterMetaType<NodeType>();
     qRegisterMetaType<ItemState>();
-    qRegisterMetaType<CameraExtraStatusFlag>();
+    qRegisterMetaType<ResourceExtraStatusFlag>();
     qRegisterMetaType<FilterType>();
     qRegisterMetaType<ShortcutHint>();
     qRegisterMetaType<ActivationType>();

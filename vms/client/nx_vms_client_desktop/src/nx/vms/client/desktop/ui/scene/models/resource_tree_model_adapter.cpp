@@ -21,7 +21,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
@@ -396,8 +396,8 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             return extraInfo;
         }
 
-        case Qn::CameraExtraStatusRole:
-            return int(base_type::data(index, Qn::CameraExtraStatusRole).value<CameraExtraStatus>());
+        case Qn::ResourceExtraStatusRole:
+            return int(base_type::data(index, Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>());
 
         case Qn::RawResourceRole:
         {

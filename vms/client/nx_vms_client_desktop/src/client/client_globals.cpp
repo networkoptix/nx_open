@@ -39,7 +39,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ResourceStatusRole),
         IDR_ITEM(ResourceIconKeyRole),
 
-        IDR_ITEM(CameraExtraStatusRole),
+        IDR_ITEM(ResourceExtraStatusRole),
 
         IDR_ITEM(VideoWallGuidRole),
         IDR_ITEM(VideoWallItemGuidRole),

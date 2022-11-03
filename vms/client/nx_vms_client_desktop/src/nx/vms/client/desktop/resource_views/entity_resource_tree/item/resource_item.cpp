@@ -13,7 +13,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
@@ -70,11 +70,12 @@ ResourceItem::ResourceItem(const QnResourcePtr& resource):
     base_type(),
     m_resource(resource),
     m_isCamera(m_resource.dynamicCast<QnVirtualCameraResource>()),
+    m_isLayout(m_resource.dynamicCast<QnLayoutResource>()),
     m_isUser(m_resource->hasFlags(Qn::user)),
     m_helpTopic(resourceHelpTopic(resource))
 {
     m_connectionsGuard.add(m_resource->connect(m_resource.get(), &QnResource::flagsChanged,
-        [this](const QnResourcePtr& resource)
+        [this]
         {
             if (m_resource->hasFlags(Qn::removed))
                 m_connectionsGuard.reset();
@@ -111,8 +112,8 @@ QVariant ResourceItem::data(int role) const
         case Qn::ResourceStatusRole:
             return resourceStatusData();
 
-        case Qn::CameraExtraStatusRole:
-            return cameraExtraStatusData();
+        case Qn::ResourceExtraStatusRole:
+            return resourceExtraStatusData();
 
         case Qn::HelpTopicIdRole:
             return helpTopic();
@@ -137,6 +138,9 @@ QVariant ResourceItem::data(int role) const
 
 Qt::ItemFlags ResourceItem::flags() const
 {
+    if (m_resource->getStatus() == api::ResourceStatus::offline)
+        return {Qt::ItemIsSelectable};
+
     return {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
 }
 
@@ -148,6 +152,11 @@ QnResource* ResourceItem::resource() const
 bool ResourceItem::isCamera() const
 {
     return m_isCamera;
+}
+
+bool ResourceItem::isLayout() const
+{
+    return m_isLayout;
 }
 
 bool ResourceItem::isUser() const
@@ -203,6 +212,15 @@ QVariant ResourceItem::resourceIconKeyData() const
             m_connectionsGuard.add(resource()->connect(resource(), &QnResource::statusChanged,
                 discardIconCache));
 
+            if (m_isCamera)
+            {
+                const auto camera = m_resource.staticCast<QnVirtualCameraResource>().get();
+                m_connectionsGuard.add(camera->connect(
+                    camera,
+                    &QnVirtualCameraResource::statusFlagsChanged,
+                    discardIconCache));
+            }
+
             const bool nonExportedLayout = m_resource->hasFlags(Qn::layout)
                 && !m_resource->hasFlags(Qn::exported_layout);
 
@@ -233,51 +251,60 @@ QVariant ResourceItem::resourceIconKeyData() const
     return m_resourceIconKeyCache;
 }
 
-QVariant ResourceItem::cameraExtraStatusData() const
+QVariant ResourceItem::resourceExtraStatusData() const
 {
-    if (!isCamera())
+    if (!isCamera() && !isLayout())
         return QVariant();
 
     const auto initNotifications =
         [this]
         {
-            const auto camera = m_resource.staticCast<QnVirtualCameraResource>().get();
-
             const auto discardExtraStatusCache =
-                [this] { discardCache(m_cameraExtraStatusCache, {Qn::CameraExtraStatusRole}); };
+                [this] { discardCache(m_resourceExtraStatusCache, {Qn::ResourceExtraStatusRole}); };
 
-            m_connectionsGuard.add(camera->connect(
-                camera, &QnVirtualCameraResource::statusChanged, discardExtraStatusCache));
+            if (m_isLayout)
+            {
+                const auto layout = m_resource.staticCast<QnLayoutResource>().get();
+                m_connectionsGuard.add(QObject::connect(
+                    layout, &QnLayoutResource::lockedChanged, discardExtraStatusCache));
+            }
+            else if (m_isCamera)
+            {
+                const auto camera = m_resource.staticCast<QnVirtualCameraResource>().get();
+                m_connectionsGuard.add(QObject::connect(
+                    camera, &QnVirtualCameraResource::statusChanged, discardExtraStatusCache));
 
-            m_connectionsGuard.add(camera->connect(
-                camera, &QnVirtualCameraResource::scheduleEnabledChanged, discardExtraStatusCache));
+                m_connectionsGuard.add(QObject::connect(
+                    camera, &QnVirtualCameraResource::scheduleEnabledChanged, discardExtraStatusCache));
 
-            m_connectionsGuard.add(camera->connect(
-                camera, &QnVirtualCameraResource::statusFlagsChanged, discardExtraStatusCache));
+                m_connectionsGuard.add(QObject::connect(
+                    camera, &QnVirtualCameraResource::statusFlagsChanged, discardExtraStatusCache));
 
-            const auto context = camera->systemContext();
-            if (!context)
-                return;
+                const auto context = camera->systemContext();
+                if (!context)
+                    return;
 
-            const auto historyPool = context->cameraHistoryPool();
-            m_connectionsGuard.add(
-                camera->connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged,
-                    [this, camera](const QnSecurityCamResourcePtr& securityCamera)
-                    {
-                        if (securityCamera->getId() == camera->getId())
-                            discardCache(m_cameraExtraStatusCache, {Qn::CameraExtraStatusRole});
-                    }));
+                const auto historyPool = context->cameraHistoryPool();
+                m_connectionsGuard.add(
+                    QObject::connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged,
+                        [this, cameraId = camera->getId()](const QnSecurityCamResourcePtr& securityCamera)
+                        {
+                            if (securityCamera->getId() == cameraId)
+                                discardCache(m_resourceExtraStatusCache, {Qn::ResourceExtraStatusRole});
+                        }));
+            }
+            else
+            {
+                NX_ASSERT("Mustn't be here");
+            }
     };
 
-    std::call_once(m_cameraExtraStatusFlag, initNotifications);
+    std::call_once(m_resourceExtraStatusFlag, initNotifications);
 
-    if (m_cameraExtraStatusCache.isNull())
-    {
-        m_cameraExtraStatusCache = QVariant::fromValue(getCameraExtraStatus(
-            m_resource.staticCast<QnVirtualCameraResource>()));
-    }
+    if (m_resourceExtraStatusCache.isNull())
+        m_resourceExtraStatusCache = QVariant::fromValue(getResourceExtraStatus(m_resource));
 
-    return m_cameraExtraStatusCache;
+    return m_resourceExtraStatusCache;
 }
 
 QVariant ResourceItem::resourceExtraInfoData() const

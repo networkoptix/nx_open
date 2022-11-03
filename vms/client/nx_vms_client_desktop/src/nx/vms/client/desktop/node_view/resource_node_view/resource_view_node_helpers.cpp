@@ -17,7 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <client_core/client_core_module.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 namespace {
 
@@ -82,14 +82,13 @@ ViewNodeData getResourceNodeData(
         return ViewNodeData();
     }
 
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto icon = qnResIconCache->icon(resource);
     auto data = ViewNodeDataBuilder()
         .withData(resourceColumn, resourceColumnRole, true)
         .withText(resourceColumn, resource->getName())
         .withIcon(resourceColumn, icon)
-        .withData(resourceColumn, cameraExtraStatusRole,
-            QVariant::fromValue(getCameraExtraStatus(camera)))
+        .withData(resourceColumn, resourceExtraStatusRole,
+            QVariant::fromValue(getResourceExtraStatus(resource)))
         .data();
 
     if (!extraText.isEmpty())

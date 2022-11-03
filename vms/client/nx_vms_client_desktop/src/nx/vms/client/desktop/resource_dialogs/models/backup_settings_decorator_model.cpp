@@ -16,7 +16,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -269,12 +269,12 @@ QVariant BackupSettingsDecoratorModel::nothingToBackupWarningData(const QModelIn
     if (camera.isNull() || !backupEnabled(camera))
         return {};
 
-    const auto cameraExtraStatus = mapToSource(index).siblingAtColumn(ResourceColumn)
-        .data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
+    const auto resourceExtraStatus = mapToSource(index).siblingAtColumn(ResourceColumn)
+        .data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
 
-    if (!cameraExtraStatus.testFlag(CameraExtraStatusFlag::hasArchive)
-        && !cameraExtraStatus.testFlag(CameraExtraStatusFlag::scheduled)
-        && !cameraExtraStatus.testFlag(CameraExtraStatusFlag::recording))
+    if (!resourceExtraStatus.testFlag(ResourceExtraStatusFlag::hasArchive)
+        && !resourceExtraStatus.testFlag(ResourceExtraStatusFlag::scheduled)
+        && !resourceExtraStatus.testFlag(ResourceExtraStatusFlag::recording))
     {
         return tr("The camera has neither recorded footage nor recording scheduled");
     }

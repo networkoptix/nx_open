@@ -8,7 +8,7 @@
 #include <client/client_settings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -242,9 +242,9 @@ void ResourceDialogItemDelegate::paintRecordingIndicator(
     if (!index.model())
         return;
 
-    const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
+    const auto extraStatus = index.data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
 
-    if (extraStatus == CameraExtraStatus())
+    if (extraStatus == ResourceExtraStatus())
         return;
 
     const auto nodeHasChildren =
