@@ -115,7 +115,8 @@ public:
     CUDTUnited();
     ~CUDTUnited();
 
-public:
+    CUDTUnited(const CUDTUnited&) = delete;
+    CUDTUnited& operator=(const CUDTUnited&) = delete;
 
     Result<> initializeUdtLibrary();
 
@@ -215,29 +216,6 @@ public:
     const Error& getError() const;
 
 private:
-    //   void init();
-
-private:
-    using HandshakeKey = std::tuple<UDTSOCKET /*id*/, int32_t /*ISN*/>;
-
-    std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_Sockets;       // stores all the socket structures
-
-    std::mutex m_ControlLock;                    // used to synchronize UDT API
-
-    std::mutex m_IDLock;                         // used to synchronize ID generation
-    UDTSOCKET m_SocketIdSequence = 0;                             // seed to generate a new unique socket ID
-
-    /**
-     * Recording accepted connections to detect connection request retransmits.
-     */
-    std::map<HandshakeKey, std::set<UDTSOCKET>> m_PeerRec;
-
-private:
-    std::map<ThreadId, Error> m_mTLSRecord;
-    void cleanupPerThreadLastErrors();
-    mutable std::mutex m_TLSLock;
-
-private:
     Result<> connect_complete(const UDTSOCKET u);
 
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
@@ -262,13 +240,35 @@ private:
 
     UDTSOCKET generateSocketId();
 
+    void checkBrokenSockets();
+
+    void removeSocket(
+        const std::unique_lock<std::mutex>& lock,
+        const UDTSOCKET u,
+        std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
+
 private:
+    using HandshakeKey = std::tuple<UDTSOCKET /*id*/, int32_t /*ISN*/>;
+
+    std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache
+    std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_Sockets;       // stores all the socket structures
+
+    std::mutex m_ControlLock;                    // used to synchronize UDT API
+
+    std::mutex m_IDLock;                         // used to synchronize ID generation
+    UDTSOCKET m_SocketIdSequence = 0;                             // seed to generate a new unique socket ID
+
+    /**
+     * Recording accepted connections to detect connection request retransmits.
+     */
+    std::map<HandshakeKey, std::set<UDTSOCKET>> m_PeerRec;
+
+    std::map<ThreadId, Error> m_mTLSRecord;
+    void cleanupPerThreadLastErrors();
+    mutable std::mutex m_TLSLock;
+
     std::map<int, std::shared_ptr<Multiplexer>> m_multiplexers;
 
-private:
-    std::unique_ptr<CCache<CInfoBlock>> m_cache;            // UDT network information cache
-
-private:
     volatile bool m_bClosing = false;
     std::mutex m_GCStopLock;
     std::condition_variable m_GCStopCond;
@@ -283,19 +283,7 @@ private:
 
     std::map<UDTSOCKET, std::shared_ptr<CUDTSocket>> m_ClosedSockets;   // temporarily store closed sockets
 
-    void checkBrokenSockets();
-
-    void removeSocket(
-        const std::unique_lock<std::mutex>& lock,
-        const UDTSOCKET u,
-        std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
-
-private:
     CEPoll m_EPoll;                                     // handling epoll data structures and events
-
-private:
-    CUDTUnited(const CUDTUnited&);
-    CUDTUnited& operator=(const CUDTUnited&);
 };
 
 #endif
