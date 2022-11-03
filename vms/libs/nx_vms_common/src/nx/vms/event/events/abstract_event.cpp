@@ -351,6 +351,7 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
 
     const auto context = user->systemContext();
 
+    // TODO: Looks like we need serious redesign here!
     if (const auto permission = kEventPermissions.value(params.eventType);
         (permission != GlobalPermission::none) &&
             !context->globalPermissionsManager()->hasGlobalPermission(user, permission))

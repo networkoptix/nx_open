@@ -1253,7 +1253,7 @@ struct ModifyServerAttributesAccess
     }
 };
 
-static Result userAccessHelper(
+static Result userHasGlobalAccess(
     QnCommonModule* commonModule,
     const Qn::UserAccessData& accessData,
     GlobalPermission permissions)
@@ -1274,13 +1274,64 @@ static Result userAccessHelper(
     return Result();
 }
 
+static Result userHasAccess(
+    QnCommonModule* commonModule,
+    const Qn::UserAccessData& accessData,
+    const QnUuid& targetResourceId,
+    nx::vms::api::AccessRights requiredAccess)
+{
+    if (hasSystemAccess(accessData))
+        return Result();
+    const auto& resPool = commonModule->resourcePool();
+    auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+    auto targetResource = resPool->getResourceById(targetResourceId);
+    if (!targetResource)
+    {
+        return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+            "Resource %1 does not exist."), targetResourceId));
+    }
+    if (!commonModule->resourceAccessManager()->hasAccessRights(
+        userResource, targetResource, requiredAccess))
+    {
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User %1 does not have %2 access to %3."),
+            userResource ? userResource->getName() : accessData.userId.toString(),
+            requiredAccess, targetResourceId));
+    }
+
+    return Result();
+}
+
+static Result userHasCommonAccess(
+    QnCommonModule* commonModule,
+    const Qn::UserAccessData& accessData,
+    nx::vms::api::AccessRights requiredAccess)
+{
+    if (hasSystemAccess(accessData))
+        return Result();
+    const auto& resPool = commonModule->resourcePool();
+    auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+    if (!(commonModule->resourceAccessManager()->commonAccessRights(userResource)
+        & requiredAccess))
+    {
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User %1 does not have common %2 access."),
+            userResource ? userResource->getName() : accessData.userId.toString(),
+            requiredAccess));
+    }
+
+    return Result();
+}
+
 struct UserInputAccess
 {
-    template<typename Param>
+    template<typename Event>
     Result operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
+        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Event& event)
     {
-        return userAccessHelper(commonModule, accessData, GlobalPermission::userInput);
+        // TODO: Check if this requirenment is not too strict.
+        return userHasCommonAccess(
+            commonModule, accessData, nx::vms::api::AccessRight::userInput);
     }
 };
 
@@ -1290,7 +1341,7 @@ struct AdminOnlyAccess
     Result operator()(
         QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userAccessHelper(commonModule, accessData, GlobalPermission::admin);
+        return userHasGlobalAccess(commonModule, accessData, GlobalPermission::admin);
     }
 };
 
@@ -1300,7 +1351,7 @@ struct AdminOnlyAccessOut
     RemotePeerAccess operator()(
         QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userAccessHelper(commonModule, accessData, GlobalPermission::admin)
+        return userHasGlobalAccess(commonModule, accessData, GlobalPermission::admin)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1450,18 +1501,10 @@ struct VideoWallControlAccess
     Result operator()(
         QnCommonModule* commonModule,
         const Qn::UserAccessData& accessData,
-        const nx::vms::api::VideowallControlMessageData&)
+        const nx::vms::api::VideowallControlMessageData& data)
     {
-        if (auto r = userAccessHelper(commonModule, accessData, GlobalPermission::controlVideowall)
-            ;
-            !r)
-        {
-            r.message = nx::format(ServerApiErrors::tr(
-                "Access check for ApiVideoWallControlMessageData failed for the user %1."),
-                accessData.userId);
-            return r;
-        }
-        return Result();
+        return userHasAccess(commonModule, accessData, data.videowallGuid,
+            nx::vms::api::AccessRight::controlVideowall);
     }
 };
 
