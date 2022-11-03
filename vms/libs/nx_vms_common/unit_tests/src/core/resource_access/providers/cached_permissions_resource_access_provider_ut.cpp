@@ -386,7 +386,7 @@ TEST_F(CachedPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRoleP
 
     auto role = createRole(GlobalPermission::none);
 
-    auto user = addUser(GlobalPermission::admin);
+    auto user = addUser(GlobalPermission::none);
     user->setUserRoleIds({role.id});
     expectAccessGranted(user, target, false);
 
@@ -402,7 +402,7 @@ TEST_F(CachedPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnInher
     auto parentRole = createRole(GlobalPermission::none);
     auto inheritedRole = createRole(GlobalPermission::none, {parentRole.id});
 
-    auto user = addUser(GlobalPermission::admin);
+    auto user = addUser(GlobalPermission::none);
     user->setUserRoleIds({inheritedRole.id});
     expectAccessGranted(user, target, false);
 

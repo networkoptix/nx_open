@@ -178,10 +178,9 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
             return {};
         }
 
-        if (const auto r = user->userRole();
-            r == Qn::UserRole::owner || r == Qn::UserRole::administrator)
+        if (user->isOwner() || user->getRawPermissions().testFlag(GlobalPermission::admin))
         {
-            NX_VERBOSE(this, "%1 is %2", user, r);
+            NX_VERBOSE(this, "%1 is an administrator", user);
             return GlobalPermission::adminPermissions;
         }
 

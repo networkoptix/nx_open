@@ -126,7 +126,7 @@ void QnCloudManagementWidget::loadDataToUi()
         ui->stackedWidget->setCurrentWidget(ui->notLinkedPage);
     }
 
-    auto isOwner = context()->user() && context()->user()->userRole() == Qn::UserRole::owner;
+    auto isOwner = context()->user() && context()->user()->isOwner();
     ui->linkButton->setVisible(isOwner);
     ui->unlinkButton->setVisible(isOwner);
 }
@@ -156,7 +156,7 @@ void QnCloudManagementWidget::connectToCloud()
 
 void QnCloudManagementWidget::disconnectFromCloud()
 {
-    const bool isOwner = context()->user() && context()->user()->userRole() == Qn::UserRole::owner;
+    const bool isOwner = context()->user() && context()->user()->isOwner();
     if (!NX_ASSERT(isOwner, "Button must be unavailable for non-owner"))
         return;
 
