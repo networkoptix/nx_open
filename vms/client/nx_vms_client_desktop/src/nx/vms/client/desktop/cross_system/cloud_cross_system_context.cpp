@@ -403,7 +403,8 @@ struct CloudCrossSystemContext::Private
         if (user)
             return;
 
-        user = QnUserResourcePtr(new QnUserResource(model.type, model.externalId));
+        user = QnUserResourcePtr(
+            new QnUserResource(model.type, model.externalId.value_or(QString())));
         user->setIdUnsafe(model.id);
         user->setName(model.name);
         user->setOwner(model.isOwner);
