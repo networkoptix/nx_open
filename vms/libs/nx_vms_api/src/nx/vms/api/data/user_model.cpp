@@ -73,6 +73,9 @@ QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml))
 UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
+    if (externalId)
+        user.externalId = std::move(*externalId);
+
     if (!userRoleId.isNull())
         user.userRoleIds.push_back(std::move(userRoleId));
 
@@ -105,6 +108,8 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         UserModelV1 model;
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
+        if (!baseData.externalId.isEmpty())
+            model.externalId = std::move(baseData.externalId);
         if (!baseData.userRoleIds.empty())
             model.userRoleId = baseData.userRoleIds.front();
         auto accessRights = nx::utils::find_if(allAccessRights,
@@ -130,7 +135,8 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
     user.userRoleIds = std::move(userGroupIds);
-    user.externalId = std::move(externalId);
+    if (externalId)
+        user.externalId = std::move(*externalId);
 
     std::optional<AccessRightsData> accessRights;
     if (resourceAccessRights)

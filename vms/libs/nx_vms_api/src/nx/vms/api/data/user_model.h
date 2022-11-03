@@ -101,6 +101,11 @@ struct NX_VMS_API UserModelV1: public UserModelBase
      */
     std::optional<std::vector<QnUuid>> accessibleResources;
 
+    /**%apidoc[unused]
+     * %// This field is invisible but required for PATCH.
+     */
+    std::optional<QString> externalId;
+
     bool operator==(const UserModelV1& other) const = default;
 
     using DbReadTypes = std::tuple<UserData, AccessRightsData>;
@@ -113,7 +118,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     static_assert(isCreateModelV<UserModelV1>);
     static_assert(isUpdateModelV<UserModelV1>);
 };
-#define UserModelV1_Fields UserModelBase_Fields(userRoleId)(accessibleResources)
+#define UserModelV1_Fields UserModelBase_Fields(userRoleId)(accessibleResources)(externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
@@ -130,7 +135,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     /**%apidoc[readonly]
      * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
      */
-    QString externalId;
+    std::optional<QString> externalId;
 
     /**%apidoc Resource ids with access rights for the User. */
     std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
