@@ -17,10 +17,12 @@
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
+#include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include "update_verification.h"
 
@@ -117,8 +119,12 @@ int CompatibilityVersionInstallationDialog::exec()
             {
                 if (auto error = std::get_if<core::RemoteConnectionError>(&result))
                 {
+                    QnMessageBox::critical(
+                        this,
+                        tr("Cannot connect to the System"),
+                        core::shortErrorDescription(error->code));
+
                     m_installationResult = InstallResult::failedDownload;
-                    setMessage(tr("Cannot connect to the System"));
                     done(QDialogButtonBox::StandardButton::Ok);
                     return;
                 }
