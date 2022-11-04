@@ -224,6 +224,10 @@ copyLibs()
             libxkbcommon.so.0 \
             libxkbcommon-x11.so.0
 
+        local -r OPENGL_LIBS_PATH="$STAGE_LIB/opengl"
+        mkdir "$OPENGL_LIBS_PATH"
+        distrib_copySystemLibs "$OPENGL_LIBS_PATH" libOpenGL.so.0
+
         # GStreamer 0.10 is required for applauncher to run old clients (< 4.0).
         local -r OLD_GSTREAMER_LIBS_PATH="$STAGE_LIB/gstreamer-0.10"
         mkdir "$OLD_GSTREAMER_LIBS_PATH"

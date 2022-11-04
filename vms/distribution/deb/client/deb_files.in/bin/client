@@ -15,6 +15,16 @@ else
     echo "Using system libstdc++."
 fi
 
+SYSTEM_OPENGL="$(ldconfig -p | grep libOpenGL.so.0 | head -n 1 | sed 's/.*=> //')"
+if [ -z "$SYSTEM_OPENGL" ]
+then
+    echo "Using bundled libOpenGL."
+    OPENGL_DIR="$DIR/../lib/opengl"
+    export LD_LIBRARY_PATH="$OPENGL_DIR:$LD_LIBRARY_PATH"
+else
+    echo "Using system libOpenGL."
+fi
+
 ulimit -c unlimited
 
 "$DIR/@client.binary.name@" "$@"
