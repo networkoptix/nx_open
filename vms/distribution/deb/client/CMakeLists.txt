@@ -42,6 +42,7 @@ set(required_dependencies_list
     "libgl1-mesa-glx | libgl1"
     "libglib2.0-0"
     "libglu1-mesa-glx | libglu1"
+    "libopengl0"
     "libpulse-mainloop-glib0"
     "libpulse0"
     "libsecret-1-0"
