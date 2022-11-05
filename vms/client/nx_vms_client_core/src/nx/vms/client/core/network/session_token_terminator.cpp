@@ -29,7 +29,6 @@ struct SessionTokenTerminator::Private
 {
     std::map<rest::Handle, RemoteConnectionPtr> runningRequests;
     std::vector<RemoteConnectionPtr> completedRequests;
-    nx::Mutex mutex;
 };
 
 SessionTokenTerminator::SessionTokenTerminator(QObject* parent):
@@ -42,7 +41,6 @@ SessionTokenTerminator::SessionTokenTerminator(QObject* parent):
     cleanupTimer->callOnTimeout(
         [this]
         {
-            NX_MUTEX_LOCKER lock(&d->mutex);
             d->completedRequests.clear();
         });
     cleanupTimer->start();
@@ -50,20 +48,16 @@ SessionTokenTerminator::SessionTokenTerminator(QObject* parent):
 
 SessionTokenTerminator::~SessionTokenTerminator()
 {
-    auto calculateTokensLeft =
-        [this]
-        {
-            NX_MUTEX_LOCKER lock(&d->mutex);
-            return d->runningRequests.size();
-        };
+    const auto start = std::chrono::high_resolution_clock::now();
+    auto tokensLeft = d->runningRequests.size();
 
-    auto start = std::chrono::high_resolution_clock::now();
-    int tokensLeft = calculateTokensLeft();
     while (tokensLeft > 0)
     {
         NX_DEBUG(this, "Waiting till %1 tokens are being terminated", tokensLeft);
         std::this_thread::sleep_for(kTerminateRefreshStep);
-        tokensLeft = calculateTokensLeft();
+
+        qApp->processEvents(); //< Allow terminate callback to be processed.
+        tokensLeft = d->runningRequests.size();
         if (std::chrono::high_resolution_clock::now() - start > kTerminateTimeout)
             break;
     }
@@ -72,8 +66,10 @@ SessionTokenTerminator::~SessionTokenTerminator()
         NX_WARNING(this, "%1 tokens are still not terminated", tokensLeft);
 }
 
-void SessionTokenTerminator::terminateTokenAsync(RemoteConnectionPtr connection)
+void SessionTokenTerminator::terminateToken(RemoteConnectionPtr connection)
 {
+    NX_ASSERT(QThread::currentThread() == this->thread(), "Method should be called in UI thread");
+
     if (!NX_ASSERT(connection))
         return;
 
@@ -95,7 +91,6 @@ void SessionTokenTerminator::terminateTokenAsync(RemoteConnectionPtr connection)
             if (!success)
                 NX_WARNING(this, "Can not terminate authentication token");
 
-            NX_MUTEX_LOCKER lock(&d->mutex);
             auto it = d->runningRequests.find(handle);
             if (it != d->runningRequests.cend())
             {
@@ -109,9 +104,9 @@ void SessionTokenTerminator::terminateTokenAsync(RemoteConnectionPtr connection)
     auto handle = connection->serverApi()->deleteEmptyResult(
         QString("/rest/v1/login/sessions/") + credentials.authToken.value,
         nx::network::rest::Params(),
-        callback);
+        callback,
+        this->thread()); //< Response handler will be called in UI thread.
 
-    NX_MUTEX_LOCKER lock(&d->mutex);
     if (handle != rest::Handle())
         d->runningRequests.emplace(handle, connection);
 }

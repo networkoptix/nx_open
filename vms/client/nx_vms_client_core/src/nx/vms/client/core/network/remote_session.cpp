@@ -71,7 +71,7 @@ struct RemoteSession::Private
 void RemoteSession::Private::terminateServerSessionIfNeeded()
 {
     if (autoTerminate)
-        qnClientCoreModule->sessionTokenTerminator()->terminateTokenAsync(connection);
+        qnClientCoreModule->sessionTokenTerminator()->terminateToken(connection);
 }
 
 void RemoteSession::Private::updateTokenExpirationTime()
