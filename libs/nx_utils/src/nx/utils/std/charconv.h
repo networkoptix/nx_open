@@ -146,7 +146,7 @@ template<typename T>
 to_chars_result to_chars(char* first, char* last, T value, const char* format)
 {
     char buf[32];
-    auto len = std::sprintf(buf, format, value);
+    auto len = std::snprintf(buf, sizeof(buf), format, value);
 
     if (len > last - first)
         return {last, std::errc::value_too_large};
@@ -209,7 +209,7 @@ to_chars_result float_to_chars(
         return {first, std::errc::invalid_argument};
 
     char format[16];
-    sprintf(format, "%%.%dg", precision);
+    snprintf(format, sizeof(format), "%%.%dg", precision);
     return to_chars(first, last, value, format);
 }
 
