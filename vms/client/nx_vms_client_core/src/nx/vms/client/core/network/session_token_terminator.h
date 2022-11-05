@@ -19,7 +19,7 @@ public:
     SessionTokenTerminator(QObject* parent = nullptr);
     virtual ~SessionTokenTerminator() override;
 
-    void terminateTokenAsync(RemoteConnectionPtr connection);
+    void terminateToken(RemoteConnectionPtr connection);
 
 private:
     struct Private;
