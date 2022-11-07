@@ -741,4 +741,13 @@ TEST_F(Json, chrono_duration_is_serialized_as_number_if_asked_explicitely)
     testSerialization("{\"d\":123}", DurationAsNumber{.d = std::chrono::milliseconds(123)});
 }
 
+NX_REFLECTION_TAG_TYPE(std::vector<DurationAsNumber>, jsonSerializeChronoDurationAsNumber)
+
+TEST_F(Json, array_with_chrono_duration_is_serialized_as_number_if_asked_explicitely)
+{
+    using ms = std::chrono::milliseconds;
+    std::vector<DurationAsNumber> v = { DurationAsNumber{.d = ms(1)}, DurationAsNumber{.d = ms(2)} };
+    testSerialization("[{\"d\":1},{\"d\":2}]", v);
+}
+
 } // namespace nx::reflect::test
