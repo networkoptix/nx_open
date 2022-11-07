@@ -34,7 +34,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     ui(new Ui::CloudLayoutsIntroDialog())
 {
     ui->setupUi(this);
-    ui->imageLabel->setPixmap(qnSkin->pixmap("promo/screen.png"));
+    ui->imageLabel->setPixmap(qnSkin->pixmap("promo/cloud_layouts_intro.png"));
     ui->availableActionsIconLabel->setPixmap(qnSkin->pixmap("promo/available.svg"));
     ui->inFutureIconLabel->setPixmap(qnSkin->pixmap("promo/future.svg"));
     ui->captionLabel->setText(tr(
