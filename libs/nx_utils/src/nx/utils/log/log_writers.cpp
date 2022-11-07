@@ -198,9 +198,14 @@ void File::archive(QString fileName, QString archiveName)
         return;
     }
 
+    const auto timestamp = QDateTime::currentMSecsSinceEpoch();
+
     QuaZipFile zippedLog(&archive);
     if (!zippedLog.open(QIODevice::WriteOnly,
-        QuaZipNewInfo(makeBaseFileName(fileName), fileName)))
+        QuaZipNewInfo(
+            makeBaseFileName(fileName).chopped(strlen(kExtensionWithSeparator))
+                + "_" + timestamp + kExtensionWithSeparator,
+            fileName)))
     {
         std::cerr << nx::toString(this).toStdString() << ": Could not zip file "
             << fileName.toStdString() << '\n';

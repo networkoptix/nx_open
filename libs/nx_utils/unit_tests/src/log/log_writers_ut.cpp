@@ -47,7 +47,6 @@ public:
     {
         const auto fileName = m_basePath + QString::fromUtf8(suffix.isEmpty()
             ? QByteArray(File::kExtensionWithSeparator) : (suffix + File::kRotateExtensionWithSeparator));
-        const auto fileNameInsideArchive = File::makeBaseFileName(m_basePath);
         if (messages.empty())
         {
             EXPECT_TRUE(!QFile::exists(fileName));
@@ -63,14 +62,17 @@ public:
         {
             ASSERT_TRUE(QFile::exists(fileName));
             QFile file(fileName);
-            file.open(QFile::ReadOnly);
+            ASSERT_TRUE(file.open(QFile::ReadOnly));
             actualContent = file.readAll();
         }
         else
         {
             ASSERT_TRUE(QFile::exists(fileName));
-            QuaZipFile file(fileName, fileNameInsideArchive);
-            file.open(QIODevice::ReadOnly);
+            QuaZip archive(fileName);
+            ASSERT_TRUE(archive.open(QuaZip::Mode::mdUnzip));
+            QuaZipFile file(&archive);
+            ASSERT_TRUE(archive.goToFirstFile());
+            ASSERT_TRUE(file.open(QIODevice::ReadOnly));
             actualContent = file.readAll();
         }
 
