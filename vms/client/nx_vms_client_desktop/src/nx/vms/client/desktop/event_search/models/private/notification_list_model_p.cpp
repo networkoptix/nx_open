@@ -175,13 +175,18 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(q, &EventListModel::rowsAboutToBeRemoved,
         this, &Private::onRowsAboutToBeRemoved);
 
-    connect(context()->instance<ServerNotificationCache>(),
+    const auto serverNotificationCache = context()->instance<ServerNotificationCache>();
+    connect(serverNotificationCache,
         &ServerNotificationCache::fileDownloaded, this,
-        [this](const QString& fileName)
+        [this, serverNotificationCache]
+            (const QString& fileName, ServerFileCache::OperationResult status)
         {
-            const auto path = context()->instance<ServerNotificationCache>()->getFullPath(fileName);
-            for (const auto& id: m_itemsByLoadingSound.values(fileName))
-                m_players[id] = loopSound(path);
+            if (status == ServerFileCache::OperationResult::ok)
+            {
+                const auto path = serverNotificationCache->getFullPath(fileName);
+                for (const auto& id: m_itemsByLoadingSound.values(fileName))
+                    m_players[id] = loopSound(path);
+            }
 
             m_itemsByLoadingSound.remove(fileName);
         });
