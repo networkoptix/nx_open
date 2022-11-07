@@ -836,9 +836,6 @@ bool QnRtspClient::sendSetup()
 
         QByteArray response;
         if (!sendRequestAndReceiveResponse(std::move(request), response))
-            return false;
-
-        if (!response.startsWith("RTSP/1.0 200"))
         {
             if (m_transport == nx::vms::api::RtpTransportType::automatic
                 && m_actualTransport == nx::vms::api::RtpTransportType::tcp)
@@ -850,8 +847,8 @@ bool QnRtspClient::sendSetup()
             else
                 return false;
         }
-        track.setupSuccess = true;
 
+        track.setupSuccess = true;
         parseSetupResponse(response, &track, i);
 
         if (m_transport == nx::vms::api::RtpTransportType::multicast)
