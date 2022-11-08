@@ -34,6 +34,7 @@ public:
 
     void registerClick(const QString& alias);
     std::shared_ptr<ScenarioGuard> beginScenario(Scenario scenario);
+    void resetScenario();
 
 private:
     void setScenario(std::optional<Scenario> scenario);

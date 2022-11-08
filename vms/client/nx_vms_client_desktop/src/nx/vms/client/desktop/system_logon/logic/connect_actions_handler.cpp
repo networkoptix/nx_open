@@ -1248,6 +1248,7 @@ void ConnectActionsHandler::clearConnection()
 {
     hideReconnectDialog();
     d->currentConnectionProcess.reset();
+    statisticsModule()->certificates()->resetScenario();
     qnClientCoreModule->networkModule()->setSession({});
     appContext()->currentSystemContext()->setSession({});
 

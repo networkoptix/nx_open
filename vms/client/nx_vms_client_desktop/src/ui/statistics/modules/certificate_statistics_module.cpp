@@ -37,6 +37,11 @@ std::shared_ptr<QnCertificateStatisticsModule::ScenarioGuard>
     return std::make_shared<ScenarioGuard>(this, scenario);
 }
 
+void QnCertificateStatisticsModule::resetScenario()
+{
+    m_scenario.reset();
+}
+
 void QnCertificateStatisticsModule::setScenario(std::optional<Scenario> scenario)
 {
     m_scenario = scenario;
