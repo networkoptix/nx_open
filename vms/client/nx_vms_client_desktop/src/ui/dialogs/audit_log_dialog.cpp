@@ -849,15 +849,16 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     using nx::network::rest::UbjsonResult;
 
-    m_sessionModel->clearData();
-    m_camerasModel->clearData();
-    m_detailModel->clearData();
     m_requests.clear();
 
     m_allData.clear();
     m_sessionData.clear();
     m_cameraData.clear();
     m_filteredData.clear();
+
+    m_sessionModel->clearData();
+    m_camerasModel->clearData();
+    m_detailModel->clearData();
 
     if (!connection())
         return;
