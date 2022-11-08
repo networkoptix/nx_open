@@ -425,7 +425,7 @@ if(${colorOutput})
     endif()
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR targetDevice STREQUAL "edge1")
     set(_stripBinaries ON)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release"
     AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux"
