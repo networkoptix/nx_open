@@ -50,7 +50,7 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
                     [this](const QnResourcePtr& resource)
                     {
                         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-                        return camera->isNvr();
+                        return camera ? camera->isNvr() : false;
                     },
                     MatchMode::All))
         )
