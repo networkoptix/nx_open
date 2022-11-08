@@ -5,5 +5,5 @@ import "components/private"
 Placeholder
 {
     id: settingsPlaceholder
-    imageSource: "qrc:///skin/analytics_icons/placeholders/no_settings.svg"
+    imageSource: "image://svg/skin/analytics_icons/placeholders/no_settings.svg"
 }
