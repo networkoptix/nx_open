@@ -761,11 +761,18 @@ static bool setIssuerOrSubject(X509* x509, const X509Name& issuerAndSubject, boo
     if (!NX_ASSERT(name, "Failed to create new X509_NAME"))
         return false;
 
-    const auto setField = [name = name.get()](const std::string& field, const std::string& value)
-    {
-        return X509_NAME_add_entry_by_txt(
-            name, field.c_str(), MBSTRING_UTF8, (unsigned char *) value.data(), -1, -1, 0);
-    };
+    const auto setField =
+        [name = name.get()](const std::string& field, const std::string& value)
+        {
+            return X509_NAME_add_entry_by_txt(
+                name,
+                field.c_str(),
+                MBSTRING_UTF8,
+                (unsigned char *) value.data(),
+                value.size(),
+                -1,
+                0);
+        };
 
     for (const auto& [name, value]: issuerAndSubject.attrs)
     {
