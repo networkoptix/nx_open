@@ -346,9 +346,7 @@ void Manager::forgetModule(const QnUuid& id)
 
 void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
 {
-    NX_ASSERT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
-        nx::format("Invalid endpoint: %1").arg(endpoint));
-
+    NX_ASSERT(ModuleConnector::isValidForConnect(endpoint), "Invalid endpoint: %1", endpoint);
     d->moduleConnector->dispatch(
         [this, endpoint = std::move(endpoint), expectedId = std::move(expectedId)]() mutable
         {
