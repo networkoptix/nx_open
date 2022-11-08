@@ -187,12 +187,6 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     handler();
 }
 
-bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
-{
-    const auto host = endpoint.address.toString();
-    return !host.empty() && ((endpoint.port != 0) || isCloudHostname(host));
-}
-
 void AddressResolver::setDnsCacheTimeout(std::chrono::milliseconds timeout)
 {
     m_dnsCacheTimeout = timeout;
