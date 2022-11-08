@@ -56,18 +56,6 @@ void ModuleConnector::setConflictHandler(ConflictHandler handler)
     m_conflictHandler = std::move(handler);
 }
 
-static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
-{
-    const auto& resolver = nx::network::SocketGlobals::addressResolver();
-    for (auto it = endpoints->begin(); it != endpoints->end(); )
-    {
-        if (resolver.isValidForConnect(*it))
-            ++it;
-        else
-            it = endpoints->erase(it);
-    }
-}
-
 void ModuleConnector::forgetModule(const QnUuid& id)
 {
     dispatch(
@@ -119,6 +107,24 @@ void ModuleConnector::deactivate()
             m_isPassiveMode = true;
             NX_DEBUG(this, "Deactivated");
         });
+}
+
+bool ModuleConnector::isValidForConnect(const nx::network::SocketAddress& endpoint)
+{
+    const auto host = endpoint.address.toString();
+    const auto& resolver = nx::network::SocketGlobals::addressResolver();
+    return !host.empty() && ((endpoint.port != 0) || resolver.isCloudHostname(host));
+}
+
+void ModuleConnector::validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
+{
+    for (auto it = endpoints->begin(); it != endpoints->end(); )
+    {
+        if (isValidForConnect(*it))
+            ++it;
+        else
+            it = endpoints->erase(it);
+    }
 }
 
 void ModuleConnector::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
