@@ -354,7 +354,8 @@ void QnResourceWidget::createButtons()
     closeButton->setIcon(loadSvgIcon("item/close.svg"));
     closeButton->setToolTip(tooltipText(tr("Close"), QKeySequence{"Del"}));
     closeButton->setObjectName("CloseButton");
-    connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
+    connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,
+        Qt::QueuedConnection);
 
     auto infoButton = createStatisticAwareButton("res_widget_info");
     infoButton->setIcon(loadSvgIcon("item/info.svg"));
