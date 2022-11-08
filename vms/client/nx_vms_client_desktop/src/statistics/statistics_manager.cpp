@@ -291,40 +291,28 @@ void QnStatisticsManager::sendStatistics()
             saveLastFilters(settings.filters, m_storage);
         });
 
-    const auto remoteGuid = commonModule()->remoteGUID();
-    // Metrics filtration may takes significant time, so run it in an another thread.
-    const auto sendFilteredMetrics =
-        [this, server, totalMetricsList, settings, timeStamp, sendStatisticsCallback, remoteGuid]
-        {
-            QnMetricHashesList totalFiltered;
-            for (const auto metrics: totalMetricsList)
-            {
-                const auto filtered = filteredMetrics(metrics, settings.filters);
-                if (!filtered.isEmpty())
-                    totalFiltered.push_back(filtered);
-            }
+    QnMetricHashesList totalFiltered;
+    for (const auto metrics: totalMetricsList)
+    {
+        const auto filtered = filteredMetrics(metrics, settings.filters);
+        if (!filtered.isEmpty())
+            totalFiltered.push_back(filtered);
+    }
 
-            if (totalFiltered.empty())
-                return;
+    if (totalFiltered.empty())
+        return;
 
-            QnSendStatisticsRequestData statisticsData;
-            statisticsData.statisticsServerUrl = settings.statisticsServerUrl;
-            statisticsData.metricsList = totalFiltered;
-            statisticsData.format = Qn::SerializationFormat::JsonFormat;
+    QnSendStatisticsRequestData statisticsData;
+    statisticsData.statisticsServerUrl = settings.statisticsServerUrl;
+    statisticsData.metricsList = totalFiltered;
+    statisticsData.format = Qn::SerializationFormat::JsonFormat;
 
-            // Check if system not changed.
-            if (remoteGuid == commonModule()->remoteGUID())
-            {
-                QMutexLocker lock(&m_mutex);
-                m_handle = connectedServerApi()->sendStatisticsUsingServer(
-                    server->getId(),
-                    statisticsData,
-                    sendStatisticsCallback,
-                    thread());
-            }
-        };
-
-    QtConcurrent::run(sendFilteredMetrics);
+    QMutexLocker lock(&m_mutex);
+    m_handle = connectedServerApi()->sendStatisticsUsingServer(
+        server->getId(),
+        statisticsData,
+        sendStatisticsCallback,
+        thread());
 }
 
 void QnStatisticsManager::saveCurrentStatistics()
