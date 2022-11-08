@@ -397,7 +397,7 @@ else()
     set(_qml_debug OFF)
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR targetDevice STREQUAL "edge1")
     set(_stripBinaries ON)
 else()
     set(_stripBinaries OFF)
