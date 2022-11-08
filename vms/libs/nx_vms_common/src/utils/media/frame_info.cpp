@@ -254,12 +254,12 @@ int64_t CLVideoDecoderOutput::sizeBytes() const
     return av_image_get_buffer_size((AVPixelFormat)format, width, height, /*align*/ 1);
 }
 
-void CLVideoDecoderOutput::reallocate(const QSize& size, int newFormat)
+bool CLVideoDecoderOutput::reallocate(const QSize& size, int newFormat)
 {
-    reallocate(size.width(), size.height(), newFormat);
+    return reallocate(size.width(), size.height(), newFormat);
 }
 
-void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
+bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();
     setUseExternalData(false);
@@ -270,18 +270,19 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = qPower2Ceil((unsigned) width, rc);
     int numBytes = av_image_get_buffer_size((AVPixelFormat) format, roundWidth, height, /*align*/ 1);
-    if (numBytes > 0) {
-        numBytes += AV_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
-        av_image_fill_arrays(
-            data,
-            linesize,
-            (quint8*) av_malloc(numBytes),
-            (AVPixelFormat) format, roundWidth, height, /*align*/ 1);
-        fillRightEdge();
-    }
+    if (numBytes <= 0)
+        return false;
+    numBytes += AV_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
+    av_image_fill_arrays(
+        data,
+        linesize,
+        (quint8*) av_malloc(numBytes),
+        (AVPixelFormat) format, roundWidth, height, /*align*/ 1);
+    fillRightEdge();
+    return true;
 }
 
-void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint)
+bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint)
 {
     clean();
     setUseExternalData(false);
@@ -290,15 +291,15 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     format = newFormat;
 
     int numBytes = av_image_get_buffer_size((AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
-    if (numBytes > 0)
-    {
-        av_image_fill_arrays(
-            data,
-            linesize,
-            (quint8*) av_malloc(numBytes),
-            (AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
-        fillRightEdge();
-    }
+    if (numBytes <= 0)
+        return false;
+    av_image_fill_arrays(
+        data,
+        linesize,
+        (quint8*) av_malloc(numBytes),
+        (AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
+    fillRightEdge();
+    return true;
 }
 
 /**

@@ -76,9 +76,9 @@ public:
     void clean();
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }
-    void reallocate(int newWidth, int newHeight, int format);
-    void reallocate(const QSize& size, int format);
-    void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
+    bool reallocate(int newWidth, int newHeight, int format);
+    bool reallocate(const QSize& size, int format);
+    bool reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZero();
 
     /** Scale frame to new size */

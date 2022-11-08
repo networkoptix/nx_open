@@ -205,7 +205,7 @@ void downscalePlanes(
     const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
     const int croppedWidth)
 {
-    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && src->data[i]; ++i)
+    for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && src->data[i] && dst->data[i]; ++i)
     {
         int width = croppedWidth;
         int height = src->height;
@@ -239,7 +239,15 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     const int scaledHeight = src->height / factor;
 
     if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format || dst->isExternalData())
-        dst->reallocate(scaledWidth, scaledHeight, src->format);
+    {
+        if (!dst->reallocate(scaledWidth, scaledHeight, src->format))
+        {
+            NX_WARNING(NX_SCOPE_TAG, 
+                "Can't allocate image. Size: %1x%2, format: %3", 
+                scaledWidth, scaledHeight, src->format);
+            return;
+        }
+    }
 
     switch(factor)
     {
