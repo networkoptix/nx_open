@@ -47,6 +47,9 @@ public:
     void activate();
     void deactivate();
 
+    static bool isValidForConnect(const nx::network::SocketAddress& endpoint);
+    static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints);
+
 protected:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
