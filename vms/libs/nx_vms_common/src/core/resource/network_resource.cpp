@@ -239,17 +239,17 @@ void QnNetworkResource::updateInternal(const QnResourcePtr& source, NotifierList
     }
 }
 
-bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
+bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr& source)
 {
     bool mergedSomething = false;
-    if (source->getUrl() != getUrl())
+    if (const auto newUrl = source->getUrl(); newUrl != getUrl())
     {
-        setUrl(source->getUrl());
+        setUrl(newUrl);
         mergedSomething = true;
     }
-    if (!source->getMAC().isNull() && source->getMAC() != getMAC())
+    if (const auto newMac = source->getMAC(); !newMac.isNull() && newMac != getMAC())
     {
-        setMAC(source->getMAC());
+        setMAC(newMac);
         mergedSomething = true;
     }
 
