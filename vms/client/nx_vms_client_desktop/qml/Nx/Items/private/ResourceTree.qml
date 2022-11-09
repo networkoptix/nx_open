@@ -229,7 +229,7 @@ TreeView
                     case ResourceTree.NodeType.layoutItem:
                     {
                         var itemLayout = modelDataAccessor.getData(
-                            treeModel.parent(modelIndex), "resource")
+                            resourceTreeModel.parent(modelIndex), "resource")
 
                         if (!itemLayout || scene.currentLayout !== itemLayout)
                             return ResourceTree.ItemState.normal
@@ -268,13 +268,13 @@ TreeView
 
                     case ResourceTree.NodeType.recorder:
                     {
-                        var childCount = treeModel.rowCount(modelIndex)
+                        var childCount = resourceTreeModel.rowCount(modelIndex)
                         var hasSelectedChildren = false
 
                         for (var i = 0; i < childCount; ++i)
                         {
                             var childResource = modelDataAccessor.getData(
-                                treeModel.index(i, 0, modelIndex), "resource")
+                                resourceTreeModel.index(i, 0, modelIndex), "resource")
 
                             if (!childResource)
                                 continue
