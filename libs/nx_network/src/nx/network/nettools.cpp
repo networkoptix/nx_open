@@ -560,7 +560,7 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
             case AF_LINK:
             {
                 unsigned char* ptr = (unsigned char *)LLADDR((struct sockaddr_dl *)(ifaptr)->ifa_addr);
-                sprintf(MAC_str, "%02x:%02x:%02x:%02x:%02x:%02x",
+                snprintf(MAC_str, MAC_ADDR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
                     *ptr, *(ptr + 1), *(ptr + 2), *(ptr + 3), *(ptr + 4), *(ptr + 5));
                 std::cout << "AF_LINK. " << ifaptr->ifa_name << ": " << MAC_str << std::endl;
                 ifNameToLinkAddress[ifaptr->ifa_name] = MAC_str;

@@ -47,7 +47,7 @@ SystemError::ErrorCode NamedPipeServer::listen(const std::string& pipeName)
     struct sockaddr_un addr;
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
-    sprintf(addr.sun_path, "/tmp/%s", pipeName.c_str());
+    snprintf(addr.sun_path, sizeof(addr.sun_path), "/tmp/%s", pipeName.c_str());
     if (::bind(m_impl->hPipe, (sockaddr*)& addr, sizeof(addr)) != 0 ||
         ::listen(m_impl->hPipe, BACKLOG_SIZE) != 0)
     {

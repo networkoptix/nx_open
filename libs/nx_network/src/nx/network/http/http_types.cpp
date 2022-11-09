@@ -2307,8 +2307,9 @@ std::string formatDateTime(const QDateTime& value)
     const QDate& date = utc.date();
     const QTime& time = utc.time();
 
-    char strDateBuf[256];
-    sprintf(strDateBuf, "%s, %02d %s %d %02d:%02d:%02d GMT",
+    static constexpr size_t kDataBufferSize = 256;
+    char strDateBuf[kDataBufferSize];
+    snprintf(strDateBuf, kDataBufferSize, "%s, %02d %s %d %02d:%02d:%02d GMT",
         kWeekDays[date.dayOfWeek() - 1],
         date.day(),
         kMonths[date.month() - 1],
