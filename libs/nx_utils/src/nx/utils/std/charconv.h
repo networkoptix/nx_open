@@ -145,8 +145,10 @@ from_chars_result int_from_chars(
 template<typename T>
 to_chars_result to_chars(char* first, char* last, T value, const char* format)
 {
-    char buf[32];
-    auto len = std::sprintf(buf, format, value);
+    static constexpr size_t kBufferSize = 32;
+    char buf[kBufferSize];
+
+    auto len = std::snprintf(buf, kBufferSize, format, value);
 
     if (len > last - first)
         return {last, std::errc::value_too_large};
@@ -208,8 +210,9 @@ to_chars_result float_to_chars(
     if (fmt != chars_format::general)
         return {first, std::errc::invalid_argument};
 
-    char format[16];
-    sprintf(format, "%%.%dg", precision);
+    static constexpr size_t kFormatSize = 16;
+    char format[kFormatSize];
+    snprintf(format, kFormatSize, "%%.%dg", precision);
     return to_chars(first, last, value, format);
 }
 
