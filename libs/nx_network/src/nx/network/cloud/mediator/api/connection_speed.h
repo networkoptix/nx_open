@@ -27,9 +27,14 @@ NX_REFLECTION_INSTRUMENT(ConnectionSpeed, ConnectionSpeed_Fields)
 
 struct NX_NETWORK_API PeerConnectionSpeed
 {
+    /**%apidoc ID of the server within the system. */
     std::string serverId;
+
+    /**%apidoc ID of the system. This is the same id clients use to connect to the system. */
     std::string systemId;
-    ConnectionSpeed connectionSpeed;
+
+    /**%apidoc The measured connection bandwidth.*/
+	ConnectionSpeed connectionSpeed;
 
     bool operator==(const PeerConnectionSpeed& other) const;
 

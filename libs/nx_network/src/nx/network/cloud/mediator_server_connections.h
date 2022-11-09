@@ -122,7 +122,7 @@ protected:
     }
 
 private:
-    AbstractCloudSystemCredentialsProvider* m_connector;
+    AbstractCloudSystemCredentialsProvider* m_connector = nullptr;
 };
 
 typedef MediatorServerConnection<network::stun::UdpClient> MediatorServerUdpConnection;

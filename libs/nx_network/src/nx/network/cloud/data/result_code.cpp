@@ -54,4 +54,35 @@ std::string Result::toString() const
     return nx::utils::buildString("code: ", nx::reflect::toString(code), ", text: ", text);
 }
 
+using namespace nx::network::http;
+
+static constexpr std::pair<api::ResultCode, ApiRequestErrorClass>
+    kResultCodeConversionTable[] =
+{
+    {ResultCode::notAuthorized, ApiRequestErrorClass::unauthorized},
+    {ResultCode::badRequest, ApiRequestErrorClass::badRequest},
+    {ResultCode::notFound, ApiRequestErrorClass::notFound},
+    {ResultCode::internalServerError, ApiRequestErrorClass::internalError}
+};
+
+void convert(const Result& result, ApiRequestResult* httpResult)
+{
+    *httpResult = ApiRequestResult();
+
+    if (!result.ok())
+    {
+        httpResult->setErrorClass(ApiRequestErrorClass::logicError);
+
+        for (const auto& [from, to]: kResultCodeConversionTable)
+        {
+            if (result.code == from)
+                httpResult->setErrorClass(to);
+        }
+
+        httpResult->setResultCode(nx::reflect::toString(result.code));
+        httpResult->setErrorText(result.text);
+        httpResult->setErrorDetail(static_cast<int>(result.code));
+    }
+}
+
 } // namespace nx::hpm::api

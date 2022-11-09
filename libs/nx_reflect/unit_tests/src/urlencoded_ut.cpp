@@ -142,6 +142,25 @@ struct ComplexObjDataWithResultStr: public ComplexObjData
 
 NX_REFLECTION_INSTRUMENT(ComplexObjData, (intV)(testData1)(testData2)(enumV));
 
+struct UnorderedMap
+{
+    std::unordered_map<std::string, std::string> x;
+
+    void compare(const UnorderedMap& r)
+    {
+        ASSERT_EQ(x, r.x);
+    }
+
+    static UnorderedMap data() { return UnorderedMap{.x={{"one", "two"}}}; }
+    static constexpr std::string_view encoded = "x={one=two}";
+};
+
+struct UnorderedMapDummy: UnorderedMap { using ParentT = UnorderedMap; };
+
+NX_REFLECTION_INSTRUMENT(UnorderedMap, (x));
+
+//-------------------------------------------------------------------------------------------------
+
 template<typename T>
 class Urlencoded: public ::testing::Test
 {
@@ -192,14 +211,14 @@ REGISTER_TYPED_TEST_SUITE_P(Urlencoded,
     encodeDecode,
     decoding_empty_string_produces_default_object);
 
-typedef ::testing::Types<
+using TestingTypes = ::testing::Types<
     FlatDataWithResultStr,
     ArrayDataWithResultStr,
     ComplexObjDataWithResultStr,
-    ComplexArrayDataWithResultStr>
-    TestingTypes;
+    ComplexArrayDataWithResultStr,
+    UnorderedMapDummy
+>;
 INSTANTIATE_TYPED_TEST_SUITE_P(UrlencodedEncode, Urlencoded, TestingTypes);
-
 
 struct TestStringDeserialization
 {
