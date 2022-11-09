@@ -403,8 +403,15 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
     if (!m_isLayoutsInitialised)
     {
         m_isLayoutsInitialised = true;
+
+        // Panoramic video streams will transcoded to single video, so use defult video layout.
+        QnConstResourceVideoLayoutPtr videoLayout;
+        if (isTranscodingEnabled())
+            videoLayout.reset(new QnDefaultResourceVideoLayout());
+        else
+            videoLayout = m_mediaDevice->getVideoLayout(m_mediaProvider);
+        setVideoLayout(videoLayout);
         setAudioLayout(m_mediaDevice->getAudioLayout(m_mediaProvider));
-        setVideoLayout(m_mediaDevice->getVideoLayout(m_mediaProvider));
         setHasVideo(m_mediaDevice->hasVideo(m_mediaProvider));
     }
 
