@@ -11,6 +11,7 @@
 
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <utils/common/synctime.h>
 
@@ -77,6 +78,7 @@ struct AbstractResourceThumbnail::Private
     QString imageId;
     QUrl url;
     microseconds imageTimestamp = 0us;
+    bool isArmServer = false;
 
     bool obsolete = false;
     minutes obsolescenceDuration = 0min;
@@ -98,6 +100,10 @@ struct AbstractResourceThumbnail::Private
     void updateIsObsolete();
     bool calculateIsObsolete() const;
     bool supportsObsolescence() const;
+    void updateIsArmServer();
+    void setIsArmServer(bool value);
+
+    static bool isResourceOnArmServer(const QnResourcePtr& resource);
 
     struct ObsolescenceWatcher;
     static ObsolescenceWatcher& obsolescenceWatcher();
@@ -165,6 +171,7 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
     d->updateRotation();
     d->updateAspectRatio();
     d->updateObsolescenceWatch();
+    d->updateIsArmServer();
 
     if (d->resource)
     {
@@ -177,6 +184,9 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
         connect(d->resource.get(), &QnResource::rotationChanged, this,
             [this]() { d->updateRotation(); });
+
+        connect(d->resource.get(), &QnResource::parentIdChanged, this,
+            [this]() { d->updateIsArmServer(); });
     }
 
     emit resourceChanged();
@@ -294,6 +304,11 @@ void AbstractResourceThumbnail::setObsolescenceMinutes(int value)
 
     d->updateObsolescenceWatch();
     d->updateIsObsolete();
+}
+
+bool AbstractResourceThumbnail::isArmServer() const
+{
+    return d->isArmServer;
 }
 
 QnAspectRatio AbstractResourceThumbnail::calculateAspectRatio(
@@ -452,6 +467,25 @@ bool AbstractResourceThumbnail::Private::calculateIsObsolete() const
 bool AbstractResourceThumbnail::Private::supportsObsolescence() const
 {
     return resource && resource->hasFlags(Qn::live_cam);
+}
+
+void AbstractResourceThumbnail::Private::updateIsArmServer()
+{
+    setIsArmServer(isResourceOnArmServer(resource));
+}
+
+void AbstractResourceThumbnail::Private::setIsArmServer(bool value)
+{
+    if (isArmServer == value)
+        return;
+
+    isArmServer = value;
+    emit q->isArmServerChanged();
+}
+
+bool AbstractResourceThumbnail::Private::isResourceOnArmServer(const QnResourcePtr& resource)
+{
+    return resource && QnMediaServerResource::isArmServer(resource->getParentResource());
 }
 
 AbstractResourceThumbnail::Private::ObsolescenceWatcher&

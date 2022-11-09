@@ -40,6 +40,7 @@ class NX_VMS_CLIENT_CORE_API AbstractResourceThumbnail: public QObject
     Q_PROPERTY(int obsolescenceMinutes READ obsolescenceMinutes WRITE setObsolescenceMinutes
         NOTIFY obsolescenceMinutesChanged)
     Q_PROPERTY(bool obsolete READ isObsolete NOTIFY obsoleteChanged)
+    Q_PROPERTY(bool isArmServer READ isArmServer NOTIFY isArmServerChanged)
 
     using base_type = QObject;
 
@@ -121,6 +122,9 @@ public:
     int obsolescenceMinutes() const;
     void setObsolescenceMinutes(int value);
 
+    /** Whether the resource is remote and is located on an ARM server. */
+    bool isArmServer() const;
+
     /**
      * Reload the thumbnail.
      * If `forceRefresh` is true, cached image (if present) must be discarded.
@@ -145,6 +149,7 @@ signals:
     void obsoleteChanged();
     void obsolescenceMinutesChanged();
     void updated();
+    void isArmServerChanged();
 
 protected:
     /**

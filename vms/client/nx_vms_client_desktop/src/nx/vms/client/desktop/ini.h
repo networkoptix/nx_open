@@ -308,6 +308,14 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, ignoreTimelineGaps,
         "[Support] Ignores timeline gaps when exporting media data");
 
+    // VMS-36585.
+    NX_INI_INT(60, resourcePreviewRefreshInterval,
+        "[Support] How often Resource Tree thumbnails request updates from non-ARM servers,\n"
+        "in seconds. Set 0 to disable automatic updates.");
+    NX_INI_INT(300, resourcePreviewRefreshIntervalArm,
+        "[Support] How often Resource Tree thumbnails request updates from ARM servers,\n"
+        "in seconds. Set 0 to disable automatic updates.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
