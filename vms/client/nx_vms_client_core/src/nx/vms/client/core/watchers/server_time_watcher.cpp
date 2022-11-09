@@ -173,10 +173,14 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
         return;
 
     auto callback = nx::utils::guarded(this,
-        [this, server](
+        [this, id = server->getId()](
             bool success, rest::Handle /*handle*/, nx::network::rest::JsonResult reply)
         {
-            if (!success || !server->resourcePool())
+            if (!success)
+                return;
+
+            const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id);
+            if (!server)
                 return;
 
             const auto result = reply.deserialized<QnTimeReply>();
