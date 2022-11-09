@@ -329,7 +329,7 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
     {
         auto rect = filter.regions[motion.channel];
         if (rect.isEmpty())
-            rect = Rect{0.f, 0.f, (double) kMotionGridWidth, (double) kMotionGridHeight };
+            rect = Rect{0.f, 0.f, (double) kMotionGridWidth, (double) kMotionGridHeight};
 
         auto matcher = RegionMatcher(rect);
         if (!matcher.match(fromBase64(motion.dataBase64)))
