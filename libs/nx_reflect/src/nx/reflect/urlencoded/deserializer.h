@@ -50,8 +50,8 @@ inline constexpr bool hasFromStringV = hasFromString<T>::value;
 template<typename T>
 inline constexpr bool IsStringAlikeV =
     std::is_convertible_v<std::string, T> ||
-    std::is_convertible_v<std::string_view, T>
-    || reflect::detail::IsQByteArrayAlikeV<T> ||
+    std::is_convertible_v<std::string_view, T> ||
+    reflect::detail::IsQByteArrayAlikeV<T> ||
     reflect::detail::HasFromBase64V<T> ||
     reflect::detail::HasFromStdStringV<T> ||
     reflect::detail::HasFromStringV<T>;
@@ -92,9 +92,11 @@ constexpr bool isInternalDeserializable()
         IsSetContainerV<T> ||
         IsUnorderedSetContainerV<T>)
         &&!IsStringAlikeV<T>;
+
     constexpr bool IsAssociativeContainer =
-        (IsAssociativeContainerV<T> && !IsSetContainerV<T>)
-            || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>);
+        (IsAssociativeContainerV<T> && !IsSetContainerV<T>) ||
+        (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>);
+
     return std::is_same_v<T,std::string> ||
         IsOptionalV<T> ||
         IsInstrumentedV<T> ||
@@ -190,7 +192,8 @@ template<typename T>
 std::tuple<T, bool> deserialize(
     const std::string_view& str,
     std::enable_if_t<
-        IsAssociativeContainerV<T> &&
+        (IsAssociativeContainerV<T> ||
+            IsUnorderedAssociativeContainerV<T>) &&
         !IsSetContainerV<T> &&
         !IsUnorderedSetContainerV<T>
     >* = nullptr)

@@ -4,8 +4,10 @@
 
 #include <string>
 
+#include <nx/network/http/server/api_request_result.h>
 #include <nx/network/stun/message.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/to_string.h>
 #include <nx/utils/string.h>
 
 namespace nx::hpm::api {
@@ -25,7 +27,8 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     noReplyFromServer,
     badTransport,
     interrupted,
-    tryAlternate
+    tryAlternate,
+    internalServerError
 )
 
 NX_NETWORK_API ResultCode fromStunErrorToResultCode(
@@ -42,10 +45,16 @@ struct NX_NETWORK_API Result
     ResultCode code = ResultCode::ok;
     std::string text;
 
+    Result(): Result(ResultCode::ok) {}
+    Result(ResultCode code): code(code), text(nx::reflect::toString(code)) {}
+    Result(ResultCode code, std::string text): code(code), text(std::move(text)) {}
+
     bool ok() const { return code == ResultCode::ok; }
     std::string toString() const;
 };
 
 NX_REFLECTION_INSTRUMENT(Result, (code)(text))
+
+NX_NETWORK_API void convert(const Result& result, nx::network::http::ApiRequestResult* httpResult);
 
 } // nx::hpm::api

@@ -146,7 +146,7 @@ inline static void convert(const StatusCode::Value& status, ApiRequestResult* ht
  *        nx::utils::MoveOnlyFunc<void(FooResult)> handler);
  * };
  *
- * // The application has to to provide the following function:
+ * // The application has to provide the following function:
  * void convert(const FooResult& result, ApiRequestResult* httpResult);
  *
  * class MyHttpServer

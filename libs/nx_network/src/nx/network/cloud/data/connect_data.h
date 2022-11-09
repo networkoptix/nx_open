@@ -22,24 +22,38 @@ namespace nx::hpm::api {
  * [connection_mediator, 4.3.5]
  */
 struct NX_NETWORK_API ConnectRequest:
-    public StunRequestData
+    StunRequestData
 {
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::connect;
 
+    /**%apidoc The name of the target peer. If peer with exact same name is not found, then all peers
+     * with name "smth.{destinationHostName}" are considered for connection.
+     */
     std::string destinationHostName;
+
+    /**%apidoc ID of the connecting peer. */
     std::string originatingPeerId;
+
+    /**%apidoc ID of the connect session. It is passed to the target peer and may be used by client to
+     * verify the peer after the connection.
+     */
     std::string connectSessionId;
-    ConnectionMethods connectionMethods;
-    /** If port is zero then mediator uses source port */
+
+    ConnectionMethods connectionMethods = 0;
+
+    /**%apidoc UDP endpoits of the client which should be used by the peer for UDP hole punching. */
     std::vector<network::SocketAddress> udpEndpointList;
-    /** if true, mediator does not report Connect request source address to the server peer.
-        Only addresses found in udpEndpointList are reported
-    */
-    bool ignoreSourceAddress;
-    CloudConnectVersion cloudConnectVersion;
+
+    /**%apidoc if true, mediator does not report Connect request source address to the server peer.
+     * Only addresses found in udpEndpointList are reported.
+     */
+    bool ignoreSourceAddress = false;
+
+    CloudConnectVersion cloudConnectVersion = kCurrentCloudConnectVersion;
 
     ConnectRequest();
+
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
@@ -55,12 +69,13 @@ NX_REFLECTION_INSTRUMENT(ConnectRequest, ConnectRequest_Fields)
 //-------------------------------------------------------------------------------------------------
 
 struct NX_NETWORK_API ConnectResponse:
-    public StunResponseData
+    StunResponseData
 {
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::connect;
 
-    /** The list of peer's TCP endpoints if peer has some.
+    /**%apidoc Public TCP endpoints of the target peer. Client may try to establish regular TCP
+     * connection to these endpoints.
      * Note that these may be addresses within peer's LAN so client may connect to some
      * other service within its LAN when using one of these endpoints.
      * So, any successful connection should be verified by means that are out of scope
@@ -84,17 +99,20 @@ struct NX_NETWORK_API ConnectResponse:
      */
     std::vector<std::string> trafficRelayUrls;
 
-    /**%apidoc
-     * May differ from ConnectRequest::destinationHostName
-     * if connect by domain name (e.g., cloud system id) has been requested.
+    /**%apidoc Full name of the destination peer.
+     * May differ from name found in the ConnectRequest if connect to a system was requested.
+     * In this case, name of some peer of the system will be found here.
      */
     std::string destinationHostFullName;
-    ConnectionParameters params;
-    CloudConnectVersion cloudConnectVersion;
 
-    /**%apidoc
-     * Set if connect request failed, but the peer was found at another mediator address.
+    ConnectionParameters params;
+
+    /**%apidoc The version of the cloud connect the peer is using. Client may use it to limit its
+     * functionality when connecting to older peers.
      */
+    CloudConnectVersion cloudConnectVersion = kCurrentCloudConnectVersion;
+
+    /**%apidoc Endpoint of a different mediator node to try. */
     std::optional<network::SocketAddress> alternateMediatorEndpointStunUdp;
 
     ConnectResponse();

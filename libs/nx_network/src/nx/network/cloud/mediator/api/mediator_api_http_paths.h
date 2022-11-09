@@ -35,6 +35,14 @@ static constexpr char kRelayAttrsPath[] = "/maintenance/relays/{id}/attrs";
 
 static constexpr char kIdParam[] = "id";
 
+static constexpr char kRuleSetsPath[] = "/rule-sets";
+static constexpr char kRuleSetPath[] =  "/rule-sets/{ruleSetId}";
+static constexpr char kRulesPath[] =    "/rule-sets/{ruleSetId}/rules";
+static constexpr char kRulePath[] =     "/rule-sets/{ruleSetId}/rules/{ruleId}";
+
+static constexpr char kRuleSetId[] = "ruleSetId";
+static constexpr char kRuleId[] = "ruleId";
+
 namespace deprecated {
 
 /**

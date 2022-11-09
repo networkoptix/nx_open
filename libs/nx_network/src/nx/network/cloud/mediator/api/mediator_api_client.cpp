@@ -122,15 +122,18 @@ ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::getResultCodeFromRe
     switch (response.statusLine.statusCode)
     {
         case StatusCode::unauthorized:
+        case StatusCode::forbidden:
             return api::ResultCode::notAuthorized;
-
-        case StatusCode::badRequest:
-            return api::ResultCode::badRequest;
 
         case StatusCode::notFound:
             return api::ResultCode::notFound;
 
+        case StatusCode::internalServerError:
+            return api::ResultCode::internalServerError;
+
         default:
+            if (response.statusLine.statusCode / 100 * 100 == StatusCode::badRequest)
+                return api::ResultCode::badRequest;
             return api::ResultCode::otherLogicError;
     }
 }

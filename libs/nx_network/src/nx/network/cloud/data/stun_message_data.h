@@ -214,9 +214,8 @@ private:
 
 /** Base class for data structure which uses only STUN message attributes. */
 struct NX_NETWORK_API StunMessageAttributesData:
-    public StunMessageParseHelper
+    StunMessageParseHelper
 {
-public:
     virtual ~StunMessageAttributesData();
 
     virtual void serializeAttributes(nx::network::stun::Message* const message) = 0;
@@ -224,9 +223,8 @@ public:
 };
 
 struct NX_NETWORK_API StunRequestData:
-    public StunMessageAttributesData
+    StunMessageAttributesData
 {
-public:
     StunRequestData(int method);
 
     /** Fills in all message header and calls StunRequestData::serializeAttributes. */
@@ -239,9 +237,8 @@ private:
 };
 
 struct NX_NETWORK_API StunResponseData:
-    public StunMessageAttributesData
+    StunMessageAttributesData
 {
-public:
     StunResponseData(int method);
 
     /**
@@ -258,9 +255,8 @@ private:
 };
 
 struct NX_NETWORK_API StunIndicationData:
-    public StunMessageAttributesData
+    StunMessageAttributesData
 {
-public:
     StunIndicationData(int method);
 
     /**

@@ -15,9 +15,8 @@
 namespace nx::hpm::api {
 
 struct NX_NETWORK_API ListenRequest:
-    public StunRequestData
+    StunRequestData
 {
-public:
     static constexpr auto kMethod = network::stun::extension::methods::listen;
 
     // TODO: #muskov Remove systemId and serverId as redundant.
@@ -34,9 +33,8 @@ public:
 };
 
 struct NX_NETWORK_API ListenResponse:
-    public StunResponseData
+    StunResponseData
 {
-public:
     static constexpr auto kMethod = network::stun::extension::methods::listen;
     static constexpr auto kDefaultRelayConnectTimeout = std::chrono::seconds(21);
 

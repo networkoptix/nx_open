@@ -11,10 +11,7 @@ namespace stun = network::stun;
 using namespace stun::extension;
 
 ConnectRequest::ConnectRequest():
-    StunRequestData(kMethod),
-    connectionMethods(0),
-    ignoreSourceAddress(false),
-    cloudConnectVersion(kCurrentCloudConnectVersion)
+    StunRequestData(kMethod)
 {
 }
 
@@ -47,8 +44,7 @@ bool ConnectRequest::parseAttributes(const nx::network::stun::Message& message)
 // ConnectResponse
 
 ConnectResponse::ConnectResponse():
-    StunResponseData(kMethod),
-    cloudConnectVersion(kCurrentCloudConnectVersion)
+    StunResponseData(kMethod)
 {
 }
 

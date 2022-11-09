@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "base_request_handler.h"
 #include "http_server_rest_path_matcher.h"
 #include "../http_message_dispatcher.h"
@@ -19,14 +21,25 @@ class MessageDispatcher:
 {
 public:
     /**
-     * Register handler that does not block and can be invoked in a synchronous manner.
+     * @param Input can be void.
+     * @param func will be invoked as
+     * <pre><code>
+     * func(
+     *     RestParamFetchers()(requestContext)...,
+     *     Input(...), // Present if non-void.
+     *     completionHandler);
+     *
+     * // where completion handler is a function that can be invoked as:
+     * completionHandler(Result, Output...);
+     * </code></pre>
+     *
+     * Note: if Result type is different from nx::network::http::StatusCode::Value then
+     * the caller has to provide the following function:
+     * <pre><code>
+     * void convert(const Result& result, nx::network::http::ApiRequestResult* httpResult);
+     * </code></pre>
+     * It should be found in the same namespace as the Result type.
      */
-    template<typename Func>
-    bool registerNonBlockingHandler(
-        const Method& method,
-        const std::string_view& path,
-        Func func);
-
     template<
         typename Result,
         typename Input,
