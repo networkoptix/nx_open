@@ -565,7 +565,7 @@ void addDataToMask(const QRect& rect, char* mask, int* maskStart, int* maskEnd)
 void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart, int* maskEnd)
 {
     if (maskStart)
-        *maskStart = 0;
+        *maskStart = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128;
     if (maskEnd)
         *maskEnd = 0;
     memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);

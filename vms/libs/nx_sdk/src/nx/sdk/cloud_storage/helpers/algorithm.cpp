@@ -56,7 +56,8 @@ public:
     RegionMatcher(const Rect& rect)
     {
         memset(m_mask, 0, kMotionGridWidth * kMotionGridHeight / 8);
-        m_maskStart = std::min<double>((rect.left() * kMotionGridHeight + rect.top()) / 128, m_maskStart);
+        m_maskStart = std::min<double>((rect.left() * kMotionGridHeight + rect.top()) / 128,
+            kMotionGridWidth * kMotionGridHeight / 128);
         m_maskEnd = std::max<double>((rect.right() * kMotionGridHeight + rect.bottom()) / 128, m_maskEnd);
         for (int x = (int) rect.left(); x <= rect.right(); ++x)
         {
