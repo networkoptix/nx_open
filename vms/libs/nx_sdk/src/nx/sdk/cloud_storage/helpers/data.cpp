@@ -685,7 +685,7 @@ double Rect::right() const
 
 double Rect::bottom() const
 {
-    return y - h;
+    return y + h;
 }
 
 nx::kit::Json Rect::to_json() const
