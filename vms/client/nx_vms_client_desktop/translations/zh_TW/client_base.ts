@@ -7248,7 +7248,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
+      <translation>開門</translation>
     </message>
     <message>
       <source>Drop</source>
@@ -7297,11 +7297,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>自動選擇</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>若支援則使用</translation>
     </message>
     <message>
       <source>Never</source>
@@ -9149,7 +9149,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>物件追蹤已開啟</translation>
     </message>
   </context>
   <context>
@@ -10187,7 +10187,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>匯出中…</translation>
     </message>
     <message>
       <source>Export archive from %1 completed</source>
@@ -10716,7 +10716,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>無動作</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10728,27 +10728,27 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>自動對焦</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>移至已儲存的PTZ位置</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>切換為全螢幕</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>選取佈局上的下個攝影機</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>選取佈局上的前一個攝影機</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>開啟佈局</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -10763,11 +10763,11 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>選取佈局...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>按鍵</translation>
     </message>
     <message>
       <source>Selected Layout</source>

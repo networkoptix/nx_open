@@ -1697,7 +1697,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>對講機通知</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>
