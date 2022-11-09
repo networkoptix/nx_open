@@ -233,6 +233,10 @@ TreeView
                 maximumSize: 400
                 obsolescenceMinutes: 15
                 enforced: resourceTree.hoveredItem === delegateItem
+
+                refreshIntervalSeconds: isArmServer
+                    ? ClientSettings.iniConfigValue("resourcePreviewRefreshIntervalArm")
+                    : ClientSettings.iniConfigValue("resourcePreviewRefreshInterval")
             }
 
             Row
