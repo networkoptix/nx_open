@@ -1025,11 +1025,11 @@
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Lagre skyoppsett</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Lagre skyoppsett som...</translation>
     </message>
   </context>
   <context>
@@ -1887,15 +1887,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <translation>Kunne ikke lagre logger i valgt mappe</translation>
     </message>
     <message>
       <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <translation>Nedlastingen er fullført!</translation>
     </message>
     <message>
       <source>Nvidia hardware acceleration is in Beta mode</source>
-      <translation type="unfinished">Nvidia hardware acceleration is in Beta mode</translation>
+      <translation>Nvidia maskinvareakselerasjon er i betamodus</translation>
     </message>
   </context>
   <context>
@@ -3200,7 +3200,7 @@ til %1</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Databasen ble gjenopprettet. Serverapplikasjonen starter snart på nytt.</translation>
     </message>
   </context>
   <context>
@@ -5636,11 +5636,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Lagring for analysedata er ikke angitt</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Systemlagring brukes til analysedata</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -7600,7 +7600,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Kamerabytteoperasjonen er ikke mulig da serveren ikke er tilgjengelig.</translation>
     </message>
   </context>
   <context>
@@ -8215,7 +8215,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Ukjent kamera</translation>
     </message>
   </context>
   <context>
@@ -8395,7 +8395,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>INFORMASJON PÅKREVET</translation>
     </message>
   </context>
   <context>
@@ -8994,12 +8994,12 @@ Do not forget to return the Logging level to its default setting after you have 
     <message>
       <source>Debug Logging is enabled.
 System performance is degraded.</source>
-      <translation type="unfinished">Debug Logging is enabled.
-System performance is degraded.</translation>
+      <translation>Feilsøkingslogging er aktivert.
+Systemytelsen er forringet.</translation>
     </message>
     <message>
       <source>Logs downloading is cancelled</source>
-      <translation type="unfinished">Logs downloading is cancelled</translation>
+      <translation>Loggnedlasting er avbrutt</translation>
     </message>
   </context>
   <context>
@@ -9631,7 +9631,7 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Leter du etter en lokal layout? Velg bare én bruker fra &quot;Vis til&quot; -listen for å vise deres lokale oppsett som et alternativ her.</translation>
     </message>
   </context>
   <context>
@@ -10657,52 +10657,52 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n server</numerusform>
-        <numerusform>Backup storage is not configured on %n server</numerusform>
+      <translation>
+        <numerusform>Sikkerhetskopieringslagring er ikke konfigurert på %n server</numerusform>
+        <numerusform>Sikkerhetskopieringslagring er ikke konfigurert på %n server</numerusform>
       </translation>
     </message>
     <message>
       <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
+      <translation>Import pågår...</translation>
     </message>
     <message>
       <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
+      <translation>Import av arkiv fra %1 fullført</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
+      <translation>Import av arkiv fra %1 mislyktes</translation>
     </message>
     <message>
       <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
+      <translation>Import av arkiv fra %1 stoppet</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
+      <translation>
+        <numerusform>Lagring for analysedata er ikke satt på %n -server</numerusform>
+        <numerusform>Lagring for analysedata er ikke satt på %n -server</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n server</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
+      <translation>
+        <numerusform>Systemlagring brukes til analysedata på %n server</numerusform>
+        <numerusform>Systemlagring brukes til analysedata på %n server</numerusform>
       </translation>
     </message>
     <message>
       <source>Not imported archive found on Device %1</source>
-      <translation type="unfinished">Not imported archive found on Device %1</translation>
+      <translation>Ikke importert arkiv funnet på enhet %1</translation>
     </message>
     <message>
       <source>Not imported archive found on Camera %1</source>
-      <translation type="unfinished">Not imported archive found on Camera %1</translation>
+      <translation>Ikke importert arkiv funnet på kamera %1</translation>
     </message>
     <message>
       <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
+      <translation>Importer arkiv fra %1</translation>
     </message>
   </context>
   <context>

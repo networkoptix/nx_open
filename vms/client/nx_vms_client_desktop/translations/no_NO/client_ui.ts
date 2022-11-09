@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Loggbehandling</translation>
     </message>
     <message>
       <source>Download</source>
@@ -130,7 +130,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Åpne mappen filer</translation>
     </message>
     <message>
       <source>Done</source>
@@ -663,11 +663,11 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Ikke ta opp primærstrøm</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Ikke ta opp sekundærstrøm</translation>
     </message>
   </context>
   <context>
@@ -898,15 +898,15 @@
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Tilgjengelige handlinger</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Videoeksport</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Live video og arkiv</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>I fremtiden</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -922,15 +922,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Les mer på hjelpesiden</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Ikke vis dette vinduet igjen</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Vi introduserer skyoppsett</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -938,11 +938,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Søker i bokmerker, objekter, hendelser</translation>
     </message>
     <message>
       <source>•</source>
-      <translation type="unfinished">•</translation>
+      <translation>•</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Lag en sikkerhetskopi av systemadministrasjonsdata, eller gjenopprett systemadministrasjonsdata fra en eksisterende sikkerhetskopi</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1028,11 +1028,11 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open folder</source>
-      <translation type="unfinished">Open folder</translation>
+      <translation>Åpne mappen</translation>
     </message>
   </context>
   <context>
@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Legg til en kommentar</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Allow computer entering sleep mode on idle</source>
-      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+      <translation>La datamaskinen gå i hvilemodus når inaktiv</translation>
     </message>
   </context>
   <context>
@@ -1869,7 +1869,7 @@
     </message>
     <message>
       <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <translation>Kunne ikke lagre logger i valgt mappe</translation>
     </message>
   </context>
   <context>
@@ -2628,7 +2628,7 @@
     </message>
     <message>
       <source>Select a rule</source>
-      <translation type="unfinished">Select a rule</translation>
+      <translation>Velg en regel</translation>
     </message>
   </context>
   <context>

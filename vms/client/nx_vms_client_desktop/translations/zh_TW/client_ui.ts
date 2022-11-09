@@ -655,7 +655,7 @@
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>停止自動匯出錄影資料</translation>
     </message>
     <message>
       <source>Export From Device</source>
