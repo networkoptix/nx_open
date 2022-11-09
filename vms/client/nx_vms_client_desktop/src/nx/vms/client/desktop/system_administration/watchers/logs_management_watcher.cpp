@@ -43,7 +43,6 @@ const QString kFailedSuffix{"_failed"};
 const QString kNormalSuffix{""};
 const QString kPartialSuffix{"_partial"};
 
-
 bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
 {
     auto settings = unit->settings();
@@ -93,13 +92,13 @@ nx::vms::api::ServerLogSettings loadClientSettings()
     QSettings rawSettings;
     result.maxVolumeSizeB = rawSettings.value(
         kMaxLogVolumeSizeSymbolicName,
-        250 * 1024 * 1024).toUInt();
+        250 * 1024 * 1024).toULongLong();
     result.maxFileSizeB = rawSettings.value(
         kMaxLogFileSizeSymbolicName,
-        10 * 1024 * 1024).toUInt();
+        10 * 1024 * 1024).toULongLong();
     result.maxFileTimePeriodS = std::chrono::seconds(rawSettings.value(
         kMaxLogFileTimePeriodSymbolicName,
-        0).toUInt());
+        0).toULongLong());
 
     return result;
 }
@@ -1465,10 +1464,15 @@ void LogsManagementWatcher::applySettings(
     }
 }
 
-const nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
+nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
 {
     // We don't use the constant from logs_settings.h because it is build-type denepdent.
     return nx::utils::log::Level::info;
+}
+
+nx::vms::api::ServerLogSettings LogsManagementWatcher::clientLogSettings()
+{
+    return loadClientSettings();
 }
 
 LogsManagementUnitPtr LogsManagementWatcher::clientUnit() const

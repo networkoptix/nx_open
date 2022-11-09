@@ -50,6 +50,7 @@
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
@@ -336,16 +337,10 @@ struct ApplicationContext::Private
             return;
 
         NX_INFO(NX_SCOPE_TAG, "Log is initialized from the settings");
-        QSettings rawSettings;
-        const auto maxVolumeSize = rawSettings.value(
-            kMaxLogVolumeSizeSymbolicName,
-            250 * 1024 * 1024).toUInt();
-        const auto maxFileSize = rawSettings.value(
-            kMaxLogFileSizeSymbolicName,
-            10 * 1024 * 1024).toUInt();
-        const auto maxFileTimePeriod = rawSettings.value(
-            kMaxLogFileTimePeriodSymbolicName,
-            0).toUInt();
+        const auto rawSettings = LogsManagementWatcher::clientLogSettings();
+        const auto maxVolumeSize = rawSettings.maxVolumeSizeB;
+        const auto maxFileSize = rawSettings.maxFileSizeB;
+        const auto maxFileTimePeriod = rawSettings.maxFileTimePeriodS;
 
         auto logLevel = startupParameters.logLevel;
         auto logFile = startupParameters.logFile;
