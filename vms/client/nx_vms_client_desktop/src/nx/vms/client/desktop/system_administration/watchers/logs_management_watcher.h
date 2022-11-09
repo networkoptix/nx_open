@@ -115,7 +115,8 @@ public:
         const std::string& token,
         const ConfigurableLogSettings& settings);
 
-    static const nx::utils::log::Level defaultLogLevel();
+    static nx::utils::log::Level defaultLogLevel();
+    static nx::vms::api::ServerLogSettings clientLogSettings();
 
     UnitPtr clientUnit() const;
     void storeClientSettings(const ConfigurableLogSettings& settings);
