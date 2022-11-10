@@ -206,8 +206,14 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
 
-    connect(ui->disableAutoExportCheckBox, &QCheckBox::clicked,
-        store, &CameraSettingsDialogStore::setRemoteArchiveAutoExportDisabled);
+    connect(ui->disableImportFromDeviceRadioButton, &QRadioButton::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveSyncronizationDisabled);
+
+    connect(ui->manualImportFromDeviceRadioButton, &QRadioButton::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveSyncronizationManual);
+
+    connect(ui->autoImportFromDeviceRadioButton, &QRadioButton::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveSyncronizationAuto);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
@@ -327,7 +333,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->secondStreamDisableCheckBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->keepCameraTimeSettingsCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
-    setHelpTopic(ui->disableAutoExportCheckBox, Qn::CameraSettings_Expert_AutomaticExport_Help);
+    setHelpTopic(ui->manualImportFromDeviceRadioButton, Qn::CameraSettings_Expert_ManualImport_Help);
+    setHelpTopic(ui->autoImportFromDeviceRadioButton, Qn::CameraSettings_Expert_AutomaticImport_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
@@ -346,8 +353,10 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     logicalIdHint->setHintText(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
-    ui->disableAutoExportCheckBox->setHint(tr("Video recorded on the internal camera's storage "
-        "will not be uploaded to the main archive automatically."));
+    ui->manualImportFromDeviceRadioButton->setHint(tr("Video recorded on the internal "
+        "camera’s storage will not be uploaded to the main archive automatically."));
+    ui->autoImportFromDeviceRadioButton->setHint(tr("Video recorded on the internal "
+        "camera’s storage will be uploaded to the main archive automatically."));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -542,9 +551,15 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->remoteArchiveAutoExportGroupBox->setVisible(remoteArchiveMdSupported);
 
-    check_box_utils::setupTristateCheckbox(
-        ui->disableAutoExportCheckBox,
-        state.expert.remoteArchiveAutoExportDisabled);
+    ui->disableImportFromDeviceRadioButton->setChecked(
+        state.expert.remoteArchiveSyncronizationMode
+            == nx::vms::common::RemoteArchiveSyncronizationMode::off);
+    ui->manualImportFromDeviceRadioButton->setChecked(
+        state.expert.remoteArchiveSyncronizationMode
+            == nx::vms::common::RemoteArchiveSyncronizationMode::manual);
+    ui->autoImportFromDeviceRadioButton->setChecked(
+        state.expert.remoteArchiveSyncronizationMode
+            == nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
 
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
