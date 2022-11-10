@@ -432,9 +432,9 @@ public:
     QnUuid preferredServerId() const;
 
     void setRemoteArchiveSynchronizationMode(
-        nx::core::resource::RemoteArchiveSyncronizationMode mode);
+        nx::vms::common::RemoteArchiveSyncronizationMode mode);
 
-    nx::core::resource::RemoteArchiveSyncronizationMode
+    nx::vms::common::RemoteArchiveSyncronizationMode
         getRemoteArchiveSynchronizationMode() const;
 
     void setManualRemoteArchiveSynchronizationTriggered(bool isTriggered = true);

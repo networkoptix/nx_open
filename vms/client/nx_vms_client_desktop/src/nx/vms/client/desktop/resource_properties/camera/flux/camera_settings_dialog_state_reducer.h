@@ -144,7 +144,9 @@ public:
     static State setRtpTransportType(State state, vms::api::RtpTransportType value);
     static State setForcedPrimaryProfile(State state, const QString& value);
     static State setForcedSecondaryProfile(State state, const QString& value);
-    static State setRemoteArchiveAutoExportDisabled(State state, const bool& value);
+    static State setRemoteArchiveSyncronizationDisabled(State state);
+    static State setRemoteArchiveSyncronizationManual(State state);
+    static State setRemoteArchiveSyncronizationAuto(State state);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
     static State setTrustCameraTime(State state, bool value);

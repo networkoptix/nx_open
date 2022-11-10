@@ -1124,17 +1124,17 @@ QnUuid QnSecurityCamResource::preferredServerId() const
 }
 
 void QnSecurityCamResource::setRemoteArchiveSynchronizationMode(
-    nx::core::resource::RemoteArchiveSyncronizationMode mode)
+    nx::vms::common::RemoteArchiveSyncronizationMode mode)
 {
     setProperty(
         ResourcePropertyKey::kRemoteArchiveSynchronizationMode,
         QString::fromStdString(nx::reflect::enumeration::toString(mode)));
 }
 
-nx::core::resource::RemoteArchiveSyncronizationMode
+nx::vms::common::RemoteArchiveSyncronizationMode
     QnSecurityCamResource::getRemoteArchiveSynchronizationMode() const
 {
-    auto mode = nx::core::resource::RemoteArchiveSyncronizationMode::off;
+    auto mode = nx::vms::common::RemoteArchiveSyncronizationMode::off;
     nx::reflect::enumeration::fromString(
         getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationMode).toStdString(),
         &mode);

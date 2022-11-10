@@ -486,8 +486,12 @@ bool isDefaultExpertSettings(const State& state)
     if (state.expert.forcedSecondaryProfile.valueOr({}).isEmpty())
         return false;
 
-    if (state.expert.remoteArchiveAutoExportDisabled.valueOr(true))
+    if (state.expert.remoteArchiveSyncronizationMode.valueOr(
+        nx::vms::common::RemoteArchiveSyncronizationMode::off)
+            != nx::vms::common::RemoteArchiveSyncronizationMode::off)
+    {
         return false;
+    }
 
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
@@ -1254,11 +1258,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<QString>(state.expert.forcedSecondaryProfile, cameras,
         [](const Camera& camera) { return camera->forcedProfile(nx::vms::api::StreamIndex::secondary); });
 
-    fetchFromCameras<bool>(state.expert.remoteArchiveAutoExportDisabled, cameras,
+    fetchFromCameras<nx::vms::common::RemoteArchiveSyncronizationMode>(
+        state.expert.remoteArchiveSyncronizationMode, cameras,
         [](const Camera& camera)
         {
-            const auto mode = camera->getRemoteArchiveSynchronizationMode();
-            return mode != nx::core::resource::RemoteArchiveSyncronizationMode::automatic;
+            return camera->getRemoteArchiveSynchronizationMode();
         });
 
     bool firstStep = true;
@@ -2385,12 +2389,37 @@ State CameraSettingsDialogStateReducer::setForcedSecondaryProfile(
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setRemoteArchiveAutoExportDisabled(
-    State state, const bool& value)
+State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationDisabled(
+    State state)
 {
-    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
 
-    state.expert.remoteArchiveAutoExportDisabled.setUser(value);
+    state.expert.remoteArchiveSyncronizationMode.setUser(
+        nx::vms::common::RemoteArchiveSyncronizationMode::off);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationManual(
+    State state)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
+
+    state.expert.remoteArchiveSyncronizationMode.setUser(
+        nx::vms::common::RemoteArchiveSyncronizationMode::manual);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationAuto(
+    State state)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
+
+    state.expert.remoteArchiveSyncronizationMode.setUser(
+        nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -2515,7 +2544,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setForcedPrimaryProfile(std::move(state), QString());
     state = setForcedSecondaryProfile(std::move(state), QString());
-    state = setRemoteArchiveAutoExportDisabled(std::move(state), false);
+    state = setRemoteArchiveSyncronizationDisabled(std::move(state));
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);
     state = setLogicalId(std::move(state), {});

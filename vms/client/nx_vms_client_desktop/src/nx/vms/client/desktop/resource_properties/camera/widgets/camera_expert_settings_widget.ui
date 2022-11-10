@@ -105,7 +105,7 @@
            <x>0</x>
            <y>0</y>
            <width>1343</width>
-           <height>1153</height>
+           <height>1152</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
@@ -396,22 +396,30 @@
              <item>
               <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
                <property name="title">
-                <string>Export From Device</string>
+                <string>Import From Device</string>
                </property>
                <property name="flat">
                 <bool>true</bool>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6_1">
                 <item>
-                 <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="disableAutoExportCheckBox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="disableImportFromDeviceRadioButton">
                   <property name="text">
-                   <string>Do not export video automatically</string>
+                   <string>Disable import</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="manualImportFromDeviceRadioButton">
+                  <property name="text">
+                   <string>Import video manually</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="autoImportFromDeviceRadioButton">
+                  <property name="text">
+                   <string>Import video automatically</string>
                   </property>
                  </widget>
                 </item>
@@ -795,6 +803,11 @@
   <customwidget>
    <class>nx::vms::client::desktop::CheckBoxWithHint</class>
    <extends>QCheckBox</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::RadioButtonWithHint</class>
+   <extends>QRadioButton</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
   <customwidget>
