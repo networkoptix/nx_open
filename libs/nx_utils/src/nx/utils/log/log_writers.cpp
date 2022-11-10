@@ -204,7 +204,7 @@ void File::archive(QString fileName, QString archiveName)
     if (!zippedLog.open(QIODevice::WriteOnly,
         QuaZipNewInfo(
             makeBaseFileName(fileName).chopped(strlen(kExtensionWithSeparator))
-                + "_" + timestamp + kExtensionWithSeparator,
+                + "_" + QString::number(timestamp) + kExtensionWithSeparator,
             fileName)))
     {
         std::cerr << nx::toString(this).toStdString() << ": Could not zip file "
