@@ -22,7 +22,8 @@ namespace random {
 
 namespace {
 
-#if defined(__linux__) && defined(SYS_getrandom) && !defined(ANDROID)
+// SYS_getrandom could be defined, but be empty.
+#if defined(__linux__) && (SYS_getrandom + 0 != 0) && !defined(ANDROID)
 
     // getrandom supported starting with kernel 3.17. E.g., ubuntu 14.04 uses kernel 3.16.
     bool generateSystemDependentRandom(CryptographicDevice::result_type* result)
