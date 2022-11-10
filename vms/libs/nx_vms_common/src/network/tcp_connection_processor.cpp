@@ -208,8 +208,9 @@ void QnTCPConnectionProcessor::parseRequest()
     if (d->owner)
         d->owner->applyModToRequest(&d->request);
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
+    if (!d->requestLogged && nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
     {
+        d->requestLogged = true;
         logRequestOrResponse(
             "Received request from",
             QByteArray::fromStdString(nx::network::http::getHeaderValue(d->request.headers, "Content-Type")),
@@ -528,6 +529,7 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
     d->response = nx::network::http::Response();
     d->clientRequest.clear();
     d->requestBody.clear();
+    d->requestLogged = false;
 
     std::optional<qint64> fullHttpMessageSize;
     while (!needToStop())
@@ -655,6 +657,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->accessRights = d->accessRights;
     other.d_ptr->authenticatedOnce = d->authenticatedOnce;
+    other.d_ptr->requestLogged = d->requestLogged;
 }
 
 nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
