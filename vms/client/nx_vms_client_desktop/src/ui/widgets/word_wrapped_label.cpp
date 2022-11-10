@@ -12,7 +12,11 @@ QnWordWrappedLabel::QnWordWrappedLabel(QWidget* parent):
 {
     m_label->setWordWrap(true);
     connect(m_label, &QLabel::linkActivated, this, &QnWordWrappedLabel::linkActivated);
-    connect(this, &QnWordWrappedLabel::objectNameChanged, m_label, &QLabel::setObjectName);
+    connect(this, &QObject::objectNameChanged,
+        [this](const QString& name)
+        {
+            m_label->setObjectName(name);
+        });
 }
 
 QLabel* QnWordWrappedLabel::label() const
