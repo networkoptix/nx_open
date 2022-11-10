@@ -154,19 +154,19 @@
     </message>
     <message>
         <source>Check Camera Settings to configure this plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Check System Administration settings to configure this plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This plugin has no settings at the System level.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This plugin has no settings for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
         <source>Log in to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -826,7 +826,7 @@
     </message>
     <message>
         <source>Preview is not available for the selected object</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -904,7 +904,7 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1071,11 +1071,11 @@ to activate PTZ</source>
     <name>SettingsDialog</name>
     <message>
         <source>Enter parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This action requires some parameters to be filled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1199,14 +1199,14 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Access denied</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>StyledRadioButton</name>
     <message>
         <source>Logical ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1323,7 +1323,7 @@ to activate PTZ</source>
     </message>
     <message>
         <source>You do not have access to the %1. Please check your internet connection.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
