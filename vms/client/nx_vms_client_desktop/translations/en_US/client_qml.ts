@@ -153,10 +153,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>This plugin has no settings for this Camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check Camera Settings to configure this plugin.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -166,6 +162,10 @@
     </message>
     <message>
         <source>This plugin has no settings at the System level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This plugin has no settings for this camera.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

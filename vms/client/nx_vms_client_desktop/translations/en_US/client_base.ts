@@ -1072,6 +1072,13 @@
     </message>
 </context>
 <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EncryptedLayoutStrings</name>
     <message>
         <source>Please enter a valid password</source>
@@ -2489,10 +2496,6 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Apply changes before exit?</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This action cannot be undone.</source>
         <translation></translation>
     </message>
@@ -2503,6 +2506,10 @@ License Key: %2</source>
     <message>
         <source>Some rules are not valid and may not work</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Apply changes before exiting?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4385,8 +4392,8 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Apply changes before exit?</source>
-        <translation></translation>
+        <source>Apply changes before exiting?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6759,6 +6766,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+        <source>Select at least one Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one I/O module</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamQualityStrings</name>
     <message>
         <source>Lowest</source>
@@ -7596,11 +7626,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 will be replaced by the selected camera and removed from the System</source>
-        <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7610,6 +7635,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be removed from the System and replaced by the selected camera</source>
+        <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11415,13 +11445,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
-    <message>
-        <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
         <source>None</source>
@@ -11450,10 +11473,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
 <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-        <source>Apply changes before exit?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Restore all rules to default?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11469,6 +11488,10 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <source>Failed to restore rules.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Apply changes before exiting?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
@@ -11478,13 +11501,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     </message>
     <message>
         <source>Action</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-        <source>Select at least one User</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
