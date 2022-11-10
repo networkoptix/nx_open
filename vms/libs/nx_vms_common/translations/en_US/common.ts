@@ -1150,6 +1150,11 @@
         <source>Session expired.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid parameter `%1`: %2.</source>
+        <comment>%1 is name, %2 is value.</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SystemHelpers</name>
@@ -1546,10 +1551,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep IO port state on when Server connects to the Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Force analytics DB storage mount point permissions in case of failure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1583,10 +1584,6 @@
     </message>
     <message>
         <source>Media buffer size (KB, 10KB-4MB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1624,6 +1621,14 @@
     </message>
     <message>
         <source>Expose IP addresses for autodiscovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep IO port state on when Server connects to the device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
