@@ -22,6 +22,7 @@ class JoystickButtonSettingsModel: public QAbstractItemModel, public QnWorkbench
     Q_OBJECT
 
     Q_PROPERTY(QString modifierButtonName READ modifierButtonName NOTIFY modifierButtonNameChanged)
+    Q_PROPERTY(bool zoomIsEnabled READ zoomIsEnabled NOTIFY zoomIsEnabledChanged)
     Q_PROPERTY(qreal panAndTiltSensitivity
         READ panAndTiltSensitivity
         WRITE setPanAndTiltSensitivity
@@ -73,11 +74,13 @@ public:
         QObject* parent);
     virtual ~JoystickButtonSettingsModel() override;
 
-    void init(const JoystickDescriptor& description, DevicePtr device);
+    void init(const JoystickDescriptor& description, const Device* device);
 
     JoystickDescriptor getDescriptionState() const;
 
     QString modifierButtonName() const;
+
+    bool zoomIsEnabled() const;
 
     double panAndTiltSensitivity() const;
     void setPanAndTiltSensitivity(double value);
@@ -101,6 +104,7 @@ public:
 
 signals:
     void modifierButtonNameChanged();
+    void zoomIsEnabledChanged();
     void panAndTiltSensitivityChanged(bool initialization = false);
     void zoomSensitivityChanged(bool initialization = false);
 

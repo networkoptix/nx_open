@@ -175,7 +175,7 @@ JoystickSettingsDialog::Private::~Private()
 bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
 {
     manager->loadConfig();
-    const QList<DevicePtr> devices = manager->devices();
+    const QList<const Device*> devices = manager->devices();
     if (devices.empty())
         return false;
 
@@ -191,11 +191,14 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
     QmlProperty<bool>(q->rootObjectHolder(), "zoomHighlighted") =
         stickPosition[Device::zIndex] != 0;
 
-    deviceConnection.reset(QObject::connect(device.get(), &Device::stickMoved, q,
-        [this](double x, double y, double z)
+    deviceConnection.reset(QObject::connect(device, &Device::stateChanged, q,
+        [this](const Device::StickPosition& stick)
         {
-            QmlProperty<bool>(q->rootObjectHolder(), "panAndTiltHighlighted") = x != 0 || y != 0;
-            QmlProperty<bool>(q->rootObjectHolder(), "zoomHighlighted") = z != 0;
+            QmlProperty<bool>(q->rootObjectHolder(), "panAndTiltHighlighted")
+                = stick[Device::xIndex] != 0 || stick[Device::yIndex] != 0;
+
+            QmlProperty<bool>(q->rootObjectHolder(), "zoomHighlighted")
+                = stick[Device::zIndex] != 0;
         }));
 
     const bool openLayoutChoiceEnabled = !q->currentServer().isNull();

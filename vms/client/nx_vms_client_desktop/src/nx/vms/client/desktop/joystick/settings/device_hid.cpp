@@ -31,6 +31,11 @@ DeviceHid::DeviceHid(
     m_bufferSize = (m_bitCount + 7) / 8;
     m_buffer.reset(new unsigned char[m_bufferSize]);
 
+    for (int axisIndex = 0; axisIndex < Device::axisIndexCount; ++axisIndex)
+        setAxisInitialized((Device::AxisIndexes)axisIndex, true);
+
+    setInitializedButtonsNumber(modelInfo.buttons.size());
+
     // Initialize stick axes (x, y, z).
     m_axisLocations.push_back(parseLocation(modelInfo.xAxis.bits));
     m_axisLocations.push_back(parseLocation(modelInfo.yAxis.bits));

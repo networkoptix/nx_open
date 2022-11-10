@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "device_win.h"
 #include "manager.h"
 
 #ifndef DIRECTINPUT_VERSION
@@ -10,8 +11,6 @@
 #include <dinput.h>
 
 namespace nx::vms::client::desktop::joystick {
-
-class DeviceWindows;
 
 class ManagerWindows: public Manager
 {
@@ -37,7 +36,7 @@ protected:
 private:
     virtual void enumerateDevices() override;
 
-    DevicePtr createDevice(
+    DeviceWindowsPtr createDevice(
         const JoystickDescriptor& deviceConfig,
         const QString& path,
         LPDIRECTINPUTDEVICE8 directInputDeviceObject);
@@ -52,7 +51,7 @@ private:
 
     QVector<FoundDeviceInfo> m_foundDevices;
 
-    QMap<QString, QSharedPointer<DeviceWindows>> m_intitializingDevices;
+    QMap<QString, DeviceWindowsPtr> m_intitializingDevices;
 };
 
 } // namespace nx::vms::client::desktop::joystick
