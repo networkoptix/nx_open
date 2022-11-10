@@ -130,7 +130,8 @@ Dialog
 
                 Tab
                 {
-                    visible: control.buttonSettingsModel && control.buttonSettingsModel.modifierButtonName
+                    visible: control.buttonSettingsModel
+                        && control.buttonSettingsModel.modifierButtonName
 
                     button: CompactTabButton
                     {

@@ -66,27 +66,18 @@ void ManagerHid::enumerateDevices()
                     "Manufacturer: %1, model: %2, id: %3, path: %4",
                     manufacturerName, modelName, id, path);
 
-                const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
-                    [modelName](const JoystickDescriptor& description)
-                    {
-                        return modelName.contains(description.model);
-                    });
-
-                if (iter != m_deviceConfigs.end())
+                const auto config = getDeviceDescription(modelName);
+                if (isGeneralJoystickConfig(config))
                 {
-                    const auto config = *iter;
-
-                    DevicePtr device(new DeviceHid(config, path, pollTimer()));
-                    if (device->isValid())
-                        initializeDevice(device, config, path);
+                    NX_VERBOSE(this, "Unsupported device. Model: %1, path: %2", modelName, path);
+                    return;
                 }
+
+                DevicePtr device(new DeviceHid(config, path, pollTimer()));
+                if (device->isValid())
+                    initializeDevice(device, config, path);
                 else
-                {
-                    NX_VERBOSE(this,
-                        "An unsupported Joystick has been found. "
-                        "Manufacturer: %1, model: %2, id: %3, path: %4",
-                        manufacturerName, modelName, id, path);
-                }
+                    NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelName, path);
             }
         }
         currentDevice = currentDevice->next;
