@@ -63,7 +63,7 @@ void ManagerWindows::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePa
     m_foundDevices.clear();
 }
 
-DevicePtr ManagerWindows::createDevice(
+DeviceWindowsPtr ManagerWindows::createDevice(
     const JoystickDescriptor& deviceConfig,
     const QString& path,
     LPDIRECTINPUTDEVICE8 directInputDeviceObject)
@@ -110,31 +110,16 @@ void ManagerWindows::enumerateDevices()
 
             if (!m_devices.contains(path))
             {
-                const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
-                    [modelName](const JoystickDescriptor& description)
-                    {
-                        return modelName.contains(description.model);
-                    });
+                const auto config = getDeviceDescription(modelName);
 
-                if (iter != m_deviceConfigs.end())
-                {
-                    const auto config = *iter;
-
-                    auto device = createDevice(
-                        config,
-                        path,
-                        deviceInfo.directInputDeviceObject);
-
-                    if (device && device->isValid())
-                        initializeDevice(device, config, path);
-                }
+                const auto device = createDevice(
+                    config,
+                    path,
+                    deviceInfo.directInputDeviceObject);
+                if (device && device->isValid())
+                    initializeDevice(device, config, path);
                 else
-                {
-                    NX_VERBOSE(this,
-                        "An unsupported Joystick has been found. "
-                        "Model: %1, path: %2",
-                        modelName, path);
-                }
+                    NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelName, path);
             }
         }
     }

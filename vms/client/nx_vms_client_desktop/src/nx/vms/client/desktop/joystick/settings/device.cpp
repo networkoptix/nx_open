@@ -55,9 +55,18 @@ void Device::resetState()
     std::fill(m_buttonStates.begin(), m_buttonStates.end(), false);
 
     m_stickPosition.fill(0);
-    emit stickMoved(0, 0, 0);
 
     emit stateChanged(m_stickPosition, m_buttonStates);
+}
+
+int Device::zAxisIsInitialized() const
+{
+    return m_zAxisInitialized;
+}
+
+int Device::initializedButtonsNumber() const
+{
+    return m_initializedButtonsNumber;
 }
 
 void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
@@ -101,10 +110,6 @@ void Device::pollData()
     {
         m_stickPosition = newState.stickPosition;
         deviceStateChanged = true;
-        emit stickMoved(
-            newState.stickPosition[xIndex],
-            newState.stickPosition[yIndex],
-            newState.stickPosition[zIndex]);
     }
 
     NX_ASSERT(m_buttonStates.size() == newState.buttonStates.size());
@@ -128,6 +133,59 @@ void Device::pollData()
 
     if (deviceStateChanged)
         emit stateChanged(newState.stickPosition, newState.buttonStates);
+}
+
+bool Device::axisIsInitialized(AxisIndexes index) const
+{
+    switch (index)
+    {
+        case xIndex:
+            return m_xAxisInitialized;
+        case yIndex:
+            return m_yAxisInitialized;
+        case zIndex:
+            return m_zAxisInitialized;
+        default: // Any other axes are not important.
+            return false;
+    }
+}
+
+void Device::setAxisInitialized(AxisIndexes index, bool isInitialized)
+{
+    switch (index)
+    {
+        case xIndex:
+        {
+            m_xAxisInitialized = isInitialized;
+            break;
+        }
+        case yIndex:
+        {
+            m_yAxisInitialized = isInitialized;
+            break;
+        }
+        case zIndex:
+        {
+            m_zAxisInitialized = isInitialized;
+            break;
+        }
+        default:
+        {
+            // Any other axes are not important.
+            return;
+        }
+    }
+
+    emit axisIsInitializedChanged(index);
+}
+
+void Device::setInitializedButtonsNumber(int number)
+{
+    if (m_initializedButtonsNumber == number)
+        return;
+
+    m_initializedButtonsNumber = number;
+    emit initializedButtonsNumberChanged();
 }
 
 } // namespace nx::vms::client::desktop::joystick

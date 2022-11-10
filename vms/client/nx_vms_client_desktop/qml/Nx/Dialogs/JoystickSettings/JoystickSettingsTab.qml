@@ -88,7 +88,7 @@ Item
 
                 width: parent.itemWidth
 
-                visible: control.basicMode
+                visible: control.basicMode && control.model && control.model.zoomIsEnabled
 
                 text: qsTr("Zoom In / Zoom Out")
                 image: "image://svg/skin/joystick_settings/zoom.svg"
