@@ -49,9 +49,9 @@ protected:
 
 private:
     LPDIRECTINPUTDEVICE8 m_inputDevice;
-    bool m_xAxisInitialized = false;
-    bool m_yAxisInitialized = false;
-    bool m_zAxisInitialized = false;
 };
+
+
+using DeviceWindowsPtr = QSharedPointer<DeviceWindows>;
 
 } // namespace nx::vms::client::desktop::joystick

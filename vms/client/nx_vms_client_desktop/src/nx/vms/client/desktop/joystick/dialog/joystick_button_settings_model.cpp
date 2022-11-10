@@ -78,10 +78,14 @@ QString formButtonName(const QString& rawButtonName)
     return nx::format("%1 %2", JoystickButtonSettingsModel::tr("Button"), rawButtonName);
 }
 
-QString getModifierButtonName(const JoystickDescriptor& description)
+QString getModifierButtonName(const JoystickDescriptor& description, const Device* device)
 {
-    for (const auto& buttonDescription: description.buttons)
+    const int visibleButtonsNumber =
+        std::min(description.buttons.size(), device->initializedButtonsNumber());
+
+    for (int i = 0; i < visibleButtonsNumber; ++i)
     {
+        const auto& buttonDescription = description.buttons[i];
         for (const auto& actionDescription: buttonDescription.actions)
         {
             if (actionDescription.id == kModifierActionId)
@@ -157,16 +161,16 @@ struct JoystickButtonSettingsModel::Private
     QnResourceIconCache* const resourceIconCache = nullptr;
 
     JoystickDescriptor description;
-    DevicePtr device;
 
     QString modifierButtonName;
+    bool zAxisIsInitialized = false;
+    int initializedButtonsNumber = 0;
 
     bool connectedToServer = false;
 
     QVector<bool> buttonPressedStates;
 
-    nx::utils::ScopedConnection deviceConnectionPressed;
-    nx::utils::ScopedConnection deviceConnectionReleased;
+    nx::utils::ScopedConnections deviceConnections;
 
 private:
     nx::utils::ScopedConnections scopedConnections;
@@ -240,7 +244,7 @@ public:
     {
     }
 
-    void initDeviceData(DevicePtr device);
+    void initDeviceData(const Device* device);
     void overwriteAction(const QModelIndex& index, ui::action::IDType newActionId);
     void resetPrevModifierButtonAction();
     void setModifierAction(const QModelIndex& index, ButtonDescriptor* buttonDescription);
@@ -255,13 +259,16 @@ public:
     void setModifierButtonName(const QString& name);
 };
 
-void JoystickButtonSettingsModel::Private::initDeviceData(DevicePtr device)
+void JoystickButtonSettingsModel::Private::initDeviceData(const Device* device)
 {
-    this->device = device;
+    zAxisIsInitialized = device->zAxisIsInitialized();
+    initializedButtonsNumber = device->initializedButtonsNumber();
 
     buttonPressedStates.fill(false, q->rowCount());
 
-    deviceConnectionPressed.reset(connect(device.get(), &Device::buttonPressed,
+    deviceConnections.reset();
+
+    deviceConnections << connect(device, &Device::buttonPressed, q,
         [this](int buttonIndex)
         {
             if (!NX_ASSERT(buttonIndex < q->rowCount()
@@ -274,9 +281,9 @@ void JoystickButtonSettingsModel::Private::initDeviceData(DevicePtr device)
 
             const QModelIndex index = q->index(buttonIndex, 0);
             emit q->dataChanged(index, index, {ButtonPressedRole});
-        }));
+        });
 
-    deviceConnectionReleased.reset(connect(device.get(), &Device::buttonReleased,
+    deviceConnections << connect(device, &Device::buttonReleased, q,
         [this](int buttonIndex)
         {
             if (!NX_ASSERT(buttonIndex < q->rowCount()
@@ -289,7 +296,24 @@ void JoystickButtonSettingsModel::Private::initDeviceData(DevicePtr device)
 
             const QModelIndex index = q->index(buttonIndex, 0);
             emit q->dataChanged(index, index, {ButtonPressedRole});
-        }));
+        });
+
+    deviceConnections << connect(device, &Device::axisIsInitializedChanged, q,
+        [this, device]
+        {
+            zAxisIsInitialized = device->zAxisIsInitialized();
+            q->zoomIsEnabledChanged();
+        });
+
+    deviceConnections << connect(device, &Device::initializedButtonsNumberChanged, q,
+        [this, device]
+        {
+            // It is unlikely situation, therefore this inafficiency is permissible.
+            q->beginResetModel();
+            initializedButtonsNumber = device->initializedButtonsNumber();
+            getModifierButtonName(description, device);
+            q->endResetModel();
+        });
 }
 
 void JoystickButtonSettingsModel::Private::overwriteAction(
@@ -433,7 +457,7 @@ JoystickButtonSettingsModel::~JoystickButtonSettingsModel()
 {
 }
 
-void JoystickButtonSettingsModel::init(const JoystickDescriptor& description, DevicePtr device)
+void JoystickButtonSettingsModel::init(const JoystickDescriptor& description, const Device* device)
 {
     beginResetModel();
     d->description = description;
@@ -441,10 +465,12 @@ void JoystickButtonSettingsModel::init(const JoystickDescriptor& description, De
 
     d->initDeviceData(device);
 
-    d->setModifierButtonName(getModifierButtonName(description));
+    d->setModifierButtonName(getModifierButtonName(description, device));
 
     emit panAndTiltSensitivityChanged(true);
     emit zoomSensitivityChanged(true);
+
+    emit zoomIsEnabledChanged();
 }
 
 JoystickDescriptor JoystickButtonSettingsModel::getDescriptionState() const
@@ -455,6 +481,11 @@ JoystickDescriptor JoystickButtonSettingsModel::getDescriptionState() const
 QString JoystickButtonSettingsModel::modifierButtonName() const
 {
     return d->modifierButtonName;
+}
+
+bool JoystickButtonSettingsModel::zoomIsEnabled() const
+{
+    return d->zAxisIsInitialized;
 }
 
 double JoystickButtonSettingsModel::panAndTiltSensitivity() const
@@ -779,7 +810,7 @@ QModelIndex JoystickButtonSettingsModel::parent(const QModelIndex& index) const
 
 int JoystickButtonSettingsModel::rowCount(const QModelIndex& parent) const
 {
-    return d->description.buttons.size();
+    return std::min(d->description.buttons.size(), d->initializedButtonsNumber);
 }
 
 int JoystickButtonSettingsModel::columnCount(const QModelIndex& parent) const

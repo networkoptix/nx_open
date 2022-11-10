@@ -41,13 +41,13 @@ void ManagerLinux::enumerateDevices()
         static constexpr int kNameMaxSize = 256;
         char name[kNameMaxSize];
         __u32 version;
-        __u8 axes;
-        __u8 buttons;
+        __u8 axesNumber;
+        __u8 buttonsNumber;
 
         ioctl(fd, JSIOCGNAME(kNameMaxSize), name);
         ioctl(fd, JSIOCGVERSION, &version);
-        ioctl(fd, JSIOCGAXES, &axes);
-        ioctl(fd, JSIOCGBUTTONS, &buttons);
+        ioctl(fd, JSIOCGAXES, &axesNumber);
+        ioctl(fd, JSIOCGBUTTONS, &buttonsNumber);
 
         close(fd);
 
@@ -57,27 +57,15 @@ void ManagerLinux::enumerateDevices()
             "Model: %1, path: %2",
             modelName, path);
 
-        const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
-            [modelName](const JoystickDescriptor& description)
-            {
-                return modelName.contains(description.model);
-            });
+        const auto config = getDeviceDescription(modelName);
+        DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
+        DevicePtr device(deviceLinux);
+        deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
 
-        if (iter != m_deviceConfigs.end())
-        {
-            const auto config = *iter;
-
-            DevicePtr device(new DeviceLinux(config, path, pollTimer()));
-            if (device->isValid())
-                initializeDevice(device, config, path);
-        }
+        if (device->isValid())
+            initializeDevice(device, config, path);
         else
-        {
-            NX_VERBOSE(this,
-                "An unsupported Joystick has been found. "
-                "Model: %1, path: %2",
-                modelName, path);
-        }
+            NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelName, path);
     }
 
     removeUnpluggedJoysticks(foundDevices);

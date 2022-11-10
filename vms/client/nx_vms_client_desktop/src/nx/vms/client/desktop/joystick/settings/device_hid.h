@@ -9,8 +9,8 @@
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 
-#include "device.h"
 #include "descriptors.h"
+#include "device.h"
 
 namespace nx::vms::client::desktop::joystick {
 

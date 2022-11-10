@@ -13,15 +13,15 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/impl_ptr.h>
 
+#include "device.h"
+
 namespace nx::vms::client::desktop {
 namespace joystick {
 
 class ActionFactory;
-class Device;
 struct JoystickDescriptor;
 
 using ActionFactoryPtr = QSharedPointer<ActionFactory>;
-using DevicePtr = QSharedPointer<Device>;
 using DeviceConfigs = QMap<QString, JoystickDescriptor>;
 
 /**
@@ -51,7 +51,7 @@ public:
      * however devices created for such models are dummy and provide only basic device info
      * such as manufacturer and model identifiers.
      */
-    QList<DevicePtr> devices() const;
+    QList<const Device*> devices() const;
 
     JoystickDescriptor getDefaultDeviceDescription(const QString& model) const;
     JoystickDescriptor getDeviceDescription(const QString& model) const;
@@ -75,18 +75,24 @@ protected:
         const QString& searchDir,
         DeviceConfigs& destConfigs,
         QMap<QString, QString>& destIdToRelativePath) const;
+
+    void loadGeneralConfig(
+        const QString& searchDir,
+        JoystickDescriptor& destConfig,
+        QMap<QString, QString>& destIdToRelativePath) const;
+
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
     void initializeDevice(
-        DevicePtr& device,
+        const DevicePtr& device,
         const JoystickDescriptor& description,
         const QString& devicePath);
+
+    bool isGeneralJoystickConfig(const JoystickDescriptor& config);
 
     QTimer* pollTimer() const;
 
 protected:
     mutable nx::Mutex m_mutex;
-
-    DeviceConfigs m_deviceConfigs;
 
     QMap<QString, DevicePtr> m_devices;
 
