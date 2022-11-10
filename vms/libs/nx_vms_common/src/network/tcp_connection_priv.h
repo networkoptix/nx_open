@@ -33,6 +33,7 @@ public:
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
+        requestLogged(false),
         owner(nullptr),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
@@ -119,6 +120,7 @@ public:
     Qn::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
+    bool requestLogged;
     QnTcpListener* owner;
     mutable nx::Mutex socketMutex;
     // TODO: #rvasilenko Fix socketMutex used for takeSocket() vs sockMutex used for send().
