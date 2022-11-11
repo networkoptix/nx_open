@@ -1182,31 +1182,43 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget* widget, co
     widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
-void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget* widget, const QRectF& zoomRect, QnMediaResourceWidget* zoomTargetWidget)
+void QnWorkbenchController::at_zoomTargetChanged(
+    QnMediaResourceWidget* widget,
+    const QRectF& zoomRect,
+    QnMediaResourceWidget* zoomTargetWidget)
 {
-    QnLayoutItemData data = widget->item()->data();
-    delete widget;
-
     const auto resource = zoomTargetWidget->resource()->toResourcePtr();
-    NX_ASSERT(resource);
-    if (!resource)
+    if (!NX_ASSERT(resource))
         return;
 
+    QnLayoutItemData existing = widget->item()->data();
+
+    // Create new layout item inplace of existing one.
+    QnLayoutItemData data = existing;
     data.uuid = QnUuid::createUuid();
     data.resource = descriptor(resource);
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
-    data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
-    data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
+    // Zoom target must always be dewarped by 90 degrees.
+    data.dewarpingParams.panoFactor = 1;
+    // Zoom items on fisheye cameras must always be dewarped.
+    data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;
 
-    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-    if (!layout)
-        return;
-    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
-        return;
-    layout->addItem(data);
+    auto currentLayout = workbench()->currentLayoutResource();
+
+    // Unpin existing item to free worbench grid place for the new item.
+    existing.flags = 0;
+    currentLayout->updateItem(existing);
+
+    // Add a new item. Existing should be deleted later to avoid AV in this method processing.
+    currentLayout->addItem(data);
+    executeDelayedParented(
+        [this, id = existing.uuid, currentLayout]
+        {
+            currentLayout->removeItem(id);
+        }, this);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*view*/,
