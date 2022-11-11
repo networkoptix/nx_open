@@ -19,6 +19,8 @@ namespace object_detection {
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
+    static const std::string kTimeShiftSetting;
+    static const std::string kSendAttributesSetting;
     static const std::string kObjectTypeGenerationSettingPrefix;
 
 public:
@@ -47,6 +49,8 @@ private:
     mutable std::mutex m_mutex;
 
     int m_frameIndex = 0;
+    int m_timestampShiftMs = 0;
+    bool m_sendAttributes = true;
     std::vector<nx::sdk::Uuid> m_trackIds;
     std::set<std::string> m_objectTypeIdsToGenerate;
 };
