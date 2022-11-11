@@ -387,7 +387,7 @@ void TestKit::keys(QJSValue object, QString keys, QString input)
     else if (input == "RELEASE")
         option = utils::KeyRelease;
 
-    utils::sendKeys(object, keys, option, QGuiApplication::keyboardModifiers());
+    utils::sendKeys(object, keys, option, QGuiApplication::queryKeyboardModifiers());
 }
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)
