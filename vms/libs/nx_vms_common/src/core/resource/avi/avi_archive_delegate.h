@@ -110,7 +110,7 @@ private:
 
     bool findStreams();
     CodecParametersConstPtr getCodecContext(AVStream* stream);
-    bool reopen();
+    bool reopen() override;
 
     virtual bool checkStorage();
 

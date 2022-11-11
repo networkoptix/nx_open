@@ -93,7 +93,7 @@ public:
 
     virtual void run() override;
 
-    virtual double getSpeed() const = 0;
+    virtual double getSpeed() const override = 0;
 
     virtual void startPaused(qint64 startTime) = 0;
     virtual void setGroupId(const nx::String& groupId)  = 0;

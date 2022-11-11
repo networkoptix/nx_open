@@ -62,7 +62,7 @@ public:
     virtual void setDewarpingParams(const nx::vms::api::dewarping::MediaData& params) override;
 
     virtual QnAspectRatio customAspectRatio() const override;
-    virtual std::optional<int> forcedRotation() const;
+    virtual std::optional<int> forcedRotation() const override;
 
     /** Returns true if the entity is contained inside a layout file. */
     bool isEmbedded() const;
