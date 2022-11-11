@@ -17,9 +17,9 @@ public:
     nx::Buffer prepareFrame(nx::Buffer payload, FrameType type, bool fin);
 
 private:
-    bool m_masked;
+    bool m_masked = false;
     bool m_doCompress = false;
-    unsigned m_mask;
+    unsigned m_mask = 0;
 
     void setMasked(bool masked, unsigned mask = 0);
     int fillHeader(char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen);

@@ -60,6 +60,7 @@ nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin
     nx::Buffer header;
     int payloadLenType = payloadLenTypeByLen(payload.size());
     header.resize(calcHeaderSize(m_masked, payloadLenType));
+    memset(header.data(), 0, header.size());
     fillHeader(header.data(), fin, type, payloadLenType, payload.size());
 
     if (m_masked)
@@ -85,31 +86,40 @@ int Serializer::fillHeader(
 {
     char* pdata = data;
 
-    *pdata = static_cast<uint8_t>(fin) << 7;
+    if (fin)
+        *pdata |= 1 << 7;
+
     if (m_doCompress)
         *pdata |= 1 << 6; //< Setting the RSV1 bit
 
     *pdata |= opCode & 0xf;
     pdata++;
 
-    *pdata |= static_cast<int>(m_masked) << 7;
+    if (m_masked)
+        *pdata |= 1 << 7;
+
     *pdata |= payloadLenType & 0x7f;
     pdata++;
 
     if (payloadLenType == 126)
     {
-        *reinterpret_cast<unsigned short*>(pdata) = htons(payloadLen);
+        unsigned short nPayloadLen = htons(payloadLen);
+        memcpy(pdata, &nPayloadLen, 2);
+        static_assert(sizeof(unsigned short) == 2);
         pdata += 2;
     }
     else if (payloadLenType == 127)
     {
-        *reinterpret_cast<uint64_t*>(pdata) = htonll((int64_t)payloadLen);
+        int64_t nPayloadLen = htonll(payloadLen);
+        memcpy(pdata, &nPayloadLen, 8);
+        static_assert(sizeof(int64_t) == 8);
         pdata += 8;
     }
 
     if (m_masked)
     {
-        *reinterpret_cast<unsigned int*>(pdata) = m_mask;
+        memcpy(pdata, &m_mask, 4);
+        static_assert(sizeof(m_mask) == 4);
         pdata += 4;
     }
 
