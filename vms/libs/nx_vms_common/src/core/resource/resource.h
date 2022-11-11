@@ -75,7 +75,7 @@ class NX_VMS_COMMON_API QnResource: public QObject, public QnFromThisToShared<Qn
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(ResourceStatus status READ getStatus WRITE setStatus NOTIFY statusChanged)
+    Q_PROPERTY(nx::vms::api::ResourceStatus status READ getStatus WRITE setStatus NOTIFY statusChanged)
 
 public:
     //---------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 
+import nx.vms.api 1.0
 import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
@@ -28,6 +29,7 @@ FocusScope
 
     implicitHeight: 20 //< Some sensible default.
     implicitWidth: isSeparator ? 0 : contentRow.implicitWidth
+    opacity: (resource && resource.status == API.ResourceStatus.offline) ? 0.3 : 1 //< Offline resources must looks like disabled.
 
     Row
     {
@@ -57,9 +59,9 @@ FocusScope
 
                 Image
                 {
-                    id: problemsIcon
                     visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.locked
                     source: "qrc:///skin/tree/locked.svg"
+                    sourceSize: Qt.size(20, 20)
                 }
 
                 Image

@@ -181,6 +181,9 @@ void initializeMetaTypes()
     OperationManager::registerQmlType();
 
     GridViewport::registerQmlType();
+
+    qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
+        "API", "API is a namespace");
 }
 
 } // namespace nx::vms::client::core
