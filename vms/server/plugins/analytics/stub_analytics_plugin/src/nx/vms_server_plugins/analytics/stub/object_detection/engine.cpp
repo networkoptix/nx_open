@@ -45,6 +45,26 @@ std::string Engine::manifestString() const
     Json deviceAgentManifest = Json::parse(kDeviceAgentManifest, errors).object_items();
 
     Json::array generationSettings;
+
+    Json::object timeShiftSetting = {
+        {"type", "SpinBox"},
+        {"name", DeviceAgent::kTimeShiftSetting},
+        {"caption", "Timestamp shift"},
+        {"description", "Metadata timestamp shift in milliseconds"},
+        {"defaultValue", 0}
+    };
+    generationSettings.push_back(std::move(timeShiftSetting));
+
+    Json::object attributesSetting = {
+        {"type", "CheckBox"},
+        {"name", DeviceAgent::kSendAttributesSetting},
+        {"caption", "Send object attributes"},
+        {"defaultValue", true}
+    };
+    generationSettings.push_back(std::move(attributesSetting));
+
+    generationSettings.push_back(Json::object{ {"type", "Separator"} });
+
     for (const auto& supportedType : deviceAgentManifest["supportedTypes"].array_items())
     {
         Json::object supportedTypeObject = supportedType.object_items();

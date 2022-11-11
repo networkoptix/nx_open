@@ -25,6 +25,8 @@ static constexpr int kTrackLength = 200;
 static constexpr float kMaxBoundingBoxWidth = 0.5F;
 static constexpr float kMaxBoundingBoxHeight = 0.5F;
 static constexpr float kFreeSpace = 0.1F;
+const std::string DeviceAgent::kTimeShiftSetting = "timestampShiftMs";
+const std::string DeviceAgent::kSendAttributesSetting = "sendAttributes";
 const std::string DeviceAgent::kObjectTypeGenerationSettingPrefix = "objectTypeIdToGenerate.";
 
 static Rect generateBoundingBox(int frameIndex, int trackIndex, int trackCount)
@@ -42,7 +44,8 @@ static Rect generateBoundingBox(int frameIndex, int trackIndex, int trackCount)
 
 static std::vector<Ptr<ObjectMetadata>> generateObjects(
     const std::map<std::string, std::map<std::string, std::string>>& attributesByObjectType,
-    const std::set<std::string>& objectTypeIdsToGenerate)
+    const std::set<std::string>& objectTypeIdsToGenerate,
+    bool doGenerateAttributes)
 {
     std::vector<Ptr<ObjectMetadata>> result;
 
@@ -52,12 +55,15 @@ static std::vector<Ptr<ObjectMetadata>> generateObjects(
         if (objectTypeIdsToGenerate.find(objectTypeId) == objectTypeIdsToGenerate.cend())
             continue;
 
-        const std::map<std::string, std::string>& attributes = entry.second;
-
         auto objectMetadata = makePtr<ObjectMetadata>();
         objectMetadata->setTypeId(objectTypeId);
-        for (const auto& attribute: attributes)
-            objectMetadata->addAttribute(makePtr<Attribute>(attribute.first, attribute.second));
+
+        if (doGenerateAttributes)
+        {
+            const std::map<std::string, std::string>& attributes = entry.second;
+            for (const auto& attribute: attributes)
+                objectMetadata->addAttribute(makePtr<Attribute>(attribute.first, attribute.second));
+        }
 
         result.push_back(std::move(objectMetadata));
     }
@@ -73,7 +79,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
     std::vector<Ptr<ObjectMetadata>> objects;
     {
         const std::lock_guard<std::mutex> lock(m_mutex);
-        objects = generateObjects(kObjectAttributes, m_objectTypeIdsToGenerate);
+        objects = generateObjects(kObjectAttributes, m_objectTypeIdsToGenerate, m_sendAttributes);
     }
 
     for (int i = 0; i < (int) objects.size(); ++i)
@@ -108,7 +114,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
         m_trackIds.clear();
 
     Ptr<IMetadataPacket> objectMetadataPacket = generateObjectMetadataPacket(
-        videoFrame->timestampUs());
+        videoFrame->timestampUs() + m_timestampShiftMs * 1000);
 
     pushMetadataPacket(objectMetadataPacket.releasePtr());
 
@@ -134,6 +140,10 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
         const std::string& value = entry.second;
         if (startsWith(key, kObjectTypeGenerationSettingPrefix) && toBool(value))
             m_objectTypeIdsToGenerate.insert(key.substr(kObjectTypeGenerationSettingPrefix.size()));
+        else if (key == kSendAttributesSetting)
+            m_sendAttributes = toBool(value);
+        else if (key == kTimeShiftSetting)
+            m_timestampShiftMs = std::stoi(value);
     }
 
     return nullptr;
