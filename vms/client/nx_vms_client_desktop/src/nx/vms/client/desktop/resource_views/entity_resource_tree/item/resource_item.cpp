@@ -138,9 +138,6 @@ QVariant ResourceItem::data(int role) const
 
 Qt::ItemFlags ResourceItem::flags() const
 {
-    if (m_resource->getStatus() == api::ResourceStatus::offline)
-        return {Qt::ItemIsSelectable};
-
     return {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
 }
 

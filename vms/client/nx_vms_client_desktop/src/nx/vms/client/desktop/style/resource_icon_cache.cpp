@@ -169,8 +169,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.png"));
 
     // Web Pages.
-    m_cache.insert(WebPages, loadIcon("tree/webpages.png"));
-    m_cache.insert(WebPage, loadIcon("tree/webpage.png"));
+    m_cache.insert(WebPages, loadIcon("tree/webpages.svg"));
+    m_cache.insert(WebPage, loadIcon("tree/webpage.svg"));
     m_cache.insert(WebPageProxied, loadIcon("tree/webpage_proxied.svg"));
 
     // Analytics.
