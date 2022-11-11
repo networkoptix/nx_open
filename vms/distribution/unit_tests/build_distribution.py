@@ -84,7 +84,13 @@ def get_go_unit_tests_list(tests_directory: str):
         "nx_chunk_log_ut_service_ut",
         "nx_chunk_log_ut_sqlmodel_ut",
         "nx_chunk_log_ut_yugabytemodel_ut",
-        
+        "nx_storage_cleaner_ut_chunklogapi_ut",
+        "nx_storage_cleaner_ut_cssapi_ut",
+        "nx_storage_cleaner_ut_dao_ut",
+        "nx_storage_cleaner_ut_httpclientfactory_ut",
+        "nx_storage_cleaner_ut_licenserapi_ut",
+        "nx_storage_cleaner_ut_model_ut",
+        "nx_storage_cleaner_ut_storagecleaner_ut",
     ]
     for test_name in GO_UNIT_TEST_NAMES:
         test_full_name = f"{test_name}{extension}"
