@@ -32,7 +32,9 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 "(Base) Enum attribute",
                 "(Base) Color attribute",
                 "(Base) Object attribute.Nested Field 1",
-                "(Base) Object attribute.Nested Field 2"
+                "(Base) Object attribute.Nested Field 2",
+                "(Base) Show Conditional Attribute",
+                "(Base) Conditional Attribute"
             ],
             "_comment": "Supported Attributes of a nested Object are declared via `.`."
         },
@@ -259,6 +261,15 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                         "type": "Object",
                         "subtype": "nx.stub.attributeObjectType",
                         "name": "(Base) Object attribute"
+                    },
+                    {
+                        "name": "(Base) Show Conditional Attribute",
+                        "type": "Boolean"
+                    },
+                    {
+                        "name": "(Base) Conditional Attribute",
+                        "type": "String",
+                        "condition": "\"(Base) Show Conditional Attribute\" = true"
                     }
                 ]
             },

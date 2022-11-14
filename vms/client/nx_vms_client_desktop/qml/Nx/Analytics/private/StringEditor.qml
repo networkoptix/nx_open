@@ -9,6 +9,7 @@ TextField
     id: control
 
     property var selectedValue: undefined
+    readonly property bool hasTextFields: true
 
     onTextChanged:
         selectedValue = text || undefined
@@ -17,4 +18,14 @@ TextField
         text = selectedValue || ""
 
     background: TextFieldBackground {}
+
+    function getFocusState()
+    {
+        return cursorPosition
+    }
+
+    function setFocusState(state)
+    {
+        cursorPosition = state
+    }
 }

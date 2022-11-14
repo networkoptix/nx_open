@@ -5,8 +5,12 @@
 #include <QtQml/QQmlEngine>
 
 #include <core/resource/camera_resource.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/composite_state_view_filter.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/engine_state_view_filter.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/node.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/scope_state_view_filter.h>
 
@@ -14,44 +18,43 @@ namespace nx::vms::client::desktop::analytics::taxonomy {
 
 namespace {
 
-class Filter: public ScopeStateViewFilter
+class LiveTypeFilter: public AbstractStateViewFilter
 {
 public:
-    Filter(
-        nx::analytics::taxonomy::AbstractEngine* engine,
-        const std::set<QnUuid>& devices,
-        bool excludeLiveTypes,
-        QObject* parent = nullptr);
+    LiveTypeFilter(bool excludeLiveTypes, QObject* parent = nullptr);
 
     virtual QString id() const override;
+    virtual QString name() const override { return ""; };
 
     virtual bool matches(
         const nx::analytics::taxonomy::AbstractObjectType* objectType) const override;
+
+    virtual bool matches(
+        const nx::analytics::taxonomy::AbstractAttribute* attribute) const override;
 
 private:
     bool m_liveTypesExcluded = false;
 };
 
-Filter::Filter(
-    nx::analytics::taxonomy::AbstractEngine* engine,
-    const std::set<QnUuid>& devices,
-    bool excludeLiveTypes,
-    QObject* parent)
-    :
-    ScopeStateViewFilter(engine, devices, parent),
+LiveTypeFilter::LiveTypeFilter(bool excludeLiveTypes, QObject* parent):
+    AbstractStateViewFilter(parent),
     m_liveTypesExcluded(excludeLiveTypes)
 {
 }
 
-QString Filter::id() const
+QString LiveTypeFilter::id() const
 {
-    return ScopeStateViewFilter::id() + QString::number(m_liveTypesExcluded);
+    return QString::number(static_cast<int>(m_liveTypesExcluded));
 }
 
-bool Filter::matches(const nx::analytics::taxonomy::AbstractObjectType* objectType) const
+bool LiveTypeFilter::matches(const nx::analytics::taxonomy::AbstractObjectType* objectType) const
 {
-    return ScopeStateViewFilter::matches(objectType)
-        && !(m_liveTypesExcluded && (objectType->isLiveOnly() || objectType->isNonIndexable()));
+    return !(m_liveTypesExcluded && (objectType->isLiveOnly() || objectType->isNonIndexable()));
+}
+
+bool LiveTypeFilter::matches(const nx::analytics::taxonomy::AbstractAttribute* attribute) const
+{
+    return true;
 }
 
 void mapObjectTypes(
@@ -82,7 +85,7 @@ std::vector<nx::analytics::taxonomy::AbstractEngine*> enginesFromFilters(
     std::vector<nx::analytics::taxonomy::AbstractEngine*> engines;
     for (auto filter: filters)
     {
-        if (auto engineFilter = dynamic_cast<ScopeStateViewFilter*>(filter))
+        if (auto engineFilter = dynamic_cast<EngineStateViewFilter*>(filter))
             engines.push_back(engineFilter->engine());
     }
     return engines;
@@ -97,6 +100,15 @@ std::set<QnUuid> deviceIds(const QnVirtualCameraResourceSet& devices)
     return ids;
 }
 
+nx::common::metadata::Attributes filterAttributes(const QVariantMap& values)
+{
+    nx::common::metadata::Attributes result;
+    for (const auto& [name, value]: nx::utils::constKeyValueRange(values))
+        result.push_back({name, value.toString()});
+
+    return result;
+}
+
 } // namespace
 
 AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QObject* parent):
@@ -107,7 +119,12 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
         return;
 
     connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-        this, &AnalyticsFilterModel::rebuild);
+        this,
+        [this]
+        {
+            if (m_isActive)
+                rebuild();
+        });
 
     rebuild();
 }
@@ -142,19 +159,30 @@ void AnalyticsFilterModel::setEngines(
 void AnalyticsFilterModel::update(
     nx::analytics::taxonomy::AbstractEngine* engine,
     const std::set<QnUuid>& devices,
+    const QVariantMap& attributeValues,
     bool liveTypesExcluded,
     bool force)
 {
     if (force
         || m_engine != engine
+        || m_attributeValues != attributeValues
         || m_devices != devices
         || m_liveTypesExcluded != liveTypesExcluded)
     {
         m_engine = engine;
         m_devices = devices;
+        m_attributeValues = attributeValues;
         m_liveTypesExcluded = liveTypesExcluded;
 
-        const auto filter = std::make_unique<Filter>(m_engine, m_devices, m_liveTypesExcluded);
+        const auto liveTypeFilter = std::make_unique<LiveTypeFilter>(m_liveTypesExcluded);
+        const auto scopeFilter = std::make_unique<ScopeStateViewFilter>(m_engine, m_devices);
+        const auto conditionFilter = std::make_unique<AttributeConditionStateViewFilter>(
+            /*baseFilter*/ nullptr, filterAttributes(m_attributeValues));
+
+        const auto filter =
+            std::make_unique<CompositeFilter>(std::vector<AbstractStateViewFilter*>{
+                liveTypeFilter.get(), scopeFilter.get(), conditionFilter.get()});
+
         taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(filter.get());
         setObjectTypes(state->rootNodes());
     }
@@ -164,7 +192,7 @@ void AnalyticsFilterModel::setSelectedEngine(
     nx::analytics::taxonomy::AbstractEngine* engine,
     bool force)
 {
-    update(engine, m_devices, m_liveTypesExcluded);
+    update(engine, m_devices, m_attributeValues, m_liveTypesExcluded);
 }
 
 void AnalyticsFilterModel::setSelectedDevices(const QnVirtualCameraResourceSet& devices)
@@ -174,12 +202,17 @@ void AnalyticsFilterModel::setSelectedDevices(const QnVirtualCameraResourceSet& 
 
 void AnalyticsFilterModel::setSelectedDevices(const std::set<QnUuid>& devices)
 {
-    update(m_engine, devices, m_liveTypesExcluded);
+    update(m_engine, devices, m_attributeValues, m_liveTypesExcluded);
+}
+
+void AnalyticsFilterModel::setSelectedAttributeValues(const QVariantMap& values)
+{
+    update(m_engine, m_devices, values, m_liveTypesExcluded);
 }
 
 void AnalyticsFilterModel::setLiveTypesExcluded(bool value)
 {
-    update(m_engine, m_devices, value);
+    update(m_engine, m_devices, m_attributeValues, value);
 }
 
 AbstractNode* AnalyticsFilterModel::objectTypeById(const QString& id) const
@@ -220,13 +253,26 @@ void AnalyticsFilterModel::setActive(bool value)
     }
 }
 
+void AnalyticsFilterModel::setSelected(
+    nx::analytics::taxonomy::AbstractEngine* engine,
+    const QVariantMap& attributeValues)
+{
+    update(engine, m_devices, attributeValues, m_liveTypesExcluded);
+}
+
 void AnalyticsFilterModel::rebuild()
 {
+    setObjectTypes({});
+    setEngines({});
+
+    if (!NX_ASSERT(m_objectTypes.empty() && m_engines.empty()))
+        return;
+
     m_stateViewBuilder =
         std::make_unique<taxonomy::StateViewBuilder>(m_taxonomyManager->currentTaxonomy());
 
     setEngines(enginesFromFilters(m_stateViewBuilder->engineFilters()));
-    update(m_engine, m_devices, m_liveTypesExcluded, /*force*/ true);
+    update(m_engine, m_devices, m_attributeValues, m_liveTypesExcluded, /*force*/ true);
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

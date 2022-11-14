@@ -2,12 +2,13 @@
 
 #include "utils.h"
 
+#include <analytics/db/text_search_utils.h>
+#include <nx/analytics/taxonomy/common.h>
+
 #include "attribute.h"
 #include "attribute_set.h"
 #include "color_set.h"
 #include "enumeration.h"
-
-#include <nx/analytics/taxonomy/common.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
@@ -222,6 +223,32 @@ AbstractAttribute* mergeAttributes(
     }
 }
 
+void determineConditionReferences(
+    const std::vector<AbstractAttribute*>& attributes,
+    const QSet<QString>& attributeConditions)
+{
+    using namespace nx::analytics::db;
+
+    QSet<QString> references;
+    UserTextSearchExpressionParser parser;
+
+    for (const QString& conditionText: attributeConditions)
+    {
+        parser.parse(
+            conditionText,
+            [&references](const TextSearchCondition& condition)
+            {
+                references << condition.name.toLower();
+            });
+    }
+
+    for (AbstractAttribute* abstractAttribute: attributes)
+    {
+        if (Attribute* attribute = dynamic_cast<Attribute*>(abstractAttribute))
+            attribute->setReferencedInCondition(references.contains(attribute->name().toLower()));
+    }
+}
+
 std::vector<AbstractAttribute*> resolveAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractObjectType*>& objectTypes,
     const AbstractStateViewFilter* filter,
@@ -232,12 +259,16 @@ std::vector<AbstractAttribute*> resolveAttributes(
         std::vector<const nx::analytics::taxonomy::AbstractAttribute*>> attributesToMerge;
     std::vector<QString> orderedAttributeNames;
     std::vector<AbstractAttribute*> result;
+    QSet<QString> conditions;
 
     for (const auto& objectType: objectTypes)
     {
         for (const nx::analytics::taxonomy::AbstractAttribute* attribute:
             objectType->supportedAttributes())
         {
+            if (!attribute->condition().isEmpty())
+                conditions.insert(attribute->condition()); //< Save condition before filtering.
+
             if (filter && !filter->matches(attribute))
                 continue;
 
@@ -251,6 +282,8 @@ std::vector<AbstractAttribute*> resolveAttributes(
 
     for (const QString& attributeName: orderedAttributeNames)
         result.push_back(mergeAttributes(attributesToMerge[attributeName], filter, parent));
+
+    determineConditionReferences(result, conditions);
 
     return result;
 }

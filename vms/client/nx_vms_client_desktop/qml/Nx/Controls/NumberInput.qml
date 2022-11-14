@@ -6,7 +6,7 @@ import QtQuick.Controls 2.14
 import Nx 1.0
 import Nx.Controls 1.0
 
-Item
+FocusScope
 {
     id: control
 
@@ -23,6 +23,8 @@ Item
             : textField.value
     }
 
+    property alias editorCursorPosition: textField.cursorPosition
+
     function setValue(value)
     {
         textField.value = value
@@ -33,9 +35,15 @@ Item
         setValue(undefined)
     }
 
+    function isValidated()
+    {
+        return textField.value === control.value
+    }
+
     property alias placeholderText: textField.placeholderText //< Displayed when value is undefined.
     property alias prefix: prefixText.text
     property alias background: textField.background
+    property alias cursorPosition: textField.cursorPosition
 
     enum Mode
     {
@@ -52,6 +60,8 @@ Item
     TextField
     {
         id: textField
+
+        focus: true
 
         width: control.width
 

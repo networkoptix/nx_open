@@ -18,37 +18,105 @@ Column
 
     property Analytics.AnalyticsFilterModel model: null
 
+    property var engine: null
+
     readonly property var selectedAnalyticsObjectTypeIds:
-        model.getAnalyticsObjectTypeIds(objectTypeSelector.selectedObjectType)
+        model.getAnalyticsObjectTypeIds(impl.selectedObjectType)
 
-    readonly property var selectedAttributeValues:
+    readonly property var selectedAttributeFilters: objectTypeSelector.selectedObjectType
+        ? impl.selectedAttributeFilters
+        : []
+
+    onModelChanged: impl.setup(engine, selectedAnalyticsObjectTypeIds, /*attributeValues*/ {})
+
+    NxObject
     {
-        if (!objectTypeSelector.selectedObjectType)
-            return []
+        id: impl
 
-        function quoteIfNeeded(text, quoteNumbers)
+        property bool updating: false
+        property var selectedAttributeFilters: []
+        property var selectedObjectType: null
+
+        function setup(engine, analyticsObjectTypeIds, attributeValues)
         {
-            if (text.search(/\s/) >= 0)
-                return `"${text}"`
+            let focusState = objectAttributes.getFocusState()
 
-            return (quoteNumbers && text.match(/^[+-]?\d+(\.\d+)?$/))
-                ? `"${text}"`
-                : text
+            updating = true
+
+            model.setSelected(engine, attributeValues)
+            analyticsFilters.engine = engine
+
+            objectTypeSelector.objectTypes = model.objectTypes
+            let filterType = findFilterObjectType(analyticsObjectTypeIds)
+            objectTypeSelector.setSelectedObjectType(filterType)
+            objectAttributes.attributes = objectTypeSelector.selectedObjectType
+                ? objectTypeSelector.selectedObjectType.attributes
+                : null
+            objectAttributes.selectedAttributeValues = attributeValues
+
+            updating = false
+
+            objectAttributes.setFocusState(focusState)
+
+            updateAttributeFilters()
+            updateSelectedObjectType()
         }
 
-        var result = []
-        const values = objectAttributes.selectedAttributeValues
-
-        for (let name in values)
+        function updateAttributeFilters()
         {
-            const value = values[name]
-            if (typeof value === "function")
-                result.push(value(quoteIfNeeded(name)))
-            else
-                result.push(`${quoteIfNeeded(name)}=${quoteIfNeeded(value.toString(), true)}`)
+            impl.selectedAttributeFilters =
+                attributeFiltersFromValues(objectAttributes.selectedAttributeValues)
         }
 
-        return result
+        function updateSelectedObjectType()
+        {
+            impl.selectedObjectType = objectTypeSelector.selectedObjectType
+        }
+
+        Connections
+        {
+            target: objectAttributes
+            enabled: !impl.updating
+
+            function onSelectedAttributeValuesChanged()
+            {
+                impl.updateAttributeFilters()
+            }
+
+            function onReferencedAttributeValueChanged()
+            {
+                impl.setup(
+                    analyticsFilters.engine,
+                    analyticsFilters.selectedAnalyticsObjectTypeIds,
+                    objectAttributes.selectedAttributeValues)
+            }
+        }
+
+        Connections
+        {
+            target: objectTypeSelector
+            enabled: !impl.updating
+            function onSelectedObjectTypeChanged()
+            {
+                impl.setup(
+                    analyticsFilters.engine,
+                    model.getAnalyticsObjectTypeIds(objectTypeSelector.selectedObjectType),
+                    /*attributeValues*/ {})
+            }
+        }
+
+        Connections
+        {
+            target: model
+            enabled: !impl.updating
+            function onObjectTypesChanged()
+            {
+                impl.setup(
+                    analyticsFilters.engine,
+                    analyticsFilters.selectedAnalyticsObjectTypeIds,
+                    /*attributeValues*/ {})
+            }
+        }
     }
 
     function clear()
@@ -56,12 +124,8 @@ Column
         objectTypeSelector.clear()
     }
 
-    function setSelectedAnalyticsObjectTypeIds(ids)
+    function setSelectedObjectType(filterObjectType)
     {
-        let filterObjectType = ids && ids.length
-            ? model.findFilterObjectType(ids)
-            : null
-
         if (!filterObjectType)
         {
             objectTypeSelector.clear()
@@ -72,10 +136,32 @@ Column
         {
             objectTypeSelector.setSelectedObjectType(filterObjectType)
         }
-
     }
 
-    function setSelectedAttributeValues(stringList)
+    function findFilterObjectType(ids)
+    {
+        return ids && ids.length
+            ? model.findFilterObjectType(ids)
+            : null
+    }
+
+    function setSelectedAnalyticsObjectTypeIds(ids)
+    {
+        setSelectedObjectType(findFilterObjectType(ids))
+    }
+
+    function setSelectedAttributeFilters(filters)
+    {
+        if (JSON.stringify(selectedAttributeFilters) !== JSON.stringify(filters))
+            impl.setup(engine, selectedAnalyticsObjectTypeIds, attributeValuesFromFilters(filters))
+    }
+
+    function setSelected(engine, analyticsObjectTypeIds, attributeFilters)
+    {
+        impl.setup(engine, analyticsObjectTypeIds, attributeValuesFromFilters(attributeFilters))
+    }
+
+    function attributeValuesFromFilters(stringList)
     {
         // This simple regular expression is intended to parse back a generated attribute string.
         // To parse any valid user input it should be further improved.
@@ -156,7 +242,32 @@ Column
             obj[path[0]] = value
         }
 
-        objectAttributes.setSelectedAttributeValues(attributeTree)
+        return attributeTree
+    }
+
+    function attributeFiltersFromValues(values)
+    {
+        function quoteIfNeeded(text, quoteNumbers)
+        {
+            if (text.search(/\s/) >= 0)
+                return `"${text}"`
+
+            return (quoteNumbers && text.match(/^[+-]?\d+(\.\d+)?$/))
+                ? `"${text}"`
+                : text
+        }
+
+        var result = []
+        for (let name in values)
+        {
+            const value = values[name]
+            if (typeof value === "function")
+                result.push(value(quoteIfNeeded(name)))
+            else
+                result.push(`${quoteIfNeeded(name)}=${quoteIfNeeded(value.toString(), true)}`)
+        }
+
+        return result
     }
 
     onVisibleChanged:
@@ -169,9 +280,10 @@ Column
     {
         id: objectTypeSelector
 
+        objectTypes: []
+
         width: analyticsFilters.width
         title: qsTr("Object Type")
-        objectTypes: model.objectTypes
         visible: model.objectTypes.length > 0
     }
 
@@ -180,9 +292,7 @@ Column
         id: objectAttributes
 
         width: analyticsFilters.width
-        attributes: objectTypeSelector.selectedObjectType
-            ? objectTypeSelector.selectedObjectType.attributes
-            : null
+
         loggingCategory: category
     }
 

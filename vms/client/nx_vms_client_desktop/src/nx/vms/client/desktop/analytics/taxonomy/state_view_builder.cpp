@@ -3,7 +3,7 @@
 #include "state_view_builder.h"
 
 #include "node.h"
-#include "scope_state_view_filter.h"
+#include "engine_state_view_filter.h"
 #include "state_view.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
@@ -31,7 +31,7 @@ static void engineFiltersFromObjectType(
         {
             inOutEngineFilterById->emplace(
                 engineId,
-                new ScopeStateViewFilter(taxonomyEngine, /*devices*/ {}, parent));
+                new EngineStateViewFilter(taxonomyEngine, parent));
         }
     }
 }

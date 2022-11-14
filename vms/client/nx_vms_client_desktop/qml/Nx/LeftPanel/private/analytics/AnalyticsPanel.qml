@@ -344,7 +344,7 @@ Item
 
         PropertyUpdateFilter on delayedAttributesFilter
         {
-            source: analyticsFilters.selectedAttributeValues
+            source: analyticsFilters.selectedAttributeFilters
             minimumIntervalMs: 250
         }
 

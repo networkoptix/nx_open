@@ -5,7 +5,7 @@ import QtQuick 2.14
 import nx.vms.client.desktop 1.0
 import nx.vms.client.desktop.analytics 1.0 as Analytics
 
-CollapsiblePanel
+FocusScope
 {
     id: attributeEditor
 
@@ -21,7 +21,12 @@ CollapsiblePanel
         ? loader.item.nestedSelectedValues
         : undefined
 
+    readonly property bool hasTextFields: loader.item && !!loader.item.hasTextFields
+
     property alias contentEnabled: loader.enabled
+
+    implicitWidth: panel.implicitWidth
+    implicitHeight: panel.implicitHeight
 
     function setSelectedValue(value)
     {
@@ -49,100 +54,127 @@ CollapsiblePanel
         }
     }
 
-    name:
+    function getFocusState()
     {
-        if (!attribute)
-            return ""
-
-        return attribute.unit
-            ? `${prefix}${attribute.name}, ${attribute.unit}`
-            : `${prefix}${attribute.name}`
+        return (loader.item && loader.item.getFocusState) ? loader.item.getFocusState() : null
     }
 
-    value: (loader.item && (loader.item.selectedText || loader.item.selectedValue)) || ""
-
-    onClearRequested:
+    function setFocusState(state)
     {
-        if (loader && loader.item && loader.item.selectedValue !== undefined)
-            loader.item.selectedValue = undefined
+        if (state && loader.item && loader.item.setFocusState)
+            loader.item.setFocusState(state)
     }
 
-    contentItem: Loader
+    CollapsiblePanel
     {
-        id: loader
+        id: panel
 
-        source:
+        anchors.fill: parent
+
+        name:
         {
-            if (!attributeEditor.attribute)
+            if (!attribute)
                 return ""
 
-            switch (attributeEditor.attribute.type)
-            {
-                case Analytics.Attribute.Type.number:
-                    return "RangeEditor.qml"
-
-                case Analytics.Attribute.Type.boolean:
-                    return "BooleanRadioGroup.qml"
-
-                case Analytics.Attribute.Type.string:
-                    return "StringEditor.qml"
-
-                case Analytics.Attribute.Type.colorSet:
-                {
-                    if (!attributeEditor.attribute.colorSet
-                        || !attributeEditor.attribute.colorSet.items.length)
-                    {
-                        console.warn(loggingCategory,
-                            `Invalid analytics color attribute "${attributeEditor.attribute.id}"`)
-                        return ""
-                    }
-
-                    if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
-                        return "ColorRadioGroup.qml"
-
-                    return attributeEditor.attribute.colorSet.items.length < 5
-                        ? "ColorTagGroup.qml"
-                        : "ColorComboBox.qml"
-                }
-
-                case Analytics.Attribute.Type.enumeration:
-                {
-                    if (!attributeEditor.attribute.enumeration
-                        || !attributeEditor.attribute.enumeration.items.length)
-                    {
-                        console.warn(loggingCategory,
-                            `Invalid analytics enum attribute "${attributeEditor.attribute.id}"`)
-                        return ""
-                    }
-
-                    if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
-                        return "EnumerationRadioGroup.qml"
-
-                    return attributeEditor.attribute.enumeration.items.length < 5
-                        ? "EnumerationTagGroup.qml"
-                        : "EnumerationComboBox.qml"
-                }
-
-                case Analytics.Attribute.Type.attributeSet:
-                    return "ObjectEditor.qml"
-
-                default:
-                    console.warn(loggingCategory,
-                        `Unknown analytics attribute type "${attributeEditor.attribute.type}"`)
-                    return ""
-            }
+            return attribute.unit
+                ? `${prefix}${attribute.name}, ${attribute.unit}`
+                : `${prefix}${attribute.name}`
         }
 
-        onLoaded:
+        value: (loader.item && (loader.item.selectedText || loader.item.selectedValue)) || ""
+
+        onClearRequested:
         {
-            if (item.hasOwnProperty("attribute"))
-                item.attribute = attributeEditor.attribute
+            if (loader && loader.item && loader.item.selectedValue !== undefined)
+                loader.item.selectedValue = undefined
+        }
 
-            if (item.hasOwnProperty("loggingCategory"))
-                item.loggingCategory = attributeEditor.loggingCategory
+        contentItem: Loader
+        {
+            id: loader
 
-            if (item.hasOwnProperty("container"))
-                item.container = attributeEditor
+            focus: true
+
+            Binding
+            {
+                target: loader.item
+                property: "focus"
+                value: true
+            }
+
+            source:
+            {
+                if (!attributeEditor.attribute)
+                    return ""
+
+                switch (attributeEditor.attribute.type)
+                {
+                    case Analytics.Attribute.Type.number:
+                        return "RangeEditor.qml"
+
+                    case Analytics.Attribute.Type.boolean:
+                        return "BooleanRadioGroup.qml"
+
+                    case Analytics.Attribute.Type.string:
+                        return "StringEditor.qml"
+
+                    case Analytics.Attribute.Type.colorSet:
+                    {
+                        if (!attributeEditor.attribute.colorSet
+                            || !attributeEditor.attribute.colorSet.items.length)
+                        {
+                            console.warn(loggingCategory,
+                                `Invalid analytics color attribute "${attributeEditor.attribute.id}"`)
+                            return ""
+                        }
+
+                        if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
+                            return "ColorRadioGroup.qml"
+
+                        return attributeEditor.attribute.colorSet.items.length < 5
+                            ? "ColorTagGroup.qml"
+                            : "ColorComboBox.qml"
+                    }
+
+                    case Analytics.Attribute.Type.enumeration:
+                    {
+                        if (!attributeEditor.attribute.enumeration
+                            || !attributeEditor.attribute.enumeration.items.length)
+                        {
+                            console.warn(loggingCategory,
+                                `Invalid analytics enum attribute "${attributeEditor.attribute.id}"`)
+                            return ""
+                        }
+
+                        if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
+                            return "EnumerationRadioGroup.qml"
+
+                        return attributeEditor.attribute.enumeration.items.length < 5
+                            ? "EnumerationTagGroup.qml"
+                            : "EnumerationComboBox.qml"
+                    }
+
+                    case Analytics.Attribute.Type.attributeSet:
+                        return "ObjectEditor.qml"
+
+                    default:
+                        console.warn(loggingCategory,
+                            `Unknown analytics attribute type "${attributeEditor.attribute.type}"`)
+                        return ""
+                }
+            }
+
+            onLoaded:
+            {
+                if (item.hasOwnProperty("attribute"))
+                    item.attribute = attributeEditor.attribute
+
+                if (item.hasOwnProperty("loggingCategory"))
+                    item.loggingCategory = attributeEditor.loggingCategory
+
+                if (item.hasOwnProperty("container"))
+                    item.container = attributeEditor
+            }
         }
     }
 }

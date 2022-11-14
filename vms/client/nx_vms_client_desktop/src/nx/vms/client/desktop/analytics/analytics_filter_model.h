@@ -68,6 +68,11 @@ public:
     void setSelectedDevices(const std::set<QnUuid>& devices);
 
     /**
+     * Sets selected attribute values.
+     */
+    Q_INVOKABLE void setSelectedAttributeValues(const QVariantMap& values);
+
+    /**
      * Sets whether to exclude live types.
      */
     Q_INVOKABLE void setLiveTypesExcluded(bool value);
@@ -84,14 +89,21 @@ public:
     Q_INVOKABLE QStringList getAnalyticsObjectTypeIds(AbstractNode* filterObjectType);
 
     /**
-     * Returns whether the model is active: the model is updated when taxonomy is changed.
+     * Returns whether the model is active: the model is updated when the taxonomy is changed.
      */
     bool isActive() const;
 
     /**
-     * Sets whether the model is active: the model is updated when taxonomy is changed.
+     * Sets whether the model is active: the model is updated when the taxonomy is changed.
      */
     void setActive(bool value);
+
+    /**
+     * Sets selected engine and attribute values.
+     */
+    Q_INVOKABLE void setSelected(
+        nx::analytics::taxonomy::AbstractEngine* engine,
+        const QVariantMap& attributeValues);
 
 signals:
     void objectTypesChanged();
@@ -106,6 +118,7 @@ private:
     void update(
         nx::analytics::taxonomy::AbstractEngine* engine,
         const std::set<QnUuid>& devices,
+        const QVariantMap& attributeValues,
         bool liveTypesExcluded,
         bool force = false);
 
@@ -115,6 +128,7 @@ private:
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
     std::set<QnUuid> m_devices;
+    QVariantMap m_attributeValues;
     bool m_liveTypesExcluded = false;
     std::vector<AbstractNode*> m_objectTypes;
     QMap<QString, AbstractNode*> m_objectTypesById;
