@@ -390,7 +390,7 @@ bool deserializeFromParams(
         // Convert flexibleId to UUID
         QnUuid uuid;
         if (resourcePool)
-            nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr);
+            uuid = nx::camera_id_helper::flexibleIdToId(resourcePool, deviceIdStr);
         if (uuid.isNull())
             uuid = QnUuid::fromStringSafe(deviceIdStr); //< Not have camera in resourcePool.
         if (!uuid.isNull())
