@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <memory>
 #include <map>
+#include <mutex>
 #include <cstring>
 
 namespace nx {
@@ -91,7 +92,9 @@ namespace detail {
 
 std::string printPrefix(const char* file)
 {
+    static std::mutex mutex;
     static std::map<std::string, std::string> cache;
+    const std::lock_guard<std::mutex> lock(mutex);
 
     auto& result = cache[file]; //< Ref to either newly created or existing entry.
     if (result.empty()) //< Newly created entry.
