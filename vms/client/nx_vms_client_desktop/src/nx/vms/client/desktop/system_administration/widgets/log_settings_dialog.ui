@@ -47,7 +47,7 @@
       <item>
        <widget class="QLabel" name="loggingLevelLabel">
         <property name="text">
-         <string>Logging level</string>
+         <string>Logging Level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -104,7 +104,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="splitBySizeLabel">
         <property name="text">
-         <string>Split file by size</string>
+         <string>Split File by Size</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -114,7 +114,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="splitByTimeLabel">
         <property name="text">
-         <string>Split file by time</string>
+         <string>Split File by Time</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -151,7 +151,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="maxVolumeLabel">
         <property name="text">
-         <string>Limit Max volume</string>
+         <string>Limit Max Volume</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
