@@ -226,12 +226,12 @@ QString LogsManagementModel::logLevelName(nx::utils::log::Level level)
 {
     switch (level)
     {
-        case nx::utils::log::Level::none: return tr("none");
-        case nx::utils::log::Level::error: return tr("error");
-        case nx::utils::log::Level::warning: return tr("warning");
-        case nx::utils::log::Level::info: return tr("info");
-        case nx::utils::log::Level::debug: return tr("debug");
-        case nx::utils::log::Level::verbose: return tr("verbose");
+        case nx::utils::log::Level::none: return tr("None");
+        case nx::utils::log::Level::error: return tr("Error");
+        case nx::utils::log::Level::warning: return tr("Warning");
+        case nx::utils::log::Level::info: return tr("Info");
+        case nx::utils::log::Level::debug: return tr("Debug");
+        case nx::utils::log::Level::verbose: return tr("Verbose");
         default: return {};
     }
 }

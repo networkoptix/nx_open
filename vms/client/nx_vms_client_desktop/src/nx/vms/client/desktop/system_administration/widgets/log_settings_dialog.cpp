@@ -131,13 +131,15 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Mega), kMegabyte);
     ui->maxVolumeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Giga), kGigabyte);
-    ui->maxVolumeHint->addHintLine(tr("Has to be 2 times more than split by size"));
+    ui->maxVolumeHint->addHintLine(
+        tr("Must be greater than or equal to the value set for Split File by Size"));
 
     ui->splitBySizeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Mega), kMegabyte);
     ui->splitBySizeUnits->addItem(
         HumanReadable::digitalSizeUnit(HumanReadable::DigitalSizeUnit::Giga), kGigabyte);
-    ui->splitBySizeHint->addHintLine(tr("Cannot be more than \"Max volume\" / 2"));
+    ui->splitBySizeHint->addHintLine(
+        tr("Must be less than or equal to the value set for Limit Max Volume"));
 
     using T = long long; // Fix ambigous type cast from long to QVariant.
     ui->splitByTimeUnits->addItem(
@@ -148,12 +150,12 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Days), (T)kDay.count());
 
     ui->detailsWarning->setText(tr(
-        "Notice: Not enough information could be collected on the current Logging level.\n"
-        "The Logging level \"%1\" will provide more granular information.")
+        "The selected Logging Level may not be collecting enough information.\n"
+        "The Logging Level \"%1\" will provide you with more granular information.")
         .arg(LogsManagementModel::logLevelName(LogsManagementWatcher::defaultLogLevel())));
     ui->performanceWarning->setText(tr(
-        "Notice: The selected Logging level may degrade the performance of the system.\n"
-        "Do not forget to return the Logging level to its default setting after you have collected enough logs."));
+        "The selected Logging Level may degrade your system's performance.\nRemember to return "
+        "the Logging Level to its default setting after you have collected enough logs."));
 
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
     resetButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
