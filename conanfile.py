@@ -70,14 +70,14 @@ class NxOpenConan(ConanFile):
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/15.0.2" "#45bb425dbd1aa7774a5b552fcf2612a0")
-            self.build_requires("sdk-gcc/7.5" "#83954f923149a58ac3f3120853628875")
+                self.build_requires("clang/15.0.2" "#0a0237b63405fd3bfa58cb5bed72e30a")
+            self.build_requires("sdk-gcc/7.5" "#8e4d5d65d516a14449a95f3c314189f8")
 
         if self.isWindows:
             self.build_requires("wix/3.11" "#a662d89b677af4a98ac8cd2371be63b8")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            self.build_requires("doxygen/1.8.14" "#5491e71ff28d608c302b6a74e82c4c61")
+            self.build_requires("doxygen/1.8.14" "#ad17490b6013c61d63e10c0e8ea4d6c9")
 
     def requirements(self):
         self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
@@ -96,12 +96,12 @@ class NxOpenConan(ConanFile):
 
             if not self.isArm32:
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#213024de424e791691f2005f614a6aa4")
+                    "#b979f9ed1c28142391346aaae5abad42")
                 self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
-                    "#730216354f6a07350d2e251f91489d38")
+                    "#665d5fc7371ad819e30bb2d25b529846")
 
         if self.haveDesktopClient:
-            self.requires("hidapi/0.10.1" "#7251f4d4b67e96c946a3de8e205a4c07")
+            self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
 
             if not self.isEdge1:
                 self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
