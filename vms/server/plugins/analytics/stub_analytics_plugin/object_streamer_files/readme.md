@@ -50,6 +50,13 @@ defined, id is auto-generated. If id is not represented in the `typeLibrary` sec
 the type is auto-generated from the id and the corresponding Object Type is added to the output
 Device Agent Manifest.
 
+`trackIdPolicy` - **[string]** The policy of Object Track id behavior. Three options are available:
+    - `fixed` - Object track id never changes (neither between Device Agent instantiations nor
+    between stream cycles).
+    - `changeOncePerStreamSycle` - Object Track id is changed every stream cycle.
+    - `changeOnDeviceAgentCreation` - Object Track id is changed every time Device Agent is being
+    instantiated.
+
 `minWidth` - **[float(0.0, 1.0]]** Minimum width of the Object bounding box. Default is `0.05`.
 
 `maxWidth` - **[float(0.0, 1.0]]** Maximum width of the Object bounding box. Default is `0.3`.
@@ -82,6 +89,7 @@ Example:
         {
             "objectTypeId": "nx.base.Vehicle",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.1,
             "minHeight": 0.1,
             "maxWidth": 0.3,

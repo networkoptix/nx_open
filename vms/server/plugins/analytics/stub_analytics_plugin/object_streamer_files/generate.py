@@ -154,7 +154,7 @@ class ObjectPosition:
 
     def __init__(self):
         self.type_id = ''
-        self.track_id = uuid.uuid4()
+        self.track_id = str(uuid.uuid4())
         self.bounding_box = BoundingBox()
         self.attributes = {}
 
@@ -207,7 +207,7 @@ class StreamEntryEncoder(json.JSONEncoder):
         result = {}
         result[self.FRAME_NUMBER_KEY] = o.frame_number
         result[self.TYPE_ID_KEY] = o.object_position.type_id
-        result[self.TRACK_ID_KEY] = str(o.object_position.track_id)
+        result[self.TRACK_ID_KEY] = o.object_position.track_id
         result[self.ATTRIBUTES_KEY] = o.object_position.attributes
         result[self.BOUNDING_BOX_KEY] = {}
         result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_X_KEY] = o.object_position.bounding_box.x
@@ -237,6 +237,11 @@ class RandomMovementGenerator(Generator):
     class Config:
         '''Random Generator configuration.'''
 
+        FIXED_TRACK_ID_POLICY = 'fixed'
+        CHANGE_ON_DEVICE_AGENT_CREATION_TRACK_ID_POLICY = 'changeOnDeviceAgentCreation'
+        CHANGE_ONCE_PER_STREAM_CYCLE_TRACK_ID_POLICY = 'changeOncePerStreamSycle'
+
+        TRACK_ID_POLICY_KEY = 'trackIdPolicy'
         OBJECT_TYPE_ID_KEY = 'objectTypeId'
         MIN_WIDTH_KEY = 'minWidth'
         MIN_HEIGHT_KEY = 'minHeight'
@@ -244,6 +249,7 @@ class RandomMovementGenerator(Generator):
         MAX_HEIGHT_KEY = 'maxHeight'
         ATTRIBUTES_KEY = 'attributes'
 
+        DEFAULT_TRACK_ID_POLICY = FIXED_TRACK_ID_POLICY
         DEFAULT_MIN_WIDTH = 0.05
         DEFAULT_MIN_HEIGHT = 0.05
         DEFAULT_MAX_WIDTH = 0.3
@@ -258,6 +264,9 @@ class RandomMovementGenerator(Generator):
             else:
                 self.object_type_id = self.AUTOMATIC_TYPE_ID_PREFIX + str(uuid.uuid4())
 
+            self.track_id_policy = (config.get(self.TRACK_ID_POLICY_KEY)
+                if config.get(self.TRACK_ID_POLICY_KEY) is not None
+                else self.DEFAULT_TRACK_ID_POLICY)
             self.min_width = (config.get(self.MIN_WIDTH_KEY)
                 if config.get(self.MIN_WIDTH_KEY) is not None else self.DEFAULT_MIN_WIDTH)
             self.min_height = (config.get(self.MIN_HEIGHT_KEY)
@@ -269,8 +278,9 @@ class RandomMovementGenerator(Generator):
             self.attributes = (config.get(self.ATTRIBUTES_KEY)
                 if config.get(self.ATTRIBUTES_KEY) is not None else {})
 
-    def __init__(self, config: Dict):
+    def __init__(self, config: Dict, generator_id: int):
         self._config = self.Config(config)
+        self._generator_id = generator_id
 
     def generate_object(self) -> ObjectContext:
         '''Overrides Generator.generate_object.'''
@@ -280,6 +290,12 @@ class RandomMovementGenerator(Generator):
         movement_parameters.direction = random.uniform(0, 2 * math.pi)
 
         position = object_context.object_position
+        track_id_policy = self._config.track_id_policy
+        if track_id_policy == self.Config.CHANGE_ON_DEVICE_AGENT_CREATION_TRACK_ID_POLICY:
+            position.track_id = f'${self._generator_id}'
+        elif track_id_policy == self.Config.CHANGE_ONCE_PER_STREAM_CYCLE_TRACK_ID_POLICY:
+            position.track_id = f'$${self._generator_id}'
+
         position.type_id = self._config.object_type_id
         position.attributes = self._config.attributes
 
@@ -361,7 +377,8 @@ class GenerationManager:
                     break
 
                 generation_context = GenerationContext()
-                generation_context.track_generator = self._track_generator(object_template)
+                generation_context.track_generator = self._track_generator(
+                    object_template, context_count)
                 self.generation_contexts.append(generation_context)
                 context_count -= 1
 
@@ -415,12 +432,12 @@ class GenerationManager:
 
         return stream
 
-    def _track_generator(self, object_template: Dict):
+    def _track_generator(self, object_template: Dict, generator_id: int):
         movement_policy = (object_template.get(self.MOVEMENT_POLICY_KEY)
             or self.DEFAULT_MOVEMENT_POLICY)
 
         if movement_policy == self.RANDOM_MOVEMENT_POLICY:
-            return RandomMovementGenerator(object_template)
+            return RandomMovementGenerator(object_template, generator_id)
         return None
 
     def _make_object_type_name_from_id(self, object_type_id: str):

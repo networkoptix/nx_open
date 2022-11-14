@@ -48,6 +48,8 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
         }
 
         Object object;
+        if (!parseTrackId(objectDescription, &object, outIssues))
+            continue;
         if (!parseCommonFields(objectDescription, &object, outIssues))
             continue;
         if (!parseBoundingBox(objectDescription, &object.boundingBox, outIssues))
@@ -65,6 +67,33 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
     return result;
 }
 
+bool parseTrackId(const Json& objectDescription, Object* outObject, Issues* outIssues)
+{
+    if (!objectDescription[kTrackIdField].is_string())
+    {
+        outIssues->errors.insert(Issue::trackIdIsNotAString);
+        return false;
+    }
+
+    const std::string& trackIdString = objectDescription[kTrackIdField].string_value();
+    if (startsWith(trackIdString, kAutoTrackIdPerDeviceAgentCreationPrefix)
+        || startsWith(trackIdString, kAutoTrackIdPerStreamCyclePrefix))
+    {
+        // Real track id will be generated later.
+        outObject->trackIdRef = trackIdString;
+        return true;
+    }
+
+    outObject->trackId = UuidHelper::fromStdString(objectDescription[kTrackIdField].string_value());
+    if (outObject->trackId.isNull())
+    {
+        outIssues->errors.insert(Issue::trackIdIsNotAUuid);
+        return false;
+    }
+
+    return true;
+}
+
 bool parseCommonFields(
     const nx::kit::Json& objectDescription,
     Object* outObject,
@@ -77,19 +106,6 @@ bool parseCommonFields(
     }
 
     outObject->typeId = objectDescription[kTypeIdField].string_value();
-
-    if (!objectDescription[kTrackIdField].is_string())
-    {
-        outIssues->errors.insert(Issue::trackIdIsNotAString);
-        return false;
-    }
-
-    outObject->trackId = UuidHelper::fromStdString(objectDescription[kTrackIdField].string_value());
-    if (outObject->trackId.isNull())
-    {
-        outIssues->errors.insert(Issue::trackIdIsNotAUuid);
-        return false;
-    }
 
     if (!objectDescription[kFrameNumberField].is_number())
     {

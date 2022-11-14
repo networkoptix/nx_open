@@ -60,7 +60,16 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
 
     ++m_frameNumber;
     if (m_frameNumber > m_maxFrameNumber)
+    {
         m_frameNumber = 0;
+        for (auto it = m_trackIdByRef.begin(); it != m_trackIdByRef.end();)
+        {
+            if (startsWith(it->first, kAutoTrackIdPerStreamCyclePrefix))
+                it = m_trackIdByRef.erase(it);
+            else
+                ++it;
+        }
+    }
 
     m_lastFrameTimestampUs = videoPacket->timestampUs();
 
@@ -76,7 +85,7 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
         return result;
 
     std::map<int64_t, Ptr<ObjectMetadataPacket>> objectMetadataPacketByTimestamp;
-    for (const Object& object: m_streamInfo.objectsByFrameNumber[frameNumber])
+    for (Object& object: m_streamInfo.objectsByFrameNumber[frameNumber])
     {
         if (m_disabledObjectTypeIds.find(object.typeId) != m_disabledObjectTypeIds.cend())
             continue;
@@ -95,6 +104,9 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
             objectMetadataPacket->setDurationUs(durationUs);
         }
 
+        if (!object.trackIdRef.empty())
+            object.trackId = obtainObjectTrackIdFromRef(object.trackIdRef);
+
         auto objectMetadata = makePtr<ObjectMetadata>();
         objectMetadata->setTypeId(object.typeId);
         objectMetadata->setTrackId(object.trackId);
@@ -110,6 +122,17 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
         result.push_back(entry.second);
 
     return result;
+}
+
+Uuid DeviceAgent::obtainObjectTrackIdFromRef(const std::string& objectTrackIdRef)
+{
+    if (const auto it = m_trackIdByRef.find(objectTrackIdRef); it != m_trackIdByRef.cend())
+        return it->second;
+
+    const auto emplacementResult = m_trackIdByRef.emplace(
+        objectTrackIdRef, UuidHelper::randomUuid());
+
+    return emplacementResult.first->second;
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(

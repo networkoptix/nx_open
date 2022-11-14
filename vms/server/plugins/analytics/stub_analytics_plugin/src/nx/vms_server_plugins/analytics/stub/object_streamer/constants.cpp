@@ -8,6 +8,9 @@ namespace analytics {
 namespace stub {
 namespace object_streamer {
 
+const std::string kAutoTrackIdPerDeviceAgentCreationPrefix = "$";
+const std::string kAutoTrackIdPerStreamCyclePrefix = "$$";
+
 const std::string kTypeIdField = "typeId";
 const std::string kTrackIdField = "trackId";
 const std::string kFrameNumberField = "frameNumber";
