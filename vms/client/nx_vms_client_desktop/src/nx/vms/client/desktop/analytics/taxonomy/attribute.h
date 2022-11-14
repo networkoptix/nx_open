@@ -32,6 +32,8 @@ public:
 
     virtual QVariant maxValue() const override;
 
+    virtual bool isReferencedInCondition() const override;
+
     void setName(QString name);
 
     void setType(Type type);
@@ -49,6 +51,8 @@ public:
     void setMinValue(QVariant minValue);
 
     void setMaxValue(QVariant maxValue);
+
+    void setReferencedInCondition(bool value);
 
 private:
     struct Private;

@@ -36,6 +36,7 @@ class NX_VMS_CLIENT_DESKTOP_API AbstractAttribute: public QObject
     Q_PROPERTY(QString unit READ unit CONSTANT)
     Q_PROPERTY(QVariant minValue READ minValue CONSTANT)
     Q_PROPERTY(QVariant maxValue READ maxValue CONSTANT)
+    Q_PROPERTY(bool isReferencedInCondition READ isReferencedInCondition CONSTANT)
 
 public:
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Type,
@@ -71,6 +72,8 @@ public:
     virtual QVariant minValue() const = 0;
 
     virtual QVariant maxValue() const = 0;
+
+    virtual bool isReferencedInCondition() const = 0;
 };
 
 } // nx::vms::client::desktop_client::analytics::taxonomy

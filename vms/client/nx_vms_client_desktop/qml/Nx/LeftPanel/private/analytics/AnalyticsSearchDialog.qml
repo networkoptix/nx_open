@@ -69,6 +69,18 @@ Window
         topPadding: 5
         spacing: 16
 
+        function selectEngine(engineId)
+        {
+            for (let i = 0; i < tabBar.count; ++i)
+            {
+                if (tabBar.itemAt(i).engineId === engineId)
+                {
+                    tabBar.currentIndex = i
+                    return
+                }
+            }
+        }
+
         component EngineButton: CompactTabButton
         {
             property Analytics.Engine engine: null
@@ -618,16 +630,24 @@ Window
     {
         id: d
 
-        property var delayedAttributesFilter: []
+        property bool isModelEmpty: true
 
         property var analyticsFiltersByEngine: ({})
 
-        property bool isModelEmpty: true
+        property var filterModel: Analytics.TaxonomyManager.createFilterModel()
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
             tabBar.currentItem ? tabBar.currentItem.engine : null
 
-        property bool updating: false
+        property var delayedAttributesFilter: []
+
+        readonly property bool pluginTabsShown: filterModel.engines.length > 1
+
+        PropertyUpdateFilter on delayedAttributesFilter
+        {
+            source: analyticsFilters.selectedAttributeFilters
+            minimumIntervalMs: 250
+        }
 
         function showSelectionOnLayout()
         {
@@ -637,43 +657,24 @@ Window
 
         onSelectedAnalyticsEngineChanged:
         {
-            updating = true
-            analyticsFiltersByEngine[analyticsFilters.engine] = {
-                "objectTypeIds": analyticsFilters.selectedAnalyticsObjectTypeIds,
-                "attributeValues": analyticsFilters.selectedAttributeValues}
+            if (filterModel.engines.length === 0)
+                return
 
-            analyticsFilters.model.setSelectedEngine(selectedAnalyticsEngine)
+            storeCurrentEngineFilterState()
 
             eventModel.analyticsSetup.engine = selectedAnalyticsEngine
                 ? NxGlobals.uuid(selectedAnalyticsEngine.id)
                 : NxGlobals.uuid("")
 
-            const savedData = analyticsFiltersByEngine[analyticsFilters.engine]
-            analyticsFilters.setSelectedAnalyticsObjectTypeIds(
-                savedData ? savedData.objectTypeIds : null)
-
-            if (!analyticsFilters.selectedAnalyticsObjectTypeIds.length)
-                eventModel.analyticsSetup.objectTypes = []
-
-            analyticsFilters.setSelectedAttributeValues(savedData ? savedData.attributeValues : {})
-            updating = false
+            restoreEngineFilterState(selectedAnalyticsEngine)
         }
 
-        property var filterModel: Analytics.TaxonomyManager.createFilterModel()
-
-        readonly property bool pluginTabsShown: filterModel.engines.length > 1
-
-        PropertyUpdateFilter on delayedAttributesFilter
+        onDelayedAttributesFilterChanged:
         {
-            source: analyticsFilters.selectedAttributeValues
-            minimumIntervalMs: 250
-        }
+            if (!eventModel.analyticsSetup)
+                return
 
-        Binding
-        {
-            target: eventModel.analyticsSetup
-            property: "attributeFilters"
-            value: d.delayedAttributesFilter
+            eventModel.analyticsSetup.attributeFilters = delayedAttributesFilter
         }
 
         Connections
@@ -689,12 +690,29 @@ Window
         Connections
         {
             target: analyticsFilters
-            enabled: !d.updating
             function onSelectedAnalyticsObjectTypeIdsChanged()
             {
                 eventModel.analyticsSetup.objectTypes =
                     analyticsFilters.selectedAnalyticsObjectTypeIds
             }
+        }
+
+        function storeCurrentEngineFilterState()
+        {
+            analyticsFiltersByEngine[analyticsFilters.engine] = {
+                objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds,
+                attributeFilters: analyticsFilters.selectedAttributeFilters
+            }
+        }
+
+        function restoreEngineFilterState(engine)
+        {
+            const savedData = analyticsFiltersByEngine[engine]
+
+            analyticsFilters.setSelected(
+                engine,
+                savedData ? savedData.objectTypeIds : null,
+                savedData ? savedData.attributeFilters : {})
         }
 
         Connections
@@ -707,24 +725,16 @@ Window
                     eventModel.analyticsSetup.objectTypes)
             }
 
+            function onAttributeFiltersChanged()
+            {
+                analyticsFilters.setSelectedAttributeFilters(
+                    eventModel.analyticsSetup.attributeFilters)
+            }
+
             function onEngineChanged()
             {
                 const engineId = eventModel.analyticsSetup.engine
-
-                for (let i = 0; i < tabBar.count; ++i)
-                {
-                    if (tabBar.itemAt(i).engineId === engineId)
-                    {
-                        tabBar.currentIndex = i
-                        return
-                    }
-                }
-            }
-
-            function onAttributeFiltersChanged()
-            {
-                analyticsFilters.setSelectedAttributeValues(
-                    eventModel.analyticsSetup.attributeFilters)
+                tabBar.selectEngine(engineId)
             }
         }
 

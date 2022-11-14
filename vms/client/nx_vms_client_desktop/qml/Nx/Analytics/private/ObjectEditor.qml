@@ -19,7 +19,7 @@ Column
 
     function setSelectedAttributeValues(nameValueTree)
     {
-        nestedAttributes.setSelectedAttributeValues(nameValueTree)
+        nestedAttributes.selectedAttributeValues = nameValueTree
     }
 
     spacing: 2

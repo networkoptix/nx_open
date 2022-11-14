@@ -2,28 +2,21 @@
 
 #pragma once
 
-#include <set>
+#include <vector>
 
-#include <nx/utils/impl_ptr.h>
-#include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
-
-namespace nx::analytics::taxonomy { class AbstractEngine; }
+#include "abstract_state_view_filter.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 /**
- * Object type and attribute scope filter.
+ * Composite filters.
  */
-class ScopeStateViewFilter: public AbstractStateViewFilter
+class CompositeFilter: public AbstractStateViewFilter
 {
 public:
-    ScopeStateViewFilter(
-        nx::analytics::taxonomy::AbstractEngine* engine = nullptr,
-        const std::set<QnUuid>& devices = {},
+    CompositeFilter(
+        const std::vector<AbstractStateViewFilter*> filters,
         QObject* parent = nullptr);
-
-    virtual ~ScopeStateViewFilter() override;
 
     virtual QString id() const override;
     virtual QString name() const override;
@@ -35,8 +28,7 @@ public:
         const nx::analytics::taxonomy::AbstractAttribute* attribute) const override;
 
 private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
+    std::vector<AbstractStateViewFilter*> m_filters;
 };
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

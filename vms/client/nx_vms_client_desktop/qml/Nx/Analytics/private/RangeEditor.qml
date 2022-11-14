@@ -9,63 +9,102 @@ import Nx.Controls 1.0
 
 import nx.vms.client.desktop.analytics 1.0 as Analytics
 
-RowLayout
+FocusScope
 {
     id: numberEditor
 
     property Analytics.Attribute attribute
-
     property alias selectedValue: d.selectedValue
-
     readonly property alias selectedText: d.selectedText
+    readonly property bool hasTextFields: true
 
-    spacing: 4
+    implicitWidth: content.implicitWidth
+    implicitHeight: content.implicitHeight
 
-    NumberInput
+    function getFocusState()
     {
-        id: fromInput
+        let cursorPosition = (input) => input.isValidated()
+            ? input.editorCursorPosition
+            : String(input.value).length
 
-        placeholderText: selectedValue
-            ? Utils.getValue(minimum, /*negative infinity*/ "-\u221E")
-            : qsTr("from")
+        if (fromInput.activeFocus && fromInput.value)
+            return { fromInput: cursorPosition(fromInput) }
 
-        Layout.fillWidth: true
+        if (toInput.activeFocus && toInput.value)
+            return { toInput: cursorPosition(toInput) }
 
-        minimum: attribute ? attribute.minValue : undefined
-        maximum: toInput.value
-
-        mode: attribute && attribute.subtype === "int"
-            ? NumberInput.Integer
-            : NumberInput.Real
-
-        background: TextFieldBackground {}
+        return null
     }
 
-    Text
+    function setFocusState(state)
     {
-        text: "..."
-        font.pixelSize: 14
-        color: ColorTheme.colors.light16
+        if (state.fromInput)
+        {
+            fromInput.focus = true
+            fromInput.cursorPosition = state.fromInput
+        }
+
+        if (state.toInput)
+        {
+            toInput.focus = true
+            toInput.cursorPosition = state.toInput
+        }
     }
 
-    NumberInput
+    RowLayout
     {
-        id: toInput
+        id: content
 
-        placeholderText: selectedValue
-            ? Utils.getValue(maximum, /*infinity*/ "\u221E")
-            : qsTr("to")
+        anchors.fill: numberEditor
 
-        Layout.fillWidth: true
+        spacing: 4
 
-        minimum: fromInput.value
-        maximum: attribute ? attribute.maxValue : undefined
+        NumberInput
+        {
+            id: fromInput
 
-        mode: attribute && attribute.subtype === "int"
-            ? NumberInput.Integer
-            : NumberInput.Real
+            placeholderText: selectedValue
+                ? Utils.getValue(minimum, /*negative infinity*/ "-\u221E")
+                : qsTr("from")
 
-        background: TextFieldBackground {}
+            Layout.fillWidth: true
+
+            minimum: attribute ? attribute.minValue : undefined
+            maximum: toInput.value
+
+            mode: attribute && attribute.subtype === "int"
+                ? NumberInput.Integer
+                : NumberInput.Real
+
+            background: TextFieldBackground {}
+        }
+
+        Text
+        {
+            text: "..."
+            font.pixelSize: 14
+            color: ColorTheme.colors.light16
+        }
+
+        NumberInput
+        {
+            id: toInput
+
+            placeholderText: selectedValue
+                ? Utils.getValue(maximum, /*infinity*/ "\u221E")
+                : qsTr("to")
+
+            Layout.fillWidth: true
+
+            minimum: fromInput.value
+            maximum: attribute ? attribute.maxValue : undefined
+
+            mode: attribute && attribute.subtype === "int"
+                ? NumberInput.Integer
+                : NumberInput.Real
+
+            background: TextFieldBackground {}
+        }
     }
 
     QtObject
@@ -88,9 +127,10 @@ RowLayout
             return isFinite(value) ? value : undefined
         }
 
-        onSelectedValuesChanged:
+        function updateSelectedValue()
         {
             updating = true
+
             if (selectedValues[0] === undefined && selectedValues[1] === undefined)
             {
                 selectedText = ""
@@ -115,6 +155,14 @@ RowLayout
             updating = false
         }
 
+        onSelectedValuesChanged:
+        {
+            if (updating)
+                return
+
+            updateSelectedValue()
+        }
+
         onSelectedValueChanged:
         {
             if (updating)
@@ -122,8 +170,12 @@ RowLayout
 
             if (selectedValue === undefined)
             {
+                updating = true
                 fromInput.clear()
                 toInput.clear()
+                updating = false
+
+                updateSelectedValue()
             }
             else
             {

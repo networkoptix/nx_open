@@ -19,6 +19,7 @@ struct Attribute::Private
     QString unit;
     QVariant minValue;
     QVariant maxValue;
+    bool isReferencedInCondition = false;
 };
 
 Attribute::Attribute(QObject* parent):
@@ -76,6 +77,11 @@ QVariant Attribute::maxValue() const
     return d->maxValue;
 }
 
+bool Attribute::isReferencedInCondition() const
+{
+    return d->isReferencedInCondition;
+}
+
 void Attribute::setName(QString name)
 {
     d->name = name;
@@ -119,6 +125,11 @@ void Attribute::setMinValue(QVariant minValue)
 void Attribute::setMaxValue(QVariant maxValue)
 {
     d->maxValue = maxValue;
+}
+
+void Attribute::setReferencedInCondition(bool value)
+{
+    d->isReferencedInCondition = value;
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy
