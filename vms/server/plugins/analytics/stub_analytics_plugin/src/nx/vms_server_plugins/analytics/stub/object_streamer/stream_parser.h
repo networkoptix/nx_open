@@ -21,6 +21,8 @@ struct Object
 {
     std::string typeId;
     nx::sdk::Uuid trackId;
+    std::string trackIdRef;
+    int streamCycle = 0;
     nx::sdk::analytics::Rect boundingBox;
     std::map<std::string, std::string> attributes;
     int frameNumberToGenerateObject = 0;
@@ -60,6 +62,11 @@ struct StreamInfo
 };
 
 StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues);
+
+bool parseTrackId(
+    const nx::kit::Json& objectDescription,
+    Object* outObject,
+    Issues* outIssues);
 
 bool parseCommonFields(
     const nx::kit::Json& objectDescription,

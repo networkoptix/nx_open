@@ -16,6 +16,7 @@
         {
             "objectTypeId": "nx.base.Vehicle",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.1,
             "minHeight": 0.1,
             "maxWidth": 0.3,
@@ -33,6 +34,7 @@
         {
             "objectTypeId": "nx.base.Car",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.2,
             "minHeight": 0.2,
             "maxWidth": 0.4,
@@ -50,6 +52,7 @@
         {
             "objectTypeId": "nx.base.Car",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.1,
             "minHeight": 0.1,
             "maxWidth": 0.2,
@@ -67,6 +70,7 @@
         {
             "objectTypeId": "nx.base.Truck",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.25,
             "minHeight": 0.4,
             "maxWidth": 0.25,
@@ -83,6 +87,7 @@
         {
             "objectTypeId": "nx.base.Bus",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.1,
             "minHeight": 0.1,
             "maxWidth": 0.5,
@@ -99,6 +104,7 @@
         {
             "objectTypeId": "nx.base.Person",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "minWidth": 0.05,
             "minHeight": 0.1,
             "maxWidth": 0.1,
@@ -116,6 +122,7 @@
         {
             "objectTypeId": "stub.objectStreamer.custom.type.1",
             "movementPolicy": "random",
+            "trackIdPolicy": "changeOncePerStreamSycle",
             "attributes":
             {
                 "string attribute 1": "first string attribute",
