@@ -106,8 +106,8 @@ class NxOpenConan(ConanFile):
                 self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
                 self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
-        if self.isWindows or self.isAndroid:
-            self.requires("openal/1.19.1" "#5e48f04d6f5a6f7c7b25e5ec6437c9c4")
+        if self.isLinux or self.isWindows or self.isAndroid:
+            self.requires("openal/1.19.1" "#1047ec92368ace234da430098bffa65a")
 
         if self.isWindows:
             self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")
