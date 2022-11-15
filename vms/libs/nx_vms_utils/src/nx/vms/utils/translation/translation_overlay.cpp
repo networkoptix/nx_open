@@ -19,10 +19,12 @@ TranslationOverlay::TranslationOverlay(Translation&& translation, QObject* paren
     for (const QString& file: translation.filePaths)
     {
         auto translator = std::make_unique<TranslationOverlayItem>();
-        translator->moveToThread(qApp->thread());
-
         if (translator->load(file))
+        {
+            // Translator can be parented by qApp in some cases. Push it to the right thread.
+            translator->moveToThread(qApp->thread());
             m_translators.push_back(std::move(translator));
+        }
     }
 }
 
@@ -38,13 +40,23 @@ TranslationOverlay::~TranslationOverlay()
             m_translation.localeCode,
             m_refCount);
 
-        for (auto& translator: m_translators)
+        // Translators can't be deleted when they are in use. Therefore we need to release them
+        // and attach to qApp to avoid memory leak. Since setParent sends signals internally,
+        // we can call it only from the application thread.
+        QList<TranslationOverlayItem*> translators;
+        for (auto& t: m_translators)
         {
-            // Release translators to avoid possible crashes. Translator is parented by qApp in
-            // handleTranslatorsUnderMutex(), therefore it will be deleted later.
-            translator.release();
+            translators << t.release();
         }
-        m_translators.clear();
+        const auto callback =
+            [translators]()
+            {
+                for (auto& translator: translators)
+                {
+                    translator->setParent(qApp);
+                }
+            };
+        QMetaObject::invokeMethod(qApp, callback, Qt::QueuedConnection);
     }
 }
 
@@ -106,14 +118,6 @@ void TranslationOverlay::handleTranslatorsUnderMutex()
     // As result, it is impossible to install translators from any other thread.
     if (QThread::currentThread() == qApp->thread())
     {
-        for (auto& translator: m_translators)
-        {
-            // Set parent to avoid memory leaks in the case of out-of-order destruction. Parent
-            // should be set in qApp's thread because some signals are sent internally.
-            if (!translator->parent())
-                translator->setParent(qApp);
-        }
-
         if (m_refCount > 0 && !m_installed)
         {
             for (auto& translator: m_translators)
