@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation>スタイルを貼り付けて一致させます</translation>
+      <translation>ペーストしてスタイルを合わせる</translation>
     </message>
     <message>
       <source>Open link in new window</source>

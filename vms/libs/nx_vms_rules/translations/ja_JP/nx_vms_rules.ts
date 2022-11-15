@@ -714,7 +714,7 @@
     </message>
     <message>
       <source>Display text for</source>
-      <translation>テキスト表示</translation>
+      <translation>テキスト表示期間</translation>
     </message>
     <message>
       <source>Text</source>
