@@ -104,6 +104,7 @@ struct NX_VMS_API ModuleInformationWithAddresses: ModuleInformation
     QSet<QString> remoteAddresses;
 
     ModuleInformationWithAddresses() = default;
+    ModuleInformationWithAddresses& operator=(const ModuleInformationWithAddresses&) = default;
     ModuleInformationWithAddresses(const ModuleInformationWithAddresses& other) = default;
     ModuleInformationWithAddresses(const ModuleInformation& other): ModuleInformation(other) {}
 
