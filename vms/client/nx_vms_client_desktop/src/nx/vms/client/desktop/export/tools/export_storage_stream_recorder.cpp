@@ -184,14 +184,10 @@ void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
 }
 
 void ExportStorageStreamRecorder::onSuccessfulPacketWrite(
-    const QnConstAbstractMediaDataPtr& md, const StorageContext& context,
-    const QnFfmpegAvPacket& avPkt, int streamIndex)
+    AVCodecParameters* avCodecParams, const uint8_t* data, int size)
 {
-    if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
-        m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
-    auto avCodecParams = context.formatCtx->streams[streamIndex]->codecpar;
-    NX_VERBOSE(this, "SignVideo: add video packet of size %1", avPkt.size);
-    m_signer.processMedia(avCodecParams, avPkt.data, avPkt.size, md->dataType);
+    NX_VERBOSE(this, "SignVideo: add packet of size %1, type: %2", size, avCodecParams->codec_type);
+    m_signer.processMedia(avCodecParams, data, size);
 }
 
 void ExportStorageStreamRecorder::fileFinished(
