@@ -76,7 +76,7 @@ Item
                 {
                     id: problemsIcon
                     visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.buggy
-                    source: "qrc:///skin/tree/locked.svg"
+                    source: "image://svg/skin/tree/locked.svg"
                 }
 
                 Image
