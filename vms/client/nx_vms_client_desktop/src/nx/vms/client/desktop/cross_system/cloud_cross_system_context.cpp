@@ -45,7 +45,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr auto kUpdateConnectionInterval = 30s;
-static const nx::vms::api::SoftwareVersion kRestApiSupportedVersion("5.0.0.0");
+static const nx::vms::api::SoftwareVersion kMinApiSupportedVersion("5.1.0.0");
 
 } // namespace
 
@@ -157,7 +157,6 @@ struct CloudCrossSystemContext::Private
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;
-    bool isRestApiSupported = false;
     QnUserResourcePtr user;
     CrossSystemServerResourcePtr server;
 
@@ -267,14 +266,12 @@ struct CloudCrossSystemContext::Private
 
     void initializeContext(core::RemoteConnectionPtr connection)
     {
-        isRestApiSupported = (connection->moduleInformation().version >= kRestApiSupportedVersion);
-        if (!isRestApiSupported)
+        systemContext->setConnection(connection);
+        if (connection->moduleInformation().version < kMinApiSupportedVersion)
         {
             updateStatus(Status::unsupportedPermanently);
             return;
         }
-
-        systemContext->setConnection(connection);
 
         const QnUuid serverId = connection->moduleInformation().id;
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
@@ -360,7 +357,7 @@ struct CloudCrossSystemContext::Private
         auto resourcePool = systemContext->resourcePool();
         auto camerasToRemove = resourcePool->getAllCameras();
         QnResourceList newlyCreatedCameras;
-        const bool systemIsReadyToUse = q->isSystemReadyToUse();
+
         for (const auto& cameraData: cameras)
         {
             if (auto existingCamera = resourcePool->getResourceById<CrossSystemCameraResource>(
