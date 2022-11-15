@@ -28,12 +28,6 @@ MembershipSettings
             ? qsTr("Built In")
             : qsTr("Custom")
 
-        additionalText: section === UserSettingsGlobal.kBuiltInGroupsSection
-            ? ""
-            : currentSearchRegExp
-                ? ""
-                : "%1".arg(model.selectedCustomGroupsCount)
-
         TextButton
         {
             visible: section === UserSettingsGlobal.kCustomGroupsSection

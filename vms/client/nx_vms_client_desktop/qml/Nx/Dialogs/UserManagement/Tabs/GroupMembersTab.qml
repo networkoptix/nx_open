@@ -25,10 +25,6 @@ MembershipSettings
         text: section === UserSettingsGlobal.kUsersSection
             ? qsTr("Users")
             : qsTr("Groups")
-
-        additionalText: section === UserSettingsGlobal.kUsersSection
-            ? `${model.users.length}`
-            : `${model.groups.length}`
     }
 
     editableModel: AllowedMembersModel
