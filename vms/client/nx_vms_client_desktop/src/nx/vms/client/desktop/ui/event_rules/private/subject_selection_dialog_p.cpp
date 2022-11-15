@@ -278,7 +278,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 return base_type::data(index, role);
 
             return !m_allUsers && isIndirectlyChecked(index)
-                ? QVariant(qnSkin->icon(lit("tree/users.png")))
+                ? QVariant(qnSkin->icon(lit("tree/users.svg")))
                 : QVariant();
         }
 
@@ -387,8 +387,8 @@ void RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
     {
         const auto validationState = index.data(Qn::ValidationStateRole).value<QValidator::State>();
         option->icon = validationState == QValidator::Acceptable
-            ? qnSkin->icon(lit("tree/users.png"))
-            : qnSkin->icon(lit("tree/users_alert.png"));
+            ? qnSkin->icon(lit("tree/users.svg"))
+            : qnSkin->icon(lit("tree/users_alert.svg"));
 
         option->decorationSize = Skin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;
@@ -421,7 +421,7 @@ void UserListDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
     if (index.column() == UserListModel::NameColumn && !index.data(Qn::ValidRole).toBool())
-        option->icon = qnSkin->icon(lit("tree/user_alert.png"));
+        option->icon = qnSkin->icon(lit("tree/user_alert.svg"));
 }
 
 QnResourceItemDelegate::ItemState UserListDelegate::itemState(const QModelIndex& index) const

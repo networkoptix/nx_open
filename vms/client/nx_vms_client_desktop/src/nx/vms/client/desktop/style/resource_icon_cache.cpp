@@ -142,23 +142,23 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
     m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
     m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));
-    m_cache.insert(IOModule, loadIcon("tree/io.png"));
-    m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.png"));
-    m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.png"));
+    m_cache.insert(IOModule, loadIcon("tree/io.svg"));
+    m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.svg"));
+    m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.svg"));
     m_cache.insert(IOModule | Incompatible, loadIcon("tree/camera_alert.svg"));
-    m_cache.insert(Recorder, loadIcon("tree/encoder.png"));
+    m_cache.insert(Recorder, loadIcon("tree/encoder.svg"));
     m_cache.insert(MultisensorCamera, loadIcon("tree/multisensor.svg"));
 
     // Local files.
-    m_cache.insert(LocalResources, loadIcon("tree/local.png"));
+    m_cache.insert(LocalResources, loadIcon("tree/local.svg"));
     m_cache.insert(Image, loadIcon("tree/snapshot.png"));
     m_cache.insert(Image | Offline, loadIcon("tree/snapshot_offline.png"));
     m_cache.insert(Media, loadIcon("tree/media.png"));
     m_cache.insert(Media | Offline, loadIcon("tree/media_offline.png"));
 
     // Users.
-    m_cache.insert(Users, loadIcon("tree/users.png"));
-    m_cache.insert(User, loadIcon("tree/user.png"));
+    m_cache.insert(Users, loadIcon("tree/users.svg"));
+    m_cache.insert(User, loadIcon("tree/user.svg"));
 
     // Videowalls.
     m_cache.insert(VideoWall, loadIcon("tree/videowall.png"));

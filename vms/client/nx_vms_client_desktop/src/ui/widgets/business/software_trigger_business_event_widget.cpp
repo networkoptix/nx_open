@@ -196,8 +196,8 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 
         ui->usersButton->setText(vms::event::StringsHelper::allUsersText());
         ui->usersButton->setIcon(icon(allValid
-            ? lit("tree/users.png")
-            : lit("tree/users_alert.png")));
+            ? lit("tree/users.svg")
+            : lit("tree/users_alert.svg")));
     }
     else
     {
@@ -209,7 +209,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
         if (users.isEmpty() && roles.isEmpty())
         {
             ui->usersButton->setText(vms::event::StringsHelper::needToSelectUserText());
-            ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
+            ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.svg")));
         }
         else
         {
@@ -230,8 +230,8 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
             const bool multiple = users.size() > 1 || !roles.empty();
             ui->usersButton->setText(m_helper->actionSubjects(users, roles));
             ui->usersButton->setIcon(icon(multiple
-                ? (allValid ? lit("tree/users.png") : lit("tree/users_alert.png"))
-                : (allValid ? lit("tree/user.png") : lit("tree/user_alert.png"))));
+                ? (allValid ? lit("tree/users.svg") : lit("tree/users_alert.svg"))
+                : (allValid ? lit("tree/user.svg") : lit("tree/user_alert.svg"))));
         }
     }
 }
