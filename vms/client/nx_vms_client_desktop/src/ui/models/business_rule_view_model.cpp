@@ -599,7 +599,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
         case vms::event::ActionType::sendMailAction:
         {
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.png");
+                return qnSkin->icon("tree/user_alert.svg");
             return qnResIconCache->icon(QnResourceIconCache::Users);
         }
 
@@ -610,7 +610,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             if (m_actionParams.allUsers)
                 return qnResIconCache->icon(QnResourceIconCache::Users);
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.png");
+                return qnSkin->icon("tree/user_alert.svg");
 
             QnUserResourceList users;
             QList<QnUuid> roles;
