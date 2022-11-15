@@ -56,7 +56,6 @@ private:
     std::unique_ptr<QnFfmpegAudioTranscoder> m_audioTranscoder;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
-    QnConstCompressedVideoDataPtr m_lastIFrame;
     AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
     MediaSigner m_signer;
     bool m_stitchTimestampGaps = true;
@@ -68,8 +67,7 @@ private:
     virtual int getStreamIndex(const QnConstAbstractMediaDataPtr& mediaData) const override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
     virtual void onSuccessfulPacketWrite(
-        const QnConstAbstractMediaDataPtr& md, const StorageContext& /*context*/,
-        const QnFfmpegAvPacket& avPkt, int streamIndex) override;
+        AVCodecParameters* avCodecParams, const uint8_t* data, int size) override;
 
     virtual CodecParametersConstPtr getVideoCodecParameters(
         const QnConstCompressedVideoDataPtr& videoData) override;

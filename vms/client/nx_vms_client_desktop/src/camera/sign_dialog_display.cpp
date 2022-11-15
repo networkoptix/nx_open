@@ -106,8 +106,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (media && media->dataSize() > 4)
         {
             const quint8* data = (const quint8*)media->data();
-            m_mediaSigner.processMedia(
-                codecParameters, data, static_cast<int>(media->dataSize()), media->dataType);
+            m_mediaSigner.processMedia(codecParameters, data, static_cast<int>(media->dataSize()));
         }
         if (video)
         {
