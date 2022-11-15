@@ -18,6 +18,21 @@ MembershipSettings
 
     signal addGroupClicked()
 
+    component AddGroupButton: TextButton
+    {
+        anchors.right: parent.right
+        anchors.rightMargin: 2
+        anchors.top: parent.top
+        anchors.topMargin: parent.baselineOffset - baselineOffset - 1
+
+        text: '+ ' + qsTr("Add Group")
+
+        font: Qt.font({pixelSize: 14, weight: Font.Normal})
+        color: ColorTheme.colors.light16
+
+        onClicked: control.addGroupClicked()
+    }
+
     editableProperty: "isParent"
     editableSection.property: "groupSection"
     editableSection.delegate: SectionHeader
@@ -28,21 +43,36 @@ MembershipSettings
             ? qsTr("Built In")
             : qsTr("Custom")
 
-        TextButton
+        AddGroupButton
         {
             visible: section === UserSettingsGlobal.kCustomGroupsSection
+        }
+    }
 
-            anchors.right: parent.right
-            anchors.rightMargin: 2
-            anchors.top: parent.top
-            anchors.topMargin: parent.baselineOffset - baselineOffset - 1
+    editableFooter: SectionHeader
+    {
+        id: customHeader
 
-            text: '+ ' + qsTr("Add")
+        visible: !currentSearchRegExp && model.customGroupCount === 0
 
-            font: Qt.font({pixelSize: 14, weight: Font.Normal})
+        width: parent.width - 16
+        text: qsTr("Custom")
+
+        AddGroupButton
+        {
+        }
+
+        Text
+        {
+            anchors.top: customHeader.bottom
+            anchors.topMargin: 2
+            anchors.left: customHeader.left
+            anchors.leftMargin: 14
+
+            font: Qt.font({pixelSize: 12, weight: Font.Normal})
             color: ColorTheme.colors.light16
 
-            onClicked: control.addGroupClicked()
+            text: qsTr("No custom groups yet")
         }
     }
 

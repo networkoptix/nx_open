@@ -26,6 +26,7 @@ Item
     property alias editableModel: allGroupsListView.model
     property alias editableSection: allGroupsListView.section
     property bool showDescription: false
+    property alias editableFooter: allGroupsListView.footer
 
     property string summaryText: ""
     property alias summaryModel: selectedGroupsListView.model

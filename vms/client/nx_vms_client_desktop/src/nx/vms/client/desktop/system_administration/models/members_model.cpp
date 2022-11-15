@@ -143,14 +143,9 @@ std::pair<QList<QnUuid>, QList<QnUuid>> MembersModel::sortedSubjects(
     return {users, groups};
 }
 
-int MembersModel::selectedCustomGroupsCount() const
+int MembersModel::customGroupCount() const
 {
-    const auto parentGroups = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
-
-    if (parentGroups.empty())
-        return 0;
-
-    return (parentGroups - predefinedGroupIdsSet()).size();
+    return m_customGroupCount;
 }
 
 void MembersModel::loadModelData()
@@ -167,6 +162,7 @@ void MembersModel::loadModelData()
         m_allGroups << id;
     }
 
+    int newCustomGroupCount = 0;
     const auto customGroups = rolesManager->userRoles();
     for (const auto& group: customGroups)
     {
@@ -174,6 +170,13 @@ void MembersModel::loadModelData()
             continue;
 
         m_allGroups << group.id;
+        ++newCustomGroupCount;
+    }
+
+    if (m_customGroupCount != newCustomGroupCount)
+    {
+        m_customGroupCount = newCustomGroupCount;
+        emit customGroupCountChanged();
     }
 
     // Cache list of users in each group.
@@ -241,6 +244,10 @@ void MembersModel::readUsersAndGroups()
 
         connect(m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
             this, &MembersModel::sharedResourcesChanged);
+    }
+    else
+    {
+        m_subjectContext->setCurrentSubjectId(m_subjectId);
     }
 
     loadModelData();
