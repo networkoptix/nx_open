@@ -3402,7 +3402,7 @@ to %1</source>
     </message>
     <message>
       <source>On click</source>
-      <translation>クリック</translation>
+      <translation>クリック時</translation>
     </message>
     <message>
       <source>Duration</source>
