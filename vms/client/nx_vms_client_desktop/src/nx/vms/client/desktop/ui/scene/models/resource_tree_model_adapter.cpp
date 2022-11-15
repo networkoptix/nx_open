@@ -367,12 +367,13 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                 QString::fromWCharArray(L"\x2013 %1");
 
             const auto resource = base_type::data(index, Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resourceFlags = resource ? resource->flags() : Qn::ResourceFlags{};
             const auto nodeType = base_type::data(
                 index, Qn::NodeTypeRole).value<ResourceTree::NodeType>();
 
             if ((nodeType == ResourceTree::NodeType::layoutItem
-                    || nodeType == ResourceTree::NodeType::sharedResource)
-                && resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                || nodeType == ResourceTree::NodeType::sharedResource)
+                && resourceFlags.testFlag(Qn::server) && !resourceFlags.testFlag(Qn::fake))
             {
                 return kCustomExtInfoTemplate.arg(tr("Health Monitor"));
             }
@@ -381,10 +382,10 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             if (extraInfo.isEmpty())
                 return {};
 
-            if (resource->hasFlags(Qn::user))
+            if (resourceFlags.testFlag(Qn::user))
                 return kCustomExtInfoTemplate.arg(extraInfo);
 
-            if (resource->hasFlags(Qn::virtual_camera))
+            if (resourceFlags.testFlag(Qn::virtual_camera))
             {
                 const auto camera = resource.dynamicCast<QnSecurityCamResource>();
                 auto systemContext = SystemContext::fromResource(camera);
