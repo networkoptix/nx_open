@@ -185,8 +185,7 @@ GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
                     QnResourceIconCache::CloudSystem | QnResourceIconCache::Locked);
             }
 
-            if (status == CloudCrossSystemContext::Status::unsupportedPermanently
-                || status == CloudCrossSystemContext::Status::unsupportedTemporary)
+            if (status == CloudCrossSystemContext::Status::unsupportedTemporary)
             {
                 return static_cast<int>(
                     QnResourceIconCache::CloudSystem | QnResourceIconCache::Incompatible);
@@ -214,6 +213,40 @@ InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
     result->connections()->add(QObject::connect(
         context->systemDescription(),
         &QnBaseSystemDescription::onlineStateChanged,
+        invalidate));
+
+    return result;
+}
+
+GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
+{
+    return
+        [systemId]
+        {
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (NX_ASSERT(context) &&
+                context->status() == CloudCrossSystemContext::Status::unsupportedPermanently)
+            {
+                return context->systemContext()->moduleInformation().version.toString();
+            }
+
+            return QString{};
+        };
+}
+
+InvalidatorPtr cloudSystemExtraInfoInvalidator(const QString& systemId)
+{
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    auto result = std::make_shared<Invalidator>();
+
+    if (!NX_ASSERT(context))
+        return result;
+
+    const auto invalidate = [invalidator = result.get()] { invalidator->invalidate(); };
+
+    result->connections()->add(QObject::connect(
+        context,
+        &CloudCrossSystemContext::statusChanged,
         invalidate));
 
     return result;
@@ -531,6 +564,8 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
     const auto nameInvalidator = cloudSystemNameInvalidator(systemId);
     const auto iconProvider = cloudSystemIconProvider(systemId);
     const auto iconInvalidator = cloudSystemIconInvalidator(systemId);
+    const auto extraInfoProvider = cloudSystemExtraInfoProvider(systemId);
+    const auto extraInfoInvalidator = cloudSystemExtraInfoInvalidator(systemId);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
@@ -538,6 +573,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withRole(Qn::CloudSystemIdRole, systemId)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
+        .withRole(Qn::ExtraInfoRole, extraInfoProvider, extraInfoInvalidator)
         .withFlags(cloudSystemFlagsProvider(systemId));
 }
 

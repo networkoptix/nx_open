@@ -311,7 +311,8 @@ TreeView
                     id: extraInfo
 
                     text: ((resourceTreeModel.extraInfoRequired
-                        || resourceTreeModel.isExtraInfoForced(delegateItem.resource))
+                        || resourceTreeModel.isExtraInfoForced(delegateItem.resource)
+                        || model.nodeType == ResourceTree.NodeType.cloudSystem)
                             && model && model.extraInfo) || ""
 
                     textFormat: Text.PlainText
