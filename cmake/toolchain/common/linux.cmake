@@ -23,6 +23,7 @@ if("$ENV{USE_CLANG}")
     set(CMAKE_CXX_COMPILER $ENV{CLANG_DIR}/bin/clang++ CACHE INTERNAL "")
 
     set(flags "--gcc-toolchain=$ENV{TOOLCHAIN_DIR}")
+    string(APPEND flags " --prefix=$ENV{TOOLCHAIN_DIR}/${COMPILE_TARGET}/bin")
     string(APPEND flags " --sysroot=$ENV{TOOLCHAIN_DIR}/${COMPILE_TARGET}/sysroot")
     string(APPEND flags " --target=${COMPILE_TARGET}")
     set(CMAKE_C_FLAGS ${flags})
