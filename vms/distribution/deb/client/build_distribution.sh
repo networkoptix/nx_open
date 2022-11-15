@@ -184,6 +184,7 @@ copyLibs()
         libcrypto.so.1.1
         libssl.so.1.1
 
+        libopenal.so.1
         libqtkeychain.so.0.9.0
         libquazip.so
     )
@@ -208,7 +209,6 @@ copyLibs()
         distrib_copySystemLibs "$STAGE_LIB" \
             libXss.so.1 \
             libxcb-xinerama.so.0 \
-            libopenal.so.1
         distrib_copySystemLibs "$STAGE_LIB" libpng16.so.16 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
