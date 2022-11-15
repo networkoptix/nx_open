@@ -295,8 +295,8 @@ void SubjectSelectionDialog::validateAllUsers()
         systemContext()->resourceAccessSubjectsCache()->allSubjects());
 
     QIcon icon = (validationState == QValidator::Acceptable
-        ? qnSkin->icon(lit("tree/users.png"))
-        : qnSkin->icon(lit("tree/users_alert.png")));
+        ? qnSkin->icon(lit("tree/users.svg"))
+        : qnSkin->icon(lit("tree/users_alert.svg")));
 
     ui->allUsersCheckableLine->setIcon(icon);
 
