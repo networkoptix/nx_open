@@ -2349,7 +2349,7 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (!NX_ASSERT(systemContext))
         return false;
 
-    if (!systemContext->accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
+    if (!systemContext->accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
         return false;
 
     auto footageServers = systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);
