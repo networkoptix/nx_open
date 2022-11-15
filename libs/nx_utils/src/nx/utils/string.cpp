@@ -5,6 +5,8 @@
 #include <array>
 #include <cmath>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
@@ -673,6 +675,20 @@ void truncateToNul(QString* s)
 {
     const int length = std::char_traits<char16_t>::length((const char16_t*) s->data());
     s->resize(length);
+}
+
+std::string toHex(const void* buffer, const int size, const std::string& delimeter)
+{
+    const uint8_t* data = (const uint8_t*)buffer;
+    std::stringstream stream;
+    stream << std::hex;
+    for (int i = 0; i < size; ++i)
+    {
+        stream << std::setfill('0') << std::setw(2) << (int)data[i];
+        if (i + 1 < size)
+            stream << delimeter;
+    }
+    return stream.str();
 }
 
 } // namespace nx::utils

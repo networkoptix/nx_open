@@ -294,4 +294,10 @@ StringType strJoin(BeginType begin, EndType end, const SeparatorType& separator)
 */
 NX_UTILS_API void truncateToNul(QString* s);
 
+/**
+* Convert any buffer to hex string.
+*/
+NX_UTILS_API std::string toHex(
+    const void* buffer, const int size, const std::string& delimeter = " ");
+
 } // namespace nx::utils
