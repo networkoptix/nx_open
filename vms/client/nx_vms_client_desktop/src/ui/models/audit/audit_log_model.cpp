@@ -951,7 +951,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             switch (record->eventType)
             {
             case Qn::AR_UserUpdate:
-                return qnSkin->icon("tree/user.png");
+                return qnSkin->icon("tree/user.svg");
 
             case Qn::AR_StorageInsert:
             case Qn::AR_StorageUpdate:

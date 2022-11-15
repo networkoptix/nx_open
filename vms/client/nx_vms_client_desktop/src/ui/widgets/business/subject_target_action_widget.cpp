@@ -141,8 +141,8 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
                 [this](const QnUserResourcePtr& user) { return userValidity(user); });
 
         m_subjectsButton->setIcon(icon(allValid
-            ? lit("tree/users.png")
-            : lit("tree/users_alert.png")));
+            ? lit("tree/users.svg")
+            : lit("tree/users_alert.svg")));
     }
     else
     {
@@ -157,7 +157,7 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
         if (users.isEmpty() && roles.isEmpty())
         {
             m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
-            m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
+            m_subjectsButton->setIcon(icon(lit("tree/user_alert.svg")));
         }
         else
         {
@@ -175,8 +175,8 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
             const bool multiple = users.size() > 1 || !roles.empty();
             m_subjectsButton->setText(m_helper->actionSubjects(users, roles));
             m_subjectsButton->setIcon(icon(multiple
-                ? (allValid ? lit("tree/users.png") : lit("tree/users_alert.png"))
-                : (allValid ? lit("tree/user.png") : lit("tree/user_alert.png"))));
+                ? (allValid ? lit("tree/users.svg") : lit("tree/users_alert.svg"))
+                : (allValid ? lit("tree/user.svg") : lit("tree/user_alert.svg"))));
         }
     }
 }
