@@ -190,6 +190,7 @@ void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTour
     if (auto layout = m_reviewLayouts.value(tour.id))
     {
         menu()->trigger(action::OpenInNewTabAction, layout);
+        updateItemsLayout();
         return;
     }
 
@@ -371,7 +372,7 @@ void LayoutTourReviewController::updateItemsLayout()
     auto layoutItems = wbLayout->items().values();
     QnWorkbenchItem::sortByGeometryAndName(layoutItems);
 
-    for (auto layoutItem : layoutItems)
+    for (auto layoutItem: layoutItems)
     {
         const bool unpinned = wbLayout->unpinItem(layoutItem);
         NX_ASSERT(unpinned);
