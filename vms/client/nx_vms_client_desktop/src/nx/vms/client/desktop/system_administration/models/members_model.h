@@ -57,9 +57,9 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
         READ ownSharedResources
         WRITE setOwnSharedResources
         NOTIFY sharedResourcesChanged)
-    Q_PROPERTY(int selectedCustomGroupsCount
-        READ selectedCustomGroupsCount
-        NOTIFY parentGroupsChanged)
+    Q_PROPERTY(int customGroupCount
+        READ customGroupCount
+        NOTIFY customGroupCountChanged)
     Q_PROPERTY(nx::vms::client::desktop::AccessSubjectEditingContext* editingContext
         READ editingContext
         NOTIFY editingContextChanged)
@@ -117,7 +117,7 @@ public:
     QList<QnUuid> groups() const;
     void setGroups(const QList<QnUuid>& groups);
 
-    int selectedCustomGroupsCount() const;
+    int customGroupCount() const;
 
     AccessSubjectEditingContext* editingContext() const { return m_subjectContext.get(); }
 
@@ -135,6 +135,7 @@ signals:
     void globalPermissionsChanged();
     void sharedResourcesChanged();
     void editingContextChanged();
+    void customGroupCountChanged();
 
 private:
     bool rebuildModel();
@@ -178,6 +179,8 @@ private:
 
     QnUuid m_subjectId;
     bool m_subjectIsUser = false;
+
+    int m_customGroupCount = 0;
 };
 
 } // namespace nx::vms::client::desktop
