@@ -81,10 +81,7 @@ protected:
     virtual void onFlush(StorageContext& /*context*/) {};
     virtual void beforeIoClose(StorageContext& context) = 0;
     virtual void onSuccessfulPacketWrite(
-        const QnConstAbstractMediaDataPtr& md,
-        const StorageContext& context,
-        const QnFfmpegAvPacket& avPkt,
-        int streamIndex) = 0;
+        AVCodecParameters* avCodecParams, const uint8_t* data, int size) = 0;
 
     virtual void fileFinished(
         qint64 durationMs, const QString& fileName, qint64 fileSize, qint64 startTimeMs) = 0;

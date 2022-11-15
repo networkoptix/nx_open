@@ -17,8 +17,7 @@ class NX_VMS_COMMON_API MediaSigner
 {
 public:
     MediaSigner();
-    void processMedia(
-        AVCodecParameters* context, const uint8_t* data, int size, QnAbstractMediaData::DataType type);
+    void processMedia(AVCodecParameters* context, const uint8_t* data, int size);
 
     QByteArray buildSignature(QnLicensePool* licensePool, const QnUuid& serverId);
     QByteArray buildSignature(const QByteArray& signPattern);

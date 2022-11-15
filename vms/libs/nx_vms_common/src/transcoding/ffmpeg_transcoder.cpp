@@ -265,8 +265,8 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                 setAudioCodec(audio->context->getCodecId(), TranscodeMethod::TM_DirectStreamCopy);
             }
             else
-            { 
-                static const std::vector<AVCodecID> audioCodecs = 
+            {
+                static const std::vector<AVCodecID> audioCodecs =
                     {AV_CODEC_ID_MP3, AV_CODEC_ID_VORBIS}; //< Audio codecs to transcode.
                 for (const auto& codec: audioCodecs)
                 {
@@ -277,7 +277,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                     }
                 }
             }
-            NX_DEBUG(this, "Auto select audio codec %1 for format %2", 
+            NX_DEBUG(this, "Auto select audio codec %1 for format %2",
                 m_audioCodec, m_container);
         }
 
@@ -371,7 +371,6 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     AVRational srcRate = {1, 1000000};
     QnFfmpegAvPacket packet;
 
-
     if (m_config.useAbsoluteTimestamp)
         packet.pts = av_rescale_q(mediaPacket->timestamp, srcRate, stream->time_base);
     else
@@ -399,8 +398,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     {
         auto context = mediaPacket->dataType == QnAbstractMediaData::VIDEO ?
             m_videoCodecParameters : m_audioCodecParameters;
-        m_mediaSigner.processMedia(
-            context, packet.data, packet.size, mediaPacket->dataType);
+        m_mediaSigner.processMedia(context, packet.data, packet.size);
     }
     return 0;
 }
