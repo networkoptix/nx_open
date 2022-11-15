@@ -11,7 +11,6 @@ Item
     width: parent ? parent.width : headerText.width
 
     property alias text: headerText.text
-    property string additionalText: ""
     property int counter: 0
 
     baselineOffset: headerText.y + headerText.baselineOffset
@@ -26,18 +25,6 @@ Item
 
         anchors.top: parent.top
         anchors.topMargin: 16
-    }
-
-    Text
-    {
-        id: additionaText
-        font: Qt.font({pixelSize: 14, weight: Font.Medium})
-        color: ColorTheme.colors.dark13
-        text: control.additionalText ? "(%1)".arg(control.additionalText) : ""
-
-        anchors.baseline: headerText.baseline
-        anchors.left: headerText.right
-        anchors.leftMargin: 4
     }
 
     Rectangle
