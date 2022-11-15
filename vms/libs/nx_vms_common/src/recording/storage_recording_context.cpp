@@ -214,6 +214,8 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& md, i
     AVRational srcRate = { 1, 1000000 };
 
     auto& context = m_recordingContext;
+    const uint8_t* packetData = nullptr;
+    int packetDataSize = 0;
     QByteArray metadataPacketData;
     if (md->dataType == QnAbstractMediaData::GENERIC_METADATA)
     {
@@ -265,14 +267,16 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& md, i
 
     if (!metadataPacketData.isEmpty())
     {
-        avPkt.data = const_cast<quint8*>((const quint8*)metadataPacketData.constData());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
-        avPkt.size = int(metadataPacketData.size());
+        packetData = const_cast<quint8*>((const quint8*)metadataPacketData.constData());
+        packetDataSize = int(metadataPacketData.size());
     }
     else
     {
-        avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
-        avPkt.size = static_cast<int>(md->dataSize());
+        packetData = const_cast<quint8*>((const quint8*)md->data());
+        packetDataSize = static_cast<int>(md->dataSize());
     }
+    avPkt.data = const_cast<uint8_t*>(packetData);  // const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
+    avPkt.size = packetDataSize;
     avPkt.stream_index = streamIndex;
 
     if (avPkt.pts < avPkt.dts)
@@ -305,7 +309,8 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& md, i
     }
 
     m_packetWritten = true;
-    onSuccessfulPacketWrite(md, context, avPkt, streamIndex);
+    onSuccessfulPacketWrite(
+        context.formatCtx->streams[streamIndex]->codecpar, packetData, packetDataSize);
 }
 
 std::optional<nx::recording::Error> StorageRecordingContext::getLastError() const

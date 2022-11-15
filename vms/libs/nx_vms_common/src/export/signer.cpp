@@ -4,6 +4,7 @@
 
 #include <export/sign_helper.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/log/log.h>
 
 MediaSigner::MediaSigner():
     m_audioHash(EXPORT_SIGN_METHOD),
@@ -15,11 +16,10 @@ MediaSigner::MediaSigner():
     m_audioHash.reset();
 }
 
-void MediaSigner::processMedia(
-    AVCodecParameters* avCodecParams, const uint8_t* data, int size, QnAbstractMediaData::DataType type)
+void MediaSigner::processMedia(AVCodecParameters* avCodecParams, const uint8_t* data, int size)
 {
     // Audio/video order can be broken after muxing/demuxing so use separate hash for audio
-    if (type == QnAbstractMediaData::VIDEO)
+    if (avCodecParams->codec_type == AVMEDIA_TYPE_VIDEO)
         QnSignHelper::updateDigest(avCodecParams, m_signatureHash, data, size);
     else
         QnSignHelper::updateDigest(avCodecParams, m_audioHash, data, size);
