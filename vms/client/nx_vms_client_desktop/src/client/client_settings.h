@@ -182,7 +182,7 @@ public:
         /** Mute audio output while two way audio is engaged. */
         MUTE_ON_AUDIO_TRANSMIT,
 
-        /** Allow computer entering sleep mode on idle while running client. */
+        /** Allow the computer to enter sleep mode on idle while running client. */
         ALLOW_COMPUTER_ENTERING_SLEEP_MODE,
 
         /** Approved urls that have access to a session token using jsapi. */

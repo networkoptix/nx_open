@@ -468,7 +468,7 @@
               <item>
                <widget class="QPushButton" name="openLogsFolderButton">
                 <property name="text">
-                 <string>Open files folder</string>
+                 <string>Open Files Folder</string>
                 </property>
                </widget>
               </item>

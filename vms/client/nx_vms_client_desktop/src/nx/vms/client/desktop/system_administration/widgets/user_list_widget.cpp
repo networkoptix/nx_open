@@ -317,11 +317,11 @@ void UserListWidget::Private::setupUi()
     q->layout()->addWidget(selectionControls);
 
     ui->filterButton->menu()->addAction(
-        tr("All users"),
+        tr("All Users"),
         [this] { sortModel->setDigestFilter(std::nullopt); });
 
     filterDigestAction = ui->filterButton->menu()->addAction(
-        tr("With enabled digest authentication"),
+        tr("Users with Digest Authentication"),
         [this] { sortModel->setDigestFilter(true); });
 
     ui->filterButton->setAdjustSize(true);

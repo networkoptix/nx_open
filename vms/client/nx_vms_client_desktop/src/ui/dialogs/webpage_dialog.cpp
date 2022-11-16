@@ -78,8 +78,7 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         " of this webpage"));
 
     ui->clientApiAlertLabel->setText(tr(
-        "The webpage is able to interact with the Desktop Client and request access to the user"
-        " session"));
+        "The web page can interact with the Desktop Client and request access to the user session"));
 
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());

@@ -259,7 +259,7 @@ void ServerCertificateViewer::pinCertificate()
     message.setText(tr("Pin this certificate to %1?").arg(name));
     message.setInformativeText(
         tr("Someone may be impersonating %1 to steal your personal information.\n"
-            "Do not pin this certificate if you did not modify %2 server SSL certificate.")
+            "Do not pin this certificate if you did not modify %2 Server SSL certificate.")
             .arg(name, name));
     message.addButton(
         tr("Pin"),
@@ -321,11 +321,11 @@ QString ServerCertificateViewer::calculateDialogTitle(Mode mode)
     switch (mode)
     {
         case Mode::custom:
-            return tr("Custom certificate");
+            return tr("Custom Certificate");
         case Mode::pinned:
-            return tr("Auto-generated certificate");
+            return tr("Auto-generated Certificate");
         default:
-            return tr("Unknown certificate");
+            return tr("Unknown Certificate");
     }
 }
 

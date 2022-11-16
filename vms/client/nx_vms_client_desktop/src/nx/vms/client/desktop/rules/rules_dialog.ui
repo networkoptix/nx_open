@@ -220,7 +220,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Select a rule</string>
+             <string>Select a Rule</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -357,7 +357,7 @@
      <item>
       <widget class="QPushButton" name="resetDefaultRulesButton">
        <property name="text">
-        <string>Reset default rules</string>
+        <string>Reset Default Rules</string>
        </property>
       </widget>
      </item>

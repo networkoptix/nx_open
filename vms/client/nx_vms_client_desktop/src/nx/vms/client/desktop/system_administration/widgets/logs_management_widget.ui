@@ -177,14 +177,14 @@
          <item>
           <widget class="QLabel" name="finishedLabel">
            <property name="text">
-            <string>Download is finished!</string>
+            <string>Download complete!</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="errorLabel">
            <property name="text">
-            <string>Failed to save logs to selected folder</string>
+            <string>Failed to save logs to the selected folder</string>
            </property>
           </widget>
          </item>
@@ -204,7 +204,7 @@
          <item>
           <widget class="QPushButton" name="openFolderButton">
            <property name="text">
-            <string>Open files folder</string>
+            <string>Open Files Folder</string>
            </property>
           </widget>
          </item>

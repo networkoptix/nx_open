@@ -30,7 +30,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="contentLabel">
      <property name="text">
-      <string>HTTP(S) content</string>
+      <string>HTTP(S) Content</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -56,7 +56,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Content type</string>
+      <string>Content Type</string>
      </property>
      <property name="wordWrap">
       <bool>false</bool>
@@ -90,7 +90,7 @@
    <item row="3" column="4">
     <widget class="QLabel" name="authTypeLabel">
      <property name="text">
-      <string>Authentication type</string>
+      <string>Authentication Type</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -126,7 +126,7 @@
    <item row="4" column="4">
     <widget class="QLabel" name="requestTypeLabel">
      <property name="text">
-      <string>Request type</string>
+      <string>Request Method</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

@@ -812,7 +812,7 @@ struct LogsManagementWatcher::Private
             if (clientLogLevelWarning.isNull())
             {
                 clientLogLevelWarning = notificationManager->add(
-                    tr("Debug Logging is enabled on Client"),
+                    tr("Debug logging is enabled on the Client"),
                     {},
                     true);
 
@@ -820,7 +820,7 @@ struct LogsManagementWatcher::Private
                     QnNotificationLevel::Value::ImportantNotification);
 
                 notificationManager->setTooltip(clientLogLevelWarning,
-                    tr("Debug Logging is enabled.\nSystem performance is degraded."));
+                    tr("Debug logging is enabled, resulting in degraded system performance."));
             }
         }
         else
@@ -855,12 +855,12 @@ struct LogsManagementWatcher::Private
             }
 
             notificationManager->setTitle(serverLogLevelWarning,
-                tr("Debug Logging is enabled on %n Servers", "", resList.size()));
+                tr("Debug logging is enabled on %n Servers", "", resList.size()));
 
             notificationManager->setAdditionalText(serverLogLevelWarning, shortList(resList));
 
             notificationManager->setTooltip(serverLogLevelWarning,
-                tr("Debug Logging is enabled.\nSystem performance is degraded."));
+                tr("Debug logging is enabled, resulting in degraded system performance."));
         }
         else
         {
@@ -933,7 +933,7 @@ struct LogsManagementWatcher::Private
 
                     level = QnNotificationLevel::Value::ImportantNotification;
 
-                    title = tr("Logs downloading is cancelled");
+                    title = tr("Logs downloading canceled");
 
                     break;
                 }

@@ -154,7 +154,7 @@ void LogsManagementWidget::setupUi()
                 [](LogsManagementUnitPtr unit){ return unit->server(); }))
             {
                 const auto token = FreshSessionTokenHelper(this).getToken(
-                    tr("Apply settings"),
+                    tr("Apply Settings"),
                     tr("Enter your account password"),
                     tr("Apply"),
                     FreshSessionTokenHelper::ActionType::updateSettings);
@@ -205,7 +205,7 @@ void LogsManagementWidget::setupUi()
 
             QString dir = QFileDialog::getExistingDirectory(
                 this,
-                tr("Select folder..."),
+                tr("Select Folder..."),
                 QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 

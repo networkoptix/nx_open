@@ -348,9 +348,11 @@ void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QS
     const QString supportContactString = Private::customerSupportMessage(
         parent,
         tr("If your System does not have access to the Internet please send the provided License "
-           "Key and Hardware ID to %1 to get activation file."),
+           "Key and Hardware ID to %1 "
+            "to receive the activation file."),
         tr("If your System does not have access to the Internet please send the provided License "
-           "Key and Hardware ID to your Regional / License support to get activation file:")) +
+           "Key and Hardware ID to your Regional / License support team "
+            "to receive the activation file:")) +
         QString(html::kLineBreak);
 
     QString licenseInfoString;
@@ -398,7 +400,7 @@ void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QS
     messageBox.setInformativeText(supportContactString + licenseInfoString, /*split*/ false);
     messageBox.setInformativeTextFormat(Qt::RichText);
 
-    auto copyButton = new ClipboardButton(tr("Copy parameters"), tr("Copied"), &messageBox);
+    auto copyButton = new ClipboardButton(tr("Copy Parameters"), tr("Copied"), &messageBox);
     messageBox.addButton(copyButton, QDialogButtonBox::HelpRole);
     QObject::connect(copyButton, &QPushButton::clicked,
         [hardwareId]

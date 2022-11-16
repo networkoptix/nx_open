@@ -268,7 +268,7 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
 {
     QString dirName = QFileDialog::getExistingDirectory(this,
-        tr("Select folder..."),
+        tr("Select Folder..."),
         ui->recordingFolderLineEdit->text(),
         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())

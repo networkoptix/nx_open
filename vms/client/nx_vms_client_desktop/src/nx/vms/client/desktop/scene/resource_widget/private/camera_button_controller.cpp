@@ -281,7 +281,7 @@ void CameraButtonController::createOpenDoorButton()
         {
             auto openDoorButton = new SoftwareTriggerButton(m_parentWidget);
             openDoorButton->setIcon("_door_opened");
-            openDoorButton->setToolTip(tr("Open door"));
+            openDoorButton->setToolTip(tr("Open Door"));
 
             connect(openDoorButton, &SoftwareTriggerButton::clicked,
                 [this, openDoorButton]

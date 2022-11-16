@@ -607,12 +607,12 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             if (deviceType == QnCameraDeviceType::Camera)
             {
                 return isPrimaryStream
-                    ? tr("Connection to Camera (primary stream) was unexpectedly closed.")
-                    : tr("Connection to Camera (secondary stream) was unexpectedly closed.");
+                    ? tr("Connection to camera (primary stream) was unexpectedly closed.")
+                    : tr("Connection to camera (secondary stream) was unexpectedly closed.");
             }
             else
             {
-                return tr("Connection to Device was unexpectedly closed.");
+                return tr("Connection to device was unexpectedly closed.");
             }
         }
         case EventReason::networkRtpPacketLoss:
@@ -621,8 +621,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkBadCameraTime:
         {
-            return tr("Failed to force using Camera time, it lags too much;"
-                " System time will be used.");
+            return tr("Failed to force using camera time, as it lags too much."
+                " System time will be used instead.");
         }
         case EventReason::networkCameraTimeBackToNormal:
         {
@@ -706,18 +706,19 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::metadataStoragePermissionDenied:
         {
             QString storageUrl = reasonParamsEncoded;
-            result = tr("Analytics storage \"%1\" DB error: Insufficient permissions on the mount point.")
-                .arg(storageUrl);
+            result = tr("Analytics storage \"%1\" database error: Insufficient permissions on the "
+                "mount point.").arg(storageUrl);
             break;
         }
         case EventReason::encryptionFailed:
         {
-            result = tr("Can't initialize AES encryption while recording media archive. Data is written unencrypted.");
+            result = tr("Cannot initialize AES encryption while recording is enabled on the media "
+                "archive. Data is written unencrypted.");
             break;
         }
         case EventReason::raidStorageError:
         {
-            result = tr("RAID error. %1.").arg(reasonParamsEncoded);
+            result = tr("RAID error: %1.").arg(reasonParamsEncoded);
             break;
         }
         case EventReason::backupFailedSourceFileError:
@@ -743,9 +744,9 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
                 QnCameraDeviceStringSet(
-                    tr("Not enough licenses. Recording has been disabled on following devices:"),
-                    tr("Not enough licenses. Recording has been disabled on following cameras:"),
-                    tr("Not enough licenses. Recording has been disabled on following I/O modules:")),
+                    tr("Not enough licenses. Recording has been disabled on the following devices:"),
+                    tr("Not enough licenses. Recording has been disabled on the following cameras:"),
+                    tr("Not enough licenses. Recording has been disabled on the following I/O modules:")),
                 disabledCameras);
 
             break;

@@ -398,7 +398,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
         Names::cloudAuthKey, QString(), this, [] { return tr("Cloud authorization key"); });
 
     m_system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::system2faEnabled, false, this, [] { return tr("Enable 2fa for system"); });
+        Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the System"); });
 
     AdaptorList result;
     result
@@ -499,7 +499,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_exposeDeviceCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::exposeDeviceCredentials, true, this,
-        [] { return tr("Expose Device passwords storred in VMS for administrators (for web-pages)"); });
+        [] { return tr("Expose device passwords stored in VMS for administrators (for web pages)"); });
 
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoDiscoveryEnabled", true, this,
@@ -556,8 +556,8 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::maxHttpTranscodingSessions, 2, this,
         [] { return tr(
             "Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 "
-            "connections at once, then close the first one. So, it is recommended to set value >=2 "
-            "to this parameter."); });
+            "connections at once, then close the first one. "
+            "We recommend setting this parameter’s value to >=2."); });
 
     m_maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtpRetryCount", 0, this, [] { return tr("RTP retry count"); });
@@ -590,7 +590,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRemoteArchiveSynchronizationThreads", -1,
         [](auto v) { return v >= -1 && v <= 32; }, this,
-        [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32"); });
+        [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)"); });
 
     m_targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "targetUpdateInformation", QByteArray(), this,
@@ -609,7 +609,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_maxVirtualCameraArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         "maxVirtualCameraArchiveSynchronizationThreads", -1, this,
-        [] { return tr("Thread count limit for Camera archive synchronization"); });
+        [] { return tr("Thread count limit for camera archive synchronization"); });
 
     m_watermarkSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>(
         "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
@@ -657,16 +657,16 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords", 100 * 1000, this,
         [] { return tr(
-            "Maximum event log records to keep into the database. Real amount of undeleted records "
+            "Maximum event log records to keep in the database. Real amount of undeleted records "
             "may be up to 20% higher than the specified value."); });
 
     m_forceLiveCacheForPrimaryStreamAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "forceLiveCacheForPrimaryStream", "auto", this,
         [] { return tr(
-            "Whether to cache some frames for the primary stream. Values: "
+            "Whether or not to cache some frames for the primary stream. Values: "
             "'yes' - always enabled (may use a lot of RAM), "
             "'no' - always disabled except when required by the playback (e.g. HLS), "
-            "'auto' - similar to 'no', but turned on when improves the user experience "
+            "'auto' - similar to 'no', but turned on when improving the user experience "
                 "(e.g. when some Analytics plugin is working on the Camera)."); });
 
     m_metadataStorageChangePolicyAdaptor =

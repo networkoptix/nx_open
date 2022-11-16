@@ -85,12 +85,12 @@ QString NetworkIssueEvent::reason(common::SystemContext* context) const
             if (deviceType == QnCameraDeviceType::Camera)
             {
                 return info().isPrimaryStream()
-                    ? tr("Connection to Camera (primary stream) was unexpectedly closed.")
-                    : tr("Connection to Camera (secondary stream) was unexpectedly closed.");
+                    ? tr("Connection to camera (primary stream) was unexpectedly closed.")
+                    : tr("Connection to camera (secondary stream) was unexpectedly closed.");
             }
             else
             {
-                return tr("Connection to Device was unexpectedly closed.");
+                return tr("Connection to device was unexpectedly closed.");
             }
         }
         case EventReason::networkRtpPacketLoss:
@@ -99,8 +99,8 @@ QString NetworkIssueEvent::reason(common::SystemContext* context) const
         }
         case EventReason::networkBadCameraTime:
         {
-            return tr("Failed to force using Camera time, it lags too much;"
-                " System time will be used.");
+            return tr("Failed to force using camera time, as it lags too much;"
+                " System time will be used instead.");
         }
         case EventReason::networkCameraTimeBackToNormal:
         {
