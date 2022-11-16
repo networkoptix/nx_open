@@ -7,8 +7,6 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
@@ -483,37 +481,15 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
                 action::Parameters(params).withArgument(Qn::ParentWidgetRole, parentWidget));
         });
 
-    const auto initDataLoaders =
-        [](const action::Parameters& params)
-        {
-            for (const auto& cameraResource: params.resources().filtered<QnVirtualCameraResource>())
-            {
-                const auto systemContext = SystemContext::fromResource(cameraResource);
-                if (!NX_ASSERT(systemContext))
-                    continue;
-
-                const auto loader = systemContext->cameraDataManager()->loader(
-                    cameraResource, /*createIfNotExists*/ true);
-                if (!NX_ASSERT(loader))
-                    continue;
-
-                auto allowedContent = loader->allowedContent();
-                allowedContent.insert(Qn::RecordingContent);
-                loader->setAllowedContent(allowedContent);
-            }
-        };
-
     connect(m_exportBookmarkAction, &QAction::triggered, this,
-        [this, params, initDataLoaders]
+        [this, params]
         {
-            initDataLoaders(params);
             menu()->triggerIfPossible(action::ExportBookmarkAction, params);
         });
 
     connect(m_exportBookmarksAction, &QAction::triggered, this,
-        [this, params, initDataLoaders]
+        [this, params]
         {
-            initDataLoaders(params);
             menu()->triggerIfPossible(action::ExportBookmarksAction, params);
         });
 
