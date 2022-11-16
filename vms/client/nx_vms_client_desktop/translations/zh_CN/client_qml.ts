@@ -151,10 +151,6 @@
       <translation>摄像机分析功能将只在观看影像时有作用. 请启用录像来使其全时运作.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
@@ -165,6 +161,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

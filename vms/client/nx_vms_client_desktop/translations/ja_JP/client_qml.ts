@@ -151,10 +151,6 @@
       <translation>カメラ分析は、カメラが表示されているときにのみ機能します。常に動作させるためには録画を有効にしてください。</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation>このプラグインには、このカメラに対する設定がありません。</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation>このプラグインを構成するには、カメラ設定を確認してください。</translation>
     </message>
@@ -165,6 +161,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation>このプラグインには、システムレベルでの設定はありません。</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

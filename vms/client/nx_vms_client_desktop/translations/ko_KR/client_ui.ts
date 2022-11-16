@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP 콘텐츠</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>사용자 로그인(옵션)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>콘텐츠 형식</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>인증 유형</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>요청 유형</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

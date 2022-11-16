@@ -1070,6 +1070,13 @@
     </message>
   </context>
   <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>Tự động</translation>
+    </message>
+  </context>
+  <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
@@ -2184,6 +2191,26 @@ Khóa giấy phép: %2</translation>
       <source>MitM attack from server %1</source>
       <translation>Tấn công MitM từ máy chủ %1</translation>
     </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connected to %1</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Connected to %1 via %2</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Disconnected from %1 via %2</translation>
+    </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -2440,10 +2467,6 @@ Khóa giấy phép: %2</translation>
       <translation>Không thể lưu rule</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Áp dụng thay đổi trước khi thoát?</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>Không thể hoàn tác thao tác này.</translation>
     </message>
@@ -2454,6 +2477,10 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Some rules are not valid and may not work</source>
       <translation>Một số quy tắc không hợp lệ và có thể không hoạt động</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -4314,8 +4341,8 @@ to %1</source>
       <translation>Quản lý PTZ cho %1...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Áp dụng thay đổi trước khi thoát?</translation>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -6640,6 +6667,29 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Chọn ít nhất một thiết bị</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Chọn ít nhất một máy ảnh</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation type="unfinished">Select at least one I/O module</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7468,11 +7518,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Đã thay thế camera!</translation>
     </message>
     <message>
-      <source>%1 will be replaced by the selected camera and removed from the System</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be replaced by the selected camera and removed from the System</translation>
-    </message>
-    <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
       <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
     </message>
@@ -7483,6 +7528,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
       <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
     </message>
   </context>
   <context>
@@ -8760,6 +8810,14 @@ Do not forget to return the Logging level to its default setting after you have 
     <message>
       <source>Reset to Default</source>
       <translation>Khôi phục về mặc định</translation>
+    </message>
+    <message>
+      <source>Has to be 2 times more than split by size</source>
+      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+    </message>
+    <message>
+      <source>Cannot be more than &quot;Max volume&quot; / 2</source>
+      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
     </message>
   </context>
   <context>
@@ -11250,13 +11308,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Tự động</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
@@ -11285,10 +11336,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Áp dụng thay đổi trước khi thoát?</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>Khôi phục tất cả các quy tắc về mặc định?</translation>
     </message>
@@ -11304,6 +11351,10 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <source>Failed to restore rules.</source>
       <translation type="unfinished">Failed to restore rules.</translation>
     </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
@@ -11314,13 +11365,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
     <message>
       <source>Action</source>
       <translation>Hoạt động</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation>Chọn ít nhất một người dùng</translation>
     </message>
   </context>
   <context>

@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP content</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Log in om te verifiëren (optioneel)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Content type</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Authenticatie type</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Aanvraag type</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

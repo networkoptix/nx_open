@@ -1070,6 +1070,13 @@
     </message>
   </context>
   <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+  </context>
+  <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
@@ -2184,6 +2191,26 @@ License Key: %2</source>
       <source>MitM attack from server %1</source>
       <translation>サーバ %1 からのMITM攻撃</translation>
     </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connected to %1</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Connected to %1 via %2</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Disconnected from %1 via %2</translation>
+    </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -2440,10 +2467,6 @@ License Key: %2</source>
       <translation>ルールを保存できませんでした</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>この操作は元に戻せません。</translation>
     </message>
@@ -2454,6 +2477,10 @@ License Key: %2</source>
     <message>
       <source>Some rules are not valid and may not work</source>
       <translation>一部のルールは不完全であり、動作しない可能性があります</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -4314,8 +4341,8 @@ to %1</source>
       <translation>%1 のPTZ管理...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -6640,6 +6667,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>少なくとも一つのデバイスを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>少なくとも1台のカメラを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation type="unfinished">Select at least one I/O module</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7468,11 +7518,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>カメラを交換しました!</translation>
     </message>
     <message>
-      <source>%1 will be replaced by the selected camera and removed from the System</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 は選択したカメラに置き換えられ、システムから削除されます</translation>
-    </message>
-    <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
       <translation>古いカメラのデータが新しいカメラに転送できるか確認しています。</translation>
     </message>
@@ -7483,6 +7528,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
       <translation>サーバーが利用できないため、カメラの交換操作は行えません。</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
     </message>
   </context>
   <context>
@@ -8761,6 +8811,14 @@ Do not forget to return the Logging level to its default setting after you have 
     <message>
       <source>Reset to Default</source>
       <translation>既定値にリセット</translation>
+    </message>
+    <message>
+      <source>Has to be 2 times more than split by size</source>
+      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+    </message>
+    <message>
+      <source>Cannot be more than &quot;Max volume&quot; / 2</source>
+      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
     </message>
   </context>
   <context>
@@ -11250,13 +11308,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
@@ -11285,10 +11336,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>すべてのルールを既定に戻しますか？</translation>
     </message>
@@ -11304,6 +11351,10 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
       <source>Failed to restore rules.</source>
       <translation>ルールの復元に失敗しました。</translation>
     </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
@@ -11314,13 +11365,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     <message>
       <source>Action</source>
       <translation>アクション</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation>少なくとも1人のユーザーを選択してください</translation>
     </message>
   </context>
   <context>

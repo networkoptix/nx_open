@@ -153,10 +153,6 @@
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation>Este complemento no tiene configuraciones para esta cámara.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation>Verifique la configuración de administración del sistema para configurar este complemento.</translation>
     </message>
@@ -167,6 +163,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

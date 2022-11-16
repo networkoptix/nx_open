@@ -1072,6 +1072,13 @@
     </message>
   </context>
   <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+  </context>
+  <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
@@ -2208,6 +2215,26 @@ Lizenzschlüssel: %2</translation>
       <source>MitM attack from server %1</source>
       <translation>MitM-Angriff von Server %1</translation>
     </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connected to %1</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Connected to %1 via %2</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation type="unfinished">Disconnected from %1 via %2</translation>
+    </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -2470,10 +2497,6 @@ Lizenzschlüssel: %2</translation>
       <translation>Fehler beim Speichern der Regel</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Einstellungen vor dem Beenden übernehmen?</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>Diese Aktion kann nicht rückgängig gemacht werden.</translation>
     </message>
@@ -2484,6 +2507,10 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Some rules are not valid and may not work</source>
       <translation>Einige Regeln sind ungültig und funktionieren möglicherweise nicht</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -4366,8 +4393,8 @@ to %1</source>
       <translation>Verwalte PTZ für %1...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Einstellungen vor dem Beenden übernehmen?</translation>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
     </message>
   </context>
   <context>
@@ -6745,6 +6772,29 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
   </context>
   <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Wählen Sie mindestens ein Gerät</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Wählen Sie mindestens eine Kamera</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation type="unfinished">Select at least one I/O module</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7582,11 +7632,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Kamera ersetzt!</translation>
     </message>
     <message>
-      <source>%1 will be replaced by the selected camera and removed from the System</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 wird durch die ausgewählte Kamera ersetzt und aus dem System entfernt</translation>
-    </message>
-    <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
       <translation>Prüfen, ob die Daten der alten Kamera auf die neue Kamera übertragen werden können.</translation>
     </message>
@@ -7597,6 +7642,11 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
       <translation>Der Vorgang "Kameraaustausch" ist nicht möglich, da der Server nicht verfügbar ist.</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
     </message>
   </context>
   <context>
@@ -8892,6 +8942,14 @@ Vergessen Sie nicht, die Protokollierungsstufe auf die Standardeinstellung zurü
     <message>
       <source>Reset to Default</source>
       <translation>Auf Standard zurücksetzen</translation>
+    </message>
+    <message>
+      <source>Has to be 2 times more than split by size</source>
+      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+    </message>
+    <message>
+      <source>Cannot be more than &quot;Max volume&quot; / 2</source>
+      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
     </message>
   </context>
   <context>
@@ -11406,13 +11464,6 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
     <message>
       <source>None</source>
@@ -11441,10 +11492,6 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Einstellungen vor dem Beenden übernehmen?</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>Alle Regeln auf Standardwerte zurücksetzen?</translation>
     </message>
@@ -11460,6 +11507,10 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
       <source>Failed to restore rules.</source>
       <translation>Regeln konnten nicht wiederhergestellt werden.</translation>
     </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation type="unfinished">Apply changes before exiting?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
@@ -11470,13 +11521,6 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
     <message>
       <source>Action</source>
       <translation>Aktion</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation>Wählen Sie mindestens einen Benutzer aus</translation>
     </message>
   </context>
   <context>

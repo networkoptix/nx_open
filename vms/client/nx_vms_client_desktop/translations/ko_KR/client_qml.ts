@@ -151,10 +151,6 @@
       <translation>카메라 분석은 카메라를 볼 때만 작동합니다. 항상 작동하도록 녹음을 활성화하십시오.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
@@ -165,6 +161,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

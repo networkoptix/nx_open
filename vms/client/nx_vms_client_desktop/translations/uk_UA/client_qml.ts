@@ -157,10 +157,6 @@
       <translation>Аналітика камери працюватиме лише під час перегляду камери. Активуйте запис, щоб вона працювала весь час.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
@@ -171,6 +167,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

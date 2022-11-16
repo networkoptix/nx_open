@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>תוכן HTTP</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>היכנס לארכיטקטורה (אופציונאלי)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>סוג תוכן</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>כתובת HTTP</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>סוג אימות</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>סוג בקשה</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

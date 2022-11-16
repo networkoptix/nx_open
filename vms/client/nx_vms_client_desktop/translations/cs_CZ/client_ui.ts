@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP obsah</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Přihlášení k ověření (volitelné)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Typ obsahu</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Typ ověření</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Typ požadavku</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

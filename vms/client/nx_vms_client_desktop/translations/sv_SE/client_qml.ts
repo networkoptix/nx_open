@@ -153,10 +153,6 @@
       <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation>Detta plugin har inga inställningar för denna kamera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation>Kontrollera kamerainställningarna för att konfigurera detta plugin.</translation>
     </message>
@@ -167,6 +163,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

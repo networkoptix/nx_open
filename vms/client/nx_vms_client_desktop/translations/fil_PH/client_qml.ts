@@ -153,10 +153,6 @@
       <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation type="unfinished">This plugin has no settings for this Camera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
@@ -167,6 +163,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

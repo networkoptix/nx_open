@@ -153,10 +153,6 @@
       <translation>L'analyse vidéo de la caméra ne fonctionnera que lorsque qu'elle est en train d'être visionnée. Activez l'enregistrement pour qu'il fonctionne en permanence.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation>Ce plugin n'a pas de paramètres pour cette caméra.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation>Vérifiez les paramètres de la caméra pour configurer ce plugin.</translation>
     </message>
@@ -167,6 +163,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation type="unfinished">This plugin has no settings at the System level.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

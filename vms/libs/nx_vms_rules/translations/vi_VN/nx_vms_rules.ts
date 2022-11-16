@@ -257,20 +257,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gởi HTTP yêu cầu</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>Khoảng thời gian hành động</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>Nội dung HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -287,6 +275,18 @@
     <message>
       <source>Request method</source>
       <translation>Phương thức yêu cầu</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

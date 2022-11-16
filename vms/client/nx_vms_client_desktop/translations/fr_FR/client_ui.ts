@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>Contenu HTTP</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Identifiant d'authentification (facultatif)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Type de contenu</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Type d'authentification</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Type de demande</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
