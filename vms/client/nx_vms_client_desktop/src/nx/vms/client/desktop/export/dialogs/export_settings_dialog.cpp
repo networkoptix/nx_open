@@ -433,13 +433,14 @@ ExportSettingsDialog::~ExportSettingsDialog()
     d->disconnect(this);
 }
 
-bool ExportSettingsDialog::tryClose(bool force)
+bool ExportSettingsDialog::tryClose(bool /*force*/)
 {
     return close();
 }
 
 void ExportSettingsDialog::forcedUpdate()
 {
+    renderState();
 }
 
 SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayType type)

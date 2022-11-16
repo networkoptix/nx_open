@@ -5,6 +5,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
@@ -132,6 +133,24 @@ LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnR
     }
 
     return layout;
+}
+
+QnCachingCameraDataLoaderPtr initDataLoader(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    const auto loader =
+        systemContext->cameraDataManager()->loader(camera, /*createIfNotExists*/ true);
+    if (!NX_ASSERT(loader))
+        return {};
+
+    auto allowedContent = loader->allowedContent();
+    allowedContent.insert(Qn::RecordingContent);
+    loader->setAllowedContent(allowedContent);
+
+    return loader;
 }
 
 } // namespace
@@ -489,6 +508,15 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
     ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), watermark(),
         mainWindowWidget());
 
+    if (const auto loader = initDataLoader(camera))
+    {
+        connect(
+            loader.get(),
+            &QnCachingCameraDataLoader::periodsChanged,
+            &dialog,
+            &ExportSettingsDialog::forcedUpdate);
+    }
+
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
     dialog.setMediaParams(camera, itemData, context());
 
@@ -514,6 +542,18 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
     ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), watermark(),
         mainWindowWidget());
+
+    for (const auto& camera: parameters.resources().filtered<QnVirtualCameraResource>())
+    {
+        if (const auto loader = initDataLoader(camera))
+        {
+            connect(
+                loader.get(),
+                &QnCachingCameraDataLoader::periodsChanged,
+                &dialog,
+                &ExportSettingsDialog::forcedUpdate);
+        }
+    }
 
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
