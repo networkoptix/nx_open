@@ -211,6 +211,12 @@ struct HttpConnection
         idleTimeout.restart();
     }
 
+    ~HttpConnection()
+    {
+        if (client)
+            client->pleaseStopSync();
+    }
+
     int getHandle() const
     {
         return context ? context->handle : 0;
