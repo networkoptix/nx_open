@@ -599,7 +599,7 @@ QString toString(CloudCrossSystemContext::Status status)
         case CloudCrossSystemContext::Status::connecting:
             return CloudCrossSystemContext::tr("Loading...");
         case CloudCrossSystemContext::Status::connectionFailure:
-            return CloudCrossSystemContext::tr("Click to show cameras");
+            return CloudCrossSystemContext::tr("Click to Show Cameras");
         case CloudCrossSystemContext::Status::unsupportedPermanently:
             return "UNSUPPORTED PERMANENTLY"; //< Debug purposes.
         case CloudCrossSystemContext::Status::unsupportedTemporary:

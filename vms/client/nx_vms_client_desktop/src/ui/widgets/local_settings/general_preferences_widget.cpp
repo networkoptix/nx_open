@@ -188,7 +188,7 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
         : ui->mediaFoldersList->item(0)->text();
 
     QString dirName = QFileDialog::getExistingDirectory(this,
-        tr("Select folder..."),
+        tr("Select Folder..."),
         initialDir,
         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())

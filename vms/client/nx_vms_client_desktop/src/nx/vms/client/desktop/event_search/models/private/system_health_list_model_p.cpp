@@ -183,7 +183,7 @@ QString SystemHealthListModel::Private::text(int index) const
                 getResourceSet(item.message).size());
 
         case QnSystemHealth::backupStoragesNotConfigured:
-            return tr("Backup storage is not configured on %n server", "",
+            return tr("Backup storage is not configured on %n Servers", "",
                 getResourceSet(item.message).size());
 
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
@@ -227,11 +227,11 @@ QString SystemHealthListModel::Private::text(int index) const
             return tr("Import archive from %1 stopped").arg(resourceName);
 
         case QnSystemHealth::metadataStorageNotSet:
-            return tr("Storage for analytics data is not set on %n server", "",
+            return tr("Storage for analytics data is not set on %n Servers", "",
                 getResourceSet(item.message).size());
 
         case QnSystemHealth::metadataOnSystemStorage:
-            return tr("System storage is used for analytics data on %n server", "",
+            return tr("System storage is used for analytics data on %n Servers", "",
                 getResourceSet(item.message).size());
 
         default:
@@ -350,18 +350,18 @@ QString SystemHealthListModel::Private::description(int index) const
             return QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
                 QnCameraDeviceStringSet(
-                    tr("Not imported archive found on Device %1").arg(resourceName),
-                    tr("Not imported archive found on Camera %1").arg(resourceName)),
+                    tr("Not imported archive found on device %1").arg(resourceName),
+                    tr("Not imported archive found on camera %1").arg(resourceName)),
                 camera);
 
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Import archive from %1").arg(resourceName);
 
         case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-            return tr("The archive stream settings have been changed by user");
+            return tr("The archive stream settings have been changed by the user");
 
         case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-            return tr("The recording settings have been changed by user");
+            return tr("The recording settings have been changed by the user");
 
         default:
             return {};

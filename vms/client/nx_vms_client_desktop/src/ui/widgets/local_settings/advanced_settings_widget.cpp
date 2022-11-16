@@ -161,7 +161,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         {
             QString dir = QFileDialog::getExistingDirectory(
                 this,
-                tr("Select folder..."),
+                tr("Select Folder..."),
                 QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
             if (dir.isEmpty())
@@ -538,8 +538,8 @@ void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()
 
     ui->logsDownloadStatusLabel->setVisible(downloadFinished);
     ui->logsDownloadStatusLabel->setText(hasErrors
-        ? tr("Failed to save logs to selected folder")
-        : tr("Download is finished!"));
+        ? tr("Failed to save logs to the selected folder")
+        : tr("Download complete!"));
     setWarningStyleOn(ui->logsDownloadStatusLabel, hasErrors);
 }
 void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
@@ -548,6 +548,6 @@ void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
         nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::nvidia;
 
     ui->alertBar->setText(ui->useHardwareDecodingCheckbox->isChecked() && isNvidiaAcceleration
-        ? tr("Nvidia hardware acceleration is in Beta mode")
+        ? tr("NVIDIA hardware acceleration is in beta mode")
         : QString());
 }

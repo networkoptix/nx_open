@@ -191,7 +191,7 @@
        <item>
         <widget class="QLabel" name="replacementCameraCaptionLabel">
          <property name="text">
-          <string>New device</string>
+          <string>New Device</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

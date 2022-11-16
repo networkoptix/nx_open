@@ -1528,7 +1528,7 @@ void ActionHandler::at_openFileAction_triggered()
 
 void ActionHandler::at_openFolderAction_triggered() {
     QString dirName = QFileDialog::getExistingDirectory(mainWindowWidget(),
-        tr("Select folder..."),
+        tr("Select Folder..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions());
 
@@ -2148,7 +2148,8 @@ void ActionHandler::replaceCameraActionTriggered()
     {
         QnMessageBox::warning(
             mainWindowWidget(),
-            tr("There are no suitable cameras for replacement on the %1").arg(parentServerName));
+            tr("There are no suitable cameras for replacement on the Server \"%1\"")
+                .arg(parentServerName));
         return;
     }
 
