@@ -261,20 +261,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Enviar pedido HTTP</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>Intervalo de ação</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>Conteúdo HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -291,6 +279,18 @@
     <message>
       <source>Request method</source>
       <translation>Método de solicitação</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

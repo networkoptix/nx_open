@@ -153,10 +153,6 @@
       <translation>Die Kameraanalytik funktioniert nur, wenn die Kamera betrachtet wird. Aktivieren Sie die Aufnahme, damit sie die ganze Zeit funktioniert.</translation>
     </message>
     <message>
-      <source>This plugin has no settings for this Camera.</source>
-      <translation>Dieses Plugin hat keine Einstellungen für diese Kamera.</translation>
-    </message>
-    <message>
       <source>Check Camera Settings to configure this plugin.</source>
       <translation>Prüfen Sie die Kameraeinstellungen, um dieses Plugin zu konfigurieren.</translation>
     </message>
@@ -167,6 +163,10 @@
     <message>
       <source>This plugin has no settings at the System level.</source>
       <translation>Dieses Plugin hat keine Einstellungen auf der Systemebene.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>

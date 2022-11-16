@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP контент</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Ім'я користувача для аутентифікації (необов'язково)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Тип вмісту</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Тип Автентифікації</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Тип запиту</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

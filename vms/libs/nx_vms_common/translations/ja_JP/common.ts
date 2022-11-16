@@ -1505,10 +1505,6 @@
       <translation>録画用の追加のローカルFSストレージタイプ</translation>
     </message>
     <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation>サーバーがデバイスに接続する際、IO ポートの状態を維持する</translation>
-    </message>
-    <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
       <translation>障害が発生した場合に分析DBストレージのマウントポイントのアクセス許可を強制する</translation>
     </message>
@@ -1545,10 +1541,6 @@
       <translation>メディアバッファサイズ (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
-      <translation>オーディオのみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
       <source>Enable 2fa for system</source>
       <translation>システムの二要素認証を有効化</translation>
     </message>
@@ -1580,6 +1572,18 @@
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
       <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
     </message>
   </context>
   <context>
@@ -1681,10 +1685,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>アラームレイアウトに表示</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTPリクエスト</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -2238,6 +2238,10 @@
     <message>
       <source>Show Intercom Informer</source>
       <translation>インターホン通知者を表示</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
     </message>
   </context>
   <context>

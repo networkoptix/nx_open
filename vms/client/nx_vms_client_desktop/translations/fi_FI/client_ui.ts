@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP-sisältö</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Kirjaudu sisään todentamiseen (valinnainen)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Sisältötyyppi</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP-URL-osoite</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Todennustyyppi</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Pyyntötyyppi</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

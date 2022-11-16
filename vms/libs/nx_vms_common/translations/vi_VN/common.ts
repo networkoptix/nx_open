@@ -1505,10 +1505,6 @@
       <translation>Các loại lưu trữ FS cục bộ bổ sung dành cho việc ghi</translation>
     </message>
     <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
-    </message>
-    <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
       <translation>Trao quyền đối với điểm gắn kết lưu trữ của Cơ sở dữ liệu phân tích đề phòng trường hợp bị lỗi</translation>
     </message>
@@ -1545,10 +1541,6 @@
       <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
-      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
       <source>Enable 2fa for system</source>
       <translation>Bật 2fa cho hệ thống</translation>
     </message>
@@ -1580,6 +1572,18 @@
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
       <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
     </message>
   </context>
   <context>
@@ -1681,10 +1685,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>Hiển thị trên Bố cục cảnh báo</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>Gởi HTTP yêu cầu</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -2238,6 +2238,10 @@
     <message>
       <source>Show Intercom Informer</source>
       <translation type="unfinished">Show Intercom Informer</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
     </message>
   </context>
   <context>

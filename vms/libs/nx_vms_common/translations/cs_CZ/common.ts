@@ -1643,10 +1643,6 @@
       <translation type="unfinished">Additional local FS storage types for recording</translation>
     </message>
     <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
       <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
     </message>
@@ -1683,10 +1679,6 @@
       <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
       <source>Enable 2fa for system</source>
       <translation type="unfinished">Enable 2fa for system</translation>
     </message>
@@ -1718,6 +1710,18 @@
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
       <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
     </message>
   </context>
   <context>
@@ -1819,10 +1823,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>Zobrazit na rozložení poplachů</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>Provést HTTP požadavek</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -2412,6 +2412,10 @@
     <message>
       <source>Show Intercom Informer</source>
       <translation type="unfinished">Show Intercom Informer</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
     </message>
   </context>
   <context>

@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP Nội dung</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>Kiểu Nội dung</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Xác thực...</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Loại yêu cầu</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>

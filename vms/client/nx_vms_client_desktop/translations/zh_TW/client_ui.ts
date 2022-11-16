@@ -1169,10 +1169,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP內容</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>認証帳號 (非必要)</translation>
     </message>
@@ -1193,16 +1189,20 @@
       <translation>內容類型</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>驗證類型</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>請求類型</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
