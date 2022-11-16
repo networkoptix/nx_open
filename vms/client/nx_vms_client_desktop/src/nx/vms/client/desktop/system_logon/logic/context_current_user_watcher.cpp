@@ -134,14 +134,11 @@ void ContextCurrentUserWatcher::at_resourcePool_resourceRemoved(const QnResource
     if (!user || user != m_user)
         return;
 
-    auto currentConnection = this->connection();
-    if (!currentConnection)
-        return;
+    setCurrentUser({});
 
-    setCurrentUser(QnUserResourcePtr());
-    if (!currentConnection->moduleInformation().id.isNull())
+    if (this->connection())
     {
-        menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
+        menu()->triggerForced(ui::action::DisconnectAction, {Qn::ForceRole, true});
     }
 }
 

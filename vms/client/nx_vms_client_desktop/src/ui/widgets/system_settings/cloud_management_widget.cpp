@@ -209,7 +209,8 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
 void QnCloudManagementWidget::onDisconnectSuccess()
 {
-    const bool isCloudUser = connection() ? connection()->connectionInfo().isCloud() : false;
+    const auto user = context()->user();
+    const bool isCloudUser = user ? user->isCloud() : false;
 
     // Disconnect may follow, but dialog should stay.
     auto messageBox = new QnMessageBox(isCloudUser ? mainWindowWidget() : this);
@@ -223,7 +224,7 @@ void QnCloudManagementWidget::onDisconnectSuccess()
     connect(messageBox, &QDialog::finished, messageBox, &QObject::deleteLater);
     messageBox->open();
 
-    if (isCloudUser && connection())
+    if (isCloudUser)
         menu()->trigger(ui::action::DisconnectAction, { Qn::ForceRole, true });
 }
 
