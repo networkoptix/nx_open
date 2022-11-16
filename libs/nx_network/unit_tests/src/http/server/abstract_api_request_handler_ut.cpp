@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/server/abstract_api_request_handler.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include "test_data.h"
@@ -161,7 +162,7 @@ protected:
         {
             preparePostRequestCommon();
             m_expectedInput.dummyInt = rand();
-            this->m_request.messageBody = QJson::serialized(m_expectedInput);
+            this->m_request.messageBody = nx::reflect::json::serialize(m_expectedInput);
             this->m_request.headers.emplace("Content-Type", "application/json");
         }
 

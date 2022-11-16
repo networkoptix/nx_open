@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 
@@ -18,12 +17,8 @@ struct Serializable
     }
 };
 
-#define Serializable_Fields (dummyInt)
-
 bool serializeToHeaders(nx::network::http::HttpHeaders* where, const Serializable& what);
 bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, Serializable* what);
-
-QN_FUSION_DECLARE_FUNCTIONS(Serializable, (json))
 
 NX_REFLECTION_INSTRUMENT(Serializable, (dummyInt));
 

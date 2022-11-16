@@ -7,9 +7,8 @@
 #include <string>
 #include <vector>
 
-#include <nx/fusion/fusion/fusion_fwd.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/db/api/system_data.h>
@@ -80,16 +79,16 @@ NX_REFLECTION_INSTRUMENT(SystemIdList, SystemIdList_Fields)
 NX_REFLECTION_INSTRUMENT_ENUM(FilterField, customization, systemStatus)
 
 void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery);
-void serialize(QnJsonContext* ctx, const Filter& filter, QJsonValue* target);
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const Filter& value);
 
 //-------------------------------------------------------------------------------------------------
 // SystemAttributesUpdate
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const data);
 void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const urlQuery);
-
-void serialize(QnJsonContext*, const SystemAttributesUpdate&, QJsonValue*);
-bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
 
 #define SystemAttributesUpdate_Fields (systemId)(name)(opaque)(system2faEnabled)(totp)(mfaCode)
 
@@ -182,9 +181,6 @@ NX_REFLECTION_INSTRUMENT(SystemDataExList, SystemDataExList_Fields)
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data);
 void serializeToUrlQuery(const UserSessionDescriptor&, QUrlQuery* const urlQuery);
 
-void serialize(QnJsonContext*, const UserSessionDescriptor&, QJsonValue*);
-bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
-
 #define UserSessionDescriptor_Fields (accountEmail)(systemId)
 
 NX_REFLECTION_INSTRUMENT(UserSessionDescriptor, UserSessionDescriptor_Fields)
@@ -198,53 +194,16 @@ NX_REFLECTION_INSTRUMENT(ValidateMSSignatureRequest, ValidateMSSignatureRequest_
 
 void serializeToUrlQuery(const GetSystemUsersRequest& data, QUrlQuery* const urlQuery);
 
-#define GetSystemUsersRequest_Fields (systemId)(localOnly)
-
-NX_REFLECTION_INSTRUMENT(GetSystemUsersRequest, GetSystemUsersRequest_Fields)
-
-//-------------------------------------------------------------------------------------------------
-// common functions
-
-QN_FUSION_DECLARE_FUNCTIONS(SystemRegistrationData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemSharing, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemId, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemIdList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemAttributesUpdate, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemMergeInfo, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemDataEx, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemDataList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemDataExList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemSharingList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemSharingEx, (ubjson)(json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemSharingExList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemAccessRoleData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemAccessRoleList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemHealthHistoryItem, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemHealthHistory, (json))
-QN_FUSION_DECLARE_FUNCTIONS(MergeRequest, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ValidateMSSignatureRequest, (json))
-QN_FUSION_DECLARE_FUNCTIONS(GetSystemUsersRequest, (json))
+NX_REFLECTION_INSTRUMENT(GetSystemUsersRequest, (systemId)(localOnly))
 
 //-------------------------------------------------------------------------------------------------
 
-#define CreateSystemOfferRequest_Fields (toAccount)(systemId)(comment)
-
-NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, CreateSystemOfferRequest_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(CreateSystemOfferRequest, (json))
+NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, (toAccount)(systemId)(comment))
 
 NX_REFLECTION_INSTRUMENT_ENUM(OfferStatus, offered, accepted, rejected)
 
-#define SystemOffer_Fields (fromAccount)(toAccount)(systemId)(systemName)(comment)(status)
+NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(systemId)(systemName)(comment)(status))
 
-NX_REFLECTION_INSTRUMENT(SystemOffer, SystemOffer_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(SystemOffer, (json))
-
-//-------------------------------------------------------------------------------------------------
-
-#define SystemOfferPatch_Fields (comment)(status)
-
-NX_REFLECTION_INSTRUMENT(SystemOfferPatch, SystemOfferPatch_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(SystemOfferPatch, (json))
+NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 } // namespace nx::cloud::db::api

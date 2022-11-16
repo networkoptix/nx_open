@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
@@ -48,7 +47,8 @@ protected:
         ASSERT_TRUE(msgBody);
         ASSERT_FALSE(msgBody->empty());
 
-        const auto statistics = QJson::deserialized(*msgBody, statistics::Statistics{});
+        const auto [statistics, err] =
+            nx::reflect::json::deserialize<statistics::Statistics>(*msgBody);
         ASSERT_TRUE(statistics.uptimeMsec >= std::chrono::milliseconds(1));
 
         NX_DEBUG(this, "serialized: %1", *msgBody);

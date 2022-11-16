@@ -2,7 +2,6 @@
 
 #include "mediator_api_client.h"
 
-#include <nx/fusion/serialization/json.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 

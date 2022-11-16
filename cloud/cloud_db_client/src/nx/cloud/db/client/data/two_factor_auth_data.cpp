@@ -2,18 +2,11 @@
 
 #include "two_factor_auth_data.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/url/query_parse_helper.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/switch.h>
 
 namespace nx::cloud::db::api {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(GenerateKeyResponse, (json), (keyUrl))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(GenerateBackupCodesRequest, (json), (count))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ValidateKeyRequest, (json), (token))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ValidateBackupCodeRequest, (json), (token))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BackupCodeInfo, (json), (backup_code))
 
 void serializeToUrlQuery(const ValidateKeyRequest& requestData, QUrlQuery* urlQuery)
 {

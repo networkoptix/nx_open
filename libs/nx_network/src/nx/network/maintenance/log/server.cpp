@@ -2,10 +2,10 @@
 
 #include "server.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/network/http/writable_message_body.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/log/logger_builder.h>
 #include <nx/utils/log/logger_collection.h>
 #include <nx/utils/log/aggregate_logger.h>
@@ -100,7 +100,7 @@ void Server::serveGetLoggers(
     http::RequestResult result(http::StatusCode::ok);
     result.body = std::make_unique<http::BufferSource>(
         "application/json",
-        nx::Buffer(QJson::serialized(mergeLoggers())));
+        nx::Buffer(nx::reflect::json::serialize(mergeLoggers())));
 
     completionHandler(std::move(result));
 }
@@ -131,9 +131,9 @@ void Server::servePostLogger(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
-    bool ok = false;
-    Logger newLoggerInfo = QJson::deserialized(requestContext.request.messageBody, Logger(), &ok);
-    if (!ok)
+    const auto [newLoggerInfo, deserializationResult] =
+        nx::reflect::json::deserialize<Logger>(requestContext.request.messageBody);
+    if (!deserializationResult.success)
         return completionHandler(http::StatusCode::badRequest);
 
     Settings logSettings;
@@ -166,7 +166,7 @@ void Server::servePostLogger(
     http::RequestResult result(http::StatusCode::created);
     result.body = std::make_unique<http::BufferSource>(
         "application/json",
-        nx::Buffer(QJson::serialized(loggerInfo)));
+        nx::Buffer(nx::reflect::json::serialize(loggerInfo)));
 
     completionHandler(std::move(result));
 }

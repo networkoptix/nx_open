@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/cloud/db/api/oauth_data.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/url_query.h>
 
@@ -32,14 +31,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(TokenType, bearer)
     (grant_type)(response_type)(client_id)(scope)(password)(username)(refresh_token)(code)( \
         refresh_token_lifetime)
 NX_REFLECTION_INSTRUMENT(IssueTokenRequest, Token_request_Fields)
-
-QN_FUSION_DECLARE_FUNCTIONS(IssueTokenRequest, (json))
-QN_FUSION_DECLARE_FUNCTIONS(IssueTokenResponse, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ValidateTokenResponse, (json))
-QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
-QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
-QN_FUSION_DECLARE_FUNCTIONS(IssueStunTokenRequest, (json))
-QN_FUSION_DECLARE_FUNCTIONS(IssueStunTokenResponse, (json))
 
 #define Issue_token_response_Fields \
     (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(scope)(error)

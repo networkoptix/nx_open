@@ -6,7 +6,6 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
@@ -16,6 +15,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/layout_data.h>

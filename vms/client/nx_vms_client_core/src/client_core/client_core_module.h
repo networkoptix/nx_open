@@ -7,8 +7,8 @@
 #include <QtCore/QObject>
 
 #include <nx/core/access/access_types.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>

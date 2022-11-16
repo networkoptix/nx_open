@@ -7,8 +7,8 @@
 #include <optional>
 #include <variant>
 
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx_ec/abstract_ec_connection_factory.h>
 #include <nx_ec/ec_api_common.h>

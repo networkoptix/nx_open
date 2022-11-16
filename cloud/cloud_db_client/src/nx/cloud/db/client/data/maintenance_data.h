@@ -3,21 +3,11 @@
 #pragma once
 
 #include <nx/cloud/db/api/maintenance_manager.h>
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/reflect/instrument.h>
 
 namespace nx::cloud::db::api {
 
-#define VmsConnectionData_Fields (systemId)(endpoint)
-
-NX_REFLECTION_INSTRUMENT(VmsConnectionData, VmsConnectionData_Fields)
-
-#define Statistics_Fields (onlineServerCount)
-
-NX_REFLECTION_INSTRUMENT(Statistics, Statistics_Fields)
-
-QN_FUSION_DECLARE_FUNCTIONS(VmsConnectionData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(Statistics, (json))
+NX_REFLECTION_INSTRUMENT(VmsConnectionData, (systemId)(endpoint))
+NX_REFLECTION_INSTRUMENT(Statistics, (onlineServerCount))
 
 } // namespace nx::cloud::db::api

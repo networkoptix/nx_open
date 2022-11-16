@@ -3,8 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
 namespace nx::hpm::api {
@@ -44,8 +44,5 @@ struct NX_NETWORK_API PeerConnectionSpeed
 #define PeerConnectionSpeed_Fields (serverId)(systemId)(connectionSpeed)
 
 NX_REFLECTION_INSTRUMENT(PeerConnectionSpeed, PeerConnectionSpeed_Fields)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ConnectionSpeed, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::PeerConnectionSpeed, (json), NX_NETWORK_API)
 
 } // namespace nx::hpm::api

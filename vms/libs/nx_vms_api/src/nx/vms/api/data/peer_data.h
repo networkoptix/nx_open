@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
-#include <nx/fusion/serialization_format.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/connection_types.h>
 
 namespace nx {

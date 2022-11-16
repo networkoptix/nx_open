@@ -364,6 +364,29 @@ TEST_F(Json, map_with_stringizable_keys)
         FooStringizableUnorderedMap{12, {{{"key1"}, {"val1"}}}});
 }
 
+TEST_F(Json, map_keys_are_overwritten_by_deserialization)
+{
+    std::map<std::string, std::string> m{{"color","yellow"}};
+
+    ASSERT_TRUE(json::deserialize(R"({"color":"red","shape":"square"})", &m));
+    ASSERT_EQ("red", m["color"]);
+    ASSERT_EQ("square", m["shape"]);
+}
+
+TEST_F(Json, keys_are_added_to_multimap_by_deserialization)
+{
+    std::multimap<std::string, std::string> m{{"color","yellow"}};
+    ASSERT_TRUE(json::deserialize(R"({"color":"red","shape":"square"})", &m));
+
+    const auto expected = std::multimap<std::string, std::string>{
+        {"color","yellow"},
+        {"color","red"},
+        {"shape","square"}
+    };
+
+    ASSERT_EQ(expected, m);
+}
+
 TEST_F(Json, multimap_support)
 {
     testSerialization(

@@ -2,7 +2,6 @@
 
 #include "test_listening_peer.h"
 
-#include <nx/fusion/serialization_format.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_type.h>
@@ -85,7 +84,7 @@ public:
 
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource =
             std::make_unique<nx::network::http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                "application/json",
                 nx::reflect::json::serialize(restResult));
 
         handler(nx::network::http::RequestResult{

@@ -6,7 +6,6 @@
 #include <string_view>
 #include <vector>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/socket_common.h>
@@ -61,8 +60,6 @@ struct NX_NETWORK_API ConnectRequest:
 #define ConnectRequest_Fields \
     (destinationHostName)(originatingPeerId)(connectSessionId)(connectionMethods) \
     (udpEndpointList)(ignoreSourceAddress)(cloudConnectVersion)
-
-QN_FUSION_DECLARE_FUNCTIONS(ConnectRequest, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(ConnectRequest, ConnectRequest_Fields)
 
@@ -126,8 +123,6 @@ static constexpr std::string_view kDelayParamName = "delay";
 #define ConnectResponse_Fields \
     (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl)(trafficRelayUrls) \
     (destinationHostFullName)(params)(cloudConnectVersion)(alternateMediatorEndpointStunUdp)
-
-QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(ConnectResponse, ConnectResponse_Fields)
 

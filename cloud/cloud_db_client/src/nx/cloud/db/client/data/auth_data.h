@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
 #include <nx/cloud/db/api/auth_provider.h>
@@ -69,18 +68,5 @@ NX_REFLECTION_INSTRUMENT(
 NX_REFLECTION_INSTRUMENT(SystemNonce, SystemNonce_Fields)
 
 static constexpr char kVmsUserAuthInfoAttributeName[] = "cloudUserAuthenticationInfo";
-
-QN_FUSION_DECLARE_FUNCTIONS(NonceData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AuthRequest, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AuthResponse, (json))
-QN_FUSION_DECLARE_FUNCTIONS(UserAuthorization, (json))
-QN_FUSION_DECLARE_FUNCTIONS(UserAuthorizationList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(CredentialsDescriptor, (json))
-QN_FUSION_DECLARE_FUNCTIONS(CredentialsDescriptorList, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemAccess, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AuthInfoRecord, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AuthInfo, (json))
-QN_FUSION_DECLARE_FUNCTIONS(VmsServerCertificatePublicKey, (json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemNonce, (ubjson)(json))
 
 } // namespace nx::cloud::db::api

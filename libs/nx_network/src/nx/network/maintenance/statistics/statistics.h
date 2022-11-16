@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::network::maintenance::statistics {
 
@@ -11,10 +11,6 @@ struct NX_NETWORK_API Statistics
     std::chrono::milliseconds uptimeMsec{0};
 };
 
-#define Statistics_maintenance_Fields (uptimeMsec)
-
-QN_FUSION_DECLARE_FUNCTIONS(Statistics, (json), NX_NETWORK_API)
+NX_REFLECTION_INSTRUMENT(Statistics, (uptimeMsec))
 
 } // namespace nx::network::maintenance::statistics
-
-

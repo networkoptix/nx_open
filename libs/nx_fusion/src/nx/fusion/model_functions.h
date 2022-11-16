@@ -13,8 +13,8 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/fusion/serialization/xml_functions.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/serialization/format.h>
 
 namespace QnHashAutomation {
     struct Visitor {

@@ -4,7 +4,9 @@
 
 #include <cstring>
 
-#include <nx/fusion/model_functions.h>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/url.h>
 
@@ -457,7 +459,7 @@ void PrintTo(const HostAddress& val, ::std::ostream* os)
 }
 
 void serialize(
-    class QnJsonContext*,
+    QnJsonContext*,
     const nx::network::HostAddress& value,
     QJsonValue* target)
 {
@@ -614,7 +616,25 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os)
     *os << val.toString();
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SocketAddress, (json), (address)(port))
+void serialize(QnJsonContext*, const SocketAddress& value, QJsonValue* target)
+{
+    QJsonObject serialized;
+    serialized.insert("address", QString::fromStdString(value.address.toString()));
+    serialized.insert("port", value.port);
+    *target = serialized;
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& source, SocketAddress* value)
+{
+    if (!source.isObject())
+        return false;
+
+    const auto obj = source.toObject();
+    value->address = HostAddress(obj.value("address").toString().toStdString());
+    value->port = obj.value("port").toInt();
+
+    return true;
+}
 
 //-------------------------------------------------------------------------------------------------
 

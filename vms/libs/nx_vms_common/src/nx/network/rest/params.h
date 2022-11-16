@@ -9,9 +9,9 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUrlQuery>
 
-#include <nx/fusion/serialization_format.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/string.h>
 
 namespace nx::network::rest {

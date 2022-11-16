@@ -5,7 +5,6 @@
 #include <chrono>
 #include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/network/http/http_types.h>
@@ -37,7 +36,6 @@ struct Result
 #define RelayResult_Fields (code)(text)
 
 NX_REFLECTION_INSTRUMENT(Result, RelayResult_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(Result, (json), NX_NETWORK_API)
 
 NX_NETWORK_API void convert(
     const Result& result,
@@ -145,12 +143,6 @@ struct ConnectToPeerRequest
 
 NX_REFLECTION_INSTRUMENT(ConnectToPeerRequest, ConnectToPeerRequest_Fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(BeginListeningRequest, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(BeginListeningResponse, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(CreateClientSessionRequest, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(CreateClientSessionResponse, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(ConnectToPeerRequest, (json), NX_NETWORK_API)
-
 //-------------------------------------------------------------------------------------------------
 
 struct Relay
@@ -171,7 +163,6 @@ struct Relay
 #define Relay_Fields (url)(listeningPeerCount)(timestamp)
 
 NX_REFLECTION_INSTRUMENT(Relay, Relay_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(Relay, (json), NX_NETWORK_API)
 
 using Relays = std::map<std::string /*relay name*/, Relay>;
 

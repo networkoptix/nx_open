@@ -2,8 +2,6 @@
 
 #include "relay_api_data_types.h"
 
-#include <nx/fusion/model_functions.h>
-
 #include <nx/utils/string.h>
 
 namespace nx::cloud::relay::api {
@@ -106,17 +104,5 @@ api::Result ResultDescriptor::getResultCodeFromResponse(
 
     return api::Result{code, response.statusLine.reasonPhrase};
 }
-
-//-------------------------------------------------------------------------------------------------
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Result, (json), RelayResult_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BeginListeningRequest, (json), BeginListeningRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BeginListeningResponse, (json), BeginListeningResponse_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CreateClientSessionRequest, (json), CreateClientSessionRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CreateClientSessionResponse, (json), CreateClientSessionResponse_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectToPeerRequest, (json), ConnectToPeerRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Relay, (json), Relay_Fields)
 
 } // namespace nx::cloud::relay::api

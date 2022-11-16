@@ -4,8 +4,8 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/result.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/serialization/format.h>
 
 namespace nx::vms::common::api {
 

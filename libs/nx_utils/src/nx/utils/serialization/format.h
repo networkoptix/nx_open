@@ -36,12 +36,12 @@ constexpr auto nxReflectVisitAllEnumItems(SerializationFormat*, Visitor&& visito
     );
 }
 
-NX_FUSION_API const char* serializationFormatToHttpContentType(SerializationFormat format);
+NX_UTILS_API const char* serializationFormatToHttpContentType(SerializationFormat format);
 
-NX_FUSION_API SerializationFormat serializationFormatFromHttpContentType(
+NX_UTILS_API SerializationFormat serializationFormatFromHttpContentType(
     const std::string_view& httpContentType);
 
-NX_FUSION_API SerializationFormat serializationFormatFromHttpContentType(
+NX_UTILS_API SerializationFormat serializationFormatFromHttpContentType(
     const QByteArray& httpContentType);
 
 } // namespace Qn

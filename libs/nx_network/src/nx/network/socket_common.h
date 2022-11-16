@@ -26,9 +26,10 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QString>
 #include <QtNetwork/QHostAddress>
-#include <nx/fusion/model_functions_fwd.h>
+
 #include <nx/reflect/instrument.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/type_utils.h>
 
 NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
 NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
@@ -36,6 +37,10 @@ NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
 #if !defined(_WIN32)
     NX_NETWORK_API extern const in_addr in4addr_loopback;
 #endif
+
+// Needed for compatibility with nx_fusion.
+// Luckily, custom nx_fusion serialization support does not require dependency on nx_fusion itself.
+class QnJsonContext;
 
 namespace nx::utils { class Url; }
 
@@ -186,7 +191,8 @@ private:
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
 
-QN_FUSION_DECLARE_FUNCTIONS(HostAddress, (json), NX_NETWORK_API)
+NX_NETWORK_API void serialize(QnJsonContext*, const nx::network::HostAddress& value, QJsonValue* target);
+NX_NETWORK_API bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -266,9 +272,10 @@ inline uint qHash(const SocketAddress &address)
 
 NX_NETWORK_API void PrintTo(const SocketAddress& val, ::std::ostream* os);
 
-QN_FUSION_DECLARE_FUNCTIONS(SocketAddress, (json), NX_NETWORK_API)
-
 NX_REFLECTION_INSTRUMENT(SocketAddress, (address)(port))
+
+NX_NETWORK_API void serialize(QnJsonContext*, const nx::network::SocketAddress& value, QJsonValue* target);
+NX_NETWORK_API bool deserialize(QnJsonContext*, const QJsonValue& source, SocketAddress* value);
 
 //-------------------------------------------------------------------------------------------------
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>

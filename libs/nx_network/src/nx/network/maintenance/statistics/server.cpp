@@ -4,7 +4,7 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_types.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json.h>
 
 #include <nx/network/url/url_parse_helper.h>
 
@@ -39,10 +39,9 @@ void Server::getStatisticsGeneral(
     http::RequestResult result(http::StatusCode::ok);
     result.body = std::make_unique<http::BufferSource>(
         http::header::ContentType::kJson,
-        QJson::serialized(std::move(stats)));
+        nx::reflect::json::serialize(std::move(stats)));
 
     completionHandler(std::move(result));
 }
-
 
 } // namespace nx::network::maintenance::statistics

@@ -2,10 +2,6 @@
 
 #include "statistics.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx::network::maintenance::statistics {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Statistics, (json), Statistics_maintenance_Fields)
 
 } // namespace nx::network::maintenance::statistics
