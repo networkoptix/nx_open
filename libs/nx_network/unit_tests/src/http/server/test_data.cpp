@@ -2,8 +2,6 @@
 
 #include "test_data.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx::network::http::test {
 
 namespace {
@@ -27,7 +25,5 @@ bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, Serializ
     what->dummyInt = nx::utils::stoi(it->second);
     return true;
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Serializable, (json), Serializable_Fields)
 
 } // namespace nx::network::http::test

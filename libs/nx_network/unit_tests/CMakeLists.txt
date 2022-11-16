@@ -4,6 +4,8 @@ nx_add_test(nx_network_ut
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_network
+        nx_fusion # nx_network itself does not depend on nx_fusion.
+                  # This dependency is needed to verify legacy compatibility with nx_fusion.
     PRIVATE_LIBS
         udt
     FOLDER common/tests

@@ -10,11 +10,11 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>

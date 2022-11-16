@@ -13,7 +13,7 @@
 namespace nx::network::http {
 
 /**
- * HTTP server request handler which deserializes input/serializes output data using fusion.
+ * HTTP server request handler which deserializes input/serializes output data using nx::reflect.
  * Reads format query parameter from incoming request and deserializes request/serializes response accordingly.
  * Request that returns some data should pass it to requestCompleted function.
  * NOTE: Input  may be void. If Input is void, AbstractApiRequestHandler::processRequest have no

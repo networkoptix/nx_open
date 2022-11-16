@@ -3,13 +3,11 @@
 #include "get_version.h"
 
 #include <nx/build_info.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_types.h>
+#include <nx/reflect/json.h>
 
 namespace nx::network::maintenance {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Version, (json), Version_Fields)
 
 Version getVersion()
 {
@@ -26,7 +24,7 @@ void GetVersion::processRequest(
     http::RequestResult result(http::StatusCode::ok);
     result.body = std::make_unique<http::BufferSource>(
         http::header::ContentType::kJson.toString(),
-        QJson::serialized(getVersion()));
+        nx::reflect::json::serialize(getVersion()));
 
     completionHandler(std::move(result));
 }

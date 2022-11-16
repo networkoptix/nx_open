@@ -7,17 +7,17 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include <nx/fusion/serialization_format.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/json_functions.h>
-#include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/reflect/json.h>
+#include <nx/reflect/to_string.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/server/api_request_result.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/url.h>
+
+#include "detail/nxreflect_wrapper.h"
 
 namespace nx::network::http {
 
@@ -28,7 +28,7 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 {
     QUrlQuery urlQuery;
     serializeToUrlQuery(data, &urlQuery);
-    urlQuery.addQueryItem(QLatin1String("format"), QnLexical::serialized(Qn::JsonFormat));
+    urlQuery.addQueryItem("format", QString::fromStdString(nx::reflect::toString(Qn::JsonFormat)));
     url->setQuery(urlQuery);
 }
 
@@ -43,12 +43,12 @@ bool deserializeFromHeaders(
     return false;
 }
 
-template<typename HandlerFunc>
+template<typename HandlerFunc, typename SerializationLibWrapper>
 class BaseFusionDataHttpClient:
     public nx::network::aio::BasicPollable
 {
     using base_type = nx::network::aio::BasicPollable;
-    using self_type = BaseFusionDataHttpClient<HandlerFunc>;
+    using self_type = BaseFusionDataHttpClient<HandlerFunc, SerializationLibWrapper>;
 
 public:
     BaseFusionDataHttpClient(
@@ -186,6 +186,13 @@ protected:
             nx::reflect::IsInstrumentedV<typename T::value_type>>
     >: std::true_type {};
 
+    template<typename T>
+    struct IsDeserializableWithNxReflect<
+        T, std::enable_if_t<nx::reflect::IsAssociativeContainerV<T> &&
+            nx::reflect::IsInstrumentedV<typename T::value_type::second_type> &&
+            std::is_same_v<std::decay_t<typename T::value_type::first_type>, std::string>>
+    >: std::true_type {};
+
     virtual void requestDone(nx::network::http::AsyncClient* client) = 0;
 
     void deserializeFusionRequestResult(
@@ -233,19 +240,7 @@ protected:
 
         if (!msgBody.empty())
         {
-            bool success = false;
-            if constexpr (IsDeserializableWithNxReflect<OutputData>::value)
-            {
-                nx::reflect::DeserializationResult res;
-                std::tie(outputData, res) = nx::reflect::json::deserialize<OutputData>(msgBody);
-                success = res.success;
-            }
-            else
-            {
-                outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
-            }
-
-            if (!success)
+            if (!SerializationLibWrapper::deserializeFromJson(msgBody, &outputData))
             {
                 handler(SystemError::invalidData, response, OutputData());
                 return;
@@ -283,19 +278,23 @@ private:
 } // namespace detail
 
 /**
- * HTTP client that uses fusion to serialize/deserialize input/output data.
+ * HTTP client that uses nx::reflect to serialize/deserialize input/output data.
  * If output data is expected, then only GET request can be used.
  * Input data in this case is serialized to the url by calling serializeToUrlQuery(InputData, QUrlQuery*).
  * NOTE: Reports SystemError::invalidData on failure to parse response.
  */
-template<typename InputData, typename OutputData>
+template<typename InputData, typename OutputData,
+    typename SerializationLibWrapper = detail::NxReflectWrapper
+>
 class FusionDataHttpClient:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData),
+        SerializationLibWrapper>
 {
     using base_type =
         detail::BaseFusionDataHttpClient<
-            void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>;
+            void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData),
+            SerializationLibWrapper>;
 
 public:
     /**
@@ -309,13 +308,9 @@ public:
         :
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
-        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
-            this->m_requestBody = nx::reflect::json::serialize(input);
-        else
-            this->m_requestBody = QJson::serialized(input).toStdString();
-
-        this->m_requestContentType =
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        bool ok = false;
+        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
+        this->m_requestContentType = "application/json";
     }
 
     FusionDataHttpClient(
@@ -328,13 +323,9 @@ public:
         base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
-        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
-            this->m_requestBody = nx::reflect::json::serialize(input);
-        else
-            this->m_requestBody = QJson::serialized(input).toStdString();
-
-        this->m_requestContentType =
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        bool ok = false;
+        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
+        this->m_requestContentType = "application/json";
     }
 
 private:
@@ -353,18 +344,20 @@ private:
 /**
  * Specialization for void input data.
  */
-template<typename OutputData>
-class FusionDataHttpClient<void, OutputData>:
+template<typename OutputData, typename SerializationLibWrapper>
+class FusionDataHttpClient<void, OutputData, SerializationLibWrapper>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData),
+        SerializationLibWrapper>
 {
-    typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)> ParentType;
+    using base_type = detail::BaseFusionDataHttpClient<
+        void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData),
+        SerializationLibWrapper>;
 
 public:
     FusionDataHttpClient(
         nx::utils::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
-        ParentType(std::move(url), std::move(credentials), std::move(adapterFunc))
+        base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
     }
 
@@ -374,7 +367,7 @@ public:
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc)
         :
-        ParentType(
+        base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
     }
@@ -395,13 +388,15 @@ private:
 /**
  * Specialization for void output data.
  */
-template<typename InputData>
-class FusionDataHttpClient<InputData, void>:
+template<typename InputData, typename SerializationLibWrapper>
+class FusionDataHttpClient<InputData, void, SerializationLibWrapper>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*),
+        SerializationLibWrapper>
 {
-    typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*)> ParentType;
+    using base_type = detail::BaseFusionDataHttpClient<
+        void(SystemError::ErrorCode, const nx::network::http::Response*),
+        SerializationLibWrapper>;
 
 public:
     FusionDataHttpClient(
@@ -410,26 +405,19 @@ public:
         ssl::AdapterFunc adapterFunc,
         const InputData& input)
         :
-        ParentType(std::move(url), std::move(credentials), std::move(adapterFunc))
+        base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
         if constexpr (std::is_same_v<InputData, std::string>)
         {
             this->m_requestBody = input;
         }
-        else 
+        else
         {
-            if constexpr (nx::reflect::IsInstrumentedV<InputData>) 
-            {
-                this->m_requestBody = nx::reflect::json::serialize(input);
-            }
-            else
-            {
-                this->m_requestBody = QJson::serialized(input).toStdString();
-            }
+            bool ok = false;
+            std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
         }
 
-        this->m_requestContentType =
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        this->m_requestContentType = "application/json";
     }
 
     FusionDataHttpClient(
@@ -439,22 +427,18 @@ public:
         ssl::AdapterFunc proxyAdapterFunc,
         const InputData& input)
         :
-        ParentType(
+        base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
-        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
-            this->m_requestBody = nx::reflect::json::serialize(input);
-        else
-            this->m_requestBody = QJson::serialized(input).toStdString();
-
-        this->m_requestContentType =
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        bool ok = false;
+        std::tie(this->m_requestBody, ok) = SerializationLibWrapper::serializeToJson(input);
+        this->m_requestContentType = "application/json";
     }
 
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
-        deserializeFusionRequestResult(
+        this->deserializeFusionRequestResult(
             client->lastSysErrorCode(),
             client->response(),
             client->fetchMessageBodyBuffer());
@@ -470,18 +454,20 @@ private:
 /**
  * Specialization for both input & output data void.
  */
-template<>
-class FusionDataHttpClient<void, void>:
+template<typename SerializationLibWrapper>
+class FusionDataHttpClient<void, void, SerializationLibWrapper>:
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*)>
+        void(SystemError::ErrorCode, const nx::network::http::Response*),
+        SerializationLibWrapper>
 {
-    typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx::network::http::Response*)> ParentType;
+    using base_type = detail::BaseFusionDataHttpClient<
+        void(SystemError::ErrorCode, const nx::network::http::Response*),
+        SerializationLibWrapper>;
 
 public:
     FusionDataHttpClient(
         nx::utils::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
-        ParentType(std::move(url), std::move(credentials), std::move(adapterFunc))
+        base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
     }
 
@@ -491,7 +477,7 @@ public:
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc)
         :
-        ParentType(
+        base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
     }
@@ -499,7 +485,7 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
-        deserializeFusionRequestResult(
+        this->deserializeFusionRequestResult(
             client->lastSysErrorCode(),
             client->response(),
             client->fetchMessageBodyBuffer());

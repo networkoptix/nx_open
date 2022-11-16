@@ -16,7 +16,6 @@ nx_add_target(nx_network LIBRARY NO_MOC
         OpenSSL::OpenSSL
         nx_kit
         nx_utils
-        nx_fusion
         nx_reflect
     PRIVATE_LIBS
         udt

@@ -186,17 +186,23 @@ inline constexpr bool IsSequenceContainerV = IsSequenceContainer<Args...>::value
 //-------------------------------------------------------------------------------------------------
 
 template<typename... Args>
-struct IsStdChronoDuration: std::false_type
-{
-};
+struct IsStdChronoDuration: std::false_type {};
 
 template<typename... Args>
-struct IsStdChronoDuration<std::chrono::duration<Args...>>:
-    std::true_type
-{
-};
+struct IsStdChronoDuration<std::chrono::duration<Args...>>: std::true_type {};
 
 template<typename... Args>
 constexpr bool IsStdChronoDurationV = IsStdChronoDuration<Args...>::value;
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename... Args>
+struct IsStdChronoTimePoint: std::false_type {};
+
+template<typename... Args>
+struct IsStdChronoTimePoint<std::chrono::time_point<Args...>>: std::true_type {};
+
+template<typename... Args>
+constexpr bool IsStdChronoTimePointV = IsStdChronoTimePoint<Args...>::value;
 
 } // namespace nx::reflect

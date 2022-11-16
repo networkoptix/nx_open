@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/server/rest/base_request_handler.h>
@@ -32,9 +31,6 @@ struct Output
 #define Output_Fields (s)
 
 NX_REFLECTION_INSTRUMENT(Output, Output_Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Input, (json), Input_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Output, (json), Output_Fields)
 
 struct Result
 {

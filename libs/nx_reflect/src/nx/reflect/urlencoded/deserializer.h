@@ -84,6 +84,19 @@ std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
     return {result, parsedSuccess};
 }
 
+// Representing timepoint in milliseconds since epoch.
+template<typename T>
+requires IsStdChronoTimePointV<T>
+std::tuple<T, bool> defaultDeserialize(const std::string_view& str)
+{
+    std::chrono::milliseconds ms;
+    bool parsedSuccess = nx::reflect::detail::fromString(str, &ms);
+    if (!parsedSuccess)
+        return std::make_tuple(T(), false);
+
+    return {T(std::chrono::duration_cast<typename T::duration>(ms)), true};
+}
+
 template<typename T>
 constexpr bool isInternalDeserializable()
 {

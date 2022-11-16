@@ -10,11 +10,10 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/generic_visitor.h>
+#include <nx/reflect/from_string.h>
+#include <nx/reflect/type_utils.h>
 
 #include "rapidjson/document.h"
-#include "../from_string.h"
-#include "../utils.h"
-#include "../type_utils.h"
 #include "utils.h"
 
 namespace nx::reflect {
@@ -169,6 +168,21 @@ DeserializationResult deserialize(
     return DeserializationResult(true);
 }
 
+template<typename C, typename Key, typename = std::void_t<>>
+struct HasSquareBracketOperator: std::false_type {};
+
+template<typename C, typename Key>
+struct HasSquareBracketOperator<
+    C,
+    Key,
+    std::void_t<decltype(std::declval<C>()[std::declval<Key>()])>
+>: std::true_type
+{
+};
+
+template<typename... Args>
+inline constexpr bool HasSquareBracketOperatorV = HasSquareBracketOperator<Args...>::value;
+
 template<typename C>
 DeserializationResult deserialize(
     const DeserializationContext& ctx,
@@ -214,7 +228,10 @@ DeserializationResult deserialize(
             continue;
         }
 
-        data->emplace(std::move(key), std::move(element));
+        if constexpr (HasSquareBracketOperatorV<C, decltype(key)>)
+            (*data)[std::move(key)] = std::move(element); //< E.g., std::map
+        else
+            data->emplace(std::move(key), std::move(element)); //< E.g., std::multimap
     }
 
     return DeserializationResult(true);

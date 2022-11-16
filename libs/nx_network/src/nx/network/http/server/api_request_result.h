@@ -6,7 +6,6 @@
 
 #include <QtCore/QString>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/reflect/instrument.h>
 
 #include "../http_types.h"
@@ -216,8 +215,5 @@ inline void ApiRequestResult::setErrorText(const std::string& text)
 {
     this->operator[](kErrorText) = text;
 }
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::ApiRequestErrorDetail, (lexical), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::ApiRequestErrorClass, (lexical), NX_NETWORK_API)
 
 } // namespace nx::network::http

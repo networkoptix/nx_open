@@ -17,7 +17,7 @@ class HasToBase64
     typedef char one;
     struct two { char x[2]; };
 
-    template <typename C> static one test(decltype(std::declval<C>().toBase64())*);
+    template <typename C> static one test(std::decay_t<decltype(std::declval<C>().toBase64())>*);
     template <typename C> static two test(...);
 
 public:
@@ -35,7 +35,7 @@ class HasToStdString
     typedef char one;
     struct two { char x[2]; };
 
-    template <typename C> static one test(decltype(std::declval<C>().toStdString())*);
+    template <typename C> static one test(std::decay_t<decltype(std::declval<C>().toStdString())>*);
     template <typename C> static two test(...);
 
 public:
@@ -53,7 +53,7 @@ class HasToString
     typedef char one;
     struct two { char x[2]; };
 
-    template <typename C> static one test(decltype(std::declval<C>().toString())*);
+    template <typename C> static one test(std::decay_t<decltype(std::declval<C>().toString())>*);
     template <typename C> static two test(...);
 
 public:

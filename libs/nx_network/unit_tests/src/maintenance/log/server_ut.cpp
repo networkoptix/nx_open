@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
@@ -10,6 +9,7 @@
 #include <nx/network/maintenance/log/utils.h>
 #include <nx/network/maintenance/log/server.h>
 #include <nx/network/maintenance/log/request_path.h>
+#include <nx/reflect/json.h>
 
 #include <nx/utils/log/logger_collection.h>
 #include <nx/utils/log/log_level.h>
@@ -183,16 +183,16 @@ protected:
         const auto messageBody = m_httpClient->fetchEntireMessageBody();
         ASSERT_TRUE(messageBody);
 
-        bool ok = false;
-        Loggers loggersReturnedByServer = QJson::deserialized<Loggers>(*messageBody, {}, &ok);
-        ASSERT_TRUE(ok);
+        const auto [loggersReturnedByServer, result] =
+            nx::reflect::json::deserialize<Loggers>(*messageBody);
+        ASSERT_TRUE(result.success);
 
         // NOTE: size can't be compared because the logging server may have its main logger set.
         // If so, then there will be one extra logger returned by the GET loggers request
         // than in the list of loggers saved from POST requests to the server.
 
         const auto serverHasLogger =
-            [this, &loggersReturnedByServer](const Logger& logger) -> bool
+            [this, loggersReturnedByServer = loggersReturnedByServer](const Logger& logger) -> bool
             {
                 auto it = std::find_if(
                     loggersReturnedByServer.loggers.begin(),
@@ -227,9 +227,9 @@ protected:
         const auto messageBody = m_httpClient->fetchEntireMessageBody();
         ASSERT_TRUE(messageBody);
 
-        bool ok = false;
-        Logger loggerReturnedByServer = QJson::deserialized<Logger>(*messageBody, {}, &ok);
-        ASSERT_TRUE(ok);
+        const auto [loggerReturnedByServer, result] =
+            nx::reflect::json::deserialize<Logger>(*messageBody);
+        ASSERT_TRUE(result.success);
 
         const Logger& expected = m_expectedLoggers.back();
 
@@ -358,7 +358,7 @@ private:
         ASSERT_TRUE(m_httpClient->doPost(
             createRequestUrl(kLoggers),
             "application/json",
-            nx::Buffer(QJson::serialized(logger))));
+            nx::Buffer(nx::reflect::json::serialize(logger))));
         m_expectedLoggers.emplace_back(logger);
     }
 

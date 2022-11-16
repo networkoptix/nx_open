@@ -1,40 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <string>
-#include <optional>
-
 #pragma once
 
-namespace nx::reflect {
-
-struct NX_REFLECT_API DeserializationResult
-{
-    bool success = true;
-    std::string errorDescription;
-
-    /**
-     * A fragment of an input string which wasn't parsed
-     */
-    std::string firstBadFragment;
-
-    /**
-     * A name of the least common ancestor of object type of the field which wasn't deserialized,
-     * if exists.
-     */
-    std::optional<std::string> firstNonDeserializedField;
-
-    DeserializationResult(bool result);
-    DeserializationResult() = default;
-    DeserializationResult(
-        bool result,
-        std::string errorDescription,
-        std::string badFragment,
-        std::optional<std::string> notDeserializedField = std::nullopt);
-
-    operator bool() const noexcept;
-};
-
-namespace detail {
+namespace nx::reflect::detail {
 
 /**
  * Types in this namespace are introduced to get rid of "#include <type_traits>"
@@ -165,6 +133,4 @@ struct SetterReturnType<void(C::*)(T)> { using Type = typename Decay<T>::Type; }
 template<typename C, typename T>
 struct SetterReturnType<void(C::*)(T) noexcept> { using Type = typename Decay<T>::Type; };
 
-} // namespace detail
-
-} // namespace nx::reflect
+} // namespace nx::reflect::detail

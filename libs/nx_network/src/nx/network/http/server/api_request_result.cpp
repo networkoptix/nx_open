@@ -2,8 +2,6 @@
 
 #include "api_request_result.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx::network::http {
 
 ApiRequestErrorClass fromHttpStatus(StatusCode::Value statusCode)

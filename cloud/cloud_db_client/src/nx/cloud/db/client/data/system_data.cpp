@@ -2,8 +2,8 @@
 
 #include "system_data.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/url/query_parse_helper.h>
+#include <nx/utils/log/assert.h>
 
 #include "../field_name.h"
 
@@ -163,18 +163,12 @@ void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery)
     }
 }
 
-void serialize(QnJsonContext* /*ctx*/, const Filter& filter, QJsonValue* target)
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const Filter& value)
 {
-    QJsonObject localTarget = target->toObject();
-    for (const auto& param: filter.nameToValue)
-    {
-        localTarget.insert(
-            QString::fromStdString(nx::reflect::toString(param.first)),
-            QString::fromStdString(param.second));
-    }
-    *target = localTarget;
+    nx::reflect::json::serialize(ctx, value.nameToValue);
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // class SystemAttributesUpdate
@@ -216,78 +210,6 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
     url::serializeField(urlQuery, SystemAttributesUpdate_mfaCode_field, data.mfaCode);
 }
 
-void serialize(QnJsonContext*, const SystemAttributesUpdate& data, QJsonValue* jsonValue)
-{
-    QJsonObject jsonObject;
-
-    if (data.systemId)
-    {
-        jsonObject.insert(
-            SystemAttributesUpdate_systemId_field, QString::fromStdString(*data.systemId));
-    }
-
-    if (data.name)
-    {
-        jsonObject.insert(SystemAttributesUpdate_name_field, QString::fromStdString(*data.name));
-    }
-
-    if (data.opaque)
-    {
-        jsonObject.insert(
-            SystemAttributesUpdate_opaque_field, QString::fromStdString(*data.opaque));
-    }
-
-    if (data.system2faEnabled)
-    {
-        jsonObject.insert(
-            SystemAttributesUpdate_system2faEnabled_field,
-            *data.system2faEnabled ? "true" : "false");
-    }
-
-    if (data.totp)
-    {
-        jsonObject.insert(SystemAttributesUpdate_totp_field, QString::fromStdString(*data.totp));
-    }
-
-    if (data.mfaCode)
-    {
-        jsonObject.insert(
-            SystemAttributesUpdate_mfaCode_field, QString::fromStdString(*data.mfaCode));
-    }
-
-    *jsonValue = jsonObject;
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& value, SystemAttributesUpdate* data)
-{
-    if (value.type() != QJsonValue::Object)
-        return false;
-    const QJsonObject map = value.toObject();
-
-    auto systemIdIter = map.find(SystemAttributesUpdate_systemId_field);
-    if (systemIdIter == map.constEnd())
-        return false;
-    data->systemId = systemIdIter.value().toString().toStdString();
-
-    auto nameIter = map.find(SystemAttributesUpdate_name_field);
-    if (nameIter != map.constEnd())
-        data->name = nameIter.value().toString().toStdString();
-    auto opaqueIter = map.find(SystemAttributesUpdate_opaque_field);
-    if (opaqueIter != map.constEnd())
-        data->opaque = opaqueIter.value().toString().toStdString();
-    auto system2faIter = map.find(SystemAttributesUpdate_system2faEnabled_field);
-    if (system2faIter != map.constEnd())
-        data->system2faEnabled = system2faIter.value().toInt();
-    auto totpIter = map.find(SystemAttributesUpdate_totp_field);
-    if (totpIter != map.constEnd())
-        data->totp = totpIter.value().toString().toStdString();
-    auto mfaCodeIter = map.find(SystemAttributesUpdate_mfaCode_field);
-    if (mfaCodeIter != map.constEnd())
-        data->mfaCode = mfaCodeIter.value().toString().toStdString();
-
-    return data->name || data->opaque;
-}
-
 //-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
@@ -307,43 +229,6 @@ void serializeToUrlQuery(const UserSessionDescriptor& data, QUrlQuery* const url
     url::serializeField(urlQuery, UserSessionDescriptor_systemId_field, data.systemId);
 }
 
-void serialize(QnJsonContext*, const UserSessionDescriptor& data, QJsonValue* jsonValue)
-{
-    QJsonObject jsonObject;
-
-    if (data.accountEmail)
-    {
-        jsonObject.insert(
-            UserSessionDescriptor_accountEmail_field,
-            QString::fromStdString(*data.accountEmail));
-    }
-
-    if (data.systemId)
-    {
-        jsonObject.insert(
-            UserSessionDescriptor_systemId_field,
-            QString::fromStdString(*data.systemId));
-    }
-
-    *jsonValue = jsonObject;
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& value, UserSessionDescriptor* data)
-{
-    if (value.type() != QJsonValue::Object)
-        return false;
-    const QJsonObject map = value.toObject();
-
-    auto accountEmailIter = map.find(UserSessionDescriptor_accountEmail_field);
-    if (accountEmailIter != map.constEnd())
-        data->accountEmail = accountEmailIter.value().toString().toStdString();
-    auto systemIdIter = map.find(UserSessionDescriptor_systemId_field);
-    if (systemIdIter != map.constEnd())
-        data->systemId = systemIdIter.value().toString().toStdString();
-
-    return data->accountEmail || data->systemId;
-}
-
 //-------------------------------------------------------------------------------------------------
 // GetSystemUsersRequest
 
@@ -359,28 +244,5 @@ void serializeToUrlQuery(const GetSystemUsersRequest& data, QUrlQuery* const url
         GetSystemUsersRequest_localOnly_field,
         QString::number(data.localOnly));
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemRegistrationData, (json), SystemRegistrationData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemData, (json), SystemData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSharing, (json), SystemSharing_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemId, (json), SystemId_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemIdList, (json), SystemIdList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemMergeInfo, (json), SystemMergeInfo_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemDataEx, (json), SystemDataEx_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemDataList, (json), SystemDataList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemDataExList, (json), SystemDataExList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSharingList, (json), SystemSharingList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSharingEx, (ubjson)(json), SystemSharingEx_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemSharingExList, (json), SystemSharingExList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemAccessRoleData, (json), SystemAccessRoleData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemAccessRoleList, (json), SystemAccessRoleList_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemHealthHistoryItem, (json), SystemHealthHistoryItem_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemHealthHistory, (json), SystemHealthHistory_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MergeRequest, (json), MergeRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ValidateMSSignatureRequest, (json), ValidateMSSignatureRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(GetSystemUsersRequest, (json), GetSystemUsersRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CreateSystemOfferRequest, (json), CreateSystemOfferRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemOffer, (json), SystemOffer_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemOfferPatch, (json), SystemOfferPatch_Fields)
 
 } // namespace nx::cloud::db::api

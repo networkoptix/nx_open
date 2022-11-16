@@ -7,7 +7,7 @@
 
 #include <rapidjson/document.h>
 
-#include "../utils.h"
+#include <nx/reflect/serialization_utils.h>
 
 namespace nx::reflect::json_detail {
 

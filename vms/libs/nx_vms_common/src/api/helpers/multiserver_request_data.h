@@ -5,7 +5,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_globals.h>
-#include <nx/fusion/serialization_format.h>
+#include <nx/utils/serialization/format.h>
 
 class QnResourcePool;
 namespace nx::network::rest { class Params; }

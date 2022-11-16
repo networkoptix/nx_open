@@ -8,7 +8,6 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/resource_property_key.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_async_client.h>
@@ -19,6 +18,7 @@
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/data/server_model.h>

@@ -2,7 +2,6 @@
 
 #include "account_data.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/url/query_parse_helper.h>
 #include <nx/utils/buffer.h>
 
@@ -14,11 +13,6 @@ using namespace nx::network;
 
 //-------------------------------------------------------------------------------------------------
 // class AccountRegistrationData
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountRegistrationSecuritySettings, (json), AccountRegistrationSecuritySettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountRegistrationSettings, (json), AccountRegistrationSettings_Fields)
 
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, email)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1)
@@ -82,12 +76,6 @@ void serializeToUrlQuery(const AccountConfirmationCode& data, QUrlQuery* const u
         QString::fromStdString(data.code));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountRegistrationData, (json), AccountRegistrationData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AccountData, (json)(sql_record), AccountData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountConfirmationCode, (json)(sql_record), AccountConfirmationCode_Fields)
-
 //-------------------------------------------------------------------------------------------------
 // class AccountUpdateData
 
@@ -136,94 +124,6 @@ void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuer
         urlQuery, AccountUpdateData_mfaCode_field, data.mfaCode);
 }
 
-void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
-{
-    QJsonObject jsonObject;
-    if (data.passwordHa1)
-    {
-        jsonObject.insert(
-            AccountUpdateData_passwordHa1_field,
-            QString::fromStdString(*data.passwordHa1));
-    }
-
-    if (data.password)
-    {
-        jsonObject.insert(
-            AccountUpdateData_password_field,
-            QString::fromStdString(*data.password));
-    }
-
-    if (data.currentPassword)
-    {
-        jsonObject.insert(
-            AccountUpdateData_currentPassword_field, QString::fromStdString(*data.currentPassword));
-    }
-
-    if (data.totp)
-    {
-        jsonObject.insert(AccountUpdateData_totp_field,
-            QString::fromStdString(*data.totp));
-    }
-
-    if (data.mfaCode)
-    {
-        jsonObject.insert(AccountUpdateData_mfaCode_field, QString::fromStdString(*data.mfaCode));
-    }
-
-    if (data.fullName)
-    {
-        jsonObject.insert(
-            AccountUpdateData_fullName_field,
-            QString::fromStdString(*data.fullName));
-    }
-
-    if (data.customization)
-    {
-        jsonObject.insert(
-            AccountUpdateData_customization_field,
-            QString::fromStdString(*data.customization));
-    }
-
-    *jsonValue = jsonObject;
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* data)
-{
-    if (value.type() != QJsonValue::Object)
-        return false;
-    const QJsonObject map = value.toObject();
-
-    auto passwordHa1Iter = map.find(AccountUpdateData_passwordHa1_field);
-    if (passwordHa1Iter != map.constEnd())
-        data->passwordHa1 = passwordHa1Iter.value().toString().toStdString();
-
-    auto passwordIter = map.find(AccountUpdateData_password_field);
-    if (passwordIter != map.constEnd())
-        data->password = passwordIter.value().toString().toStdString();
-
-    auto currentPasswordIter = map.find(AccountUpdateData_currentPassword_field);
-    if (currentPasswordIter != map.constEnd())
-        data->currentPassword = currentPasswordIter.value().toString().toStdString();
-
-    auto totpIter = map.find(AccountUpdateData_totp_field);
-    if (totpIter != map.constEnd())
-        data->totp = totpIter.value().toString().toStdString();
-
-    auto mfaCodeIter = map.find(AccountUpdateData_mfaCode_field);
-    if (mfaCodeIter != map.constEnd())
-        data->mfaCode = totpIter.value().toString().toStdString();
-
-    auto fullNameIter = map.find(AccountUpdateData_fullName_field);
-    if (fullNameIter != map.constEnd())
-        data->fullName = fullNameIter.value().toString().toStdString();
-
-    auto customizationIter = map.find(AccountUpdateData_customization_field);
-    if (customizationIter != map.constEnd())
-        data->customization = customizationIter.value().toString().toStdString();
-
-    return true;
-}
-
 //-------------------------------------------------------------------------------------------------
 // class AccountEmail
 
@@ -243,13 +143,6 @@ void serializeToUrlQuery(const AccountEmail& data, QUrlQuery* const urlQuery)
         AccountEmail_email_field,
         QString::fromStdString(data.email));
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AccountEmail, (json), AccountEmail_Fields, (optional, false))
-
-//-------------------------------------------------------------------------------------------------
-// PasswordResetRequest
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PasswordResetRequest, (json), PasswordResetRequest_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // class TemporaryCredentials
@@ -324,18 +217,6 @@ void serializeToUrlQuery(
     }
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TemporaryCredentialsTimeouts, (json), TemporaryCredentialsTimeouts_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TemporaryCredentialsParams, (json), TemporaryCredentialsParams_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TemporaryCredentials, (json), TemporaryCredentials_Fields)
-
-//-------------------------------------------------------------------------------------------------
-// struct AccountSecuritySettings
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountSecuritySettings, (json), AccountSecuritySettings_Fields)
-
 //-------------------------------------------------------------------------------------------------
 // struct AccountForSharingRequest
 
@@ -351,14 +232,5 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountForSharingRequest* const
         data->nonce = urlQuery.queryItemValue("nonce").toStdString();
     return true;
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountForSharingRequest, (json), AccountForSharingRequest_Fields)
-
-//-------------------------------------------------------------------------------------------------
-// struct AccountForSharing
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AccountForSharing, (json), AccountForSharing_Fields)
 
 } // namespace nx::cloud::db::api

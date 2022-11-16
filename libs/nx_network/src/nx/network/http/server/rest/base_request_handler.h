@@ -187,7 +187,7 @@ inline static void convert(const StatusCode::Value& status, ApiRequestResult* ht
  *         },
  *         network::http::Method::get);
  *
- *     // NOTE: this request has no fusion input and no fusion output.
+ *     // NOTE: this request has no deserializable input and no serializable output.
  *     // NOTE: RestArgFetcher<kIdParam> and ClientEndpointFetcher must occur in the same order
  *     // as the parameters they correspond to.
 

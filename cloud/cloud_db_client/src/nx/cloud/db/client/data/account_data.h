@@ -2,15 +2,13 @@
 
 #pragma once
 
-#include <QtCore/QUrlQuery>
-
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/uuid.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
+#include <QtCore/QUrlQuery>
+
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
 
 #include <nx/cloud/db/api/account_data.h>
 
@@ -39,9 +37,6 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationSecuritySettings, AccountRegistratio
 
 NX_REFLECTION_INSTRUMENT(AccountRegistrationSettings, AccountRegistrationSettings_Fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(AccountRegistrationSecuritySettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AccountRegistrationSettings, (json))
-
 #define AccountRegistrationData_Fields \
     (email)(passwordHa1)(password)\
     (fullName)(customization)(settings)
@@ -67,10 +62,6 @@ void serializeToUrlQuery(const AccountConfirmationCode&, QUrlQuery* const urlQue
 
 #define AccountConfirmationCode_Fields (code)
 
-QN_FUSION_DECLARE_FUNCTIONS(AccountRegistrationData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AccountData, (json)(sql_record))
-QN_FUSION_DECLARE_FUNCTIONS(AccountConfirmationCode, (json)(sql_record))
-
 NX_REFLECTION_INSTRUMENT(AccountConfirmationCode, AccountConfirmationCode_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -78,9 +69,6 @@ NX_REFLECTION_INSTRUMENT(AccountConfirmationCode, AccountConfirmationCode_Fields
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
-
-void serialize(QnJsonContext*, const AccountUpdateData&, QJsonValue*);
-bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
 
 #define AccountUpdateData_Fields \
     (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)(mfaCode)
@@ -95,7 +83,6 @@ void serializeToUrlQuery(const AccountEmail&, QUrlQuery* const urlQuery);
 
 #define AccountEmail_Fields (email)
 
-QN_FUSION_DECLARE_FUNCTIONS(AccountEmail, (json))
 NX_REFLECTION_INSTRUMENT(AccountEmail, AccountEmail_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -103,7 +90,6 @@ NX_REFLECTION_INSTRUMENT(AccountEmail, AccountEmail_Fields)
 
 #define PasswordResetRequest_Fields (email)(customization)
 
-QN_FUSION_DECLARE_FUNCTIONS(PasswordResetRequest, (json))
 NX_REFLECTION_INSTRUMENT(PasswordResetRequest, PasswordResetRequest_Fields)
 
 //-------------------------------------------------------------------------------------------------
@@ -127,14 +113,8 @@ NX_REFLECTION_INSTRUMENT(TemporaryCredentialsParams, TemporaryCredentialsParams_
 
 NX_REFLECTION_INSTRUMENT(TemporaryCredentials, TemporaryCredentials_Fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(TemporaryCredentialsTimeouts, (json))
-QN_FUSION_DECLARE_FUNCTIONS(TemporaryCredentialsParams, (json))
-QN_FUSION_DECLARE_FUNCTIONS(TemporaryCredentials, (json))
-
 //-------------------------------------------------------------------------------------------------
 // struct AccountSecuritySettings
-
-QN_FUSION_DECLARE_FUNCTIONS(AccountSecuritySettings, (json))
 
 #define AccountSecuritySettings_Fields \
     (httpDigestAuthEnabled)(password)(account2faEnabled)(totp)(totpExistsForAccount)\
@@ -148,16 +128,12 @@ NX_REFLECTION_INSTRUMENT(AccountSecuritySettings, AccountSecuritySettings_Fields
 void serializeToUrlQuery(const AccountForSharingRequest& requestData, QUrlQuery* urlQuery);
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountForSharingRequest* const data);
 
-QN_FUSION_DECLARE_FUNCTIONS(AccountForSharingRequest, (json))
-
 #define AccountForSharingRequest_Fields (nonce)
 
 NX_REFLECTION_INSTRUMENT(AccountForSharingRequest, AccountForSharingRequest_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // struct AccountForSharing
-
-QN_FUSION_DECLARE_FUNCTIONS(AccountForSharing, (json))
 
 #define AccountForSharing_Fields (id)(email)(fullName)(statusCode)(account2faEnabled)(intermediateResponse)(remote)
 

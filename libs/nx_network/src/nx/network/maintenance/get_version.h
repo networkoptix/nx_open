@@ -1,8 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/fusion/model_functions_fwd.h>
-
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::network::maintenance {
 
@@ -15,9 +14,7 @@ struct NX_NETWORK_API Version
     std::string revision;
 };
 
-#define Version_Fields (version)(revision)
-
-QN_FUSION_DECLARE_FUNCTIONS(Version, (json), NX_NETWORK_API)
+NX_REFLECTION_INSTRUMENT(Version, (version)(revision))
 
 NX_NETWORK_API Version getVersion();
 

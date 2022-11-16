@@ -7,8 +7,8 @@
 #include <QtCore/QObject>
 
 #include <api/server_rest_connection_fwd.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/types/connection_types.h>

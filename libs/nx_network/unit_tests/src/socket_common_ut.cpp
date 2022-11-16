@@ -9,6 +9,7 @@ typedef ULONG in_addr_t;
 #include <gtest/gtest.h>
 
 #include <nx/network/socket_common.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 
@@ -240,6 +241,15 @@ TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitly)
 
 #endif
 
+TEST(HostAddress, compatible_with_nx_fusion)
+{
+    ASSERT_EQ("\"localhost\"", QJson::serialized(nx::network::HostAddress("localhost")));
+
+    nx::network::HostAddress value;
+    ASSERT_TRUE(QJson::deserialize(nx::Buffer("\"localhost\""), &value));
+    ASSERT_EQ(nx::network::HostAddress("localhost"), value);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class SocketAddress:
@@ -322,6 +332,17 @@ TEST_F(SocketAddress, fromUserInput)
     ASSERT_EQ(socketAddressFromUserInput("localhost:7001").isNull(), false);
 }
 
+TEST_F(SocketAddress, compatible_with_nx_fusion)
+{
+    ASSERT_EQ(
+        R"({"address":"localhost","port":12345})",
+        QJson::serialized(nx::network::SocketAddress("localhost", 12345)));
+
+    nx::network::SocketAddress value;
+    ASSERT_TRUE(QJson::deserialize(nx::Buffer(R"({"address":"localhost","port":12345})"), &value));
+    ASSERT_EQ(nx::network::SocketAddress("localhost", 12345), value);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 TEST(KeepAliveOptions, parse)
@@ -349,6 +370,5 @@ TEST(KeepAliveOptions, toString)
         "{11ms,131ms,12}",
         KeepAliveOptions(milliseconds(11), milliseconds(131), 12).toString());
 }
-
 
 } // namespace nx::network::test

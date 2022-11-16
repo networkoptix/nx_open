@@ -7,64 +7,16 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <nx/fusion/fusion/fusion_adaptors.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization_format.h>
-#include <nx/reflect/json.h>
-#include <nx/reflect/urlencoded.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "../../buffer_source.h"
+#include "../../detail/nxreflect_wrapper.h"
 #include "../abstract_http_request_handler.h"
 #include "../api_request_result.h"
 
 namespace nx::network::http::detail {
-
-class NxReflectBinder
-{
-public:
-    template<typename T>
-    static std::tuple<nx::Buffer, bool /*result*/> serialized(
-        Qn::SerializationFormat format, const T& data)
-    {
-        switch (format)
-        {
-            case Qn::JsonFormat:
-                return std::make_tuple(
-                    nx::Buffer(nx::reflect::json::serialize(data)), true);
-
-            case Qn::UrlEncodedFormat:
-                return std::make_tuple(nx::Buffer(nx::reflect::urlencoded::serialize(data)), true);
-
-            default:
-                return std::make_tuple(nx::Buffer(), false);
-        }
-    }
-
-    template<class T>
-    static bool deserialize(
-        Qn::SerializationFormat format,
-        const nx::Buffer& data,
-        T* const target)
-    {
-        switch (format)
-        {
-            case Qn::JsonFormat:
-                return nx::reflect::json::deserialize(
-                    std::string_view(data.data(), data.size()), target);
-
-            case Qn::UrlEncodedFormat:
-                return nx::reflect::urlencoded::deserialize(
-                    std::string_view(data.data(), data.size()), target);
-
-            default:
-                return false;
-        }
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
 
 /**
  * This is a dummy implementation for types that
@@ -87,7 +39,7 @@ class BaseApiRequestHandler:
     public RequestHandlerWithContext
 {
     using base_type = RequestHandlerWithContext;
-    using FormatBinder = NxReflectBinder;
+    using FormatBinder = NxReflectWrapper;
 
 public:
     BaseApiRequestHandler() = default;
@@ -116,7 +68,7 @@ protected:
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody);
 
     template<class T>
-    bool parseAnyFusionFormat(
+    bool parseAnySupportedFormat(
         Qn::SerializationFormat dataFormat,
         const nx::Buffer& data,
         T* const target);
@@ -265,7 +217,7 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
         NX_ASSERT(serializeToAnyFusionFormat(result, Qn::JsonFormat, &serializedResult));
 
         outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            "application/json",
             serializedResult);
     }
 
@@ -289,7 +241,7 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
 
 template<typename Input, typename Descendant>
 template<class T>
-bool BaseApiRequestHandler<Input, Descendant>::parseAnyFusionFormat(
+bool BaseApiRequestHandler<Input, Descendant>::parseAnySupportedFormat(
     Qn::SerializationFormat dataFormat,
     const nx::Buffer& data,
     T* const target)
@@ -324,7 +276,7 @@ bool BaseApiRequestHandler<Input, Descendant>::serializeToAnyFusionFormat(
         default:
         {
             bool success = true;
-            std::tie(*output, success) = FormatBinder::serialized(dataFormat, data);
+            std::tie(*output, success) = FormatBinder::serialize(dataFormat, data);
             return success;
         }
     }
@@ -484,8 +436,7 @@ bool BaseApiRequestHandler<Input, Descendant>::parseInput(
     if (!this->getInputFormat(request, error))
         return false;
 
-    // Parsing request message body using fusion.
-    if (!this->template parseAnyFusionFormat<LocalInput>(
+    if (!this->template parseAnySupportedFormat<LocalInput>(
             this->inputFormat(),
             request.requestLine.method == nx::network::http::Method::get
                 ? request.requestLine.url.query().toUtf8()

@@ -2,12 +2,9 @@
 
 #include "connection_speed.h"
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json.h>
 
 namespace nx::hpm::api {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectionSpeed, (json), ConnectionSpeed_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PeerConnectionSpeed, (json), PeerConnectionSpeed_Fields)
 
 bool ConnectionSpeed::operator==(const ConnectionSpeed& other) const
 {
@@ -16,7 +13,7 @@ bool ConnectionSpeed::operator==(const ConnectionSpeed& other) const
 
 std::string ConnectionSpeed::toString() const
 {
-    return QJson::serialized(*this).toStdString();
+    return nx::reflect::json::serialize(*this);
 }
 
 bool PeerConnectionSpeed::operator==(const PeerConnectionSpeed& other) const
@@ -29,7 +26,7 @@ bool PeerConnectionSpeed::operator==(const PeerConnectionSpeed& other) const
 
 std::string PeerConnectionSpeed::toString() const
 {
-    return QJson::serialized(*this).toStdString();
+    return nx::reflect::json::serialize(*this);
 }
 
 } // namespace nx::hpm::api

@@ -4,8 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/fusion/serialization_format.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
 
 #include "server_certificate_validation_level.h"

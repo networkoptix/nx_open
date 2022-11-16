@@ -7,8 +7,6 @@
 #include <vector>
 
 #include <nx/utils/buffer.h>
-
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
 #include "connection_speed.h"
@@ -65,10 +63,5 @@ struct ListeningPeers
 #define ListeningPeers_Fields (systems)(clients)
 
 NX_REFLECTION_INSTRUMENT(ListeningPeers, ListeningPeers_Fields)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ListeningPeer, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::BoundClient, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::SystemPeers, (json), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ListeningPeers, (json), NX_NETWORK_API)
 
 } // namespace nx::hpm::api

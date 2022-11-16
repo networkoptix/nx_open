@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "serialization_format.h"
+#include "format.h"
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>

@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -69,8 +68,6 @@ public:
     (rendezvousConnectTimeout)(udpTunnelKeepAliveInterval)(udpTunnelKeepAliveRetries) \
     (tunnelInactivityTimeout)/*(tcpReverseRetryPolicy)(tcpReverseHttpTimeouts)*/ \
     (udpHolePunchingStartDelay)(trafficRelayingStartDelay)(directTcpConnectStartDelay)
-
-QN_FUSION_DECLARE_FUNCTIONS(ConnectionParameters, (json), NX_NETWORK_API)
 
 NX_REFLECTION_INSTRUMENT(ConnectionParameters, ConnectionParameters_Fields)
 

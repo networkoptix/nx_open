@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
-
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/maintenance/get_version.h>
@@ -22,7 +20,7 @@ struct DebugCounters
 
 #define DebugCounters_Fields (tcpSocketCount)(stunServerConnectionCount)(httpServerConnectionCount)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DebugCounters, (json), DebugCounters_Fields)
+NX_REFLECTION_INSTRUMENT(DebugCounters, DebugCounters_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -76,7 +74,7 @@ protected:
         const auto msgBody = m_httpClient.fetchEntireMessageBody();
         ASSERT_TRUE(msgBody);
 
-        const auto debugCounters = QJson::deserialized<DebugCounters>(
+        const auto [debugCounters, result] = nx::reflect::json::deserialize<DebugCounters>(
             (nx::ConstBufferRefType) *msgBody);
         ASSERT_EQ(1U, debugCounters.httpServerConnectionCount);
         ASSERT_EQ(2U, debugCounters.tcpSocketCount);
@@ -88,7 +86,7 @@ protected:
         const auto msgBody = m_httpClient.fetchEntireMessageBody();
         ASSERT_TRUE(msgBody);
 
-        const auto version = QJson::deserialized<Version>(*msgBody);
+        const auto [version, result] = nx::reflect::json::deserialize<Version>(*msgBody);
 
         ASSERT_EQ(getVersion().version, version.version);
         ASSERT_EQ(getVersion().revision, version.revision);

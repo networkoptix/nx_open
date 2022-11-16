@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/fusion/serialization_format.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/event/event_fwd.h>
 #include <recording/time_period.h>

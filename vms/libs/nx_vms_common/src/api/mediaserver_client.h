@@ -34,6 +34,7 @@
 
 #include <analytics/db/analytics_db_types.h>
 #include <nx_ec/ec_api_fwd.h>
+#include <utils/common/nxfusion_wrapper.h>
 
 #include "model/merge_system_data.h"
 #include "model/system_settings_reply.h"
@@ -174,6 +175,8 @@ public:
     nx::network::http::StatusLine lastResponseHttpStatusLine() const;
 
 protected:
+    using SerializationImpl = nx::vms::common::detail::NxFusionWrapper;
+
     virtual void stopWhileInAioThread() override;
 
     // TODO: #akolesnikov Return std::variant<nx::network::rest::Result, Response> here.
@@ -197,8 +200,9 @@ protected:
             credentials = *m_credentials;
 
         auto fusionClient =
-            std::make_unique<nx::network::http::FusionDataHttpClient<Input, ActualOutputType>>(
-                requestUrl, std::move(credentials), m_adapterFunc, inputData);
+            std::make_unique<nx::network::http::FusionDataHttpClient<
+                Input, ActualOutputType, SerializationImpl>>(
+                    requestUrl, std::move(credentials), m_adapterFunc, inputData);
         if (m_requestTimeout)
             fusionClient->setRequestTimeout(*m_requestTimeout);
 
@@ -229,8 +233,9 @@ protected:
             httpMethod,
             [&inputData, this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
             {
-                return std::make_unique<nx::network::http::FusionDataHttpClient<Input, ActualOutputType>>(
-                    url, std::move(credentials), m_adapterFunc, inputData);
+                return std::make_unique<nx::network::http::FusionDataHttpClient<
+                    Input, ActualOutputType, SerializationImpl>>(
+                        url, std::move(credentials), m_adapterFunc, inputData);
             },
             requestPath,
             std::move(completionHandler));
@@ -251,8 +256,9 @@ protected:
             httpMethod,
             [this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
             {
-                return std::make_unique<nx::network::http::FusionDataHttpClient<void, ActualOutputType>>(
-                    url, std::move(credentials), m_adapterFunc);
+                return std::make_unique<nx::network::http::FusionDataHttpClient<
+                    void, ActualOutputType, SerializationImpl>>(
+                        url, std::move(credentials), m_adapterFunc);
             },
             requestPath,
             std::move(completionHandler));

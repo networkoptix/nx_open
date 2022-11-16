@@ -2,7 +2,6 @@
 
 #include "connect_data.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
 
 namespace nx::hpm::api {
@@ -95,8 +94,5 @@ bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
         readAttributeValue<attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
         params.parseAttributes(message);
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectRequest, (json), ConnectRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectResponse, (json), ConnectResponse_Fields)
 
 } // namespace nx::hpm::api
