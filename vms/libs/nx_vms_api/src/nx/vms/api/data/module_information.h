@@ -148,6 +148,8 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     std::chrono::milliseconds systemIdentityTimeMs{0};
     TransactionLogTime transactionLogTime;
 
+    bool collectedByThisServer = false;
+
     ServerInformation() = default;
     ServerInformation(const ServerInformation& rhs) = default;
     ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
@@ -160,6 +162,7 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     (certificatePem) \
     (systemIdentityTimeMs) \
     (transactionLogTime) \
+    (collectedByThisServer)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
