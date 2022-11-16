@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 ClientApiAuthDialog::ClientApiAuthDialog(const QnResourcePtr& resource, QWidget* parent):
     QnMessageBox(
         QnMessageBox::Icon::Warning,
-        tr("This webpage is requesting access to your account for authorization"),
+        tr("This web page is requesting access to your account for authorization"),
         tr("Your confirmation is required to provide a token to",
             "... a web page (below there is a web page name with an icon)"),
         QDialogButtonBox::Cancel,

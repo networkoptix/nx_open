@@ -210,7 +210,7 @@ void CameraReplacementDialog::Private::reportFailureByMessageBox() const
     if (!deviceReplacementResponce)
     {
         message =
-            tr("The Camera Replacement operation is not possible as the server is unavailable.");
+            tr("The Camera Replacement operation is not possible as the Server is unavailable.");
     }
 
     QnMessageBox::critical(

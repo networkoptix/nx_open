@@ -465,8 +465,8 @@ void OutgoingMailSettingsWidget::Private::updateCloudServiceStatus()
             .arg(nx::branding::shortCloudName());
 
         //: %1 will be substituted with short, non-branded cloud service name e.g. "Cloud".
-        const auto pendingCloudOptionText = tr("%1 users will start receiving emails right after "
-            "you apply settings").arg(nx::branding::shortCloudName());
+        const auto pendingCloudOptionText = tr("%1 users will start receiving emails immediately "
+            "after you apply settings").arg(nx::branding::shortCloudName());
 
         setConfigurationStatusHint(q->systemSettings()->useCloudServiceToSendEmail()
             ? activeCloudOptionText

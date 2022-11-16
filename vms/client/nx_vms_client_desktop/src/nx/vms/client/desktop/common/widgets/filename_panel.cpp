@@ -64,7 +64,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
         [this]
         {
             const auto folder = QFileDialog::getExistingDirectory(this,
-                tr("Select folder..."),
+                tr("Select Folder..."),
                 d->filename.path,
                 QnCustomFileDialog::directoryDialogOptions());
 

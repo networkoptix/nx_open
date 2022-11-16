@@ -409,8 +409,8 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
     const bool multipleWebpagesAreMoved = webPages.count() > 1;
 
     const auto text = tr(
-        "You are about to move these webpages to server \"%1\". These webpages proxy all"
-             " requested contents, and their proxy server will change to server \"%1\".",
+        "You are about to move these web pages to Server \"%1\". These web pages proxy all"
+             " requested contents, and their proxy server will change to Server \"%1\".",
         "",
         webPages.count());
 
