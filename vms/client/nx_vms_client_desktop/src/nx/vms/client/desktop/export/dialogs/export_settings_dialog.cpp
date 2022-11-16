@@ -430,6 +430,7 @@ bool ExportSettingsDialog::tryClose(bool /*force*/)
 
 void ExportSettingsDialog::forcedUpdate()
 {
+    renderState();
 }
 
 SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayType type)
