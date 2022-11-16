@@ -161,7 +161,7 @@
         <item>
          <widget class="QPushButton" name="openFolderButton">
           <property name="text">
-           <string>Open folder</string>
+           <string>Open Folder</string>
           </property>
          </widget>
         </item>

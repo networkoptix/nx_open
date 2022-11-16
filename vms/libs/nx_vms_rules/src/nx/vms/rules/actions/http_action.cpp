@@ -22,11 +22,11 @@ const ItemDescriptor& HttpAction::manifest()
         .fields = {
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TextWithFields>("url", tr("HTTP(S) URL")),
-            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) content")),
-            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
+            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) Content")),
+            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content Type")),
             makeFieldDescriptor<ActionTextField>("login", tr("Login")),
             makeFieldDescriptor<PasswordField>("password", tr("Password")),
-            makeFieldDescriptor<HttpMethodField>("method", tr("Request method")),
+            makeFieldDescriptor<HttpMethodField>("method", tr("Request Method")),
             // TODO: #amalov Add auth type field.
         }
     };

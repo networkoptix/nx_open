@@ -624,7 +624,7 @@ void ClientUpdateManager::Private::handleUpdateContents(UpdateContents newConten
             case common::update::InformationError::httpError:
             case common::update::InformationError::networkError:
             case common::update::InformationError::jsonError:
-                updateVerificationError = tr("Cannot check client update availability. "
+                updateVerificationError = tr("Cannot check Client update availability. "
                     "Check your internet connection and try again.");
                 errorAffectsAnyClient = true;
                 break;

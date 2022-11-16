@@ -80,15 +80,15 @@ QString StorageIssueEvent::reason(common::SystemContext* context) const
 
         case EventReason::metadataStoragePermissionDenied:
             return tr(
-                "Analytics storage \"%1\" DB error: Insufficient permissions on the mount point.")
-                .arg(storageUrl);
+                "Analytics storage \"%1\" database error: Insufficient permissions on the mount "
+                "point.").arg(storageUrl);
 
         case EventReason::encryptionFailed:
-            return tr("Can't initialize AES encryption while recording media archive."
-                " Data is written unencrypted.");
+            return tr("Cannot initialize AES encryption while recording is enabled on the media "
+                "archive. Data is written unencrypted.");
 
         case EventReason::raidStorageError:
-            return tr("RAID error. %1.").arg(m_reasonText);
+            return tr("RAID error: %1.").arg(m_reasonText);
 
         case EventReason::backupFailedSourceFileError:
             return tr("Archive backup failed. Failed to backup file %1.").arg(m_reasonText);

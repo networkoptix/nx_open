@@ -216,7 +216,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     const auto failoverHint = HintButton::createGroupBoxHint(ui->failoverGroupBox);
     // Notice: this hint button uses help topic from the parent class.
     failoverHint->setHintText(
-        tr("Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID."));
+        tr("Servers with failover enabled will automatically take cameras from offline Servers "
+           "with the same Location ID."));
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
@@ -470,8 +471,8 @@ void QnServerSettingsWidget::updateCertificatesInfo()
 
 void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)
 {
-    const auto kBase = tr("Certificate received from the server does not match"
-        " the certificate this server is pinned to.");
+    const auto kBase =
+        tr("The certificate received from the Server does not match the pinned certificate.");
 
     ui->alertBar->setText(dataLoaded
         ? kBase + " " + nx::vms::common::html::localLink(tr("Details"), kMismatchedCertificateLink)

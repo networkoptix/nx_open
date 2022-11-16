@@ -105,7 +105,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
             return tr("No server has internet access for time synchronization");
 
         case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return tr("Remote archive synchronization available");
+            return tr("Remote archive synchronization is available");
         case QnSystemHealth::RemoteArchiveSyncFinished:
             return tr("Remote archive synchronization has been finished");
         case QnSystemHealth::RemoteArchiveSyncProgress:
@@ -170,7 +170,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::metadataOnSystemStorage:
             messageParts << tr("Analytics data can take up large amounts of space.");
-            messageParts << tr("We recommend to choose another location for it instead of the "
+            messageParts << tr("We recommend choosing another location for it instead of the "
                 "system partition.");
             break;
         default:
