@@ -105,7 +105,7 @@ FocusScope
             id: extraInfo
 
             text: ((delegateItem.showExtraInfo
-               || model.nodeType == ResourceTree.NodeType.cloudSystem)
+               || (model && model.nodeType == ResourceTree.NodeType.cloudSystem))
                     && model && model.extraInfo) || ""
             textFormat: Text.PlainText
             font.weight: Font.Normal
