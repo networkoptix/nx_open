@@ -21,6 +21,8 @@ class ClientLogCollector: public QThread
 
 public:
     ClientLogCollector(const QString& target, QObject *parent = nullptr);
+    virtual ~ClientLogCollector() override;
+
     void pleaseStop();
 
 protected:
