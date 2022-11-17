@@ -100,6 +100,7 @@ protected:
     virtual LayoutResourcePtr createClonedInstance() const;
 
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
+    virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 private:
     /** @return Whether data value was changed. */
