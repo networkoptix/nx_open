@@ -127,6 +127,11 @@ NX_UTILS_API uint64_t stringToBytes(const std::string_view& str, uint64_t defaul
  */
 NX_UTILS_API QString removeMnemonics(QString text);
 
+/**
+ * Escapes all mnemonic characters in the string. Each ampersand in the string is doubled.
+ */
+NX_UTILS_API QString escapeMnemonics(QString text);
+
 //!Splits data by delimiter not closed within quotes
 /*!
     E.g.:
