@@ -240,6 +240,15 @@ void LayoutResource::setSystemContext(nx::vms::common::SystemContext* systemCont
         }));
 }
 
+void LayoutResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
+{
+    QnLayoutResource::updateInternal(source, notifiers);
+
+    const auto localOther = source.dynamicCast<LayoutResource>();
+    if (NX_ASSERT(localOther))
+        m_localRange = localOther->m_localRange;
+}
+
 void LayoutResource::updateIsIntercomState()
 {
     const auto parentCamera = getParentResource().dynamicCast<QnClientCameraResource>();
