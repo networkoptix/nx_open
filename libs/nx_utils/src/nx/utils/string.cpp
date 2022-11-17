@@ -547,6 +547,11 @@ QString removeMnemonics(QString text)
     return text.remove(QRegularExpression(QStringLiteral("(?<!&)&(?!([\\s&]|$))")));
 }
 
+QString escapeMnemonics(QString text)
+{
+    return text.replace("&","&&");
+}
+
 template <class T, class T2>
 static QList<T> smartSplitInternal(
     const T& data,

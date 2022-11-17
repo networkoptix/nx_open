@@ -16,6 +16,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -161,7 +162,8 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     if (!layout)
         return QString();
 
-    QString baseName = layout->name();
+    // Escaping the mnemonic is required to correctly display the tab title with '&' symbol.
+    QString baseName = nx::utils::escapeMnemonics(layout->name());
 
     // videowall control mode
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
