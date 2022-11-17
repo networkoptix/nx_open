@@ -2218,22 +2218,22 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Verbunden mit %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Verbindung zu %1 getrennt</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Verbunden mit %1 über %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Verbindung von %1 über %2 getrennt</translation>
     </message>
   </context>
   <context>
@@ -2510,7 +2510,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Änderungen vor dem Verlassen anwenden?</translation>
     </message>
   </context>
   <context>
@@ -4394,7 +4394,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Änderungen vor dem Verlassen anwenden?</translation>
     </message>
   </context>
   <context>
@@ -6775,11 +6775,11 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Wählen Sie mindestens einen Server aus</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Wählen Sie mindestens einen Benutzer aus</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -6791,7 +6791,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>Wählen Sie mindestens ein I/O-Modul aus</translation>
     </message>
   </context>
   <context>
@@ -7646,7 +7646,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1 wird aus dem System entfernt und durch die ausgewählte Kamera ersetzt</translation>
     </message>
   </context>
   <context>
@@ -8945,11 +8945,11 @@ Vergessen Sie nicht, die Protokollierungsstufe auf die Standardeinstellung zurü
     </message>
     <message>
       <source>Has to be 2 times more than split by size</source>
-      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+      <translation>Muss 2 mal größer sein als der Größe nach geteilt</translation>
     </message>
     <message>
       <source>Cannot be more than &quot;Max volume&quot; / 2</source>
-      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
+      <translation>Kann nicht mehr sein als &quot;Max Lautstärke&quot; / 2</translation>
     </message>
   </context>
   <context>
@@ -11509,7 +11509,7 @@ Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers n
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Änderungen vor dem Verlassen anwenden?</translation>
     </message>
   </context>
   <context>

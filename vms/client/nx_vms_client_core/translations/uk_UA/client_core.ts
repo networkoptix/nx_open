@@ -217,11 +217,11 @@
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation>Не можу перевірити справжність %1</translation>
+      <translation>Не можливо перевірити справжність %1</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation>Сертифікат Сервера недійсний.</translation>
+      <translation>Сертифікат сервера недійсний.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>

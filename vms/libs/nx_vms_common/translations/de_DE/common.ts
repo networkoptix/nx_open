@@ -1621,15 +1621,15 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>IP-Adressen für die automatische Erkennung freigeben</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>IO-Port-Status beibehalten, wenn der Server eine Verbindung zum Gerät herstellt</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Medienpuffergröße für reine Audiogeräte (KB, 1KB-1MB)</translation>
     </message>
   </context>
   <context>
@@ -2299,7 +2299,7 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>HTTP(S)-Anfrage durchführen</translation>
     </message>
   </context>
   <context>
