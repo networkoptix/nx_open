@@ -197,9 +197,30 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
 
             if (handshakeKey == publicKey(provided.certificate))
                 return;
+
+            // Handshake certificate doesn't match target server certificates.
+            NX_WARNING(this,
+                "The handshake certificate doesn't match any certificate provided by server.\n"
+                "Handshake key: %1", handshakeKey);
+
+            if (provided.certificate)
+            {
+                NX_VERBOSE(this, "Server's certificate key: %1\nServer's certificate: %2",
+                    publicKey(provided.certificate), provided.certificate);
+            }
+
+            if (provided.userProvidedCertificate)
+            {
+                NX_VERBOSE(this, "User provided certificate key: %1\nServer's certificate: %2",
+                    publicKey(provided.userProvidedCertificate), provided.userProvidedCertificate);
+            }
+        }
+        else
+        {
+            NX_ERROR(this, "Handshake certificate chain is empty.");
         }
 
-        // Handshake certificate doesn't match target server certificates.
+        // Report an error.
         context->error = RemoteConnectionErrorCode::certificateRejected;
     }
 
