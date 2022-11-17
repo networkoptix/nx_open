@@ -81,6 +81,37 @@ MembershipSettings
         sourceModel: control.model
     }
 
+    editablePlaceholder: Item
+    {
+        anchors.centerIn: parent
+        width: 200
+        height: parent.height
+
+        Placeholder
+        {
+            anchors.verticalCenterOffset: -32
+            imageSource: "image://svg/skin/user_settings/no_results.svg"
+            text: qsTr("No groups found")
+            additionalText: qsTr("Change search criteria or create a new group")
+
+            Button
+            {
+                Layout.alignment: Qt.AlignHCenter
+
+                text: qsTr("Add Group")
+
+                iconUrl: "image://svg/skin/user_settings/add.svg"
+                iconWidth: 20
+                iconHeight: 20
+                leftPadding: 12
+                rightPadding: 16
+                iconSpacing: 2
+
+                onClicked: control.addGroupClicked()
+            }
+        }
+    }
+
     summaryText: qsTr("Selected groups")
     summaryModel: ParentGroupsModel
     {

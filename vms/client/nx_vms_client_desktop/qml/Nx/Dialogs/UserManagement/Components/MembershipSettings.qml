@@ -33,6 +33,8 @@ Item
     property alias summarySection: selectedGroupsListView.section
     property alias summaryDelegate: selectedGroupsListView.delegate
 
+    property alias editablePlaceholder: editablePlaceholderItem.children
+
     property var summaryPlaceholder: []
 
     readonly property color highlightColor: "#E1A700"
@@ -214,6 +216,19 @@ Item
                 text: section
             }
         }
+
+        Item
+        {
+            id: editablePlaceholderItem
+
+            visible: allGroupsListView.count === 0 && editablePlaceholderItem.children.length
+
+            anchors.bottom: parent.bottom
+
+            x: 0
+            width: parent.width - editablePanel.anchors.leftMargin
+            height: parent.height - allGroupsListView.headerItem.height
+        }
     }
 
     Rectangle
@@ -238,7 +253,7 @@ Item
 
         Placeholder
         {
-            visible: selectedGroupsListView.count === 0
+            visible: selectedGroupsListView.count === 0 && !editablePlaceholderItem.visible
 
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -100

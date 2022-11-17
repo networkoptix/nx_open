@@ -18,7 +18,7 @@ ColumnLayout
     anchors.centerIn: parent
     anchors.verticalCenterOffset: -100
 
-    spacing: 16
+    spacing: 8
 
     Image
     {
@@ -37,6 +37,8 @@ ColumnLayout
         id: placeholderMainText
 
         Layout.alignment: Qt.AlignHCenter
+        Layout.topMargin: 8
+
         font: Qt.font({pixelSize: 16, weight: Font.Medium})
         color: placeholder.textColor
     }

@@ -30,6 +30,7 @@ Button
     property string pressedIconUrl
     property alias iconWidth: control.icon.width
     property alias iconHeight: control.icon.height
+    property alias iconSpacing: iconLabel.spacing
 
     icon.color: textColor
     icon.width: action ? action.icon.width : 20
