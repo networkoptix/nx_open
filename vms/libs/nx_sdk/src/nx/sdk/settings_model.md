@@ -21,6 +21,7 @@ Some field names have the same meaning through all the controls and can have som
 - `"defaultValue"` - Default value of the control. Will be sent to the engine on applying changes.
 
 Certain fields are supported by some of the controls.
+
 - `"isActive"` - Boolean. Marks the control as "active" - it means that every change of the control
     value in the GUI immediately (or with some delay in the case of TextField-like fields) triggers
     sending a request to the Server, without waiting for the confirmation with the "Apply" button.
@@ -33,6 +34,17 @@ Certain fields are supported by some of the controls.
     providing a better user experience. An example could be an Active combo-box which lists the
     supported measurement units, and the handler code which converts the entered value into the
     selected unit.
+    
+    ATTENTION: The "Active Setting" feature requires the reaction with the entity that the settings
+    are intended for, like an Analytics Engine or a Device Agent. In certain scenarios, this entity
+    may not exist yet - for example, when an Engine is going to be turned on for a camera for the
+    first time, Device Agent settings are presented to the user (their Settings Model is defined in
+    the Engine Manifest), but the Device Agent is created only after the user clicks `Apply`. In
+    such case the `isActive` flag cannot work and is ignored, so for the optimal user experience it
+    may be found useful to present the initial Settings Model that does not count on `isActive`,
+    and after the settings are applied and the entity (e.g. Device Agent) is created, it may
+    present a more advanced Settings Model which makes use of `isActive`.
+    
 - `"parametersModel"` - Settings Model JSON object. Applies only for controls with the `"isActive"`
     property set to `true`. Additional parameters are requested when the active control is triggered.
     NOTE: The `"parametersModel"` model does not support items with the `"isActive"` property set
