@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 function(set_distribution_names)
     set(prefix ${customization.installerName})
 
@@ -10,6 +12,12 @@ function(set_distribution_names)
         set(publication_type_suffix "-${publicationType}")
     endif()
     nx_expose_to_parent_scope(publication_type_suffix)
+
+    if("${flavor}" STREQUAL "default" OR "${flavor}" STREQUAL "")
+        set(flavor_suffix "")
+    else()
+        set(flavor_suffix ".${flavor}")
+    endif()
 
     # Only private builds must have cloud group suffix.
     if(${publicationType} STREQUAL "private")
@@ -23,7 +31,9 @@ function(set_distribution_names)
     endif()
 
     set(distribution_name_suffix "${publication_type_suffix}${cloud_group_suffix}")
-    set(suffix "${targetDevice}${distribution_name_suffix}${notification_provider_suffix}")
+    set(suffix
+        "${targetDevice}${flavor_suffix}${distribution_name_suffix}${notification_provider_suffix}"
+    )
     set(android_aab_suffix "android${distribution_name_suffix}${notification_provider_suffix}")
     set(vmsBenchmarkSuffix "${targetDevice}${publication_type_suffix}")
     set(sdkSuffix "universal${publication_type_suffix}")
