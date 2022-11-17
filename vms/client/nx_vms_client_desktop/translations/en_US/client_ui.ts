@@ -129,12 +129,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Open files folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Done</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Open Files Folder</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -239,10 +239,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Event rules</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server actions</source>
         <translation></translation>
     </message>
@@ -277,6 +273,10 @@
     <message>
         <source>All servers are offline. Audit data is not available.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -646,14 +646,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Secondary stream profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary stream profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not export video automatically</source>
         <translation type="unfinished"></translation>
     </message>
@@ -667,6 +659,14 @@
     </message>
     <message>
         <source>Do not record secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary Stream Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary Stream Profile</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -788,10 +788,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>New device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -806,6 +802,10 @@
     <message>
         <source>Next</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>New Device</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1031,7 +1031,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Open folder</source>
+        <source>Open Folder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1185,23 +1185,23 @@
         <translation></translation>
     </message>
     <message>
-        <source>Content type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Authentication type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Request type</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>HTTP(S) URL</source>
         <translation></translation>
     </message>
     <message>
-        <source>HTTP(S) content</source>
+        <source>HTTP(S) Content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request Method</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1428,7 +1428,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Allow computer entering sleep mode on idle</source>
+        <source>Allow the computer to enter sleep mode on idle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1790,24 +1790,24 @@
 <context>
     <name>LogSettingsDialog</name>
     <message>
-        <source>Logging level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Limit Max volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Split file by time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Split file by size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Logging Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split File by Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split File by Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit Max Volume</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1852,14 +1852,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Download is finished!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open files folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Done</source>
         <translation></translation>
     </message>
@@ -1868,7 +1860,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failed to save logs to selected folder</source>
+        <source>Download complete!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save logs to the selected folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Files Folder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2623,11 +2623,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Reset default rules</source>
+        <source>Select a Rule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select a rule</source>
+        <source>Reset Default Rules</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3012,8 +3012,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-        <translation></translation>
+        <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

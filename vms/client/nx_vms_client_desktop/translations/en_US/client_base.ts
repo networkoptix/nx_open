@@ -1329,10 +1329,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Copy parameters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Copied</source>
         <translation></translation>
     </message>
@@ -1342,12 +1338,16 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</source>
-        <translation></translation>
+        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</source>
-        <translation></translation>
+        <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Parameters</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1532,11 +1532,6 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>%1 users will start receiving emails right after you apply settings</source>
-        <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 is not available</source>
         <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
         <translation></translation>
@@ -1569,6 +1564,11 @@ License Key: %2</source>
     <message>
         <source>Unable to test email settings due to no internet connection on any of the active servers</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>%1 users will start receiving emails immediately after you apply settings</source>
+        <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1888,19 +1888,19 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Select folder...</source>
-        <translation></translation>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to save logs to selected folder</source>
-        <translation></translation>
+        <source>Failed to save logs to the selected folder</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Download is finished!</source>
-        <translation></translation>
+        <source>Download complete!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nvidia hardware acceleration is in Beta mode</source>
+        <source>NVIDIA hardware acceleration is in beta mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3119,7 +3119,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Failed to log in to &quot;%1&quot; system</source>
+        <source>Failed to log in to System &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3568,10 +3568,6 @@ to %1</source>
 <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Folder already added</source>
         <translation></translation>
     </message>
@@ -3582,6 +3578,10 @@ to %1</source>
     <message>
         <source>Auto (%1)</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4381,8 +4381,8 @@ to %1</source>
 <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-        <source>These settings apply only to the System you are logged in and will be removed in the future versions.</source>
-        <translation></translation>
+        <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4556,10 +4556,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Best</source>
         <translation></translation>
     </message>
@@ -4578,6 +4574,10 @@ to %1</source>
     <message>
         <source>Quarter Native</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5032,12 +5032,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-        <translation></translation>
+        <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Certificate received from the server does not match the certificate this server is pinned to.</source>
-        <translation></translation>
+        <source>The certificate received from the Server does not match the pinned certificate.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5647,10 +5647,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Remote archive synchronization available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remote archive synchronization has been stopped</source>
         <translation></translation>
     </message>
@@ -5667,7 +5663,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>We recommend to choose another location for it instead of the system partition.</source>
+        <source>Remote archive synchronization is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We recommend choosing another location for it instead of the system partition.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6681,13 +6681,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Merge</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-        <translation type="unfinished">
-            <numerusform>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</numerusform>
-            <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
         <translation></translation>
@@ -6735,6 +6728,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Move Partially</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7415,7 +7415,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Open door</source>
+        <source>Open Door</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7498,13 +7498,13 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto</source>
         <comment>Let server determine if Media2 should be used to fetch profiles</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7634,13 +7634,13 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 will be removed from the System and replaced by the selected camera</source>
         <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
         <translation></translation>
+    </message>
+    <message>
+        <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7944,10 +7944,6 @@ We recommend you not to open this web page. If you understand the risks, you can
 <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-        <source>This webpage is requesting access to your account for authorization</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Your confirmation is required to provide a token to</source>
         <comment>... a web page (below there is a web page name with an icon)</comment>
         <translation></translation>
@@ -7955,6 +7951,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Allow</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This web page is requesting access to your account for authorization</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8054,7 +8054,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Click to show cameras</source>
+        <source>Click to Show Cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8673,8 +8673,8 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Select folder...</source>
-        <translation></translation>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8922,25 +8922,25 @@ We recommend you not to open this web page. If you understand the risks, you can
 <context>
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
-        <source>Notice: Not enough information could be collected on the current Logging level.
-The Logging level &quot;%1&quot; will provide more granular information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notice: The selected Logging level may degrade the performance of the system.
-Do not forget to return the Logging level to its default setting after you have collected enough logs.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reset to Default</source>
         <translation></translation>
     </message>
     <message>
-        <source>Has to be 2 times more than split by size</source>
+        <source>Must be greater than or equal to the value set for Split File by Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot be more than &quot;Max volume&quot; / 2</source>
+        <source>Must be less than or equal to the value set for Limit Max Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8970,27 +8970,27 @@ Do not forget to return the Logging level to its default setting after you have 
         <translation></translation>
     </message>
     <message>
-        <source>none</source>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>error</source>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>warning</source>
+        <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>info</source>
+        <source>Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>debug</source>
+        <source>Debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>verbose</source>
+        <source>Verbose</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9001,17 +9001,6 @@ Do not forget to return the Logging level to its default setting after you have 
         <translation>
             <numerusform>... and %n more</numerusform>
             <numerusform>... and %n more</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Debug Logging is enabled on Client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Debug Logging is enabled on %n Servers</source>
-        <translation type="unfinished">
-            <numerusform>Debug Logging is enabled on %n Server</numerusform>
-            <numerusform>Debug Logging is enabled on %n Servers</numerusform>
         </translation>
     </message>
     <message>
@@ -9038,25 +9027,27 @@ Do not forget to return the Logging level to its default setting after you have 
         <translation></translation>
     </message>
     <message>
-        <source>Debug Logging is enabled.
-System performance is degraded.</source>
+        <source>Debug logging is enabled on the Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Logs downloading is cancelled</source>
+        <source>Debug logging is enabled, resulting in degraded system performance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Debug logging is enabled on %n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Logs downloading canceled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
-    <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Apply settings</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Enter your account password</source>
         <translation></translation>
@@ -9064,6 +9055,14 @@ System performance is degraded.</source>
     <message>
         <source>Apply</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Apply Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9939,7 +9938,7 @@ You can force it, but it may significantly increase CPU load.</source>
         <translation></translation>
     </message>
     <message>
-        <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
+        <source>The web page can interact with the Desktop Client and request access to the user session</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10384,14 +10383,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>Custom certificate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown certificate</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This is a custom certificate installed on %1</source>
         <translation></translation>
     </message>
@@ -10404,10 +10395,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>Auto-generated certificate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The certificate is auto-generated and pinned to %1</source>
         <translation></translation>
     </message>
@@ -10417,7 +10404,19 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
         <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-generated Certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Certificate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10686,21 +10685,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>The archive stream settings have been changed by user</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The recording settings have been changed by user</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Backup storage is not configured on %n server</source>
-        <translation type="unfinished">
-            <numerusform>Backup storage is not configured on %n server</numerusform>
-            <numerusform>Backup storage is not configured on %n servers</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Import in progress...</source>
         <translation></translation>
     </message>
@@ -10716,31 +10700,46 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <source>Import archive from %1 stopped</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Storage for analytics data is not set on %n server</source>
-        <translation type="unfinished">
-            <numerusform>Storage for analytics data is not set on a server</numerusform>
-            <numerusform>Storage for analytics data is not set on %n servers</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>System storage is used for analytics data on %n server</source>
-        <translation type="unfinished">
-            <numerusform>System storage is used for analytics data on a server</numerusform>
-            <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Not imported archive found on Device %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not imported archive found on Camera %1</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Import archive from %1</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Backup storage is not configured on %n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Storage for analytics data is not set on %n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>System storage is used for analytics data on %n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Not imported archive found on device %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not imported archive found on camera %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The archive stream settings have been changed by the user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The recording settings have been changed by the user</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11005,11 +11004,11 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>All users</source>
+        <source>All Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>With enabled digest authentication</source>
+        <source>Users with Digest Authentication</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11794,10 +11793,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Too short period selected</source>
         <translation></translation>
     </message>
@@ -11942,10 +11937,6 @@ You can select another storage location in the &quot;Storage Management&quot; ta
         <translation></translation>
     </message>
     <message>
-        <source>There are no suitable cameras for replacement on the %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Undo replacement completed successfully!</source>
         <translation></translation>
     </message>
@@ -11956,6 +11947,14 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
         <source>Confirm undo replacement?</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Select Folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12200,8 +12199,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cannot check client update availability. Check your internet connection and try again.</source>
-        <translation></translation>
+        <source>Cannot check Client update availability. Check your internet connection and try again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
