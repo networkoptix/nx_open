@@ -217,9 +217,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     auto resetLogsDownloadState =
         [this]
         {
-            d->logsCollector->pleaseStop();
-            d->logsCollector->wait();
-            d->logsCollector.reset(nullptr);
+            d->logsCollector.reset();
             d->path.clear();
             d->finished = d->success = false;
 

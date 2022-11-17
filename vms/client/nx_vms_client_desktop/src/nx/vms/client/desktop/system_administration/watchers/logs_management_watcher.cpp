@@ -148,6 +148,16 @@ ClientLogCollector::ClientLogCollector(const QString& target, QObject *parent):
 {
 }
 
+ClientLogCollector::~ClientLogCollector()
+{
+    pleaseStop();
+
+    // This class instance is created and destroyed in the GUI thread. Therefore it must be
+    // destroyed in time. If not, there is a problem with the thread loop that should be fixed.
+    constexpr int kDelay = 500; //< milliseconds.
+    NX_ASSERT(wait(kDelay), "Log collection thread has not stopped");
+}
+
 void ClientLogCollector::pleaseStop()
 {
     m_cancelled = true;
@@ -559,8 +569,6 @@ struct LogsManagementWatcher::Unit::Private
 
         if (m_collector)
         {
-            m_collector->pleaseStop();
-            m_collector->wait();
             m_collector.reset();
         }
         if (m_downloader)
