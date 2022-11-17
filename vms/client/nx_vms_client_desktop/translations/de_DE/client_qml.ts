@@ -166,7 +166,7 @@
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Dieses Plugin hat keine Einstellungen für diese Kamera.</translation>
     </message>
   </context>
   <context>

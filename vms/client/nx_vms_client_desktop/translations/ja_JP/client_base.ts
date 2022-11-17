@@ -2194,22 +2194,22 @@ License Key: %2</source>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>%1 に接続</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>%1 から切断</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>%2 経由で %1 に接続</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>%2 経由で %1 から切断</translation>
     </message>
   </context>
   <context>
@@ -2480,7 +2480,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -4342,7 +4342,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -7532,7 +7532,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1 はシステムから削除され、選択したカメラに置き換えられます</translation>
     </message>
   </context>
   <context>
@@ -8814,11 +8814,11 @@ Do not forget to return the Logging level to its default setting after you have 
     </message>
     <message>
       <source>Has to be 2 times more than split by size</source>
-      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+      <translation>サイズで割った値の 2 倍以上にする必要があります</translation>
     </message>
     <message>
       <source>Cannot be more than &quot;Max volume&quot; / 2</source>
-      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
+      <translation>&quot;最大容量&quot; / 2 以上にすることはできません</translation>
     </message>
   </context>
   <context>
@@ -11353,7 +11353,7 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</so
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>

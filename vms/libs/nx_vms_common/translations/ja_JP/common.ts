@@ -1575,15 +1575,15 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>自動検出用に IP アドレスを公開する</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>サーバーがデバイスに接続する際、IO ポートの状態を維持する</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>オーディオのみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
     </message>
   </context>
   <context>
@@ -2241,7 +2241,7 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>HTTP(S) リクエストを実行</translation>
     </message>
   </context>
   <context>

@@ -1198,11 +1198,11 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S)-URL</translation>
     </message>
     <message>
       <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <translation>HTTP(S)-Inhalt</translation>
     </message>
   </context>
   <context>

@@ -278,15 +278,15 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>HTTP(S) リクエストを実行</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <translation>HTTP(S) コンテンツ</translation>
     </message>
   </context>
   <context>
