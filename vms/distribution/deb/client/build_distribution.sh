@@ -188,11 +188,11 @@ copyLibs()
         libqtkeychain.so.0.9.0
         libquazip.so
     )
-    distrib_copySystemLibs "$STAGE_LIB" "${THIRD_PARTY_LIBS[@]}"
+    distrib_copyLibs "${BUILD_DIR}/lib" "$STAGE_LIB" "${THIRD_PARTY_LIBS[@]}"
 
     if [ "$ARCH" != "arm" ]
     then
-        distrib_copySystemLibs "$STAGE_LIB" libhidapi-hidraw.so.0
+        distrib_copyLibs "${BUILD_DIR}/lib" "$STAGE_LIB" libhidapi-hidraw.so.0
     fi
 
     if [[ ${#CPP_RUNTIME_LIBS[@]} != 0 ]]
@@ -208,7 +208,7 @@ copyLibs()
         echo "  Copying additional system libs"
         distrib_copySystemLibs "$STAGE_LIB" \
             libXss.so.1 \
-            libxcb-xinerama.so.0 \
+            libxcb-xinerama.so.0
         distrib_copySystemLibs "$STAGE_LIB" libpng16.so.16 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
@@ -228,9 +228,8 @@ copyLibs()
         # GStreamer 0.10 is required for applauncher to run old clients (< 4.0).
         local -r OLD_GSTREAMER_LIBS_PATH="$STAGE_LIB/gstreamer-0.10"
         mkdir "$OLD_GSTREAMER_LIBS_PATH"
-        "$PYTHON" "$OPEN_SOURCE_DIR"/build_utils/linux/copy_system_library.py \
-            --dest-dir "$OLD_GSTREAMER_LIBS_PATH" \
-            -L "${LEGACY_OS_DEPS_DIR}/usr/lib/${ARCH_DIR}" \
+        distrib_copyLibs "${LEGACY_OS_DEPS_DIR}/usr/lib/${ARCH_DIR}" \
+            "$OLD_GSTREAMER_LIBS_PATH" \
             libgstreamer-0.10.so.0 \
             libgstapp-0.10.so.0 \
             libgstbase-0.10.so.0 \
