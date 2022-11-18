@@ -85,8 +85,14 @@ void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust, const QUrl& url
 
 void QnGenericTabbedDialog::reject()
 {
-    if (!forcefullyClose())
+    /* Very rare outcome. */
+    if (!canDiscardChanges())
         return;
+
+    hide();
+    discardChanges();
+    loadDataToUi();
+
     base_type::reject();
     emit dialogClosed();
 }
@@ -102,16 +108,10 @@ void QnGenericTabbedDialog::accept()
     emit dialogClosed();
 }
 
-bool QnGenericTabbedDialog::forcefullyClose()
+void QnGenericTabbedDialog::forcefullyClose()
 {
-    /* Very rare outcome. */
-    if (!canDiscardChanges())
-        return false;
-
     hide();
     discardChanges();
-    loadDataToUi();
-    return true;
 }
 
 void QnGenericTabbedDialog::loadDataToUi()
