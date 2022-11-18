@@ -39,6 +39,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_synchronizer.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <utils/web_downloader.h>
 
@@ -527,8 +528,16 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
             password = layout::askPassword(resource, mainWindowWidget());
             if (password.isEmpty())
             {
-                // FIXME: #sivanov Layout must be closed and deleted here.
-                NX_ASSERT(false, "Layout must be closed and deleted here");
+                // The layout must be removed after opening, not during opening. Otherwise, the
+                // tabbar invariant will be violated.
+                d->currentLayout = layout;
+                executeDelayedParented(
+                    [this, layout]
+                    {
+                        menu()->trigger(action::CloseLayoutAction,
+                            QnWorkbenchLayoutList() << layout);
+                    },
+                    this);
                 return;
             }
 
