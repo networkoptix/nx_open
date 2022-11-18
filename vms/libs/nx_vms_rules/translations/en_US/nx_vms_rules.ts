@@ -445,10 +445,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>%1 - %2</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Camera</source>
         <translation></translation>
     </message>
