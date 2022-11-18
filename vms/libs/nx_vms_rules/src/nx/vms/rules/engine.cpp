@@ -95,7 +95,9 @@ bool Engine::addEventConnector(EventConnector *eventConnector)
         return false;
 
     connect(eventConnector, &EventConnector::event, this, &Engine::processEvent);
+    connect(eventConnector, &EventConnector::analyticsEvents, this, &Engine::processAnalyticsEvents);
     m_connectors.push_back(eventConnector);
+
     return true;
 }
 
@@ -722,15 +724,12 @@ void Engine::processEvent(const EventPtr& event)
             continue;
 
         bool matched = false;
-        for (const auto filter: rule->eventFilters())
+        for (const auto filter: rule->eventFiltersByType(event->type()))
         {
-            if (filter->eventType() == event->type())
+            if (filter->match(event))
             {
-                if (filter->match(event))
-                {
-                    matched = true;
-                    break;
-                }
+                matched = true;
+                break;
             }
         }
 
@@ -762,6 +761,12 @@ void Engine::processEvent(const EventPtr& event)
         eventData = serializeProperties(event.get(), eventFields);
         m_router->routeEvent(eventData, ruleIds, resources);
     }
+}
+
+void Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
+{
+    for (const auto& event: events)
+        processEvent(event);
 }
 
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.

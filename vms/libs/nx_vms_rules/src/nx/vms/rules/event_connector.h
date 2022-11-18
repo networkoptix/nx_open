@@ -18,6 +18,9 @@ class NX_VMS_RULES_API EventConnector: public QObject
 
 signals:
     void event(const nx::vms::rules::EventPtr &event);
+
+    // TODO: #amalov Think of more general interface.
+    void analyticsEvents(const std::vector<nx::vms::rules::EventPtr>& events);
 };
 
 } // namespace nx::vms::rules

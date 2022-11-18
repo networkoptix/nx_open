@@ -46,6 +46,7 @@ public:
 
     // TODO: #spanasenko const pointers?
     const QList<EventFilter*> eventFilters() const;
+    const QList<EventFilter*> eventFiltersByType(const QString& type) const;
     const QList<ActionBuilder*> actionBuilders() const;
 
     void setComment(const QString& comment);
