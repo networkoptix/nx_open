@@ -142,7 +142,7 @@ protected:
 
     virtual void initializeButtonBox() override;
 
-    virtual bool forcefullyClose();
+    virtual void forcefullyClose();
 
     virtual void setReadOnlyInternal() override;
 
