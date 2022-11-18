@@ -1612,10 +1612,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1629,6 +1625,10 @@
     </message>
     <message>
         <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
