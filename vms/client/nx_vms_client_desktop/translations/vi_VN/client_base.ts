@@ -1325,10 +1325,6 @@
       <translation>Không kích hoạt được giấy phép miễn phí</translation>
     </message>
     <message>
-      <source>Copy parameters</source>
-      <translation>Sao chép thông số</translation>
-    </message>
-    <message>
       <source>Copied</source>
       <translation>Đã sao chép</translation>
     </message>
@@ -1339,12 +1335,16 @@ License Key: %2</source>
 Khóa giấy phép: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</translation>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</translation>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+    </message>
+    <message>
+      <source>Copy Parameters</source>
+      <translation type="unfinished">Copy Parameters</translation>
     </message>
   </context>
   <context>
@@ -1522,11 +1522,6 @@ Khóa giấy phép: %2</translation>
       <translation>Người dùng %1 đang nhận email</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails right after you apply settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>Người dùng %1 sẽ bắt đầu nhận được email ngay sau khi bạn áp dụng cài đặt</translation>
-    </message>
-    <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
       <translation>%1 không khả dụng</translation>
@@ -1559,6 +1554,11 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
       <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply settings</translation>
     </message>
   </context>
   <context>
@@ -1873,20 +1873,20 @@ Khóa giấy phép: %2</translation>
       <translation>Trong lần kết nối đầu tiên với máy chủ, nếu chứng chỉ có lỗi, bạn sẽ được yêu cầu xác nhận chấp nhận</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Chọn thư mục...</translation>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
     <message>
-      <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
     </message>
     <message>
-      <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
     </message>
     <message>
-      <source>Nvidia hardware acceleration is in Beta mode</source>
-      <translation type="unfinished">Nvidia hardware acceleration is in Beta mode</translation>
+      <source>NVIDIA hardware acceleration is in beta mode</source>
+      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
     </message>
   </context>
   <context>
@@ -3083,8 +3083,8 @@ to %1</source>
       <translation>Hệ thống không tương thích với xác thực hai yếu tố</translation>
     </message>
     <message>
-      <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation>Không đăng nhập được vào hệ thống &quot;%1&quot;</translation>
+      <source>Failed to log in to System &quot;%1&quot;</source>
+      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3525,10 +3525,6 @@ to %1</source>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-      <source>Select folder...</source>
-      <translation>Chọn thư mục...</translation>
-    </message>
-    <message>
       <source>Folder already added</source>
       <translation>Đã thêm thư mục</translation>
     </message>
@@ -3539,6 +3535,10 @@ to %1</source>
     <message>
       <source>Auto (%1)</source>
       <translation>Tự động (%1)</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -4330,8 +4330,8 @@ to %1</source>
   <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-      <source>These settings apply only to the System you are logged in and will be removed in the future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in and will be removed in the future versions.</translation>
+      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -4502,10 +4502,6 @@ to %1</source>
       <translation>%1 (chìa khóa)</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Thời gian máy chủ...</translation>
-    </message>
-    <message>
       <source>Best</source>
       <translation>Cao nhất (Hs)</translation>
     </message>
@@ -4524,6 +4520,10 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>Quarter Native</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -4966,12 +4966,12 @@ to %1</source>
       <translation>Chi tiết</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation>Máy chủ được bật chuyển đổi dự phòng sẽ tự động tiếp quản camera từ Máy chủ ngoại tuyến có cùng ID vị trí.</translation>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
     </message>
     <message>
-      <source>Certificate received from the server does not match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server does not match the certificate this server is pinned to.</translation>
+      <source>The certificate received from the Server does not match the pinned certificate.</source>
+      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
     </message>
   </context>
   <context>
@@ -5581,10 +5581,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Lịch biểu ghi camera không hợp lệ</translation>
     </message>
     <message>
-      <source>Remote archive synchronization available</source>
-      <translation>Đồng bộ hóa lưu trữ từ xa khả dụng</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been stopped</source>
       <translation>Đồng bộ hóa lưu trữ từ xa đã bị dừng</translation>
     </message>
@@ -5601,8 +5597,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Dữ liệu phân tích có thể chiếm nhiều dung lượng.</translation>
     </message>
     <message>
-      <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Chúng tôi khuyến nghị chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
+      <source>Remote archive synchronization is available</source>
+      <translation type="unfinished">Remote archive synchronization is available</translation>
+    </message>
+    <message>
+      <source>We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -6583,12 +6583,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Merge</source>
       <translation>Gộp lại</translation>
     </message>
-    <message numerus="yes">
-      <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Bạn sắp chuyển các trang web này sang máy chủ &quot;%1&quot;. Các trang web này ủy quyền tất cả các nội dung được yêu cầu và máy chủ ủy quyền sẽ thay đổi thành máy chủ &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
       <translation>Việc ủy quyền tất cả nội dung sẽ hiển thị bất kỳ dịch vụ hoặc thiết bị nào trong mạng của máy chủ cho người dùng của trang web này.</translation>
@@ -6636,6 +6630,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Move Partially</source>
       <translation type="unfinished">Move Partially</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation type="unfinished">
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7309,8 +7309,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Bật tiếng</translation>
     </message>
     <message>
-      <source>Open door</source>
-      <translation>Mở cửa</translation>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
     </message>
   </context>
   <context>
@@ -7391,13 +7391,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tự động</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Video được ghi trên bộ nhớ nội bộ của camera sẽ không được tự động tải lên kho lưu trữ chính.</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Tự động</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -7526,13 +7526,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
     </message>
     <message>
-      <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
-    </message>
-    <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
       <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
     </message>
   </context>
   <context>
@@ -7827,10 +7827,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-      <source>This webpage is requesting access to your account for authorization</source>
-      <translation>Trang web này đang yêu cầu quyền truy cập vào tài khoản của bạn để được ủy quyền</translation>
-    </message>
-    <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
       <translation>Xác nhận của bạn là bắt buộc để cung cấp mã token cho</translation>
@@ -7838,6 +7834,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Allow</source>
       <translation>Cho phép</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
     </message>
   </context>
   <context>
@@ -7937,8 +7937,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Đang tải...</translation>
     </message>
     <message>
-      <source>Click to show cameras</source>
-      <translation type="unfinished">Click to show cameras</translation>
+      <source>Click to Show Cameras</source>
+      <translation type="unfinished">Click to Show Cameras</translation>
     </message>
   </context>
   <context>
@@ -8551,8 +8551,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tên không thể để trống.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Chọn thư mục...</translation>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -8796,28 +8796,28 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   <context>
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
-      <source>Notice: Not enough information could be collected on the current Logging level.
-The Logging level &quot;%1&quot; will provide more granular information.</source>
-      <translation type="unfinished">Notice: Not enough information could be collected on the current Logging level.
-The Logging level &quot;%1&quot; will provide more granular information.</translation>
-    </message>
-    <message>
-      <source>Notice: The selected Logging level may degrade the performance of the system.
-Do not forget to return the Logging level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">Notice: The selected Logging level may degrade the performance of the system.
-Do not forget to return the Logging level to its default setting after you have collected enough logs.</translation>
-    </message>
-    <message>
       <source>Reset to Default</source>
       <translation>Khôi phục về mặc định</translation>
     </message>
     <message>
-      <source>Has to be 2 times more than split by size</source>
-      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
     </message>
     <message>
-      <source>Cannot be more than &quot;Max volume&quot; / 2</source>
-      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
     </message>
   </context>
   <context>
@@ -8846,28 +8846,28 @@ Do not forget to return the Logging level to its default setting after you have 
       <translation>Khách hàng</translation>
     </message>
     <message>
-      <source>none</source>
-      <translation>không xác định</translation>
+      <source>None</source>
+      <translation>Không</translation>
     </message>
     <message>
-      <source>error</source>
-      <translation>lỗi</translation>
+      <source>Error</source>
+      <translation>Lỗi</translation>
     </message>
     <message>
-      <source>warning</source>
-      <translation>sự phản đối</translation>
+      <source>Warning</source>
+      <translation type="unfinished">Warning</translation>
     </message>
     <message>
-      <source>info</source>
-      <translation>thông tin</translation>
+      <source>Info</source>
+      <translation>Thông tin</translation>
     </message>
     <message>
-      <source>debug</source>
-      <translation>gỡ rối</translation>
+      <source>Debug</source>
+      <translation type="unfinished">Debug</translation>
     </message>
     <message>
-      <source>verbose</source>
-      <translation>dài dòng</translation>
+      <source>Verbose</source>
+      <translation type="unfinished">Verbose</translation>
     </message>
   </context>
   <context>
@@ -8876,16 +8876,6 @@ Do not forget to return the Logging level to its default setting after you have 
       <source>... and %n more</source>
       <translation>
         <numerusform>... và %n nhiều hơn nữa</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Debug Logging is enabled on Client</source>
-      <translation type="unfinished">Debug Logging is enabled on Client</translation>
-    </message>
-    <message numerus="yes">
-      <source>Debug Logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug Logging is enabled on %n Servers</numerusform>
       </translation>
     </message>
     <message>
@@ -8911,26 +8901,26 @@ Do not forget to return the Logging level to its default setting after you have 
       <translation type="unfinished">Logs downloading failed</translation>
     </message>
     <message>
-      <source>Debug Logging is enabled.
-System performance is degraded.</source>
-      <translation type="unfinished">Debug Logging is enabled.
-System performance is degraded.</translation>
+      <source>Debug logging is enabled on the Client</source>
+      <translation type="unfinished">Debug logging is enabled on the Client</translation>
     </message>
     <message>
-      <source>Logs downloading is cancelled</source>
-      <translation type="unfinished">Logs downloading is cancelled</translation>
+      <source>Debug logging is enabled, resulting in degraded system performance.</source>
+      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloading canceled</source>
+      <translation type="unfinished">Logs downloading canceled</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Chọn thư mục...</translation>
-    </message>
-    <message>
-      <source>Apply settings</source>
-      <translation type="unfinished">Apply settings</translation>
-    </message>
     <message>
       <source>Enter your account password</source>
       <translation type="unfinished">Enter your account password</translation>
@@ -8938,6 +8928,14 @@ System performance is degraded.</translation>
     <message>
       <source>Apply</source>
       <translation>ứng dụng</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -9812,8 +9810,8 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Việc ủy quyền tất cả nội dung sẽ hiển thị bất kỳ dịch vụ hoặc thiết bị nào trong mạng của máy chủ cho người dùng của trang web này</translation>
     </message>
     <message>
-      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
-      <translation>Trang web có thể tương tác với Máy khách trên máy tính để bàn và yêu cầu quyền truy cập vào phiên người dùng</translation>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
     </message>
   </context>
   <context>
@@ -10256,14 +10254,6 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>Chứng chỉ này không khớp với chứng chỉ %1 được ghim vào.</translation>
     </message>
     <message>
-      <source>Custom certificate</source>
-      <translation>Tùy chỉnh chứng nhận</translation>
-    </message>
-    <message>
-      <source>Unknown certificate</source>
-      <translation>Chứng chỉ không xác định</translation>
-    </message>
-    <message>
       <source>This is a custom certificate installed on %1</source>
       <translation>Đây là chứng chỉ tùy chỉnh được cài đặt trên %1</translation>
     </message>
@@ -10276,10 +10266,6 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>Ghim</translation>
     </message>
     <message>
-      <source>Auto-generated certificate</source>
-      <translation>Chứng chỉ được tạo tự động</translation>
-    </message>
-    <message>
       <source>The certificate is auto-generated and pinned to %1</source>
       <translation>Chứng chỉ được tạo tự động và được ghim thành %1</translation>
     </message>
@@ -10289,9 +10275,21 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 server SSL certificate.</translation>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation type="unfinished">Custom Certificate</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation type="unfinished">Auto-generated Certificate</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation type="unfinished">Unknown Certificate</translation>
     </message>
   </context>
   <context>
@@ -10555,20 +10553,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Đã tìm thấy bản ghi trên thiết bị</translation>
     </message>
     <message>
-      <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
-    </message>
-    <message numerus="yes">
-      <source>Backup storage is not configured on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n server</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Import in progress...</source>
       <translation type="unfinished">Import in progress...</translation>
     </message>
@@ -10584,29 +10568,43 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <source>Import archive from %1 stopped</source>
       <translation type="unfinished">Import archive from %1 stopped</translation>
     </message>
-    <message numerus="yes">
-      <source>Storage for analytics data is not set on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>System storage is used for analytics data on %n server</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on Device %1</source>
-      <translation type="unfinished">Not imported archive found on Device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on Camera %1</source>
-      <translation type="unfinished">Not imported archive found on Camera %1</translation>
-    </message>
     <message>
       <source>Import archive from %1</source>
       <translation type="unfinished">Import archive from %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on device %1</source>
+      <translation type="unfinished">Not imported archive found on device %1</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on camera %1</source>
+      <translation type="unfinished">Not imported archive found on camera %1</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by the user</source>
+      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by the user</source>
+      <translation type="unfinished">The recording settings have been changed by the user</translation>
     </message>
   </context>
   <context>
@@ -10869,12 +10867,12 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Bắt buộc xác thực an toàn</translation>
     </message>
     <message>
-      <source>All users</source>
+      <source>All Users</source>
       <translation>Tất cả người dùng</translation>
     </message>
     <message>
-      <source>With enabled digest authentication</source>
-      <translation>Với xác thực thông báo được bật</translation>
+      <source>Users with Digest Authentication</source>
+      <translation type="unfinished">Users with Digest Authentication</translation>
     </message>
   </context>
   <context>
@@ -11649,10 +11647,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Tất cả được hỗ trợ</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Chọn thư mục...</translation>
-    </message>
-    <message>
       <source>Too short period selected</source>
       <translation>Đã chọn thời gian quá ngắn</translation>
     </message>
@@ -11798,10 +11792,6 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
       <translation>%1 Beta</translation>
     </message>
     <message>
-      <source>There are no suitable cameras for replacement on the %1</source>
-      <translation>Không có camera thích hợp để thay thế trên %1</translation>
-    </message>
-    <message>
       <source>Undo replacement completed successfully!</source>
       <translation>Hoàn tác thay thế đã hoàn tất thành công!</translation>
     </message>
@@ -11812,6 +11802,14 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <message>
       <source>Confirm undo replacement?</source>
       <translation type="unfinished">Confirm undo replacement?</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -12056,8 +12054,8 @@ to view more bookmarks</source>
       <translation>Thiếu gói cập nhật ứng dụng khách cho nền tảng hiện tại.</translation>
     </message>
     <message>
-      <source>Cannot check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check client update availability. Check your internet connection and try again.</translation>
+      <source>Cannot check Client update availability. Check your internet connection and try again.</source>
+      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
     </message>
   </context>
 </TS>

@@ -1423,10 +1423,6 @@
       <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
-    </message>
-    <message>
       <source>RTP retry count</source>
       <translation type="unfinished">RTP retry count</translation>
     </message>
@@ -1455,10 +1451,6 @@
       <translation>Aktiver opptak på EDGE</translation>
     </message>
     <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation type="unfinished">Target update information</translation>
     </message>
@@ -1473,10 +1465,6 @@
     <message>
       <source>Client update settings</source>
       <translation>Klientoppdateringsinnstillinger</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1521,14 +1509,6 @@
     <message>
       <source>URI for resource_data.json automatic update</source>
       <translation type="unfinished">URI for resource_data.json automatic update</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Maksimal hendelsesloggoppføringer for å oppbevare i databasen. Den reelle mengden ubemerkede poster kan være opptil 20% høyere enn den spesifiserte verdien.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1587,14 +1567,6 @@
       <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Enable 2fa for system</source>
-      <translation type="unfinished">Enable 2fa for system</translation>
-    </message>
-    <message>
-      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
-      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
-    </message>
-    <message>
       <source>Enable cross-domain policy</source>
       <translation type="unfinished">Enable cross-domain policy</translation>
     </message>
@@ -1621,15 +1593,43 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>La IP-adresser bli automatisk oppdaget</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Hold IO-portstatus på når serveren kobles til enheten</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Mediebufferstørrelse for bare lydenheter (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation>Aktiver 2FA for systemet</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation>Vis enhetspassord som er lagret i VMS for administratorer (for nettsider)</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
+      <translation>Maks antall HTTP-tilkoblinger som bruker transkoding for serveren. Chrome åpner 2 tilkoblinger samtidig, og lukker deretter den første. Vi anbefaler å sette denne parameterens verdi til &gt;=2.</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>Maks antall tråder for ekstern arkiv synkronisering (&lt;=0 - auto, maks 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation>Trådtellergrense for synkronisering av kameraarkiv</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation>Maksimalt antall hendelsesloggposter å beholde i databasen. Den reelle mengden av ikke slettede poster kan være opptil 20 % høyere enn den angitte verdien.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation>Hvorvidt du skal bufre noen rammer for primærstrømmen eller ikke. Verdier: &apos;ja&apos; - alltid aktivert (kan bruke mye RAM), &apos;nei&apos; - alltid deaktivert bortsett fra når det kreves av avspillingen (f.eks. HLS), &apos;auto&apos; - ligner på &apos;nei&apos;, men slått på når du forbedrer brukeropplevelse (f.eks. når en Analytics-plugin fungerer på kameraet).</translation>
     </message>
   </context>
   <context>
@@ -2011,18 +2011,6 @@
       <translation>Systemdisk &quot;%1&quot; er nesten full.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende enheter:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende kameraer:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende I / O-moduler:</translation>
-    </message>
-    <message>
       <source>start</source>
       <translation>start</translation>
     </message>
@@ -2142,10 +2130,6 @@
       <translation>Ukjent diagnostikkhendelse for plugin</translation>
     </message>
     <message>
-      <source>RAID error. %1.</source>
-      <translation>RAID-feil. %1.</translation>
-    </message>
-    <message>
       <source>Buzzer</source>
       <translation>Buzzer</translation>
     </message>
@@ -2212,14 +2196,6 @@
       <translation>Plugin: %1</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Analytics-lagring &quot;%1&quot; DB-feil: Utilstrekkelige tillatelser på monteringspunktet.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>&apos;ikke initialisere AES-kryptering under opptak av mediearkiv. Data skrives ukryptert.</translation>
-    </message>
-    <message>
       <source>Archive backup failed.</source>
       <translation>Sikkerhetskopiering mislyktes.</translation>
     </message>
@@ -2250,22 +2226,6 @@
     <message>
       <source>RTP error in secondary stream (%1).</source>
       <translation>RTP-feil i sekundærstrøm (%1).</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Camera (primary stream) was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Camera (secondary stream) was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to Device was unexpectedly closed.</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation type="unfinished">Failed to force using Camera time, it lags too much; System time will be used.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -2299,7 +2259,47 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Gjør HTTP(S)-forespørsel</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (primær strøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Tilkobling til enheten ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Kunne ikke tvinge bruk av kameratid, da det henger for mye. Systemtid vil bli brukt i stedet.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Analytics-lagring &quot;%1&quot; databasefeil: Utilstrekkelige tillatelser på monteringspunktet.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Kan ikke initialisere AES-kryptering mens opptak er aktivert i mediearkivet. Data skrives ukryptert.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID-feil: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende enheter:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende kameraer:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende I/O-moduler:</translation>
     </message>
   </context>
   <context>

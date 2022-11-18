@@ -1377,10 +1377,6 @@
       <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Vì vậy, bạn nên đặt giá trị &gt;= 2 cho tham số này.</translation>
-    </message>
-    <message>
       <source>RTP retry count</source>
       <translation>Số lần thử lại RTP</translation>
     </message>
@@ -1409,10 +1405,6 @@
       <translation>Bật ghi tại biên</translation>
     </message>
     <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation>Thông tin cập nhật mục tiêu</translation>
     </message>
@@ -1427,10 +1419,6 @@
     <message>
       <source>Client update settings</source>
       <translation>Cài đặt cập nhật ứng dụng khách</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1475,14 +1463,6 @@
     <message>
       <source>URI for resource_data.json automatic update</source>
       <translation>URI cho cập nhật tự động resource_data.json</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Bản ghi nhật ký sự kiện tối đa để giữ vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1541,14 +1521,6 @@
       <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Enable 2fa for system</source>
-      <translation>Bật 2fa cho hệ thống</translation>
-    </message>
-    <message>
-      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
-      <translation>Hiển thị mật khẩu thiết bị được lưu trữ trong VMS cho quản trị viên (đối với trang web)</translation>
-    </message>
-    <message>
       <source>Enable cross-domain policy</source>
       <translation>Bật chính sách tên miền chéo</translation>
     </message>
@@ -1584,6 +1556,34 @@
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
       <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation type="unfinished">Enable 2FA for the System</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
     </message>
   </context>
   <context>
@@ -1955,18 +1955,6 @@
       <translation>Đĩa hệ thống &quot;%1&quot; gần như đầy.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các thiết bị sau:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các camera sau:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Không đủ khóa giấy phép. Chức năng ghi đã bị tắt trên các Mô-đun I/O sau:</translation>
-    </message>
-    <message>
       <source>start</source>
       <translation>bắt đầu</translation>
     </message>
@@ -2084,10 +2072,6 @@
       <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
     <message>
-      <source>RAID error. %1.</source>
-      <translation>Lỗi RAID. %1.</translation>
-    </message>
-    <message>
       <source>Buzzer</source>
       <translation>Buzzer</translation>
     </message>
@@ -2154,14 +2138,6 @@
       <translation>Plugin: %1</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Bộ nhớ Phân tích &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>Không thể khởi tạo mã hóa AES trong khi ghi lưu trữ đa phương tiện. Dữ liệu không được mã hóa.</translation>
-    </message>
-    <message>
       <source>Archive backup failed.</source>
       <translation>Sao lưu video không thành công.</translation>
     </message>
@@ -2192,22 +2168,6 @@
     <message>
       <source>RTP error in secondary stream (%1).</source>
       <translation>Lỗi RTP trong luồng phụ (%1).</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng chính) bị đóng đột ngột.</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng phụ) bị đóng đột ngột.</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>Không thể bắt buộc sử dụng thời gian của camera, nó bị trễ quá nhiều, sẽ sử dụng thời gian hệ thống.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -2242,6 +2202,46 @@
     <message>
       <source>Do HTTP(S) request</source>
       <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng chính) đã bất ngờ đóng cửa.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Kết nối với thiết bị đã bất ngờ đóng cửa.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>

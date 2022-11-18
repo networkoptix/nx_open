@@ -129,12 +129,12 @@
       <translation>キャンセル</translation>
     </message>
     <message>
-      <source>Open files folder</source>
-      <translation>ファイルフォルダーを開く</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>完了</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -239,10 +239,6 @@
       <translation>ログイン／ログアウト</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>イベントルール</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>サーバーアクション</translation>
     </message>
@@ -277,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>全サーバーがオフラインの為、操作履歴が表示できません</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>イベントルール</translation>
     </message>
   </context>
   <context>
@@ -646,14 +646,6 @@
       <translation>ONVIF設定</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation>セカンダリストリームのプロファイル</translation>
-    </message>
-    <message>
-      <source>Primary stream profile</source>
-      <translation>プライマリストリームのプロファイル</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>ビデオを自動的にエクスポートしない</translation>
     </message>
@@ -668,6 +660,14 @@
     <message>
       <source>Do not record secondary stream</source>
       <translation>セカンダリストリームを録画しない</translation>
+    </message>
+    <message>
+      <source>Secondary Stream Profile</source>
+      <translation type="unfinished">Secondary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Primary Stream Profile</source>
+      <translation type="unfinished">Primary Stream Profile</translation>
     </message>
   </context>
   <context>
@@ -788,10 +788,6 @@
       <translation>カメラ交換</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation>新しいデバイス</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名前</translation>
     </message>
@@ -806,6 +802,10 @@
     <message>
       <source>Next</source>
       <translation>次へ</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation type="unfinished">New Device</translation>
     </message>
   </context>
   <context>
@@ -1031,8 +1031,8 @@
       <translation>&lt;Message&gt;</translation>
     </message>
     <message>
-      <source>Open folder</source>
-      <translation>フォルダーを開く</translation>
+      <source>Open Folder</source>
+      <translation type="unfinished">Open Folder</translation>
     </message>
   </context>
   <context>
@@ -1185,24 +1185,24 @@
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>コンテンツタイプ</translation>
-    </message>
-    <message>
-      <source>Authentication type</source>
-      <translation>認証タイプ</translation>
-    </message>
-    <message>
-      <source>Request type</source>
-      <translation>要求のタイプ</translation>
-    </message>
-    <message>
       <source>HTTP(S) URL</source>
       <translation>HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation>HTTP(S) コンテンツ</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>コンテンツタイプ</translation>
+    </message>
+    <message>
+      <source>Authentication Type</source>
+      <translation>認証タイプ</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -1428,8 +1428,8 @@
       <translation>マイクがアクティブなときに音声をミュート</translation>
     </message>
     <message>
-      <source>Allow computer entering sleep mode on idle</source>
-      <translation>アイドル時にコンピュータがスリープ モードに入るのを許可する</translation>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>アイドル時にコンピューターがスリープモードに入ることを許可する</translation>
     </message>
   </context>
   <context>
@@ -1790,24 +1790,24 @@
   <context>
     <name>LogSettingsDialog</name>
     <message>
-      <source>Logging level</source>
-      <translation>ログレベル</translation>
-    </message>
-    <message>
-      <source>Limit Max volume</source>
-      <translation>最大サイズを制限する</translation>
-    </message>
-    <message>
-      <source>Split file by time</source>
-      <translation>ファイルを時間で分割</translation>
-    </message>
-    <message>
-      <source>Split file by size</source>
-      <translation>ファイルをサイズで分割</translation>
-    </message>
-    <message>
       <source>Enable</source>
       <translation>有効化</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation type="unfinished">Logging Level</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation type="unfinished">Split File by Size</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation type="unfinished">Split File by Time</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation type="unfinished">Limit Max Volume</translation>
     </message>
   </context>
   <context>
@@ -1852,14 +1852,6 @@
       <translation>キャンセル</translation>
     </message>
     <message>
-      <source>Download is finished!</source>
-      <translation>ダウンロードが完了しました！</translation>
-    </message>
-    <message>
-      <source>Open files folder</source>
-      <translation>ファイルフォルダを開く</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>完了</translation>
     </message>
@@ -1868,8 +1860,16 @@
       <translation>再試行</translation>
     </message>
     <message>
-      <source>Failed to save logs to selected folder</source>
-      <translation>選択したフォルダにログを保存できませんでした</translation>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -2623,12 +2623,12 @@
       <translation>ルールを削除</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation>デフォルトのルールにリセット</translation>
+      <source>Select a Rule</source>
+      <translation type="unfinished">Select a Rule</translation>
     </message>
     <message>
-      <source>Select a rule</source>
-      <translation>ルールを選択</translation>
+      <source>Reset Default Rules</source>
+      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
       <translation>USBストレージで録画が有効になりました</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
     </message>
   </context>

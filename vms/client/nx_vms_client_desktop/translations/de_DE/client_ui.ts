@@ -129,12 +129,12 @@
       <translation>Abbrechen</translation>
     </message>
     <message>
-      <source>Open files folder</source>
-      <translation>Dateiordner öffnen</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>Fertig</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -239,10 +239,6 @@
       <translation>Login/Logout</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>Ereignisregeln</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>Serveraktionen</translation>
     </message>
@@ -277,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Alle Server sind offline. Prüfdaten sind nicht verfügbar.</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Ereignisregeln</translation>
     </message>
   </context>
   <context>
@@ -646,14 +646,6 @@
       <translation>ONVIF-Einstellungen</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation>Sekundäres Stream-Profil</translation>
-    </message>
-    <message>
-      <source>Primary stream profile</source>
-      <translation>Primäres Stream-Profil</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation>Video nicht automatisch exportieren</translation>
     </message>
@@ -668,6 +660,14 @@
     <message>
       <source>Do not record secondary stream</source>
       <translation>Sekundärstream nicht aufzeichnen</translation>
+    </message>
+    <message>
+      <source>Secondary Stream Profile</source>
+      <translation type="unfinished">Secondary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Primary Stream Profile</source>
+      <translation type="unfinished">Primary Stream Profile</translation>
     </message>
   </context>
   <context>
@@ -788,10 +788,6 @@
       <translation>Kamera-Ersatz</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation>Neues Gerät</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Name</translation>
     </message>
@@ -806,6 +802,10 @@
     <message>
       <source>Next</source>
       <translation>Weiter</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation type="unfinished">New Device</translation>
     </message>
   </context>
   <context>
@@ -1031,8 +1031,8 @@
       <translation>&lt;Message&gt;</translation>
     </message>
     <message>
-      <source>Open folder</source>
-      <translation>Ordner öffnen</translation>
+      <source>Open Folder</source>
+      <translation type="unfinished">Open Folder</translation>
     </message>
   </context>
   <context>
@@ -1185,24 +1185,24 @@
       <translation>Passwort</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>Inhaltstyp</translation>
-    </message>
-    <message>
-      <source>Authentication type</source>
-      <translation>Authentifizierungstyp</translation>
-    </message>
-    <message>
-      <source>Request type</source>
-      <translation>Anforderungstyp</translation>
-    </message>
-    <message>
       <source>HTTP(S) URL</source>
       <translation>HTTP(S)-URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation>HTTP(S)-Inhalt</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Authentication Type</source>
+      <translation type="unfinished">Authentication Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -1428,8 +1428,8 @@
       <translation>Audio stummschalten, wenn das Mikrofon aktiv ist</translation>
     </message>
     <message>
-      <source>Allow computer entering sleep mode on idle</source>
-      <translation>Ruhezustand des Computers bei Leerlauf zulassen</translation>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
   </context>
   <context>
@@ -1790,24 +1790,24 @@
   <context>
     <name>LogSettingsDialog</name>
     <message>
-      <source>Logging level</source>
-      <translation>Logging-Level</translation>
-    </message>
-    <message>
-      <source>Limit Max volume</source>
-      <translation>Grenzwert für Maximale Lautstärke</translation>
-    </message>
-    <message>
-      <source>Split file by time</source>
-      <translation>Datei nach Zeit aufteilen</translation>
-    </message>
-    <message>
-      <source>Split file by size</source>
-      <translation>Datei nach Größe aufteilen</translation>
-    </message>
-    <message>
       <source>Enable</source>
       <translation>Aktivieren</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation type="unfinished">Logging Level</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation type="unfinished">Split File by Size</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation type="unfinished">Split File by Time</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation type="unfinished">Limit Max Volume</translation>
     </message>
   </context>
   <context>
@@ -1852,14 +1852,6 @@
       <translation>Abbrechen</translation>
     </message>
     <message>
-      <source>Download is finished!</source>
-      <translation>Der Download ist abgeschlossen!</translation>
-    </message>
-    <message>
-      <source>Open files folder</source>
-      <translation>Dateiordner öffnen</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>Fertig</translation>
     </message>
@@ -1868,8 +1860,16 @@
       <translation>Wiederholen</translation>
     </message>
     <message>
-      <source>Failed to save logs to selected folder</source>
-      <translation>Protokolle konnten nicht im ausgewählten Ordner gespeichert werden</translation>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -2623,12 +2623,12 @@
       <translation>Regel löschen</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation>Standardregeln zurücksetzen</translation>
+      <source>Select a Rule</source>
+      <translation type="unfinished">Select a Rule</translation>
     </message>
     <message>
-      <source>Select a rule</source>
-      <translation>Regel auswählen</translation>
+      <source>Reset Default Rules</source>
+      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -3012,8 +3012,8 @@
       <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Analysedaten können große Mengen an Platz beanspruchen. Wir empfehlen, anstelle der Systempartition einen anderen Speicherort für sie zu wählen.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

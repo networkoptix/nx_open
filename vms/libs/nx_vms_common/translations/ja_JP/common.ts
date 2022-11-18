@@ -1377,10 +1377,6 @@
       <translation>レコードキューの最大サイズ (要素数, 250-4000)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、次に最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
-    </message>
-    <message>
       <source>RTP retry count</source>
       <translation>RTPリトライ回数</translation>
     </message>
@@ -1409,10 +1405,6 @@
       <translation>EDGEでの録画を有効にする</translation>
     </message>
     <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation>ターゲットの更新情報</translation>
     </message>
@@ -1427,10 +1419,6 @@
     <message>
       <source>Client update settings</source>
       <translation>クライアントの更新設定</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation>カメラアーカイブ同期のスレッド数制限</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1475,14 +1463,6 @@
     <message>
       <source>URI for resource_data.json automatic update</source>
       <translation>resource_data.json 自動更新用 URI</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>データベースに保存する最大イベントログレコード。削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります。</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>プライマリストリーム用にフレームをキャッシュするかどうか。値: &apos;yes&apos; - 常に有効 (RAMを多く消費する可能性あり)、 &apos;no&apos; - 再生時に要求される場合 (HLS等) を除いて常に無効、&apos;auto&apos; - &apos;no&apos;と似ていますが、ユーザーエクスペリエンスが向上するとオンになります (分析プラグインがカメラで動作しているとき等)。</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1541,14 +1521,6 @@
       <translation>メディアバッファサイズ (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Enable 2fa for system</source>
-      <translation>システムの二要素認証を有効化</translation>
-    </message>
-    <message>
-      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
-      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用)</translation>
-    </message>
-    <message>
       <source>Enable cross-domain policy</source>
       <translation>クロスドメインポリシーを有効にする</translation>
     </message>
@@ -1584,6 +1556,34 @@
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
       <translation>オーディオのみのデバイスに対するメディアバッファサイズ (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation>システムの二要素認証を有効化</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用)</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
+      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
     </message>
   </context>
   <context>
@@ -1955,18 +1955,6 @@
       <translation>システムディスク&quot;%1&quot; がほぼいっぱいです。</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
-    </message>
-    <message>
       <source>start</source>
       <translation>開始</translation>
     </message>
@@ -2084,10 +2072,6 @@
       <translation>不明なプラグイン診断イベント</translation>
     </message>
     <message>
-      <source>RAID error. %1.</source>
-      <translation>RAIDエラー。 %1。</translation>
-    </message>
-    <message>
       <source>Buzzer</source>
       <translation>ブザー</translation>
     </message>
@@ -2154,14 +2138,6 @@
       <translation>プラグイン: %1</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>分析ストレージ &quot;%1&quot; DB エラー: マウントポイントの権限が不足しています。</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>録画処理の際、AES暗号化を初期化できませんでした。データは暗号化されずに書き込まれます。</translation>
-    </message>
-    <message>
       <source>Archive backup failed.</source>
       <translation>アーカイブのバックアップに失敗しました。</translation>
     </message>
@@ -2192,22 +2168,6 @@
     <message>
       <source>RTP error in secondary stream (%1).</source>
       <translation>セカンダリストリームのRTPエラー (%1)。</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>デバイスへの接続が予期せず終了しました。</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。システム時刻が使用されます。</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -2242,6 +2202,46 @@
     <message>
       <source>Do HTTP(S) request</source>
       <translation>HTTP(S) リクエストを実行</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>デバイスとの通信が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>分析ストレージ &quot;%1&quot; データベースエラー: マウントポイントの権限が不足しています。</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>メディアアーカイブの録画が有効になっている間は、AES 暗号化を初期化できません。データは暗号化されずに書き込まれます。</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>

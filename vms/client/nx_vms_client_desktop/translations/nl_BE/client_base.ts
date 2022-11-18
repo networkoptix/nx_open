@@ -1329,10 +1329,6 @@
       <translation type="unfinished">Failed to activate free license</translation>
     </message>
     <message>
-      <source>Copy parameters</source>
-      <translation type="unfinished">Copy parameters</translation>
-    </message>
-    <message>
       <source>Copied</source>
       <translation>Gekopieerd</translation>
     </message>
@@ -1343,12 +1339,16 @@ License Key: %2</source>
 License Key: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to get activation file.</translation>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support to get activation file:</translation>
+      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+    </message>
+    <message>
+      <source>Copy Parameters</source>
+      <translation type="unfinished">Copy Parameters</translation>
     </message>
   </context>
   <context>
@@ -1533,11 +1533,6 @@ License Key: %2</translation>
       <translation type="unfinished">%1 users are receiving emails</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails right after you apply settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
-    </message>
-    <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
       <translation type="unfinished">%1 is not available</translation>
@@ -1570,6 +1565,11 @@ License Key: %2</translation>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
       <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply settings</translation>
     </message>
   </context>
   <context>
@@ -1889,20 +1889,20 @@ License Key: %2</translation>
       <translation>Bij de eerste verbinding met de server wordt om uw bevestiging gevraagd om het certificaat te accepteren als het fouten bevat</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
     <message>
-      <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
     </message>
     <message>
-      <source>Download is finished!</source>
-      <translation type="unfinished">Download is finished!</translation>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
     </message>
     <message>
-      <source>Nvidia hardware acceleration is in Beta mode</source>
-      <translation type="unfinished">Nvidia hardware acceleration is in Beta mode</translation>
+      <source>NVIDIA hardware acceleration is in beta mode</source>
+      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
     </message>
   </context>
   <context>
@@ -3120,8 +3120,8 @@ to %1</source>
       <translation>Systeem is niet compatibel met tweefactorauthenticatie</translation>
     </message>
     <message>
-      <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation>Aanmelden bij &quot;%1&quot; systeem mislukt</translation>
+      <source>Failed to log in to System &quot;%1&quot;</source>
+      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3569,10 +3569,6 @@ to %1</source>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
       <source>Folder already added</source>
       <translation>Map is reeds toegevoegd</translation>
     </message>
@@ -3583,6 +3579,10 @@ to %1</source>
     <message>
       <source>Auto (%1)</source>
       <translation>Auto (%1)</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -4382,8 +4382,8 @@ to %1</source>
   <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-      <source>These settings apply only to the System you are logged in and will be removed in the future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in and will be removed in the future versions.</translation>
+      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -4557,10 +4557,6 @@ to %1</source>
       <translation>%1 (primair)</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
       <source>Best</source>
       <translation>Beste</translation>
     </message>
@@ -4579,6 +4575,10 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>Kwart van de oorspronkelijke resolutie</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -5033,12 +5033,12 @@ to %1</source>
       <translation>Details</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation>Servers met ingeschakelde failover nemen automatisch camera's van offline servers met dezelfde locatie-ID.</translation>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
     </message>
     <message>
-      <source>Certificate received from the server does not match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server does not match the certificate this server is pinned to.</translation>
+      <source>The certificate received from the Server does not match the pinned certificate.</source>
+      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
     </message>
   </context>
   <context>
@@ -5650,10 +5650,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Camera-opnameschema is ongeldig</translation>
     </message>
     <message>
-      <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been stopped</source>
       <translation type="unfinished">Remote archive synchronization has been stopped</translation>
     </message>
@@ -5670,8 +5666,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Analytics-gegevens kunnen grote hoeveelheden ruimte in beslag nemen.</translation>
     </message>
     <message>
-      <source>We recommend to choose another location for it instead of the system partition.</source>
-      <translation>We raden aan om er een andere locatie voor te kiezen in plaats van de systeempartitie.</translation>
+      <source>Remote archive synchronization is available</source>
+      <translation type="unfinished">Remote archive synchronization is available</translation>
+    </message>
+    <message>
+      <source>We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -6687,13 +6687,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <source>Merge</source>
       <translation>Samenvoegen</translation>
     </message>
-    <message numerus="yes">
-      <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxiteren alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</numerusform>
-        <numerusform>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxiteren alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
       <translation>Alle inhoud uitsluiten stelt elke service of apparaat op de server&apos;s netwerk bloot aan de gebruikers van deze webpagina.</translation>
@@ -6741,6 +6734,13 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Move Partially</source>
       <translation type="unfinished">Move Partially</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation type="unfinished">
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7421,8 +7421,8 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Dempen opheffen</translation>
     </message>
     <message>
-      <source>Open door</source>
-      <translation>Deur openen</translation>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
     </message>
   </context>
   <context>
@@ -7504,13 +7504,13 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Automatisch</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Video opgenomen op de interne camera&apos;s opslag wordt niet automatisch geüpload naar het hoofdarchief.</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -7640,13 +7640,13 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
     </message>
     <message>
-      <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
-    </message>
-    <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
       <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
     </message>
   </context>
   <context>
@@ -7950,10 +7950,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-      <source>This webpage is requesting access to your account for authorization</source>
-      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
-    </message>
-    <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
       <translation type="unfinished">Your confirmation is required to provide a token to</translation>
@@ -7961,6 +7957,10 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Allow</source>
       <translation type="unfinished">Allow</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
     </message>
   </context>
   <context>
@@ -8060,8 +8060,8 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Laden...</translation>
     </message>
     <message>
-      <source>Click to show cameras</source>
-      <translation type="unfinished">Click to show cameras</translation>
+      <source>Click to Show Cameras</source>
+      <translation type="unfinished">Click to Show Cameras</translation>
     </message>
   </context>
   <context>
@@ -8679,8 +8679,8 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>De naam mag niet leeg zijn.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -8928,28 +8928,28 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
   <context>
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
-      <source>Notice: Not enough information could be collected on the current Logging level.
-The Logging level &quot;%1&quot; will provide more granular information.</source>
-      <translation type="unfinished">Notice: Not enough information could be collected on the current Logging level.
-The Logging level &quot;%1&quot; will provide more granular information.</translation>
-    </message>
-    <message>
-      <source>Notice: The selected Logging level may degrade the performance of the system.
-Do not forget to return the Logging level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">Notice: The selected Logging level may degrade the performance of the system.
-Do not forget to return the Logging level to its default setting after you have collected enough logs.</translation>
-    </message>
-    <message>
       <source>Reset to Default</source>
       <translation>Standaardinstellingen herstellen</translation>
     </message>
     <message>
-      <source>Has to be 2 times more than split by size</source>
-      <translation type="unfinished">Has to be 2 times more than split by size</translation>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
     </message>
     <message>
-      <source>Cannot be more than &quot;Max volume&quot; / 2</source>
-      <translation type="unfinished">Cannot be more than &quot;Max volume&quot; / 2</translation>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
     </message>
   </context>
   <context>
@@ -8978,28 +8978,28 @@ Do not forget to return the Logging level to its default setting after you have 
       <translation>Client</translation>
     </message>
     <message>
-      <source>none</source>
-      <translation>geen</translation>
+      <source>None</source>
+      <translation>Geen</translation>
     </message>
     <message>
-      <source>error</source>
-      <translation>fout</translation>
+      <source>Error</source>
+      <translation>Fout</translation>
     </message>
     <message>
-      <source>warning</source>
-      <translation>waarschuwing</translation>
+      <source>Warning</source>
+      <translation type="unfinished">Warning</translation>
     </message>
     <message>
-      <source>info</source>
-      <translation>info</translation>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
     <message>
-      <source>debug</source>
-      <translation>debug</translation>
+      <source>Debug</source>
+      <translation type="unfinished">Debug</translation>
     </message>
     <message>
-      <source>verbose</source>
-      <translation>uitgebreid</translation>
+      <source>Verbose</source>
+      <translation type="unfinished">Verbose</translation>
     </message>
   </context>
   <context>
@@ -9009,17 +9009,6 @@ Do not forget to return the Logging level to its default setting after you have 
       <translation>
         <numerusform>... en %n meer</numerusform>
         <numerusform>... en %n meer</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Debug Logging is enabled on Client</source>
-      <translation type="unfinished">Debug Logging is enabled on Client</translation>
-    </message>
-    <message numerus="yes">
-      <source>Debug Logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug Logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug Logging is enabled on %n Servers</numerusform>
       </translation>
     </message>
     <message>
@@ -9046,26 +9035,27 @@ Do not forget to return the Logging level to its default setting after you have 
       <translation type="unfinished">Logs downloading failed</translation>
     </message>
     <message>
-      <source>Debug Logging is enabled.
-System performance is degraded.</source>
-      <translation type="unfinished">Debug Logging is enabled.
-System performance is degraded.</translation>
+      <source>Debug logging is enabled on the Client</source>
+      <translation type="unfinished">Debug logging is enabled on the Client</translation>
     </message>
     <message>
-      <source>Logs downloading is cancelled</source>
-      <translation type="unfinished">Logs downloading is cancelled</translation>
+      <source>Debug logging is enabled, resulting in degraded system performance.</source>
+      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloading canceled</source>
+      <translation type="unfinished">Logs downloading canceled</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
-      <source>Apply settings</source>
-      <translation type="unfinished">Apply settings</translation>
-    </message>
     <message>
       <source>Enter your account password</source>
       <translation type="unfinished">Enter your account password</translation>
@@ -9073,6 +9063,14 @@ System performance is degraded.</translation>
     <message>
       <source>Apply</source>
       <translation>Toepassen</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -9951,8 +9949,8 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
       <translation>Alle inhoud uitsluiten stelt elke service of apparaat op de server&apos;s netwerk bloot aan de gebruikers van deze webpagina</translation>
     </message>
     <message>
-      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
     </message>
   </context>
   <context>
@@ -10401,14 +10399,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Dit certificaat komt niet overeen met het certificaat %1 is vastgezet.</translation>
     </message>
     <message>
-      <source>Custom certificate</source>
-      <translation>Aangepast certificaat</translation>
-    </message>
-    <message>
-      <source>Unknown certificate</source>
-      <translation>Onbekend certificaat</translation>
-    </message>
-    <message>
       <source>This is a custom certificate installed on %1</source>
       <translation>Dit is een aangepast certificaat geïnstalleerd op %1</translation>
     </message>
@@ -10421,10 +10411,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Vastzetten</translation>
     </message>
     <message>
-      <source>Auto-generated certificate</source>
-      <translation>Automatisch gegenereerd certificaat</translation>
-    </message>
-    <message>
       <source>The certificate is auto-generated and pinned to %1</source>
       <translation>Het certificaat wordt automatisch gegenereerd en vastgezet op %1</translation>
     </message>
@@ -10434,9 +10420,21 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 server SSL certificate.</translation>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation type="unfinished">Custom Certificate</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation type="unfinished">Auto-generated Certificate</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation type="unfinished">Unknown Certificate</translation>
     </message>
   </context>
   <context>
@@ -10704,21 +10702,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Er zijn opnamen op het apparaat gevonden</translation>
     </message>
     <message>
-      <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
-    </message>
-    <message numerus="yes">
-      <source>Backup storage is not configured on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n server</numerusform>
-        <numerusform>Backup storage is not configured on %n server</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Import in progress...</source>
       <translation type="unfinished">Import in progress...</translation>
     </message>
@@ -10734,31 +10717,46 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <source>Import archive from %1 stopped</source>
       <translation type="unfinished">Import archive from %1 stopped</translation>
     </message>
-    <message numerus="yes">
-      <source>Storage for analytics data is not set on %n server</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
-        <numerusform>Storage for analytics data is not set on %n server</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>System storage is used for analytics data on %n server</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
-        <numerusform>System storage is used for analytics data on %n server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on Device %1</source>
-      <translation type="unfinished">Not imported archive found on Device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on Camera %1</source>
-      <translation type="unfinished">Not imported archive found on Camera %1</translation>
-    </message>
     <message>
       <source>Import archive from %1</source>
       <translation type="unfinished">Import archive from %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on device %1</source>
+      <translation type="unfinished">Not imported archive found on device %1</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on camera %1</source>
+      <translation type="unfinished">Not imported archive found on camera %1</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by the user</source>
+      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by the user</source>
+      <translation type="unfinished">The recording settings have been changed by the user</translation>
     </message>
   </context>
   <context>
@@ -11023,12 +11021,12 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Beveiligde authenticatie forceren</translation>
     </message>
     <message>
-      <source>All users</source>
+      <source>All Users</source>
       <translation>Alle gebruikers</translation>
     </message>
     <message>
-      <source>With enabled digest authentication</source>
-      <translation>Met ingeschakelde digest authenticatie</translation>
+      <source>Users with Digest Authentication</source>
+      <translation type="unfinished">Users with Digest Authentication</translation>
     </message>
   </context>
   <context>
@@ -11812,10 +11810,6 @@ Do not pin this certificate if you did not modify %2 server SSL certificate.</tr
       <translation>Alle ondersteund</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Selecteer map...</translation>
-    </message>
-    <message>
       <source>Too short period selected</source>
       <translation>Te korte periode geselecteerd</translation>
     </message>
@@ -11963,10 +11957,6 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
       <translation>%1 Beta</translation>
     </message>
     <message>
-      <source>There are no suitable cameras for replacement on the %1</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
-    </message>
-    <message>
       <source>Undo replacement completed successfully!</source>
       <translation type="unfinished">Undo replacement completed successfully!</translation>
     </message>
@@ -11977,6 +11967,14 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     <message>
       <source>Confirm undo replacement?</source>
       <translation type="unfinished">Confirm undo replacement?</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -12221,8 +12219,8 @@ to view more bookmarks</source>
       <translation>Het clientupdatepakket ontbreekt voor het huidige platform.</translation>
     </message>
     <message>
-      <source>Cannot check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check client update availability. Check your internet connection and try again.</translation>
+      <source>Cannot check Client update availability. Check your internet connection and try again.</source>
+      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
     </message>
   </context>
 </TS>

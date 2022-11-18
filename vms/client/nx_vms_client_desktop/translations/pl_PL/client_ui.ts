@@ -129,12 +129,12 @@
       <translation>Anuluj</translation>
     </message>
     <message>
-      <source>Open files folder</source>
-      <translation>Otwórz folder plików</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>Gotowe</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -239,10 +239,6 @@
       <translation>Zaloguj/Wyloguj</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>Reguły zdarzeń</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>Akcje serwera</translation>
     </message>
@@ -277,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Wszystkie serwery są odłączone. Dane z dziennika są niedostępne.</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Reguły zdarzeń</translation>
     </message>
   </context>
   <context>
@@ -646,14 +646,6 @@
       <translation type="unfinished">ONVIF Settings</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
-    </message>
-    <message>
-      <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
-    </message>
-    <message>
       <source>Do not export video automatically</source>
       <translation type="unfinished">Do not export video automatically</translation>
     </message>
@@ -668,6 +660,14 @@
     <message>
       <source>Do not record secondary stream</source>
       <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream Profile</source>
+      <translation type="unfinished">Secondary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Primary Stream Profile</source>
+      <translation type="unfinished">Primary Stream Profile</translation>
     </message>
   </context>
   <context>
@@ -788,10 +788,6 @@
       <translation type="unfinished">Camera Replacement</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation type="unfinished">New device</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Nazwa</translation>
     </message>
@@ -806,6 +802,10 @@
     <message>
       <source>Next</source>
       <translation>Dalej</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation type="unfinished">New Device</translation>
     </message>
   </context>
   <context>
@@ -1031,8 +1031,8 @@
       <translation>&lt;Message&gt;</translation>
     </message>
     <message>
-      <source>Open folder</source>
-      <translation type="unfinished">Open folder</translation>
+      <source>Open Folder</source>
+      <translation type="unfinished">Open Folder</translation>
     </message>
   </context>
   <context>
@@ -1185,24 +1185,24 @@
       <translation>Hasło</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>Typ zawartości</translation>
-    </message>
-    <message>
-      <source>Authentication type</source>
-      <translation>Typ uwierzytelniania</translation>
-    </message>
-    <message>
-      <source>Request type</source>
-      <translation>Typ zapytania</translation>
-    </message>
-    <message>
       <source>HTTP(S) URL</source>
       <translation type="unfinished">HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Authentication Type</source>
+      <translation type="unfinished">Authentication Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -1428,8 +1428,8 @@
       <translation>Wycisz dźwięk gdy mikrofon jest aktywny</translation>
     </message>
     <message>
-      <source>Allow computer entering sleep mode on idle</source>
-      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
   </context>
   <context>
@@ -1790,24 +1790,24 @@
   <context>
     <name>LogSettingsDialog</name>
     <message>
-      <source>Logging level</source>
-      <translation>Poziom logowania</translation>
-    </message>
-    <message>
-      <source>Limit Max volume</source>
-      <translation>Maksymalna głośność</translation>
-    </message>
-    <message>
-      <source>Split file by time</source>
-      <translation>Podziel plik według czasu</translation>
-    </message>
-    <message>
-      <source>Split file by size</source>
-      <translation>Podziel plik według rozmiaru</translation>
-    </message>
-    <message>
       <source>Enable</source>
       <translation>Włącz</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation type="unfinished">Logging Level</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation type="unfinished">Split File by Size</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation type="unfinished">Split File by Time</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation type="unfinished">Limit Max Volume</translation>
     </message>
   </context>
   <context>
@@ -1852,14 +1852,6 @@
       <translation>Anuluj</translation>
     </message>
     <message>
-      <source>Download is finished!</source>
-      <translation>Pobieranie zakończone!</translation>
-    </message>
-    <message>
-      <source>Open files folder</source>
-      <translation>Otwórz folder plików</translation>
-    </message>
-    <message>
       <source>Done</source>
       <translation>Gotowe</translation>
     </message>
@@ -1868,8 +1860,16 @@
       <translation>Ponów</translation>
     </message>
     <message>
-      <source>Failed to save logs to selected folder</source>
-      <translation type="unfinished">Failed to save logs to selected folder</translation>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -2623,12 +2623,12 @@
       <translation type="unfinished">Delete Rule</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <source>Select a Rule</source>
+      <translation type="unfinished">Select a Rule</translation>
     </message>
     <message>
-      <source>Select a rule</source>
-      <translation type="unfinished">Select a rule</translation>
+      <source>Reset Default Rules</source>
+      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -3012,8 +3012,8 @@
       <translation>Nagrywanie zostało włączone na nośniku USB</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Dane analityczne mogą zajmować dużo przestrzeni dyskowej. Zalecamy wybranie innej lokalizacji zamiast partycji systemowej.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

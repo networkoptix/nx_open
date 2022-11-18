@@ -1423,10 +1423,6 @@
       <translation>Tamanho máximo da fila de registros (elementos, 250-4000)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation>Quantidade máxima de conexões HTTP usando transcodificação para o servidor. O Chrome abre 2 conexões ao mesmo tempo e fecha a primeira. Portanto, é recomendável definir o valor &gt;=2 para este parâmetro.</translation>
-    </message>
-    <message>
       <source>RTP retry count</source>
       <translation>Contagem de tentativas de RTP</translation>
     </message>
@@ -1455,10 +1451,6 @@
       <translation>Ativar gravação no EDGE</translation>
     </message>
     <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation>Contagem máxima de encadeamentos para sincronização de arquivo remoto (&lt;= 0 - automático, máximo 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation>Informações de atualização de destino</translation>
     </message>
@@ -1473,10 +1465,6 @@
     <message>
       <source>Client update settings</source>
       <translation>Configurações de atualização do cliente</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation>Contagem limite de tópicos para a sincronização do arquivo da câmera</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1521,14 +1509,6 @@
     <message>
       <source>URI for resource_data.json automatic update</source>
       <translation>URI para atualização automática de resource_data.json</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Máximo de registros de log de eventos a serem mantidos no banco de dados. A quantidade real de registros não excluídos pode ser até 20% maior que o valor especificado.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>Se alguns quadros devem ser armazenados em cache para o fluxo primário. Valores: &apos;sim&apos; - sempre habilitado (pode usar muita RAM), &apos;não&apos; - sempre desabilitado exceto quando exigido pelo playback (ex. HLS), &apos;auto&apos; - semelhante a &apos;não&apos;, mas ligado quando melhora o experiência do usuário (por exemplo, quando algum plug-in do Analytics está funcionando na câmera).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1587,14 +1567,6 @@
       <translation>Tamanho do buffer de mídia (KB, 10KB-4MB)</translation>
     </message>
     <message>
-      <source>Enable 2fa for system</source>
-      <translation type="unfinished">Enable 2fa for system</translation>
-    </message>
-    <message>
-      <source>Expose Device passwords storred in VMS for administrators (for web-pages)</source>
-      <translation type="unfinished">Expose Device passwords storred in VMS for administrators (for web-pages)</translation>
-    </message>
-    <message>
       <source>Enable cross-domain policy</source>
       <translation type="unfinished">Enable cross-domain policy</translation>
     </message>
@@ -1630,6 +1602,34 @@
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
       <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation type="unfinished">Enable 2FA for the System</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
     </message>
   </context>
   <context>
@@ -2011,18 +2011,6 @@
       <translation>O disco do sistema &quot;%1&quot; está quase cheio.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Licenças insuficientes. A gravação foi desativada nos seguintes dispositivos:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Licenças insuficientes. A gravação foi desativada nas seguintes câmeras:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Licenças insuficientes. A gravação foi desativada nos seguintes módulos de I / O:</translation>
-    </message>
-    <message>
       <source>start</source>
       <translation>começar</translation>
     </message>
@@ -2142,10 +2130,6 @@
       <translation>Evento de diagnóstico de plug-in desconhecido</translation>
     </message>
     <message>
-      <source>RAID error. %1.</source>
-      <translation>Erro de RAID. %1.</translation>
-    </message>
-    <message>
       <source>Buzzer</source>
       <translation>Campainha</translation>
     </message>
@@ -2212,14 +2196,6 @@
       <translation>Plugin: %1</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Armazenamento de análise &quot;%1&quot; Erro de banco de dados: permissões insuficientes no ponto de montagem.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>Pode&apos;t inicializar a criptografia AES durante a gravação do arquivo de mídia. Os dados são escritos sem criptografia.</translation>
-    </message>
-    <message>
       <source>Archive backup failed.</source>
       <translation>O backup do arquivo falhou.</translation>
     </message>
@@ -2250,22 +2226,6 @@
     <message>
       <source>RTP error in secondary stream (%1).</source>
       <translation>Erro de RTP no fluxo secundário (%1).</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>A conexão com a câmera (fluxo primário) foi fechada inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>A conexão com a câmera (fluxo secundário) foi fechada inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>A conexão com o dispositivo foi fechada inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>Falha ao forçar o uso do tempo da câmera, demora muito; A hora do sistema será usada.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -2300,6 +2260,46 @@
     <message>
       <source>Do HTTP(S) request</source>
       <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>A conexão com a câmera (stream principal) foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>A conexão com a câmera (fluxo secundário) foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>A conexão com o dispositivo foi fechada inesperadamente.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
