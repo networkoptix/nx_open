@@ -12,6 +12,8 @@ set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
 if(LINUX AND NOT ANDROID)
     option(useLdGold "Use ld.gold to link binaries" OFF)
+    option(verboseDebugInfoInRelease
+        "Add more debug info when building Release version; effective only when -DuseClang=ON" OFF)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
@@ -329,12 +331,19 @@ if(LINUX)
         list(APPEND link_flags " -Wl,--gdb-index")
     endif()
 
+   if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT verboseDebugInfoInRelease)
+            set(debug_level_options "-gline-directives-only")
+        else()
+            set(debug_level_options "-ggdb1")
+        endif()
+        add_compile_options(-fno-omit-frame-pointer ${debug_level_options})
+
+        string(APPEND link_flags " -Wl,--compress-debug-sections=zlib")
+    endif()
+
     string(APPEND CMAKE_EXE_LINKER_FLAGS ${link_flags})
     string(APPEND CMAKE_SHARED_LINKER_FLAGS ${link_flags})
-
-    if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_compile_options(-ggdb1 -fno-omit-frame-pointer)
-    endif()
 endif()
 
 if(MACOSX)
@@ -396,5 +405,10 @@ if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
 
-option(stripBinaries "Strip the resulting binaries" ${_stripBinaries})
-unset(_stripBinaries)
+if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR targetDevice STREQUAL "edge1")
+    set(_stripBinaries ON)
+else()
+    set(_stripBinaries OFF)
+endif()
+
+nx_option(stripBinaries "Strip the resulting binaries" ${_stripBinaries})
