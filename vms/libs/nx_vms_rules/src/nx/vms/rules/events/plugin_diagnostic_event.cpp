@@ -88,7 +88,7 @@ QString PluginDiagnosticEvent::eventCaption() const
 QString PluginDiagnosticEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-    return tr("%1 - %2").arg(resourceName).arg(eventCaption());
+    return nx::format("%1 - %2", resourceName, eventCaption());
 }
 
 const ItemDescriptor& PluginDiagnosticEvent::manifest()
