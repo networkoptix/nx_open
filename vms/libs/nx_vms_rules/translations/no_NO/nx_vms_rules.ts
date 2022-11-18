@@ -265,10 +265,6 @@
       <translation type="unfinished">Interval of action</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>Innholdstype</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Logg Inn</translation>
     </message>
@@ -277,20 +273,24 @@
       <translation>Passord</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Gjør HTTP(S)-forespørsel</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S)-innhold</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>Innholdstype</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation>Forespørsel Metode</translation>
     </message>
   </context>
   <context>
@@ -361,24 +361,8 @@
       <translation>RTP-feil i sekundærstrøm (%1).</translation>
     </message>
     <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>Tilkobling til enheten ble uventet lukket.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP-pakketap oppdaget.</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>Kunne ikke tvinge bruk av kameraets tidsur, det henger for mye, systemtiden vil bli brukt.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -405,6 +389,22 @@
     <message>
       <source>Network address %1 is not a multicast address.</source>
       <translation>Nettverksadresse %1 er ikke en multicast-adresse.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (primærstrøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (sekundær strøm) ble uventet stengt.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Tilkoblingen til enheten ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
+      <translation>Kunne ikke tvinge bruk av kameratid, da det henger for mye; Systemtid vil bli brukt i stedet.</translation>
     </message>
   </context>
   <context>
@@ -687,20 +687,20 @@
       <translation>Analytics-lagring &quot;%1&quot; er nesten full.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
-    </message>
-    <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
       <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Analytics-lagring &quot;%1&quot; databasefeil: Utilstrekkelige tillatelser på monteringspunktet.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Kan ikke initialisere AES-kryptering mens opptak er aktivert i mediearkivet. Data skrives ukryptert.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID-feil: %1.</translation>
     </message>
   </context>
   <context>

@@ -261,20 +261,12 @@
       <translation type="unfinished">Interval of action</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>內容類型</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登入帳號</translation>
     </message>
     <message>
       <source>Password</source>
       <translation>密碼</translation>
-    </message>
-    <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
@@ -285,8 +277,16 @@
       <translation type="unfinished">HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -356,24 +356,8 @@
       <translation>次串流的RTP錯誤( %1 )。</translation>
     </message>
     <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(主串流)無預期中斷。</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(次串流)無預期中斷。</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>與設備的連線無預期中斷。</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>偵測到 RTP 封包丟失。</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>無法強制使用攝影機時間，因其延遲過久，將採用系統時間。</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -400,6 +384,22 @@
     <message>
       <source>Network address %1 is not a multicast address.</source>
       <translation>網址 %1 並非群播位址。</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -682,20 +682,20 @@
       <translation>儲存裝置 &quot;%1&quot; 容量即將不足。</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>分析存儲 &quot;%1&quot; DB錯誤：掛載點權限不足。</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>錄影資料寫入時，無法初始化 AES 加密。錄影資料以未加密狀態寫入。</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>RAID錯誤，%1。</translation>
-    </message>
-    <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
       <translation>錄影資料備份失敗: 無法完成'檔案 %1 備份</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
     </message>
   </context>
   <context>

@@ -265,20 +265,12 @@
       <translation>Intervalo de ação</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>Tipo de conteúdo</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Entrar</translation>
     </message>
     <message>
       <source>Password</source>
       <translation>Password</translation>
-    </message>
-    <message>
-      <source>Request method</source>
-      <translation>Método de solicitação</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
@@ -289,8 +281,16 @@
       <translation type="unfinished">HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -361,24 +361,8 @@
       <translation>Erro de RTP no fluxo secundário (%1).</translation>
     </message>
     <message>
-      <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
-      <translation>A conexão com a câmera (fluxo primário) foi fechada inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
-      <translation>A conexão com a câmera (fluxo secundário) foi fechada inesperadamente.</translation>
-    </message>
-    <message>
-      <source>Connection to Device was unexpectedly closed.</source>
-      <translation>A conexão com o dispositivo foi fechada inesperadamente.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>Perda de pacote RTP detectada.</translation>
-    </message>
-    <message>
-      <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
-      <translation>Falha ao forçar o uso do tempo da câmera, demora muito; A hora do sistema será usada.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -405,6 +389,22 @@
     <message>
       <source>Network address %1 is not a multicast address.</source>
       <translation>O endereço de rede %1 não é um endereço multicast.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -687,20 +687,20 @@
       <translation>O armazenamento de análise &quot;%1&quot; está quase cheio.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Armazenamento analítico &quot;%1&quot; Erro de banco de dados: permissões insuficientes no ponto de montagem.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>&apos;t pode inicializar a criptografia AES durante a gravação do arquivo de mídia. Os dados são gravados sem criptografia.</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>Erro de RAID. %1.</translation>
-    </message>
-    <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
       <translation>Falha no backup do arquivo. Falha ao fazer backup do arquivo %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
     </message>
   </context>
   <context>
