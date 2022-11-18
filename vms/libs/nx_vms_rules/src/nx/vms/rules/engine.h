@@ -199,6 +199,7 @@ public:
 
 public:
     void processEvent(const EventPtr& event);
+    void processAnalyticsEvents(const std::vector<EventPtr>& events);
 
 public: // Declare following methods public for testing purposes.
     std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
