@@ -152,7 +152,7 @@ class NxOpenConan(ConanFile):
 
             copy_packages.append("ffmpeg")
 
-        if self.isWindows or self.isAndroid:
+        if self.isLinux or self.isWindows or self.isAndroid:
             copy_packages.append("openal")
 
         self._copy_packages(copy_packages)

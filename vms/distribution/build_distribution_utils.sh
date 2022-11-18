@@ -179,6 +179,22 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
         "$@"
 }
 
+# Copy libraries from the specified directory using copy_system_library.py.
+#
+# [in] OPEN_SOURCE_DIR
+# [in] LIB_DIR
+#
+distrib_copyLibs() # lib_dir dest_dir libs_to_copy...
+{
+    local -r LIB_DIR="$1" && shift
+    local -r DEST_DIR="$1" && shift
+
+    "$PYTHON" "$OPEN_SOURCE_DIR"/build_utils/linux/copy_system_library.py \
+        -L "$LIB_DIR" \
+        --dest-dir="$DEST_DIR" \
+        "$@"
+}
+
 # Copy specified plugins from $BUILD_DIR/bin/plugins-dir-name to target-dir/plugins-dir-name>/.
 # Create target-dir if needed.
 #
