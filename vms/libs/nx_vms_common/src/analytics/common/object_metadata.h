@@ -118,8 +118,8 @@ static constexpr int kCoordinateDecimalDigits = 4;
 
 NX_REFLECTION_ENUM_CLASS(ObjectMetadataType,
     /**%apidoc Undefined analytics object. */
-    undefined, 
-    
+    undefined,
+
     /**%apidoc Regular analytics object. It represents a rectangle where object was detected. */
     regular,
 
@@ -129,7 +129,7 @@ NX_REFLECTION_ENUM_CLASS(ObjectMetadataType,
     bestShot,
 
     /**%apidoc same as `bestShot` but such metadata has explicitly loaded image from a Device.
-     * The API request /ec2/analyticsTrackBestShot uses this data. 
+     * The API request /ec2/analyticsTrackBestShot uses this data.
      */
     externalBestShot
 )
@@ -147,13 +147,13 @@ struct NX_VMS_COMMON_API ObjectMetadata
 
     /**%apidoc Unique track Id. */
     QnUuid trackId;
-    
+
     /**%apidoc Bounding box of the object. JSON object containing top-left corner (fields `x`
      * and `y`), `width` and `height`. Relative coordinates are in range [0;1].
      */
     QRectF boundingBox;
 
-    std::vector<Attribute> attributes;
+    Attributes attributes;
 
     /**%apidoc Kind of the object. */
     ObjectMetadataType objectMetadataType;

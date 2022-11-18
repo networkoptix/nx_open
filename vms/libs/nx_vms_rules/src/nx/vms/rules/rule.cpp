@@ -80,6 +80,19 @@ const QList<EventFilter*> Rule::eventFilters() const
     return result;
 }
 
+const QList<EventFilter*> Rule::eventFiltersByType(const QString& type) const
+{
+    QList<EventFilter*> result;
+
+    for (const auto& filter: m_filters)
+    {
+        if (filter->eventType() == type)
+            result += filter.get();
+
+    }
+    return result;
+}
+
 const QList<ActionBuilder*> Rule::actionBuilders() const
 {
     QList<ActionBuilder*> result;
