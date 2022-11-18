@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
 
@@ -52,6 +53,8 @@ NX_REFLECTION_INSTRUMENT(StaticWebContentUpdateInfo, StaticWebContentUpdateInfo_
 /**%apidoc Information about the static web content. */
 struct NX_VMS_API StaticWebContentInfo
 {
+    QnUuid id;
+
     /**%apidoc[readonly] The origin of the web content archive. */
     QString source;
 
@@ -68,7 +71,7 @@ struct NX_VMS_API StaticWebContentInfo
     std::optional<StaticWebContentUpdateInfo> update;
 };
 
-#define StaticWebContentInfo_Fields (source)(sha256)(timestampMs)(details)(update)
+#define StaticWebContentInfo_Fields (id)(source)(sha256)(timestampMs)(details)(update)
 QN_FUSION_DECLARE_FUNCTIONS(StaticWebContentInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StaticWebContentInfo, StaticWebContentInfo_Fields)
 
