@@ -43,7 +43,10 @@ QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog(
 bool QnSessionAwareTabbedDialog::tryClose(bool force)
 {
     if (force)
-        return forcefullyClose();
+    {
+        forcefullyClose();
+        return true;
+    }
 
     if (!tryToApplyOrDiscardChanges())
         return false;
