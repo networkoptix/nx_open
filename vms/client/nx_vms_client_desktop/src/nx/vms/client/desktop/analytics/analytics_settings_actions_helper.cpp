@@ -45,7 +45,7 @@ std::optional<AnalyticsSettingsActionsHelper::SettingsValuesMap>
 
     SettingsValuesMap result;
     for (const auto& key: values->keys())
-        result[key] = values->value(key).toString();
+        result[key] = nx::toString(values->value(key));
 
     return result;
 }
