@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Åpne mappen Filer</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF-innstillinger</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
@@ -663,11 +663,11 @@
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Sekundær strømningsprofil</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Primær strømmeprofil</translation>
     </message>
   </context>
   <context>
@@ -785,7 +785,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Kamerabytte</translation>
     </message>
     <message>
       <source>Name</source>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Ny enhet</translation>
     </message>
   </context>
   <context>
@@ -894,7 +894,7 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
@@ -940,10 +940,6 @@
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>Søker i bokmerker, objekter, hendelser</translation>
     </message>
-    <message>
-      <source>•</source>
-      <translation>•</translation>
-    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>
@@ -971,11 +967,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Denne handlingen kan kun angis for øyeblikkelige hendelser</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Velg en annen hendelse eller handling</translation>
     </message>
   </context>
   <context>
@@ -1032,7 +1028,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Åpne mappe</translation>
     </message>
   </context>
   <context>
@@ -1163,7 +1159,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Generisk hendelse</translation>
     </message>
   </context>
   <context>
@@ -1190,19 +1186,19 @@
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S)-innhold</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Innholdstype</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Autentiseringstype</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Forespørselsmetode</translation>
     </message>
   </context>
   <context>
@@ -1331,15 +1327,15 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Legg til en kommentar</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Sett tidsplan</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Test handling</translation>
     </message>
     <message>
       <source>Add a comment</source>
@@ -1429,7 +1425,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>La datamaskinen gå inn i hvilemodus når inaktiv</translation>
     </message>
   </context>
   <context>
@@ -1795,19 +1791,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Loggingsnivå</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Del fil etter størrelse</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Del fil etter tid</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Begrens maks størrelse</translation>
     </message>
   </context>
   <context>
@@ -1861,15 +1857,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Nedlasting ferdig!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Kunne ikke lagre logger i den valgte mappen</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Åpne filmappe</translation>
     </message>
   </context>
   <context>
@@ -2052,7 +2048,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Tilkoblingsinnstillinger</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2068,15 +2064,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Serveradresse</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Sikkerhetsprotokoll</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>E-postinnstillinger</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -2612,23 +2608,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Alarm/hendelsesregler</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Ny regel</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Slett regel</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Velg en regel</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Tilbakestill standardregler</translation>
     </message>
   </context>
   <context>
@@ -2940,11 +2936,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Lyd</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Administrer</translation>
     </message>
   </context>
   <context>
@@ -3013,7 +3009,7 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Analytics-data kan ta opp store mengder plass. Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
     </message>
   </context>
   <context>
@@ -3081,7 +3077,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>Egendefinert språk for skyvarsler</translation>
     </message>
   </context>
   <context>
@@ -3149,11 +3145,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Legg til gruppe</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Ingen grupper funnet</translation>
     </message>
   </context>
   <context>
@@ -3164,11 +3160,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Legg til bruker</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Ingen brukere funnet</translation>
     </message>
   </context>
   <context>

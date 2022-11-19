@@ -940,10 +940,6 @@
       <source>Searching Bookmarks, Objects, Events</source>
       <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
     </message>
-    <message>
-      <source>•</source>
-      <translation type="unfinished">•</translation>
-    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>

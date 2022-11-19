@@ -1336,11 +1336,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を %1 に送信してアクティベーションファイルを取得してください。</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
@@ -1874,19 +1874,19 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>指定されたフォルダーにログを保存できませんでした</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>ダウンロード完了！</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>NVIDIA ハードウェアアクセラレーションはベータモードです</translation>
     </message>
   </context>
   <context>
@@ -3084,7 +3084,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>システム &quot;%1&quot; へのログインに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -3538,7 +3538,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -4331,7 +4331,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>これらの設定はログインしているシステムにのみ適用され、将来のバージョンで削除されます。</translation>
     </message>
   </context>
   <context>
@@ -4523,7 +4523,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -4967,11 +4967,11 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>フェイルオーバーが有効なサーバーは、同じロケーションIDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>サーバーから受信した証明書がピン留めされた証明書と一致しません。</translation>
     </message>
   </context>
   <context>
@@ -5599,11 +5599,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>リモートアーカイブの同期が利用可能です</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>システムパーティション以外の場所を選択することをお勧めします。</translation>
     </message>
   </context>
   <context>
@@ -6633,8 +6633,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
       </translation>
     </message>
   </context>
@@ -7310,7 +7310,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>ドアを開ける</translation>
     </message>
   </context>
   <context>
@@ -7397,7 +7397,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <translation>カメラの内部ストレージに保存された映像は、メインアーカイブに自動的にアップロードされません。</translation>
     </message>
   </context>
   <context>
@@ -7532,7 +7532,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>サーバーが利用できないため、カメラの交換操作は行えません。</translation>
     </message>
   </context>
   <context>
@@ -7837,7 +7837,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>このウェブページは認証のためにあなたのアカウントへのアクセスを要求しています</translation>
     </message>
   </context>
   <context>
@@ -8553,7 +8553,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -8802,23 +8802,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>「ファイルをサイズで分割」の設定値以上である必要があります</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>「最大サイズを制限」の設定値以下である必要があります</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>指定されたログレベルでは、十分な情報を収集できない可能性があります。
+ログレベル &quot;%1&quot; はより詳細な情報を提供します。</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>指定されたログレベルではシステムのパフォーマンスが低下する可能性があります。
+必要なログを収集した後、忘れずにログレベルをデフォルト設定にお戻しください。</translation>
     </message>
   </context>
   <context>
@@ -8856,7 +8856,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8868,7 +8868,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>詳細</translation>
     </message>
   </context>
   <context>
@@ -8903,21 +8903,21 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>クライアントのデバッグログが有効です</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>デバッグログが有効になっているため、システムパフォーマンスが低下します。</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 台のサーバーでデバッグログが有効です</numerusform>
       </translation>
     </message>
     <message>
       <source>Logs downloading canceled</source>
-      <translation type="unfinished">Logs downloading canceled</translation>
+      <translation>ログのダウンロードがキャンセルされました</translation>
     </message>
   </context>
   <context>
@@ -8936,7 +8936,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -9812,7 +9812,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>Webページはデスクトップクライアントと通信し、ユーザーセッションへのアクセスを要求することができます</translation>
     </message>
   </context>
   <context>
@@ -10276,8 +10276,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。
+%2 サーバーのSSL証明書を変更していない場合は、この証明書をピン留めしないでください。</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
@@ -10289,7 +10289,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>不明な証明書</translation>
     </message>
   </context>
   <context>
@@ -10580,31 +10580,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーで分析データ用ストレージが設定されていません</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーで分析データ用にシステムストレージが使用されています</numerusform>
       </translation>
     </message>
     <message>
       <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
+      <translation>未インポートのアーカイブがデバイス %1 で見つかりました</translation>
     </message>
     <message>
       <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
+      <translation>未インポートのアーカイブがカメラ %1 で見つかりました</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+      <translation>アーカイブストリームの設定がユーザーによって変更されました</translation>
     </message>
     <message>
       <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
+      <translation>録画設定がユーザーによって変更されました</translation>
     </message>
   </context>
   <context>
@@ -10872,7 +10872,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>ダイジェスト認証を使用するユーザー</translation>
     </message>
   </context>
   <context>
@@ -11805,11 +11805,11 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>サーバー &quot;%1&quot; には交換に適したカメラがありません</translation>
     </message>
   </context>
   <context>

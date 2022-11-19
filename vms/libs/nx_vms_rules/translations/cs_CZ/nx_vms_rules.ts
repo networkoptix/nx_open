@@ -455,10 +455,6 @@
       <translation>Diagnosticka události pluginu</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Kamera</translation>
     </message>

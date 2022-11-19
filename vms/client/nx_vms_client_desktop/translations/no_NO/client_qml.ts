@@ -154,15 +154,15 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Sjekk kamerainnstillinger for å konfigurere denne plugin-en.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Sjekk systemadministrasjonsinnstillingene for å konfigurere denne plugin-en.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Denne plugin-en har ingen innstillinger på systemnivå.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
@@ -1078,7 +1078,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Denne handlingen krever at noen parametere fylles ut.</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Du har ikke tilgang til %1. Vennligst sjekk Internett-tilkoblingen din.</translation>
     </message>
   </context>
 </TS>
