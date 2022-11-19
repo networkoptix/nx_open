@@ -455,10 +455,6 @@
       <translation>Zdarzenie diagnostyczne wtyczki</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Kamera</translation>
     </message>

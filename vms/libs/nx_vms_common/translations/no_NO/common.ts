@@ -1612,10 +1612,6 @@
       <translation>Vis enhetspassord som er lagret i VMS for administratorer (for nettsider)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
-      <translation>Maks antall HTTP-tilkoblinger som bruker transkoding for serveren. Chrome åpner 2 tilkoblinger samtidig, og lukker deretter den første. Vi anbefaler å sette denne parameterens verdi til &gt;=2.</translation>
-    </message>
-    <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
       <translation>Maks antall tråder for ekstern arkiv synkronisering (&lt;=0 - auto, maks 32)</translation>
     </message>
@@ -1630,6 +1626,10 @@
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
       <translation>Hvorvidt du skal bufre noen rammer for primærstrømmen eller ikke. Verdier: &apos;ja&apos; - alltid aktivert (kan bruke mye RAM), &apos;nei&apos; - alltid deaktivert bortsett fra når det kreves av avspillingen (f.eks. HLS), &apos;auto&apos; - ligner på &apos;nei&apos;, men slått på når du forbedrer brukeropplevelse (f.eks. når en Analytics-plugin fungerer på kameraet).</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation>Maks antall HTTP-tilkoblinger som bruker transkoding for serveren. Chrome åpner 2 tilkoblinger samtidig, og lukker deretter den første. Vi anbefaler å sette denne parameterens verdi til 2 eller mer.</translation>
     </message>
   </context>
   <context>

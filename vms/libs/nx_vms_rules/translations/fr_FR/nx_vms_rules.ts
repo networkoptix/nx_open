@@ -445,10 +445,6 @@
       <translation>Événement de diagnostic du plugin</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Caméra</translation>
     </message>

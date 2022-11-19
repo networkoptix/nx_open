@@ -940,10 +940,6 @@
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>Suche nach Lesezeichen, Objekten, Ereignissen</translation>
     </message>
-    <message>
-      <source>•</source>
-      <translation>•</translation>
-    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>

@@ -440,10 +440,6 @@
       <translation>插件诊断事件</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>摄像机</translation>
     </message>

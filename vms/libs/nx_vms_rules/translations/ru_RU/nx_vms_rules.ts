@@ -455,10 +455,6 @@
       <translation>Событие диагностики плагина</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Камера</translation>
     </message>

@@ -445,10 +445,6 @@
       <translation>Evento diagnostico plug-in</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Telecamera / e</translation>
     </message>

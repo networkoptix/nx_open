@@ -1566,24 +1566,24 @@
       <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter�s value to &gt;=2.</source>
-      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
-    </message>
-    <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
       <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>カメラアーカイブ同期のスレッド数制限</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>データベースに保存する最大イベントログレコード数。削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります。</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>プライマリストリーム用にフレームをキャッシュするかどうか。値: &apos;yes&apos; - 常に有効 (RAMを多く消費する可能性あり)、 &apos;no&apos; - 再生時に要求される場合 (HLS等) を除いて常に無効、&apos;auto&apos; - &apos;no&apos;と似ていますが、ユーザーエクスペリエンスを向上させる場合にオンになります (分析プラグインがカメラで動作しているとき等)。</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
     </message>
   </context>
   <context>
@@ -2217,7 +2217,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにシステム時刻が使用されます。</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
@@ -2229,19 +2229,19 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID エラー: %1。</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
     </message>
   </context>
   <context>

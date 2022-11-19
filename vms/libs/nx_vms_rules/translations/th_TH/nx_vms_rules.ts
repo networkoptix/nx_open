@@ -440,10 +440,6 @@
       <translation>เหตุการณ์การวิเคราะห์ปลั๊กอิน</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>กล้อง</translation>
     </message>

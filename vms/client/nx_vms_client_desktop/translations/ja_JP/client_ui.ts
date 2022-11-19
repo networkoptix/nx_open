@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>ファイルフォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -663,11 +663,11 @@
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>セカンダリストリームのプロファイル</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>プライマリストリームのプロファイル</translation>
     </message>
   </context>
   <context>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>新しいデバイス</translation>
     </message>
   </context>
   <context>
@@ -940,10 +940,6 @@
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>ブックマーク、オブジェクト、イベントの検索</translation>
     </message>
-    <message>
-      <source>•</source>
-      <translation>•</translation>
-    </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>
@@ -1032,7 +1028,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>フォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -1190,7 +1186,7 @@
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) コンテンツ</translation>
     </message>
     <message>
       <source>Content Type</source>
@@ -1202,7 +1198,7 @@
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>リクエストメソッド</translation>
     </message>
   </context>
   <context>
@@ -1795,19 +1791,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>ログレベル</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>ファイルをサイズで分割</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>ファイルを時間で分割</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>最大サイズを制限</translation>
     </message>
   </context>
   <context>
@@ -1861,15 +1857,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>ダウンロード完了！</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>指定されたフォルダーにログを保存できませんでした</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>ファイルフォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -2624,11 +2620,11 @@
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>ルールを選択</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>デフォルトのルールにリセット</translation>
     </message>
   </context>
   <context>

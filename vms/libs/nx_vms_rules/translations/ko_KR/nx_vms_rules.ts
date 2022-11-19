@@ -440,10 +440,6 @@
       <translation>플러그인 진단 이벤트</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>카메라</translation>
     </message>

@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) コンテンツ</translation>
     </message>
     <message>
       <source>Content Type</source>
@@ -286,7 +286,7 @@
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>リクエストメソッド</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにシステム時刻が使用されます。</translation>
     </message>
   </context>
   <context>
@@ -438,10 +438,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>プラグイン診断イベント</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -695,7 +691,7 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID エラー: %1。</translation>
     </message>
   </context>
   <context>
