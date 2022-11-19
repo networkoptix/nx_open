@@ -35,7 +35,13 @@ Menu
 
     delegate: MenuItem {}
 
-    contentItem: Column {}
+    contentItem: Column
+    {
+        Repeater
+        {
+            model: menu.contentModel
+        }
+    }
 
     background: Rectangle
     {
