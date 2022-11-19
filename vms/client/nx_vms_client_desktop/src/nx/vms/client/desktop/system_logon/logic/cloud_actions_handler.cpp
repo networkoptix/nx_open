@@ -6,6 +6,7 @@
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
+#include <core/resource/user_resource.h>
 #include <nx/branding.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
@@ -71,7 +72,9 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
             if (command == SharedMemoryData::Command::logoutFromCloud)
             {
                 logoutFromCloud();
-                menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
+
+                if (context()->user() && context()->user()->isCloud())
+                    menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
             }
         });
 }
@@ -83,7 +86,6 @@ CloudActionsHandler::~CloudActionsHandler()
 void CloudActionsHandler::logoutFromCloud()
 {
     qnCloudStatusWatcher->resetAuthData();
-    core::settings()->cloudPasswordCredentials = nx::network::http::Credentials();
 }
 
 void CloudActionsHandler::at_loginToCloudAction_triggered()

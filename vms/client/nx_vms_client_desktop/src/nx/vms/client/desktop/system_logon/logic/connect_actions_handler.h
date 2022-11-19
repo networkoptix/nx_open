@@ -114,6 +114,7 @@ private:
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
     void at_selectCurrentServerAction_triggered();
+    void at_logoutFromCloud();
 
     /**
      * Handle connection in the videowall or ACS mode.
