@@ -96,11 +96,6 @@ void saveCloudCredentials(const CloudAuthData& authData)
         username, nx::network::http::BearerAuthToken(authData.refreshToken));
 }
 
-void forgetSavedCloudPassword()
-{
-    settings()->cloudPasswordCredentials = nx::network::http::Credentials();
-}
-
 std::optional<QnUuid> preferredCloudServer(const QString& systemId)
 {
     const auto preferredServers = settings()->preferredCloudServers();

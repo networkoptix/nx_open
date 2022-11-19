@@ -14,7 +14,6 @@
 #include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
@@ -305,37 +304,8 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
             action(ui::action::ResourcesModeAction)->setChecked(true);
         });
 
-    connect(action(ui::action::LogoutFromCloud), &QAction::triggered, this,
-        [this]()
-        {
-            switch (d->logicalState)
-            {
-                case LogicalState::disconnected:
-                case LogicalState::connecting:
-                    if (d->currentConnectionProcess &&
-                        isConnectionToCloud(d->currentConnectionProcess->context->logonData))
-                    {
-                        /**
-                         * TODO: #ynikitenkov Get rid of this static cast (here and below).
-                         * Write #define like Q_DECLARE_OPERATORS_FOR_FLAGS for private
-                         * class flags
-                         */
-                        const auto flags = static_cast<DisconnectFlags>(DisconnectFlag::Force
-                            /*| DisconnectFlag::ErrorReason*/ | DisconnectFlag::ClearAutoLogin);
-                        disconnectFromServer(flags);
-                    }
-                    return;
-                case LogicalState::connected:
-                    break;
-                default:
-                    NX_ASSERT(false, "Unhandled connection state");
-            }
-
-            // There is no way to login with different cloud users since 5.0.
-            // Disconnect unconditionally.
-            disconnectFromServer(static_cast<DisconnectFlags>(
-                DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin));
-        });
+    connect(action(ui::action::LogoutFromCloud), &QAction::triggered,
+        this, &ConnectActionsHandler::at_logoutFromCloud);
 
     connect(systemContext()->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
@@ -1198,6 +1168,31 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
         };
 
     executeDelayedParented(showModalDialog, kSelectCurrentServerShowDialogDelay, this);
+}
+
+void ConnectActionsHandler::at_logoutFromCloud()
+{
+    bool forceDisconnect = false;
+
+    switch (d->logicalState)
+    {
+        case LogicalState::disconnected:
+        case LogicalState::connecting:
+            if (d->currentConnectionProcess &&
+                isConnectionToCloud(d->currentConnectionProcess->context->logonData))
+            {
+                forceDisconnect = true;
+            }
+            break;
+        case LogicalState::connected:
+            forceDisconnect = connection()->connectionInfo().isCloud();
+            break;
+        default:
+            NX_ASSERT(false, "Unhandled connection state: %1", d->logicalState);
+    }
+
+    if (forceDisconnect)
+        disconnectFromServer(DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin);
 }
 
 bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
