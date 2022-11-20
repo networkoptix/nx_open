@@ -5,13 +5,17 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/scoped_connections.h>
+#include <nx/utils/impl_ptr.h>
 
 class QnUuid;
 namespace nx::vms::license { class SingleCamLicenseStatusHelper; }
 
 namespace nx::vms::client::core {
 
+/**
+ * Watches on the specified camera for the two way audio transmission availability. Takes into
+ * the consideration mapping of the source camera to it's audio output device.
+ */
 class NX_VMS_CLIENT_CORE_API TwoWayAudioAvailabilityWatcher: public QObject
 {
     Q_OBJECT
@@ -21,23 +25,22 @@ public:
     TwoWayAudioAvailabilityWatcher(QObject* parent = nullptr);
     virtual ~TwoWayAudioAvailabilityWatcher() override;
 
+    QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     bool available() const;
 
+    /* Device to be used as an actual audio output. */
+    QnVirtualCameraResourcePtr audioOutputDevice();
+
 signals:
     void availabilityChanged();
+    void cameraChanged();
+    void audioOutputDeviceChanged();
 
 private:
-    void updateAvailability();
-
-    void setAvailable(bool value);
-
-private:
-    bool m_available = false;
-    QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<nx::vms::license::SingleCamLicenseStatusHelper> m_licenseHelper;
-    nx::utils::ScopedConnections m_connections;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core
