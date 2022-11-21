@@ -105,12 +105,13 @@ GroupSettingsDialog::GroupSettingsDialog(
             });
     }
 
+    connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
+        this, SLOT(onGroupClicked(QVariant)));
+
     if (dialogType == editGroup)
     {
         connect(rootObjectHolder()->object(), SIGNAL(deleteRequested()),
             this, SLOT(onDeleteRequested()));
-        connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
-            this, SLOT(onGroupClicked(QVariant)));
     }
 }
 
