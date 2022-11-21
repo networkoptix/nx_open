@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class IUtilityProvider;
 
@@ -65,5 +64,4 @@ public:
 };
 using IPlugin0 = IPlugin;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk
