@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <set>
 
 #include <QUuid>
 
@@ -289,6 +290,48 @@ TEST(Urlencoded, bool_flag_presence_is_handled_as_true)
 
     Foo2 expected{true, true};
     ASSERT_EQ(expected, val);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+struct FooSet
+{
+    std::set<std::string> bar;
+
+    bool operator==(const FooSet&) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(FooSet, (bar))
+
+TEST(Urlencoded, std_set_is_represented_as_array)
+{
+    const FooSet expected{.bar = {{"1one"}, {"2two"}, {"3three"}}};
+
+    ASSERT_EQ("bar=[1one,2two,3three]", urlencoded::serialize(expected));
+
+    ASSERT_EQ(
+        std::make_tuple(expected, true),
+        urlencoded::deserialize<FooSet>("bar=[1one,2two,3three]"));
+
+    ASSERT_EQ(
+        std::make_tuple(expected, true),
+        urlencoded::deserialize<FooSet>("bar=1one,2two,3three"));
+
+    // TODO: add support for the following format.
+    //ASSERT_EQ(
+    //    std::make_tuple(expected, true),
+    //    urlencoded::deserialize<FooSet>("bar[]=1one,bar[]=2two,bar[]=3three"));
+}
+
+TEST(Urlencoded, detail_trimBrackets)
+{
+    ASSERT_EQ(std::make_tuple("foo", true), detail::trimBrackets("[foo]"));
+    ASSERT_EQ(std::make_tuple("foo", true), detail::trimBrackets("{foo}"));
+    ASSERT_EQ(std::make_tuple("foo", true), detail::trimBrackets("(foo)"));
+    ASSERT_EQ(std::make_tuple("foo", true), detail::trimBrackets("foo"));
+    ASSERT_EQ(std::make_tuple("f", true), detail::trimBrackets("f"));
+    ASSERT_EQ(std::make_tuple("", false), detail::trimBrackets("{foo"));
+    ASSERT_EQ(std::make_tuple("", false), detail::trimBrackets("{foo]"));
 }
 
 } // namespace nx::reflect::urlencoded::test
