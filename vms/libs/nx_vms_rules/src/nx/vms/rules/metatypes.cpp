@@ -9,6 +9,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/level.h>
+#include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
 #include <nx/vms/rules/client_action.h>
 #include <nx/vms/rules/icon.h>
@@ -57,6 +58,7 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::rules::ClientAction>();
 
     qRegisterMetaType<nx::vms::rules::EventPtr>();
+    qRegisterMetaType<std::vector<nx::vms::rules::EventPtr>>();
 
     qRegisterMetaType<nx::vms::rules::Icon>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::Icon>();
