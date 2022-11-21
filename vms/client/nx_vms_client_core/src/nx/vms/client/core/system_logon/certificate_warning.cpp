@@ -7,11 +7,13 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 namespace {
 
 const QString kCertificateLink = "#certificate";
 const QString kHelpLink = "#help";
+constexpr auto kMaxDisplayNameLength = 20;
 
 } // namespace
 
@@ -21,16 +23,15 @@ QString CertificateWarning::header(
     Reason reason,
     const nx::vms::api::ModuleInformation& target)
 {
-    const auto& serverName = target.name;
-    const auto& systemName = helpers::getSystemName(target);
-
     switch (reason)
     {
         case Reason::unknownServer:
-            return tr("Connecting to %1 for the first time?").arg(systemName);
+            return tr("Connecting to %1 for the first time?")
+                .arg(nx::utils::elideString(helpers::getSystemName(target), kMaxDisplayNameLength));
         case Reason::invalidCertificate:
         case Reason::serverCertificateChanged:
-            return tr("Cannot verify the identity of %1").arg(serverName);
+            return tr("Cannot verify the identity of %1")
+                .arg(nx::utils::elideString(target.name, kMaxDisplayNameLength));
         default:
             NX_ASSERT(false, "Unreachable");
             return {};
