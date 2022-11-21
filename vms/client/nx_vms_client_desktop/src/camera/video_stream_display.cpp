@@ -253,6 +253,9 @@ void QnVideoStreamDisplay::reorderPrevFrames()
 
 void QnVideoStreamDisplay::checkQueueOverflow()
 {
+    if (m_reverseQueue.size() == 1)
+        return;
+
     while (m_reverseSizeInBytes > kMaxReverseQueueSize)
     {
         // drop some frame at queue. Find max interval contains non-dropped frames (and drop frame from mid of this interval)
@@ -293,12 +296,13 @@ void QnVideoStreamDisplay::checkQueueOverflow()
             if (maxStart + minHole < m_reverseQueue.size())
                 index = maxStart + minHole; // take right frame from the hole
             else
-                index = maxStart-1; // take left frame
+                index = std::min(maxStart - 1, 0); // take left frame
         }
         else {
             index = maxStart + maxInterval/2;
         }
-        NX_ASSERT( m_reverseQueue[index]->data[0]);
+        if (!NX_ASSERT(m_reverseQueue[index]->data[0]))
+            return;
         m_reverseSizeInBytes -= m_reverseQueue[index]->sizeBytes();
         m_reverseQueue[index]->clean();
     }
@@ -322,7 +326,7 @@ qint64 QnVideoStreamDisplay::nextReverseTime() const
 {
     for (int i = 0; i < m_reverseQueue.size(); ++i)
     {
-        if (m_reverseQueue[i]->pkt_dts != AV_NOPTS_VALUE)
+        if (m_reverseQueue[i]->data[0] && m_reverseQueue[i]->pkt_dts != AV_NOPTS_VALUE)
         {
             if (m_reverseQueue[i]->flags & QnAbstractMediaData::MediaFlags_ReverseReordered)
                 return m_reverseQueue[i]->pkt_dts;
@@ -628,6 +632,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         m_reverseQueue.enqueue(outFrame);
         m_reverseSizeInBytes += outFrame->sizeBytes();
         checkQueueOverflow();
+
+        while(!m_reverseQueue.front()->data[0])
+            outFrame = m_reverseQueue.dequeue();
+
         if (!m_reverseQueue.front()->flags.testFlag(QnAbstractMediaData::MediaFlags_ReverseReordered))
             return Status_Buffered; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
