@@ -2,6 +2,8 @@
 
 #include "deserializer.h"
 
+#include <utility>
+
 namespace nx::reflect::urlencoded::detail {
 
 std::tuple<std::string, bool> decode(const std::string_view& str)
@@ -26,21 +28,38 @@ std::tuple<std::string, bool> decode(const std::string_view& str)
                 else
                     return {"", false};
                 break;
+
             default:
                 result += str[i];
         }
     }
+
     return {result, true};
 }
 
-std::tuple<std::string_view, bool> trancateCurlBraces(const std::string_view& str)
+std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str)
 {
+    static constexpr std::pair<char, char> kBrackets[] = {
+        {'{', '}'}, {'(', ')'}, {'[', ']'}
+    };
+
     if (str.length() < 2)
-        return {str, false};
-    return {str.substr(1, str.length() - 2), true};
+        return {str, true};
+
+    for (const auto& p: kBrackets)
+    {
+        if (str.starts_with(p.first))
+        {
+            if (!str.ends_with(p.second))
+                return {"", false};
+            return {str.substr(1, str.length() - 2), true};
+        }
+    }
+
+    return {str, true};
 }
 
-NX_REFLECT_API std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
+std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
     const std::string_view& request, char delimiter)
 {
     std::vector<std::string_view> requestTokenized;

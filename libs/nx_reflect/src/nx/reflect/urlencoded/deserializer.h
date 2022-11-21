@@ -60,7 +60,18 @@ namespace detail {
 
 NX_REFLECT_API std::tuple<std::string, bool> decode(const std::string_view& str);
 
-NX_REFLECT_API std::tuple<std::string_view, bool> trancateCurlBraces(const std::string_view& str);
+/**
+ * Cuts enclosing [], {} or () if present.
+ * Examples:
+ * - `trimBrackets("[foo]")` => ("foo", true)
+ * - `trimBrackets("{foo}")` => ("foo", true)
+ * - `trimBrackets("(foo)")` => ("foo", true)
+ * - `trimBrackets("foo")` => ("foo", true)
+ * - `trimBrackets("f")` => "f"
+ * - `trimBrackets("{foo")` => ("", false)
+ * - `trimBrackets("{foo]")` => ("", false)
+ */
+NX_REFLECT_API std::tuple<std::string_view, bool> trimBrackets(const std::string_view& str);
 
 NX_REFLECT_API std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
     const std::string_view& request, char delimiter);
@@ -184,7 +195,7 @@ std::tuple<T, bool> deserialize(
         &&!IsStringAlikeV<T>
     >* = nullptr)
 {
-    const auto& [fieldStr, trancatedSuccess] = trancateCurlBraces(str);
+    const auto& [fieldStr, trancatedSuccess] = trimBrackets(str);
     if (!trancatedSuccess)
         return {T(), false};
     const auto& [strValues, tokenizedSuccess] = tokenizeRequest(fieldStr, ',');
@@ -211,7 +222,7 @@ std::tuple<T, bool> deserialize(
         !IsUnorderedSetContainerV<T>
     >* = nullptr)
 {
-    const auto& [fieldStr, trancatedSuccess] = trancateCurlBraces(str);
+    const auto& [fieldStr, trancatedSuccess] = trimBrackets(str);
     if (!trancatedSuccess)
         return {T(), false};
     const auto& [strValues, tokenizedSuccess] = tokenizeRequest(fieldStr, '&');
@@ -252,7 +263,7 @@ public:
         if constexpr (IsInstrumentedV<typename WrappedField::Type>)
         {
             bool trancatedSuccess;
-            std::tie(fieldStr, trancatedSuccess) = trancateCurlBraces(m_request[field.name()]);
+            std::tie(fieldStr, trancatedSuccess) = trimBrackets(m_request[field.name()]);
             if (!trancatedSuccess)
             {
                 m_deserializationFailed = true;
