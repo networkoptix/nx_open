@@ -1629,7 +1629,7 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Max antal HTTP-anslutningar med omkodning för servern. Chrome öppnar 2 anslutningar samtidigt och stänger sedan den första. Så det rekommenderas att ställa in värdet &apos;=2 till denna parameter.</translation>
     </message>
   </context>
   <context>

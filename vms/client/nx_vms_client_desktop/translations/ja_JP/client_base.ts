@@ -345,7 +345,7 @@
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>検索表示...</translation>
+      <translation>プレビュー検索...</translation>
     </message>
     <message>
       <source>Server...</source>
@@ -11656,7 +11656,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation>検索表示 %1</translation>
+      <translation>%1 プレビュー検索</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
