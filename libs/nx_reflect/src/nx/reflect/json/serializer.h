@@ -44,6 +44,22 @@ private:
 struct SerializationContext
 {
     JsonComposer composer;
+
+    template<typename T>
+    bool beforeSerialize(const T&)
+    {
+        // Applying tag to all embedded members also.
+
+        return composer.setSerializeDurationAsNumber(
+            composer.isSerializeDurationAsNumber() ||
+            jsonSerializeChronoDurationAsNumber((const T*) nullptr));
+    }
+
+    template<typename T>
+    void afterSerialize(const T&, bool bak)
+    {
+        composer.setSerializeDurationAsNumber(bak);
+    }
 };
 
 } // namespace detail
@@ -53,12 +69,7 @@ using SerializationContext = detail::SerializationContext;
 template<typename Data>
 void serialize(SerializationContext* ctx, const Data& data)
 {
-    const bool bak = ctx->composer.setSerializeDurationAsNumber(
-        jsonSerializeChronoDurationAsNumber((const Data*) nullptr));
-
     BasicSerializer::serializeAdl(ctx, data);
-
-    ctx->composer.setSerializeDurationAsNumber(bak);
 }
 
 /**

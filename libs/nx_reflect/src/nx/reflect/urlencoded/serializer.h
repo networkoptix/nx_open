@@ -50,6 +50,12 @@ private:
 struct SerializationContext
 {
     UrlencodedComposer composer;
+
+    template<typename T>
+    int beforeSerialize(const T&) { return -1; /*dummy*/ }
+
+    template<typename T>
+    void afterSerialize(const T&, int) {}
 };
 
 } // namespace detail
