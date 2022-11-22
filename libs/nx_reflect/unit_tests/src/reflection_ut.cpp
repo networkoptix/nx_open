@@ -322,4 +322,28 @@ TEST(Reflection, non_instrumented_child_of_instrumented_base_is_converted_to_bas
     static_assert(nx::reflect::IsInstrumentedV<NonInstrumentedGenericFooDescendant<int>>);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename T>
+static constexpr bool FooTag(const T*) { return false; }
+
+struct TaggedFoo
+{
+    int bar = 0;
+};
+
+struct NonTaggedFoo
+{
+    int bar = 0;
+};
+
+NX_REFLECTION_INSTRUMENT(TaggedFoo, (bar))
+NX_REFLECTION_TAG_TYPE(TaggedFoo, FooTag)
+
+TEST(Reflection, tags)
+{
+    static_assert(FooTag((const TaggedFoo*) nullptr));
+    static_assert(!FooTag((const NonTaggedFoo*) nullptr));
+}
+
 } // namespace nx::reflect::test

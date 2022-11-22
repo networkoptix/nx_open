@@ -84,6 +84,11 @@ public:
         return std::exchange(m_serializeDurationAsNumber, val);
     }
 
+    bool isSerializeDurationAsNumber() const
+    {
+        return m_serializeDurationAsNumber;
+    }
+
 private:
     bool m_serializeDurationAsNumber = false;
 };
@@ -123,11 +128,15 @@ inline constexpr bool IsStringAlikeV =
 template<typename SerializationContext, typename Data>
 void serializeAdl(SerializationContext* ctx, const Data& data)
 {
+    auto state = ctx->beforeSerialize(data);
+
     // Delegating control to a separate namespace so that current namespace serialize
     // overloads are not considered during the ADL lookup.
     // This is needed to provide a way to override serialization for certain template classes.
 
     detail::serializeAdl(ctx, data);
+
+    ctx->afterSerialize(data, std::move(state));
 }
 
 template<typename Composer>
