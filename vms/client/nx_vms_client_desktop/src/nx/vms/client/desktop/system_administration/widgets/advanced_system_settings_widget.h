@@ -5,6 +5,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -12,7 +13,7 @@ class SystemContext;
 
 class AdvancedSystemSettingsWidget:
     public QnAbstractPreferencesWidget,
-    public SystemContextAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
@@ -24,11 +25,12 @@ public:
         logs,
     };
 
+    static QUrl urlFor(Subpage page);
+
     explicit AdvancedSystemSettingsWidget(SystemContext* context, QWidget *parent = nullptr);
     ~AdvancedSystemSettingsWidget();
 
     virtual bool activate(const QUrl& url) override;
-    static QUrl urlFor(Subpage page);
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -36,6 +38,8 @@ public:
 
 protected:
     void setReadOnlyInternal(bool readOnly) override;
+
+    virtual void showEvent(QShowEvent* event) override;
 
 private:
     class Private;

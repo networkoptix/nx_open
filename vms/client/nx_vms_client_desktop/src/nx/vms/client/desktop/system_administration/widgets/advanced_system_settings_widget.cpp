@@ -10,8 +10,12 @@
 #include <QtWidgets/QStackedWidget>
 
 #include <client_core/client_core_module.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
 
@@ -21,6 +25,22 @@ const QUrl kLogsUrl{"#logs"};
 } // namespace
 
 namespace nx::vms::client::desktop {
+
+QUrl AdvancedSystemSettingsWidget::Private::urlFor(Subpage page)
+{
+    switch (page)
+    {
+        case Subpage::backup:
+            return kBackupUrl;
+
+        case Subpage::logs:
+            return kLogsUrl;
+
+        default:
+            NX_ASSERT(false, "");
+            return {};
+    }
+}
 
 AdvancedSystemSettingsWidget::Private::Private(AdvancedSystemSettingsWidget* q):
     QObject(q),
@@ -75,14 +95,49 @@ void AdvancedSystemSettingsWidget::Private::setCurrentTab(int idx)
     m_stack->setCurrentIndex(idx);
 }
 
+bool AdvancedSystemSettingsWidget::Private::backupAndRestoreIsVisible() const
+{
+    const auto isOwner = q->context()->user() && q->context()->user()->isOwner();
+
+    const auto isAdministrator =
+        q->context()->user() && q->context()->user()->userRole() == Qn::UserRole::administrator;
+
+    const auto hasOwnerApiForAdmins = q->context()->currentServer()->getServerFlags().testFlag(
+        nx::vms::api::SF_OwnerApiForAdmins);
+
+    return isOwner || (isAdministrator && hasOwnerApiForAdmins);
+}
+
+void AdvancedSystemSettingsWidget::Private::updateBackupAndRestoreTabVisibility()
+{
+    const bool visible = backupAndRestoreIsVisible();
+
+    QMetaObject::invokeMethod(m_menu->rootObject(),
+        "setIndexVisible",
+        Q_ARG(QVariant, 0),
+        Q_ARG(QVariant, visible));
+
+    if (!visible && (m_stack->currentIndex() == (int)Subpage::backup))
+    {
+        const Subpage nextToBackupSubpage(Subpage((int)Subpage::backup + 1));
+        openSubpage(urlFor(nextToBackupSubpage));
+    }
+}
+
+QUrl AdvancedSystemSettingsWidget::urlFor(Subpage page)
+{
+    return Private::urlFor(page);
+}
+
 AdvancedSystemSettingsWidget::AdvancedSystemSettingsWidget(
     SystemContext* context,
     QWidget *parent)
     :
     base_type(parent),
-    SystemContextAware(context),
+    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
+    // Tabs must be added in the order they declared in AdvancedSystemSettingsWidget::Subpage.
     d->addTab(tr("Backup and Restore"), kBackupUrl, new QnDatabaseManagementWidget(this));
     d->addTab(tr("Logs Management"), kLogsUrl, new LogsManagementWidget(context, this));
 }
@@ -93,23 +148,10 @@ AdvancedSystemSettingsWidget::~AdvancedSystemSettingsWidget()
 
 bool AdvancedSystemSettingsWidget::activate(const QUrl& url)
 {
+    if (kBackupUrl == url && !d->backupAndRestoreIsVisible())
+        return false;
+
     return d->openSubpage(url);
-}
-
-QUrl AdvancedSystemSettingsWidget::urlFor(Subpage page)
-{
-    switch (page)
-    {
-        case Subpage::backup:
-            return kBackupUrl;
-
-        case Subpage::logs:
-            return kLogsUrl;
-
-        default:
-            NX_ASSERT(false, "");
-            return {};
-    }
 }
 
 void AdvancedSystemSettingsWidget::loadDataToUi()
@@ -127,6 +169,13 @@ bool AdvancedSystemSettingsWidget::hasChanges() const
 
 void AdvancedSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
 {
+}
+
+void AdvancedSystemSettingsWidget::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+
+    d->updateBackupAndRestoreTabVisibility();
 }
 
 } // namespace nx::vms::client::desktop
