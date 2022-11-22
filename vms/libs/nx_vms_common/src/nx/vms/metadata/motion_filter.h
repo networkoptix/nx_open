@@ -27,6 +27,7 @@ public:
 private:
     int m_maskStart = 0;
     int m_maskEnd = 0;
+    bool m_wholeFrame = false;
     simd128i m_mask[kGridDataSizeBytes / sizeof(simd128i)];
 };
 

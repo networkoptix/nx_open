@@ -7,9 +7,20 @@ namespace nx::vms::metadata {
 MotionRecordMatcher::MotionRecordMatcher(const MotionFilter* filter):
     base_type(filter)
 {
-    const auto region = filter->region.isEmpty()
-        ? QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight) : filter->region;
-    QnMetaDataV1::createMask(region, (char*) m_mask, &m_maskStart, &m_maskEnd);
+    // Optimization for whole frame match.
+    if (filter->region.isEmpty())
+        m_wholeFrame = true; //< According to the API empty region means whole frame.
+    for (const auto& rect: filter->region)
+    {
+        if (rect.width() == Qn::kMotionGridWidth && rect.height() == Qn::kMotionGridHeight)
+        {
+            m_wholeFrame = true;
+            break;
+        }
+    }
+
+    if (!m_wholeFrame)
+        QnMetaDataV1::createMask(filter->region, (char*) m_mask, &m_maskStart, &m_maskEnd);
 }
 
 const MotionFilter* MotionRecordMatcher::filter() const
@@ -20,6 +31,8 @@ const MotionFilter* MotionRecordMatcher::filter() const
 bool MotionRecordMatcher::matchRecord(
     int64_t /*timestampMs*/, const uint8_t* data, int /*recordSize*/) const
 {
+    if (m_wholeFrame)
+        return true;
     return QnMetaDataV1::matchImage((quint64*)data, m_mask, m_maskStart, m_maskEnd);
 }
 
