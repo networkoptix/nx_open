@@ -88,7 +88,6 @@ Item
             {
                 id: thumbnailSource
                 cameraId: figureView.resourceId
-                engineId: figureView.engineId
             }
 
             Timer
