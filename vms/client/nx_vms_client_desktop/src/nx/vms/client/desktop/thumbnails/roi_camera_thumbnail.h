@@ -15,7 +15,6 @@ class RoiCameraThumbnail: public LiveCameraThumbnail
     using base_type = LiveCameraThumbnail;
 
     Q_PROPERTY(QnUuid cameraId READ cameraId WRITE setCameraId NOTIFY resourceChanged)
-    Q_PROPERTY(QnUuid engineId READ engineId WRITE setEngineId NOTIFY engineIdChanged)
 
 public:
     RoiCameraThumbnail(QObject* parent = nullptr);
@@ -23,9 +22,6 @@ public:
 
     QnUuid cameraId() const;
     void setCameraId(const QnUuid& value);
-
-    QnUuid engineId() const;
-    void setEngineId(const QnUuid& value);
 
     static void registerQmlType();
 

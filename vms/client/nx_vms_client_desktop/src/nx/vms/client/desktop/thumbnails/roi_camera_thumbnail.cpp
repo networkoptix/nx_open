@@ -15,27 +15,12 @@ namespace nx::vms::client::desktop {
 struct RoiCameraThumbnail::Private
 {
     RoiCameraThumbnail* const q;
-    QnUuid engineId;
-
-    void updateStream()
-    {
-        const auto camera = q->resource().objectCast<QnVirtualCameraResource>();
-        if (!camera)
-            return;
-
-        const nx::vms::api::StreamIndex analyzedStreamIndex = camera->analyzedStreamIndex(engineId);
-        q->setStream(analyzedStreamIndex == nx::vms::api::StreamIndex::primary
-            ? CameraStream::primary
-            : CameraStream::secondary);
-    }
 };
 
 RoiCameraThumbnail::RoiCameraThumbnail(QObject* parent):
     base_type(parent),
     d(new Private{this})
 {
-    connect(this, &AbstractResourceThumbnail::resourceChanged, this,
-        [this]() { d->updateStream(); });
 }
 
 RoiCameraThumbnail::~RoiCameraThumbnail()
@@ -55,22 +40,6 @@ void RoiCameraThumbnail::setCameraId(const QnUuid& value)
 {
     setResource(qnClientCoreModule->resourcePool()
         ->getResourceById<QnVirtualCameraResource>(value));
-}
-
-QnUuid RoiCameraThumbnail::engineId() const
-{
-    return d->engineId;
-}
-
-void RoiCameraThumbnail::setEngineId(const QnUuid& value)
-{
-    if (d->engineId == value)
-        return;
-
-    d->engineId = value;
-    emit engineIdChanged();
-
-    d->updateStream();
 }
 
 void RoiCameraThumbnail::registerQmlType()
