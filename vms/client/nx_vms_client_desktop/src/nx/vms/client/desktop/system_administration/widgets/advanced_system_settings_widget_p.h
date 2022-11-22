@@ -18,6 +18,8 @@ class AdvancedSystemSettingsWidget::Private: public QObject
     Q_OBJECT
 
 public:
+    static QUrl urlFor(AdvancedSystemSettingsWidget::Subpage page);
+
     Private(AdvancedSystemSettingsWidget* q);
 
     void addTab(const QString& name, const QUrl& url, QWidget* widget);
@@ -25,6 +27,9 @@ public:
 
     // Called from QML when user clicks on menu item.
     Q_INVOKABLE void setCurrentTab(int idx);
+
+    bool backupAndRestoreIsVisible() const;
+    void updateBackupAndRestoreTabVisibility();
 
 private:
     AdvancedSystemSettingsWidget* const q = nullptr;
