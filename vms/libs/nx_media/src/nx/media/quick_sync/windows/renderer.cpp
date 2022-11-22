@@ -187,6 +187,11 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
     auto wglDXOpenDeviceNV = (PFNWGLDXOPENDEVICENVPROC)wglGetProcAddress("wglDXOpenDeviceNV");
     auto wglDXRegisterObjectNV = (PFNWGLDXREGISTEROBJECTNVPROC)wglGetProcAddress("wglDXRegisterObjectNV");
     auto wglDXSetResourceShareHandleNV = (PFNWGLDXSETRESOURCESHAREHANDLENVPROC)wglGetProcAddress("wglDXSetResourceShareHandleNV");
+    if (!wglDXOpenDeviceNV || !wglDXRegisterObjectNV || !wglDXSetResourceShareHandleNV)
+    {
+        NX_WARNING(this, "Invalid wgl context");
+        return false;
+    }
 
     // Acquire a handle to the D3D device for use in OGL
     m_renderDeviceHandle = wglDXOpenDeviceNV(m_device);
