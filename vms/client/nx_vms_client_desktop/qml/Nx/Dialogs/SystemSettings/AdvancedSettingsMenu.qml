@@ -34,6 +34,12 @@ NavigationMenu
         }
     }
 
+    function setIndexVisible(idx, visible)
+    {
+        if (idx >= 0 && idx < lst.count)
+            lst.itemAt(idx).visible = visible
+    }
+
     signal currentIndexChanged(int idx)
     onItemClicked: currentIndexChanged(item.idx)
-} 
+}

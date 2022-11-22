@@ -8,11 +8,8 @@
 #include <api/server_rest_connection.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -299,21 +296,6 @@ void QnDatabaseManagementWidget::updateVisible(bool operationSuccess)
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly)
 {
     ui->restoreButton->setEnabled(!readOnly);
-}
-
-void QnDatabaseManagementWidget::showEvent(QShowEvent* event)
-{
-    base_type::showEvent(event);
-
-    const auto isAdministrator =
-        context()->user() && context()->user()->userRole() == Qn::UserRole::administrator;
-
-    const auto hasOwnerApiForAdmins =
-        context()->currentServer()->getServerFlags().testFlag(nx::vms::api::SF_OwnerApiForAdmins);
-
-    ui->restoreButton->setVisible(
-        context()->user()->isOwner()
-        || (isAdministrator && hasOwnerApiForAdmins));
 }
 
 void QnDatabaseManagementWidget::hideEvent(QHideEvent* event)
