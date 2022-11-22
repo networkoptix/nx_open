@@ -545,10 +545,6 @@ distrib_copyServerBins() # additional_bins_to_copy...
     echo "Copying translations"
     install -m 755 -d "${stage_bin}/translations"
     install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_common.dat" "${stage_bin}/translations/"
-    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_rules.dat" "${stage_bin}/translations/"
-    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_server.dat" "${stage_bin}/translations/"
-    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_server_db.dat" \
-        "${stage_bin}/translations/"
 
     # if ENABLE_ROOT_TOOL is not set, consider it to be "false".
     if [[ "${ENABLE_ROOT_TOOL-"false"}" == "true" ]]; then
