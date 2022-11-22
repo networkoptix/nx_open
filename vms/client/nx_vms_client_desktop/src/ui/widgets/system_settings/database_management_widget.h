@@ -30,7 +30,6 @@ public:
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 
-    virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
