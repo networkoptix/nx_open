@@ -40,7 +40,7 @@ public:
 protected:
     virtual void onFlush(StorageContext& context) override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
-    void setLastError(nx::recording::Error::Code code);
+    virtual void setLastError(nx::recording::Error::Code code) override;
 
     // Overridden to remove gaps from the stream.
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override;

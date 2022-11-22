@@ -162,6 +162,9 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
         {
+            if (m_firstTime)
+                setLastError(nx::recording::Error::Code::dataNotFound);
+
             pleaseStop();
             return true;
         }
