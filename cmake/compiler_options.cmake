@@ -371,25 +371,8 @@ if(LINUX)
 endif()
 
 if(MACOSX)
-    if("${arch}" STREQUAL "arm64")
-        nx_add_c_cxx_compile_options(
-            -mmacosx-version-min=11.0
-            -target arm64-apple-macos
-        )
-        add_link_options(
-            -mmacosx-version-min=11.0
-            -target arm64-apple-macos
-        )
-    else()
-        nx_add_c_cxx_compile_options(
-            -msse4.1
-            -mmacosx-version-min=10.14
-            -target x86_64-apple-macos
-        )
-        add_link_options(
-            -mmacosx-version-min=10.14
-            -target x86_64-apple-macos
-        )
+    if("${arch}" STREQUAL "x64")
+        nx_add_c_cxx_compile_options(-msse4.1)
     endif()
     nx_add_c_cxx_compile_options(-Wno-unused-local-typedef)
     list(APPEND CMAKE_INSTALL_RPATH @executable_path/../lib)
