@@ -117,6 +117,47 @@ distrib_onExit()
     return $RESULT
 }
 
+# Copy specified plugins from $BUILD_DIR/bin/plugins-dir-name to target-dir/plugins-dir-name>/.
+# Create target-dir if needed.
+#
+# [in] BUILD_DIR
+#
+distrib_copyMediaserverPluginsToDir() # plugins-folder-name target-dir plugin_lib_name...
+{
+    local -r plugins_dir_name="$1" && shift #< E.g. plugins, plugins_optional.
+
+    if (( $# == 0 )); then
+        return
+    fi
+
+    local -r target_dir="${STAGE}/${BIN_INSTALL_PATH}/${plugins_dir_name}"
+    mkdir -p "${target_dir}"
+
+    local plugin
+    local plugin_path
+    for plugin in "$@"; do
+        if [[ -f "${plugin}" ]]; then
+            # File name instead of the plugin name was passed.
+            plugin_path="${plugin}"
+        elif [[ -d "${BUILD_DIR}/bin/${plugins_dir_name}/${plugin}" ]]; then
+            # Plugin is a "directory" plugin.
+            plugin_path="${BUILD_DIR}/bin/${plugins_dir_name}/${plugin}"
+        else
+            plugin_path="${BUILD_DIR}/bin/${plugins_dir_name}/lib${plugin}.so"
+        fi
+
+        if [[ -f "${plugin_path}" ]]; then
+            echo "  Copying ${plugin_path} to ${plugins_dir_name}"
+            cp "${plugin_path}" "${target_dir}/"
+        elif [[ -d "${plugin_path}" ]]; then
+            echo "  Copying ${plugin} dedicated directory to ${plugins_dir_name}"
+            cp -r "${plugin_path}" "${target_dir}/"
+        else
+            echo "ERROR: Cannot find plugin ${plugin}" >&2
+        fi
+    done
+}
+
 # Global variables - need to be accessible in onExit().
 declare distrib_WORK_DIR
 declare -i distrib_VERBOSE
@@ -179,46 +220,51 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
         "$@"
 }
 
-# Copy specified plugins from $BUILD_DIR/bin/plugins-dir-name to target-dir/plugins-dir-name>/.
-# Create target-dir if needed.
+# Copy all system libraries needed by the Server.
 #
-# [in] BUILD_DIR
+# [in] STAGE
+# [in] CPP_RUNTIME_LIBS
+# [in] ICU_RUNTIME_LIBS
 #
-distrib_copyMediaserverPlugins() # plugins-folder-name target-dir plugin_lib_name...
+distrib_copyServerSystemLibs() # destination_path
 {
-    local -r PLUGINS_DIR_NAME="$1" && shift #< e.g.: plugins, plugins_optional
-    local -r TARGET_DIR="$1" && shift
+    local -r destination_path="$1"
 
-    mkdir -p "$TARGET_DIR/$PLUGINS_DIR_NAME"
+    echo ""
+    echo "Copying system libs"
 
-    local PLUGIN
-    local PLUGIN_FILENAME
-    for PLUGIN in "$@"
-    do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
+    echo "Copying cpp runtime libs: ${CPP_RUNTIME_LIBS[@]}"
+    distrib_copySystemLibs "${destination_path}" "${CPP_RUNTIME_LIBS[@]}"
 
-        if [[ -f "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" ]]
-        then
-            echo "  Copying $PLUGIN_FILENAME to $PLUGINS_DIR_NAME"
-            cp "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
-        elif [[ -d "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN" ]]
-        then
-            echo "  Copying $PLUGIN dedicated directory to $PLUGINS_DIR_NAME"
-            cp -r "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
-        else
-            echo "ERROR: Cannot find plugin $PLUGIN" >&2
-        fi
-    done
+    echo "Copying libicu"
+    distrib_copySystemLibs "${destination_path}" "${ICU_RUNTIME_LIBS[@]}"
+}
+
+# Copy libraries from the specified directory using copy_system_library.py.
+#
+# [in] OPEN_SOURCE_DIR
+# [in] LIB_DIR
+#
+distrib_copyLibs() # lib_dir dest_dir libs_to_copy...
+{
+    local -r LIB_DIR="$1" && shift
+    local -r DEST_DIR="$1" && shift
+
+    "$PYTHON" "$OPEN_SOURCE_DIR"/build_utils/linux/copy_system_library.py \
+        -L "$LIB_DIR" \
+        --dest-dir="$DEST_DIR" \
+        "$@"
 }
 
 # Copy the specified file to the proper location, creating the symlink if necessary: if
 # ALT_LIB_INSTALL_PATH is unset, or the file is a symlink, just copy it to STAGE/LIB_INSTALL_PATH;
 # otherwise, put it to STAGE/ALT_LIB_INSTALL_PATH, and create a symlink from
-# STAGE/LIB_INSTALL_PATH to the file basename in /ALT_LIB_INSTALL_PATH. If an optional parameter
-# library_subdirectory is passed to the function, it adds it as a suffix to both LIB_INSTALL_PATH
-# and ALT_LIB_INSTALL_PATH.
+# STAGE/LIB_INSTALL_PATH to the file basename in INSTALL_ROOT/ALT_LIB_INSTALL_PATH. If an optional
+# parameter library_subdirectory is passed to the function, it adds it as a suffix to both
+# LIB_INSTALL_PATH and ALT_LIB_INSTALL_PATH.
 #
 # [in] STAGE
+# [in] INSTALL_ROOT
 # [in] LIB_INSTALL_PATH
 # [in] ALT_LIB_INSTALL_PATH Path to the alternative lib directory in the distribution creation
 #      directory.
@@ -235,17 +281,18 @@ distrib_copyLib() # file [library_subdirectory]
         local -r lib_dir="${LIB_INSTALL_PATH}"
         local -r alt_lib_dir="${alt_lib_instal_path_local}"
     else
-        local -r lib_dir="${LIB_INSTALL_PATH}/${LIB_SUBDIR}"
-        local -r alt_lib_dir="${alt_lib_instal_path_local}/${LIB_SUBDIR}"
+        local -r lib_dir="${LIB_INSTALL_PATH}/${lib_subdir}"
+        local -r alt_lib_dir="${alt_lib_instal_path_local}/${lib_subdir}"
     fi
 
     local -r stage_lib="${STAGE}/${lib_dir}"
 
-    if [[ ! -z "${alt_lib_instal_path_local}" && ! -L "${FILE}" ]]; then
+    if [[ ! -z "${alt_lib_instal_path_local}" && ! -L "${file}" ]]; then
         # FILE is not a symlink - put to the alt location, and create a symlink to it.
         cp -r "${file}" "${STAGE}/${alt_lib_dir}/"
         local -r file_name=$(basename "${file}")
-        ln -s "/${alt_lib_dir}/${file_name}" "${stage_lib}/${file_name}"
+        local -r install_root="${INSTALL_ROOT-}"
+        ln -s "${install_root}/${alt_lib_dir}/${file_name}" "${stage_lib}/${file_name}"
     else
         # FILE is a symlink, or the alt location is not defined - put to the regular location.
         cp -r "${file}" "${stage_lib}/"
@@ -327,7 +374,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         local file
         for file in "${BUILD_DIR}/lib/${lib}".so*; do
             if [[ "${file}" != *.debug ]]; then
-                echo "    Copying $(basename "${file}")"
+                echo "  Copying $(basename "${file}")"
                 distrib_copyLib "${file}"
             fi
         done
@@ -336,7 +383,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         local file
         for file in "${BUILD_DIR}/lib/${lib}".so*; do
             if [[ -f "${file}" ]]; then
-                echo "    Copying (optional) $(basename "${file}")"
+                echo "  Copying (optional) $(basename "${file}")"
                 distrib_copyLib "${file}"
             fi
         done
@@ -363,6 +410,9 @@ distrib_copyFfmpegLibs() # source_directory [distribution_libs_ffmpeg_subdirecto
         libavdevice.so.58
     )
 
+    echo ""
+    echo "Copying FFmpeg libs"
+
     if [[ ! -z "${ffmpeg_subdirectory}" ]]; then
         mkdir -p "${STAGE}/${LIB_INSTALL_PATH}/${ffmpeg_subdirectory}"
         # if ALT_LIB_INSTALL_PATH is not set, consider it to be an empty string.
@@ -375,7 +425,7 @@ distrib_copyFfmpegLibs() # source_directory [distribution_libs_ffmpeg_subdirecto
         local file
         for file in "${source_directory}/${lib}"*; do
             if [ -f "${file}" ]; then
-                echo "Copying $(basename "${file}")"
+                echo "  Copying $(basename "${file}")"
                 distrib_copyLib "${file}" "${ffmpeg_subdirectory}"
             fi
         done
@@ -440,17 +490,46 @@ distrib_copyQtPlugins() # additional_plugins_to_copy...
     done
 }
 
+# Copy libGL libraries
+#
+# [in] BUILD_DIR
+distrib_copyGlLibs()
+{
+    if [[ "${ARCH}" = "arm" ]]; then
+        return
+    fi
+
+    echo ""
+    echo "Copying LibGL stub"
+
+    local -a libs_to_copy=(
+        libGL.so.1
+    )
+
+    local lib
+    for lib in "${libs_to_copy[@]}"; do
+        local file="${BUILD_DIR}/lib/libgl_stub/${lib}"
+        echo "  Copying $(basename "${file}")"
+        distrib_copyLib "${file}"
+    done
+}
+
 # Copy server binaries and other files that must reside next to them to the distribution creation
 # directory.
 #
 # [in] STAGE
+# [in] INSTALL_ROOT
 # [in] BIN_INSTALL_PATH
+# [in] LIB_INSTALL_PATH
 # [in] BUILD_DIR
 # [in] CURRENT_BUILD_DIR
 # [in] ENABLE_ROOT_TOOL
 # [in] OPEN_SOURCE_DIR
-distrib_copyServerBins()
+# [in] SERVER_SCRIPTS_DIR
+distrib_copyServerBins() # additional_bins_to_copy...
 {
+    local -a additional_server_binaries=("$@")
+
     echo ""
     echo "Copying mediaserver binaries"
 
@@ -459,16 +538,35 @@ distrib_copyServerBins()
 
     install -m 755 "${BUILD_DIR}/bin/mediaserver" "${stage_bin}/"
     install -m 755 "${BUILD_DIR}/bin/external.dat" "${stage_bin}/" #< TODO: Why "+x" is needed?
+    for bin in "${additional_server_binaries[@]}"; do
+        install -m 755 "${bin}" "${stage_bin}/"
+    done
 
     echo "Copying translations"
     install -m 755 -d "${stage_bin}/translations"
     install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_common.dat" "${stage_bin}/translations/"
+    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_rules.dat" "${stage_bin}/translations/"
+    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_server.dat" "${stage_bin}/translations/"
+    install -m 644 "${BUILD_DIR}/bin/translations/nx_vms_server_db.dat" \
+        "${stage_bin}/translations/"
 
     # if ENABLE_ROOT_TOOL is not set, consider it to be "false".
     if [[ "${ENABLE_ROOT_TOOL-"false"}" == "true" ]]; then
         echo "Copying root-tool"
-        install -m 750 "${BUILD_DIR}/bin/root_tool" "${stage_bin}/"
-        install -m 640 "${CURRENT_BUILD_DIR}/system_commands.conf" "${stage_bin}/"
+        install -m 750 "${BUILD_DIR}/bin/root_tool" "${stage_bin}/root-tool"
+
+        # Use the flavor-specific system_commands.conf if it exists; otherwise use the standard
+        # one.
+        if [[ -f "${CURRENT_BUILD_DIR}/system_commands.conf" ]]; then
+            local -r system_commands_conf="${CURRENT_BUILD_DIR}/system_commands.conf"
+        else
+            local -r system_commands_conf="${BUILD_DIR}/bin/system_commands.conf"
+        fi
+        install -m 640 "${system_commands_conf}" "${stage_bin}/"
+
+        # Fix root-tool rpath.
+        local -r install_root="${INSTALL_ROOT-}"
+        chrpath --replace "${install_root}/${LIB_INSTALL_PATH}" "${stage_bin}/root-tool"
     fi
 
     echo "Copying nx_log_viewer.html"
@@ -476,6 +574,24 @@ distrib_copyServerBins()
 
     echo "Copying qt.conf"
     install -m 644 "${CURRENT_BUILD_DIR}/qt.conf" "${stage_bin}/"
+
+    # Copy the Server scripts if the variable SERVER_SCRIPTS_DIR is defined and not empty.
+    if [[ ! -z "${SERVER_SCRIPTS_DIR-}" ]]; then
+        echo "Copying Server scripts"
+        install -m 755 -d "${STAGE}/${SERVER_SCRIPTS_DIR}"
+        install -m 755 "${CURRENT_BUILD_DIR}/scripts"/* "${STAGE}/${SERVER_SCRIPTS_DIR}/"
+    fi
+}
+
+# [in] SERVER_PLUGINS
+# [in] SERVER_PLUGINS_OPTIONAL
+distrib_copyMediaserverPlugins()
+{
+    echo ""
+    echo "Copying Server plugins"
+
+    distrib_copyMediaserverPluginsToDir "plugins" "${SERVER_PLUGINS[@]}"
+    distrib_copyMediaserverPluginsToDir "plugins_optional" "${SERVER_PLUGINS_OPTIONAL[@]}"
 }
 
 distrib_createArchive() # archive dir command...
@@ -487,6 +603,50 @@ distrib_createArchive() # archive dir command...
     echo "  Creating ${archive}"
     ( cd "${dir}" && "$@" "${archive}" * ) #< Subshell prevents "cd" from changing the current dir.
     echo "  Done"
+}
+
+# [in] WORK_DIR
+# [in] DISTRIBUTION_OUTPUT_DIR
+# [in] DISTRIBUTION_TAR_GZ
+# [in] CURRENT_BUILD_DIR
+# [in] DISTRIBUTION_UPDATE_ZIP
+distrib_createUpdateZip() # file.tar.gz
+{
+    local -r tar_gz_file="$1" && shift
+
+    echo ""
+    echo "Creating \"update\" .zip"
+
+    local -r zip_dir="${WORK_DIR}/zip"
+    mkdir -p "${zip_dir}"
+
+    ln -s "${tar_gz_file}" "${zip_dir}/"
+    install -m 644 "${CURRENT_BUILD_DIR}/update.json" "${zip_dir}/"
+    install -m 644 "${CURRENT_BUILD_DIR}/package.json" "${zip_dir}/"
+    install -m 755 "${CURRENT_BUILD_DIR}/install.sh" "${zip_dir}/"
+
+    distrib_createArchive "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}" "${zip_dir}" \
+        zip `# Never compress .tar.gz file #` -0
+}
+
+# TODO: Check, if we really need this function - may be it would be better to use "install" instead
+# of cp everywhere so there will be no need to setting permissions in the separate function.
+#
+# [in] STAGE
+# [in] BIN_INSTALL_PATH
+# [in] SERVER_SCRIPTS_DIR
+distrib_setPermissionsInStageDir()
+{
+    echo ""
+    echo "Setting permissions"
+
+    find "${STAGE}" -type d -print0 | xargs -0 chmod 755
+    find "${STAGE}" -type f -print0 | xargs -0 chmod 644
+    chmod -R 755 "${STAGE}/${BIN_INSTALL_PATH}"
+
+    if [[ "${SERVER_SCRIPTS_DIR-}" ]]; then
+        chmod 755 "${STAGE}/${SERVER_SCRIPTS_DIR}"/*
+    fi
 }
 
 # Prepare to build the distribution archives/packages.
