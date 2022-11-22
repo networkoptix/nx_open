@@ -91,6 +91,7 @@ protected:
     virtual void adjustMetaData(QnAviArchiveMetadata& metaData) const = 0;
     virtual std::vector<uint8_t> prepareEncryptor(quint64 /*nonce*/) { return std::vector<uint8_t>(); }
     virtual QnConstAbstractMediaDataPtr encryptDataIfNeed(const QnConstAbstractMediaDataPtr& data);
+    virtual void setLastError(nx::recording::Error::Code code) = 0;
 
 private:
     qint64 findNextIFrame(qint64 baseTime);
