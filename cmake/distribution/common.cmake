@@ -4,6 +4,8 @@ include_guard(GLOBAL)
 
 include(CMakeParseArguments)
 
+include(utils)
+
 set(nx_vms_distribution_dir "${open_source_root}/vms/distribution")
 set(vms_distribution_common_dir ${nx_vms_distribution_dir}/common)
 
@@ -75,4 +77,23 @@ function(nx_create_distribution_package)
     nx_add_targets_to_strengthened(${DISTRIBUTION_OUTPUT_FILE})
     add_custom_target("generate_${DISTRIBUTION_PACKAGE_TARGET}_package" ALL
         DEPENDS ${DISTRIBUTION_OUTPUT_FILE})
+endfunction()
+
+function(nx_prepare_build_distribution_conf)
+    file(COPY_FILE
+        "${open_source_root}/vms/distribution/build_distribution_common.conf.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf.in"
+    )
+
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in" SPECIFIC_CONF_CONTENTS)
+    file(APPEND
+        "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf.in"
+        "${SPECIFIC_CONF_CONTENTS}"
+    )
+
+    nx_configure_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf"
+        @ONLY
+    )
 endfunction()
