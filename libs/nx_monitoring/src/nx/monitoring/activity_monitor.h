@@ -82,7 +82,8 @@ public:
             Item{OpticalDiskPartition, "optical"},
             Item{SwapPartition, "swap"},
             Item{NetworkPartition, "network"},
-            Item{RemovableDiskPartition, "usb"},
+            Item{RemovableDiskPartition, "removable"},
+            Item{RemovableDiskPartition, "usb"}, //< Deprecated.
             Item{UnknownPartition, "unknown"});
     }
 
