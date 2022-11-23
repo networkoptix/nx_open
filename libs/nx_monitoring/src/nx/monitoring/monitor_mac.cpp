@@ -726,11 +726,16 @@ QList<ActivityMonitor::PartitionSpace> MacMonitor::totalPartitionSpaceInfo()
     {
         ActivityMonitor::PartitionSpace partition;
 
+        if (fs.f_flags & MNT_DONTBROWSE || fs.f_owner != 0)
+            continue;
+
         partition.devName = QLatin1String(fs.f_mntfromname);
         partition.path = QLatin1String(fs.f_mntonname);
         partition.freeBytes = fs.f_bavail * fs.f_bsize;
         partition.sizeBytes = fs.f_blocks * fs.f_bsize;
-        partition.type = getPartitionTypeByFsType(fs.f_fstypename);
+        partition.type = (fs.f_flags & MNT_REMOVABLE)
+            ? RemovableDiskPartition
+            : getPartitionTypeByFsType(fs.f_fstypename);
 
         foundPartitions << partition;
     }
