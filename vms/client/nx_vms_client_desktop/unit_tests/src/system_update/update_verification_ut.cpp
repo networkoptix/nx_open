@@ -241,7 +241,7 @@ TEST_F(UpdateVerificationTest, testFailedUpdateChechk)
     using VersionReport = MultiServerUpdatesWidget::VersionReport;
     UpdateContents contents;
     contents.sourceType = UpdateSourceType::internetSpecific;
-    contents.changeset = "29681";
+    contents.info.version = Version("4.0.0.29681");
     auto clientData = makeClientData(Version("4.0.0.29679"));
 
     // "Unable to check updates on the Internet"

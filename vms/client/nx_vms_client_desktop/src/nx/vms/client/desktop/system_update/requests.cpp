@@ -51,10 +51,7 @@ UpdateContents getUpdateContents(
     {
         const bool certainVersionRequested = std::holds_alternative<CertainVersionParams>(params);
         if (certainVersionRequested)
-        {
             contents.sourceType = UpdateSourceType::internetSpecific;
-            contents.changeset = std::get<CertainVersionParams>(params).version.toString();
-        }
 
         const PublicationInfoResult result = getPublicationInfo(
             url, *params.toPublicationInfoParams());

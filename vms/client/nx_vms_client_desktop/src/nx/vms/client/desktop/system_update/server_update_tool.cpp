@@ -62,33 +62,6 @@ QDir findFolderForFile(QDir root, QString file)
     return root;
 }
 
-QJsonArray componentsListToJson(
-    const nx::utils::OsInfo& clientOsInfo, const QSet<nx::utils::OsInfo>& serverInfoSet)
-{
-    const auto makeItem =
-        [](const QString& component, const nx::utils::OsInfo& info)
-        {
-            QJsonObject obj = info.toJson();
-            obj[QStringLiteral("component")] = component;
-            return obj;
-        };
-
-    QJsonArray result;
-    result.append(makeItem(QStringLiteral("client"), clientOsInfo));
-    for (const auto& info: serverInfoSet)
-        result.append(makeItem(QStringLiteral("server"), info));
-
-    return result;
-}
-
-QString compactPackagesQuery(const QJsonArray& packagesQuery)
-{
-    const QByteArray& json = QJsonDocument(packagesQuery).toJson(QJsonDocument::Compact);
-    QByteArray compressed = qCompress(json);
-    compressed.remove(0, 4); //< We don't need 4 bytes which are added by Qt in the beginning.
-    return QString::fromLatin1(compressed.toBase64());
-}
-
 static const QString kPackageIndexFile = "packages.json";
 static constexpr auto kReadBufferSizeBytes = 1024 * 1024;
 
@@ -1493,81 +1466,6 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
                 contents.sourceType = UpdateSourceType::internetSpecific;
             return contents;
         });
-}
-
-nx::utils::SoftwareVersion getCurrentVersion(
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    QnResourcePool* resourcePool)
-{
-    nx::utils::SoftwareVersion minimalVersion = engineVersion;
-    const auto allServers = resourcePool->servers();
-    for (const QnMediaServerResourcePtr& server: allServers)
-    {
-        if (server->getVersion() < minimalVersion)
-            minimalVersion = server->getVersion();
-    }
-    return minimalVersion;
-}
-
-QUrl generateUpdatePackageUrl(
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const UpdateContents& contents,
-    const QSet<QnUuid>& targets,
-    QnResourcePool* resourcePool)
-{
-    const bool useLatest = contents.sourceType == UpdateSourceType::internet;
-    auto changeset = contents.changeset;
-    const api::SoftwareVersion targetVersion = useLatest
-        ? api::SoftwareVersion()
-        : contents.info.version;
-
-    QUrlQuery query;
-    // Query with 'version=latest' can have no password
-    // Query with 'version=29646' should have a password
-
-    if (changeset == "latest" && targetVersion.isNull())
-    {
-        // We are here if we have failed to check update in the internet.
-        // Changeset will contain requested build number in this case, or 'latest'.
-        query.addQueryItem("version", changeset);
-        query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
-    }
-    else
-    {
-        const QString key = contents.info.version.isNull()
-            ? changeset : QString::number(targetVersion.build());
-        const QString password = nx::vms::common::update::passwordForBuild(key);
-        // Changeset will contain either full version like "4.0.0.28340",
-        // or only build number like "28340".
-        query.addQueryItem("version", key);
-        query.addQueryItem("password", password);
-    }
-
-    query.addQueryItem("customization", nx::branding::customization());
-
-    QSet<nx::utils::OsInfo> osInfoList;
-    for (const auto& id: targets)
-    {
-        const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
-        if (!server)
-            continue;
-
-        if (!server->getOsInfo().isValid())
-            continue;
-
-        if (!targetVersion.isNull() && server->getVersion() == targetVersion)
-            continue;
-
-        osInfoList.insert(server->getOsInfo());
-    }
-
-    query.addQueryItem("components",
-        compactPackagesQuery(componentsListToJson(nx::utils::OsInfo::current(), osInfoList)));
-
-    QUrl url(common::update::updateGeneratorUrl());
-    url.setQuery(query);
-
-    return url;
 }
 
 } // namespace nx::vms::client::desktop

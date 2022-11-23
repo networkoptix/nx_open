@@ -133,6 +133,26 @@ void toDebugString(QStringList& lines, const QString& caption, const QSet<QnUuid
     }
 }
 
+QString getComponentQuery(const QSet<nx::utils::OsInfo>& serverInfoSet)
+{
+    const auto makeItem =
+        [](const QString& component, const nx::utils::OsInfo& info)
+        {
+            QJsonObject obj = info.toJson();
+            obj["component"] = component;
+            return obj;
+        };
+
+    QJsonArray json{makeItem("client", nx::utils::OsInfo::current())};
+    for (const auto& info: serverInfoSet)
+        json.append(makeItem("server", info));
+
+    const QByteArray& data = QJsonDocument(json).toJson(QJsonDocument::Compact);
+    QByteArray compressed = qCompress(data);
+    compressed.remove(0, 4); //< We don't need 4 bytes which are added by Qt in the beginning.
+    return QString::fromLatin1(compressed.toBase64());
+}
+
 } // anonymous namespace
 
 namespace nx::vms::client::desktop
@@ -482,25 +502,13 @@ void MultiServerUpdatesWidget::initDownloadActions()
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {
-            QSet<QnUuid> targets = m_stateTracker->allPeers();
-            auto url = generateUpdatePackageUrl(
-                commonModule()->engineVersion(),
-                m_updateInfo, targets,
-                resourcePool()).toString();
-
-            QDesktopServices::openUrl(url);
+            QDesktopServices::openUrl(generateUpcombinerUrl());
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
         [this]()
         {
-            QSet<QnUuid> targets = m_stateTracker->allPeers();
-            auto url = generateUpdatePackageUrl(
-                commonModule()->engineVersion(),
-                m_updateInfo,
-                targets,
-                resourcePool()).toString();
-            qApp->clipboard()->setText(url);
+            qApp->clipboard()->setText(generateUpcombinerUrl().toString());
 
             ui->linkCopiedWidget->show();
             fadeWidget(ui->linkCopiedWidget, 1.0, 0.0, kLinkCopiedMessageTimeoutMs, 1.0,
@@ -675,8 +683,6 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
 
     if (report.versionMode == VersionReport::VersionMode::empty)
         report.version = kNoVersionNumberText;
-    else if (contents.info.version.isNull())
-        report.version = contents.changeset;
     else
         report.version = contents.info.version.toString();
 
@@ -771,6 +777,74 @@ void MultiServerUpdatesWidget::updateAlertBlock()
 
     ui->alertBlock->setAlerts(messages);
     ui->alertBlock->setVisible(!messages.isEmpty());
+}
+
+QUrl MultiServerUpdatesWidget::generateUpcombinerUrl() const
+{
+    const common::update::PersistentUpdateStorage updateStorage =
+        commonModule()->globalSettings()->targetPersistentUpdateStorage();
+
+    const bool useLatest = m_updateInfo.sourceType == UpdateSourceType::internet;
+    const api::SoftwareVersion targetVersion = useLatest
+        ? api::SoftwareVersion()
+        : m_updateInfo.info.version;
+
+    QUrlQuery query;
+
+    if (targetVersion.isNull())
+    {
+        // We are here if we have failed to check update in the Internet.
+        // Changeset will contain requested build number in this case, or 'latest'.
+        query.addQueryItem("version", "latest");
+        query.addQueryItem("current", getMinimumComponentVersion().toString());
+    }
+    else
+    {
+        query.addQueryItem("version", m_updateInfo.info.version.toString());
+        query.addQueryItem("password",
+            common::update::passwordForBuild(QString::number(m_updateInfo.info.version.build())));
+    }
+
+    query.addQueryItem("customization", nx::branding::customization());
+
+    QSet<nx::utils::OsInfo> osInfoList;
+    for (const auto& id: m_stateTracker->allPeers())
+    {
+        const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(id);
+        if (!server)
+            continue;
+
+        if (!server->getOsInfo().isValid())
+            continue;
+
+        if (!targetVersion.isNull() && server->getVersion() == targetVersion)
+            continue;
+
+        osInfoList.insert(server->getOsInfo());
+    }
+
+    const bool includeAllClientPackages =
+        updateStorage.autoSelection || !updateStorage.servers.isEmpty();
+
+    query.addQueryItem("allClients", includeAllClientPackages ? "true" : "false");
+    query.addQueryItem("components", getComponentQuery(osInfoList));
+
+    QUrl url(common::update::updateGeneratorUrl());
+    url.setQuery(query);
+
+    return url;
+}
+
+nx::utils::SoftwareVersion MultiServerUpdatesWidget::getMinimumComponentVersion() const
+{
+    nx::utils::SoftwareVersion minVersion = commonModule()->engineVersion();
+    const auto allServers = resourcePool()->servers();
+    for (const QnMediaServerResourcePtr& server: allServers)
+    {
+        if (server->getVersion() < minVersion)
+            minVersion = server->getVersion();
+    }
+    return minVersion;
 }
 
 void MultiServerUpdatesWidget::atUpdateCurrentState()
