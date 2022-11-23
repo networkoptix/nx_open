@@ -1270,6 +1270,17 @@ QnUuid QnSecurityCamResource::audioOutputDeviceId() const
     return QnUuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioOutputDeviceId));
 }
 
+QnSecurityCamResourcePtr QnSecurityCamResource::audioOutputDevice() const
+{
+    const auto redirectedOutputCamera =
+        resourcePool()->getResourceById<QnSecurityCamResource>(audioOutputDeviceId());
+
+    if (redirectedOutputCamera)
+        return redirectedOutputCamera;
+
+    return toSharedPointer(this);
+}
+
 void QnSecurityCamResource::setAudioOutputDeviceId(const QnUuid& deviceId)
 {
     if (!NX_ASSERT(deviceId != getId(), "Only another device may act as audio output override"))

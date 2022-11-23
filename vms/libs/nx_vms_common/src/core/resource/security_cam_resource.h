@@ -305,6 +305,11 @@ public:
      */
     void setAudioOutputDeviceId(const QnUuid& deviceId);
 
+    /**
+     * @return Redirected audio output (if any) or self.
+     */
+    QnSecurityCamResourcePtr audioOutputDevice() const;
+
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
