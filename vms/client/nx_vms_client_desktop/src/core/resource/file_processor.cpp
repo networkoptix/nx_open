@@ -22,6 +22,12 @@ QString fixSeparators(const QString& filePath)
     return QDir::fromNativeSeparators(filePath);
 }
 
+void fixSeparators(QStringList& filePaths)
+{
+    std::transform(filePaths.cbegin(), filePaths.cend(), filePaths.begin(),
+        [](const QString& path) { return fixSeparators(path); });
+}
+
 QnResourcePtr resourceFromFile(
     const QString& filename,
     const QPointer<QnResourcePool>& resourcePool)
@@ -96,23 +102,36 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(
     const QString& fileName,
     QnResourcePool* resourcePool)
 {
-    const auto result = resourceFromFile(fileName, resourcePool);
-    if (result)
-        resourcePool->addResource(result);
-    return result;
+    if (!NX_ASSERT(resourcePool))
+        return {};
+
+    const auto result = createResourcesForFiles({fileName}, resourcePool);
+    return result.isEmpty() ? QnResourcePtr() : result.first();
 }
 
 QnResourceList QnFileProcessor::createResourcesForFiles(
-    const QStringList& files,
+    QStringList files,
     QnResourcePool* resourcePool)
 {
+    if (!NX_ASSERT(resourcePool))
+        return {};
+
+    fixSeparators(files);
+
     QnResourceList result;
-    for (const auto& fileName: files)
+
+    for (const auto& path: files)
     {
-        QnResourcePtr resource = resourceFromFile(fileName, resourcePool);
-        if (resource)
-            result << resource;
+        if (!QFileInfo::exists(path))
+            continue;
+
+        if (auto existingResource = resourcePool->getResourceByUrl(path))
+            resourcePool->removeResource(existingResource);
+
+        if (auto newResource = ResourceDirectoryBrowser::createArchiveResource(path, resourcePool))
+            result << newResource;
     }
+
     resourcePool->addResources(result);
 
     return result;
