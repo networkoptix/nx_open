@@ -27,7 +27,7 @@ public:
         const QString& fileName,
         QnResourcePool* resourcePool);
     static QnResourceList createResourcesForFiles(
-        const QStringList& files,
+        QStringList files,
         QnResourcePool* resourcePool);
 
     /**
