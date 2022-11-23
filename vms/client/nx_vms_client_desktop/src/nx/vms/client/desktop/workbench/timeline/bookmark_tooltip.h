@@ -21,6 +21,7 @@ public:
         const QnCameraBookmarkList& bookmarks,
         bool readOnly,
         QWidget* parent = nullptr);
+    void setAllowExport(bool allowExport);
 
 signals:
     void playClicked(const QnCameraBookmark& bookmark);
@@ -44,6 +45,7 @@ private:
 
 private:
     bool m_readOnly = false;
+    QPushButton* m_exportButton = nullptr;
 };
 
 } // namespace nx::vms::client::desktop::workbench::timeline

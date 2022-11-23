@@ -126,6 +126,11 @@ BookmarkTooltip::BookmarkTooltip(
     setLayout(layout);
 }
 
+void BookmarkTooltip::setAllowExport(bool allowExport)
+{
+    m_exportButton->setVisible(allowExport);
+}
+
 void BookmarkTooltip::colorizeBorderShape(const QPainterPath& borderShape)
 {
     QPainter(this).fillPath(borderShape, QBrush(ColorTheme::transparent(
@@ -269,14 +274,14 @@ QLayout* BookmarkTooltip::createButtonsLayout(const QnCameraBookmark& bookmark)
         buttonLayout->addWidget(editButton);
     }
 
-    auto exportButton = createButton("bookmark/tooltip/export.png", tr("Export bookmark"));
-    exportButton->setObjectName("BookmarkTooltipExportButton");
-    connect(exportButton, &QPushButton::clicked, this,
+    m_exportButton = createButton("bookmark/tooltip/export.png", tr("Export bookmark"));
+    m_exportButton->setObjectName("BookmarkTooltipExportButton");
+    connect(m_exportButton, &QPushButton::clicked, this,
         [this, bookmark]
         {
             emit exportClicked(bookmark);
         });
-    buttonLayout->addWidget(exportButton);
+    buttonLayout->addWidget(m_exportButton);
     buttonLayout->addStretch();
 
     if (!m_readOnly)
