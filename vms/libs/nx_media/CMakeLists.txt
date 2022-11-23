@@ -1,5 +1,13 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+# Isolate C/CXX compile options specified on the top level via `add_compile_options` from CUDA
+# compile options. CUDA compiler tries to process unknown warning/error options itself and fails.
+get_directory_property(compile_options COMPILE_OPTIONS)
+list(JOIN compile_options " " compile_options)
+string(APPEND CMAKE_C_FLAGS " ${compile_options}")
+string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
+set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
+
 set(additional_sources)
 set(additional_sources_include_dirs)
 set(additional_libraries)
