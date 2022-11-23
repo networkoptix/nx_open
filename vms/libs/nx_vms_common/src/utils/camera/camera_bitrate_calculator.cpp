@@ -28,7 +28,7 @@ constexpr float bitrateCoefficient(Qn::StreamQuality quality)
     switch (quality)
     {
         case Qn::StreamQuality::lowest:
-            return 0.66f;
+            return 0.33f;
         case Qn::StreamQuality::low:
             return 0.8f;
         case Qn::StreamQuality::normal:
