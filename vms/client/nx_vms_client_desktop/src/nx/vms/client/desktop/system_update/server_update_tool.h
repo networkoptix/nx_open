@@ -370,16 +370,4 @@ private:
     QnUuid m_systemId;
 };
 
-/**
- * Generates URL for upcombiner.
- * Upcombiner is special server utility, that combines several update packages
- * to a single zip archive.
- */
-QUrl generateUpdatePackageUrl(
-    const nx::vms::api::SoftwareVersion& engineVersion,
-    const UpdateContents& contents,
-    const QSet<QnUuid>& targets,
-    bool includeAllClientPackages,
-    QnResourcePool* resourcePool);
-
 } // namespace nx::vms::client::desktop

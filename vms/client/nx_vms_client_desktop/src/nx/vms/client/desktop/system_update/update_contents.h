@@ -54,7 +54,6 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
 {
     UpdateSourceType sourceType = UpdateSourceType::internet;
     QString source;
-    QString changeset;
 
     /** A set of servers without proper update file. */
     QSet<QnUuid> missingUpdate;
