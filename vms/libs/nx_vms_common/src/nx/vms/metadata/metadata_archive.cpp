@@ -4,52 +4,51 @@
 
 #include <QtCore/QDir>
 
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/std/algorithm.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+#include <utils/media/sse_helper.h>
 
 #include "metadata_helper.h"
-#include <utils/media/sse_helper.h>
-#include <utils/math/math.h>
 
 namespace nx::vms::metadata {
 
-static const char kVersion = 2;
-static const int kRecordsPerIteration = 1024;
+static const char kVersion = 3;
+static const int kReadBufferSize = 1024 * 256;
 static const int kAlignment = 16;
 static const int kIndexRecordSize = sizeof(IndexRecord);
 static const int kMetadataIndexHeaderSize = sizeof(IndexHeader);
+
+inline bool checkPeriod(const Filter* filter, qint64 startTimeMs, qint32 durationMs)
+{
+    return startTimeMs <= filter->endTime.count()
+        && startTimeMs + durationMs >= filter->startTime.count();
+}
 
 Index::Index(MetadataArchive* owner): m_owner(owner)
 {
     reset();
 }
 
-qint64 Index::dataFileSize() const
-{
-    return dataSize(0, records.size());
-}
-
-qint64 Index::dataOffset(int recordNumber) const
-{
-    return dataSize(0, recordNumber);
-}
-
-qint64 Index::dataSize(int from, int size) const
-{
-    qint64 words = 0;
-    for (int i = from; i < from + size; ++i)
-        words += records[i].extraWords();
-    return header.baseRecordSize * size + words * header.wordSize;
-}
-
-qint64 Index::dataSize(const QVector<IndexRecord>::const_iterator& itr) const
-{
-    return header.baseRecordSize + itr->extraWords() * header.wordSize;
-}
-
 qint64 Index::indexFileSize() const
 {
     return records.size() * kIndexRecordSize + kMetadataIndexHeaderSize;
+}
+
+qint64 Index::dataOffset(int recordNumber, bool noGeometryMode) const
+{
+    return dataSize(0, recordNumber, noGeometryMode);
+}
+
+qint64 Index::dataSize(int from, int size, bool noGeometryMode) const
+{
+    qint64 counter = 0;
+    for (int i = from; i < from + size; ++i)
+        counter += records[i].recordCount();
+    const int recordSize = noGeometryMode ? header.noGeometryRecordSize() : header.recordSize;
+    return recordSize * counter;
 }
 
 void Index::reset()
@@ -58,25 +57,28 @@ void Index::reset()
     header = IndexHeader();
 
     header.version = kVersion;
-    header.baseRecordSize = m_owner->baseRecordSize();
-    header.wordSize = m_owner->wordSize();
+    header.recordSize = m_owner->baseRecordSize();
     header.intervalMs = m_owner->aggregationIntervalSeconds() * 1000;
+
+    memset(header.dummy, 0, sizeof(header.dummy));
 }
 
-void Index::truncate(qint64 dataFileSize)
+int64_t Index::truncateTo(qint64 mediaRecords)
 {
-    qint64 indexSize = 0;
-    for (auto i = records.begin(); i < records.end(); ++i)
+    int64_t counter = 0;
+    for (int i = 0; i < records.size(); ++i)
     {
-        indexSize += dataSize(i);
-        if (indexSize > dataFileSize)
+        const int mediaRecord = records[i].recordCount();
+        if (counter + mediaRecord > mediaRecords)
         {
-                NX_VERBOSE(this, "Metadata index is truncated from %1 to %2 records",
-                    records.size(), std::distance(records.begin(), i));
-            records.erase(i, records.end());
+            NX_VERBOSE(this, "Metadata index is truncated from %1 to %2 records",
+                records.size(), i);
+            records.erase(records.begin() + i, records.end());
             break;
         }
+        counter += mediaRecord;
     }
+    return counter;
 }
 
 bool Index::load(const QDateTime& time)
@@ -87,7 +89,7 @@ bool Index::load(const QDateTime& time)
 bool Index::load(qint64 timestampMs)
 {
     QFile indexFile;
-    m_owner->fillFileNames(timestampMs, 0, &indexFile);
+    m_owner->fillFileNames(timestampMs, &indexFile);
     if (!indexFile.open(QFile::ReadOnly))
         return false;
     return load(indexFile);
@@ -107,8 +109,7 @@ bool Index::load(QFile& indexFile)
     if (header.version < 2)
     {
         // For version < 2 these fields are empty.
-        header.baseRecordSize = m_owner->baseRecordSize();
-        header.wordSize = m_owner->wordSize();
+        header.recordSize = m_owner->baseRecordSize();
     }
 
     records.resize((indexFile.size() - kMetadataIndexHeaderSize) / kIndexRecordSize);
@@ -131,50 +132,23 @@ MetadataArchive::MetadataArchive(
     int channel)
     :
     m_filePrefix(filePrefix),
-    m_baseRecordSize(baseRecordSize),
-    m_wordSize(wordSize),
+    m_recordSize(baseRecordSize),
     m_aggregationIntervalSeconds(aggregationIntervalSeconds),
     m_index(this),
     m_dataDir(dataDir),
     m_physicalId(physicalId),
     m_channel(channel)
 {
-    loadRecordedRange();
 }
 
 int MetadataArchive::baseRecordSize() const
 {
-    return m_baseRecordSize;
-}
-
-int MetadataArchive::wordSize() const
-{
-    return m_wordSize;
+    return m_recordSize;
 }
 
 int MetadataArchive::aggregationIntervalSeconds() const
 {
     return m_aggregationIntervalSeconds;
-}
-
-void MetadataArchive::loadRecordedRange()
-{
-    m_minMetadataTime = AV_NOPTS_VALUE;
-    m_maxMetadataTime = AV_NOPTS_VALUE;
-    m_lastRecordedTime = AV_NOPTS_VALUE;
-    MetadataHelper helper(m_dataDir);
-    QList<QDate> existsRecords = helper.recordedMonth(m_physicalId);
-    if (existsRecords.isEmpty())
-        return;
-
-    Index index(this);
-    index.load(existsRecords.first().startOfDay());
-    if (!index.records.isEmpty())
-        m_minMetadataTime = index.records.first().start + index.header.startTimeMs;
-    if (existsRecords.size() > 1)
-        index.load(existsRecords.last().startOfDay());
-    if (!index.records.isEmpty())
-        m_lastRecordedTime = m_maxMetadataTime = index.records.last().start + index.header.startTimeMs;
 }
 
 QString MetadataArchive::getFilePrefix(const QDate& datetime) const
@@ -188,14 +162,20 @@ QString MetadataArchive::getChannelPrefix() const
     return m_channel == 0 ? QString() : QString::number(m_channel);
 }
 
-void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, QFile* indexFile) const
+void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* indexFile) const
+{
+    fillFileNames(datetimeMs, nullptr, false, indexFile);
+}
+
+void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, bool noGeometry, QFile* indexFile) const
 {
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QString fileName = getFilePrefix(datetime.date());
     if (metadataFile)
     {
         metadataFile->close();
-        metadataFile->setFileName(fileName + QString("%1_detailed_data").arg(m_filePrefix) + getChannelPrefix() + ".bin");
+        const QString fileType = noGeometry ? "nogeometry" : "detailed";
+        metadataFile->setFileName(fileName + QString("%1_%2_data").arg(m_filePrefix).arg(fileType) + getChannelPrefix() + ".bin");
     }
     if (indexFile)
     {
@@ -213,11 +193,10 @@ bool resizeFile(QFile* file, qint64 size)
 
 bool MetadataArchive::openFiles(qint64 timestampMs)
 {
-    m_middleRecordNum = -1;
     m_index.reset();
     dateBounds(timestampMs, m_firstTime, m_lastDateForCurrentFile);
 
-    fillFileNames(timestampMs, &m_detailedMetadataFile, &m_detailedIndexFile);
+    fillFileNames(timestampMs, &m_detailedMetadataFile, /*noGeometry*/ false, &m_detailedIndexFile);
 
     auto dirName = getFilePrefix(QDateTime::fromMSecsSinceEpoch(timestampMs).date());
     QDir dir;
@@ -239,24 +218,61 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         m_index.load(m_detailedIndexFile);
         m_firstTime = m_index.header.startTimeMs;
         if (m_index.records.size() > 0)
-            m_lastRecordedTime = m_maxMetadataTime = m_index.records.last().start + m_index.header.startTimeMs;
+            m_lastRecordedTime = m_index.records.last().start + m_index.header.startTimeMs;
+    }
+
+    if (m_index.header.noGeometryModeSupported() && m_index.header.noGeometryRecordSize() > 0)
+    {
+        auto name = m_detailedMetadataFile.fileName();
+        name = name.replace("detailed", "nogeometry");
+        m_noGeometryMetadataFile = std::make_unique<QFile>(name);
+        m_noGeometryMetadataFile->open(QFile::ReadWrite);
     }
 
     // Truncate biggest file. So, it is error checking.
-    m_index.truncate(m_detailedMetadataFile.size());
+    int availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
+    if (m_noGeometryMetadataFile)
+    {
+        availableMediaRecords = std::min(availableMediaRecords, 
+            (int) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
+    }
+    int mediaRecords = m_index.truncateTo(availableMediaRecords);
     if (!resizeFile(&m_detailedIndexFile, m_index.indexFileSize()))
+    {
+        NX_WARNING(this, "Failed to resize file %1 to size %2", 
+            m_detailedIndexFile.fileName(), m_index.indexFileSize());
         return false;
-    if (!resizeFile(&m_detailedMetadataFile, m_index.dataFileSize()))
+    }
+
+    if (!resizeFile(&m_detailedMetadataFile, mediaRecords * m_index.header.recordSize))
+    {
+        NX_WARNING(this, "Failed to resize file %1 to size %2",
+            m_detailedMetadataFile.fileName(), mediaRecords * m_index.header.recordSize);
         return false;
+    }
+    if (m_noGeometryMetadataFile)
+    {
+        const int recordSize = m_index.header.noGeometryRecordSize();
+        if (!resizeFile(m_noGeometryMetadataFile.get(), mediaRecords * recordSize))
+        {
+            NX_WARNING(this, "Failed to resize file %1 to size %2",
+                m_noGeometryMetadataFile->fileName(), mediaRecords * recordSize);
+            return false;
+        }
+        m_noGeometryMetadataFile->seek(m_noGeometryMetadataFile->size());
+    }
 
     m_detailedMetadataFile.seek(m_detailedMetadataFile.size());
     m_detailedIndexFile.seek(m_detailedIndexFile.size());
+
     return true;
 }
 
 bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data)
 {
     NX_MUTEX_LOCKER lock(&m_writeMutex);
+
+    const int recordCount = data->dataSize() / m_index.header.recordSize;
 
     const qint64 timestamp = data->timestamp / 1000;
     if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)
@@ -268,19 +284,15 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
 
     if (timestamp < m_lastRecordedTime)
     {
-        // go to the file middle
-        m_middleRecordNum = getSizeForTime(timestamp, true);
-        m_detailedIndexFile.seek(m_middleRecordNum*kIndexRecordSize + kMetadataIndexHeaderSize);
-        m_detailedMetadataFile.seek(m_index.dataOffset(m_middleRecordNum));
-        m_minMetadataTime = qMin(m_minMetadataTime.load(), timestamp);
-    }
-    else if (m_middleRecordNum >= 0 && m_middleRecordNum < m_index.records.size())
-    {
-        qint64 timeInIndex = m_index.records[m_middleRecordNum].start + m_index.header.startTimeMs;
-        if (timestamp > timeInIndex) {
-            m_middleRecordNum = getSizeForTime(timestamp, false);
-            m_detailedIndexFile.seek(m_middleRecordNum*kIndexRecordSize + kMetadataIndexHeaderSize);
-            m_detailedMetadataFile.seek(m_index.dataOffset(m_middleRecordNum));
+        NX_WARNING(this, 
+            "Timestamp discontinuity %1 detected for metadata binary index, "
+            "previous time=%2, camera=%3", timestamp, m_lastRecordedTime, m_physicalId);
+        if (!(m_index.header.flags & IndexHeader::Flags::hasDiscontinue))
+        {
+            m_index.header.flags |= IndexHeader::Flags::hasDiscontinue;
+            m_detailedIndexFile.seek(0);
+            m_detailedIndexFile.write((const char*)&m_index.header, sizeof(IndexHeader));
+            m_detailedIndexFile.seek(m_detailedIndexFile.size());
         }
     }
 
@@ -290,23 +302,26 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
      */
     quint32 relTime = quint32(qMax(0LL, timestamp - m_firstTime));
     quint32 duration = std::max(kMinimalDurationMs, quint32(data->m_duration / 1000));
-    const int extraRecordSize = data->dataSize() - m_index.header.baseRecordSize;
-    quint32 extraWords = 0;
-    if (extraRecordSize > 0)
+    NX_ASSERT(data->dataSize() % m_index.header.recordSize == 0);
+
+    if (m_noGeometryMetadataFile)
     {
-        if (!NX_ASSERT(extraWords <= 255))
-            return false;
-        if (!NX_ASSERT(extraRecordSize % m_index.header.wordSize))
-            return false;
-        extraWords = extraRecordSize / m_index.header.wordSize;
+        const char* dataEx = data->data() + kGeometrySize;
+        const int recordExSize = m_index.header.recordSize - kGeometrySize;
+        for (int i = 0; i < recordCount; ++i)
+        {
+            if (m_noGeometryMetadataFile->write(dataEx, recordExSize) != recordExSize)
+                NX_WARNING(this, "Failed to write nogeometry file for camera %1", m_physicalId);
+            dataEx += m_index.header.recordSize;
+        }
     }
 
     if (m_detailedIndexFile.write((const char*)&relTime, 4) != 4)
     {
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
-    quint32 durationAndWords = (duration & 0xffffff) + (extraWords << 24);
-    if (m_detailedIndexFile.write((const char*)&durationAndWords, 4) != 4)
+    quint32 durationAndRecordCount = (duration & 0xffffff) + ((recordCount-1) << 24);
+    if (m_detailedIndexFile.write((const char*)&durationAndRecordCount, 4) != 4)
     {
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
@@ -317,14 +332,12 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
 
-    m_detailedIndexFile.flush();
     m_detailedMetadataFile.flush();
+    if (m_noGeometryMetadataFile)
+        m_noGeometryMetadataFile->flush();
+    m_detailedIndexFile.flush();
 
     m_lastRecordedTime = timestamp;
-    m_maxMetadataTime = qMax(m_maxMetadataTime.load(), timestamp);
-    if (m_minMetadataTime == (qint64)AV_NOPTS_VALUE)
-        m_minMetadataTime = m_maxMetadataTime.load();
-    m_middleRecordNum++;
     return true;
 }
 
@@ -338,16 +351,117 @@ void MetadataArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& max
     maxDate = nextMonth.toMSecsSinceEpoch() - 1;
 }
 
-int MetadataArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
+bool addToResultAsc(
+    const Filter* filter,
+    qint64 fullStartTimeMs,
+    qint32 durationMs,
+    QnTimePeriodList& rez)
 {
-    if (reloadIndex)
-        m_index.load(m_detailedIndexFile);
-    auto indexIterator = std::lower_bound(
-        m_index.records.begin(), m_index.records.end(), timeMs - m_index.header.startTimeMs);
-    return indexIterator - m_index.records.begin();
+    if (rez.empty())
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+        return true;
+    }
+
+    QnTimePeriod& last = rez.back();
+    if (!rez.empty() && fullStartTimeMs <= last.startTimeMs 
+        + last.durationMs + filter->detailLevel.count())
+    {
+        last.durationMs = qMax(last.durationMs, durationMs + fullStartTimeMs - last.startTimeMs);
+    }
+    else
+    {
+        if (rez.size() == filter->limit)
+            return false;
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+    }
+    return true;
+}
+
+bool addToResultAscUnordered(
+    const Filter* filter,
+    qint64 fullStartTimeMs,
+    qint32 durationMs,
+    QnTimePeriodList& rez)
+{
+    if (rez.empty())
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+        return true;
+    }
+
+    QnTimePeriod& last = rez.back();
+    if (fullStartTimeMs >= last.startTimeMs 
+        && fullStartTimeMs <= last.startTimeMs + last.durationMs + filter->detailLevel.count())
+    {
+        last.durationMs = qMax(last.durationMs, durationMs + fullStartTimeMs - last.startTimeMs);
+    }
+    else
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+    }
+    return true;
+}
+
+bool addToResultDesc(
+    const Filter* filter,
+    qint64 fullStartTimeMs,
+    qint32 durationMs,
+    QnTimePeriodList& rez)
+{
+    if (rez.empty())
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+        return true;
+    }
+
+    QnTimePeriod& last = rez.back();
+    const auto detailLevel = filter->detailLevel.count();
+    if (fullStartTimeMs + durationMs + detailLevel >= last.startTimeMs)
+    {
+        const auto endTimeMs = last.endTimeMs();
+        last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);
+        last.durationMs = endTimeMs - last.startTimeMs;
+    }
+    else
+    {
+        if (rez.size() == filter->limit)
+            return false;
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+    }
+    return true;
+}
+
+bool addToResultDescUnordered(
+    const Filter* filter,
+    qint64 fullStartTimeMs,
+    qint32 durationMs,
+    QnTimePeriodList& rez)
+{
+    if (rez.empty())
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+        return true;
+    }
+
+    QnTimePeriod& last = rez.back();
+    const auto detailLevel = filter->detailLevel.count();
+    if (fullStartTimeMs <= last.startTimeMs 
+        && fullStartTimeMs + durationMs + detailLevel >= last.startTimeMs)
+    {
+        const auto endTimeMs = last.endTimeMs();
+        last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);
+        last.durationMs = endTimeMs - last.startTimeMs;
+    }
+    else
+    {
+        rez.push_back(QnTimePeriod(fullStartTimeMs, durationMs));
+    }
+    return true;
 }
 
 void MetadataArchive::loadDataFromIndex(
+    AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
     QFile& metadataFile,
@@ -358,68 +472,86 @@ void MetadataArchive::loadDataFromIndex(
 {
     QnByteArray buffer(kAlignment, 0, 0);
 
-    int totalSteps = endItr - startItr;
+    int mediaRecordsLeft = 0;
+    for (auto i = startItr; i < endItr; ++i)
+        mediaRecordsLeft += i->recordCount();
+    if (mediaRecordsLeft == 0)
+        return;
 
-    int currentRecordNumber = startItr - index.records.begin();
-    qint64 dataOffset = index.dataOffset(currentRecordNumber);
+    const int recordSize = recordMatcher->isNoGeometryMode()
+        ? index.header.noGeometryRecordSize() : index.header.recordSize;
+
+    int indexRecordNumber = startItr - index.records.begin();
+    qint64 dataOffset = index.dataOffset(indexRecordNumber, recordMatcher->isNoGeometryMode());
     metadataFile.seek(dataOffset);
 
-    // math file (one month)
     QVector<IndexRecord>::const_iterator i = startItr;
-    while (totalSteps > 0)
+    const int maxRecordsInBuffer = kReadBufferSize / recordSize;
+    int mediaRecordsPerIndexRecord = i->recordCount();
+    while (mediaRecordsLeft > 0)
     {
-        const int recordsToRead = qMin(totalSteps, kRecordsPerIteration);
-        const int dataSize = index.dataSize(currentRecordNumber, recordsToRead);
-        buffer.reserve(dataSize);
-        const int read = metadataFile.read(buffer.data(), dataSize);
+        const int recordsToRead = qMin(mediaRecordsLeft, maxRecordsInBuffer);
+        const int bufferSize = recordsToRead * recordSize;
+        buffer.reserve(bufferSize);
+        const int read = metadataFile.read(buffer.data(), bufferSize);
         if (read <= 0)
             break;
         const quint8* dataEnd = (quint8*) buffer.data() + read;
         quint8* curData = (quint8*) buffer.data();
+        const auto filter = recordMatcher->filter();
         while (i < endItr && curData < dataEnd)
         {
             const qint64 fullStartTimeMs = i->start + index.header.startTimeMs;
-            const int dataSize = index.dataSize(i);
-            if (curData + dataSize > dataEnd)
+            if (checkPeriod(filter, fullStartTimeMs, i->duration()))
             {
-                NX_DEBUG(this, "Unexpected metadata file size");
-                break;
-            }
-            if (recordMatcher->matchRecord(fullStartTimeMs, curData, dataSize))
-            {
-                if (rez.empty())
+                if (curData + recordSize > dataEnd)
                 {
-                    rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration()));
+                    NX_DEBUG(this, "Unexpected metadata file size");
+                    break;
                 }
-                else
+                if (recordMatcher->matchRecord(fullStartTimeMs, curData, recordSize))
                 {
-                    QnTimePeriod& last = rez.back();
-                    if (fullStartTimeMs <= last.startTimeMs + last.durationMs
-                        + recordMatcher->filter()->detailLevel.count())
-                    {
-                        last.durationMs = qMax(last.durationMs, i->duration() + fullStartTimeMs
-                            - last.startTimeMs);
-                    }
-                    else
-                    {
-                        if (rez.size() == recordMatcher->filter()->limit)
-                            return;
-                        rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration()));
-                    }
+                if (!addRecordFunc(recordMatcher->filter(), fullStartTimeMs, i->duration(), rez))
+                        return;
                 }
+                if (interruptionCallback && interruptionCallback())
+                    return;
             }
-            if (interruptionCallback && interruptionCallback())
-                return;
 
-            curData += index.dataSize(i);
-            ++i;
-            --totalSteps;
+            curData += recordSize;
+            --mediaRecordsLeft;
+            if (--mediaRecordsPerIndexRecord == 0)
+            {
+                if (++i < endItr)
+                    mediaRecordsPerIndexRecord = i->recordCount();
+            }
         }
-        currentRecordNumber += recordsToRead;
+    }
+}
+
+void MetadataArchive::loadDataFromIndex(
+    AddRecordFunc addRecordFunc,
+    const Filter* filter,
+    std::function<bool()> interruptionCallback,
+    const Index& index,
+    QVector<IndexRecord>::iterator startItr,
+    const QVector<IndexRecord>::iterator endItr,
+    QnTimePeriodList& rez) const
+{
+    for(auto i = startItr; i < endItr;  ++i)
+    {
+        const qint64 fullStartTimeMs = i->start + index.header.startTimeMs;
+        if (!checkPeriod(filter, fullStartTimeMs, i->duration()))
+            continue;
+        if (!addRecordFunc(filter, fullStartTimeMs, i->duration(), rez))
+            return;
+        if (interruptionCallback && interruptionCallback())
+            return;
     }
 }
 
 void MetadataArchive::loadDataFromIndexDesc(
+    AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
     QFile& metadataFile,
@@ -430,80 +562,121 @@ void MetadataArchive::loadDataFromIndexDesc(
 {
     QnByteArray buffer(kAlignment, 0, 0);
 
-    int totalSteps = endItr - startItr;
-    int recordNumberToSeek = qMax<int>(0LL, (endItr - std::min(kRecordsPerIteration, totalSteps))
-        - index.records.begin());
+    const int recordSize = recordMatcher->isNoGeometryMode()
+        ? index.header.noGeometryRecordSize() : index.header.recordSize;
+
+    int mediaRecordsLeft = 0;
+    for (auto i = startItr; i < endItr; ++i)
+        mediaRecordsLeft += i->recordCount();
+    if (mediaRecordsLeft == 0)
+        return;
+
+    const int maxRecordsInBuffer = kReadBufferSize / recordSize;
+    const int recordsToRead = qMin(mediaRecordsLeft, maxRecordsInBuffer);
+
+    auto calcRecordNumberToSeek = 
+        [&index](auto currentItr, auto startItr, int maxMediaRecords)
+        {
+            int mediaRecordsInBlock = 0;
+            while (currentItr >= startItr)
+            {
+                const int records = currentItr->recordCount();
+                if (mediaRecordsInBlock + records > maxMediaRecords)
+                    break;
+                mediaRecordsInBlock += records;
+                --currentItr;
+            }
+
+            return mediaRecordsInBlock;
+        };
 
     // math file (one month)
     QVector<IndexRecord>::const_iterator i = endItr - 1;
-    while (totalSteps > 0)
+    int64_t mediaFileOffset = index.dataOffset(endItr - index.records.begin(), recordMatcher->isNoGeometryMode());
+    while (mediaRecordsLeft > 0)
     {
-        metadataFile.seek(index.dataOffset(recordNumberToSeek));
-        const int recordsToRead = qMin(totalSteps, kRecordsPerIteration);
-        int dataSize = index.dataSize(recordNumberToSeek, recordsToRead);
-        buffer.reserve(dataSize);
+        int mediaRecordsPerIndexRecord = i->recordCount();
+        int recordsToRead = std::min(mediaRecordsLeft, maxRecordsInBuffer);
+        int actualRecordsToRead = calcRecordNumberToSeek(i, startItr, recordsToRead);
+        mediaFileOffset -= actualRecordsToRead * recordSize;
+        metadataFile.seek(mediaFileOffset);
 
-        const int read = metadataFile.read(buffer.data(), dataSize);
+        int mediaDataSize = actualRecordsToRead * recordSize;
+        buffer.reserve(mediaDataSize);
+        const int read = metadataFile.read(buffer.data(), mediaDataSize);
         if (read <= 0)
             break;
 
         quint8* dataEnd = (quint8*) buffer.data() + read;
-        quint8* curData = dataEnd - index.dataSize(i);
+        quint8* curData = dataEnd - recordSize;
+        const auto filter = recordMatcher->filter();
         while (i >= startItr && curData >= (quint8*) buffer.data())
         {
             qint64 fullStartTimeMs = i->start + index.header.startTimeMs;
-            if (recordMatcher->matchRecord(fullStartTimeMs, curData, index.dataSize(i)))
+            if (checkPeriod(filter, fullStartTimeMs, i->duration()))
             {
-                if (rez.empty())
+                if (recordMatcher->matchRecord(fullStartTimeMs, curData, recordSize))
                 {
-                    rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration()));
+                    if (!addRecordFunc(filter, fullStartTimeMs, i->duration(), rez))
+                        return;
                 }
-                else
-                {
-                    QnTimePeriod& last = rez.back();
-                    const auto detailLevel = recordMatcher->filter()->detailLevel.count();
-                    if (fullStartTimeMs + i->duration() + detailLevel >= last.startTimeMs)
-                    {
-                        const auto endTimeMs = last.endTimeMs();
-                        last.startTimeMs = qMin(last.startTimeMs, fullStartTimeMs);
-                        last.durationMs = endTimeMs - last.startTimeMs;
-                    }
-                    else
-                    {
-                        if (rez.size() == recordMatcher->filter()->limit)
-                            return;
-                        rez.push_back(QnTimePeriod(fullStartTimeMs, i->duration()));
-                    }
-                }
+                if (interruptionCallback && interruptionCallback())
+                    return;
             }
-            if (interruptionCallback && interruptionCallback())
-                return;
 
-            --i;
-            if (i >= startItr)
-                curData -= index.dataSize(i);
-            --totalSteps;
+            --mediaRecordsLeft;
+            curData -= recordSize;
+            if (--mediaRecordsPerIndexRecord == 0)
+            {
+                if (--i >= startItr)
+                    mediaRecordsPerIndexRecord = i->recordCount();
+            }
         }
-        recordNumberToSeek = std::max(
-            0, recordNumberToSeek - std::min(totalSteps, kRecordsPerIteration));
+    }
+}
 
+void MetadataArchive::loadDataFromIndexDesc(
+    AddRecordFunc addRecordFunc,
+    const Filter* filter,
+    std::function<bool()> interruptionCallback,
+    const Index& index,
+    QVector<IndexRecord>::iterator startItr,
+    const QVector<IndexRecord>::iterator endItr,
+    QnTimePeriodList& rez) const
+{
+    for (auto i = endItr - 1; i >= startItr; --i)
+    {
+        const qint64 fullStartTimeMs = i->start + index.header.startTimeMs;
+        if (!checkPeriod(filter, fullStartTimeMs, i->duration()))
+            continue;
+
+        if (!addRecordFunc(filter, fullStartTimeMs, i->duration(), rez))
+            return;
+        if (interruptionCallback && interruptionCallback())
+            return;
     }
 }
 
 QnTimePeriodList MetadataArchive::matchPeriodInternal(
     RecordMatcher* recordMatcher,
-    std::function<bool()> interruptionCallback)
+    std::function<bool()> interruptionCallback,
+    FixDiscontinue fixDiscontinue)
 {
-    qint64 msStartTime = recordMatcher->filter()->startTime.count();
-    qint64 msEndTime = recordMatcher->filter()->endTime.count();
+    MetadataHelper helper(m_dataDir);
+    QList<QDate> existingRecords = helper.recordedMonth(m_physicalId);
+    if (existingRecords.isEmpty())
+        return QnTimePeriodList();
 
-    if (minTime() != (qint64)AV_NOPTS_VALUE)
-        msStartTime = qMax(minTime(), msStartTime);
-    msEndTime = qMin(msEndTime, m_maxMetadataTime.load());
+    qint64 msStartTime = std::max(
+        (qint64) recordMatcher->filter()->startTime.count(),
+        existingRecords.first().startOfDay().toMSecsSinceEpoch());
+    qint64 msEndTime = std::min(
+        (qint64) recordMatcher->filter()->endTime.count(),
+        existingRecords.last().startOfDay().addMonths(1).toMSecsSinceEpoch() - 1);
 
     QnTimePeriodList rez;
     const bool descendingOrder = recordMatcher->filter()->sortOrder == Qt::SortOrder::DescendingOrder;
-
+    bool needToFixDiscontinuity = false;
     while (msStartTime <= msEndTime)
     {
         qint64 minTime, maxTime;
@@ -513,50 +686,95 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         QFile metadataFile;
         Index index(this);
 
-        fillFileNames(timePointMs, &metadataFile, nullptr);
-        NX_VERBOSE(this, nx::format("Matching metadata periods for camera %1 for month %2")
-            .args(m_physicalId, metadataFile.fileName()));
-        const bool isFileExists = metadataFile.open(QFile::ReadOnly) && index.load(timePointMs);
-        if (isFileExists)
+        if (index.load(timePointMs))
         {
-            index.truncate(metadataFile.size());
+            const bool hasDiscontinue = index.header.flags & IndexHeader::Flags::hasDiscontinue;
+            needToFixDiscontinuity |= hasDiscontinue;
 
-            QVector<IndexRecord>::iterator startItr = index.records.begin();
-            QVector<IndexRecord>::iterator endItr = index.records.end();
+            const bool noGeometryMode = index.header.noGeometryModeSupported()
+                && index.header.noGeometryRecordSize() > 0
+                && recordMatcher->isWholeFrame();
+            recordMatcher->setNoGeometryMode(noGeometryMode);
+            fillFileNames(timePointMs, &metadataFile, noGeometryMode, nullptr);
+            NX_VERBOSE(this, nx::format("Matching metadata periods for camera %1 for month %2")
+                .args(m_physicalId, metadataFile.fileName()));
 
-            if (msStartTime > minTime)
+            if (recordMatcher->isEmpty() || metadataFile.open(QFile::ReadOnly))
             {
-                const quint32 relativeStartTime = msStartTime - index.header.startTimeMs;
-                startItr = std::lower_bound(index.records.begin(), index.records.end(), relativeStartTime);
-                while (startItr != index.records.end() && startItr != index.records.begin())
+                QVector<IndexRecord>::iterator startItr = index.records.begin();
+                QVector<IndexRecord>::iterator endItr = index.records.end();
+
+                if (!hasDiscontinue)
                 {
-                    const auto prevItr = startItr - 1;
-                    if (qBetween(prevItr->start, relativeStartTime, prevItr->start + prevItr->duration()))
-                        startItr = prevItr;
+                    if (msStartTime > minTime)
+                    {
+                        const quint32 relativeStartTime = msStartTime - index.header.startTimeMs;
+                        startItr = std::lower_bound(index.records.begin(), index.records.end(), relativeStartTime);
+                        while (startItr != index.records.end() && startItr != index.records.begin())
+                        {
+                            const auto prevItr = startItr - 1;
+                            if (qBetween(prevItr->start, relativeStartTime, prevItr->start + prevItr->duration()))
+                                startItr = prevItr;
+                            else
+                                break;
+                        }
+                    }
+                    if (msEndTime <= maxTime)
+                        endItr = std::upper_bound(startItr, index.records.end(), msEndTime - index.header.startTimeMs);
+                }
+
+                // Turn off limit checking for discontinue mode. It is needed to apply limit after sorting data.
+                const auto breakCallback = hasDiscontinue ? nullptr : interruptionCallback;
+
+                // Match one file (one month of data or less).
+                if (recordMatcher->isEmpty())
+                {
+                    if (descendingOrder)
+                    {
+                        loadDataFromIndexDesc(
+                            hasDiscontinue ? addToResultDescUnordered : addToResultDesc,
+                            recordMatcher->filter(),
+                            breakCallback, index, startItr, endItr, rez);
+                    }
                     else
-                        break;
+                    {
+                        loadDataFromIndex(
+                            hasDiscontinue ? addToResultAscUnordered : addToResultAsc,
+                            recordMatcher->filter(), 
+                            breakCallback, index, startItr, endItr, rez);
+                    }
+                }
+                else
+                {
+                    const int recordSize = noGeometryMode
+                        ? index.header.noGeometryRecordSize() : index.header.recordSize;
+                    index.truncateTo(metadataFile.size() / recordSize);
+
+                    if (descendingOrder)
+                    {
+                        loadDataFromIndexDesc(
+                            hasDiscontinue ? addToResultDescUnordered : addToResultDesc,
+                            recordMatcher, breakCallback,
+                            metadataFile, index, startItr, endItr,
+                            rez);
+                    }
+                    else
+                    {
+                        loadDataFromIndex(
+                            hasDiscontinue ? addToResultAscUnordered : addToResultAsc,
+                            recordMatcher, breakCallback,
+                            metadataFile, index, startItr, endItr,
+                            rez);
+                    }
+                }
+
+                if (!hasDiscontinue
+                    && recordMatcher->filter()->limit > 0
+                    && rez.size() >= recordMatcher->filter()->limit)
+                {
+                    break;
                 }
             }
-            if (msEndTime <= maxTime)
-                endItr = std::upper_bound(startItr, index.records.end(), msEndTime - index.header.startTimeMs);
-
-            if (descendingOrder)
-            {
-                loadDataFromIndexDesc(
-                    recordMatcher, interruptionCallback,
-                    metadataFile, index, startItr, endItr,
-                    rez);
-            }
-            else
-            {
-                loadDataFromIndex(
-                    recordMatcher, interruptionCallback,
-                    metadataFile, index, startItr, endItr,
-                    rez);
-            }
-
-            if (recordMatcher->filter()->limit > 0 && rez.size() == recordMatcher->filter()->limit)
-                break;
         }
 
         if (descendingOrder)
@@ -569,17 +787,25 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
     }
     NX_VERBOSE(this, nx::format("Found %1 metadata period(s) for camera %2 for range %3-%4")
         .args(rez.size(), m_physicalId, recordMatcher->filter()->startTime, recordMatcher->filter()->endTime));
+
+    if (needToFixDiscontinuity)
+        fixDiscontinue(&rez, descendingOrder, recordMatcher->filter());
     return rez;
 }
 
-qint64 MetadataArchive::minTime() const
+void MetadataArchive::onDiscontinueInMatchedResult(
+    QnTimePeriodList* result, bool descendingOrder, const Filter* filter)
 {
-    return m_minMetadataTime;
-}
+    sortData(result, descendingOrder);
 
-qint64 MetadataArchive::maxTime() const
-{
-    return m_maxMetadataTime;
+    QnTimePeriodList fixedResult;
+    auto addRecord = descendingOrder ? addToResultDesc : addToResultAsc;
+    for (const auto& period: *result)
+    {
+        if (!addRecord(filter, period.startTimeMs, period.durationMs, fixedResult))
+            break;
+    }
+    *result = std::move(fixedResult);
 }
 
 int MetadataArchive::getChannel() const

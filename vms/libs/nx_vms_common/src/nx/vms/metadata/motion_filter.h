@@ -24,6 +24,10 @@ public:
 
     virtual bool matchRecord(int64_t timestampMs, const uint8_t* data, int recordSize) const override;
     const MotionFilter* filter() const;
+
+    virtual bool isWholeFrame() const override { return m_wholeFrame; }
+    virtual bool isEmpty() const override { return m_wholeFrame; }
+
 private:
     int m_maskStart = 0;
     int m_maskEnd = 0;
