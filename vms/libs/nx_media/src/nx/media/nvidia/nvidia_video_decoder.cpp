@@ -32,6 +32,8 @@ inline cudaVideoCodec FFmpeg2NvCodecId(AVCodecID id)
     }
 }
 
+static constexpr int kCurrentCudaToolkitVersion = 11070;
+
 }
 
 namespace nx::media::nvidia {
@@ -58,11 +60,34 @@ bool NvidiaVideoDecoder::isAvailable()
 {
     auto isAvalibaleImpl = []() {
         if (!NvidiaDriverApiProxy::instance().load())
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to load nvidia driver");
             return false;
+        }
 
         CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
         if (status != CUDA_SUCCESS)
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to init nvidia driver");
             return false;
+        }
+
+        int driverCudaVersion = 0;
+        status = NvidiaDriverApiProxy::instance().cuDriverGetVersion(&driverCudaVersion);
+        if (status != CUDA_SUCCESS)
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to get cuda version supported by driver");
+            return false;
+        }
+
+        if (driverCudaVersion < kCurrentCudaToolkitVersion)
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Update nvidia driver, it supports cuda toolkit version: %1, but needed: %2",
+                driverCudaVersion,
+                kCurrentCudaToolkitVersion);
+            return false;
+        }
 
         return true;
     };

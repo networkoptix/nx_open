@@ -90,6 +90,8 @@ public:
     using CuGraphicsUnmapResourcesType = CUresult (*)(unsigned int, CUgraphicsResource*, CUstream);
     using CuGraphicsResourceGetMappedPointerType = CUresult (*)(CUdeviceptr*, size_t*, CUgraphicsResource);
     using CuMemsetD8Type = CUresult (*)(CUdeviceptr, unsigned char, size_t);
+    using CuDriverGetVersionType = CUresult (*)(int*);
+
 
     CuInitType cuInit = nullptr;
     CuCtxCreateType cuCtxCreate = nullptr;
@@ -109,6 +111,7 @@ public:
     CuMemcpy2DAsyncType cuMemcpy2DAsync = nullptr;
     CuStreamSynchronizeType cuStreamSynchronize = nullptr;
     CuGetErrorNameType cuGetErrorName = nullptr;
+    CuDriverGetVersionType cuDriverGetVersion = nullptr;
 
 private:
     LibraryLoader m_loader;
