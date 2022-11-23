@@ -17,6 +17,38 @@ namespace nx::vms::api {
 
 /**%apidoc Server information object.
  * %param[opt]:object parameters Server-specific key-value parameters.
+ * %param[opt]:array backupBitrateBytesPerSecond
+ *     Backup bitrate per day of week and hour, as a JSON array of key-value objects, structured
+ *     according to the following example:
+ *     <pre><code>
+ *     [
+ *         {
+ *             "key": { "day": "DAY_OF_WEEK", "hour": HOUR },
+ *             "value": BYTES_PER_SECOND
+ *         },
+ *         ...
+ *     ]
+ *     </code></pre>
+ *     Here <code>DAY_OF_WEEK</code> is one of <code>monday</code>, <code>tuesday</code>,
+ *     <code>wednesday</code>, <code>thursday</code>, <code>friday</code>, <code>saturday</code>,
+ *     <code>sunday</code>; <code>HOUR</code> is an integer in range 0..23;
+ *     <code>BYTES_PER_SECOND</code> is an integer.
+ *     <br/>
+ *     For any day-hour position, a missing value means "unlimited bitrate", and a zero value means
+ *     "don't perform backup".
+ * %param:object backupBitrateBytesPerSecond[].key
+ * %param:enum backupBitrateBytesPerSecond[].key.day
+ *     %value monday
+ *     %value tuesday
+ *     %value wednesday
+ *     %value thursday
+ *     %value friday
+ *     %value saturday
+ *     %value sunday
+ * %param:integer backupBitrateBytesPerSecond[].key.hour
+ *     %example 0
+ * %param:integer backupBitrateBytesPerSecond[].value
+ *     %example 0
  */
 struct NX_VMS_API ServerModel: ResourceWithParameters
 {
@@ -50,27 +82,6 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     bool isFailoverEnabled = false;
     std::optional<int> maxCameras = 0;
 
-    /**%apidoc[opt]:array
-     * Backup bitrate per day of week and hour, as a JSON array of name-value objects, structured
-     * according to the following example:
-     * <pre><code>
-     * [
-     *     {
-     *         "key": { "day": "DAY_OF_WEEK", "hour": HOUR },
-     *         "value": BYTES_PER_SECOND
-     *     },
-     *     ...
-     * ]
-     * </code></pre>
-     * Here <code>DAY_OF_WEEK</code> is one of <code>monday</code>, <code>tuesday</code>,
-     * <code>wednesday</code>, <code>thursday</code>, <code>friday</code>, <code>saturday</code>,
-     * <code>sunday</code>; <code>HOUR</code> is an integer in range 0..23;
-     * <code>BYTES_PER_SECOND</code> is an integer.
-     * <br/>
-     * For any day-hour position, a missing value means "unlimited bitrate", and a zero value means
-     * "don't perform backup".
-     * %example [{"key": {"day": "monday", "hour": 0}, "value": 0}]
-     */
     BackupBitrateBytesPerSecond backupBitrateBytesPerSecond;
 
     std::optional<ResourceStatus> status;
