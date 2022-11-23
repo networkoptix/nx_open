@@ -228,7 +228,12 @@ void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 
 void QnBookmarksViewer::Impl::setAllowExport(bool allowExport)
 {
+    if (m_allowExport == allowExport)
+        return;
+
     m_allowExport = allowExport;
+    if (m_bookmarkTooltip)
+        m_bookmarkTooltip->setAllowExport(m_allowExport);
 }
 
 void QnBookmarksViewer::Impl::updateLocationInternal(qint64 location)
@@ -333,6 +338,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         {
             m_bookmarkTooltip = new workbench::timeline::BookmarkTooltip(
                 bookmarks, readOnly(), m_tooltipParentWidget);
+            m_bookmarkTooltip->setAllowExport(m_allowExport);
             m_bookmarkTooltip->setVisible(true);
             m_bookmarkTooltip->move(1000, 300);
             if (m_timelineHoverProcessor)
