@@ -32,16 +32,24 @@ struct NX_VMS_API DeviceAgentManifest
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
     Capabilities capabilities;
+
+    /**%apidoc
+     * %deprecated Use "supportedTypes" field instead.
+     */
     QList<QString> supportedEventTypeIds;
+
+    /**%apidoc
+     * %deprecated Use "supportedTypes" field instead.
+     */
     QList<QString> supportedObjectTypeIds;
 
     /**%apidoc
-     * %deprecated Use "typeLibrary" field instead.
+     * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
     QList<EventType> eventTypes;
 
     /**%apidoc
-     * %deprecated Use "typeLibrary" field instead.
+     * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
     QList<ObjectType> objectTypes;
 
