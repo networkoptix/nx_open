@@ -102,3 +102,20 @@ TEST_F(QnLexicalTextFixture, negativeQRectF)
     const QRectF result = QnLexical::deserialized<QRectF>(data);
     ASSERT_EQ(value, result);
 }
+
+TEST_F(QnLexicalTextFixture, notDefaultLocale)
+{
+    QRectF rect(0.2, 0.3, 0.4, 0.5);
+    const auto serializedData = QJson::serialized(rect);
+    QRectF newRect = QJson::deserialized<QRectF>(serializedData);
+    ASSERT_EQ(rect, newRect);
+
+    const auto previousLocale = setlocale(LC_ALL, NULL);
+    nx::utils::ScopeGuard guard = [&]() { setlocale(LC_ALL, previousLocale); };
+
+    setlocale(LC_ALL, "rus"); //< This locale has comma delimiter for float numbers.
+    const auto serializedData2 = QJson::serialized(rect);
+    ASSERT_EQ(serializedData, serializedData2);
+    newRect = QJson::deserialized<QRectF>(serializedData2);
+    ASSERT_EQ(rect, newRect);
+}
