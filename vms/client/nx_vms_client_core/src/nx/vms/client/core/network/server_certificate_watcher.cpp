@@ -12,6 +12,12 @@
 
 #include "certificate_verifier.h"
 
+namespace {
+
+const auto kMinimumSupportedVersion = nx::utils::SoftwareVersion(5, 0);
+
+} // namespace
+
 namespace nx::vms::client::core {
 
 ServerCertificateWatcher::ServerCertificateWatcher(
@@ -21,15 +27,14 @@ ServerCertificateWatcher::ServerCertificateWatcher(
     base_type(parent)
 {
     auto pinCertificates =
-        [this,
-            certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
-                const QnMediaServerResourcePtr& server)
+        [certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
+            const QnMediaServerResourcePtr& server)
         {
             if (!NX_ASSERT(certificateVerifier))
                 return;
 
-            // Server v4.2 or older.
-            if (server->certificate().empty())
+            // Servers v4.2 or older shouldn't have certificate data.
+            if (server->getVersion() < kMinimumSupportedVersion)
                 return;
 
             using namespace nx::network::ssl;
