@@ -11,6 +11,7 @@ const QString LayoutData::kResourceTypeName = lit("Layout");
 const QnUuid LayoutData::kResourceTypeId =
     ResourceData::getFixedTypeId(LayoutData::kResourceTypeName);
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LayoutItemFilter, (json), LayoutItemFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     LayoutItemData, (ubjson)(xml)(json)(sql_record)(csv_record), LayoutItemData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
