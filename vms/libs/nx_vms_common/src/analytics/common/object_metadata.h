@@ -153,7 +153,7 @@ struct NX_VMS_COMMON_API ObjectMetadata
      */
     QRectF boundingBox;
 
-    Attributes attributes;
+    std::vector<Attribute> attributes;
 
     /**%apidoc Kind of the object. */
     ObjectMetadataType objectMetadataType;
