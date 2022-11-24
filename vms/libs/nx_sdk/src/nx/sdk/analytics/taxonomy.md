@@ -324,12 +324,31 @@ Attributes that are inherited from the base type can be "re-defined" as follows:
     respectively, provided that this overriding Enum/Color is in turn inherited from the
     Enum/Color of the base Attribute.
 
-- ATTENTION: In the current VMS version, there is the following limitation when overriding
-    inherited attributes. It is considered an undefined behavior (the Search GUI may behave
-    unexpectedly) to use the following scheme: an Object type `B` has an Attribute `a`, and
-    the hidden derived Object type `D` inherited from `B` overrides the Attribute `a`, and
-    both `B.a` and `D.a` are declared as supported Attributes, no matter whether in one or in
-    different Device Agent manifests, and in one or different Plugins.
+### Overriden Attributes
+
+The following behavior is observed in the GUI when several types inherited from the same base type
+override the same Attribute and declare it as a supported one.
+
+- For Numeric attributes:
+    - The widest possible range is applied.
+    - If units don't have the same value, the resulting unit is set to an empty string.
+    - If at least one Attribute has the `"float"` subtype, the resulting Attribute will be float as
+        well.
+
+- For Enum and Color Attributes:
+    - The resulting Attribute will contain all the values from the initial Attributes.
+
+- For Object Attributes (aggregated Objects):
+    - The resulting Attribute will contain all the sub-attributes that are declared as supported in
+        all the types that override the Attribute.
+    - All collisions are resolved recursively according to the rules described in this section.
+
+- Boolean and String Attributes stay intact.
+
+- For other type combinations:
+    - All such Attributes (though with the same name) are shown in the Search filter GUI, treating
+        all the values entered by the user as required criteria, so it makes sense for the user to
+        fill only one of them as a filter.
 
 ### Attribute types
 
