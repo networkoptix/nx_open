@@ -996,7 +996,6 @@ void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role)
 
 void ZoomWindowInstrument::at_layoutAccessChanged()
 {
-    qDebug() << "ZoomWindowInstrument::at_layoutAccessChanged()";
     for (auto widgetRaw: m_dataByWidget.keys())
     {
         if (auto widget = dynamic_cast<QnMediaResourceWidget*>(widgetRaw))
