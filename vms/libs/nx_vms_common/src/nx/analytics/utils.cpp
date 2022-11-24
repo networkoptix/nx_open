@@ -19,6 +19,12 @@ std::set<QString> supportedEventTypeIdsFromManifest(const DeviceAgentManifest& m
     for (const auto& eventType: manifest.eventTypes)
         result.insert(eventType.id);
 
+    for (const auto& entityType: manifest.supportedTypes)
+    {
+        if (!entityType.eventTypeId.isEmpty())
+            result.insert(entityType.eventTypeId);
+    }
+
     return result;
 }
 
@@ -30,6 +36,12 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
 
     for (const auto& objectType: manifest.objectTypes)
         result.insert(objectType.id);
+
+    for (const auto& entityType: manifest.supportedTypes)
+    {
+        if (!entityType.objectTypeId.isEmpty())
+            result.insert(entityType.objectTypeId);
+    }
 
     return result;
 }
