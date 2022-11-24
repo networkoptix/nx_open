@@ -53,7 +53,7 @@ Device Agent Manifest.
 `trackIdPolicy` - **[string]** The policy of Object Track id behavior. Three options are available:
     - `fixed` - Object track id never changes (neither between Device Agent instantiations nor
     between stream cycles).
-    - `changeOncePerStreamSycle` - Object Track id is changed every stream cycle.
+    - `changeOncePerStreamCycle` - Object Track id is changed every stream cycle.
     - `changeOnDeviceAgentCreation` - Object Track id is changed every time Device Agent is being
     instantiated.
 
@@ -89,7 +89,7 @@ Example:
         {
             "objectTypeId": "nx.base.Vehicle",
             "movementPolicy": "random",
-            "trackIdPolicy": "changeOncePerStreamSycle",
+            "trackIdPolicy": "changeOncePerStreamCycle",
             "minWidth": 0.1,
             "minHeight": 0.1,
             "maxWidth": 0.3,

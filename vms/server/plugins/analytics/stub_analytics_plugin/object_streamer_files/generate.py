@@ -239,7 +239,7 @@ class RandomMovementGenerator(Generator):
 
         FIXED_TRACK_ID_POLICY = 'fixed'
         CHANGE_ON_DEVICE_AGENT_CREATION_TRACK_ID_POLICY = 'changeOnDeviceAgentCreation'
-        CHANGE_ONCE_PER_STREAM_CYCLE_TRACK_ID_POLICY = 'changeOncePerStreamSycle'
+        CHANGE_ONCE_PER_STREAM_CYCLE_TRACK_ID_POLICY = 'changeOncePerStreamCycle'
 
         TRACK_ID_POLICY_KEY = 'trackIdPolicy'
         OBJECT_TYPE_ID_KEY = 'objectTypeId'
