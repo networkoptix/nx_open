@@ -269,26 +269,28 @@ bool serialize(const QRect& value, QString* target)
 
 bool deserialize(const QString& value, QRect* target)
 {
-    std::regex re("^(-?\\d+),(-?\\d+),(\\d+)x(\\d+)$");
-    std::smatch match;
-
-    const auto str = value.toStdString();
-    if (!std::regex_search(str, match, re))
+    const auto params = value.splitRef(',');
+    if (params.size() != 3)
+        return false;
+    const auto dimensions = params[2].split('x');
+    if (dimensions.size() != 2)
         return false;
 
-    try
-    {
-        target->setX(std::stoi(match[1]));
-        target->setY(std::stoi(match[2]));
-        target->setWidth(std::stoi(match[3]));
-        target->setHeight(std::stoi(match[4]));
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(NX_SCOPE_TAG, e.what());
+    bool success = false;
+    target->setX(params[0].toInt(&success));
+    if (!success)
         return false;
-    }
-    return true;
+
+    target->setY(params[1].toInt(&success));
+    if (!success)
+        return false;
+
+    target->setWidth(dimensions[0].toInt(&success));
+    if (!success)
+        return false;
+    
+    target->setHeight(dimensions[1].toInt(&success));
+    return success;
 }
 
 bool serialize(const QRectF& value, QString* target)
@@ -306,26 +308,28 @@ bool serialize(const QRectF& value, QString* target)
 
 bool deserialize(const QString& value, QRectF* target)
 {
-	std::regex re("^(.+),(.+),(.+)x(.+)$");
-	std::smatch match;
-
-	const auto str = value.toStdString();
-	if (!std::regex_search(str, match, re))
-	    return false;
-
-    try
-	{
-        target->setX(std::stod(match[1]));
-        target->setY(std::stod(match[2]));
-        target->setWidth(std::stod(match[3]));
-        target->setHeight(std::stod(match[4]));
-	}
-	catch (const std::exception& e)
-	{
-		NX_DEBUG(NX_SCOPE_TAG, e.what());
+    const auto params = value.splitRef(',');
+    if (params.size() != 3)
         return false;
-    }
-    return true;
+    const auto dimensions = params[2].split('x');
+    if (dimensions.size() != 2)
+        return false;
+
+    bool success;
+    target->setX(params[0].toDouble(&success));
+    if (!success)
+        return false;
+
+    target->setY(params[1].toDouble(&success));
+    if (!success)
+        return false;
+
+    target->setWidth(dimensions[0].toDouble(&success));
+    if (!success)
+        return false;
+
+    target->setHeight(dimensions[1].toDouble(&success));
+    return success;
 }
 
 static const auto kArray = QStringLiteral("array");
