@@ -224,11 +224,10 @@ copyLibs()
             libxkbcommon.so.0 \
             libxkbcommon-x11.so.0
 
-        local -r ARCH_DIR=$("${COMPILER}" ${CFLAGS} --print-multiarch)
         # GStreamer 0.10 is required for applauncher to run old clients (< 4.0).
         local -r OLD_GSTREAMER_LIBS_PATH="$STAGE_LIB/gstreamer-0.10"
         mkdir "$OLD_GSTREAMER_LIBS_PATH"
-        distrib_copyLibs "${LEGACY_OS_DEPS_DIR}/usr/lib/${ARCH_DIR}" \
+        distrib_copyLibs "${LEGACY_OS_DEPS_DIR}/usr/lib/${TARGET_TRIPLET}" \
             "$OLD_GSTREAMER_LIBS_PATH" \
             libgstreamer-0.10.so.0 \
             libgstapp-0.10.so.0 \
