@@ -48,7 +48,7 @@ public:
     void testSettings();
     void showTestResult(const QString &text);
     void stopTesting(const QString &text = QString());
-    nx::vms::api::LdapSettingsDeprecated settings() const;
+    nx::vms::api::LdapSettings settings() const;
     void updateFromSettings();
 
     void at_timeoutTimer_timeout();
@@ -138,11 +138,11 @@ void QnLdapSettingsDialogPrivate::stopTesting(const QString &text) {
     showTestResult(text);
 }
 
-nx::vms::api::LdapSettingsDeprecated QnLdapSettingsDialogPrivate::settings() const
+nx::vms::api::LdapSettings QnLdapSettingsDialogPrivate::settings() const
 {
     Q_Q(const QnLdapSettingsDialog);
 
-    nx::vms::api::LdapSettingsDeprecated result;
+    nx::vms::api::LdapSettings result;
 
     QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text().trimmed());
     if (url.isValid())
@@ -154,8 +154,13 @@ nx::vms::api::LdapSettingsDeprecated QnLdapSettingsDialogPrivate::settings() con
 
     result.adminDn = q->ui->adminDnLineEdit->text().trimmed();
     result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
-    result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
-    result.searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
+    const auto searchBase = q->ui->searchBaseLineEdit->text().trimmed();
+    const auto searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
+    if (!searchBase.isEmpty() || !searchFilter.isEmpty())
+    {
+        result.filters.push_back(
+            {.base = searchBase, .groupFilter = QString(), .userFilter = searchFilter});
+    }
     result.searchTimeoutS = std::chrono::seconds(q->ui->searchTimeoutSSpinBox->value());
     // TODO: Support searchPageSize.
     return result;

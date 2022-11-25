@@ -102,7 +102,7 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     /**%apidoc[opt]
      * %example 0
      */
-    std::chrono::seconds continuousSyncIntervalS;
+    std::chrono::seconds continuousSyncIntervalS = 0s;
 
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
@@ -122,7 +122,6 @@ struct NX_VMS_API LdapSettingsDeprecated: LdapSettingsBase
 
     LdapSettingsDeprecated() = default;
     LdapSettingsDeprecated(LdapSettings settings);
-    operator LdapSettings() &&;
     bool operator==(const LdapSettingsDeprecated&) const = default;
 };
 #define LdapSettingsDeprecated_Fields LdapSettingsBase_Fields(searchBase)(searchFilter)

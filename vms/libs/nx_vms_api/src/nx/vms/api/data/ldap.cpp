@@ -32,15 +32,6 @@ LdapSettingsDeprecated::LdapSettingsDeprecated(LdapSettings settings)
     }
 }
 
-LdapSettingsDeprecated::operator LdapSettings() &&
-{
-    LdapSettings r;
-    static_cast<LdapSettingsBase&>(r) = static_cast<LdapSettingsBase&&>(*this);
-    if (!searchBase.isEmpty() || !searchFilter.isEmpty())
-        r.filters.push_back({.base = searchBase, .groupFilter = {}, .userFilter = searchFilter});
-    return r;
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsDeprecated, (json), LdapSettingsDeprecated_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettings, (json), LdapSettings_Fields)
