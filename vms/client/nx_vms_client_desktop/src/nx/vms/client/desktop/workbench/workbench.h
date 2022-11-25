@@ -199,6 +199,7 @@ public:
     void applyLoadedState();
 
     bool isInLayoutChangeProcess() const;
+    bool isInSessionRestoreProcess() const;
 
 signals:
     /**
