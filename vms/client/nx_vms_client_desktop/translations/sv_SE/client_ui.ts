@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Öppna mappen Filer</translation>
     </message>
   </context>
   <context>
@@ -655,19 +655,19 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Spela inte in primärström</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Spela inte in sekundär ström</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Sekundär strömningsprofil</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Primär strömningsprofil</translation>
     </message>
   </context>
   <context>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Ny enhet</translation>
     </message>
   </context>
   <context>
@@ -898,15 +898,15 @@
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Tillgängliga åtgärder</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Exportera video</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Livevideo och arkiv</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>I framtiden</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -922,15 +922,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Läs mer på hjälpsidan</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Visa inte det här fönstret igen</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Vi introducerar molnlayouter</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -938,7 +938,7 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Söker bokmärken, objekt, händelser</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1016,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Skapa en säkerhetskopia av systemhanteringsdata, eller återställ systemhanteringsdata från en befintlig säkerhetskopia</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Öppna mapp</translation>
     </message>
   </context>
   <context>
@@ -1182,23 +1182,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) innehåll</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Innehållstyp</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Autentiseringsmetod</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Metod för begäran</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1339,7 @@
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Lägg till kommentar</translation>
     </message>
   </context>
   <context>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Tillåt datorn att gå in i viloläge</translation>
     </message>
   </context>
   <context>
@@ -1791,19 +1791,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Loggningsnivå</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Dela upp fil efter storlek</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Dela fil efter tid</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Begränsa maximal volym</translation>
     </message>
   </context>
   <context>
@@ -1857,15 +1857,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Nedladdning klar!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Det gick inte att spara loggar till den valda mappen</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Öppna filmapp</translation>
     </message>
   </context>
   <context>
@@ -2620,11 +2620,11 @@
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Välj en regel</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Återställ standardregler</translation>
     </message>
   </context>
   <context>
@@ -3009,7 +3009,7 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Analysdata kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
     </message>
   </context>
   <context>
