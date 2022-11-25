@@ -3190,12 +3190,13 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
     const QnUuid& controllerId,
     bool on)
 {
-    bool needUpdate = false;
-    auto layout = workbench()->currentLayout()->resource();
-    if (!layout)
+    // The videowall should not be updated while disconnecting.
+    if (!systemContext()->connection())
         return;
 
-    QnUuid currentId = layout->getId();
+    const auto currentLayoutId = workbench()->currentLayoutResource()->getId();
+    bool needUpdate = false;
+
     for (const auto& videoWall: resourcePool()->getResources<QnVideoWallResource>())
     {
         // Make a copy before updating items.
@@ -3205,7 +3206,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
             if (!on && item.runtimeStatus.controlledBy == controllerId)
             {
                 /* Check layouts that were previously controlled by this client. */
-                needUpdate |= (item.layout == currentId && !item.layout.isNull());
+                needUpdate |= (item.layout == currentLayoutId && !item.layout.isNull());
 
                 QnVideoWallItem updated(item);
                 updated.runtimeStatus.controlledBy = QnUuid();
