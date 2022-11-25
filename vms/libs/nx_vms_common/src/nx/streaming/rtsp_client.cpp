@@ -1141,7 +1141,7 @@ void QnRtspClient::processTextData(const QByteArray& textData)
         parseRangeHeader(range);
 }
 
-bool QnRtspClient::processTextDataInsideBinData()
+bool QnRtspClient::readAndProcessTextData()
 {
     // have text response or part of text response.
     if (!m_tcpSock)
@@ -1151,31 +1151,24 @@ bool QnRtspClient::processTextDataInsideBinData()
         return false;
     m_responseBufferLen += bytesRead;
 
-    quint8* curPtr = m_responseBuffer;
-    quint8* bEnd = m_responseBuffer+m_responseBufferLen;
-    for(; curPtr < bEnd && *curPtr != '$'; curPtr++);
+    const quint8* textBlockEnd = m_responseBuffer;
+    const quint8* bEnd = m_responseBuffer + m_responseBufferLen;
+    for(; textBlockEnd < bEnd && *textBlockEnd != '$'; textBlockEnd++);
 
-    bool isReadyToProcess = curPtr < bEnd;
-    if (!isReadyToProcess)
+    while (textBlockEnd > m_responseBuffer)
     {
-        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(
-            QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen));
+        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData(
+            (const char*) m_responseBuffer, textBlockEnd - m_responseBuffer));
+        if (messageSize <= 0)
+            break;
 
-        if (messageSize < 0)
-            return false;
-
-        if (messageSize > 0)
-            isReadyToProcess = true;
-    }
-
-    if (isReadyToProcess)
-    {
-        QByteArray textData = QByteArray::fromRawData(
-            (const char*) m_responseBuffer, curPtr - m_responseBuffer);
+        QByteArray textData = QByteArray::fromRawData((const char*) m_responseBuffer, messageSize);
         processTextData(textData);
-        memmove(m_responseBuffer, curPtr, bEnd - curPtr);
-        m_responseBufferLen = bEnd - curPtr;
-    }
+        const quint8* messageEnd = m_responseBuffer + messageSize;
+        memmove(m_responseBuffer, messageEnd, bEnd - messageEnd);
+        m_responseBufferLen -= messageSize;
+        textBlockEnd -= messageSize;
+    };
 
     return true;
 }
@@ -1196,7 +1189,7 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
             break;
 
         // have text response or part of text response.
-        if (!processTextDataInsideBinData())
+        if (!readAndProcessTextData())
             return -1;
     }
     int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
@@ -1245,7 +1238,7 @@ int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int
         }
         if (m_responseBuffer[0] == '$')
             break;
-        if (!processTextDataInsideBinData())
+        if (!readAndProcessTextData())
             return -1;
     }
 

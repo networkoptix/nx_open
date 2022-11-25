@@ -313,6 +313,8 @@ public:
     void setIgnoreQopInDigest(bool value);
     bool ignoreQopInDigest(bool value) const;
 
+    bool readAndProcessTextData();
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -329,7 +331,6 @@ private:
     bool parseSDP(const QByteArray& response);
 
     void addAdditionAttrs( nx::network::http::Request* const request );
-    bool processTextDataInsideBinData();
     void processTextData(const QByteArray& textData);
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
