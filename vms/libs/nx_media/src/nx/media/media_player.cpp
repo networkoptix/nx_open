@@ -247,6 +247,8 @@ public:
     // Turn on / turn off audio.
     bool isAudioEnabled = true;
 
+    bool isAudioOnlyMode = false;
+
     RenderContextSynchronizerPtr renderContextSynchronizer;
 
     using MetadataConsumerList = QList<QWeakPointer<AbstractMetadataConsumer>>;
@@ -269,6 +271,7 @@ private:
     void at_hurryUp();
     void at_jumpOccurred(int sequence);
     void at_gotVideoFrame();
+    void at_gotAudioFrame();
     void at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     void presentNextFrameDelayed();
 
@@ -431,6 +434,23 @@ void PlayerPrivate::at_jumpOccurred(int sequence)
         clearCurrentFrame();
         at_gotVideoFrame();
     }
+}
+
+void PlayerPrivate::at_gotAudioFrame()
+{
+    Q_Q(Player);
+
+    if (state == Player::State::Stopped)
+        return;
+
+    if (!dataConsumer)
+        return;
+
+    // TODO lbusygin: move audioOutput to MediaPlayer from dataConsumer?
+
+    auto audioOutput = dataConsumer->audioOutput();
+    if (q->isAudioOnlyMode() && audioOutput && dataConsumer->isAudioEnabled())
+        setMediaStatus(Player::MediaStatus::Loaded);
 }
 
 void PlayerPrivate::at_gotVideoFrame()
@@ -727,7 +747,7 @@ void PlayerPrivate::applyVideoQuality()
         return;
 
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    if (!camera || !camera->hasVideo())
         return; //< Setting videoQuality for files is not supported.
 
     const auto currentVideoDecoders = dataConsumer
@@ -811,10 +831,22 @@ bool PlayerPrivate::createArchiveReader()
 
 bool PlayerPrivate::initDataProvider()
 {
+    Q_Q(Player);
+
     if (!createArchiveReader())
     {
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
+    }
+
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera)
+    {
+        if (isAudioOnlyMode != !camera->hasVideo())
+        {
+            isAudioOnlyMode = !camera->hasVideo();
+            emit q->audioOnlyModeChanged();
+        }
     }
 
     applyVideoQuality();
@@ -855,6 +887,8 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_gotMetadata);
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotAudioFrame,
+        this, &PlayerPrivate::at_gotAudioFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
     connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
@@ -1102,6 +1136,7 @@ void Player::play()
         return;
 
     d->setState(State::Playing);
+
     d->setMediaStatus(MediaStatus::Loading);
     d->updateAudio();
 
@@ -1245,6 +1280,12 @@ bool Player::isAudioEnabled() const
     return d->isAudioEnabled;
 }
 
+bool Player::isAudioOnlyMode() const
+{
+    Q_D(const Player);
+    return d->isAudioOnlyMode;
+}
+
 void Player::setAudioEnabled(bool value)
 {
     Q_D(Player);
@@ -1375,7 +1416,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         : QnArchiveStreamReader(d->resource).getTranscodingCodec();
 
     const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    if (!camera || !camera->hasVideo())
         return result; //< Setting videoQuality for files is not supported.
 
     const auto currentDecoders = d->dataConsumer

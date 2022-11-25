@@ -102,6 +102,9 @@ signals:
     /** New video frame is decoded and ready for rendering. */
     void gotVideoFrame();
 
+    /** New audio frame is decoded and ready for play. */
+    void gotAudioFrame();
+
     /** Jump to new position. */
     void jumpOccurred(int sequence);
 
