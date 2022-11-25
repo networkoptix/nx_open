@@ -91,6 +91,8 @@ protected:
 
     QTimer* pollTimer() const;
 
+    const DeviceConfigs& getKnownJoystickConfigs() const;
+
 protected:
     mutable nx::Mutex m_mutex;
 
