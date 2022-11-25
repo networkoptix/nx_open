@@ -17,6 +17,8 @@ public:
 
 private:
     virtual void enumerateDevices() override;
+
+    QString findDeviceModel(const QString& modelAndManufacturer) const;
 };
 
 } // namespace nx::vms::client::desktop::joystick
