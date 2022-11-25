@@ -424,6 +424,8 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
         AudioFramePtr decodedFrame = m_audioDecoder->nextFrame();
         if (!decodedFrame || !decodedFrame->context)
             return true; //< decoder is buffering. true means input frame processed
+
+        emit gotAudioFrame();
         m_audioOutput->write(decodedFrame);
     }
 

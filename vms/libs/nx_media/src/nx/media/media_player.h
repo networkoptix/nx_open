@@ -119,6 +119,8 @@ class Player: public QObject
      */
     Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
 
+    Q_PROPERTY(bool audioOnlyMode READ isAudioOnlyMode NOTIFY audioOnlyModeChanged)
+
     Q_PROPERTY(bool tooManyConnectionsError READ tooManyConnectionsError
         NOTIFY tooManyConnectionsErrorChanged)
 
@@ -272,6 +274,7 @@ public:
 
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
+    bool isAudioOnlyMode() const;
 
     RenderContextSynchronizerPtr renderContextSynchronizer() const;
     void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
@@ -326,6 +329,7 @@ signals:
     void speedChanged();
     void autoJumpPolicyChanged();
     void cannotDecryptMediaErrorChanged();
+    void audioOnlyModeChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
