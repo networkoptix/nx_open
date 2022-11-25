@@ -26,6 +26,9 @@
 static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
 
+/** Corresponds to the same-name Server setting. */
+static const int kMaxTcpRequestSize = 512 * 1024 * 1024;
+
 namespace nx::vms::client::core {
 
 class DesktopCameraConsumer: public QnAbstractDataConsumer
@@ -116,7 +119,8 @@ DesktopCameraConnectionProcessor::DesktopCameraConnectionProcessor(
     :
     QnTCPConnectionProcessor(new Private(),
         std::move(socket),
-        qnClientCoreModule->commonModule()),
+        qnClientCoreModule->commonModule(),
+        kMaxTcpRequestSize),
     d(dynamic_cast<Private*>(d_ptr))
 {
     NX_CRITICAL(d);

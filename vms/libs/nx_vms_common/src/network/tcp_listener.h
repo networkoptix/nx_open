@@ -39,6 +39,7 @@ public:
 
     explicit QnTcpListener(
         QnCommonModule* commonModule,
+        int maxTcpRequestSize,
         const QHostAddress& address,
         int port,
         int maxConnections = DEFAULT_MAX_CONNECTIONS,
@@ -88,7 +89,8 @@ public slots:
 protected:
     virtual void run() override;
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) = 0;
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket,
+        int maxTcpRequestSize) = 0;
     virtual void doPeriodicTasks();
     /** Called to create server socket.
         This method is supposed to bind socket to \a localAddress and call \a listen
@@ -109,4 +111,7 @@ protected:
     Q_DECLARE_PRIVATE(QnTcpListener);
 
     QnTcpListenerPrivate *d_ptr;
+
+private:
+    int m_maxTcpRequestSize;
 };
