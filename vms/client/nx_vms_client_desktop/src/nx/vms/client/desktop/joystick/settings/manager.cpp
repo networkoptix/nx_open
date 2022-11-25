@@ -426,4 +426,9 @@ QTimer* Manager::pollTimer() const
     return d->pollTimer;
 }
 
+const DeviceConfigs& Manager::getKnownJoystickConfigs() const
+{
+    return d->deviceConfigs;
+}
+
 } // namespace nx::vms::client::desktop::joystick
