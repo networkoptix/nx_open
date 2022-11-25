@@ -36,6 +36,7 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/engine.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -209,7 +210,8 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
 void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
 {
     if (auto user = context()->user();
-        user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1)
+        user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
+        && systemContext()->vmsRulesEngine()->isEnabled())
     {
         m_headerWidget->show();
         m_separatorLine->show();

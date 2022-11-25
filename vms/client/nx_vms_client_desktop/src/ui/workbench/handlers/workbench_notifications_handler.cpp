@@ -39,6 +39,7 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/engine.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -385,7 +386,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
         clear();
         m_listener.reset();
     }
-    else if (context()->user()->isCloud())
+    else if (systemContext()->vmsRulesEngine()->isEnabled() && context()->user()->isCloud())
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),
