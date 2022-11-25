@@ -1099,21 +1099,21 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Saknar obligatorisk parameter: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Det gick inte att behandla begäran.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Förbjuden.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Konflikt.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1123,7 +1123,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Ej implementerat.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1136,11 +1136,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Mediatyp stöds inte.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Tjänsten är inte tillgänglig.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1148,12 +1148,12 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Sessionen löpte ut.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Ogiltig parameter `%1`: %2.</translation>
     </message>
   </context>
   <context>
@@ -1568,64 +1568,64 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Aktivera policy för flera domäner</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>Aktivera WebSocket för P2P</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>Visa servrar i resursträdet för icke-administratörer</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Använd endast HTTPS för kameror</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+      <translation>Aktivera föråldrade API-funktioner (osäkra)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 -programvara (osäker)</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Exponera IP-adresser för autodiscovery</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Behåll IO-portstatus på när servern ansluter till enheten</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Mediabuffertstorlek för enheter endast för ljud (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>Aktivera 2FA för systemet</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>Visa enhetslösenord lagrade i VMS för administratörer (för webbsidor)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Max antal trådar för fjärrarkivsynkronisering (&lt;=0 - auto, max 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>Trådantalgräns för kameraarkivsynkronisering</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maximala händelseloggposter för att hålla i databasen. Den verkliga mängden av raderade poster kan vara upp till 20% högre än det angivna värdet.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Om några bilder ska cachelagras för den primära strömmen. Värden: &apos;ja&apos; - alltid aktiverat (kan använda mycket RAM-minne), &apos;nej&apos; - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), &apos;auto&apos; - liknande &apos;nej&apos;, men aktiverat när förbättrar användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
@@ -2255,11 +2255,11 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>Visa Intercom Informer</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Gör HTTP(S)-begäran</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -2275,31 +2275,31 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Det gick inte att tvinga fram kameratid, det släpar för mycket; Systemtiden kommer att användas.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analyslagring &quot;%1&quot; Db-fel: Otillräckliga behörigheter på monteringspunkten.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Kan inte initiera AES-kryptering under inspelning till mediaarkiv. Data skrivs okrypterad.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID-fel: %1.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande I / O-moduler:</translation>
     </message>
   </context>
   <context>

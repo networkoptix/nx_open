@@ -171,9 +171,9 @@
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>Kamera frånkopplad</numerusform>
+        <numerusform>Kamera frånkopplad</numerusform>
       </translation>
     </message>
   </context>
@@ -206,9 +206,9 @@
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Kamera IP-konflikt</numerusform>
+        <numerusform>Kamera IP-konflikt</numerusform>
       </translation>
     </message>
   </context>
@@ -274,23 +274,23 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Begär HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S)-innehåll</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Innehållstyp</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Metod för begäran</translation>
     </message>
   </context>
   <context>
@@ -392,19 +392,19 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Anslutningen till kameran (primär ström) stängdes oväntat.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Anslutningen till kameran (sekundär ström) stängdes oväntat.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Anslutningen till enheten stängdes oväntat.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
+      <translation>Det gick inte att tvinga fram kameratid, det släpar för mycket; Systemtiden kommer att användas.</translation>
     </message>
   </context>
   <context>
@@ -688,15 +688,15 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analyslagring &quot;%1&quot; Db-fel: Otillräckliga behörigheter på monteringspunkten.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Kan inte initiera AES-kryptering under inspelning till mediaarkiv. Data skrivs okrypterad.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID-fel: %1.</translation>
     </message>
   </context>
   <context>
