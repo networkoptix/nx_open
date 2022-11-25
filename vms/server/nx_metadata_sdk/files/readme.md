@@ -106,10 +106,10 @@ These samples can be compiled and linked using CMake.
 Prerequisites:
 ```
 - CMake >= 3.3.2
-- Windows (7 or 10): Microsoft Visual Studio >= 2015
-- Linux (Ubuntu 16.04, 18.04, 20.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
+- Windows (7 or 10): Microsoft Visual Studio >= 2019
+- Linux (Ubuntu 18.04, 20.04, 22.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
     cross-compiling:
-    - g++ >= 5.4.0
+    - g++ >= 7.5
     - make or Ninja
 ```
 
