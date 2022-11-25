@@ -4,11 +4,7 @@
 
 #include <QtCore/QObject>
 
-namespace nx::vms::time { class AbstractTimeSyncManager; }
-
 namespace ec2 {
-
-class TransactionMessageBusAdapter;
 
 class NX_VMS_COMMON_API AbstractECConnectionFactory: public QObject
 {
