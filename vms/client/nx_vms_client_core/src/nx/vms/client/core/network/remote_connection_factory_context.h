@@ -50,10 +50,8 @@ struct RemoteConnectionProcess
     std::shared_ptr<RemoteConnectionFactoryContext> context;
     std::future<void> future;
 
-    RemoteConnectionProcess():
-        context(new RemoteConnectionFactoryContext())
-    {
-    }
+    RemoteConnectionProcess();
+    ~RemoteConnectionProcess();
 };
 
 } // namespace nx::vms::client::core
