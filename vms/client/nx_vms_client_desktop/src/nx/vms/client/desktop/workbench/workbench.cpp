@@ -4,6 +4,8 @@
 
 #include <array>
 
+#include <QtCore/QScopedValueRollback>
+
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/user_resource.h>
@@ -165,6 +167,9 @@ struct Workbench::Private
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
 
+    /** Whether workbench is in session restore process. */
+    bool inSessionRestoreProcess = false;
+
     std::shared_ptr<StateDelegate> stateDelegate;
 
     int layoutIndex(const LayoutResourcePtr& resource) const
@@ -275,6 +280,7 @@ void Workbench::clear()
 
     d->layouts.clear();
     d->processRemovedLayouts(removedLayouts);
+
     emit layoutsChanged();
 }
 
@@ -710,6 +716,7 @@ void Workbench::updateCentralRoleItem()
 
 void Workbench::update(const QnWorkbenchState& state)
 {
+    QScopedValueRollback<bool> rollback(d->inSessionRestoreProcess, true);
     clear();
 
     for (const auto& id: state.layoutUuids)
@@ -922,6 +929,11 @@ void Workbench::at_layout_cellSpacingChanged()
 bool Workbench::isInLayoutChangeProcess() const
 {
     return d->inLayoutChangeProcess;
+}
+
+bool Workbench::isInSessionRestoreProcess() const
+{
+    return d->inSessionRestoreProcess;
 }
 
 } // namespace nx::vms::client::desktop
