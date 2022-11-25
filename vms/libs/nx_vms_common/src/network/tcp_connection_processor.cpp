@@ -55,7 +55,7 @@ void copyAndReplaceHeader(
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
-:
+    :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
@@ -68,7 +68,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
-:
+    :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(dptr)
 {
@@ -81,7 +81,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnCommonModule* commonModule)
-:
+    :
     QnCommonModuleAware(commonModule),
     d_ptr(dptr)
 {
@@ -581,41 +581,43 @@ bool QnTCPConnectionProcessor::readSingleRequest()
     d->currentRequestSize = 0;
     d->prevSocketError = SystemError::noError;
 
-    if( !d->clientRequest.isEmpty() )   //TODO #akolesnikov it is more reliable to check for the first call of this method
+    // TODO: #akolesnikov It is more reliable to check for the first call of this method.
+    if (!d->clientRequest.isEmpty())
     {
-        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest
-        //    can contain multiple interleaved requests.
-        //    Have to parse them!
-        NX_ASSERT( d->interleavedMessageData.isEmpty() );
-        d->interleavedMessageData = d->clientRequest;    //no copying here!
+        // Due to a bug in QnTCPConnectionProcessor::readRequest(), d->clientRequest can contain
+        // multiple interleaved requests. We have to parse them.
+        NX_ASSERT (d->interleavedMessageData.isEmpty());
+        d->interleavedMessageData = d->clientRequest; //< No copying here.
         d->clientRequest.clear();
         d->interleavedMessageDataPos = 0;
     }
 
     while (!needToStop() && d->socket->isConnected())
     {
-        if( d->interleavedMessageDataPos == (size_t)d->interleavedMessageData.size() )
+        if (d->interleavedMessageDataPos == (size_t) d->interleavedMessageData.size())
         {
-            //buffer depleted, draining more data
-            const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-            if (readed <= 0)
+            // The buffer depleted, draining more data.
+            const int bytesRead = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+            if (bytesRead <= 0)
             {
                 d->prevSocketError = SystemError::getLastOSErrorCode();
                 NX_DEBUG(this, "Error reading request from %1: %2",
                     d->socket->getForeignAddress(), SystemError::toString( d->prevSocketError ));
                 return false;
             }
-            d->interleavedMessageData = QByteArray::fromRawData( (const char*)d->tcpReadBuffer, readed );
+            d->interleavedMessageData =
+                QByteArray::fromRawData((const char*) d->tcpReadBuffer, bytesRead);
             d->interleavedMessageDataPos = 0;
         }
 
         size_t bytesParsed = 0;
-        if( !d->httpStreamReader.parseBytes(
-                nx::ConstBufferRefType(
-                    d->interleavedMessageData.data() + d->interleavedMessageDataPos,
-                    d->interleavedMessageData.size() - d->interleavedMessageDataPos),
-                &bytesParsed ) ||
-            (d->httpStreamReader.state() == nx::network::http::HttpStreamReader::ReadState::parseError) )
+        if (!d->httpStreamReader.parseBytes(
+            nx::ConstBufferRefType(
+                d->interleavedMessageData.data() + d->interleavedMessageDataPos,
+                d->interleavedMessageData.size() - d->interleavedMessageDataPos),
+            &bytesParsed) ||
+            (d->httpStreamReader.state() ==
+                nx::network::http::HttpStreamReader::ReadState::parseError))
         {
             //parse error
             return false;
@@ -625,16 +627,18 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
         if( d->currentRequestSize > kMaxRequestSize )
         {
-            qWarning() << "Too large HTTP client request ("<<d->currentRequestSize<<" bytes"
+            qWarning() << "Too large HTTP client request (" << d->currentRequestSize << " bytes"
                 ", "<<kMaxRequestSize<<" allowed). Ignoring...";
             return false;
         }
 
-        if( d->httpStreamReader.state() == nx::network::http::HttpStreamReader::ReadState::messageDone )
+        if (d->httpStreamReader.state() ==
+            nx::network::http::HttpStreamReader::ReadState::messageDone)
         {
-            if( d->httpStreamReader.message().type != nx::network::http::MessageType::request )
+            if (d->httpStreamReader.message().type != nx::network::http::MessageType::request)
                 return false;
-            //TODO #akolesnikov we have parsed message in d->httpStreamReader: should use it, not copy!
+            // TODO: #akolesnikov We have parsed the message in d->httpStreamReader: should use it,
+            // not copy.
             d->request = *d->httpStreamReader.message().request;
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody().takeByteArray();

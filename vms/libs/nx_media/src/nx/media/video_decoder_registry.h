@@ -106,11 +106,12 @@ private:
         }
     };
 
+private:
     std::vector<Metadata> m_plugins;
 
     bool m_isTranscodingEnabled;
 
-    RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer;
+    RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer = nullptr;
 };
 
 } // namespace media

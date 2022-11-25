@@ -147,7 +147,8 @@ protected:
         QnTCPConnectionProcessorPrivate* d_ptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
-    // For inherited classes without TCP server socket only
+
+    /** For inherited classes without a TCP server socket only. */
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
@@ -166,6 +167,7 @@ protected:
         const QByteArray& contentEncoding,
         const QByteArray& httpMessageFull,
         const nx::Buffer& httpMessageBodyOnly);
+
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 
