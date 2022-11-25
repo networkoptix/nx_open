@@ -633,6 +633,9 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    // Cross system manager should be destroyed before the network module.
+    d->cloudCrossSystemManager.reset();
+
     // Shared pointer to remote session must be freed as it's destructor depends on app context.
     d->clientCoreModule.reset();
 
@@ -645,7 +648,6 @@ ApplicationContext::~ApplicationContext()
     // Remote session must be fully destroyed while application context still exists.
     d->mainSystemContext.reset();
     d->cloudLayoutsManager.reset();
-    d->cloudCrossSystemManager.reset();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;

@@ -9,4 +9,15 @@ QString RemoteConnectionFactoryContext::toString() const
     return nx::format("ConnectionContext to %1", logonData.address);
 }
 
+RemoteConnectionProcess::RemoteConnectionProcess():
+    context(new RemoteConnectionFactoryContext())
+{
+}
+
+RemoteConnectionProcess::~RemoteConnectionProcess()
+{
+    // Reset the context first to speed up an early return of async connection func.
+    context.reset();
+}
+
 } // namespace nx::vms::client::core
