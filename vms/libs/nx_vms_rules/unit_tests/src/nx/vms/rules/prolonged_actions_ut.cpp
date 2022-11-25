@@ -93,7 +93,7 @@ private:
     QnSyncTime syncTime;
 };
 
-TEST_F(ProlongedActionsTest, sanity)
+TEST_F(ProlongedActionsTest, DISABLED_sanity)
 {
     whenTestEventFired(State::started);
     thenProlongedActionExecuted(0, State::started);

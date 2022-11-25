@@ -53,10 +53,6 @@ Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
     QObject(parent),
     m_router(std::move(router))
 {
-    const QString rulesVersion(ini().rulesEngine);
-    m_enabled = (rulesVersion == "new" || rulesVersion == "both");
-    m_oldEngineEnabled = (rulesVersion != "new");
-
     connect(m_router.get(), &Router::eventReceived, this, &Engine::processAcceptedEvent);
 }
 
