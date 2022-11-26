@@ -243,32 +243,40 @@ enum ServerFlag
     SF_IfListCtrl = 0x008,
     SF_timeCtrl = 0x010,
 
-    //* System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+    /**%apidoc[unused]
+     * System name is default, so it will be displayed as "Unassigned System' in NxTool.
+     */
     SF_Obsolete_AutoSystemName = 0x020,
 
+    /**%apidoc The Server has a setting isArmServer=true. */
     SF_ArmServer = 0x040,
 
-    SF_Obsolete_Has_HDD = 0x080, //< Removed in 5.1, was proprietary.
+    /**%apidoc[unused] Removed in 5.1, was proprietary. */
+    SF_Obsolete_Has_HDD = 0x080,
 
-    /**
-     * System is just installed, it has default admin password and is not linked to the cloud.
-     * this flag is deprecated ond only visible in APIs for compatibility. A proper indicator for
-     * thew new System is empty (null) localSystemId.
+    /**%apidoc
+     * The System is just installed, it has the default admin password and is not connected to the
+     * Cloud.
+     * %deprecated Is returned by the API only for compatibility. A proper indicator of a new
+     *     System is the empty (null) localSystemId. 
      */
     SF_NewSystem = 0x100,
 
     SF_SupportsTranscoding = 0x200,
-    SF_P2pSyncDone = 0x1000000, //< For UT purpose only
 
-    SF_Obsolete_RequiresEdgeLicense = 0x2000000, //< Removed in 5.1 - Edge-only licenses are gone.
+    /**%apidoc[unused] For unit test purpose only. */
+    SF_P2pSyncDone = 0x1000000,
 
-    // Server can provide information about built-in PoE block.
+    /**%apidoc[unused] Removed in 5.1 - Edge-only licenses are gone. */
+    SF_Obsolete_RequiresEdgeLicense = 0x2000000,
+
+    /**%apidoc Server can provide information about built-in PoE block. */
     SF_HasPoeManagementCapability = 0x4000000,
 
-    // Server can provide information about internal fan and its state.
+    /**%apidoc Server can provide information about internal fan and its state. */
     SF_HasFanMonitoringCapability = 0x8000000,
 
-    // Server has a buzzer that can produce sound.
+    /**%apidoc Server has a buzzer that can produce sound. */
     SF_HasBuzzer = 0x10000000,
 
     SF_OwnerApiForAdmins = 0x20000000,
