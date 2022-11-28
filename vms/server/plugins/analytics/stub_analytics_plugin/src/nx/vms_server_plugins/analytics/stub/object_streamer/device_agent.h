@@ -36,7 +36,7 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:
-    std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>> generateObjects(
+    std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>> generateMetadata(
         int frameNumber,
         int64_t frameTimestampUs,
         int64_t durationUs);

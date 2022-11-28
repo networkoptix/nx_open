@@ -8,6 +8,7 @@ full information.
 '''
 
 import argparse
+import collections
 import copy
 import json
 import math
@@ -180,14 +181,28 @@ class ObjectContext:
     '''Full information about an Object on a certain video frame.'''
 
     def __init__(self):
+        self.frame_number = 0
         self.object_position = ObjectPosition()
         self.object_movement_parameters = ObjectMovementParameters()
+
+class BestShot:
+    '''Information about Object Track Best Shot.'''
+
+    def __init__(self):
+        self.attributes = {}
+        self.image_source = ''
 
 class StreamEntry:
     '''Single entry of the stream file.'''
 
+    REGULAR_ENTRY_TYPE = 'regular'
+    BEST_SHOT_ENTRY_TYPE = 'bestShot'
+    DEFAULT_ENTRY_TYPE = REGULAR_ENTRY_TYPE
+
     def __init__(self, frame_number: int, object_position: ObjectPosition):
         self.frame_number = frame_number
+        self.entry_type = self.DEFAULT_ENTRY_TYPE
+        self.image_source = ''
         self.object_position = object_position
 
 class StreamEntryEncoder(json.JSONEncoder):
@@ -202,6 +217,8 @@ class StreamEntryEncoder(json.JSONEncoder):
     TOP_LEFT_Y_KEY = 'y'
     WIDTH_KEY = 'width'
     HEIGHT_KEY = 'height'
+    IMAGE_SOURCE_KEY = 'imageSource'
+    ENTRY_TYPE_KEY = 'entryType'
 
     def default(self, o: StreamEntry) -> Dict:
         result = {}
@@ -214,6 +231,11 @@ class StreamEntryEncoder(json.JSONEncoder):
         result[self.BOUNDING_BOX_KEY][self.TOP_LEFT_Y_KEY] = o.object_position.bounding_box.y
         result[self.BOUNDING_BOX_KEY][self.WIDTH_KEY] = o.object_position.bounding_box.width
         result[self.BOUNDING_BOX_KEY][self.HEIGHT_KEY] = o.object_position.bounding_box.height
+
+        if o.entry_type == StreamEntry.BEST_SHOT_ENTRY_TYPE:
+            result[self.IMAGE_SOURCE_KEY] = o.image_source
+            result[self.ENTRY_TYPE_KEY] = StreamEntry.BEST_SHOT_ENTRY_TYPE
+
         return result
 
 class Generator(ABC):
@@ -226,6 +248,10 @@ class Generator(ABC):
     @abstractmethod
     def move_object(self, object_context: ObjectContext) -> ObjectContext:
         '''Moves an existing Object.'''
+
+    @abstractmethod
+    def generate_best_shot(self, frame_number: int, object_context: ObjectContext) -> StreamEntry:
+        '''Generates Object Track Best Shot.'''
 
     @abstractmethod
     def object_type_info(self) -> ObjectTypeInfo:
@@ -248,6 +274,9 @@ class RandomMovementGenerator(Generator):
         MAX_WIDTH_KEY = 'maxWidth'
         MAX_HEIGHT_KEY = 'maxHeight'
         ATTRIBUTES_KEY = 'attributes'
+        BEST_SHOTS_KEY = 'bestShots'
+        IMAGE_SOURCE_KEY = 'imageSource'
+        FRAME_NUMBER_KEY = 'frameNumber'
 
         DEFAULT_TRACK_ID_POLICY = FIXED_TRACK_ID_POLICY
         DEFAULT_MIN_WIDTH = 0.05
@@ -277,6 +306,18 @@ class RandomMovementGenerator(Generator):
                 if config.get(self.MAX_HEIGHT_KEY) is not None else self.DEFAULT_MAX_HEIGHT)
             self.attributes = (config.get(self.ATTRIBUTES_KEY)
                 if config.get(self.ATTRIBUTES_KEY) is not None else {})
+            self.best_shots_by_frame_number = {}
+
+            best_shots = config.get(self.BEST_SHOTS_KEY)
+            if isinstance(best_shots, collections.abc.Sequence):
+                for entry in best_shots:
+                    frame_number = entry.get(self.FRAME_NUMBER_KEY)
+                    if not isinstance(frame_number, int):
+                        continue
+                    best_shot = BestShot()
+                    best_shot.attributes = entry.get(self.ATTRIBUTES_KEY)
+                    best_shot.image_source = entry.get(self.IMAGE_SOURCE_KEY)
+                    self.best_shots_by_frame_number[frame_number] = best_shot
 
     def __init__(self, config: Dict, generator_id: int):
         self._config = self.Config(config)
@@ -319,6 +360,18 @@ class RandomMovementGenerator(Generator):
         object_context.object_position.bounding_box = bounding_box
 
         return object_context
+
+    def generate_best_shot(self, frame_number: int, object_context: ObjectContext) -> StreamEntry:
+        if frame_number not in self._config.best_shots_by_frame_number:
+            return None
+
+        best_shot = self._config.best_shots_by_frame_number.get(frame_number)
+        stream_entry = StreamEntry(frame_number, object_context)
+        stream_entry.entry_type = StreamEntry.BEST_SHOT_ENTRY_TYPE
+        stream_entry.image_source = best_shot.image_source
+        stream_entry.object_position = copy.deepcopy(object_context.object_position)
+        stream_entry.object_position.attributes = best_shot.attributes
+        return stream_entry
 
     def object_type_info(self) -> ObjectTypeInfo:
         '''Overrides Generator.object_type_info.'''
@@ -427,6 +480,12 @@ class GenerationManager:
                 objects_in_frame.append(
                     StreamEntry(frame_number,
                         copy.deepcopy(context.object_context.object_position)))
+
+                best_shot_entry = track_generator.generate_best_shot(
+                    frame_number, context.object_context)
+
+                if best_shot_entry is not None:
+                    objects_in_frame.append(best_shot_entry)
 
             stream.extend(objects_in_frame)
 

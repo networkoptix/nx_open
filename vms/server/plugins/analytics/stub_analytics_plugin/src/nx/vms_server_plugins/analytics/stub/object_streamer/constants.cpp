@@ -21,6 +21,10 @@ const std::string kTopLeftYfield = "y";
 const std::string kWidthField = "width";
 const std::string kHeightField = "height";
 const std::string kTimestampUsField = "timestampUs";
+const std::string kEntryTypeField = "entryType";
+const std::string kImageSourceField = "imageSource";
+
+const std::string kBestShotEntryType = "bestShot";
 
 const std::string kDefaultManifestFile = "manifest.json";
 const std::string kDefaultStreamFile = "stream.json";

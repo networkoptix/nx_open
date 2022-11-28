@@ -21,15 +21,29 @@
             "minHeight": 0.1,
             "maxWidth": 0.3,
             "maxHeight": 0.3,
-            "attributes":
-            {
+            "attributes": {
                 "Color": "Red",
                 "Brand": "Lada",
                 "Model": "2106",
                 "LicensePlate.Number": "A001AA",
                 "LicensePlate.State/Province": "77",
                 "LicensePlate.Country": "Russia"
-            }
+            },
+            "bestShots": [
+                {
+                    "imageSource": "https://picsum.photos/200/300",
+                    "frameNumber": 10,
+                    "attributes": {
+                        "Best Shot Type": "URL",
+                        "Color": "Dark Red",
+                        "Brand": "Mercedes",
+                        "Model": "EQE",
+                        "LicensePlate.Number": "KEN560",
+                        "LicensePlate.State/Province": "05",
+                        "LicensePlate.Country": "Kazakhstan"
+                    }
+                }
+            ]
         },
         {
             "objectTypeId": "nx.base.Car",
@@ -39,15 +53,22 @@
             "minHeight": 0.2,
             "maxWidth": 0.4,
             "maxHeight": 0.4,
-            "attributes":
-            {
+            "attributes": {
                 "Color": "Green",
                 "Brand": "BMW",
                 "Model": "X5",
                 "LicensePlate.Number": "LHD 8448",
                 "LicensePlate.State/Province": "Texas",
                 "LicensePlate.Country": "USA"
-            }
+            },
+            "bestShots": [
+                {
+                    "frameNumber": 250,
+                    "attributes": {
+                        "Best Shot Type": "Bounding Box"
+                    }
+                }
+            ]
         },
         {
             "objectTypeId": "nx.base.Car",
@@ -57,8 +78,7 @@
             "minHeight": 0.1,
             "maxWidth": 0.2,
             "maxHeight": 0.2,
-            "attributes":
-            {
+            "attributes": {
                 "Color": "Yellow",
                 "Brand": "Fiat",
                 "Model": "124 Spider",
@@ -75,8 +95,7 @@
             "minHeight": 0.4,
             "maxWidth": 0.25,
             "maxHeight": 0.4,
-            "attributes":
-            {
+            "attributes": {
                 "Color": "White",
                 "Brand": "Ford",
                 "Model": "F150",
@@ -92,8 +111,7 @@
             "minHeight": 0.1,
             "maxWidth": 0.5,
             "maxHeight": 0.5,
-            "attributes":
-            {
+            "attributes": {
                 "Color": "Blue",
                 "Brand": "Bogdan",
                 "Model": "A-092",
@@ -109,8 +127,7 @@
             "minHeight": 0.1,
             "maxWidth": 0.1,
             "maxHeight": 0.2,
-            "attributes":
-            {
+            "attributes": {
                 "Age": "32",
                 "Gender": "Female",
                 "Body Shape": "Normal",
@@ -123,8 +140,7 @@
             "objectTypeId": "stub.objectStreamer.custom.type.1",
             "movementPolicy": "random",
             "trackIdPolicy": "changeOncePerStreamCycle",
-            "attributes":
-            {
+            "attributes": {
                 "string attribute 1": "first string attribute",
                 "string attribute 2": "second string attribute",
                 "number attribute 1": "0.1",
