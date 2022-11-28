@@ -73,8 +73,6 @@ private:
     utils::Url m_url;
     utils::InterruptionFlag m_destructionFlag;
     nx::String m_connectionGuid;
-    bool m_connectionEstablished = false;
-    network::aio::Timer m_timer;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
 
     void startReading();
