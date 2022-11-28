@@ -183,11 +183,6 @@ enum IDType
     HiDpiSupportMessageAction,
 
     /**
-     * Displays dialog asking about statistics reporting.
-     */
-    AllowStatisticsReportMessageAction,
-
-    /**
      * Asks user to select analytics storage location.
      */
     ConfirmAnalyticsStorageAction,

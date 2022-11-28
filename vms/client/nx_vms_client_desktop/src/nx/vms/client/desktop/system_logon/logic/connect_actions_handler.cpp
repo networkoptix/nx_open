@@ -733,7 +733,6 @@ void ConnectActionsHandler::showWarnMessagesOnce()
     /* Collect and send crash dumps if allowed */
     d->crashReporter->scanAndReportAsync(qnSettings->rawSettings());
 
-    menu()->triggerIfPossible(ui::action::AllowStatisticsReportMessageAction);
     menu()->triggerIfPossible(ui::action::VersionMismatchMessageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();

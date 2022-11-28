@@ -396,7 +396,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
     connect(action(action::ConfirmAnalyticsStorageAction), &QAction::triggered, this, [this] { confirmAnalyticsStorageLocation(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
@@ -2907,26 +2906,6 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
 
     dialog.exec();
-}
-
-void ActionHandler::checkIfStatisticsReportAllowed()
-{
-    // Suppress notification if no server has internet access.
-    const bool atLeastOneServerHasInternetAccess = (bool) resourcePool()->serverWithInternetAccess();
-    if (!atLeastOneServerHasInternetAccess)
-        return;
-
-    // Check if user has already made a decision.
-    if (globalSettings()->isStatisticsAllowedDefined())
-        return;
-
-    QnMessageBox::information(mainWindowWidget(),
-        tr("System sends anonymous usage statistics"),
-        tr("It will be used by software development team to improve your user experience.")
-            + '\n' + tr("To disable it, go to System Administration dialog."));
-
-    globalSettings()->setStatisticsAllowed(true);
-    globalSettings()->synchronizeNow();
 }
 
 void ActionHandler::confirmAnalyticsStorageLocation()
