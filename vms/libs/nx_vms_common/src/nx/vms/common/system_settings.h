@@ -225,7 +225,6 @@ public:
     nx::vms::api::BackupSettings backupSettings() const;
     void setBackupSettings(const nx::vms::api::BackupSettings& value);
 
-    bool isStatisticsAllowedDefined() const;
     bool isStatisticsAllowed() const;
     void setStatisticsAllowed(bool value);
 
@@ -571,7 +570,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::BackupSettings>* m_backupSettingsAdaptor = nullptr;
 
     // set of statistics settings adaptors
-    QnResourcePropertyAdaptor<QnOptionalBool>* m_statisticsAllowedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_statisticsAllowedAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportLastTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportLastVersionAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_statisticsReportLastNumberAdaptor = nullptr;
