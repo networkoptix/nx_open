@@ -188,6 +188,9 @@ public:
         /** Approved urls that have access to a session token using jsapi. */
         AUTH_ALLOWED_URLS,
 
+        /** The maximum file duration in seconds for sound notification actions. */
+        MAX_MP3_FILE_DURATION_SEC,
+
         VARIABLE_COUNT
     };
     Q_ENUM(Variable)
@@ -336,6 +339,8 @@ private:
             setAuthAllowedUrls,
             AUTH_ALLOWED_URLS,
             AuthAllowedUrls{})
+
+        QN_DECLARE_R_PROPERTY(int, maxMp3FileDurationSec, MAX_MP3_FILE_DURATION_SEC, 30)
 
     QN_END_PROPERTY_STORAGE()
 
