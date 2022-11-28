@@ -184,6 +184,9 @@ public:
         /** Allow computer entering sleep mode on idle while running client. */
         ALLOW_COMPUTER_ENTERING_SLEEP_MODE,
 
+        /** The maximum file duration in seconds for sound notification actions. */
+        MAX_MP3_FILE_DURATION_SEC,
+
         VARIABLE_COUNT
     };
     Q_ENUM(Variable)
@@ -332,6 +335,8 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, muteOnAudioTransmit, setMuteOnAudioTransmit,
             MUTE_ON_AUDIO_TRANSMIT, true)
+
+        QN_DECLARE_R_PROPERTY(int, maxMp3FileDurationSec, MAX_MP3_FILE_DURATION_SEC, 30)
 
     QN_END_PROPERTY_STORAGE()
 

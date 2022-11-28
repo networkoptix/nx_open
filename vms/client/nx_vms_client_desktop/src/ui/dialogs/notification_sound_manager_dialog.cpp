@@ -84,11 +84,12 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
             supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
-    int cropSoundSecs = 5;
+    const int maxValueSec = qnSettings->maxMp3FileDurationSec();
+    int cropSoundSecs = maxValueSec / 2;
     QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds")
-        .arg(QnCustomFileDialog::spinBoxPlaceholder()), 1, 10, &cropSoundSecs);
+        .arg(QnCustomFileDialog::spinBoxPlaceholder()), 1, maxValueSec, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom title:"), &title);
     if (!dialog->exec())
         return;
