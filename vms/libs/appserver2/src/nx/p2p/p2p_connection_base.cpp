@@ -349,9 +349,22 @@ void ConnectionBase::onHttpClientDone()
             url));
     }
 
-    m_p2pTransport->start();
     m_httpClient.reset();
-    setState(State::Connected);
+    m_p2pTransport->start([this](SystemError::ErrorCode errorCode)
+        {
+            if (errorCode == SystemError::noError)
+            {
+                setState(State::Connected);
+            }
+            else
+            {
+                cancelConnecting(
+                    errorCode == SystemError::sslHandshakeError
+                    ? State::handshakeError
+                    : State::Error,
+                    nx::format("P2P Http transport connection failed %1").arg(errorCode));
+            }
+        });
 }
 
 void ConnectionBase::startConnection()
@@ -359,8 +372,11 @@ void ConnectionBase::startConnection()
     m_startedClassId = typeid(*this).hash_code();
 
     auto headers = m_additionalRequestHeaders;
-    nx::network::websocket::addClientHeaders(
-        &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
+    if (m_remotePeerUrl.path() == kWebsocketUrlPath)
+    {
+        nx::network::websocket::addClientHeaders(
+            &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
+    }
     m_connectionGuid = QnUuid::createUuid().toByteArray();
     headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_httpClient->addRequestHeaders(headers);

@@ -32,9 +32,10 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_connectionGuid(connectionGuid)
 {
     using namespace std::chrono_literals;
+
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
-    m_readHttpClient->bindToAioThread(getAioThread());
+    bindToAioThread(m_readHttpClient->getAioThread());
     const auto keepAliveOptions =
         nx::network::KeepAliveOptions(std::chrono::minutes(1), std::chrono::seconds(10), 5);
     m_readHttpClient->setKeepAlive(keepAliveOptions);
@@ -44,7 +45,6 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 
     m_writeHttpClient->bindToAioThread(getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
-    m_timer.bindToAioThread(getAioThread());
 }
 
 void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
@@ -127,22 +127,6 @@ void P2PHttpClientTransport::sendAsync(
             NX_VERBOSE(this, "sendAsync: Starting..");
             if (m_failed)
                 return handler(SystemError::connectionAbort, 0);
-
-            if (!m_connectionEstablished)
-            {
-                constexpr auto kDelayTimeout = std::chrono::milliseconds(25);
-                NX_VERBOSE(
-                    this, "sendAsync: GET channel to '%1' has not been established yet. Delaying",
-                    m_url);
-                m_timer.start(
-                    kDelayTimeout,
-                    [this, buffer, handler = std::move(handler)]() mutable
-                    {
-                        sendAsync(&buffer, std::move(handler));
-                    });
-
-                return;
-            }
 
             m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
                 m_messageType,
@@ -262,7 +246,6 @@ void P2PHttpClientTransport::startReading()
                 return;
             }
 
-            m_connectionEstablished = true;
             if (m_onStartHandler)
             {
                 utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
