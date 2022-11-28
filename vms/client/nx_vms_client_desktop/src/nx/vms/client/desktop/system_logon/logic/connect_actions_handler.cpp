@@ -965,6 +965,7 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
     if (!connectionInfo)
         return;
 
+    statisticsModule()->certificates()->resetScenario();
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
         ? statisticsModule()->certificates()->beginScenario(*connectData.connectScenario)
         : nullptr;
