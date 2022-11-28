@@ -23,6 +23,10 @@ extern const std::string kTopLeftYfield;
 extern const std::string kWidthField;
 extern const std::string kHeightField;
 extern const std::string kTimestampUsField;
+extern const std::string kEntryTypeField;
+extern const std::string kImageSourceField;
+
+extern const std::string kBestShotEntryType;
 
 extern const std::string kDefaultManifestFile;
 extern const std::string kDefaultStreamFile;

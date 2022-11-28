@@ -7,6 +7,7 @@
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/settings_response.h>
 
@@ -49,12 +50,12 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
 {
     if (m_lastFrameTimestampUs >= 0)
     {
-        for (auto& objectMetdataPacket: generateObjects(
+        for (auto& metdataPacket: generateMetadata(
             m_frameNumber == 0 ? m_maxFrameNumber : m_frameNumber - 1,
             m_lastFrameTimestampUs,
             std::max(videoPacket->timestampUs() - m_lastFrameTimestampUs, (int64_t) 0)))
         {
-            pushMetadataPacket(objectMetdataPacket.releasePtr());
+            pushMetadataPacket(metdataPacket.releasePtr());
         }
     }
 
@@ -76,15 +77,16 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     return true;
 }
 
-std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
+std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
     int frameNumber, int64_t frameTimestampUs, int64_t durationUs)
 {
-    std::vector<Ptr<IObjectMetadataPacket>> result;
+    std::vector<Ptr<IMetadataPacket>> result;
 
     if (m_streamInfo.objectsByFrameNumber.find(frameNumber) == m_streamInfo.objectsByFrameNumber.cend())
         return result;
 
     std::map<int64_t, Ptr<ObjectMetadataPacket>> objectMetadataPacketByTimestamp;
+    std::vector<Ptr<ObjectTrackBestShotPacket>> objectTrackBestShotPackets;
     for (Object& object: m_streamInfo.objectsByFrameNumber[frameNumber])
     {
         if (m_disabledObjectTypeIds.find(object.typeId) != m_disabledObjectTypeIds.cend())
@@ -94,32 +96,63 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
             ? object.timestampUs
             : frameTimestampUs;
 
-        Ptr<ObjectMetadataPacket>& objectMetadataPacket =
-            objectMetadataPacketByTimestamp[timestampUs];
-
-        if (!objectMetadataPacket)
-        {
-            objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-            objectMetadataPacket->setTimestampUs(timestampUs);
-            objectMetadataPacket->setDurationUs(durationUs);
-        }
-
         if (!object.trackIdRef.empty())
             object.trackId = obtainObjectTrackIdFromRef(object.trackIdRef);
 
-        auto objectMetadata = makePtr<ObjectMetadata>();
-        objectMetadata->setTypeId(object.typeId);
-        objectMetadata->setTrackId(object.trackId);
-        objectMetadata->setBoundingBox(object.boundingBox);
+        if (object.entryType == Object::EntryType::bestShot)
+        {
+            auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
+            bestShotPacket->setTimestampUs(timestampUs);
+            bestShotPacket->setTrackId(object.trackId);
+            bestShotPacket->setBoundingBox(object.boundingBox);
+            for (const auto& item: object.attributes)
+                bestShotPacket->addAttribute(makePtr<Attribute>(item.first, item.second));
 
-        for (const auto& item: object.attributes)
-            objectMetadata->addAttribute(makePtr<Attribute>(item.first, item.second));
+            if (isHttpOrHttpsUrl(object.imageSource))
+            {
+                bestShotPacket->setImageUrl(object.imageSource);
+            }
+            else if (!object.imageSource.empty())
+            {
+                std::string imageFormat = imageFormatFromPath(object.imageSource);
+                if (!imageFormat.empty())
+                {
+                    bestShotPacket->setImageDataFormat(std::move(imageFormat));
+                    bestShotPacket->setImageData(loadFile(object.imageSource));
+                }
+            }
 
-        objectMetadataPacket->addItem(objectMetadata.get());
+            objectTrackBestShotPackets.push_back(std::move(bestShotPacket));
+        }
+        else
+        {
+            Ptr<ObjectMetadataPacket>& objectMetadataPacket =
+                objectMetadataPacketByTimestamp[timestampUs];
+
+            if (!objectMetadataPacket)
+            {
+                objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+                objectMetadataPacket->setTimestampUs(timestampUs);
+                objectMetadataPacket->setDurationUs(durationUs);
+            }
+
+            auto objectMetadata = makePtr<ObjectMetadata>();
+            objectMetadata->setTypeId(object.typeId);
+            objectMetadata->setTrackId(object.trackId);
+            objectMetadata->setBoundingBox(object.boundingBox);
+
+            for (const auto& item: object.attributes)
+                objectMetadata->addAttribute(makePtr<Attribute>(item.first, item.second));
+
+            objectMetadataPacket->addItem(objectMetadata.get());
+        }
     }
 
     for (const auto& entry: objectMetadataPacketByTimestamp)
         result.push_back(entry.second);
+
+    for (const auto& bestShotPacket: objectTrackBestShotPackets)
+        result.push_back(bestShotPacket);
 
     return result;
 }

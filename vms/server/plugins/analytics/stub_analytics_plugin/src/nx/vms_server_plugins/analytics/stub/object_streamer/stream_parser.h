@@ -19,14 +19,21 @@ namespace object_streamer {
 
 struct Object
 {
+    enum class EntryType
+    {
+        regular,
+        bestShot,
+    };
+
     std::string typeId;
     nx::sdk::Uuid trackId;
     std::string trackIdRef;
-    int streamCycle = 0;
     nx::sdk::analytics::Rect boundingBox;
     std::map<std::string, std::string> attributes;
     int frameNumberToGenerateObject = 0;
     int64_t timestampUs = -1;
+    EntryType entryType = EntryType::regular;
+    std::string imageSource;
 };
 
 enum class Issue
@@ -86,6 +93,11 @@ bool parseAttributes(
 bool parseTimestamp(
     const nx::kit::Json& objectDescription,
     int64_t* outTimestamp,
+    Issues* outIssues);
+
+bool parseImageSource(
+    const nx::kit::Json& objectDescription,
+    std::string* outImageSource,
     Issues* outIssues);
 
 std::string issueToString(Issue issue);
