@@ -232,8 +232,8 @@ SystemSettings::AdaptorList SystemSettings::initLdapAdaptors()
 
 SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
 {
-    m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(
-        "statisticsAllowed", QnOptionalBool(), this,
+    m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        "statisticsAllowed", false, this,
         [] { return tr("Anonymous statistics report allowed"); });
 
     m_statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
@@ -1445,21 +1445,14 @@ void SystemSettings::setBackupSettings(const nx::vms::api::BackupSettings& value
     m_backupSettingsAdaptor->setValue(value);
 }
 
-bool SystemSettings::isStatisticsAllowedDefined() const
-{
-    return m_statisticsAllowedAdaptor->value().isDefined();
-}
-
 bool SystemSettings::isStatisticsAllowed() const
 {
-    /* Undefined value means we are allowed to send statistics. */
-    return !m_statisticsAllowedAdaptor->value().isDefined()
-        || m_statisticsAllowedAdaptor->value().value();
+    return m_statisticsAllowedAdaptor->value();
 }
 
 void SystemSettings::setStatisticsAllowed(bool value)
 {
-    m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
+    m_statisticsAllowedAdaptor->setValue(value);
 }
 
 QDateTime SystemSettings::statisticsReportLastTime() const

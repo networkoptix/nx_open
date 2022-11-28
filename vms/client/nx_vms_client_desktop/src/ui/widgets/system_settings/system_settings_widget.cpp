@@ -166,10 +166,6 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (ui->autoSettingsCheckBox->isChecked() != globalSettings()->isCameraSettingsOptimizationEnabled())
         return true;
 
-    /* Always mark as 'has changes' if we have not still decided to allow the statistics. */
-    if (!globalSettings()->isStatisticsAllowedDefined())
-        return true;
-
     if (ui->statisticsReportCheckBox->isChecked() != globalSettings()->isStatisticsAllowed())
         return true;
 

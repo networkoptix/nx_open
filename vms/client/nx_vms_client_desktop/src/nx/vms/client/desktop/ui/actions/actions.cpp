@@ -654,11 +654,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .condition(condition::showBetaUpgradeWarning());
 
-    factory(AllowStatisticsReportMessageAction)
-        .flags(NoTarget)
-        .mode(DesktopMode)
-        .requiredGlobalPermission(GlobalPermission::admin);
-
     factory(ConfirmAnalyticsStorageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
