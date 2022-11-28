@@ -125,8 +125,10 @@ bool objectMatches(const QObject* object, QJSValue properties)
         // QML type name looks like QQuickText or Text_QMLTYPE_123
         if (auto item = qobject_cast<const QQuickItem*>(object))
         {
+            // TODO: Also use QML.Element from classInfo.
             matches = className.startsWith(typeString + "_QMLTYPE_") ||
-                className.startsWith("QQuick" + typeString);
+                className.startsWith("QQuick" + typeString) ||
+                className.startsWith("QQuickPre64" + typeString);
         }
 
         if (!matches && className != typeString)
