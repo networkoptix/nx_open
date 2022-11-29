@@ -21,7 +21,7 @@ DetectableObjectTypeComboBox::DetectableObjectTypeComboBox(QWidget* parent):
         qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
             qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
 
-    const auto filterModel = new analytics::taxonomy::AnalyticsFilterModel(taxonomyManager, this);
+    const auto filterModel = taxonomyManager->createFilterModel(this);
 
     setModel(new DetectableObjectTypeModel(filterModel, this));
 }

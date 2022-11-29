@@ -77,7 +77,9 @@ static AbstractNode* makeFilteredNode(
     if (directFilterMatch && outEngineFilters)
         engineFiltersFromObjectType(objectType, outEngineFilters, parent);
 
-    Node* node = new Node(objectType, parent);
+    Node* node = new Node(objectType, nullptr);
+    node->moveToThread(parent->thread());
+    node->setParent(parent);
     node->setFilter(filter);
     for (const nx::analytics::taxonomy::AbstractObjectType* nodeObjectType: nodeObjectTypes)
         node->addObjectType(nodeObjectType);
