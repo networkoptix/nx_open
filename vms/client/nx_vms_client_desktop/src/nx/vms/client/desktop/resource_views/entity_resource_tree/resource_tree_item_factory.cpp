@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topics.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace {
 
@@ -227,7 +228,9 @@ GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
             if (NX_ASSERT(context) &&
                 context->status() == CloudCrossSystemContext::Status::unsupportedPermanently)
             {
-                return context->systemContext()->moduleInformation().version.toString();
+                const auto cloudSystem = qnCloudStatusWatcher->cloudSystem(systemId);
+                if (NX_ASSERT(cloudSystem))
+                    return cloudSystem->version;
             }
 
             return QString{};

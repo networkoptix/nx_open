@@ -340,6 +340,19 @@ void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
     accountManager->reactivateAccount(account, nx::utils::guarded(this, callback));
 }
 
+std::optional<QnCloudSystem> QnCloudStatusWatcher::cloudSystem(const QString& systemId) const
+{
+    Q_D(const QnCloudStatusWatcher);
+
+    for (const auto& cloudSystem: d->cloudSystems)
+    {
+        if (cloudSystem.cloudId == systemId)
+            return cloudSystem;
+    }
+
+    return {};
+}
+
 QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
 {
     Q_D(const QnCloudStatusWatcher);
