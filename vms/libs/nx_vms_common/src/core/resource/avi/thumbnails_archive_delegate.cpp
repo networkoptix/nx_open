@@ -137,6 +137,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             m_currentPos += m_frameStep;
             seekRez = m_baseDelegate->seek(m_currentPos, true);
         }
+
         if (seekRez == -1)
             return QnAbstractMediaDataPtr();
 
