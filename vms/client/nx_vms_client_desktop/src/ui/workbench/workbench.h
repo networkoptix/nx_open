@@ -178,6 +178,7 @@ public:
     void applyLoadedState();
 
     bool isInLayoutChangeProcess() const;
+    bool isInSessionRestoreProcess() const;
 signals:
     /**
      * This signal is emitted while the workbench is still intact, but is about
@@ -270,6 +271,9 @@ private:
 
     /** Whether current layout is being changed. */
     bool m_inLayoutChangeProcess;
+
+    /** Whether workbench is in session restore process. */
+    bool m_inSessionRestoreProcess = false;
 
     class StateDelegate;
     StateDelegate* m_stateDelegate;

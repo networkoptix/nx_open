@@ -2,6 +2,8 @@
 
 #include "workbench.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
 
@@ -508,6 +510,7 @@ void QnWorkbench::updateCentralRoleItem() {
 
 void QnWorkbench::update(const QnWorkbenchState& state)
 {
+    QScopedValueRollback<bool> rollback(m_inSessionRestoreProcess, true);
     clear();
 
     for (const auto& id: state.layoutUuids)
@@ -658,4 +661,9 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
 bool QnWorkbench::isInLayoutChangeProcess() const
 {
     return m_inLayoutChangeProcess;
+}
+
+bool QnWorkbench::isInSessionRestoreProcess() const
+{
+    return m_inSessionRestoreProcess;
 }

@@ -171,7 +171,8 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
 
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
-                && workbench()->layouts().empty())
+                && workbench()->layouts().empty()
+                && !workbench()->isInSessionRestoreProcess())
             {
                 menu()->trigger(action::OpenNewTabAction);
             }

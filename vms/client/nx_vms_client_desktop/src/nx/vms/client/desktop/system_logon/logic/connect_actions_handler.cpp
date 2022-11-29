@@ -1194,6 +1194,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         qnSettings->save();
     }
 
+    qnClientModule->clientStateHandler()->storeSystemSpecificState();
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
     {
         NX_ASSERT(!force, "Forced exit must close connection");
