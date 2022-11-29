@@ -632,6 +632,7 @@ FocusScope
                     anchors.left: button.right
                     anchors.right: listItem.right
                     anchors.rightMargin: treeView.rightMargin
+                        + (listView.ScrollBar.vertical.visible ? listView.ScrollBar.vertical.width : 0)
 
                     Connections
                     {
