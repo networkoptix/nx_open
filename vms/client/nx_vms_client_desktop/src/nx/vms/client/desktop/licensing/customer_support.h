@@ -26,6 +26,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ContactAddress
         phone,
         link,
         textLink, //< Link with the predefined text.
+        plainText,
     };
 
     const Channel channel;
