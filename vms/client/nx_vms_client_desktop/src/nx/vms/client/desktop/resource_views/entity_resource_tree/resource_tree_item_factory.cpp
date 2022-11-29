@@ -13,6 +13,7 @@
 #include <finders/systems_finder.h>
 #include <network/base_system_description.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -227,7 +228,9 @@ GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
             if (NX_ASSERT(context) &&
                 context->status() == CloudCrossSystemContext::Status::unsupportedPermanently)
             {
-                return context->systemContext()->moduleInformation().version.toString();
+                const auto cloudSystem = qnCloudStatusWatcher->cloudSystem(systemId);
+                if (NX_ASSERT(cloudSystem))
+                    return cloudSystem->version;
             }
 
             return QString{};
