@@ -354,7 +354,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     {
         m_eofReached = time > endTime;
         if (m_eofReached)
-            return time;
+            return DATETIME_NOW;
     }
 
     std::fill(m_keyFrameFound.begin(), m_keyFrameFound.end(), false);
