@@ -36,7 +36,23 @@ FocusScope
         id: contentRow
 
         height: delegateItem.height
+        width: parent.width
         spacing: 4
+
+        // Resource name and extra information need to be elided proportionally to their sizes.
+        readonly property real availableTextWidth: width - icon.width
+            - (name.visible ? spacing : 0) - (extraInfo.visible ? spacing : 0)
+
+        readonly property real actualTextWidth: name.implicitWidth + extraInfo.implicitWidth
+        readonly property bool isElideRequired: actualTextWidth > availableTextWidth
+
+        readonly property real nameWidth: isElideRequired
+            ? (actualTextWidth > 0 ? availableTextWidth * name.implicitWidth / actualTextWidth : 0)
+            : name.implicitWidth
+
+        readonly property real extraInfoWidth: isElideRequired
+            ? (actualTextWidth > 0 ? availableTextWidth * extraInfo.implicitWidth / actualTextWidth : 0)
+            : extraInfo.implicitWidth
 
         Image
         {
@@ -94,8 +110,8 @@ FocusScope
             font.weight: Font.DemiBold
             height: parent.height
             verticalAlignment: Text.AlignVCenter
-            visible: !delegateItem.isEditing
-            width: Math.min(implicitWidth, delegateItem.availableWidth - x)
+            visible: !delegateItem.isEditing && text.length !== 0
+            width: parent.nameWidth
             elide: Text.ElideRight
             color: delegateItem.mainTextColor
         }
@@ -110,10 +126,10 @@ FocusScope
             textFormat: Text.PlainText
             font.weight: Font.Normal
             height: parent.height
-            width: Math.min(implicitWidth, delegateItem.availableWidth - x)
+            width: parent.extraInfoWidth
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
-            visible: !delegateItem.isEditing
+            visible: !delegateItem.isEditing && text.length !== 0
             leftPadding: 1
 
             color:
