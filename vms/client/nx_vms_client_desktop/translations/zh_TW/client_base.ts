@@ -5507,7 +5507,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <translation>有可用的遠端錄影備份</translation>
     </message>
   </context>
   <context>
@@ -9899,8 +9899,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation> %1 將有被冒充，並竊取您隱私資料的風險。
+若您沒有修改%2伺服器的憑證，請不要綁定此憑證。</translation>
     </message>
     <message>
       <source>Auto-generated certificate</source>
