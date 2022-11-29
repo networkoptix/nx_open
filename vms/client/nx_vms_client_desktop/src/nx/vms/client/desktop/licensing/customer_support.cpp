@@ -35,8 +35,11 @@ ContactAddress::Channel detectChannel(const QString& address)
     if (address.startsWith("<a href="))
         return ContactAddress::Channel::textLink;
 
-    // In all uncertain cases try to make it a link.
-    return ContactAddress::Channel::link;
+    // Link with the predefined text.
+    if (QUrl::fromUserInput(address).isValid())
+        return ContactAddress::Channel::link;
+
+    return ContactAddress::Channel::plainText;
 }
 
 QString makeHref(ContactAddress::Channel channel, const QString& address)
@@ -51,6 +54,7 @@ QString makeHref(ContactAddress::Channel channel, const QString& address)
             return html::mailtoLink(address);
         case ContactAddress::Channel::phone:
         case ContactAddress::Channel::textLink:
+        case ContactAddress::Channel::plainText:
             return address;
         case ContactAddress::Channel::link:
             return html::link(nx::utils::Url::fromUserInput(address));
