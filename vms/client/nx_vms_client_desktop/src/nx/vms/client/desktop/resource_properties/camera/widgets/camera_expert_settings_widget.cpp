@@ -392,7 +392,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             controlDisabledForAll);
     }
 
-    ui->timeSettingsGroupBox->setHidden(!state.settingsOptimizationEnabled);
+    // Hide certain fields for RTSP/HTTP links.
+    const bool isNetworkLink = state.isSingleCamera() && state.singleCameraProperties.networkLink;
+    ui->timeSettingsGroupBox->setHidden(!state.settingsOptimizationEnabled || isNetworkLink);
     check_box_utils::setupTristateCheckbox(ui->keepCameraTimeSettingsCheckBox,
         state.expert.keepCameraTimeSettings.hasValue() || !state.settingsOptimizationEnabled,
         !state.settingsOptimizationEnabled
