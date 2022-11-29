@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <string>
 #include <chrono>
+#include <optional>
+#include <string>
 
 #include <QtCore/QObject>
 
@@ -94,6 +95,7 @@ public:
     bool isCloudEnabled() const;
 
     void updateSystems();
+    std::optional<QnCloudSystem> cloudSystem(const QString& systemId) const;
     QnCloudSystemList cloudSystems() const;
     QnCloudSystemList recentCloudSystems() const;
 

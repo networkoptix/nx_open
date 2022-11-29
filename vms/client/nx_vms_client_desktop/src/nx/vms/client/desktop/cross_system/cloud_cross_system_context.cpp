@@ -232,8 +232,8 @@ struct CloudCrossSystemContext::Private
 
                     auto status = Status::connectionFailure;
 
-                    if (error->code
-                        == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa)
+                    if (error->code == core::RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
+                        || error->code == core::RemoteConnectionErrorCode::versionIsTooLow)
                     {
                         status = Status::unsupportedPermanently;
                     }
