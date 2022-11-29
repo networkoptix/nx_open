@@ -53,16 +53,17 @@ void RecorderItemDataHelper::onCameraAdded(const QnResourcePtr& cameraResource)
 {
     const auto camera = cameraResource.staticCast<QnVirtualCameraResource>();
     const QString groupId = camera->getGroupId();
-    if (groupId.isEmpty())
-        return;
-
-    m_camerasByRecorderGroupId[groupId].insert(camera);
 
     connect(camera.get(), &QnVirtualCameraResource::groupIdChanged,
         this, &RecorderItemDataHelper::onCameraGroupIdChanged);
 
     connect(camera.get(), &QnVirtualCameraResource::groupNameChanged,
         this, &RecorderItemDataHelper::onCameraGroupNameChanged);
+
+    if (groupId.isEmpty())
+        return;
+
+    m_camerasByRecorderGroupId[groupId].insert(camera);
 }
 
 void RecorderItemDataHelper::onCameraRemoved(const QnResourcePtr& cameraResource)
