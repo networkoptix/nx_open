@@ -253,7 +253,8 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
                 workbench()->removeLayouts(layouts);
 
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
-                && workbench()->layouts().empty())
+                && workbench()->layouts().empty()
+                && !workbench()->isInSessionRestoreProcess())
             {
                 menu()->trigger(action::OpenNewTabAction);
             }

@@ -227,8 +227,6 @@ void ClientStateHandler::clientDisconnected()
     if (!NX_ASSERT(d->sessionId != SessionId()))
         return;
 
-    storeSystemSpecificState();
-
     d->startupParameters = {};
     d->sessionState = {};
     d->sessionId = {};

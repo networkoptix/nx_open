@@ -75,7 +75,7 @@ public:
      * values.
      * Note that this function does not reset parameters of the grid mapper.
      */
-    void clear(bool doProcessRemovedLayouts = true);
+    void clear();
 
     /**
      * Note that this function never returns nullptr.
@@ -199,6 +199,7 @@ public:
     void applyLoadedState();
 
     bool isInLayoutChangeProcess() const;
+    bool isInSessionRestoreProcess() const;
 
 signals:
     /**
