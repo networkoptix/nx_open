@@ -387,9 +387,10 @@ TEST_F(AsyncFileDownloader, interruptedBeforeContent)
     auto context = prepareTestContext(
         ssl::kAcceptAnyCertificate,
         {kNoTimeout, kNoTimeout, kNoTimeout});
-    context->downloader->start(prepareUrl(kInfiniteFilePath), context->file);
+    context->downloader->start(prepareUrl(kEmptyFilePath), context->file);
 
-    ASSERT_EQ(context->responseFuture.get(), std::nullopt);
+    auto contentLength = context->responseFuture.get().value();
+    ASSERT_EQ(contentLength, kContentLength);
     context->downloader->pleaseStopSync();
 
     auto status = context->doneFuture.wait_for(std::chrono::milliseconds(100));
