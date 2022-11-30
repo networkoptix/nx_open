@@ -1054,7 +1054,7 @@ void LayoutsHandler::openLayouts(
             {
                 // Use zero position for nov files.
                 const auto state = layout->isFile()
-                    ? StreamSynchronizationState::disabled()
+                    ? StreamSynchronizationState::playFromStart()
                     : playbackState;
 
                 // Force playback state.

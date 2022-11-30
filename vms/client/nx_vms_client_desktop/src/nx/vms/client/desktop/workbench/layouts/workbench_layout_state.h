@@ -13,6 +13,7 @@ struct StreamSynchronizationState
 {
     static StreamSynchronizationState live() { return {true, DATETIME_NOW, 1.0}; }
     static StreamSynchronizationState disabled() { return {false, DATETIME_INVALID, 0.0}; }
+    static StreamSynchronizationState playFromStart() { return {true, 0, 1.0}; }
 
     bool isSyncOn = false;
     qint64 timeUs = DATETIME_INVALID;
