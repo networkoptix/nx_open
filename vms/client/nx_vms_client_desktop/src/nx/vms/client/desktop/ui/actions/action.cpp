@@ -328,7 +328,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
 bool Action::event(QEvent* event)
 {
     if (event->type() != QEvent::Shortcut)
-        return QObject::event(event);
+        return QAction::event(event);
 
     QSet<Action*> actions;
     actions.insert(this);
@@ -344,11 +344,13 @@ bool Action::event(QEvent* event)
 
         QSet<QAction*> associatedActions;
 
-        for (auto widget: associatedWidgets())
-            associatedActions += toSet(widget->actions());
-
-        for (auto widget: associatedGraphicsWidgets())
-            associatedActions += toSet(widget->actions());
+        for (auto object: associatedObjects())
+        {
+            if (auto widget = qobject_cast<QWidget*>(object))
+                associatedActions += toSet(widget->actions());
+            else if (auto graphicsWidget = qobject_cast<QGraphicsWidget*>(object))
+                associatedActions += toSet(graphicsWidget->actions());
+        }
 
         bool hasRawActions = false;
         for (const auto associatedAction: associatedActions)
