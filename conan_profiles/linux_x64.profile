@@ -6,8 +6,8 @@ TOOLCHAIN_PREFIX=x86_64-linux-gnu
 arch=x86_64
 
 [options]
-qt-base:mysql=True
-qt-base:psql=True
+qt:mysql=True
+qt:psql=True
 
 [env]
 TOOLCHAIN_PREFIX=$TOOLCHAIN_PREFIX

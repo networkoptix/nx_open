@@ -12,4 +12,4 @@ libvpx:shared=False
 
 [build_requires]
 openssl*:jom/1.1.2
-qt-*:jom/1.1.2,patch-windows/0.1
+qt*:patch-windows/0.1,strawberryperl/5.30.0.1
