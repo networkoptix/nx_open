@@ -116,7 +116,7 @@ class NxOpenConan(ConanFile):
             self.requires("winsdk-redist/10.0.19041.0" "#acf550438d5c5d7c1be638c7ac9662e3")
 
         if self.isArm32 or self.isArm64:
-            self.requires("sse2neon/efcbd5" "#57aba3f11ce3af714a328146c08e5171")
+            self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
 
         self._add_documentation_requirements()
 
