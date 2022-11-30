@@ -8,9 +8,7 @@
 
 struct QnStartupParameters;
 
-namespace nx {
-namespace vms {
-namespace client {
+namespace nx::vms::client::desktop {
 
 /**
     Class for updating client installation if needed.
@@ -73,6 +71,4 @@ private:
     nx::utils::SoftwareVersion m_clientVersion;
 };
 
-} // namespace client
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::client::desktop

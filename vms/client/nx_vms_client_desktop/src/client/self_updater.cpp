@@ -22,6 +22,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <utils/applauncher_utils.h>
 
 #include <nx/branding.h>
@@ -29,9 +30,7 @@
 #include <platform/platform_abstraction.h>
 #include <platform/shortcuts/platform_shortcuts.h>
 
-namespace nx {
-namespace vms {
-namespace client {
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -140,7 +139,7 @@ bool isDeveloperBuildOnWindows()
 
 
 SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
-    m_clientVersion(nx::build_info::vmsVersion())
+    m_clientVersion(appContext()->version())
 {
     if (!startupParams.engineVersion.isEmpty())
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
@@ -823,7 +822,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
             nx::branding::vmsName(),
             nx::branding::desktopClientDisplayName(),
             iconName,
-            SoftwareVersion(nx::build_info::vmsVersion()));
+            appContext()->version());
     }
     #endif // defined(Q_OS_LINUX)
 
@@ -919,6 +918,4 @@ void SelfUpdater::updateMinilauncherIconsOnWindows(bool hasAdminRights)
     NX_VERBOSE(this, "Shortcut update finished");
 }
 
-} // namespace client
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::client::desktop

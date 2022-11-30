@@ -891,7 +891,7 @@ void MainWindow::at_fileOpenSignalizer_activated(QObject*, QEvent* event)
     const auto fileEvent = static_cast<QFileOpenEvent *>(event);
     const auto url = fileEvent->url();
     if (!url.isEmpty() && !url.isLocalFile())
-        vms::client::SelfUpdater::runNewClient(QStringList() << url.toString());
+        SelfUpdater::runNewClient({url.toString()});
     else
         handleOpenFile(fileEvent->file());
 }

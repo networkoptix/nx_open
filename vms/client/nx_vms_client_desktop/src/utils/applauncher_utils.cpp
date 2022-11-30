@@ -212,8 +212,8 @@ bool checkOnline(bool runWhenOffline)
             return true;
     }
 
-    return ((result == ResultType::connectError) && runWhenOffline
-        && nx::vms::client::SelfUpdater::runMinilaucher());
+    return (result == ResultType::connectError) && runWhenOffline
+        && client::desktop::SelfUpdater::runMinilaucher();
 }
 
 } // namespace nx::vms::applauncher::api

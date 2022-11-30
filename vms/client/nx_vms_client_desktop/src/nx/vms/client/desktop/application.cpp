@@ -89,12 +89,10 @@
 namespace {
 
 const int kSuccessCode = 0;
-const int kInvalidParametersCode = -1;
-static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
 const QString kWindowGeometryData = "windowGeometry";
 static constexpr int kStarDragDistance = 20;
 
-void initApplication()
+void initApplication(const QnStartupParameters& startupParams)
 {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -103,7 +101,8 @@ void initApplication()
     QApplication::setApplicationName(nx::branding::desktopClientInternalName());
     QApplication::setApplicationDisplayName(nx::branding::desktopClientDisplayName());
 
-    QString applicationVersion = nx::build_info::vmsVersion();
+    QString applicationVersion = !startupParams.engineVersion.isEmpty()
+        ? startupParams.engineVersion : nx::build_info::vmsVersion();
     if (!nx::build_info::usedMetaVersion().isEmpty())
         applicationVersion += " " + nx::build_info::usedMetaVersion();
 
@@ -217,7 +216,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
     {
         /* All functionality is in the constructor. */
-        nx::vms::client::SelfUpdater updater(startupParams);
+        SelfUpdater updater(startupParams);
     }
 
     /* Immediately exit if run in self-update mode. */
@@ -372,7 +371,7 @@ int runApplication(int argc, char** argv)
     QtWebEngine::initialize();
 
     auto application = std::make_unique<QApplication>(argc, argv);
-    initApplication();
+    initApplication(startupParams);
 
     // Initialize speech synthesis.
     const QString applicationDirPath = QCoreApplication::applicationDirPath();
