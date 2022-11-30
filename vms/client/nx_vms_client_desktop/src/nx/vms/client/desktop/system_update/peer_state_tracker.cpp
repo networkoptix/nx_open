@@ -5,10 +5,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
-#include <nx/build_info.h>
-#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -1441,14 +1440,8 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
 
 bool PeerStateTracker::updateClientData()
 {
-    bool changed = false;
-    auto version = nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
-    if (m_clientItem->version != version)
-    {
-        m_clientItem->version = version;
-        changed = true;
-    }
-
+    bool changed = (m_clientItem->version != appContext()->version());
+    m_clientItem->version = appContext()->version();
     return changed;
 }
 

@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topic_accessor.h>
@@ -89,7 +90,7 @@ bool alwaysShowDeveloperError(
     if (nx::build_info::publicationType() == nx::build_info::PublicationType::local)
         return true;
 
-    return nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion()) == targetSystem.version
+    return appContext()->version() == targetSystem.version
         && nx::branding::customization() == targetSystem.customization;
 }
 

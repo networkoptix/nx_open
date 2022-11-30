@@ -6,7 +6,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
-#include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -57,7 +56,7 @@ QSet<QnUuid> getServersLinkedToCloud(SystemContext* systemContext, const QSet<Qn
 void ClientVerificationData::fillDefault()
 {
     osInfo = nx::utils::OsInfo::current();
-    currentVersion = nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
+    currentVersion = appContext()->version();
 }
 
 bool checkCloudHost(

@@ -7,7 +7,6 @@
 #include <api/server_rest_connection.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
-#include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -19,6 +18,7 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
@@ -275,10 +275,7 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledClientVersion
         m_installedVersions = m_installedVersionsFuture.get();
     auto result = m_installedVersions;
     if (includeCurrentVersion)
-    {
-        QString clientVersion = nx::build_info::vmsVersion();
-        result.insert(nx::utils::SoftwareVersion(clientVersion));
-    }
+        result.insert(appContext()->version());
     return result;
 }
 
@@ -691,8 +688,7 @@ bool ClientUpdateTool::isInstallComplete() const
 
 bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version) const
 {
-    QString clientVersion = nx::build_info::vmsVersion();
-    return version != nx::utils::SoftwareVersion(clientVersion);
+    return version != appContext()->version();
 }
 
 QString ClientUpdateTool::getServerAuthString() const
