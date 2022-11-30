@@ -476,11 +476,11 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
         // done in one place.
 
         const auto change = calculateLayoutChange(layout);
-        const auto layoutParent = layout->getParentResource();
+        const auto layoutOwner = layout->getParentResource();
 
-        const auto user = layoutParent.dynamicCast<QnUserResource>();
-        if (confirmLayoutChange(change, user))
+        if (confirmLayoutChange(change, layoutOwner))
         {
+            const auto user = layoutOwner.dynamicCast<QnUserResource>();
             if (user)
                 grantMissingAccessRights(user, change);
 
@@ -814,7 +814,7 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
 
 bool LayoutsHandler::confirmLayoutChange(
     const LayoutChange& change,
-    const QnUserResourcePtr& layoutOwner)
+    const QnResourcePtr& layoutOwner)
 {
     NX_ASSERT(context()->user(), "Should never ask for layout saving when offline");
     if (!context()->user())
@@ -840,7 +840,7 @@ bool LayoutsHandler::confirmLayoutChange(
     if (change.layout->isIntercomLayout())
         return true;
 
-    return confirmChangeLocalLayout(layoutOwner, change);
+    return confirmChangeLocalLayout(layoutOwner.dynamicCast<QnUserResource>(), change);
 }
 
 bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
