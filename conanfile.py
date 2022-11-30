@@ -119,7 +119,7 @@ class NxOpenConan(ConanFile):
             self.requires("zlib/1.2.11" "#64ef9c596106c733055d8551926b4f0c")
 
         if self.isArm32 or self.isArm64:
-            self.requires("sse2neon/efcbd5" "#57aba3f11ce3af714a328146c08e5171")
+            self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
 
         self._add_documentation_requirements()
 
