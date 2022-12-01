@@ -1109,7 +1109,9 @@ void DigestCredentials::serialize(nx::Buffer* dest) const
     auto needQuoteForParam = [](const auto& value)
     {
         // According to RFC ( https://httpwg.org/specs/rfc7616.html ) fields 'algorithm', 'qop', and 'nc' must not be quoted.
-        if (value == "algorithm" || value == "qop" || value == "nc")
+        // But ffmpeg and others ignore RFC and use quotes for 'algorithm' and 'qop'
+        // Comment for ffmpeg: <we are violating the RFC and use "" because all others seem to do that too.>
+        if (value == "nc")
             return false;
         return true;
     };
