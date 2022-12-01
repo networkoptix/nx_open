@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation>Воспроизводить звуксо всех камер на раскладке</translation>
+      <translation>Воспроизводить звук со всех камер на раскладке</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
