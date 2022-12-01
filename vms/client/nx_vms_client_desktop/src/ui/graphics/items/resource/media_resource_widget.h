@@ -474,6 +474,7 @@ private:
 
     void updateSelectedArea();
     void handleSelectedAreaChanged();
+    void traceFps() const;
 
 private:
     nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
