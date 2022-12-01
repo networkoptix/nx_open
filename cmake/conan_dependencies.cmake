@@ -32,6 +32,11 @@ if(targetDevice MATCHES "^linux|^edge")
     list(APPEND _additional_conan_parameters
         "--profile:host ${open_source_root}/cmake/conan_profiles/gcc.profile"
     )
+elseif(targetDevice MATCHES "macos")
+    list(APPEND _additional_conan_parameters
+        "--profile:build ${open_source_root}/cmake/conan_profiles/xcode.profile"
+        "--profile:host ${open_source_root}/cmake/conan_profiles/xcode.profile"
+    )
 endif()
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
