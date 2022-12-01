@@ -231,19 +231,29 @@ void P2PHttpClientTransport::startReading()
                     }
                 });
 
-            NX_VERBOSE(this, "startReading: Received response to initial GET request to '%1'", m_url);
-            m_multipartContentParser.setNextFilter(nextFilter);
-            const auto& headers = m_readHttpClient->response()->headers;
-            const auto contentTypeIt = headers.find("Content-Type");
+            const auto statusCode = m_readHttpClient->response()->statusLine.statusCode;
+            NX_VERBOSE(this, 
+                "startReading: Received response to initial GET request to '%1', statusCode=%2",
+                m_url, statusCode);
 
-            NX_ASSERT(contentTypeIt != headers.end());
-            if (contentTypeIt == headers.end() ||
-                !m_multipartContentParser.setContentType(contentTypeIt->second))
+            if (nx::network::http::StatusCode::isSuccessCode(statusCode))
             {
-                NX_WARNING(
-                    this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);
+                m_multipartContentParser.setNextFilter(nextFilter);
+                const auto& headers = m_readHttpClient->response()->headers;
+                const auto contentTypeIt = headers.find("Content-Type");
+
+                NX_ASSERT(contentTypeIt != headers.end());
+                if (contentTypeIt == headers.end() ||
+                    !m_multipartContentParser.setContentType(contentTypeIt->second))
+                {
+                    NX_WARNING(
+                        this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);
+                    m_failed = true;
+                }
+            }
+            else
+            {
                 m_failed = true;
-                return;
             }
 
             if (m_onStartHandler)
@@ -256,7 +266,11 @@ void P2PHttpClientTransport::startReading()
                     return;
             }
 
-            NX_VERBOSE(this, "startReading: Connection to '%1' established", m_url);
+            if (m_failed)
+                NX_VERBOSE(this, "startReading: Connection to '%1' aborted", m_url);
+            else
+                NX_VERBOSE(this, "startReading: Connection to '%1' established", m_url);
+
         });
 
     m_readHttpClient->setOnSomeMessageBodyAvailable(
