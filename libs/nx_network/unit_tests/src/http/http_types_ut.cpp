@@ -640,8 +640,8 @@ TEST(HttpTypesHeaderAuthorization, serialize)
     static constexpr char expected[] =
         "Digest realm=\"AXIS_ACCC8E338EDF\", "
         "nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", "
-        "algorithm=MD5, "
-        "qop=auth";
+        "algorithm=\"MD5\", "
+        "qop=\"auth\"";
 
     ASSERT_EQ(expected, auth.serialized());
 }
