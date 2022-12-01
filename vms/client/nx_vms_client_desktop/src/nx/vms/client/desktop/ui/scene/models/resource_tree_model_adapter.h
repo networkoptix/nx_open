@@ -13,6 +13,8 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+
 class QnResourceTreeSortProxyModel;
 class QnWorkbenchContext;
 

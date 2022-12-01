@@ -6,6 +6,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("QtCore/QItemSelectionModel")
+
 class QItemSelectionModel;
 
 namespace nx::vms::client::desktop {

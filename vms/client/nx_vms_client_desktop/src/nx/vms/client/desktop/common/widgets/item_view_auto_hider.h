@@ -5,6 +5,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+Q_MOC_INCLUDE("QtWidgets/QAbstractItemView")
+
 class QAbstractItemView;
 class QLabel;
 

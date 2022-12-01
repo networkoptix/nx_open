@@ -6,6 +6,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("QtGui/QWindow")
+
 class QWindow;
 
 namespace nx::vms::client::desktop {

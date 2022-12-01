@@ -5,7 +5,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-class QAbstractVideoSurface;
+Q_MOC_INCLUDE("nx/vms/client/core/media/media_player.h")
+
+class QVideoSink;
 
 namespace nx::vms::client::core {
 

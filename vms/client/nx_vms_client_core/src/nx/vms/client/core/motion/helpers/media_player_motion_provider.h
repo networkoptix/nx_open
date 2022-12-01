@@ -5,6 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
+Q_MOC_INCLUDE("nx/vms/client/core/media/media_player.h")
+
 namespace nx::vms::client::core {
 
 class MediaPlayer;

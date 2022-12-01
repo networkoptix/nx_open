@@ -6,6 +6,8 @@
 
 #include <QtCore/QObject>
 
+Q_MOC_INCLUDE("QtQuick/QQuickWindow")
+
 class QQuickWindow;
 
 namespace nx::vms::client::core {

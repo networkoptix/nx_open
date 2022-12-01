@@ -19,6 +19,10 @@
 
 #include "matrix_map.h"
 
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
+Q_MOC_INCLUDE("ui/workbench/workbench_item.h")
+Q_MOC_INCLUDE("ui/workbench/workbench_layout_synchronizer.h")
+
 class QnWorkbenchItem;
 class QnWorkbenchLayoutSynchronizer;
 

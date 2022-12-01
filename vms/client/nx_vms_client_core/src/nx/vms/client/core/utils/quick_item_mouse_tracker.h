@@ -5,6 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QPoint>
 
+Q_MOC_INCLUDE("QtQuick/QQuickItem")
+
 class QQuickItem;
 
 namespace nx::vms::client::core {

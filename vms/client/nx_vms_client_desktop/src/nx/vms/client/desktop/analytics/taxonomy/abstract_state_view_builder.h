@@ -6,6 +6,8 @@
 
 #include "abstract_state_view.h"
 
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h")
+
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 class AbstractStateViewFilter;

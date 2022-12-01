@@ -11,6 +11,8 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
+
 namespace nx::vms::client::desktop {
 
 class LayoutModel;

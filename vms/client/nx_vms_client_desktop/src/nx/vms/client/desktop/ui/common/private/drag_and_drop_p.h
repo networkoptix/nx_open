@@ -6,8 +6,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
+Q_MOC_INCLUDE("QtQuick/QQuickItem")
+
 class QQuickItem;
-class QWindow;
 
 namespace nx::vms::client::desktop {
 

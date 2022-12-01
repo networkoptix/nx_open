@@ -8,6 +8,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("nx/vms/client/core/media/time_period_storage.h")
+
 namespace nx::vms::client::core {
 
 class AbstractTimePeriodStorage;

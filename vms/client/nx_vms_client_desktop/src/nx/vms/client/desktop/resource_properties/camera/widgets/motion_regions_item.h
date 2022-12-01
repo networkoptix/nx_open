@@ -8,6 +8,8 @@
 #include <QtGui/QColor>
 #include <QtQuick/QQuickItem>
 
+Q_MOC_INCLUDE("nx/vms/client/core/motion/helpers/camera_motion_helper.h")
+
 namespace nx::vms::client::core { class CameraMotionHelper; }
 
 namespace nx::vms::client::desktop {

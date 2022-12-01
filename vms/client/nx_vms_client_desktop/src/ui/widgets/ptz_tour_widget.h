@@ -7,6 +7,9 @@
 
 #include <core/ptz/ptz_fwd.h>
 
+Q_MOC_INCLUDE("core/ptz/ptz_preset.h")
+Q_MOC_INCLUDE("core/ptz/ptz_tour.h")
+
 class QnPtzTourSpotsModel;
 
 namespace Ui {

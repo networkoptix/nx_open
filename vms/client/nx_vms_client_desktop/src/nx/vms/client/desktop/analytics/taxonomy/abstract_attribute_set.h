@@ -6,6 +6,8 @@
 
 #include <vector>
 
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/abstract_attribute.h")
+
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 class AbstractAttribute;
