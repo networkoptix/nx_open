@@ -54,6 +54,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -1612,6 +1613,17 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     updateInfoTextLater();
+    traceFps();
+}
+
+void QnMediaResourceWidget::traceFps() const
+{
+    if (!d->traceFpsTimer.hasExpired(1s))
+        return;
+    d->traceFpsTimer.restart();
+
+    NX_TRACE_COUNTER_ID("Item FPS", (int64_t) this).args(
+        {{ "FPS", d->getStatisticsFps(channelCount()) }});
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(

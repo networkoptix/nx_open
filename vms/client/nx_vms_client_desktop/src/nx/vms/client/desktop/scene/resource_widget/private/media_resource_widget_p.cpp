@@ -371,6 +371,20 @@ const char* const MediaResourceWidgetPrivate::motionSkipMask(int channel) const
         : kEmptyMask.bitMask();
 }
 
+qreal MediaResourceWidgetPrivate::getStatisticsFps(int channelCount) const
+{
+    qreal fps = 0.0;
+
+    for (int i = 0; i < channelCount; i++)
+    {
+        const auto provider = display()->mediaProvider();
+        const QnMediaStreamStatistics* statistics = provider->getStatistics(i);
+        fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
+    }
+
+    return fps;
+}
+
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
 {
     setIsPlayingLive(m_display && m_display->camDisplay()->isRealTimeSource());

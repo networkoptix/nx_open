@@ -62,6 +62,7 @@ public:
     bool analyticsObjectsVisibleForcefully = false;
 
     mutable nx::utils::ElapsedTimer updateDetailsTimer;
+    mutable nx::utils::ElapsedTimer traceFpsTimer;
     mutable QString currentDetailsText;
 
     const QPointer<nx::vms::client::desktop::analytics::TaxonomyManager> taxonomyManager;
@@ -99,6 +100,8 @@ public:
     void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 
     const char* const motionSkipMask(int channel) const;
+
+    qreal getStatisticsFps(int channelCount) const;
 
 signals:
     void stateChanged();
