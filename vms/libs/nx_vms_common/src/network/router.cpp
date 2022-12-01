@@ -20,11 +20,22 @@ QnRoute routeTo(
     const QnUuid& serverId,
     const QnMediaServerResourcePtr& server)
 {
-    if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
-        return {}; //< Do not route to unknown or offline Server.
+    if (!server)
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "Server is not found. Can not route");
+        return {}; //< Do not route to unknown Server.
+    }
+    if (server->getStatus() != nx::vms::api::ResourceStatus::online)
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "Server %1 is offline. Can not route", server->getId());
+        return {}; //< Do not route to offline Server.
+    }
 
     if (!NX_ASSERT(systemContext) || !systemContext->moduleDiscoveryManager())
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "Routing is not enabled in the Context.");
         return {}; // Routing is not enabled in the Context.
+    }
 
     auto moduleDiscoveryManager = systemContext->moduleDiscoveryManager();
 
