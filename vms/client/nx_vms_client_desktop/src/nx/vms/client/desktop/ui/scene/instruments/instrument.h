@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+Q_MOC_INCLUDE("QtQuick/QQuickItem")
+
 class QQuickItem;
 
 namespace nx::vms::client::desktop {

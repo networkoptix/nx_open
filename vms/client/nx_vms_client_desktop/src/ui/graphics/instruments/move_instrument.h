@@ -7,6 +7,8 @@
 #include "drag_processing_instrument.h"
 #include <ui/common/weak_graphics_item_pointer.h>
 
+Q_MOC_INCLUDE("QtWidgets/QGraphicsItem")
+
 class MoveInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:

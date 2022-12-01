@@ -7,6 +7,8 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/system_context_aware.h>
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+
 namespace nx::vms::client::core {
 
 class ResourceHelper: public QObject, public SystemContextAware

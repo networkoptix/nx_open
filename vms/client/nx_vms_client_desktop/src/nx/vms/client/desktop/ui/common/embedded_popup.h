@@ -7,6 +7,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("QtWidgets/QWidget")
+
 namespace nx::vms::client::desktop {
 
 /**

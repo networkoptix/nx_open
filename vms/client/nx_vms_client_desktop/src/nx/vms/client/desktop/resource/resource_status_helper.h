@@ -8,6 +8,9 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+
 class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {

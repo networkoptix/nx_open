@@ -44,6 +44,8 @@
 #include <QtCore/qset.h>
 #include <QtQuick/private/qquickitemchangelistener_p.h>
 
+Q_MOC_INCLUDE("QtQuick/QQuickItem")
+
 class QQuickItem;
 
 class ScenePositionListener:

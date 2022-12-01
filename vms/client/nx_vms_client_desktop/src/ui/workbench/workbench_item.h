@@ -15,6 +15,8 @@
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 
+Q_MOC_INCLUDE("core/resource/layout_item_data.h")
+
 class QnWorkbenchLayout;
 
 /**

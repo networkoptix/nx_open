@@ -16,6 +16,8 @@
 #include "utils/color_space/image_correction.h"
 #include "workbench_context_aware.h"
 
+Q_MOC_INCLUDE("QtWidgets/QGraphicsItem")
+
 class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;

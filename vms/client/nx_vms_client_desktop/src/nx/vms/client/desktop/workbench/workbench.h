@@ -12,6 +12,9 @@
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+Q_MOC_INCLUDE("ui/workbench/workbench_layout.h")
+
 class QnWorkbenchLayout;
 class QnWorkbenchGridMapper;
 class QnWorkbenchItem;

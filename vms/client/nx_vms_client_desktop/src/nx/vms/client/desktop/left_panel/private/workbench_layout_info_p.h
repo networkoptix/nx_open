@@ -11,6 +11,9 @@
 
 #include <nx/utils/uuid.h>
 
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
+Q_MOC_INCLUDE("core/resource/videowall_resource.h")
+
 namespace nx::vms::client::desktop {
 
 class AbstractResourceContainer: public QObject

@@ -9,6 +9,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
+Q_MOC_INCLUDE("nx/vms/event/rule.h")
+
 namespace nx {
 namespace vms {
 namespace event {

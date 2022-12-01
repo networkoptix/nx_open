@@ -8,6 +8,9 @@
 
 #include <nx/utils/uuid.h>
 
+Q_MOC_INCLUDE("nx/analytics/taxonomy/abstract_engine.h")
+Q_MOC_INCLUDE("nx/analytics/taxonomy/abstract_group.h")
+
 namespace nx::analytics::taxonomy {
 
 class AbstractEngine;

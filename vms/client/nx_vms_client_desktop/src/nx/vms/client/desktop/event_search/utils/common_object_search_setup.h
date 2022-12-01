@@ -10,6 +10,9 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
+Q_MOC_INCLUDE("core/resource/camera_resource.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/text_filter_setup.h")
+
 class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {

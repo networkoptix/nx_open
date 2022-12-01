@@ -8,6 +8,8 @@
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
 
+Q_MOC_INCLUDE("core/ptz/ptz_preset.h")
+
 class QnPtzTourSpotsModel : public QAbstractTableModel
 {
     Q_OBJECT

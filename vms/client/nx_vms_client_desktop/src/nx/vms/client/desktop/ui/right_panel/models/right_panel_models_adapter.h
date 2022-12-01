@@ -12,6 +12,10 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
+Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/analytics_search_setup.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
+Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+
 class QnWorkbenchContext;
 namespace nx::analytics::db { struct ObjectTrack; }
 

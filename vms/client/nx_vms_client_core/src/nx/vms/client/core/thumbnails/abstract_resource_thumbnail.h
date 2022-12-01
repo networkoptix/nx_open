@@ -13,6 +13,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+Q_MOC_INCLUDE("core/resource/resource.h")
+
 namespace nx::vms::client::core {
 
 class AsyncImageResult;
