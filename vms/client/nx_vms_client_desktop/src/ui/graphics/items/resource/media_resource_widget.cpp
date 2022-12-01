@@ -387,12 +387,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     updateCameraButtons();
     initAnalyticsOverlays();
     initAreaSelectOverlay();
+    initCameraHotspotsOverlay();
 
     /* Set up buttons. */
     createButtons();
     initStatusOverlayController();
 
-    initCameraHotspotsOverlay();
 
     // TODO: #sivanov Get rid of resourceChanged.
     connect(base_type::resource().get(), &QnResource::resourceChanged, this,
@@ -728,25 +728,10 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
     if (!ini().enableCameraHotspotsFeature)
         return;
 
-    m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget();
-
-    addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
+    m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget(this);
     m_cameraHotspotsOverlayWidget->setContentsMargins(0.0, 0.0, 0.0, 0.0);
 
-    if (const auto camera = resource().dynamicCast<QnVirtualCameraResource>())
-    {
-        const auto initHotspots =
-            [this, camera]
-            {
-                m_cameraHotspotsOverlayWidget->initHotspots(
-                    windowContext()->workbenchContext(),
-                    camera,
-                    camera->getCameraHotspots());
-            };
-
-        connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsChanged, initHotspots);
-        initHotspots();
-    }
+    addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
 }
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
