@@ -1215,7 +1215,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Не реализовано.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1303,7 +1303,7 @@
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>DN администратора LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Оптимизировать настройки камеры</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
@@ -1484,7 +1484,7 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Настройки резервного копирования</translation>
     </message>
     <message>
       <source>Cloud host override</source>

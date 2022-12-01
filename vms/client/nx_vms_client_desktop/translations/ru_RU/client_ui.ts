@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Настройки ONVIF</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>В будущем</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -926,7 +926,7 @@
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Больше не показывать это окно</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Открыть папку</translation>
     </message>
   </context>
   <context>
@@ -1327,7 +1327,7 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Добавить комментарий</translation>
     </message>
     <message>
       <source>Set Schedule</source>
@@ -1417,7 +1417,7 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation>Воспроизводить звуксо всех камер на раскладке</translation>
+      <translation>Воспроизводить звук со всех камер на раскладке</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
@@ -2064,7 +2064,7 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Адрес сервера</translation>
     </message>
     <message>
       <source>Security Protocol</source>
@@ -2612,15 +2612,15 @@
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Новое правило</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Удалить правило</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Выберите правило</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
