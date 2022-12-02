@@ -321,6 +321,8 @@ void LinuxMonitor::Private::updatePartitions()
             auto it = allPartitions.upper_bound( devName );
             if( it == allPartitions.end() || !it->first.startsWith(devName) )
                 continue;   //partition devName does not have sub partitions, considering it not a physical device
+            if( it->first[devName.size()].isDigit() )
+                continue;   //the fallowing record is just a 2 digit patition number
         }
 
         const int id = calculateId(int(major), int(minor));
