@@ -270,23 +270,23 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Thực hiện yêu cầu HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Nội dung HTTP(S)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Loại nội dung</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Phương thức yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -387,19 +387,19 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Kết nối với camera (luồng thứ cấp) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
+      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -683,15 +683,15 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Lỗi RAID. %1.</translation>
     </message>
   </context>
   <context>

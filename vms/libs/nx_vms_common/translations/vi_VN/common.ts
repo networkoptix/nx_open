@@ -1107,7 +1107,7 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Tham số không hợp lệ `%1`: %2.</translation>
     </message>
   </context>
   <context>
@@ -1547,43 +1547,43 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Hiển thị địa chỉ IP để tự động phát hiện</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>Bật 2fa cho hệ thống</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>Hiển thị mật khẩu thiết bị được lưu trữ trong VMS cho quản trị viên (đối với trang web)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Bản ghi nhật ký sự kiện tối đa có thể lưu vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Chúng tôi khuyến nghị nên đặt giá trị tham số này là 2 hoặc nhiều hơn.</translation>
     </message>
   </context>
   <context>
@@ -2197,11 +2197,11 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>Hiển thị thông tin liên lạc nội bộ</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Thực hiện yêu cầu HTTP(S)</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -2217,31 +2217,31 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Lỗi RAID. %1.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
     </message>
   </context>
   <context>

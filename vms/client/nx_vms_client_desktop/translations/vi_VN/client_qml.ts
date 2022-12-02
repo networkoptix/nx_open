@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Kiểm tra Cài đặt Camera để định cấu hình plugin này.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Kiểm tra Cài đặt quản trị hệ thống để định cấu hình plugin này.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Plugin này không có cài đặt ở cấp Hệ thống.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Plugin này không có cài đặt cho camera này.</translation>
     </message>
   </context>
   <context>
@@ -1069,7 +1069,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Hành động này yêu cầu điền một vài thông số.</translation>
     </message>
   </context>
   <context>
@@ -1315,7 +1315,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Bạn không có quyền truy cập vào %1. Xin vui lòng kiểm tra kết nối Internet của bạn.</translation>
     </message>
   </context>
 </TS>
