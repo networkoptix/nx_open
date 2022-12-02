@@ -45,12 +45,12 @@ void QnCameraNotificationManager::triggerNotification(
 
 void QnCameraNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     switch (tran.command)
     {
     case ApiCommand::removeCamera:
-        emit removed(tran.params.id);
+        emit removed(tran.params.id, source);
         break;
     case ApiCommand::removeCameraUserAttributes:
         emit userAttributesRemoved(tran.params.id);

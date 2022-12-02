@@ -68,20 +68,20 @@ void QnResourceNotificationManager::triggerNotification(
 
 void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     if (tran.command == ApiCommand::removeResourceStatus)
-        emit resourceStatusRemoved(tran.params.id);
+        emit resourceStatusRemoved(tran.params.id, source);
     else
-        emit resourceRemoved(tran.params.id);
+        emit resourceRemoved(tran.params.id, source);
 }
 
 void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::IdDataList>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     for (const vms::api::IdData& id: tran.params)
-        emit resourceRemoved(id.id);
+        emit resourceRemoved(id.id, source);
 }
 
 } // namespace ec2

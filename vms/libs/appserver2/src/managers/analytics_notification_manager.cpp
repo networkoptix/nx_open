@@ -22,15 +22,15 @@ void AnalyticsNotificationManager::triggerNotification(
 
 void AnalyticsNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     switch (tran.command)
     {
         case ApiCommand::removeAnalyticsPlugin:
-            emit analyticsPluginRemoved(QnUuid(tran.params.id));
+            emit analyticsPluginRemoved(QnUuid(tran.params.id), source);
             break;
         case ApiCommand::removeAnalyticsEngine:
-            emit analyticsEngineRemoved(QnUuid(tran.params.id));
+            emit analyticsEngineRemoved(QnUuid(tran.params.id), source);
             break;
         default:
             NX_ASSERT(false, "Wrong transaction type");

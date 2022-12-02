@@ -18,10 +18,10 @@ void QnWebPageNotificationManager::triggerNotification(
 
 void QnWebPageNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::removeWebPage);
-    emit removed(QnUuid(tran.params.id));
+    emit removed(QnUuid(tran.params.id), source);
 }
 
 } // namespace ec2
