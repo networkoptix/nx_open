@@ -99,7 +99,7 @@ QString NetworkIssueEvent::reason(common::SystemContext* context) const
         }
         case EventReason::networkBadCameraTime:
         {
-            return tr("Failed to force using camera time, as it lags too much;"
+            return tr("Failed to force using camera time, as it lags too much."
                 " System time will be used instead.");
         }
         case EventReason::networkCameraTimeBackToNormal:
