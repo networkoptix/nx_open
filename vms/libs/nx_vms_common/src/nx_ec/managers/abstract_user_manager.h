@@ -25,7 +25,7 @@ signals:
      */
     void addedOrUpdated(const nx::vms::api::UserData& user, ec2::NotificationSource source);
     void userRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
-    void removed(const QnUuid& id);
+    void removed(const QnUuid& id, ec2::NotificationSource source);
     void userRoleRemoved(const QnUuid& id);
     void accessRightsChanged(const nx::vms::api::AccessRightsData& access);
 };

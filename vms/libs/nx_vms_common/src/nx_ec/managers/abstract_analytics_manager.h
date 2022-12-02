@@ -25,9 +25,9 @@ signals:
         const nx::vms::api::AnalyticsEngineData& analyticsEngine,
         ec2::NotificationSource source);
 
-    void analyticsPluginRemoved(const QnUuid& id);
+    void analyticsPluginRemoved(const QnUuid& id, ec2::NotificationSource source);
 
-    void analyticsEngineRemoved(const QnUuid& id);
+    void analyticsEngineRemoved(const QnUuid& id, ec2::NotificationSource source);
 };
 
 /**

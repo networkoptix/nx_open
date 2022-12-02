@@ -136,7 +136,7 @@ protected:
     void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
 
-    virtual bool canRemoveResource(const QnUuid& resourceId);
+    virtual bool canRemoveResource(const QnUuid& resourceId, ec2::NotificationSource source);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
 
     virtual bool canRemoveResourceProperty(const QnUuid& resourceId, const QString& propertyName);
@@ -169,8 +169,8 @@ private slots:
         const nx::vms::api::ResourceParamWithRefData& param,
         ec2::NotificationSource source);
     void on_resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
-    void on_resourceRemoved(const QnUuid& resourceId);
-    void on_resourceStatusRemoved(const QnUuid& resourceId);
+    void on_resourceRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
+    void on_resourceStatusRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
 
     void on_accessRightsChanged(const nx::vms::api::AccessRightsData& accessRights);
     void on_userRoleChanged(const nx::vms::api::UserRoleData& userRole);
