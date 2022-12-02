@@ -31,23 +31,23 @@ void QnMediaServerNotificationManager::triggerNotification(
 
 void QnMediaServerNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdDataList>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::removeStorages);
     for (const nx::vms::api::IdData& idData: tran.params)
-    emit storageRemoved(idData.id);
+        emit storageRemoved(idData.id, source);
 }
 
 void QnMediaServerNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     if (tran.command == ApiCommand::removeMediaServer)
-    emit removed(tran.params.id);
+        emit removed(tran.params.id, source);
     else if (tran.command == ApiCommand::removeStorage)
-    emit storageRemoved(tran.params.id);
+        emit storageRemoved(tran.params.id, source);
     else if (tran.command == ApiCommand::removeServerUserAttributes)
-    emit userAttributesRemoved(tran.params.id);
+        emit userAttributesRemoved(tran.params.id);
     else
         NX_ASSERT(0, "Invalid transaction");
 }

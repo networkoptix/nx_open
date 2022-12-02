@@ -699,9 +699,10 @@ void QnCommonMessageProcessor::on_resourceParamRemoved(
     }
 }
 
-void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
+void QnCommonMessageProcessor::on_resourceRemoved(
+    const QnUuid& resourceId, ec2::NotificationSource source)
 {
-    if (canRemoveResource(resourceId))
+    if (canRemoveResource(resourceId, source))
     {
         if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
             resourcePool()->removeResource(ownResource);
@@ -711,9 +712,10 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
         removeResourceIgnored(resourceId);
 }
 
-void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId)
+void QnCommonMessageProcessor::on_resourceStatusRemoved(
+    const QnUuid& resourceId, ec2::NotificationSource source)
 {
-    if (!canRemoveResource(resourceId))
+    if (!canRemoveResource(resourceId, source))
     {
         if (auto res = resourcePool()->getResourceById(resourceId))
         {
@@ -928,7 +930,7 @@ void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)
     m_context->userRolesManager()->resetUserRoles(roles);
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
+bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &, ec2::NotificationSource source)
 {
     return true;
 }

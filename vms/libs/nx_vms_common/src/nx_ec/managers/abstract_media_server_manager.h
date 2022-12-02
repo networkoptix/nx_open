@@ -20,8 +20,8 @@ class NX_VMS_COMMON_API AbstractMediaServerNotificationManager: public QObject
 signals:
     void addedOrUpdated(const nx::vms::api::MediaServerData& server, ec2::NotificationSource source);
     void storageChanged(const nx::vms::api::StorageData& storage, ec2::NotificationSource source);
-    void removed(const QnUuid& id);
-    void storageRemoved(const QnUuid& id);
+    void removed(const QnUuid& id, ec2::NotificationSource source);
+    void storageRemoved(const QnUuid& id, ec2::NotificationSource source);
     void userAttributesChanged(const nx::vms::api::MediaServerUserAttributesData& attributes);
     void userAttributesRemoved(const QnUuid& id);
 };

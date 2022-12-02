@@ -18,10 +18,10 @@ void QnVideowallNotificationManager::triggerNotification(
 
 void QnVideowallNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::removeVideowall);
-    emit removed(tran.params.id);
+    emit removed(tran.params.id, source);
 }
 
 void QnVideowallNotificationManager::triggerNotification(
