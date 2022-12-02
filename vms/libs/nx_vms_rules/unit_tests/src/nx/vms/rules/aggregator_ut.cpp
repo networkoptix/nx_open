@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
+#include <memory>
 
-#include <thread>
+#include <gtest/gtest.h>
 
 #include <nx/vms/rules/aggregator.h>
 #include <nx/vms/rules/basic_event.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <utils/common/synctime.h>
 
 #include "test_event.h"
@@ -35,10 +36,43 @@ EventPtr makeEvent(const QString& name = QString())
 
 } // namespace
 
+class TimeSyncManagerStub: public common::AbstractTimeSyncManager
+{
+public:
+    void start() override {}
+    void stop() override {}
+    void resync() override {}
+
+    std::chrono::milliseconds getSyncTime(bool* /*outIsTimeTakenFromInternet*/) const override
+    {
+        return m_timeValue;
+    }
+
+    void adjust(std::chrono::milliseconds value)
+    {
+        m_timeValue += value;
+    }
+
+private:
+    std::chrono::milliseconds m_timeValue{};
+};
+
 class AggregatorTest: public ::testing::Test
 {
+public:
+    AggregatorTest(): m_timeSyncManagerStub(new TimeSyncManagerStub)
+    {
+        m_syncTime.setTimeSyncManager(m_timeSyncManagerStub);
+    }
+
+    void adjustTime(std::chrono::milliseconds value)
+    {
+        m_timeSyncManagerStub->adjust(value);
+    }
+
 private:
-    QnSyncTime syncTime;
+    std::shared_ptr<TimeSyncManagerStub> m_timeSyncManagerStub;
+    QnSyncTime m_syncTime;
 };
 
 TEST_F(AggregatorTest, newAggregatorHasNoAggregatedEvents)
@@ -59,7 +93,7 @@ TEST_F(AggregatorTest, firstEventIsNotAggregated)
     EXPECT_EQ(events.size(), 0);
     EXPECT_TRUE(aggregator.empty());
 
-    std::this_thread::sleep_for(kDefaultAggregationInterval);
+    adjustTime(kDefaultAggregationInterval);
 
     events = aggregator.popEvents();
     EXPECT_EQ(events.size(), 0);
@@ -75,17 +109,16 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
     aggregator.aggregate(event1);
 
     constexpr auto kDelay1 = 20ms;
-    std::this_thread::sleep_for(kDelay1);
+    adjustTime(kDelay1);
     auto event2 = makeEvent("a");
     ASSERT_TRUE(aggregator.aggregate(event2));
 
     constexpr auto kDelay2 = 50ms;
-    std::this_thread::sleep_for(kDelay2);
+    adjustTime(kDelay2);
     auto event3 = makeEvent("a");
     ASSERT_TRUE(aggregator.aggregate(event3));
 
-    // Just to be sure that aggregation time is not elapsed. In case of slow hw required
-    // to increase aggregationInterval.
+    // Just to be sure that aggregation time is not elapsed.
     ASSERT_TRUE(qnSyncTime->currentTimePoint() - event1->timestamp() < kAggregationInterval);
 
     // There is no elapsed events as the events are existing less than the given interval.
@@ -94,7 +127,7 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
     ASSERT_TRUE(events.empty());
     ASSERT_FALSE(aggregator.empty());
 
-    std::this_thread::sleep_for(kAggregationInterval - kDelay1 - kDelay2);
+    adjustTime(kAggregationInterval - kDelay1 - kDelay2);
     auto currentTimePoint = qnSyncTime->currentTimePoint();
     // The interval is enough to consider event1 creation time as elapsed.
     auto interval = currentTimePoint - event1->timestamp();
@@ -116,7 +149,7 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
     ASSERT_TRUE(aggregator.aggregate(event4));
     EXPECT_FALSE(aggregator.empty());
 
-    std::this_thread::sleep_for(kAggregationInterval);
+    adjustTime(kAggregationInterval);
     events = aggregator.popEvents();
     ASSERT_EQ(events.size(), 1);
     EXPECT_EQ(events.front().event, event4);
@@ -140,14 +173,14 @@ TEST_F(AggregatorTest, aggregatorHandlesDifferentEventsProperly)
     auto eventA3 = makeEvent("a");
     ASSERT_TRUE(aggregator.aggregate(eventA3));
 
-    std::this_thread::sleep_for(20ms);
+    adjustTime(20ms);
 
     auto eventB2 = makeEvent("b");
     ASSERT_TRUE(aggregator.aggregate(eventB2));
     auto eventB3 = makeEvent("b");
     ASSERT_TRUE(aggregator.aggregate(eventB3));
 
-    std::this_thread::sleep_for(kAggregationInterval);
+    adjustTime(kAggregationInterval);
 
     auto events = aggregator.popEvents();
     ASSERT_EQ(events.size(), 2);
