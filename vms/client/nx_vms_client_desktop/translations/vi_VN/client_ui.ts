@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Quản lý nhật ký</translation>
     </message>
     <message>
       <source>Download</source>
@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -655,19 +655,19 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Không ghi luồng chính</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Không ghi luồng phụ</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Hồ sơ luồng thứ cấp</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Hồ sơ luồng chính</translation>
     </message>
   </context>
   <context>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Thiết bị mới</translation>
     </message>
   </context>
   <context>
@@ -894,19 +894,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Hoạt động có sẵn</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Xuất video</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Video trực tiếp và lưu trữ</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>Trong tương lai</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -922,11 +922,11 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Đọc thêm trên trang trợ giúp</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Không hiển thị lại cửa sổ này</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
@@ -1803,7 +1803,7 @@
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Giới hạn khối lượng tối đa</translation>
     </message>
   </context>
   <context>
@@ -1857,15 +1857,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Tải xuống hoàn tất!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Không thể lưu nhật ký vào thư mục đã chọn</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -2620,11 +2620,11 @@
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Chọn một quy tắc</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Đặt lại quy tắc mặc định</translation>
     </message>
   </context>
   <context>
@@ -3009,7 +3009,7 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn dung lượng. Chúng tôi khuyên bạn nên chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -3077,7 +3077,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>Ngôn ngữ tùy chỉnh cho thông báo trên Đám mây</translation>
     </message>
   </context>
   <context>
