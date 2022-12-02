@@ -11,6 +11,22 @@
 
 namespace nx::vms::event {
 
+ActionFlags getFlags(ActionType actionType)
+{
+    static const QMap<ActionType, ActionFlags> flags = {
+        {ActionType::bookmarkAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::cameraOutputAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::cameraRecordingAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::playSoundAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::playSoundOnceAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::sayTextAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::showOnAlarmLayoutAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::showTextOverlayAction, {ActionFlag::canUseSourceCamera}},
+    };
+
+    return flags.value(actionType);
+}
+
 bool requiresCameraResource(ActionType actionType)
 {
     switch (actionType)
@@ -145,6 +161,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::execHttpRequestAction:
         case ActionType::acknowledgeAction:
         case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
         case ActionType::showIntercomInformer:
             return false;
@@ -155,12 +172,11 @@ bool hasToggleState(ActionType actionType)
         case ActionType::playSoundAction:
         case ActionType::bookmarkAction:
         case ActionType::showTextOverlayAction:
-        case ActionType::fullscreenCameraAction:
         case ActionType::buzzerAction:
             return true;
 
         default:
-            NX_ASSERT(false, "All action types must be handled.");
+            NX_ASSERT(false, "Unhandled action type: %1", actionType);
             break;
     }
     return false;
@@ -182,8 +198,9 @@ bool supportsDuration(ActionType actionType)
         case ActionType::showTextOverlayAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
-        case ActionType::fullscreenCameraAction:
         case ActionType::buzzerAction:
+            NX_ASSERT(hasToggleState(actionType),
+                "Action %1 should have toggle state to support duration", actionType);
             return true;
         default:
             return false;
@@ -207,26 +224,17 @@ bool allowsAggregation(ActionType actionType)
     }
 }
 
+bool canUseSourceCamera(ActionType actionType)
+{
+    return getFlags(actionType).testFlag(ActionFlag::canUseSourceCamera);
+}
+
 bool isActionProlonged(ActionType actionType, const ActionParameters &parameters)
 {
-    if (!hasToggleState(actionType))
-        return false;
+    if (supportsDuration(actionType))
+        return parameters.durationMs <= 0;
 
-    switch (actionType)
-    {
-        case ActionType::bookmarkAction:
-        case ActionType::showTextOverlayAction:
-        case ActionType::cameraOutputAction:
-        case ActionType::cameraRecordingAction:
-        case ActionType::fullscreenCameraAction:
-        case ActionType::buzzerAction:
-            return parameters.durationMs <= 0;
-
-        default:
-            break;
-    }
-
-    return true;
+    return hasToggleState(actionType);
 }
 
 QList<ActionType> userAvailableActions()
@@ -299,7 +307,7 @@ const QVector<QnUuid>& AbstractAction::getResources() const
     return m_resources;
 }
 
-QVector<QnUuid> AbstractAction::getSourceResources(QnResourcePool* resourcePool) const
+QVector<QnUuid> AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
 {
     NX_ASSERT(m_params.useSource, "Method should be called only when corresponding parameter is set.");
     QVector<QnUuid> result;

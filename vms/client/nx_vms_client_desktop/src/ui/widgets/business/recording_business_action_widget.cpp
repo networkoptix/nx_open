@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/delayed.h>

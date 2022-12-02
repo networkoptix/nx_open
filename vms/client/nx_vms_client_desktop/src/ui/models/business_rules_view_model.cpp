@@ -5,11 +5,10 @@
 #include <QtCore/QFileInfo>
 
 #include <client/client_settings.h>
-
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/event/rule.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/math.h>
 
 using namespace nx;

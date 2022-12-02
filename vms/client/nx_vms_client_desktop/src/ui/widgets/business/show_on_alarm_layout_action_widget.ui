@@ -7,17 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>322</width>
-    <height>87</height>
+    <height>115</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="usersLabel">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="selectUsersButton">
      <property name="text">
-      <string>for</string>
+      <string notr="true">&lt;All users&gt;</string>
      </property>
     </widget>
    </item>
@@ -28,17 +28,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="3">
-    <widget class="QCheckBox" name="useSourceCheckBox">
+   <item row="1" column="0">
+    <widget class="QLabel" name="usersLabel">
      <property name="text">
-      <string>Also show source camera</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="selectUsersButton">
-     <property name="text">
-      <string notr="true">&lt;All users&gt;</string>
+      <string>for</string>
      </property>
     </widget>
    </item>
@@ -60,13 +53,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>selectUsersButton</tabstop>
-  <tabstop>forceOpenCheckBox</tabstop>
-  <tabstop>useSourceCheckBox</tabstop>
- </tabstops>
- <resources/>
- <connections/>
  <customwidgets>
   <customwidget>
    <class>nx::vms::client::desktop::RewindForWidget</class>
@@ -75,4 +61,10 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>selectUsersButton</tabstop>
+  <tabstop>forceOpenCheckBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
 </ui>

@@ -2,21 +2,22 @@
 
 #include "business_rule_view_model.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <business/business_resource_validation.h> //< TODO: #vkutin Move these to proper locations and namespaces
 #include <business/business_types_comparator.h>
 #include <client/client_settings.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/qset.h>
@@ -35,19 +36,16 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/events.h>
+#include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/text/human_readable.h>
 #include <ui/help/business_help.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/media/audio_player.h>
 
 using namespace nx;
-
-using nx::vms::api::EventType;
-using nx::vms::api::ActionType;
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::event;
 
 namespace {
 
@@ -98,16 +96,17 @@ QSet<QnUuid> filterSubjectIds(const IDList& ids)
 {
     QnUserResourceList users;
     QList<QnUuid> roles;
+
     appContext()->currentSystemContext()->userRolesManager()->usersAndRoles(ids, users, roles);
     return toIds(users).unite(nx::utils::toQSet(roles));
 }
 
 QSet<QnUuid> filterActionResources(
-    const QnBusinessRuleViewModel* /*model*/,
+    const QnBusinessRuleViewModel* model,
     const QSet<QnUuid>& ids,
     vms::api::ActionType actionType)
 {
-    auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+    auto resourcePool = model->resourcePool();
 
     if (actionType == vms::api::ActionType::fullscreenCameraAction)
     {
@@ -139,6 +138,11 @@ vms::event::ActionParameters filterActionParams(vms::api::ActionType actionType,
 {
     Q_UNUSED(actionType);
     return params;
+}
+
+bool eventCanHaveCamera(EventType eventType)
+{
+    return (eventType >= EventType::userDefinedEvent) || requiresCameraResource(eventType);
 }
 
 } // namespace
@@ -594,6 +598,9 @@ QnBusinessRuleViewModel::Fields QnBusinessRuleViewModel::updateEventClassRelated
 
 QIcon QnBusinessRuleViewModel::iconForAction() const
 {
+    if (isActionUsingSourceCamera())
+        return qnResIconCache->icon(QnResourceIconCache::Camera);
+
     switch (m_actionType)
     {
         case vms::event::ActionType::sendMailAction:
@@ -620,14 +627,6 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             return (users.size() > 1 || !roles.empty())
                 ? qnResIconCache->icon(QnResourceIconCache::Users)
                 : qnResIconCache->icon(QnResourceIconCache::User);
-        }
-
-        case vms::event::ActionType::showTextOverlayAction:
-        case vms::event::ActionType::showOnAlarmLayoutAction:
-        {
-            if (isActionUsingSourceCamera())
-                return qnResIconCache->icon(QnResourceIconCache::Camera);
-            break;
         }
 
         case vms::event::ActionType::fullscreenCameraAction:
@@ -925,8 +924,7 @@ void QnBusinessRuleViewModel::setDisabled(bool value)
 
 bool QnBusinessRuleViewModel::actionCanUseSourceCamera() const
 {
-    return m_eventType >= vms::api::userDefinedEvent
-        || vms::event::requiresCameraResource(m_eventType);
+    return eventCanHaveCamera(m_eventType) && canUseSourceCamera(m_actionType);
 }
 
 bool QnBusinessRuleViewModel::isActionUsingSourceCamera() const
@@ -942,16 +940,23 @@ bool QnBusinessRuleViewModel::actionCanUseSourceServer() const
 
 bool QnBusinessRuleViewModel::actionIsUsingSourceServer() const
 {
-    return m_actionParams.useSource
-        && vms::event::requiresServerResource(m_actionType)
-        && vms::event::requiresServerResource(m_eventType);
+    return m_actionParams.useSource && actionCanUseSourceServer();
 }
 
 void QnBusinessRuleViewModel::toggleActionUseSourceServer()
 {
-    if (!NX_ASSERT(actionCanUseSourceServer()))
-        return;
+    if (NX_ASSERT(actionCanUseSourceServer()))
+        toggleActionUseSource();
+}
 
+void QnBusinessRuleViewModel::toggleActionUseSourceCamera()
+{
+    if (NX_ASSERT(actionCanUseSourceCamera()))
+        toggleActionUseSource();
+}
+
+void QnBusinessRuleViewModel::toggleActionUseSource()
+{
     m_actionParams.useSource = !m_actionParams.useSource;
     m_modified = true;
 
@@ -1245,6 +1250,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         resourcePool()->getResourcesByIds<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
+
                 case vms::api::showTextOverlayAction:
                 case vms::api::showOnAlarmLayoutAction:
                 {
@@ -1377,7 +1383,19 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
 
 QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 {
+    if (isActionUsingSourceCamera())
+    {
+        QnVirtualCameraResourceList targetCameras =
+            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
+
+        if (targetCameras.isEmpty())
+            return tr("Source Camera");
+
+        return tr("Source and %n more Cameras", "", targetCameras.size());
+    }
+
     QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
+
     switch (m_actionType)
     {
         case ActionType::sendMailAction:
@@ -1415,22 +1433,6 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 
         case ActionType::executePtzPresetAction:
             return QnExecPtzPresetPolicy::getText(resources, detailed);
-
-        case ActionType::showTextOverlayAction:
-        case ActionType::showOnAlarmLayoutAction:
-        {
-            if (isActionUsingSourceCamera())
-            {
-                QnVirtualCameraResourceList targetCameras =
-                    resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
-
-                if (targetCameras.isEmpty())
-                    return tr("Source Camera");
-
-                return tr("Source and %n more Cameras", "", targetCameras.size());
-            }
-            break;
-        }
 
         case ActionType::fullscreenCameraAction:
         {

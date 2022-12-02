@@ -292,6 +292,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="useEventSourceCameraCheckBox">
+          <property name="text">
+           <string>Use event source camera</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="nx::vms::client::desktop::AggregationWidget" name="aggregationWidget" native="true"/>
         </item>
         <item>
@@ -322,8 +329,8 @@
          </widget>
         </item>
         <item>
-         <widget class="QnWordWrappedLabel" name="actionWarningLabel">
-          <property name="text">
+         <widget class="QnWordWrappedLabel" name="actionWarningLabel" native="true">
+          <property name="text" stdset="0">
            <string/>
           </property>
          </widget>
