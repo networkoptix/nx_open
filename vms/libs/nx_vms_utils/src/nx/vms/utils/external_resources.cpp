@@ -13,6 +13,7 @@
 namespace nx::vms::utils {
 
 static Mutex g_resourceMutex;
+static QSet<QString> g_registeredDirectories;
 
 QDir externalResourcesDirectory()
 {
@@ -42,6 +43,7 @@ bool registerExternalResource(const QString& filename, const QString& mapRoot)
 bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 {
     NX_MUTEX_LOCKER lock(&g_resourceMutex);
+    g_registeredDirectories.remove(filename);
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
     return QResource::unregisterResource(filePath, mapRoot);
@@ -50,6 +52,10 @@ bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 bool registerExternalResourceDirectory(const QString& directory)
 {
     NX_MUTEX_LOCKER lock(&g_resourceMutex);
+    if (g_registeredDirectories.contains(directory))
+        return true;
+    g_registeredDirectories.insert(directory);
+
     QDir assetsDirectory(externalResourcesDirectory());
     if (!NX_ASSERT(assetsDirectory.cd(directory),
         "Unable to find '%1' in asset directory: %2", directory, assetsDirectory))
