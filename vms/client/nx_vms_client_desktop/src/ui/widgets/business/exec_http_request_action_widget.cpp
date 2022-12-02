@@ -3,11 +3,10 @@
 #include "exec_http_request_action_widget.h"
 #include "ui_exec_http_request_action_widget.h"
 
-#include <map>
-
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_types.h>
+#include <nx/utils/log/to_string.h>
 #include <nx/vms/event/action_parameters.h>
 
 using namespace nx::vms::client::desktop;
@@ -16,13 +15,16 @@ namespace
 {
 static constexpr int kAutoContentTypeItemIndex = 0;
 static constexpr int kAutoAuthTypeItemIndex = 0;
-static constexpr int kAutoRequestTypeItemIndex = 0;
-static const QStringList kAutoRequestTypes{
+
+using nx::network::http::Method;
+
+static const auto kMethods = QStringList{
     QString(),
-    lit("GET"),
-    lit("POST"),
-    lit("PUT"),
-    lit("DELETE")
+    nx::toQString(Method::get),
+    nx::toQString(Method::post),
+    nx::toQString(Method::put),
+    nx::toQString(Method::patch),
+    nx::toQString(Method::delete_),
 };
 } // namespace
 
@@ -57,7 +59,7 @@ QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(
     ui->authTypeComboBox->addItem(tr("Basic"));
     NX_ASSERT(ui->authTypeComboBox->itemText(kAutoAuthTypeItemIndex) == tr("Auto"));
 
-    for (const QString& requestType : kAutoRequestTypes)
+    for (const QString& requestType: kMethods)
     {
         if (requestType.isEmpty())
             ui->requestTypeComboBox->addItem(tr("Auto"));
@@ -109,14 +111,14 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
             ui->authTypeComboBox->setCurrentIndex(1);
             break;
         default:
-            NX_ASSERT(0, "Uxepected authType value in ActionParameters");
+            NX_ASSERT(0, "Unexpected authType value in ActionParameters: %1", params.authType);
             ui->authTypeComboBox->setCurrentIndex(0);
     }
 
-    int requestTypeComboBoxIndex = kAutoRequestTypes.indexOf(params.httpMethod);
+    int requestTypeComboBoxIndex = kMethods.indexOf(params.httpMethod);
     if (requestTypeComboBoxIndex < 0)
     {
-        NX_ASSERT(0, "Uxepected httpMethod value in ActionParameters");
+        NX_ASSERT(0, "Unexpected httpMethod value in ActionParameters: %1", params.httpMethod);
         requestTypeComboBoxIndex = 0;
     }
     ui->requestTypeComboBox->setCurrentIndex(requestTypeComboBoxIndex);
@@ -147,9 +149,8 @@ void QnExecHttpRequestActionWidget::paramsChanged()
         nx::network::http::AuthType::authBasicAndDigest :  //Auto
         nx::network::http::AuthType::authBasic);           //Basic
 
-    params.httpMethod = ui->requestTypeComboBox->currentText();
-    if (params.httpMethod == ui->requestTypeComboBox->itemText(kAutoRequestTypeItemIndex))
-        params.httpMethod.clear(); //< Auto value
+    // Empty value is "Auto" value.
+    params.httpMethod = kMethods.value(ui->requestTypeComboBox->currentIndex());
 
     ui->contentTextEdit->setEnabled(params.httpMethod.isEmpty()
         || nx::network::http::Method::isMessageBodyAllowed(params.httpMethod.toStdString()));
