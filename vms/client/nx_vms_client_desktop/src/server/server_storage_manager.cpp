@@ -481,7 +481,7 @@ void QnServerStorageManager::at_archiveRebuildReply(
         replyInfo = reply.begin()->second;
 
     Callback delayedCallback;
-    if ((replyInfo.state > nx::vms::api::RebuildState::none) || !success)
+    if (replyInfo.state > nx::vms::api::RebuildState::none)
     {
         NX_VERBOSE(this, "Queue next rebuild progress request");
         delayedCallback =
