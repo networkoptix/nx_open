@@ -2,24 +2,19 @@
 
 #pragma once
 
-#include <QtCore/QScopedPointer>
 #include <QtCore/QModelIndex>
-
+#include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QMenu>
-#include <QtGui/QStandardItem>
-#include <QtGui/QStandardItemModel>
-
-#include <nx/vms/event/rule.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
-
 #include <ui/models/business_rules_actual_model.h>
-#include <ui/widgets/business/business_rule_widget.h>
 
 namespace Ui {
 class BusinessRulesDialog;
 } // namespace Ui
+
+class QnBusinessRuleWidget;
 
 class QnBusinessRulesDialog: public QnSessionAwareButtonBoxDialog
 {
@@ -91,7 +86,6 @@ private:
     QList<QnUuid> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
-
 
     QMap<int, QnUuid> m_deleting;
 

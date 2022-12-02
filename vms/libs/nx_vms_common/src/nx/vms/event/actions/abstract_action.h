@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QFlags>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVector>
 
@@ -17,6 +18,14 @@ class QnResourcePool;
 
 namespace nx::vms::event {
 
+enum class ActionFlag {
+    canUseSourceCamera = 1 << 0,
+};
+
+Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
+
+NX_VMS_COMMON_API ActionFlags getFlags(ActionType actionType);
+
 // TODO: #sivanov Fix to resourceTypeRequired: None, Camera, Server, User, etc.
 NX_VMS_COMMON_API bool requiresCameraResource(ActionType actionType);
 NX_VMS_COMMON_API bool requiresUserResource(ActionType actionType);
@@ -27,6 +36,7 @@ NX_VMS_COMMON_API bool hasToggleState(ActionType actionType);
 NX_VMS_COMMON_API bool canBeInstant(ActionType actionType);
 NX_VMS_COMMON_API bool supportsDuration(ActionType actionType);
 NX_VMS_COMMON_API bool allowsAggregation(ActionType actionType);
+NX_VMS_COMMON_API bool canUseSourceCamera(ActionType actionType);
 
 NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
 
@@ -99,7 +109,7 @@ public:
     const QVector<QnUuid>& getResources() const;
 
     /** Source resource of the action (including custom for generic events). */
-    QVector<QnUuid> getSourceResources(QnResourcePool* resourcePool) const;
+    QVector<QnUuid> getSourceResources(const QnResourcePool* resourcePool) const;
 
     void setParams(const ActionParameters& params);
     const ActionParameters& getParams() const;

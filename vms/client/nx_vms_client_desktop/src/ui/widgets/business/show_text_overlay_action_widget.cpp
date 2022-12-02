@@ -6,7 +6,8 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -38,7 +39,6 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(SystemContext* syst
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
 
-    connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
 
@@ -81,8 +81,7 @@ QnShowTextOverlayActionWidget::~QnShowTextOverlayActionWidget()
 {}
 
 void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->useSourceCheckBox);
-    setTabOrder(ui->useSourceCheckBox, ui->fixedDurationCheckBox);
+    setTabOrder(before, ui->fixedDurationCheckBox);
     setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
     setTabOrder(ui->durationSpinBox, ui->customTextCheckBox);
     setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
@@ -105,7 +104,6 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(Fields fields) {
 
         const bool canUseSource = ((model()->eventType() >= vms::api::EventType::userDefinedEvent)
             || (vms::event::requiresCameraResource(model()->eventType())));
-        ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 
     if (fields.testFlag(Field::actionParams)) {
@@ -121,12 +119,8 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(Fields fields) {
         m_lastCustomText = params.text;
         ui->customTextCheckBox->setChecked(useCustomText);
         ui->customTextEdit->setPlainText(useCustomText ? params.text : getPlaceholderText());
-
-        ui->useSourceCheckBox->setChecked(params.useSource);
     }
 }
-
-
 
 void QnShowTextOverlayActionWidget::paramsChanged() {
     if (!model() || m_updating)
@@ -138,6 +132,6 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
     params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
-    params.useSource = ui->useSourceCheckBox->isChecked();
+
     model()->setActionParams(params);
 }

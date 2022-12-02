@@ -5,6 +5,7 @@
 #include <api/common_message_processor.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>

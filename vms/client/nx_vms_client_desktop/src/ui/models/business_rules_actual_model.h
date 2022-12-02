@@ -1,7 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef __QN_BUSINESS_RULES_ACTUAL_MODEL_H_
-#define __QN_BUSINESS_RULES_ACTUAL_MODEL_H_
+#pragma once
+
+#include <nx/vms/event/rule.h>
 
 #include "business_rules_view_model.h"
 
@@ -41,5 +42,3 @@ private slots:
 private:
     QMap<int, QnBusinessRuleViewModelPtr> m_savingRules;
 };
-
-#endif // __QN_BUSINESS_RULES_ACTUAL_MODEL_H_

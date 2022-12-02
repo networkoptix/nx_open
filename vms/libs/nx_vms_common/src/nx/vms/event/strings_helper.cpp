@@ -1069,7 +1069,8 @@ QString StringsHelper::notificationCaption(
         {
             const auto event = eventName(parameters.eventType);
             const auto trigger = getSoftwareTriggerName(parameters);
-            return lit("%1 %2").arg(event, useHtml ? html::bold(trigger) : trigger);
+            return QString("%1 %2")
+                .arg(event, useHtml ? nx::vms::common::html::bold(trigger) : trigger);
         }
 
         case EventType::userDefinedEvent:

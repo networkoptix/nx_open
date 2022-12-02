@@ -6,15 +6,15 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <business/business_resource_validation.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
-
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/event/action_parameters.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;

@@ -9,8 +9,6 @@
 
 namespace nx::vms::event {
 
-using namespace nx::vms::common;
-
 class NX_VMS_COMMON_API PluginDiagnosticEvent: public InstantEvent
 {
     using base_type = InstantEvent;

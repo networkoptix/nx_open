@@ -4,19 +4,13 @@
 
 #include <QtCore/QVariant>
 
-#include <QtGui/QStandardItemModel>
-
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/event_fwd.h>
-
-#include <core/resource/resource_fwd.h>
-
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/event_parameters.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/utils/uuid.h>
+class QStandardItemModel;
 
-typedef QVector<QnUuid> IDList;
-namespace nx { namespace vms { namespace event { class StringsHelper; }}}
+namespace nx::vms::event { class StringsHelper; }
 
 class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware
 {
@@ -118,6 +112,7 @@ public:
     bool actionIsUsingSourceServer() const;
 
     void toggleActionUseSourceServer();
+    void toggleActionUseSourceCamera();
 
     QIcon iconForAction() const;
 
@@ -161,6 +156,8 @@ private:
 
     static QString toggleStateToModelString(nx::vms::api::EventState value);
     Fields updateEventClassRelatedParams();
+
+    void toggleActionUseSource();
 
 private:
     QnUuid m_id;
