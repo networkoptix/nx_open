@@ -114,6 +114,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget* parent):
     // be replaced with some kind of read-only check box eventually.
     connect(ui->useEventSourceServerCheckBox, &QCheckBox::clicked, this,
         [this](bool checked) { m_model->toggleActionUseSourceServer(); });
+    connect(ui->useEventSourceCameraCheckBox, &QCheckBox::clicked, this,
+        [this](bool checked) { m_model->toggleActionUseSourceCamera(); });
 
     m_eventAligner->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
     m_actionAligner->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
@@ -143,7 +145,6 @@ void QnBusinessRuleWidget::retranslateUi()
         tr("Select at least one camera")
     ));
 }
-
 
 QnBusinessRuleViewModelPtr QnBusinessRuleWidget::model() const
 {
@@ -203,8 +204,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(Column::source,
             Qt::DecorationRole).value<QIcon>()));
 
-        if (vms::event::requiresServerResource(m_model->actionType()))
+        if (vms::event::requiresServerResource(m_model->actionType())
+            || nx::vms::event::canUseSourceCamera(m_model->actionType()))
+        {
             setActionResourcesHolderDisplayFromModel(ui->actionResourcesHolder, m_model.get());
+        }
     }
 
     if (fields & Field::actionType)
@@ -276,6 +280,12 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
         ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
         ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
+
+        ui->useEventSourceCameraCheckBox->setVisible(
+            nx::vms::event::canUseSourceCamera(m_model->actionType()));
+
+        ui->useEventSourceCameraCheckBox->setEnabled(m_model->actionCanUseSourceCamera());
+        ui->useEventSourceCameraCheckBox->setChecked(m_model->isActionUsingSourceCamera());
 
         if (m_model->eventType() == EventType::softwareTriggerEvent)
         {

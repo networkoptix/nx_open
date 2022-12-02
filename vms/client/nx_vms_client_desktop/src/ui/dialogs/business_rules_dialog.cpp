@@ -46,6 +46,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>

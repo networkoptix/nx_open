@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

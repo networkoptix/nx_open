@@ -3,17 +3,14 @@
 #pragma once
 
 #include <QtCore/QAbstractItemModel>
-#include <QtGui/QStandardItemModel>
+#include <QtCore/QList>
 #include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
-#include <QtCore/QList>
-
-#include <nx/vms/event/event_fwd.h>
-
-#include <ui/models/business_rule_view_model.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/event/event_fwd.h>
+#include <ui/models/business_rule_view_model.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware
 {

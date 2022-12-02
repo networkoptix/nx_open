@@ -11,6 +11,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -26,9 +27,6 @@ QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(
     ui->setupUi(this);
 
     connect(ui->forceOpenCheckBox, &QCheckBox::clicked,
-        this, &QnShowOnAlarmLayoutActionWidget::paramsChanged);
-
-    connect(ui->useSourceCheckBox, &QCheckBox::clicked,
         this, &QnShowOnAlarmLayoutActionWidget::paramsChanged);
 
     connect(ui->rewindForWidget, &RewindForWidget::valueEdited, this,
@@ -54,8 +52,7 @@ void QnShowOnAlarmLayoutActionWidget::updateTabOrder(QWidget* before, QWidget* a
 {
     setTabOrder(before, ui->selectUsersButton);
     setTabOrder(ui->selectUsersButton, ui->forceOpenCheckBox);
-    setTabOrder(ui->forceOpenCheckBox, ui->useSourceCheckBox);
-    setTabOrder(ui->useSourceCheckBox, after);
+    setTabOrder(ui->forceOpenCheckBox, after);
 }
 
 void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(Fields fields)
@@ -70,7 +67,6 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(Fields fields)
     if (fields.testFlag(Field::actionParams))
     {
         ui->forceOpenCheckBox->setChecked(model()->actionParams().forced);
-        ui->useSourceCheckBox->setChecked(model()->actionParams().useSource);
         ui->rewindForWidget->setValue(duration_cast<seconds>(
             milliseconds(model()->actionParams().recordBeforeMs)));
     }
@@ -79,7 +75,6 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(Fields fields)
     {
         const bool canUseSource = (model()->eventType() >= vms::api::EventType::userDefinedEvent
             || vms::event::requiresCameraResource(model()->eventType()));
-        ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 }
 
@@ -92,6 +87,5 @@ void QnShowOnAlarmLayoutActionWidget::paramsChanged()
 
     vms::event::ActionParameters params = model()->actionParams();
     params.forced = ui->forceOpenCheckBox->isChecked();
-    params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);
 }
