@@ -508,7 +508,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::maxHttpTranscodingSessions, 2, this,
         [] { return tr(
             "Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 "
-            "connections at once, then close the first one. "
+            "connections at once, then closes the first one. "
             "We recommend setting this parameter's value to 2 or more."); });
 
     m_maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(

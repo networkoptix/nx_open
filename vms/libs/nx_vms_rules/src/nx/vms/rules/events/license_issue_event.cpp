@@ -77,9 +77,9 @@ QStringList LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) c
     result << QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
         QnCameraDeviceStringSet(
-            tr("Not enough licenses. Recording has been disabled on following devices:"),
-            tr("Not enough licenses. Recording has been disabled on following cameras:"),
-            tr("Not enough licenses. Recording has been disabled on following I/O modules:")),
+            tr("Not enough licenses. Recording has been disabled on the following devices:"),
+            tr("Not enough licenses. Recording has been disabled on the following cameras:"),
+            tr("Not enough licenses. Recording has been disabled on the following I/O modules:")),
         disabledCameras);
 
     const auto stringHelper = utils::StringHelper(context);
