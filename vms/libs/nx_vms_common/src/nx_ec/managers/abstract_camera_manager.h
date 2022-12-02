@@ -25,7 +25,7 @@ class NX_VMS_COMMON_API AbstractCameraNotificationManager: public QObject
 signals:
     void addedOrUpdated(const nx::vms::api::CameraData& camera, ec2::NotificationSource source);
     void cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
-    void removed(const QnUuid& id);
+    void removed(const QnUuid& id, ec2::NotificationSource source);
 
     void userAttributesChanged(const nx::vms::api::CameraAttributesData& attributes);
     void userAttributesRemoved(const QnUuid& id);

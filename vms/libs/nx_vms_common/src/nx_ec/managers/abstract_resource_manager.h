@@ -29,8 +29,8 @@ signals:
         ec2::NotificationSource source);
 
     void resourceParamRemoved(const nx::vms::api::ResourceParamWithRefData& param);
-    void resourceRemoved(const QnUuid& resourceId);
-    void resourceStatusRemoved(const QnUuid& resourceId);
+    void resourceRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
+    void resourceStatusRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
 };
 
 /*!

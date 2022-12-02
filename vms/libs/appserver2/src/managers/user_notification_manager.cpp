@@ -35,14 +35,14 @@ void QnUserNotificationManager::triggerNotification(
 
 void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
-    NotificationSource /*source*/)
+    NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserRole)
     ;
     if (tran.command == ApiCommand::removeUser)
-    emit removed(tran.params.id);
+        emit removed(tran.params.id, source);
     else if (tran.command == ApiCommand::removeUserRole)
-    emit userRoleRemoved(tran.params.id);
+        emit userRoleRemoved(tran.params.id);
 }
 
 void QnUserNotificationManager::triggerNotification(

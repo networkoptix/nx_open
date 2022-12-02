@@ -20,7 +20,7 @@ signals:
     void addedOrUpdated(
         const nx::vms::api::VideowallData& videowall, ec2::NotificationSource source);
 
-    void removed(const QnUuid& id);
+    void removed(const QnUuid& id, ec2::NotificationSource source);
     void controlMessage(const nx::vms::api::VideowallControlMessageData& message);
 };
 

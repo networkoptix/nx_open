@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractWebPageNotificationManager: public QObject
 
 signals:
     void addedOrUpdated(const nx::vms::api::WebPageData& webpage, ec2::NotificationSource source);
-    void removed(const QnUuid& id);
+    void removed(const QnUuid& id, ec2::NotificationSource source);
 };
 
 /*!
