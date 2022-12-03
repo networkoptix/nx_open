@@ -1396,8 +1396,6 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item)
     if (!widget)
         return false;
 
-    m_scene->removeItem(widget);
-
     /* Remove all linked zoom items. */
     removeZoomLinksInternal(item);
 
@@ -1413,6 +1411,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item)
     }
 
     emit widgetAboutToBeRemoved(widget);
+
+    m_scene->removeItem(widget);
 
     const auto resource = widget->resource();
 
