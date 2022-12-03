@@ -804,9 +804,13 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     }
 
     updateCurrentWidget();
+
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods();
-    updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
+
+    if (!widget->isZoomWindow())
+        updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
+
     updateLines();
     updateSyncIsForced();
     updateLiveSupported();
