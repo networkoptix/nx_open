@@ -19,7 +19,6 @@ struct NX_VMS_COMMON_API QnCloudSystem
     qint64 lastLoginTimeUtcMs;
     bool online = false;
     bool system2faEnabled = false;
-    std::string newestServerVersion;
 
     /** The VMS version reported by the last connected VMS server. */
     QString version;

@@ -137,6 +137,10 @@ struct StartupActionsHandler::Private
                 {
                     delayedLogonParameters->address = logonData->address;
                     delayedLogonParameters->expectedServerId = logonData->expectedServerId;
+                    delayedLogonParameters->expectedServerVersion =
+                        logonData->expectedServerVersion;
+                    delayedLogonParameters->expectedCloudSystemId =
+                        logonData->expectedCloudSystemId;
                 }
             }
 

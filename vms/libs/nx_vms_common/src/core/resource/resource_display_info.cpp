@@ -14,28 +14,12 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/common/resource/server_host_priority.h>
 #include <nx/vms/common/system_context.h>
 
+using namespace nx::vms::common;
+
 namespace {
-
-enum Priority { kDns, kLocalIpV4, kRemoteIp, kLocalIpV6, kLocalHost, kCloud };
-
-Priority hostPriority(const nx::network::HostAddress& host)
-{
-    if (host.isLoopback())
-        return kLocalHost;
-
-    if (host.isLocalNetwork())
-        return host.ipV4() ? kLocalIpV4 : kLocalIpV6;
-
-    if (host.ipV4() || (bool) host.ipV6().first)
-        return kRemoteIp;
-
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostname(host.toString()))
-        return kCloud;
-
-    return kDns;
-};
 
 nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 {
@@ -45,7 +29,7 @@ nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 
     // We should not display localhost or cloud addresses to the user.
     auto primaryUrl = server->getPrimaryAddress();
-    if (hostPriority(primaryUrl.address) < kLocalHost)
+    if (serverHostPriority(primaryUrl.address) < ServerHostPriority::localHost)
         return primaryUrl;
 
     auto allAddresses = server->getAllAvailableAddresses();
@@ -55,7 +39,7 @@ nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
     return *std::min_element(allAddresses.cbegin(), allAddresses.cend(),
         [](const auto& l, const auto& r)
         {
-            return hostPriority(l.address) < hostPriority(r.address);
+            return serverHostPriority(l.address) < serverHostPriority(r.address);
         });
 }
 

@@ -423,3 +423,15 @@ bool QnSystemDescriptionAggregator::isOauthSupported() const
             return system->isOauthSupported();
         });
 }
+
+nx::utils::SoftwareVersion QnSystemDescriptionAggregator::version() const
+{
+    if (isEmptyAggregator())
+        return {};
+
+    return (*std::max_element(m_systems.cbegin(), m_systems.cend(),
+        [](const auto& l, const auto& r)
+        {
+            return l->version() < r->version();
+        }))->version();
+}

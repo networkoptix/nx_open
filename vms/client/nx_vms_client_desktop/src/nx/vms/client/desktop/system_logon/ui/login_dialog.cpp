@@ -238,6 +238,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
 
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
+                const auto& moduleInformation = d->connectionProcess->context->moduleInformation;
                 switch (error->code)
                 {
                     case RemoteConnectionErrorCode::binaryProtocolVersionDiffers:
@@ -245,7 +246,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                     {
                         if (QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
                                 this,
-                                d->connectionProcess->context->moduleInformation,
+                                moduleInformation,
                                 d->connectionProcess->context->logonData,
                                 appContext()->version()))
                         {
@@ -256,8 +257,8 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                     case RemoteConnectionErrorCode::factoryServer:
                     {
                         LogonData logonData(d->connectionProcess->context->logonData);
-                        logonData.expectedServerId =
-                            d->connectionProcess->context->moduleInformation.id;
+                        logonData.expectedServerId = moduleInformation.id;
+                        logonData.expectedServerVersion = moduleInformation.version;
 
                         menu()->trigger(ui::action::SetupFactoryServerAction,
                             ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));

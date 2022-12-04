@@ -96,3 +96,8 @@ bool QnCloudSystemDescription::isOauthSupported() const
     static const auto kOauthStartSupportVersion = nx::utils::SoftwareVersion(5, 0);
     return m_lastKnownVersion.isNull() || m_lastKnownVersion >= kOauthStartSupportVersion;
 }
+
+nx::utils::SoftwareVersion QnCloudSystemDescription::version() const
+{
+    return std::max(m_lastKnownVersion, base_type::version());
+}

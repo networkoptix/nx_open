@@ -44,6 +44,9 @@ public: // Overrides
 
     virtual bool isOauthSupported() const override;
 
+    /** The VMS version reported by the last connected VMS server. */
+    virtual nx::utils::SoftwareVersion version() const override;
+
 private:
     QnCloudSystemDescription(
         const QString& systemId,
