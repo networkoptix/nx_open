@@ -78,6 +78,7 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     m_private->logonData = logonData;
     m_private->logonData.purpose = core::LogonData::Purpose::connectInCompatibilityMode;
     m_private->logonData.expectedServerId = moduleInformation.id;
+    m_private->logonData.expectedServerVersion = moduleInformation.version;
     m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(
         appContext()->currentSystemContext(),
         this));

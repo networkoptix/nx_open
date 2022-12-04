@@ -2,6 +2,8 @@
 
 #include "remote_connection_error.h"
 
+#include <nx/reflect/to_string.h>
+
 namespace nx::vms::client::core {
 
 RemoteConnectionError::RemoteConnectionError(RemoteConnectionErrorCode code):
@@ -12,6 +14,14 @@ RemoteConnectionError::RemoteConnectionError(RemoteConnectionErrorCode code):
 bool RemoteConnectionError::operator==(RemoteConnectionErrorCode code) const
 {
     return this->code == code;
+}
+
+QString RemoteConnectionError::toString() const
+{
+    QString result = QString::fromStdString(nx::reflect::toString(code));
+    if (externalDescription)
+        result += "(" + *externalDescription + ")";
+    return result;
 }
 
 } // namespace nx::vms::client::core

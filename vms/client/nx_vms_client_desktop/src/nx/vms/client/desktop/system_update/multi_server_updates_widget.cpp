@@ -454,6 +454,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 .address = connection->address(),
                 .credentials = connection->credentials(),
                 .expectedServerId = moduleInformation.id,
+                .expectedServerVersion = moduleInformation.version,
             },
             systemContext()->certificateVerifier());
         //m_clientUpdateTool->requestRemoteUpdateInfo();

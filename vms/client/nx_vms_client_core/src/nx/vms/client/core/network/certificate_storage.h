@@ -21,7 +21,7 @@ namespace nx::vms::client::core {
  * Keeps record of all pinned certificates, allows to check if the provided certificate is pinned
  * or not, and pin it if needed. Only public keys are stored to identify certificates.
  */
-class CertificateStorage: public QObject
+class NX_VMS_CLIENT_CORE_API CertificateStorage: public QObject
 {
     using base_type = QObject;
 

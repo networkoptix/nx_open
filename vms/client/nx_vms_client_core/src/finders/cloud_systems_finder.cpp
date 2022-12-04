@@ -244,8 +244,8 @@ struct CloudSystemsFinder::Private
             systemDescription->setOnline(system.online);
 
             NX_VERBOSE(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.newestServerVersion);
-            const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
+                systemDescription->name(), systemDescription->id(), system.version);
+            const auto version = nx::utils::SoftwareVersion(system.version);
             systemDescription->updateLastKnownVersion(version);
 
             NX_VERBOSE(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",

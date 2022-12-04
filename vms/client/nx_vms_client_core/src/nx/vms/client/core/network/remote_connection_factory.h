@@ -25,6 +25,7 @@ struct QnPingReply;
 
 namespace nx::vms::client::core {
 
+class AbstractRemoteConnectionFactoryRequestsManager;
 class CertificateVerifier;
 
 /**
@@ -41,12 +42,23 @@ public:
     using Process = RemoteConnectionProcess;
     using ProcessPtr = std::shared_ptr<Process>;
 
+    using AuditIdProvider = std::function<QnUuid()>;
+
+    struct CloudCredentialsProvider
+    {
+        std::function<nx::network::http::Credentials()> getCredentials;
+        std::function<std::string()> getLogin;
+        std::function<std::string()> getDigestPassword;
+        std::function<bool()> is2FaEnabledForUser;
+    };
+
     /**
-     * Common module and certificate validator ownership is not taken. Their lifetime must be
-     * controlled by the caller.
+     * Certificate validator ownership is not taken. Its lifetime must be controlled by the caller.
      */
     RemoteConnectionFactory(
-        QnCommonModule* commonModule,
+        AuditIdProvider auditIdProvider,
+        CloudCredentialsProvider cloudCredentialsProvider,
+        std::shared_ptr<AbstractRemoteConnectionFactoryRequestsManager> requestsManager,
         CertificateVerifier* certificateVerifier,
         nx::vms::api::PeerType peerType,
         Qn::SerializationFormat serializationFormat);
@@ -59,6 +71,13 @@ public:
      */
     void setUserInteractionDelegate(
         std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> delegate);
+
+    /**
+     * Access to user interaction delegate to re-use it in the separate server cetificate watcher
+     * class. When server certificate changes, we should display totally the same dialogs as when
+     * connecting to the system.
+     */
+    AbstractRemoteConnectionUserInteractionDelegate* userInteractionDelegate() const;
 
     using ConnectionOrError = std::variant<RemoteConnectionPtr, RemoteConnectionError>;
     using Callback = std::function<void(ConnectionOrError)>;

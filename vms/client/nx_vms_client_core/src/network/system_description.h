@@ -55,6 +55,8 @@ public: // overrides
 
     virtual bool isOauthSupported() const override;
 
+    virtual nx::utils::SoftwareVersion version() const override;
+
     static QString extractSystemName(const QString& systemName);
 
 public:
