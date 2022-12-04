@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx_ec/ec_api_fwd.h>
@@ -31,13 +32,12 @@ namespace nx::vms::common {
 class NX_VMS_COMMON_API ServerCompatibilityValidator
 {
 public:
-    enum class Purpose
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Purpose,
         connect,
         merge,
         connectInCompatibilityMode,
-        connectInCrossSystemMode,
-    };
+        connectInCrossSystemMode
+    );
 
     enum class Reason
     {

@@ -69,7 +69,6 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
             ? data.localSystemId
             : guidFromArbitraryData(system.cloudId); //< Safety check, local id should be present.
 
-        system.newestServerVersion = systemData.version;
         system.online = (systemData.stateOfHealth == SystemHealth::online);
         system.system2faEnabled = systemData.system2faEnabled;
         system.name = QString::fromStdString(systemData.name);

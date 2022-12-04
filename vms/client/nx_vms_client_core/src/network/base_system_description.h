@@ -91,6 +91,8 @@ public:
 
     virtual bool isOauthSupported() const = 0;
 
+    virtual nx::utils::SoftwareVersion version() const = 0;
+
 signals:
     void isCloudSystemChanged();
 

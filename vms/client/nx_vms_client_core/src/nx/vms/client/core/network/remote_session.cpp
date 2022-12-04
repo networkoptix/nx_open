@@ -462,6 +462,8 @@ void RemoteSession::reconnectStep()
             .credentials = d->connection->credentials(),
             .userType = d->connection->userType(),
             .expectedServerId = d->reconnectHelper->currentServer()->getId(),
+            .expectedServerVersion = d->connection->moduleInformation().version,
+            .expectedCloudSystemId = d->connection->moduleInformation().cloudSystemId,
             .userInteractionAllowed = false
         };
 

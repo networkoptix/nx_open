@@ -91,6 +91,9 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionError
     RemoteConnectionError(RemoteConnectionErrorCode code);
     bool operator==(const RemoteConnectionError&) const = default;
     bool operator==(RemoteConnectionErrorCode) const;
+
+    /** Debug representation. */
+    QString toString() const;
 };
 
 } // namespace nx::vms::client::core
