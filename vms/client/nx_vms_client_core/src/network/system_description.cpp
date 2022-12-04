@@ -184,7 +184,7 @@ bool QnSystemDescription::isReachable() const
     return !m_reachableServers.isEmpty();
 }
 
-bool QnSystemDescription::hasLocalServer() const 
+bool QnSystemDescription::hasLocalServer() const
 {
     const auto systemServers = servers();
     return std::any_of(systemServers.cbegin(), systemServers.cend(),
@@ -197,7 +197,7 @@ bool QnSystemDescription::hasLocalServer() const
         });
 }
 
-QnSystemCompatibility QnSystemDescription::systemCompatibility() const 
+QnSystemCompatibility QnSystemDescription::systemCompatibility() const
 {
     const auto systemServers = servers();
     for (const auto& serverInfo: systemServers)
@@ -219,6 +219,19 @@ QnSystemCompatibility QnSystemDescription::systemCompatibility() const
 bool QnSystemDescription::isOauthSupported() const
 {
     return true; //< We suppose that OAuth is supported by default.
+}
+
+nx::utils::SoftwareVersion QnSystemDescription::version() const
+{
+    const auto systemServers = servers();
+    if (systemServers.empty())
+        return {};
+
+    return std::max_element(systemServers.cbegin(), systemServers.cend(),
+        [](const auto& l, const auto& r)
+        {
+            return l.version < r.version;
+        })->version;
 }
 
 void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)

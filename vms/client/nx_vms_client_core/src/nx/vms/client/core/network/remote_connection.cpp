@@ -269,7 +269,10 @@ LogonData RemoteConnection::createLogonData() const
         .address = d->connectionInfo.address,
         .credentials = d->connectionInfo.credentials,
         .userType = d->connectionInfo.userType,
-        .expectedServerId = d->moduleInformation.id};
+        .expectedServerId = d->moduleInformation.id,
+        .expectedServerVersion = d->moduleInformation.version,
+        .expectedCloudSystemId = d->moduleInformation.cloudSystemId,
+    };
     return logonData;
 }
 

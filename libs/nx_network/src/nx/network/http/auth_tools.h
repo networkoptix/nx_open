@@ -92,6 +92,9 @@ public:
     bool operator==(const Credentials& other) const = default;
 };
 
+/** GTest support. */
+NX_NETWORK_API void PrintTo(const Credentials& val, ::std::ostream* os);
+
 class NX_NETWORK_API PasswordCredentials: public Credentials
 {
 public:

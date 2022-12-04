@@ -8,6 +8,7 @@
 
 #include <openssl/md5.h>
 
+#include <nx/reflect/json.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/random.h>
 #include <nx/utils/random_cryptographic_device.h>
@@ -92,6 +93,11 @@ Credentials::Credentials(const QAuthenticator& credentials):
     username(credentials.user().toStdString()),
     authToken(PasswordAuthToken(credentials.password().toStdString()))
 {
+}
+
+void PrintTo(const Credentials& val, ::std::ostream* os)
+{
+    *os << nx::reflect::json::serialize(SerializableCredentials(val));
 }
 
 //-------------------------------------------------------------------------------------------------

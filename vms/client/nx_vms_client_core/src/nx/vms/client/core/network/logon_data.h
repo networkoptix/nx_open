@@ -36,10 +36,20 @@ struct NX_VMS_CLIENT_CORE_API LogonData
     Purpose purpose = Purpose::connect;
 
     /**
-     * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to another
-     * Server on the same endpoint.
+     * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to
+     * another Server on the same endpoint.
      */
     std::optional<QnUuid> expectedServerId = std::nullopt;
+
+    /**
+     * Version of the server we expect to connect. Allows to simplify the connection scenario.
+     */
+    std::optional<nx::utils::SoftwareVersion> expectedServerVersion;
+
+    /**
+     * Cloud ID of the System we expect to connect. Allows to simplify the connection scenario.
+     */
+    std::optional<QString> expectedCloudSystemId;
 
     /**
      * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).

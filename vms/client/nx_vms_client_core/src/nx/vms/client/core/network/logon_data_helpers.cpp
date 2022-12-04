@@ -92,6 +92,19 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         }
     }
 
+    if (auto systemVersion = system->version(); !systemVersion.isNull())
+    {
+        result.expectedServerVersion = systemVersion;
+        NX_DEBUG(NX_SCOPE_TAG, "Expect system version %1.", systemVersion);
+    }
+
+    if (system->isCloudSystem())
+    {
+        // First system in the aggregator is the cloud one (if the system is cloud).
+        result.expectedCloudSystemId = system->id();
+        NX_DEBUG(NX_SCOPE_TAG, "Expect Cloud System ID %1.", system->id());
+    }
+
     if (url.isEmpty())
     {
         const auto debugServersInfo =
@@ -118,13 +131,16 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         if (iter != servers.cend())
         {
             result.expectedServerId = iter->id;
+            result.expectedServerVersion = iter->version;
+            result.expectedCloudSystemId = iter->cloudSystemId;
             url = system->getServerHost(iter->id);
             if (NX_ASSERT(!url.isEmpty()))
             {
                 NX_DEBUG(NX_SCOPE_TAG,
-                    "Choosing %1 connection to the server %2 (%3)",
+                    "Choosing %1 connection to the server %2 [%3] (%4)",
                     isCloudUrl(url) ? "cloud" : "local",
                     result.expectedServerId,
+                    result.expectedServerVersion,
                     url);
             }
             else if (systemHasInitialServer)
