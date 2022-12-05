@@ -233,5 +233,5 @@ nx::vms::api::StorageStatuses QnStorageResource::statusFlag() const
 
 bool QnStorageResource::canStoreAnalytics() const
 {
-    return isUsedForWriting() && isOnline() && isDbReady();
+    return isOnline() && isDbReady();
 }
