@@ -423,7 +423,7 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
     }
 }
 
-#elif defined(__arm__) && defined(__ARM_NEON__)
+#elif defined(__arm__) && defined(__ARM_NEON)
 
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
@@ -479,7 +479,7 @@ void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8*
 }
 
 #else
-    
+
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,

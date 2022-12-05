@@ -22,7 +22,7 @@ bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
 #if defined(NX_SSE2_SUPPORTED)
     static const __m128i sse_0000_intrs =
         _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
-#elif defined(__arm__) && defined(__ARM_NEON__)
+#elif defined(__arm__) && defined(__ARM_NEON)
     // TODO: ARM.
 #else
     // TODO: C fallback routine.
@@ -127,7 +127,7 @@ CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderO
                 srcY += strideCoeff;
             }
         }
-    #elif defined(__arm__) && defined(__ARM_NEON__)
+    #elif defined(__arm__) && defined(__ARM_NEON)
         // TODO: ARM.
     #else
         // TODO: C fallback routine.
