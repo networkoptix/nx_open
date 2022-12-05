@@ -200,7 +200,7 @@ bool QnMetaDataV1::matchImage(const quint64* data, const simd128i* mask, int mas
         return mathImage_sse41((const simd128i*) data, mask, maskStart, maskEnd);
     else
         return mathImage_sse2((const simd128i*) data, mask, maskStart, maskEnd);
-#elif __arm__ && __ARM_NEON__
+#elif __arm__ && __ARM_NEON
     //TODO/ARM
     return mathImage_cpu(data, mask, maskStart, maskEnd);
 #else
@@ -324,7 +324,7 @@ bool QnMetaDataV1::isEmpty() const
         return metadataIsEmpty_sse41((__m128i*) m_data.data());
     else
         return metadataIsEmpty_sse2((__m128i*) m_data.data());
-#elif __arm__ && __ARM_NEON__
+#elif __arm__ && __ARM_NEON
     return metadataIsEmpty_cpu(m_data.data());
 #else
     return metadataIsEmpty_cpu(m_data.data());

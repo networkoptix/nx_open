@@ -15,7 +15,7 @@
 typedef __m128i simd128i;
 typedef __m128 simd128;
 
-#elif (defined(__arm__) || defined(__aarch64__)) && defined(__ARM_NEON__)
+#elif (defined(__arm__) || defined(__aarch64__)) && defined(__ARM_NEON)
     #include <sse2neon.h>
     #define NX_SSE2_SUPPORTED
     #define NX_SSE2_SUPPORTED_SSE2NEON

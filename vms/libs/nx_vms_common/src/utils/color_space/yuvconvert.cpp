@@ -424,7 +424,7 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
     }
 }
 
-#elif __arm__ && __ARM_NEON__
+#elif __arm__ && __ARM_NEON
 
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
