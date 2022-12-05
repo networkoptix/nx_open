@@ -60,7 +60,7 @@ public:
         uint64_t ntpTimestamp = 0;
         uint32_t rtpTimestamp = 0;
     };
-    PacketTimestamp getLastPacketTimestamp() { return m_lastPacketTimestamp; }
+    PacketTimestamp getLastPacketTimestamp() const { return m_lastPacketTimestamp; }
     void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
 
 protected:
