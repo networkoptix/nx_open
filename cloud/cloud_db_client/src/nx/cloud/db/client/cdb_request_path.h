@@ -35,6 +35,8 @@ static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/s
 static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
 static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
 
+static constexpr char kSendNotificationQueryParam[] = "sendNotification";
+
 static constexpr char kAuthGetNoncePath[] = "/cdb/auth/getNonce";
 static constexpr char kAuthGetAuthenticationPath[] = "/cdb/auth/getAuthentication";
 static constexpr char kAuthResolveUserCredentials[] = "/cdb/auth_provider/caller-identity";

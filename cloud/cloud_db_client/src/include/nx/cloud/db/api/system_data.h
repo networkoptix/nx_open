@@ -234,6 +234,12 @@ struct SystemSharingExList
     std::vector<SystemSharingEx> sharing;
 };
 
+struct ShareSystemQuery
+{
+    /**%apidoc Specifies whether the "system shared with you" notification is sent or not. */
+    std::optional<bool> sendNotification;
+};
+
 struct SystemAccessRoleData
 {
     SystemAccessRole accessRole = SystemAccessRole::none;
