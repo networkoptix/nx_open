@@ -151,6 +151,8 @@ NX_REFLECTION_INSTRUMENT(SystemSharingExList, SystemSharingExList_Fields)
 
 #define SystemAccessRoleData_Fields (accessRole)
 
+NX_REFLECTION_INSTRUMENT(ShareSystemQuery, (sendNotification))
+
 NX_REFLECTION_INSTRUMENT(SystemAccessRoleData, SystemAccessRoleData_Fields)
 
 #define SystemAccessRoleList_Fields (accessRoles)
