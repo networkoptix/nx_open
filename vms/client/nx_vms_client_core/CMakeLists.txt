@@ -39,6 +39,7 @@ file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     "static-resources/qml/*.vert"
     "static-resources/qml/*.frag"
 )
+# This command generates nx_vms_client_core_other_files target.
 qt6_add_shaders(nx_vms_client_core "nx_vms_client_core_shaders"
     BATCHABLE
     PREFIX
@@ -48,6 +49,7 @@ qt6_add_shaders(nx_vms_client_core "nx_vms_client_core_shaders"
     FILES
         ${shader_sources}
 )
+set_property(TARGET nx_vms_client_core_other_files PROPERTY FOLDER client/other_files)
 
 # Workaround for Qt bug with Xcode new build system:
 #
