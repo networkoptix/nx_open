@@ -153,6 +153,7 @@ file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     "shaders/qsb/*.frag"
 )
 
+# This command generates nx_vms_client_desktop_other_files target.
 qt6_add_shaders(nx_vms_client_desktop "nx_vms_client_desktop_shaders"
     BATCHABLE
     PREFIX
@@ -160,6 +161,7 @@ qt6_add_shaders(nx_vms_client_desktop "nx_vms_client_desktop_shaders"
     FILES
         ${shader_sources}
 )
+set_property(TARGET nx_vms_client_desktop_other_files PROPERTY FOLDER client/other_files)
 
 target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}
