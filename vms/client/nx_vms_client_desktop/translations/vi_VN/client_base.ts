@@ -6633,8 +6633,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Bạn sắp chuyển các trang web này sang máy chủ &quot;%1&quot;. Các trang web này ủy quyền tất cả các nội dung được yêu cầu và máy chủ ủy quyền sẽ thay đổi thành máy chủ &quot;%1&quot;.</numerusform>
       </translation>
     </message>
   </context>
@@ -6670,11 +6670,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Chọn ít nhất một Máy chủ</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Chọn ít nhất một người dùng</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -6686,7 +6686,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>Chọn ít nhất một mô-đun I/O</translation>
     </message>
   </context>
   <context>
@@ -6948,7 +6948,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Quản lý nhật ký</translation>
     </message>
   </context>
   <context>
@@ -7310,7 +7310,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Mở Cửa</translation>
     </message>
   </context>
   <context>
@@ -7397,7 +7397,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <translation>Video được quay trên bộ nhớ nội bộ của camera sẽ không được tự động tải lên kho lưu trữ chính.</translation>
     </message>
   </context>
   <context>
@@ -7519,20 +7519,20 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>Kiểm tra xem có thể chuyển dữ liệu của camera cũ sang camera mới không.</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>Một số dữ liệu và cài đặt có thể không tương thích với camera mới</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1 sẽ bị xóa khỏi Hệ thống và được thay thế bằng camera đã chọn</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>Không thể thực hiện thao tác Thay thế camera do Máy chủ không khả dụng.</translation>
     </message>
   </context>
   <context>
@@ -7837,7 +7837,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>Trang web này đang yêu cầu quyền truy cập vào tài khoản của bạn để được ủy quyền</translation>
     </message>
   </context>
   <context>
@@ -7938,7 +7938,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Nhấp để hiển thị camera</translation>
     </message>
   </context>
   <context>
@@ -7946,15 +7946,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Introducing %1 Layouts</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
+      <translation>Giới thiệu Bố cục %1</translation>
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>Bố cục %1 là &lt;b&gt;bố cục xuyên hệ thống&lt;/b&gt; cho phép bạn làm việc với các thiết bị từ các Hệ thống khác nhau. Hiện tại, chỉ có một số tính năng của bố cục thông thường là khả dụng, nhưng chúng tôi sẽ tiếp tục mở rộng khả năng của Bố cục %1 trong các phiên bản sau</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>Đọc thêm trên %1</translation>
     </message>
     <message>
       <source>help page</source>
@@ -7966,12 +7966,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Sao chép)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Sao chép %2)</translation>
     </message>
   </context>
   <context>
@@ -8138,7 +8138,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Camera không xác định</translation>
     </message>
   </context>
   <context>
@@ -8315,7 +8315,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>THÔNG TIN BẮT BUỘC</translation>
     </message>
   </context>
   <context>
@@ -8552,7 +8552,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Chọn thư mục...</translation>
     </message>
   </context>
   <context>
@@ -8801,23 +8801,23 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>Phải lớn hơn hoặc bằng giá trị được đặt cho Chia tệp theo kích thước</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>Phải nhỏ hơn hoặc bằng giá trị được đặt cho giới hạn âm lượng tối đa</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>Mức ghi nhật ký đã chọn có thể không thu thập đủ thông tin.
+Nhật ký Cấp độ &quot;%1&quot; sẽ cung cấp cho bạn thông tin chi tiết hơn.</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Mức ghi nhật ký đã chọn có thể làm giảm hiệu suất của hệ thống.
+Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau khi bạn đã thu thập đủ nhật ký.</translation>
     </message>
   </context>
   <context>
@@ -8835,11 +8835,11 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
+      <translation>Đơn vị</translation>
     </message>
     <message>
       <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
+      <translation>Cấp độ hiện tại</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8855,7 +8855,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Cảnh báo</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8863,11 +8863,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Gỡ lỗi</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Chi tiết</translation>
     </message>
   </context>
   <context>
@@ -8884,7 +8884,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
+      <translation>Đang chờ tải xuống...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -8894,24 +8894,24 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>Nhật ký đã tải xuống</translation>
     </message>
     <message>
       <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
+      <translation>Tải xuống nhật ký không thành công</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>Ghi nhật ký gỡ lỗi được bật trên Máy khách</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>Ghi nhật ký gỡ lỗi được bật, dẫn đến hiệu năng hệ thống bị suy giảm.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>Ghi nhật ký gỡ lỗi được bật trên %n Máy chủ</numerusform>
       </translation>
     </message>
     <message>
