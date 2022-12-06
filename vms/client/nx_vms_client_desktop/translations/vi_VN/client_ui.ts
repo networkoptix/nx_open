@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Giới thiệu Bố cục đám mây</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -938,7 +938,7 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Tìm kiếm Dấu trang, Đối tượng, Sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1016,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Tạo bản sao lưu dữ liệu quản lý Hệ thống hoặc khôi phục dữ liệu Quản lý hệ thống từ bản sao lưu hiện có</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -1182,23 +1182,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Nội dung HTTP(S)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Loại nội dung</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Loại Xác Thực,</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Phương thức yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1339,7 @@
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Thêm bình luận</translation>
     </message>
   </context>
   <context>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Cho phép máy tính chuyển sang chế độ ngủ khi không hoạt động</translation>
     </message>
   </context>
   <context>
@@ -1791,15 +1791,15 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Mức ghi nhật ký</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Tách tệp theo kích thước</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Tách tệp theo thời gian</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
