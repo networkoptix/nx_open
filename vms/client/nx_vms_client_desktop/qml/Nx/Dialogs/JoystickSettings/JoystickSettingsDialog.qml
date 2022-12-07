@@ -43,8 +43,9 @@ Dialog
 
     onApplyButtonEnabledChanged:
     {
-        if (buttonBox.standardButton(Dialog.Apply))
-            buttonBox.standardButton(Dialog.Apply).enabled = applyButtonEnabled
+        const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
+        if (applyButton)
+            applyButton.enabled = applyButtonEnabled
     }
 
     contentItem: Rectangle
@@ -190,8 +191,9 @@ Dialog
 
         onStandardButtonsChanged:
         {
-            if (buttonBox.standardButton(Dialog.Apply))
-                buttonBox.standardButton(Dialog.Apply).enabled = false
+            const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
+            if (applyButton)
+                applyButton.enabled = false
         }
     }
 
