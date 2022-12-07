@@ -55,6 +55,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
     setControlPtz(data.controlPtz);
     setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
     setDisplayRoi(data.displayRoi);
+    setFrameDistinctionColor(data.frameDistinctionColor);
 }
 
 QnWorkbenchItem::~QnWorkbenchItem()
@@ -87,18 +88,7 @@ QnLayoutItemData QnWorkbenchItem::data() const
         return {};
 
     QnLayoutItemData data = m_layout->resource()->getItem(m_uuid);
-    data.flags = flags();
-    data.rotation = rotation();
-    data.combinedGeometry = combinedGeometry();
-    data.zoomRect = zoomRect();
-    data.contrastParams = imageEnhancement();
-    data.dewarpingParams = dewarpingParams();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
-    data.displayInfo = displayInfo();
-    data.controlPtz = controlPtz();
-    data.displayAnalyticsObjects = displayAnalyticsObjects();
-    data.displayRoi = displayRoi();
-
+    submit(data);
     return data;
 }
 
@@ -122,6 +112,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
     setControlPtz(data.controlPtz);
     setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
     setDisplayRoi(data.displayRoi);
+    setFrameDistinctionColor(data.frameDistinctionColor);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     return result;
@@ -145,6 +136,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const
     data.controlPtz = controlPtz();
     data.displayAnalyticsObjects = displayAnalyticsObjects();
     data.displayRoi = displayRoi();
+    data.frameDistinctionColor = frameDistinctionColor();
 }
 
 QnResourcePtr QnWorkbenchItem::resource() const
@@ -384,6 +376,20 @@ void QnWorkbenchItem::setDisplayRoi(bool value)
     m_displayRoi = value;
     emit displayRoiChanged();
     emit dataChanged(Qn::ItemDisplayRoiRole);
+}
+
+QColor QnWorkbenchItem::frameDistinctionColor() const
+{
+    return m_frameDistinctionColor;
+}
+
+void QnWorkbenchItem::setFrameDistinctionColor(const QColor& value)
+{
+    if (m_frameDistinctionColor == value)
+        return;
+
+    m_frameDistinctionColor = value;
+    emit dataChanged(Qn::ItemFrameDistinctionColorRole);
 }
 
 QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const

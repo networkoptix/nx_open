@@ -1209,6 +1209,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
+    data.frameDistinctionColor = widget->frameDistinctionColor();
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     // Zoom target must always be dewarped by 90 degrees.
     data.dewarpingParams.panoFactor = 1;
@@ -1224,7 +1225,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
     // Add a new item. Existing should be deleted later to avoid AV in this method processing.
     currentLayout->addItem(data);
     executeDelayedParented(
-        [this, id = existing.uuid, currentLayout]
+        [id = existing.uuid, currentLayout]
         {
             currentLayout->removeItem(id);
         }, this);

@@ -70,7 +70,7 @@ public:
 
 #define QnWorkbenchStateUnsavedLayoutItem_Fields (resource)(uuid)(flags)(combinedGeometry) \
     (zoomTargetUuid)(zoomRect)(rotation)(displayInfo)(controlPtz)(displayAnalyticsObjects) \
-    (displayRoi)(contrastParams)(dewarpingParams)
+    (displayRoi)(frameDistinctionColor)(contrastParams)(dewarpingParams)
 #define QnWorkbenchStateUnsavedLayout_Fields (id)(parentId)(name)(cellSpacing)(cellAspectRatio) \
     (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)(isCrossSystem)
 #define QnWorkbenchState_Fields \

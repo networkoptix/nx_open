@@ -566,8 +566,12 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 {
     connect(widget, &QnResourceWidget::zoomRectChanged, this,
         &ZoomWindowInstrument::at_widget_zoomRectChanged);
-    connect(widget, &QnResourceWidget::frameDistinctionColorChanged, this,
-        &ZoomWindowInstrument::at_widget_frameColorChanged);
+    connect(widget->item(), &QnWorkbenchItem::dataChanged, this,
+        [this](Qn::ItemDataRole role)
+        {
+            if (role == Qn::ItemFrameDistinctionColorRole)
+                at_widget_frameColorChanged();
+        });
     connect(widget, &QnResourceWidget::optionsChanged, this,
         &ZoomWindowInstrument::at_widget_optionsChanged);
 
