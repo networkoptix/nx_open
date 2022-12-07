@@ -21,6 +21,7 @@ Item
     property Item scrollBarParent: null
     property Item headerItem: null
     property Item placeholderItem: null
+    property alias thumbnailSource: sharedResources.thumbnailSource
 
     property var resourceId: NxGlobals.uuid("")
     property var engineId: NxGlobals.uuid("")
@@ -33,6 +34,12 @@ Item
         id: impl
         property var sectionPaths: ({})
         property bool valuesChangedEnabled: true
+    }
+
+    QtObject
+    {
+        id: sharedResources
+        property var thumbnailSource: null
     }
 
     function loadModel(model, initialValues, restoreScrollPosition)

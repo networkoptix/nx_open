@@ -94,11 +94,12 @@ struct CameraSettingsDialog::Private: public QObject
     std::unique_ptr<CameraSettingsAdvancedManifestWatcher> advancedParametersManifestWatcher;
 
     const QSharedPointer<LiveCameraThumbnail> cameraPreview{new LiveCameraThumbnail()};
+    bool isPreviewRefreshRequired = true;
 
     Private(CameraSettingsDialog* q): q(q)
     {
         const auto timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, &Private::updatePreviewIfNeeded);
+        timer->callOnTimeout([this] { updatePreviewIfNeeded(); });
         timer->start(kPreviewReloadInterval);
 
         cameraPreview->setMaximumSize(LiveCameraThumbnail::kUnlimitedSize);
@@ -258,15 +259,22 @@ struct CameraSettingsDialog::Private: public QObject
         q->ui->defaultPasswordAlert->setCameras(troublesomeCameras);
     }
 
-    void updatePreviewIfNeeded()
+    void updatePreviewIfNeeded(bool forceRefresh = false)
     {
-        if (q->isVisible())
+        const bool isPreviewVisible = q->isVisible()
+            && (q->currentPage() == int(CameraSettingsTab::dewarping)
+                || q->currentPage() == int(CameraSettingsTab::hotspots));
+
+        cameraPreview->setActive(isPreviewVisible);
+
+        if (isPreviewVisible)
         {
-            if (q->currentPage() == int(CameraSettingsTab::dewarping) ||
-                q->currentPage() == int(CameraSettingsTab::hotspots))
-            {
-                cameraPreview->update();
-            }
+            cameraPreview->update(forceRefresh || isPreviewRefreshRequired);
+            isPreviewRefreshRequired = false;
+        }
+        else if (forceRefresh)
+        {
+            isPreviewRefreshRequired = true;
         }
     }
 };
@@ -430,7 +438,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
             d->store->setSelectedTab((CameraSettingsTab)currentPage());
         });
 
-    connect(ui->tabWidget, &QTabWidget::currentChanged, d.get(), &Private::updatePreviewIfNeeded);
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        d.get(), [this] { d->updatePreviewIfNeeded(); });
 
     setHelpTopic(this, Qn::CameraSettings_Help);
 }
@@ -510,7 +519,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->cameraPropertyWatcher->setCameras(cameras);
 
     d->cameraPreview->setResource(singleCamera);
-    d->cameraPreview->update(/*forceRefresh*/ true);
+    d->updatePreviewIfNeeded(/*forceRefresh*/ true);
 
     const auto camerasSet = nx::utils::toQSet(cameras);
     d->cameraPtzCapabilitiesWatcher->setCameras(camerasSet);
@@ -538,7 +547,7 @@ void CameraSettingsDialog::showEvent(QShowEvent* event)
     d->deviceAgentSettingsAdapter->refreshSettings();
 
     base_type::showEvent(event);
-    d->cameraPreview->update(/*forceRefresh*/ true);
+    d->updatePreviewIfNeeded(/*forceRefresh*/ true);
 }
 
 void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
