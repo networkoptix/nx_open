@@ -10,7 +10,6 @@ import Nx.Items 1.0
 
 import nx.client.core 1.0
 import nx.client.desktop 1.0
-import nx.vms.client.desktop 1.0
 
 Item
 {
@@ -22,12 +21,9 @@ Item
     property alias backgroundColor: background.color
     property alias hovered: mouseArea.containsMouse
     property alias pressed: mouseArea.containsPress
-
-    property var resourceId: NxGlobals.uuid("")
-    property var engineId: NxGlobals.uuid("")
-
     property bool editable: true
 
+    readonly property var thumbnailSource: sharedResources.thumbnailSource
     property int thumbnailReloadIntervalSeconds: 10
 
     signal editRequested()
@@ -63,7 +59,7 @@ Item
             backgroundImage.implicitWidth, backgroundImage.implicitHeight)
 
         visible: preview.hasFigure
-        videoRotation: thumbnailSource.rotationQuadrants * 90.0
+        videoRotation: thumbnailSource ? thumbnailSource.rotationQuadrants * 90.0 : 0
 
         layer.enabled: true
         layer.effect: OpacityMask
@@ -82,20 +78,14 @@ Item
             id: backgroundImage
 
             cache: false
-            source: thumbnailSource.url
-
-            RoiCameraThumbnail
-            {
-                id: thumbnailSource
-                cameraId: figureView.resourceId
-            }
+            source: thumbnailSource ? thumbnailSource.url : ""
 
             Timer
             {
                 id: updateTimer
 
                 interval: thumbnailReloadIntervalSeconds * 1000
-                running: true
+                running: thumbnailSource && thumbnailSource.active
 
                 onTriggered:
                     thumbnailSource.update()
@@ -206,8 +196,11 @@ Item
     property string figureStringified: figure ? JSON.stringify(figure) : ""
     onFigureStringifiedChanged:
     {
-        thumbnailSource.update(/*forceRefresh*/ !!figure)
-        updateTimer.restart()
+        if (thumbnailSource)
+            thumbnailSource.update(/*forceRefresh*/ !!figure)
+
+        if (updateTimer.running)
+            updateTimer.restart()
     }
 
     Keys.enabled: editable

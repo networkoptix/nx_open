@@ -7,6 +7,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <utils/common/event_processors.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -32,6 +33,11 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
 
     if (!NX_ASSERT(rootObject()))
         return;
+
+    installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
+        [this]() { rootObject()->setVisible(isVisible()); });
+
+    rootObject()->setVisible(false);
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
     rootObject()->setProperty("backend", QVariant::fromValue(this));

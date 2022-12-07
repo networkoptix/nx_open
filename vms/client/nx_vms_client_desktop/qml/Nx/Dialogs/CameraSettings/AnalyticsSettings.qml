@@ -12,6 +12,7 @@ import Nx.Items 1.0
 import Nx.Utils 1.0
 
 import nx.vms.client.core 1.0
+import nx.vms.client.desktop 1.0
 
 Item
 {
@@ -171,6 +172,12 @@ Item
         contentEnabled: header.checked || isDeviceDependent
         contentVisible: contentEnabled
         scrollBarParent: scrollBarsParent
+
+        thumbnailSource: RoiCameraThumbnail
+        {
+            cameraId: settingsView.resourceId
+            active: visible
+        }
 
         onValuesEdited: function(activeItem)
         {

@@ -6,7 +6,7 @@ import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Dialogs 1.0
 
-// Warning! Uses "thumbnailProvider", "mediaResourceHelper" and "settingsView" objects from context.
+// Warning! Uses "mediaResourceHelper" and "settingsView" objects from context.
 // TODO: #vkutin #dklychkov Avoid it if possible.
 
 LabeledItem
@@ -50,9 +50,6 @@ LabeledItem
 
                 figure: control.figure
                 figureType: control.figureType
-
-                resourceId: settingsView.resourceId
-                engineId: settingsView.engineId
 
                 Text
                 {
@@ -104,7 +101,7 @@ LabeledItem
             {
                 figureType: control.figureType
                 figureSettings: control.figureSettings
-                resourceId: figureView.resourceId
+                resourceId: settingsView.resourceId
 
                 onAccepted:
                 {
