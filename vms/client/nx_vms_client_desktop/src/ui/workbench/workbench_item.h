@@ -7,6 +7,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVariant>
+#include <QtGui/QColor>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
@@ -279,6 +280,9 @@ public:
     bool displayRoi() const;
     void setDisplayRoi(bool value);
 
+    QColor frameDistinctionColor() const;
+    void setFrameDistinctionColor(const QColor &value);
+
     /**
      * \param role                      Role to get data for.
      * \returns                         Data for the given role.
@@ -378,4 +382,6 @@ private:
     bool m_displayAnalyticsObjects = false;
     /** Should the regions of interest be always displayed on the item. */
     bool m_displayRoi = true;
+    /** Base frame color */
+    QColor m_frameDistinctionColor;
 };

@@ -4,8 +4,6 @@
 
 #include <nx/utils/math/fuzzy.h>
 
-#include "media_resource.h"
-
 bool QnLayoutItemData::operator==(const QnLayoutItemData& other) const
 {
     return (
@@ -21,6 +19,7 @@ bool QnLayoutItemData::operator==(const QnLayoutItemData& other) const
         && controlPtz == other.controlPtz
         && displayAnalyticsObjects == other.displayAnalyticsObjects
         && displayRoi == other.displayRoi
+        && frameDistinctionColor == other.frameDistinctionColor
         && contrastParams == other.contrastParams
         && dewarpingParams == other.dewarpingParams
         );
