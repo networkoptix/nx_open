@@ -140,7 +140,6 @@ QnResourceWidget::QnResourceWidget(
     m_options(DisplaySelection | AllowFocus),
     m_localActive(false),
     m_frameOpacity(1.0),
-    m_frameDistinctionColor(),
     m_titleTextFormat("%1"),
     m_titleTextFormatHasPlaceholder(true),
     m_mouseInWidget(false),
@@ -475,17 +474,12 @@ void QnResourceWidget::setFrameOpacity(qreal frameOpacity)
 
 QColor QnResourceWidget::frameDistinctionColor() const
 {
-    return m_frameDistinctionColor;
+    return m_item->frameDistinctionColor();
 }
 
 void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor)
 {
-    if (m_frameDistinctionColor == frameColor)
-        return;
-
-    m_frameDistinctionColor = frameColor;
-
-    emit frameDistinctionColorChanged();
+    m_item->setFrameDistinctionColor(frameColor);
 }
 
 float QnResourceWidget::aspectRatio() const
@@ -1378,6 +1372,7 @@ void QnResourceWidget::at_itemDataChanged(int role)
 {
     if (role != Qn::ItemCheckedButtonsRole)
         return;
+
     updateCheckedButtons();
 }
 

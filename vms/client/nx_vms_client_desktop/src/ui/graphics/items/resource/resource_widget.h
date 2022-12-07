@@ -50,7 +50,7 @@ class QnResourceWidget:
 {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
-    Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
+    Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_PROPERTY(QnUuid uuid READ uuid)
     Q_PROPERTY(QString uuidString READ uuidString)
@@ -312,7 +312,6 @@ signals:
     void optionsChanged(Options changedOptions, QPrivateSignal);
     void zoomRectChanged();
     void zoomTargetWidgetChanged();
-    void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
     void displayInfoChanged();
@@ -458,9 +457,6 @@ private:
 
     /** Frame opacity. */
     qreal m_frameOpacity;
-
-    /** Base frame color */
-    QColor m_frameDistinctionColor;
 
     QString m_titleTextFormat;
     bool m_titleTextFormatHasPlaceholder;
