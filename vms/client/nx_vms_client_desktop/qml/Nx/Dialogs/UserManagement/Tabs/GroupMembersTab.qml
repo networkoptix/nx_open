@@ -70,7 +70,9 @@ MembershipSettings
         enabled: control.enabled && !model.isLdap
         offset: model.offset
         iconSource: model.isUser
-            ? "image://svg/skin/user_settings/user_local.svg"
+            ? model.isLdap
+                ? "image://svg/skin/user_settings/user_ldap.svg"
+                : "image://svg/skin/user_settings/user_local.svg"
             : "image://svg/skin/user_settings/group_custom.svg"
 
         GlobalToolTip.text: model.offset > 0 ? qsTr("Inherits membership in current group") : ""

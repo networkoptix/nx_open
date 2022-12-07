@@ -114,7 +114,11 @@ Item
                     source:
                     {
                         if (model.isUser)
-                            return "image://svg/skin/user_settings/user_local.svg"
+                        {
+                            return model.isLdap
+                                ? "image://svg/skin/user_settings/user_ldap.svg"
+                                : "image://svg/skin/user_settings/user_local.svg"
+                        }
 
                         if (model.groupSection == "B")
                             return "image://svg/skin/user_settings/group_built_in.svg"

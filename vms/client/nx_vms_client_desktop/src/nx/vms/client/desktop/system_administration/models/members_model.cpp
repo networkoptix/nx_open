@@ -622,7 +622,7 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 return true;
 
             case IsAllowedMember:
-                return !m_subjectIsUser && !info(userId).isLdap;
+                return !m_subjectIsUser;
 
             case IsAllowedParent:
                 return false;
@@ -676,9 +676,6 @@ bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int 
 
     const bool isUser = data(index, IsUserRole).toBool();
     const auto selectedId = data(index, IdRole).value<QnUuid>();
-
-    if (info(selectedId).isLdap)
-        return false;
 
     if (role == IsMemberRole)
     {
