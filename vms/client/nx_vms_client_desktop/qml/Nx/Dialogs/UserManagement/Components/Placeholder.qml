@@ -18,6 +18,8 @@ ColumnLayout
     anchors.centerIn: parent
     anchors.verticalCenterOffset: -100
 
+    property real maxWidth: parent.width - 16 * 2
+
     spacing: 8
 
     Image
@@ -38,6 +40,7 @@ ColumnLayout
 
         Layout.alignment: Qt.AlignHCenter
         Layout.topMargin: 8
+        Layout.maximumWidth: placeholder.maxWidth
 
         font: Qt.font({pixelSize: 16, weight: Font.Medium})
         color: placeholder.textColor
@@ -47,7 +50,7 @@ ColumnLayout
     {
         id: placeholderAdditionalText
         Layout.alignment: Qt.AlignHCenter
-        Layout.maximumWidth: placeholder.parent.width - 16 * 2
+        Layout.maximumWidth: placeholder.maxWidth
 
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
