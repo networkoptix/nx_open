@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QMetaMethod>
 #include <QtGui/QGuiApplication>
 
 #include <nx/utils/log/assert.h>
@@ -21,7 +22,6 @@ public:
     using base_type::base_type;
 
 protected:
-    static constexpr const char* kStateModifiedSignalName = "stateModified()";
     static constexpr const char* kStateAcceptedSignalName = "stateAccepted()";
     static constexpr const char* kStateAppliedSignalName = "stateApplied()";
 
@@ -42,6 +42,9 @@ class QmlDialogWithState: public QmlDialogWithStateNotifier
 {
     using base_type = QmlDialogWithStateNotifier;
 
+    static constexpr auto kModifiedPropertyName = "modified";
+
+public:
     /** Copies Q_GADGET properties to Q_OBJECT. */
     static void stateToObject(const S& state, QObject* object)
     {
@@ -96,14 +99,21 @@ class QmlDialogWithState: public QmlDialogWithStateNotifier
      * Connects all change notification signals of the object properties (which are part of state)
      * to the target's signal.
      */
-    static void subscribeToChanges(QObject* object, QObject* target, const char* signal)
+    template <typename PointerToMemberFunction>
+    static void subscribeToChanges(QObject* object, QObject* target, PointerToMemberFunction signal)
     {
         auto meta = S::staticMetaObject;
+
+        auto signalMethod = QMetaMethod::fromSignal(signal);
+
+        if (!NX_ASSERT(signalMethod.isValid(), "Provided signal must exist in %1", target))
+            return;
+
+        const QMetaObject* metaObject = object->metaObject();
 
         for (int i = 0; i < meta.propertyCount(); ++i)
         {
             const auto& property = meta.property(i);
-            const QMetaObject* metaObject = object->metaObject();
 
             NX_ASSERT(metaObject->indexOfProperty(property.name()) != -1,
                 "No such property '%1' in %2", property.name(), object);
@@ -113,21 +123,15 @@ class QmlDialogWithState: public QmlDialogWithStateNotifier
 
             if (objectProperty.hasNotifySignal())
             {
-                const QMetaObject* targetMetaObject = target->metaObject();
-                const int index = targetMetaObject->indexOfSignal(signal);
-                if (NX_ASSERT(index >= 0, "Signal '%1' must exist in %2", signal, target))
-                {
-                    QObject::connect(
-                        object, objectProperty.notifySignal(),
-                        target, targetMetaObject->method(index));
-                }
+                QObject::connect(
+                    object,
+                    objectProperty.notifySignal(),
+                    target,
+                    signalMethod);
             }
         }
     }
 
-    static constexpr auto kModifiedPropertyName = "modified";
-
-public:
     QmlDialogWithState(QWidget* parent, const QString& qmlSourceFile, QQmlEngine* engine = nullptr):
         base_type(
             engine ? engine : appContext()->qmlEngine(),
@@ -154,7 +158,7 @@ public:
                     kModifiedPropertyName,
                     rootObject->metaObject());
 
-                subscribeToChanges(rootObject, this, kStateModifiedSignalName);
+                subscribeToChanges(rootObject, this, &QmlDialogWithStateNotifier::stateModified);
 
                 if (rootObject->metaObject()->indexOfSignal(kStateAcceptedSignalName))
                     connect(rootObject, SIGNAL(stateAccepted()), this, SIGNAL(stateAccepted()));
