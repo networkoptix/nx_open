@@ -163,8 +163,9 @@ DialogWithState
 
     onModifiedChanged:
     {
-        if (buttonBox.standardButton(Dialog.Apply))
-            buttonBox.standardButton(Dialog.Apply).enabled = modified
+        const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
+        if (applyButton)
+            applyButton.enabled = modified
     }
 
     validateFunc: () =>
