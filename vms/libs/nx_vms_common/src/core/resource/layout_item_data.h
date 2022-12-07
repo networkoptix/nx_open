@@ -7,13 +7,12 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QRect>
 #include <QtCore/QVariant>
+#include <QtGui/QColor>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/common/resource/resource_descriptor.h>
-
-#include "resource_fwd.h"
 
 struct NX_VMS_COMMON_API QnLayoutItemData
 {
@@ -29,6 +28,7 @@ struct NX_VMS_COMMON_API QnLayoutItemData
     bool controlPtz = false;
     bool displayAnalyticsObjects = false;
     bool displayRoi = true;
+    QColor frameDistinctionColor;
 
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::dewarping::ViewData dewarpingParams;
