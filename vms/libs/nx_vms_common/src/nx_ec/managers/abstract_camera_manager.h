@@ -99,7 +99,7 @@ public:
         Handler<nx::vms::api::ServerFootageDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode getServerFootageDataSync(nx::vms::api::ServerFootageDataList* outDataList);
+    Result getServerFootageDataSync(nx::vms::api::ServerFootageDataList* outDataList);
 
     virtual int setServerFootageData(
         const QnUuid& serverGuid,

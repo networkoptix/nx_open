@@ -160,8 +160,6 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
     std::chrono::milliseconds creationEndTimeMs{};
     std::set<QnUuid> cameras;
 
-    QnCameraBookmarkSearchFilter();
-
     bool operator==(const QnCameraBookmarkSearchFilter& other) const = default;
 
     bool isValid() const;

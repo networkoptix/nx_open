@@ -53,7 +53,7 @@ ErrorCode AbstractCameraManager::removeSync(const QnUuid& id)
         });
 }
 
-ErrorCode AbstractCameraManager::getServerFootageDataSync(
+Result AbstractCameraManager::getServerFootageDataSync(
     nx::vms::api::ServerFootageDataList* outDataList)
 {
     return detail::callSync(
