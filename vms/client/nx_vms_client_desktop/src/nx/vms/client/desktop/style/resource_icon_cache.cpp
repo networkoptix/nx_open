@@ -337,6 +337,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             key = VideoWall;
         else if (layout->isIntercomLayout())
             key = IntercomLayout;
+        else if (layout->isCrossSystem())
+            key = CloudLayout;
         else if (layout->isShared())
             key = SharedLayout;
         else if (layout::isEncrypted(layout))

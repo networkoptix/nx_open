@@ -27,8 +27,8 @@ public:
     static bool sharedLayoutEdit(QWidget* parent);
     static bool stopSharingLayouts(QWidget* parent, const QnResourceList& mediaResources,
         const QnResourceAccessSubject& subject);
-    static bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts);
-    static bool deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible);
+    static bool deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
+        const QnResourceList& personalLayouts);
 
     static bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
     static bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources);
