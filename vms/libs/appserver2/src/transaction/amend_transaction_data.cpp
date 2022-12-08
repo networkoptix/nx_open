@@ -2,10 +2,13 @@
 
 #include "amend_transaction_data.h"
 
+#include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/url.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -22,6 +25,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/action_parameters.h>
@@ -181,6 +185,27 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     nx::vms::api::CameraDataEx* paramData)
 {
     return amendOutputDataIfNeeded(accessData, accessManager, &paramData->addParams);
+}
+
+bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::ServerFootageData* paramData)
+{
+    if (accessData == Qn::kSystemAccess
+        || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+    {
+        return false;
+    }
+
+    return nx::utils::erase_if(paramData->archivedCameras,
+        [&](auto id)
+        {
+            auto resourcePool = accessManager->systemContext()->resourcePool();
+            auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(id);
+            return !camera
+                || !accessManager->hasPermission(accessData, camera, Qn::ViewFootagePermission);
+        });
 }
 
 } // namespace ec2
