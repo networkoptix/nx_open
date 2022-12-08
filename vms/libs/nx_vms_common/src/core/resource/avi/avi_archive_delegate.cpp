@@ -190,6 +190,12 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             }
             return QnAbstractMediaDataPtr();
         }
+        if (packet.stream_index >= m_indexToChannel.size())
+        {
+            NX_DEBUG(this, "Invalid packet stream number: %1, overall streams: %2",
+                packet.stream_index, m_indexToChannel.size());
+            continue;
+        }
 
         stream = m_formatContext->streams[packet.stream_index];
         if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
