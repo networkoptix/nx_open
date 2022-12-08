@@ -6,10 +6,10 @@
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_field.h>
+#include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_field.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/rule.h>
@@ -270,7 +270,7 @@ void SimplifiedRule::watchOn(QObject* object) const
 
     const auto propertyNames = nx::utils::propertyNames(object);
     const auto metaObject = object->metaObject();
-    for (const auto propertyName: propertyNames)
+    for (const auto& propertyName: propertyNames)
     {
         const auto metaProperty =
             metaObject->property(metaObject->indexOfProperty(propertyName));

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "../action_field.h"
-#include "../event_field.h"
+#include "../action_builder_field.h"
+#include "../event_filter_field.h"
 
 namespace nx::vms::rules {
 
@@ -42,9 +42,9 @@ protected:
  * type only.
  */
 template<class T, class D>
-class SimpleTypeActionField: public SimpleTypeField<T, ActionField, D>
+class SimpleTypeActionField: public SimpleTypeField<T, ActionBuilderField, D>
 {
-    using SimpleTypeField<T, ActionField, D>::m_value;
+    using SimpleTypeField<T, ActionBuilderField, D>::m_value;
 
 public:
     virtual QVariant build(const AggregatedEventPtr&) const override
@@ -61,9 +61,9 @@ protected:
  * type only.
  */
 template<class T, class D>
-class SimpleTypeEventField: public SimpleTypeField<T, EventField, D>
+class SimpleTypeEventField: public SimpleTypeField<T, EventFilterField, D>
 {
-    using SimpleTypeField<T, EventField, D>::m_value;
+    using SimpleTypeField<T, EventFilterField, D>::m_value;
 
 public:
     virtual bool match(const QVariant& value) const override

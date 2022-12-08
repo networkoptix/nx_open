@@ -7,9 +7,9 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../event_fields/analytics_object_attributes_field.h"
-#include "../event_fields/analytics_object_type_field.h"
-#include "../event_fields/source_camera_field.h"
+#include "../event_filter_fields/analytics_object_attributes_field.h"
+#include "../event_filter_fields/analytics_object_type_field.h"
+#include "../event_filter_fields/source_camera_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"

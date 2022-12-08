@@ -6,11 +6,11 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_fields/builtin_fields.h>
+#include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_fields/builtin_fields.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>

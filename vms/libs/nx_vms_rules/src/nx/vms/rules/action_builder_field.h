@@ -14,12 +14,12 @@ namespace nx::vms::rules {
  * configuration of corresponding action field as well as build procedure
  * used to get actual field value for given values and given event.
  */
-class NX_VMS_RULES_API ActionField: public Field
+class NX_VMS_RULES_API ActionBuilderField: public Field
 {
     Q_OBJECT
 
 public:
-    ActionField();
+    ActionBuilderField();
 
     virtual QSet<QString> requiredEventFields() const;
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const = 0;

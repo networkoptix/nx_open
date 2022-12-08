@@ -4,8 +4,8 @@
 
 #include <QtCore/QSet>
 
-#include "../action_field.h"
-#include "../event_field.h"
+#include "../action_builder_field.h"
+#include "../event_filter_field.h"
 #include "../field_types.h"
 
 namespace nx::vms::rules {
@@ -44,7 +44,7 @@ private:
 };
 
 class NX_VMS_RULES_API ResourceFilterEventField:
-    public EventField,
+    public EventFilterField,
     public ResourceFilterFieldBase<ResourceFilterEventField>
 {
     Q_OBJECT
@@ -61,7 +61,7 @@ public:
 };
 
 class NX_VMS_RULES_API ResourceFilterActionField:
-    public ActionField,
+    public ActionBuilderField,
     public ResourceFilterFieldBase<ResourceFilterActionField>
 {
     Q_OBJECT

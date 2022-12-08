@@ -9,10 +9,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/action_fields/content_type_field.h>
-#include <nx/vms/rules/action_fields/http_method_field.h>
-#include <nx/vms/rules/event_fields/input_port_field.h>
-#include <nx/vms/rules/event_fields/source_camera_field.h>
+#include <nx/vms/rules/action_builder_fields/content_type_field.h>
+#include <nx/vms/rules/action_builder_fields/http_method_field.h>
+#include <nx/vms/rules/event_filter_fields/input_port_field.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/widgets/common/elided_label.h>
 

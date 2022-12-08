@@ -7,7 +7,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
-#include <nx/vms/rules/event_fields/source_user_field.h>
+#include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <nx/vms/rules/utils/serialization.h>
 
 #include "test_field.h"

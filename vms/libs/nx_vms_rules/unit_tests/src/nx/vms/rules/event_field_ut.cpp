@@ -5,7 +5,7 @@
 #include <nx/utils/log/format.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/test_support/test_context.h>
-#include <nx/vms/rules/event_fields/builtin_fields.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 
 namespace nx::vms::rules::test {
 

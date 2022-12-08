@@ -3,7 +3,7 @@
 #pragma once
 
 #include <nx/vms/rules/plugin.h>
-#include <nx/vms/rules/event_fields/state_field.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
 
 #include "test_field.h"
 #include "test_event.h"

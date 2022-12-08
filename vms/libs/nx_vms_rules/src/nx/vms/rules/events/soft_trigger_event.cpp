@@ -2,11 +2,11 @@
 
 #include "soft_trigger_event.h"
 
-#include "../event_fields/customizable_icon_field.h"
-#include "../event_fields/customizable_text_field.h"
-#include "../event_fields/source_camera_field.h"
-#include "../event_fields/source_user_field.h"
-#include "../event_fields/unique_id_field.h"
+#include "../event_filter_fields/customizable_icon_field.h"
+#include "../event_filter_fields/customizable_text_field.h"
+#include "../event_filter_fields/source_camera_field.h"
+#include "../event_filter_fields/source_user_field.h"
+#include "../event_filter_fields/unique_id_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"

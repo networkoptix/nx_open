@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../event_fields/source_camera_field.h"
+#include "../event_filter_fields/source_camera_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"

@@ -20,11 +20,11 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_fields/customizable_icon_field.h>
-#include <nx/vms/rules/event_fields/customizable_text_field.h>
-#include <nx/vms/rules/event_fields/source_camera_field.h>
-#include <nx/vms/rules/event_fields/source_user_field.h>
-#include <nx/vms/rules/event_fields/state_field.h>
+#include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
+#include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
+#include <nx/vms/rules/event_filter_fields/source_user_field.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
 #include <nx/vms/rules/ini.h>

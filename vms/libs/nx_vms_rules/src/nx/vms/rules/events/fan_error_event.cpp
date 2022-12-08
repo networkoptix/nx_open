@@ -2,7 +2,7 @@
 
 #include "fan_error_event.h"
 
-#include "../event_fields/source_server_field.h"
+#include "../event_filter_fields/source_server_field.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"

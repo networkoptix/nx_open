@@ -3,9 +3,9 @@
 #include "initializer.h"
 
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/rules/action_fields/builtin_fields.h>
+#include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
-#include <nx/vms/rules/event_fields/builtin_fields.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
 namespace nx::vms::rules {

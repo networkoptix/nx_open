@@ -11,8 +11,8 @@ class QJsonValue;
 namespace nx::vms::rules {
 
 class Field;
-class EventField;
-class ActionField;
+class EventFilterField;
+class ActionBuilderField;
 
 class EventConnector;
 class ActionExecutor;

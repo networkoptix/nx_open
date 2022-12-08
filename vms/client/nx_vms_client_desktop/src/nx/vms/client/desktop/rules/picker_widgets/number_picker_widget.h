@@ -6,7 +6,7 @@
 #include <QtWidgets/QSpinBox>
 
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/rules/event_fields/int_field.h>
+#include <nx/vms/rules/event_filter_fields/int_field.h>
 #include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"

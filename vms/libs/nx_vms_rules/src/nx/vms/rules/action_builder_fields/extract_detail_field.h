@@ -4,14 +4,14 @@
 
 #include <nx/vms/common/system_context_aware.h>
 
-#include "../action_field.h"
+#include "../action_builder_field.h"
 #include "../data_macros.h"
 
 namespace nx::vms::rules {
 
 /** Extract single value from event detail map. */
 class NX_VMS_RULES_API ExtractDetailField:
-    public ActionField,
+    public ActionBuilderField,
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT

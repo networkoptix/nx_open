@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/common/test_support/test_context.h>
-#include <nx/vms/rules/action_fields/builtin_fields.h>
+#include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
 

@@ -12,12 +12,12 @@ namespace nx::vms::rules {
  * configuration of corespongind event field as well as match procedure
  * used to check values of incomming events in filter.
  */
-class NX_VMS_RULES_API EventField: public Field
+class NX_VMS_RULES_API EventFilterField: public Field
 {
     Q_OBJECT
 
 public:
-    EventField();
+    EventFilterField();
 
     virtual bool match(const QVariant& value) const = 0;
 };

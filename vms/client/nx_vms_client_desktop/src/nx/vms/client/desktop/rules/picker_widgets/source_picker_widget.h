@@ -14,10 +14,10 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
-#include <nx/vms/rules/action_fields/target_user_field.h>
-#include <nx/vms/rules/event_fields/source_camera_field.h>
-#include <nx/vms/rules/event_fields/source_server_field.h>
-#include <nx/vms/rules/event_fields/source_user_field.h>
+#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
+#include <nx/vms/rules/event_filter_fields/source_server_field.h>
+#include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/select_resources_button.h>
 

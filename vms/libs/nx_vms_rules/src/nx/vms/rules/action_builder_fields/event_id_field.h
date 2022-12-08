@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "../action_field.h"
+#include "../action_builder_field.h"
 
 namespace nx::vms::rules {
 
 /**
  * Unique id of event, used for action deduplication, e.g. notification.
  */
-class NX_VMS_RULES_API EventIdField: public ActionField
+class NX_VMS_RULES_API EventIdField: public ActionBuilderField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.eventId")

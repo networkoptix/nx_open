@@ -16,11 +16,11 @@
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <nx/vms/rules/action_fields/substitution.h>
+#include <nx/vms/rules/action_builder_fields/substitution.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
-#include <nx/vms/rules/event_fields/keywords_field.h>
+#include <nx/vms/rules/event_filter_fields/keywords_field.h>
 #include <nx/vms/rules/events/debug_event.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context.h>

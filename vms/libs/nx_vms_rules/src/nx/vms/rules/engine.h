@@ -141,8 +141,8 @@ public:
     std::optional<ItemDescriptor> actionDescriptor(const QString& id) const;
 
 public:
-    using EventFieldConstructor = std::function<EventField*()>;
-    using ActionFieldConstructor = std::function<ActionField*()>;
+    using EventFieldConstructor = std::function<EventFilterField*()>;
+    using ActionFieldConstructor = std::function<ActionBuilderField*()>;
 
     bool isEventFieldRegistered(const QString& fieldId) const;
     bool registerEventField(const QString& type, const EventFieldConstructor& ctor);
@@ -179,24 +179,24 @@ public:
      */
     std::unique_ptr<ActionBuilder> buildActionBuilder(const QString& actionType) const;
 
-    std::unique_ptr<EventField> buildEventField(const api::Field& serialized) const;
+    std::unique_ptr<EventFilterField> buildEventField(const api::Field& serialized) const;
 
     /**
      * Builds default event field based on the registered event field constructor. Returns nullptr
      * if the event constructor is not registered.
      */
-    std::unique_ptr<EventField> buildEventField(const QString& fieldType) const;
+    std::unique_ptr<EventFilterField> buildEventField(const QString& fieldType) const;
 
     //api::Field serialize(const EventField* field) const;
 
-    std::unique_ptr<ActionField> buildActionField(const api::Field& serialized) const;
+    std::unique_ptr<ActionBuilderField> buildActionField(const api::Field& serialized) const;
     //api::Field serialize(const ActionField* field) const;
 
     /**
      * Builds default action field based on the registered action field constructor. Returns
      * nullptr if the event constructor is not registered.
      */
-    std::unique_ptr<ActionField> buildActionField(const QString& fieldType) const;
+    std::unique_ptr<ActionBuilderField> buildActionField(const QString& fieldType) const;
 
 public:
     void processEvent(const EventPtr& event);

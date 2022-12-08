@@ -4,14 +4,14 @@
 
 #include <nx/vms/common/system_context_aware.h>
 
-#include "../event_field.h"
+#include "../event_filter_field.h"
 
 namespace nx::vms::rules {
 
 // TODO: Introduce base class for analytics id fields.
 
 class NX_VMS_RULES_API AnalyticsEventTypeField:
-    public EventField,
+    public EventFilterField,
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT

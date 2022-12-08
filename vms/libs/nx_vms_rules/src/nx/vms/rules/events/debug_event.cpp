@@ -2,8 +2,8 @@
 
 #include "debug_event.h"
 
-#include "../event_fields/int_field.h"
-#include "../event_fields/text_field.h"
+#include "../event_filter_fields/int_field.h"
+#include "../event_filter_fields/text_field.h"
 #include "../utils/event_details.h"
 
 namespace nx::vms::rules {

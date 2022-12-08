@@ -2,10 +2,10 @@
 
 #include "send_email_action.h"
 
-#include "../action_fields/email_message_field.h"
-#include "../action_fields/optional_time_field.h"
-#include "../action_fields/target_user_field.h"
-#include "../action_fields/text_field.h"
+#include "../action_builder_fields/email_message_field.h"
+#include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/target_user_field.h"
+#include "../action_builder_fields/text_field.h"
 #include "../utils/field.h"
 
 namespace nx::vms::rules {

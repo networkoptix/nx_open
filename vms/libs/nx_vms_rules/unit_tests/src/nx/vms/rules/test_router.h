@@ -13,7 +13,7 @@ public:
     virtual void routeEvent(
         const EventData& eventData,
         const QSet<QnUuid>& triggeredRules,
-        const QSet<QnUuid>& affectedResources) override
+        const QSet<QnUuid>& /*affectedResources*/) override
     {
         for (const auto ruleId: triggeredRules)
         {

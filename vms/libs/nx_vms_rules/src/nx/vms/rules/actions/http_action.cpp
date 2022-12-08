@@ -2,12 +2,12 @@
 
 #include "http_action.h"
 
-#include "../action_fields/content_type_field.h"
-#include "../action_fields/http_method_field.h"
-#include "../action_fields/optional_time_field.h"
-#include "../action_fields/password_field.h"
-#include "../action_fields/text_field.h"
-#include "../action_fields/text_with_fields.h"
+#include "../action_builder_fields/content_type_field.h"
+#include "../action_builder_fields/http_method_field.h"
+#include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/password_field.h"
+#include "../action_builder_fields/text_field.h"
+#include "../action_builder_fields/text_with_fields.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
