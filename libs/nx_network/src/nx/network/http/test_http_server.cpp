@@ -14,7 +14,8 @@ namespace nx::network::http {
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStopSync();
+    if (m_httpServer)
+        terminateListener();
 
     NX_INFO(this, "Stopped");
 }
@@ -147,6 +148,22 @@ bool TestHttpServer::registerRedirectHandler(
 void TestHttpServer::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     m_httpServer->bindToAioThread(aioThread);
+}
+
+void TestHttpServer::terminateListener()
+{
+    m_httpServer->pleaseStopSync();
+    m_httpServer.reset();
+}
+
+void TestHttpServer::installIntermediateRequestHandler(
+    std::unique_ptr<IntermediaryHandler> handler)
+{
+    auto bak = m_authDispatcher.nextHandler();
+    m_authDispatcher.setNextHandler(handler.get());
+    handler->setNextHandler(bak);
+
+    m_installedIntermediateRequestHandlers.push_back(std::move(handler));
 }
 
 //-------------------------------------------------------------------------------------------------

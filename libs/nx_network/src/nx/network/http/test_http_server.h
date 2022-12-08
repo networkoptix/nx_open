@@ -135,10 +135,17 @@ public:
     nx::network::http::server::rest::MessageDispatcher& httpMessageDispatcher()
         { return m_httpMessageDispatcher; }
 
+    void terminateListener();
+
+    // Installs handler to receive all incoming HTTP request.
+    // handler->setNextHandler() receives the previous default handler.
+    void installIntermediateRequestHandler(std::unique_ptr<IntermediaryHandler> handler);
+
 private:
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::PlainTextCredentialsProvider m_credentialsProvider;
     server::BaseAuthenticationManager m_authenticationManager;
+    std::vector<std::unique_ptr<IntermediaryHandler>> m_installedIntermediateRequestHandlers;
     server::AuthenticationDispatcher m_authDispatcher;
     std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
 };
