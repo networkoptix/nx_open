@@ -91,6 +91,13 @@ public:
     /** Whether this Layout belongs to an Intercom Camera. Is valid for removed intercom. */
     bool isIntercomLayout() const;
 
+    /**
+     * Whether this Layout is a Cross-System Layout. Such layouts are stored in the Cloud and can
+     * contain Cameras from different Systems. Cross-System Layouts are personal and cannot be
+     * shared.
+     **/
+    bool isCrossSystem() const;
+
 signals:
     void dataChanged(Qn::ItemDataRole role);
     void itemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);

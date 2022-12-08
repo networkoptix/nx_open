@@ -7,7 +7,8 @@
 
 #include <client/client_globals.h>
 
-#include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+
 
 namespace {
 
@@ -51,12 +52,16 @@ bool QnResourceCompareHelper::resourceLessThan(
 
         if (l->hasFlags(Qn::layout) && r->hasFlags(Qn::layout))
         {
-            auto leftLayout = l.dynamicCast<QnLayoutResource>();
-            auto rightLayout = r.dynamicCast<QnLayoutResource>();
+            auto leftLayout = l.dynamicCast<nx::vms::client::desktop::LayoutResource>();
+            auto rightLayout = r.dynamicCast<nx::vms::client::desktop::LayoutResource>();
             NX_ASSERT(leftLayout && rightLayout);
-            if (leftLayout && rightLayout
-                && leftLayout->isShared() != rightLayout->isShared())
-                return leftLayout->isShared();
+            if (leftLayout && rightLayout)
+            {
+                if (leftLayout->isCrossSystem() != rightLayout->isCrossSystem())
+                    return rightLayout->isCrossSystem();
+                if (leftLayout->isShared() != rightLayout->isShared())
+                    return leftLayout->isShared();
+            }
         }
 
         // Web pages in plain list must be the last

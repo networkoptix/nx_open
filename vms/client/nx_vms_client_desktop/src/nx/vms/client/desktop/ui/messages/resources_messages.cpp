@@ -27,31 +27,31 @@
 namespace {
 
 /* Edit shared layout. */
-static const QString kSharedLayoutEditShowOnceKey(lit("SharedLayoutEdit"));
+static const QString kSharedLayoutEditShowOnceKey("SharedLayoutEdit");
 
 /* Items are removed from user's layout, but access still persist. */
-static const QString kChangeUserLocalLayoutShowOnceKey(lit("ChangeUserLocalLayout"));
+static const QString kChangeUserLocalLayoutShowOnceKey("ChangeUserLocalLayout");
 
 /* Items are added to roled user's layout. */
-static const QString kAddToRoleLocalLayoutShowOnceKey(lit("AddToRoleLocalLayout"));
+static const QString kAddToRoleLocalLayoutShowOnceKey("AddToRoleLocalLayout");
 
 /* Items are removed from roled user's layout, but access still persist. */
-static const QString kRemoveFromRoleLocalLayoutOnceKey(lit("RemoveFromRoleLocalLayout"));
-
-/* Batch delete user's or group's local layouts. */
-static const QString kDeleteLocalLayoutsShowOnceKey(lit("DeleteLocalLayouts"));
+static const QString kRemoveFromRoleLocalLayoutOnceKey("RemoveFromRoleLocalLayout");
 
 /* Removing multiple items from layout. */
-static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayout"));
+static const QString kRemoveItemsFromLayoutShowOnceKey("RemoveItemsFromLayout");
 
 /*  Batch delete resources. */
-static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
+static const QString kDeleteResourcesShowOnceKey("DeleteResources");
 
 /*  Merge resource groups. */
-static const QString kMergeResourceGroupsShowOnceKey(lit("MergeResourceGroups"));
+static const QString kMergeResourceGroupsShowOnceKey("MergeResourceGroups");
 
 /* Move proxied webpages to another server. */
 static const QString kMoveProxiedWebpageWarningShowOnceKey("MoveProxiedWebpageWarning");
+
+/* Delete personal (not shared) layout. */
+static const QString kDeleteLocalLayoutsShowOnceKey("DeleteLocalLayouts");
 
 static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption
     | QnResourceListView::ServerAsHealthMonitorOption
@@ -175,29 +175,39 @@ bool Resources::stopSharingLayouts(QWidget* parent,
     return showCompositeDialog(parent, QString(), text, QString(), resources);
 }
 
-bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
+bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
+    const QnResourceList& personalLayouts)
 {
+    if (sharedLayouts.empty() && qnClientShowOnce->testFlag(kDeleteLocalLayoutsShowOnceKey))
+        return true;
+
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
-    messageBox.setText(tr("Delete %n shared layouts?", "", layouts.size()));
+    messageBox.setText(tr("Delete %n layouts?", "", sharedLayouts.size() + personalLayouts.size()));
+
+    if (!sharedLayouts.empty())
+    {
+        messageBox.setInformativeText(
+            tr("%n layouts are shared with other users, so they will be deleted for their accounts as well.",
+                "", sharedLayouts.size()));
+    }
+
+    QnResourceList layouts;
+    layouts.append(sharedLayouts);
+    layouts.append(personalLayouts);
     messageBox.addCustomWidget(new QnResourceListView(layouts, kSimpleOptions, &messageBox));
-    messageBox.setInformativeText(
-        tr("These %n layouts are shared with other users, so you delete it for them too.",
-            "", layouts.size()));
+
+    messageBox.setCheckBoxEnabled(sharedLayouts.empty());
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
-    return (messageBox.exec() != QDialogButtonBox::Cancel);
-}
+    const auto result = messageBox.exec();
 
-bool Resources::deleteLocalLayouts(QWidget* parent,
-    const QnResourceList& stillAccessible)
-{
-    return showCompositeDialog(parent, kDeleteLocalLayoutsShowOnceKey,
-        tr("User will still have access to %n removed resources:", "", stillAccessible.size()),
-        tr("To remove access, please go to User Settings."),
-        stillAccessible);
+    if (messageBox.isChecked())
+        qnClientShowOnce->setFlag(kDeleteLocalLayoutsShowOnceKey);
+
+    return (result != QDialogButtonBox::Cancel);
 }
 
 bool Resources::removeItemsFromLayout(QWidget* parent,

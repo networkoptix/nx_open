@@ -82,9 +82,7 @@ private:
     bool confirmLayoutChange(const LayoutChange& change, const QnResourcePtr& layoutOwner);
 
     bool confirmChangeSharedLayout(const LayoutChange& change);
-    bool confirmDeleteSharedLayouts(const LayoutResourceList& layouts);
     bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
-    bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const LayoutResourceList& layouts);
     bool confirmChangeVideoWallLayout(const LayoutChange& change);
 
     /**

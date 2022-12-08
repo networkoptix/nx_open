@@ -187,6 +187,11 @@ bool LayoutResource::isIntercomLayout() const
     return m_isIntercomLayout;
 }
 
+bool LayoutResource::isCrossSystem() const
+{
+    return hasFlags(Qn::cross_system);
+}
+
 bool LayoutResource::setItemDataUnderLock(
     const QnUuid& id,
     Qn::ItemDataRole role,

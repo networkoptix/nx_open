@@ -169,11 +169,6 @@ QSet<QnResourcePtr> localLayoutResources(const LayoutResourcePtr& layout)
     return localLayoutResources(layout->resourcePool(), layout->getItems());
 }
 
-bool isCloudLayout(const LayoutResourcePtr& layout)
-{
-    return layout->hasFlags(Qn::cross_system);
-}
-
 bool hasCrossSystemItems(const LayoutResourcePtr& layout)
 {
     const auto currentCloudSystemId = appContext()->currentSystemContext()->globalSettings()
@@ -426,7 +421,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
 
     // This scenario is not very actual as it can be caused only if user places cross-system
     // cameras on a local layout using api.
-    if (!isCloudLayout(layout) && hasCrossSystemItems(layout))
+    if (!layout->isCrossSystem() && hasCrossSystemItems(layout))
     {
         appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
         return;
@@ -447,7 +442,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
     {
         menu()->trigger(action::SaveLocalLayoutAction, layout);
     }
-    else if (isCloudLayout(layout))
+    else if (layout->isCrossSystem())
     {
         snapshotManager->save(layout);
         return;
@@ -498,7 +493,7 @@ void LayoutsHandler::saveLayoutAs(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(layout))
         return;
 
-    if (isCloudLayout(layout))
+    if (layout->isCrossSystem())
         saveCloudLayoutAs(layout);
     else
         saveRemoteLayoutAs(layout);
@@ -639,7 +634,7 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(layout))
         return;
 
-    NX_ASSERT(!isCloudLayout(layout));
+    NX_ASSERT(!layout->isCrossSystem());
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
         QDialogButtonBox::Save | QDialogButtonBox::Cancel,
@@ -680,7 +675,7 @@ void LayoutsHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
 
 void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
 {
-    if (!NX_ASSERT(isCloudLayout(layout)))
+    if (!NX_ASSERT(layout->isCrossSystem()))
         return;
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
@@ -721,7 +716,7 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     }
 
     auto cloudLayout = layout->clone();
-    NX_ASSERT(isCloudLayout(cloudLayout));
+    NX_ASSERT(layout->isCrossSystem());
     cloudLayout->addFlags(Qn::local);
     cloudLayout->setName(name);
     appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
@@ -862,28 +857,6 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
     return ui::messages::Resources::sharedLayoutEdit(mainWindowWidget());
 }
 
-bool LayoutsHandler::confirmDeleteSharedLayouts(const LayoutResourceList& layouts)
-{
-    /* Checking if custom users have access to this shared layout. */
-    auto allUsers = resourcePool()->getResources<QnUserResource>();
-    auto accessibleToCustomUsers = std::any_of(allUsers.cbegin(), allUsers.cend(),
-        [this, layouts](const QnUserResourcePtr& user)
-        {
-            return std::any_of(layouts.cbegin(), layouts.cend(),
-                [this, user](const LayoutResourcePtr& layout)
-                {
-                    return resourceAccessProvider()->accessibleVia(user, layout) ==
-                        nx::core::access::Source::shared;
-                });
-        });
-
-    /* Do not warn if there are no such users - no side effects in any case. */
-    if (!accessibleToCustomUsers)
-        return true;
-
-    return ui::messages::Resources::deleteSharedLayouts(mainWindowWidget(), layouts);
-}
-
 bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     const LayoutChange& change)
 {
@@ -907,48 +880,6 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
             break;
     }
     return true;
-}
-
-bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
-    const LayoutResourceList& layouts)
-{
-    NX_ASSERT(user);
-    if (!user)
-        return true;
-
-    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
-        return true;
-
-    /* Never ask for own layouts. */
-    if (user == context()->user())
-        return true;
-
-    // Calculate removed cameras that are still directly accessible.
-    // Check only Resources from the same System Context as the Layout. Cross-system Resources
-    // cannot be available through Shared Layouts.
-    QSet<QnResourcePtr> removedResources;
-    for (const auto& layout: layouts)
-    {
-        NX_ASSERT(!isCloudLayout(layout));
-
-        auto systemContext = SystemContext::fromResource(layout);
-        if (!NX_ASSERT(systemContext))
-            continue;
-
-        const auto& snapshot = systemContext->layoutSnapshotManager()->snapshot(layout);
-        removedResources.unite(localLayoutResources(resourcePool(), snapshot.items));
-    }
-
-    const auto accessible = sharedResourcesManager()->sharedResources(user);
-    QnResourceList stillAccessible;
-    for (const QnResourcePtr& resource: std::as_const(removedResources))
-    {
-        QnUuid id = resource->getId();
-        if (accessible.contains(id))
-            stillAccessible.append(resource);
-    }
-
-    return ui::messages::Resources::deleteLocalLayouts(mainWindowWidget(), stillAccessible);
 }
 
 bool LayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
@@ -1003,7 +934,7 @@ void LayoutsHandler::removeLayouts(const LayoutResourceList &layouts)
         if (layout->isFile())
             continue;
 
-        if (isCloudLayout(layout))
+        if (layout->isCrossSystem())
             appContext()->cloudLayoutsManager()->deleteLayout(layout);
         else if (layout->hasFlags(Qn::local))
             resourcePool()->removeResource(layout); /*< This one can be simply deleted from resource pool. */
@@ -1168,44 +1099,26 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
 {
     auto layouts = menu()->currentParameters(sender()).resources().filtered<LayoutResource>();
 
-    LayoutResourceList canAutoDelete;
-    LayoutResourceList shared;
-    QHash<QnUserResourcePtr, LayoutResourceList> common;
+    LayoutResourceList personalLayouts;
+    LayoutResourceList sharedLayouts;
     for (const auto& layout: layouts)
     {
         NX_ASSERT(!layout->isFile());
         if (layout->isFile())
             continue;
 
-        auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
-        if (isCloudLayout(layout) || layout->isServiceLayout() || layout->hasFlags(Qn::local))
-            canAutoDelete << layout;
+        if (layout->isCrossSystem())
+            personalLayouts << layout;
         else if (layout->isShared())
-            shared << layout;
-        else if (owner)
-            common[owner] << layout;
+            sharedLayouts << layout;
         else
-            canAutoDelete << layout; /* Invalid layout */
+            personalLayouts << layout;
     }
-    removeLayouts(canAutoDelete);
 
-    if (confirmDeleteSharedLayouts(shared))
-        removeLayouts(shared);
-
-    auto users = common.keys();
-    std::sort(
-        users.begin(), users.end(),
-        [](const QnUserResourcePtr& l, const QnUserResourcePtr &r)
-        {
-            return nx::utils::naturalStringLess(l->getName(), r->getName());
-        });
-
-    for (const auto &user : users)
+    if (ui::messages::Resources::deleteLayouts(mainWindowWidget(), sharedLayouts, personalLayouts))
     {
-        auto userLayouts = common[user];
-        NX_ASSERT(!userLayouts.isEmpty());
-        if (confirmDeleteLocalLayouts(user, userLayouts))
-            removeLayouts(userLayouts);
+        removeLayouts(sharedLayouts);
+        removeLayouts(personalLayouts);
     }
 }
 
