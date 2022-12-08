@@ -2,9 +2,9 @@
 
 #include "field.h"
 
-#include "../action_fields/extract_detail_field.h"
-#include "../action_fields/optional_time_field.h"
-#include "../event_fields/state_field.h"
+#include "../action_builder_fields/extract_detail_field.h"
+#include "../action_builder_fields/optional_time_field.h"
+#include "../event_filter_fields/state_field.h"
 
 namespace nx::vms::rules::utils {
 

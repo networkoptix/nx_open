@@ -2,8 +2,8 @@
 
 #include "camera_input_event.h"
 
-#include "../event_fields/input_port_field.h"
-#include "../event_fields/source_camera_field.h"
+#include "../event_filter_fields/input_port_field.h"
+#include "../event_filter_fields/source_camera_field.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/field.h"

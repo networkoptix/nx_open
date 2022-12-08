@@ -3,13 +3,13 @@
 #pragma once
 
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/rules/action_field.h>
-#include <nx/vms/rules/event_field.h>
+#include <nx/vms/rules/action_builder_field.h>
+#include <nx/vms/rules/event_filter_field.h>
 
 namespace nx::vms::rules::test {
 
 /** This field class may be used as list of supported property types. */
-class TestEventField: public nx::vms::rules::EventField
+class TestEventField: public nx::vms::rules::EventFilterField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.field.test")
@@ -40,7 +40,7 @@ public:
     nx::vms::api::EventLevels levels = {};
 };
 
-class TestActionField: public nx::vms::rules::ActionField
+class TestActionField: public nx::vms::rules::ActionBuilderField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.field.test")

@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "../action_field.h"
+#include "../action_builder_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API Substitution: public ActionField
+class NX_VMS_RULES_API Substitution: public ActionBuilderField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.substitution")

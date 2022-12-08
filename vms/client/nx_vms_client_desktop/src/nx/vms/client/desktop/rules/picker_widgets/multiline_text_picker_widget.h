@@ -6,7 +6,7 @@
 
 #include "ui_multiline_text_picker_widget.h"
 
-#include <nx/vms/rules/action_fields/text_with_fields.h>
+#include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 
 namespace nx::vms::client::desktop::rules {
 

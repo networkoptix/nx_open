@@ -13,8 +13,8 @@
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_fields/optional_time_field.h>
-#include <nx/vms/rules/action_fields/target_user_field.h>
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/action_builder_fields/target_user_field.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>

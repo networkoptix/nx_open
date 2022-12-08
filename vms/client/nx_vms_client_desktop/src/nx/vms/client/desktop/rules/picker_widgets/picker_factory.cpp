@@ -2,8 +2,8 @@
 
 #include "picker_factory.h"
 
-#include <nx/vms/rules/action_fields/builtin_fields.h>
-#include <nx/vms/rules/event_fields/builtin_fields.h>
+#include <nx/vms/rules/action_builder_fields/builtin_fields.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 
 #include "blank_picker_widget.h"
 #include "dropdown_text_picker_widget.h"

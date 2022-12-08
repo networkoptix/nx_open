@@ -360,7 +360,7 @@ TEST_F(EngineTest, cloneEvent)
     EXPECT_EQ(original->type(), copy->type());
     EXPECT_NE(original, copy);
 
-    for (const auto propName :
+    for (const auto& propName :
         nx::utils::propertyNames(original.get(), nx::utils::PropertyAccess::readable))
     {
         static const QSet<QString> kNoComparator = {"attributes"};

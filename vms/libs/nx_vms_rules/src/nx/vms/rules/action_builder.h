@@ -14,7 +14,7 @@
 
 namespace nx::vms::rules {
 
-class ActionField;
+class ActionBuilderField;
 class Aggregator;
 class BasicAction;
 
@@ -62,9 +62,9 @@ public:
     bool updateFlatData(const std::map<QString, QVariant>& data);
 
     // Takes ownership.
-    void addField(const QString& name, std::unique_ptr<ActionField> field);
+    void addField(const QString& name, std::unique_ptr<ActionBuilderField> field);
 
-    const QHash<QString, ActionField*> fields() const;
+    const QHash<QString, ActionBuilderField*> fields() const;
 
     QSet<QString> requiredEventFields() const;
     QSet<QnUuid> affectedResources(const EventPtr& event) const;
@@ -106,8 +106,8 @@ private:
     QnUuid m_ruleId;
     QString m_actionType;
     ActionConstructor m_constructor;
-    std::map<QString, std::unique_ptr<ActionField>> m_fields;
-    QList<ActionField*> m_targetFields;
+    std::map<QString, std::unique_ptr<ActionBuilderField>> m_fields;
+    QList<ActionBuilderField*> m_targetFields;
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
     QTimer m_timer;
     QSharedPointer<Aggregator> m_aggregator;

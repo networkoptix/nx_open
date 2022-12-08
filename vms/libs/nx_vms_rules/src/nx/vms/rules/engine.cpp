@@ -13,13 +13,13 @@
 #include <utils/common/synctime.h>
 
 #include "action_builder.h"
+#include "action_builder_field.h"
 #include "action_executor.h"
-#include "action_field.h"
 #include "basic_action.h"
 #include "basic_event.h"
 #include "event_connector.h"
-#include "event_field.h"
 #include "event_filter.h"
+#include "event_filter_field.h"
 #include "manifest.h"
 #include "router.h"
 #include "rule.h"
@@ -647,7 +647,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
     return builder;
 }
 
-std::unique_ptr<EventField> Engine::buildEventField(const api::Field& serialized) const
+std::unique_ptr<EventFilterField> Engine::buildEventField(const api::Field& serialized) const
 {
     auto field = buildEventField(serialized.metatype);
     if (!field)
@@ -658,7 +658,7 @@ std::unique_ptr<EventField> Engine::buildEventField(const api::Field& serialized
     return field;
 }
 
-std::unique_ptr<EventField> Engine::buildEventField(const QString& fieldType) const
+std::unique_ptr<EventFilterField> Engine::buildEventField(const QString& fieldType) const
 {
     const auto& constructor = m_eventFields.value(fieldType);
     if (!constructor)
@@ -671,14 +671,14 @@ std::unique_ptr<EventField> Engine::buildEventField(const QString& fieldType) co
         return nullptr; // TODO: #spanasenko Default field type
     }
 
-    std::unique_ptr<EventField> field(constructor());
+    std::unique_ptr<EventFilterField> field(constructor());
 
     NX_ASSERT(field, "Field constructor returns nullptr");
 
     return field;
 }
 
-std::unique_ptr<ActionField> Engine::buildActionField(const api::Field& serialized) const
+std::unique_ptr<ActionBuilderField> Engine::buildActionField(const api::Field& serialized) const
 {
     auto field = buildActionField(serialized.metatype);
     deserializeProperties(serialized.props, field.get());
@@ -686,7 +686,7 @@ std::unique_ptr<ActionField> Engine::buildActionField(const api::Field& serializ
     return field;
 }
 
-std::unique_ptr<ActionField> Engine::buildActionField(const QString& fieldType) const
+std::unique_ptr<ActionBuilderField> Engine::buildActionField(const QString& fieldType) const
 {
     const auto& constructor = m_actionFields.value(fieldType);
     if (!constructor)
@@ -699,7 +699,7 @@ std::unique_ptr<ActionField> Engine::buildActionField(const QString& fieldType) 
         return nullptr; // TODO: #spanasenko Default field type
     }
 
-    std::unique_ptr<ActionField> field(constructor());
+    std::unique_ptr<ActionBuilderField> field(constructor());
 
     NX_ASSERT(field, "Field constructor returns nullptr");
 

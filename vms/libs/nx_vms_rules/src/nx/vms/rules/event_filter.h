@@ -16,7 +16,7 @@
 
 namespace nx::vms::rules {
 
-class EventField;
+class EventFilterField;
 
 /**
  * Event filters are used to filter events received by VMS rules engine
@@ -57,9 +57,9 @@ public:
     bool updateFlatData(const std::map<QString, QVariant>& data);
 
     // Takes ownership.
-    void addField(const QString& name, std::unique_ptr<EventField> field);
+    void addField(const QString& name, std::unique_ptr<EventFilterField> field);
 
-    const QHash<QString, EventField*> fields() const;
+    const QHash<QString, EventFilterField*> fields() const;
 
     bool match(const EventPtr& event) const;
 
@@ -92,7 +92,7 @@ private:
 private:
     QnUuid m_id;
     QString m_eventType;
-    std::map<QString, std::unique_ptr<EventField>> m_fields;
+    std::map<QString, std::unique_ptr<EventFilterField>> m_fields;
     bool m_updateInProgress = false;
 
     mutable std::set<QString> m_runningEvents;

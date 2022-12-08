@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../event_field.h"
+#include "../event_filter_field.h"
 
 namespace nx::vms::rules {
 
@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 * Any keyword match is enough. Empty keywords are always match.
 * Keep in sync with checkForKeywords() in event_parameters.h.
 */
-class NX_VMS_RULES_API KeywordsField: public EventField
+class NX_VMS_RULES_API KeywordsField: public EventFilterField
 {
     Q_OBJECT
 

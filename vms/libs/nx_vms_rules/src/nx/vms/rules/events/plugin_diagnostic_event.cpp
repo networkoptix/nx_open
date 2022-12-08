@@ -2,10 +2,10 @@
 
 #include "plugin_diagnostic_event.h"
 
-#include <nx/vms/rules/event_fields/analytics_engine_field.h>
-#include <nx/vms/rules/event_fields/analytics_event_level_field.h>
-#include <nx/vms/rules/event_fields/keywords_field.h>
-#include <nx/vms/rules/event_fields/source_camera_field.h>
+#include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
+#include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
+#include <nx/vms/rules/event_filter_fields/keywords_field.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 
 #include "../utils/event_details.h"
 #include "../utils/field.h"

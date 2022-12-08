@@ -5,9 +5,9 @@
 #include <thread>
 
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_fields/keywords_field.h>
-#include <nx/vms/rules/event_fields/state_field.h>
-#include <nx/vms/rules/event_fields/text_field.h>
+#include <nx/vms/rules/event_filter_fields/keywords_field.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/event_filter_fields/text_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/utils/field.h>

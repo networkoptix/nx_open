@@ -4,7 +4,7 @@
 
 #include "ui_state_picker_widget.h"
 
-#include <nx/vms/rules/action_fields/flag_field.h>
+#include <nx/vms/rules/action_builder_fields/flag_field.h>
 
 #include "picker_widget.h"
 

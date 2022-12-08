@@ -14,8 +14,8 @@
 #include <utils/common/synctime.h>
 
 #include "basic_event.h"
-#include "event_field.h"
-#include "event_fields/state_field.h"
+#include "event_filter_field.h"
+#include "event_filter_fields/state_field.h"
 #include "utils/field.h"
 #include "utils/type.h"
 
@@ -109,16 +109,16 @@ bool EventFilter::updateFlatData(const std::map<QString, QVariant>& data)
     return true;
 }
 
-void EventFilter::addField(const QString& name, std::unique_ptr<EventField> field)
+void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField> field)
 {
     // TODO: assert?
     m_fields[name] = std::move(field);
     updateState();
 }
 
-const QHash<QString, EventField*> EventFilter::fields() const
+const QHash<QString, EventFilterField*> EventFilter::fields() const
 {
-    QHash<QString, EventField*> result;
+    QHash<QString, EventFilterField*> result;
     for (const auto& [name, field]: m_fields)
     {
         result[name] = field.get();

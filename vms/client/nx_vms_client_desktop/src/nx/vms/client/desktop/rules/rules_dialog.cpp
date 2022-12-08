@@ -204,7 +204,7 @@ void RulesDialog::setupRuleTableView()
 
     const auto selectionModel = ui->tableView->selectionModel();
     connect(selectionModel, &QItemSelectionModel::currentChanged, this,
-        [this, selectionModel](const QModelIndex& current)
+        [this](const QModelIndex& current)
         {
             displayedRule = rulesTableModel->rule(rulesFilterModel->mapToSource(current));
             updateControlButtons();

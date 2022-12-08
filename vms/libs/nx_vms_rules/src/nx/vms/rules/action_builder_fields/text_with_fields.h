@@ -4,13 +4,13 @@
 
 #include <nx/vms/common/system_context_aware.h>
 
-#include "../action_field.h"
+#include "../action_builder_field.h"
 
 namespace nx::vms::rules {
 
  /** Perform string formatting using event data values. */
 class NX_VMS_RULES_API TextWithFields:
-    public ActionField,
+    public ActionBuilderField,
     public common::SystemContextAware
 {
     Q_OBJECT

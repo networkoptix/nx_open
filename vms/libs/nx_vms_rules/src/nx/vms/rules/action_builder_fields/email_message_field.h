@@ -13,7 +13,7 @@
 namespace nx::vms::rules {
 
 class NX_VMS_RULES_API EmailMessageField:
-    public ActionField,
+    public ActionBuilderField,
     public common::SystemContextAware
 {
     Q_OBJECT

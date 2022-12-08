@@ -48,7 +48,6 @@ private:
 private:
     bool m_connected = false;
     bool m_updateInProgress = false;
-
 };
 
 template <class T>

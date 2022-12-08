@@ -18,9 +18,9 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/migration_utils.h>
 
-#include "action_field.h"
-#include "action_fields/optional_time_field.h"
-#include "action_fields/target_user_field.h"
+#include "action_builder_field.h"
+#include "action_builder_fields/optional_time_field.h"
+#include "action_builder_fields/target_user_field.h"
 #include "aggregated_event.h"
 #include "aggregator.h"
 #include "basic_action.h"
@@ -246,7 +246,7 @@ bool ActionBuilder::updateFlatData(const std::map<QString, QVariant>& data)
     return true;
 }
 
-void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionField> field)
+void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderField> field)
 {
     if (!NX_ASSERT(field))
         return;
@@ -263,9 +263,9 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionField> f
     updateState();
 }
 
-const QHash<QString, ActionField*> ActionBuilder::fields() const
+const QHash<QString, ActionBuilderField*> ActionBuilder::fields() const
 {
-    QHash<QString, ActionField*> result;
+    QHash<QString, ActionBuilderField*> result;
     for (const auto& [name, field]: m_fields)
     {
         result[name] = field.get();

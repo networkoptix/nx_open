@@ -190,7 +190,7 @@ private:
     void readSomeAsync()
     {
         p2pWebsocketTransport->readSomeAsync(&buffer,
-            [this](SystemError::ErrorCode errorCode, std::size_t size)
+            [this](SystemError::ErrorCode errorCode, std::size_t /*size*/)
             {
                 if (errorCode == SystemError::noError)
                 {

@@ -6,11 +6,11 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/rules/action_fields/password_field.h>
-#include <nx/vms/rules/action_fields/text_field.h>
-#include <nx/vms/rules/event_fields/customizable_text_field.h>
-#include <nx/vms/rules/event_fields/keywords_field.h>
-#include <nx/vms/rules/event_fields/text_field.h>
+#include <nx/vms/rules/action_builder_fields/password_field.h>
+#include <nx/vms/rules/action_builder_fields/text_field.h>
+#include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
+#include <nx/vms/rules/event_filter_fields/keywords_field.h>
+#include <nx/vms/rules/event_filter_fields/text_field.h>
 #include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
