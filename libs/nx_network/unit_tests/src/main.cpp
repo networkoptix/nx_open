@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <QtCore/QCoreApplication>
+
 #include <nx/network/ssl/certificate.h>
 
 #define USE_GMOCK
