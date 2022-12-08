@@ -4,6 +4,8 @@
 
 #include <tuple>
 
+#include <nx/utils/counter.h>
+
 #include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
 #include "../../server/rest/http_server_rest_message_dispatcher.h"
@@ -36,7 +38,7 @@ public:
         ApplicationData... /*requestData*/)>;
 
     BasicCustomTunnelServer(NewTunnelHandler newTunnelHandler);
-    virtual ~BasicCustomTunnelServer() = default;
+    ~BasicCustomTunnelServer();
 
     virtual void setTunnelAuthorizer(
         TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer) override;
@@ -71,6 +73,7 @@ private:
     NewTunnelHandler m_newTunnelHandler;
     TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
     std::string m_path;
+    nx::utils::Counter m_asyncCallsTracker;
 
     void authorizeTunnel(
         const nx::network::http::HttpServerConnection& connection,
@@ -99,6 +102,12 @@ BasicCustomTunnelServer<ApplicationData...>::BasicCustomTunnelServer(
     :
     m_newTunnelHandler(std::move(newTunnelHandler))
 {
+}
+
+template<typename ...ApplicationData>
+BasicCustomTunnelServer<ApplicationData...>::~BasicCustomTunnelServer()
+{
+    m_asyncCallsTracker.wait();
 }
 
 template<typename ...ApplicationData>
@@ -143,9 +152,13 @@ void BasicCustomTunnelServer<ApplicationData...>::processTunnelInitiationRequest
     if (!connection) //< The connection was closed.
         return completionHandler(StatusCode::internalServerError);
 
-    connection->dispatch(
+    // NOTE: connection can be closed and all its posted calls queue cleaned.
+    // But we need the following lambda to be executed in any case.
+    connection->getAioThread()->dispatch(
+        nullptr,
         [this, connection, requestContext = std::move(requestContext),
-            completionHandler = std::move(completionHandler)]() mutable
+            completionHandler = std::move(completionHandler),
+            locker = m_asyncCallsTracker.getScopedIncrement()]() mutable
         {
             if (m_tunnelAuthorizer)
             {
@@ -207,14 +220,16 @@ void BasicCustomTunnelServer<ApplicationData...>::authorizeTunnel(
                 std::move(applicationData)...);
 
             // Moving execution to the connection thread.
-            aioThread->dispatch(nullptr, [this, args = std::move(args)]() mutable
-            {
-                std::apply([this](auto&&... args)
+            aioThread->dispatch(
+                nullptr,
+                [this, args = std::move(args), locker = m_asyncCallsTracker.getScopedIncrement()]() mutable
                 {
-                    onTunnelAutorizationCompleted(std::forward<decltype(args)>(args)...);
-                },
-                std::move(args));
-            });
+                    std::apply([this](auto&&... args)
+                    {
+                        onTunnelAutorizationCompleted(std::forward<decltype(args)>(args)...);
+                    },
+                    std::move(args));
+                });
         });
 }
 

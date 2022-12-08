@@ -11,6 +11,50 @@
 
 namespace nx::network::http::tunneling::test {
 
+namespace {
+
+struct Events
+{
+    nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> onRequestSent = nullptr;
+};
+
+// Just forwards all received requests transferring them to a different AIO thread.
+// This way it emulates an asynchronous request authentication.
+class AsyncRequestForwarder:
+    public IntermediaryHandler
+{
+    using base_type = IntermediaryHandler;
+
+public:
+    using base_type::base_type;
+
+    ~AsyncRequestForwarder()
+    {
+        m_aioThreadBinder.pleaseStopSync();
+    }
+
+    virtual void serve(
+        network::http::RequestContext ctx,
+        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
+    {
+        if (!nextHandler())
+            return handler(StatusCode::notFound);
+
+        m_aioThreadBinder.post(
+            [this, ctx = std::move(ctx), handler = std::move(handler)]() mutable
+            {
+                nextHandler()->serve(std::move(ctx), std::move(handler));
+            });
+    }
+
+private:
+    aio::BasicPollable m_aioThreadBinder;
+};
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+
 struct GetPostMethodMask { static constexpr int value = TunnelMethod::getPost; };
 class HttpTunnelingGetPost:
     public HttpTunneling<GetPostMethodMask>
@@ -41,22 +85,25 @@ protected:
         setBaseUrl(url);
     }
 
-    void whenSendGetRequest()
+    void whenSendGetRequest(Events events = {})
     {
         const auto url = nx::network::url::Builder(baseUrl())
             .appendPath(rest::substituteParameters(detail::kGetPostTunnelPath, {"1"})).toUrl();
 
         m_httpClient = std::make_unique<AsyncClient>(ssl::kAcceptAnyCertificate);
         m_httpClient->setTimeouts(AsyncClient::kInfiniteTimeouts);
-        std::promise<StatusCode::Value> done;
+        if (events.onRequestSent)
+            m_httpClient->setOnRequestHasBeenSent(std::move(events.onRequestSent));
         m_httpClient->doGet(
             url,
-            [this, &done]()
+            [this]()
             {
                 m_tunnelConnection = m_httpClient->takeSocket();
-                done.set_value((StatusCode::Value) m_httpClient->response()->statusLine.statusCode);
+                m_requestResults.push(
+                    m_httpClient->response()
+                        ? (StatusCode::Value) m_httpClient->response()->statusLine.statusCode
+                        : StatusCode::undefined);
             });
-        ASSERT_EQ(StatusCode::ok, done.get_future().get());
     }
 
     void whenSendGetAndPostRequestsTogether()
@@ -82,7 +129,12 @@ protected:
         sendBuf(url::getEndpoint(url), buf);
     }
 
-    void thenTunnelIsClosedByServerEventually()
+    void thenRequestSucceeded()
+    {
+        ASSERT_EQ(StatusCode::ok, m_requestResults.pop());
+    }
+
+    void andTunnelIsClosedByServerEventually()
     {
         ASSERT_TRUE(m_tunnelConnection->setNonBlockingMode(false));
         ASSERT_TRUE(m_tunnelConnection->setRecvTimeout(kNoTimeout));
@@ -111,11 +163,22 @@ protected:
         ASSERT_EQ(m_userRequest.toString(), buf);
     }
 
+    void installAsyncDefaultHttpRequestHandler()
+    {
+        httpServer().installIntermediateRequestHandler(std::make_unique<AsyncRequestForwarder>(nullptr));
+    }
+
+    std::unique_ptr<AsyncClient>& httpClient()
+    {
+        return m_httpClient;
+    }
+
 private:
     std::unique_ptr<AsyncClient> m_httpClient;
     std::unique_ptr<AbstractStreamSocket> m_tunnelConnection;
     std::unique_ptr<AbstractStreamSocket> m_rawClientConnection;
     Request m_userRequest;
+    nx::utils::SyncQueue<StatusCode::Value> m_requestResults;
 
     void addTunnelGetRequest(const nx::utils::Url& url, nx::Buffer* buf)
     {
@@ -160,8 +223,11 @@ TEST_F(HttpTunnelingGetPost, connection_is_closed_by_timeout_if_post_never_comes
     setHttpConnectionInactivityTimeout(std::chrono::milliseconds(100));
 
     givenTunnellingServer();
+
     whenSendGetRequest();
-    thenTunnelIsClosedByServerEventually();
+    thenRequestSucceeded();
+
+    andTunnelIsClosedByServerEventually();
 }
 
 TEST_F(HttpTunnelingGetPost, get_and_post_arrive_together)
@@ -193,6 +259,17 @@ TEST_F(HttpTunnelingGetPost, authentication_is_supported)
 
     thenTunnelIsEstablished();
     assertDataExchangeWorksThroughTheTunnel();
+}
+
+TEST_F(HttpTunnelingGetPost, unexpected_connection_reset_is_handled_properly)
+{
+    givenTunnellingServer();
+    installAsyncDefaultHttpRequestHandler();
+
+    whenSendGetRequest();
+
+    std::this_thread::sleep_for(std::chrono::microseconds(rand() % 100));
+    httpServer().terminateListener();
 }
 
 } // namespace nx::network::http::tunneling::test
