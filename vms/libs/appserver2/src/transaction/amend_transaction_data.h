@@ -61,6 +61,11 @@ bool amendOutputDataIfNeeded(
     QnResourceAccessManager* accessManager,
     nx::vms::api::MediaServerDataEx* mediaServerDataEx);
 
+bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::ServerFootageData* serverFootageData);
+
 template<typename T>
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,

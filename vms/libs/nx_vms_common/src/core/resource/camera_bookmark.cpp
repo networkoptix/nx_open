@@ -552,10 +552,6 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark)
     return dbg.space();
 }
 
-QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter()
-{
-}
-
 bool QnCameraBookmarkSearchFilter::isValid() const
 {
     return startTimeMs <= endTimeMs && limit > 0;
