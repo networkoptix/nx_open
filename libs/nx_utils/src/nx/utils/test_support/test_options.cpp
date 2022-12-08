@@ -2,6 +2,7 @@
 
 #include "test_options.h"
 
+#include <QtCore/QCommandLineParser>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
@@ -102,6 +103,25 @@ void TestOptions::setLoadMode(const QString& mode)
 
 void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 {
+    QStringList args;
+    for (const auto& [key, value] : arguments.allArgs())
+        args.push_back(QString("--%1=%2").arg(key).arg(value));
+
+    QCommandLineParser parser;
+    parser.addOptions({
+        {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
+        {"enable-discovery", "Enable discovery"},
+        {"timeout-multiplier", "Timeout multiplier to speedup realtime tests"},
+        {"load-factor", "Increase amount of work for some tests. Default value is 1.0"},
+        {"disable-time-asserts", "Do not check calendar time."},
+        {"keep-temporary-directory", "Do not delete tmp directory after test is finished"},
+        {"load-mode", "Available values: light/normal/stress"},
+        {"disable-crash-dump", "Do not create crash dump if test fails"},
+        {"enable-full-crash-dump", "Generate full crash dump if test fails"},
+        });
+    parser.addHelpOption();
+    parser.parse(args);
+
     if (const auto value = arguments.get<size_t>("timeout-multiplier"))
         setTimeoutMultiplier(*value);
 
@@ -135,6 +155,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
         win32_exception::setCreateFullCrashDump(generateFullCrashDump);
     }
 #endif
+
+    if (parser.isSet("help"))
+        parser.showHelp();
 }
 
 TestOptions::TemporaryDirectory& TestOptions::tmpDirInstance()
