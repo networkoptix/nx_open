@@ -64,6 +64,7 @@ enum MethodType
     bindingMethod = 1,
     // TURN RFC 8656
     allocateMethod = 3,
+    refreshMethod = 4,
     sendMethod = 6,
     dataMethod = 7,
     createPermissionMethod = 8,
