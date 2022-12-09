@@ -133,7 +133,8 @@ bool amendOutputDataIfNeeded(
     QnResourceAccessManager* accessManager,
     nx::vms::api::MediaServerDataEx* mediaServerDataEx)
 {
-    bool result = amendOutputDataIfNeeded(accessData, accessManager, &mediaServerDataEx);
+    bool result = amendOutputDataIfNeeded(
+        accessData, accessManager, (nx::vms::api::MediaServerData*) mediaServerDataEx);
     for (auto& storage: mediaServerDataEx->storages)
         result |= amendOutputDataIfNeeded(accessData, accessManager, &storage);
     return result;
