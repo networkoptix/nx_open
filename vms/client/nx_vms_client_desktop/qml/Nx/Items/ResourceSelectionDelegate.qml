@@ -61,6 +61,9 @@ Item
 
             sourceSize: Qt.size(20, 20)
 
+            width: 20
+            height: 20
+
             Row
             {
                 id: extras

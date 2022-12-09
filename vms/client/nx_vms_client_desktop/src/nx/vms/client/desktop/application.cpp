@@ -358,6 +358,12 @@ int runApplication(int argc, char** argv)
         // These attributes must be set before application instance is created.
         QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+        if (ini().roundDpiScaling)
+        {
+            QApplication::setHighDpiScaleFactorRoundingPolicy(
+                Qt::HighDpiScaleFactorRoundingPolicy::Round);
+        }
     }
 
     if (nx::build_info::isMacOsX())

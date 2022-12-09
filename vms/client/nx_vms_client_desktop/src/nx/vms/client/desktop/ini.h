@@ -193,6 +193,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(4, attributeTableSpacing,
         "[Design] Spacing between attributes in analytics attribute tables.");
 
+    NX_INI_FLAG(false, roundDpiScaling,
+        "[Design] Whether a DPI scaling factor should be rounded to an integer value.");
+
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the
