@@ -8,27 +8,29 @@
 #include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
+#include <client_core/client_core_module.h>
+#include <client_core/client_core_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
-#include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
 #include <finders/systems_finder.h>
 #include <licensing/license.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/analytics/utils.h>
 #include <nx/build_info.h>
 #include <nx/monitoring/hardware_information.h>
@@ -40,6 +42,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
@@ -71,8 +74,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
 #include <statistics/statistics_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
@@ -129,6 +130,7 @@ struct ConnectActionsHandler::Private
     RemoteConnectionFactory::ProcessPtr currentConnectionProcess;
     /** Flag that we should handle new connection. */
     bool warnMessagesDisplayed = false;
+    std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ec2::CrashReporter> crashReporter;
 
     Private(ConnectActionsHandler* owner):
@@ -164,7 +166,8 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
-    d->crashReporter = std::make_unique<ec2::CrashReporter>(systemContext());
+    d->timerManager = std::make_unique<nx::utils::TimerManager>("CrashReportTimers");
+    d->crashReporter = std::make_unique<ec2::CrashReporter>(systemContext(), d->timerManager.get());
 
     // Videowall must not disconnect automatically as we may have not option to restart it.
     // ACS clients display only fixed part of the archive, so they look quite safe.

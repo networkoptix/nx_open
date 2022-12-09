@@ -14,12 +14,15 @@
 #include <nx/utils/url.h>
 #include <nx/vms/common/system_context_aware.h>
 
+namespace nx::utils { class TimerManager; }
+
 namespace ec2 {
 
 class CrashReporter: public nx::vms::common::SystemContextAware
 {
 public:
-    CrashReporter(nx::vms::common::SystemContext* systemContext);
+    CrashReporter(
+        nx::vms::common::SystemContext* systemContext, nx::utils::TimerManager* timerManager);
     ~CrashReporter();
 
     /** Scans for local reports and sends them to the statistics server asynchronously
@@ -43,6 +46,7 @@ public:
 private:
     friend class ReportData;
 
+    nx::utils::TimerManager* const m_timerManager;
     nx::Mutex m_mutex;
     nx::utils::concurrent::Future<bool> m_activeCollection;
     nx::network::http::AsyncHttpClientPtr m_activeHttpClient;
