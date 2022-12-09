@@ -62,8 +62,12 @@ static QFileInfoList readCrashes([[maybe_unused]] const QString& prefix = QStrin
 
 namespace ec2 {
 
-CrashReporter::CrashReporter(nx::vms::common::SystemContext* systemContext):
+CrashReporter::CrashReporter(
+    nx::vms::common::SystemContext* systemContext,
+    nx::utils::TimerManager* timerManager)
+    :
     nx::vms::common::SystemContextAware(systemContext),
+    m_timerManager(timerManager),
     m_terminated(false)
 {
 }
@@ -78,7 +82,7 @@ CrashReporter::~CrashReporter()
     }
 
     if (timerId)
-        nx::vms::common::appContext()->timerManager()->joinAndDeleteTimer(*timerId);
+        m_timerManager->joinAndDeleteTimer(*timerId);
 
     // wait for the last scanAndReportAsync
     m_activeCollection.cancel();
@@ -190,9 +194,11 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_terminated)
-        m_timerId = nx::vms::common::appContext()->timerManager()->addTimer(
+    {
+        m_timerId = m_timerManager->addTimer(
             std::bind(&CrashReporter::scanAndReportByTimer, this, settings),
             std::chrono::milliseconds(SCAN_TIMER_CYCLE));
+    }
 }
 
 bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash, QSettings* settings)
