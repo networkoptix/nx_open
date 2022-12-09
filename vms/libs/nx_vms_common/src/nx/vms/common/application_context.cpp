@@ -150,9 +150,4 @@ QnStoragePluginFactory* ApplicationContext::storagePluginFactory() const
     return d->storagePluginFactory.get();
 }
 
-nx::utils::TimerManager* ApplicationContext::timerManager() const
-{
-    return d->timerManager.get();
-}
-
 } // namespace nx::vms::common
