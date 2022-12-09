@@ -413,18 +413,6 @@ APPLY(305, addCameraHistoryItem, nx::vms::api::ServerFootageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadFootageDataAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(309, removeCameraHistoryItem, nx::vms::api::ServerFootageData, \
-                       true, /* persistent*/ \
-                       false, /* system*/ \
-                       true, /*isRemoveOperation*/ \
-                       &createHashForServerFootageDataHelper, /* getHash*/ \
-                       CameraNotificationManagerHelper(), \
-                       ModifyFootageDataAccess(), /* save permission checker */ \
-                       ReadFootageDataAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(310, saveCameraUserAttributes, nx::vms::api::CameraAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
