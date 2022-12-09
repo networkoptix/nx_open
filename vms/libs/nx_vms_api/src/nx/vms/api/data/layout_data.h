@@ -103,7 +103,7 @@ struct NX_VMS_API LayoutItemData: IdData
      */
     float zoomBottom = 0;
 
-    /**%apidoc Unique id of the original layout item for which the zoom window was created.*/
+    /**%apidoc [opt] Unique id of the original layout item for which the zoom window was created.*/
     QnUuid zoomTargetId;
 
     /**%apidoc [opt] Image enhancement parameters.*/
