@@ -52,8 +52,6 @@ public:
 
     QnStoragePluginFactory* storagePluginFactory() const;
 
-    nx::utils::TimerManager* timerManager() const;
-
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
