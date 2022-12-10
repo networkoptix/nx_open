@@ -22,6 +22,8 @@ Item
     property alias allCamerasPeriodStorage: calendarModel.allCamerasPeriodStorage
     property bool periodsVisible: true
 
+    implicitHeight: 32 * 6
+
     QtObject
     {
         id: d
@@ -41,7 +43,9 @@ Item
 
         function setSelection(start, end, endClicked)
         {
-            selection = NxGlobals.dateRange(start, end)
+            selection = NxGlobals.dateRange(
+                DateUtils.maxDate(start, range.start),
+                DateUtils.minDate(end, range.end))
 
             const clickedDate = endClicked ? selection.end : selection.start
             visibleYear = clickedDate.getFullYear()
@@ -85,6 +89,8 @@ Item
 
                 SelectionMarker
                 {
+                    id: selectionMarker
+
                     anchors
                     {
                         fill: parent
@@ -99,60 +105,40 @@ Item
 
                 Rectangle
                 {
-                    anchors
-                    {
-                        fill: parent
-                        topMargin: 1
-                        bottomMargin: 1
-                    }
-
-                    radius: 2
+                    anchors.fill: selectionMarker
                     color: "transparent"
+                    radius: 4
                     border.width: 1
-                    border.color: ColorTheme.colors.light16
-
-                    visible: mouseArea.containsMouse
-                }
-
-                Rectangle
-                {
-                    anchors.centerIn: dayLabel
-
-                    width: parent.width - 16
-                    height: parent.height - 14
-
-                    radius: 2
-                    visible: calendarDay.current
-                    color: ColorTheme.colors.light4
+                    border.color: mouseArea.containsMouse
+                        ? ColorTheme.colors.light12
+                        : calendarDay.current
+                            ? ColorTheme.highlight
+                            : "transparent"
                 }
 
                 Text
                 {
                     id: dayLabel
 
-                    y: 4
+                    y: 6
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     text: calendarDay.date.getDate()
                     color:
                     {
-                        if (calendarDay.current)
-                            return ColorTheme.colors.dark9
-
-                        return (enabled && model.date.getUTCMonth() === visibleMonth)
-                            ? ColorTheme.text
-                            : ColorTheme.transparent(ColorTheme.colors.light16, 0.5)
+                        return (model.date.getUTCMonth() === visibleMonth)
+                            ? ColorTheme.text : ColorTheme.colors.light16
                     }
 
                     topPadding: 1
                     font.pixelSize: 12
-                    font.weight: Font.DemiBold
+                    font.weight: Font.Medium
                 }
 
                 ArchiveIndicator
                 {
                     cameraHasArchive: periodsVisible && model.hasArchive
-                    anyCameraHasArchive: model.anyCameraHasArchive
+                    anyCameraHasArchive: periodsVisible && model.anyCameraHasArchive
                 }
 
                 MouseArea
@@ -160,6 +146,7 @@ Item
                     id: mouseArea
 
                     anchors.fill: parent
+                    enabled: model.hasArchive || model.anyCameraHasArchive
                     hoverEnabled: true
                     onPressed: function(event)
                     {

@@ -34,7 +34,11 @@ Item
                 color: "transparent"
                 border.width: 1
                 border.color: monthButtonMouseArea.containsMouse
-                    ? ColorTheme.midlight : "transparent"
+                    ? ColorTheme.colors.light12
+                    : current
+                        ? ColorTheme.highlight
+                        : "transparent"
+
                 radius: 2
 
                 Text
@@ -42,20 +46,11 @@ Item
                     anchors.centerIn: parent
 
                     text: locale.monthName(modelData, Locale.ShortFormat)
-                    font.pixelSize: 15
-                    font.weight: Font.DemiBold
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    font.capitalization: Font.AllUppercase
 
-                    color: current ? ColorTheme.colors.dark8 : ColorTheme.colors.light4
-
-                    Rectangle
-                    {
-                        anchors.centerIn: parent
-                        width: parent.width + 16
-                        height: parent.height + 8
-                        z: -1
-                        radius: 2
-                        color: current ? ColorTheme.colors.light6 : "transparent"
-                    }
+                    color: ColorTheme.buttonText
                 }
 
                 MouseArea

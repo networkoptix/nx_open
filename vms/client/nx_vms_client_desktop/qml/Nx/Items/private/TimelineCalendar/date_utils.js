@@ -7,6 +7,16 @@ function areDatesEqual(date1, date2)
         && date1.getDate() === date2.getDate()
 }
 
+function minDate(date1, date2)
+{
+    return date1.getTime() <= date2.getTime() ? date1 : date2
+}
+
+function maxDate(date1, date2)
+{
+    return date1.getTime() > date2.getTime() ? date1 : date2
+}
+
 function addDays(date, days)
 {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)

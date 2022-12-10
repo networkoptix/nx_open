@@ -23,7 +23,7 @@ Item
     property alias allCamerasPeriodStorage: dayHoursModel.allCamerasPeriodStorage
     property bool periodsVisible: true
 
-    implicitHeight: 50
+    implicitHeight: grid.implicitHeight
 
     signal selectionEdited(int start, int end)
 
@@ -33,28 +33,22 @@ Item
         amPmTime: !!locale.amText
     }
 
-    Image
-    {
-        y: 13
-        source: "image://svg/skin/misc/clock_small.svg"
-        sourceSize: Qt.size(20, 20)
-        visible: !dayHoursModel.amPmTime
-    }
-
     Column
     {
-        x: 2
+        id: amPmIndicator
+
         spacing: 1
         visible: dayHoursModel.amPmTime
 
         component AmPmLabel: Text
         {
-            height: 24
+            height: 32
+            width: control.width / (grid.columns + 1)
             text: locale.amText
-            color: ColorTheme.light
-            font.pixelSize: 9
-            font.weight: Font.DemiBold
-            topPadding: 6
+            color: enabled ? ColorTheme.buttonText : ColorTheme.colors.light16
+            font.pixelSize: 10
+            font.weight: Font.Medium
+            topPadding: 7
         }
         AmPmLabel { text: locale.amText }
         AmPmLabel { text: locale.pmText }
@@ -64,7 +58,7 @@ Item
     {
         id: grid
 
-        x: 24
+        x: amPmIndicator.visible ? amPmIndicator.width : 0
         width: parent.width - x
         height: parent.height
 
@@ -83,12 +77,12 @@ Item
                 property int hour: model.hour
 
                 width: grid.cellWidth
-                height: 26
-
-                enabled: hour >= minimumHour && hour <= maximumHour
+                height: 32
 
                 SelectionMarker
                 {
+                    id: selectionMarker
+
                     anchors
                     {
                         fill: parent
@@ -98,49 +92,43 @@ Item
 
                     start: hour === selectionStart
                     end: hour === selectionEnd
-                    visible: hour >= selectionStart && hour <= selectionEnd
+
+                    visible: enabled && hour >= selectionStart && hour <= selectionEnd
                 }
 
                 Rectangle
                 {
-                    anchors
-                    {
-                        fill: parent
-                        topMargin: 1
-                        bottomMargin: 1
-                    }
-
-                    radius: 2
+                    anchors.fill: selectionMarker
                     color: "transparent"
+                    radius: 4
                     border.width: 1
-                    border.color: ColorTheme.colors.light16
-
-                    visible: mouseArea.containsMouse
+                    border.color: ColorTheme.colors.light12
+                    visible: enabled && mouseArea.containsMouse
                 }
 
                 Text
                 {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    topPadding: 5
-                    font.pixelSize: 11
-
+                    topPadding: 7
+                    font.pixelSize: 10
+                    font.weight: Font.Medium
                     text: model.display
-
-                    color: enabled
-                        ? ColorTheme.text
-                        : ColorTheme.transparent(ColorTheme.colors.light16, 0.5)
+                    color: enabled ? ColorTheme.buttonText : ColorTheme.colors.light16
                 }
 
                 ArchiveIndicator
                 {
-                    width: 10
+                    width: 12
                     cameraHasArchive: periodsVisible && model.hasArchive
-                    anyCameraHasArchive: model.anyCameraHasArchive
+                    anyCameraHasArchive: periodsVisible && model.anyCameraHasArchive
+                    visible: enabled
                 }
 
                 MouseArea
                 {
                     id: mouseArea
+
+                    enabled: hourItem.hour >= minimumHour && hourItem.hour <= maximumHour
 
                     anchors.fill: parent
                     hoverEnabled: true
