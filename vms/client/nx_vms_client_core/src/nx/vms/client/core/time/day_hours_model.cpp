@@ -266,8 +266,8 @@ QVariant DayHoursModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
             if (!d->amPmTime)
-                return hour;
-            return (hour == 0 || hour == 12) ? 12 : hour % 12;
+                return QString::number(hour).rightJustified(2, '0');
+            return QString::number((hour == 0 || hour == 12) ? 12 : hour % 12);
         case HourRole:
             return hour;
         case HasArchiveRole:

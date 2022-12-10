@@ -4,7 +4,7 @@ import QtQuick 2.0
 
 import Nx 1.0
 
-Rectangle
+Item
 {
     property bool cameraHasArchive: false
     property bool anyCameraHasArchive: false
@@ -12,15 +12,18 @@ Rectangle
     anchors
     {
         bottom: parent ? parent.bottom : undefined
-        bottomMargin: 5
+        bottomMargin: 6
         horizontalCenter: parent ? parent.horizontalCenter : undefined
     }
 
-    color: ColorTheme.colors.green_l4
-    radius: height / 2
+    width: 16
+    height: 2
 
-    width: cameraHasArchive ? 12 : 8
-    height: cameraHasArchive ? 2 : 1
-    opacity: cameraHasArchive ? 1.0 : 0.5
-    visible: cameraHasArchive || anyCameraHasArchive
+    Rectangle
+    {
+        anchors.fill: parent
+        color: cameraHasArchive ? ColorTheme.colors.green_l1 : ColorTheme.colors.green_d1
+        radius: height / 2
+        visible: cameraHasArchive || anyCameraHasArchive
+    }
 }

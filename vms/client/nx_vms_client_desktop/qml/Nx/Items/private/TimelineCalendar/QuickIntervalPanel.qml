@@ -9,9 +9,14 @@ Item
 {
     height: 32
 
+    property var range: NxGlobals.dateRange(
+        new Date(1970, 1, 1), DateUtils.addDays(d.today, 1))
+
     signal intervalSelected(real milliseconds)
 
     readonly property real kMillisecondsPerHour: 60 * 60 * 1000
+
+    readonly property real rangeLength: range.end.getTime() - range.start.getTime()
 
     Item
     {
@@ -25,7 +30,7 @@ Item
         Rectangle
         {
             anchors.fill: parent
-            color: ColorTheme.colors.dark5
+            color: ColorTheme.colors.dark4
             radius: parent.radius
         }
 
@@ -33,7 +38,7 @@ Item
         {
             width: parent.width
             height: parent.radius
-            color: ColorTheme.colors.dark5
+            color: ColorTheme.colors.dark4
         }
     }
 
@@ -42,40 +47,33 @@ Item
         anchors.verticalCenter: parent.verticalCenter
         x: 8
 
-        Text
-        {
-            anchors.verticalCenter: parent.verticalCenter
-            text: qsTr("Last")
-            color: ColorTheme.midlight
-            font.pixelSize: 11
-            padding: 2
-            rightPadding: 10
-        }
-
-        component IntervalButton: Rectangle
+        component IntervalButton: Item
         {
             property alias text: buttonText.text
-
-            signal pressed()
+            property real interval: 0
 
             anchors.verticalCenter: parent.verticalCenter
             implicitWidth: buttonText.implicitWidth + 16
             implicitHeight: buttonText.implicitHeight
 
-            color: "transparent"
+            enabled: interval <= rangeLength
 
-            radius: 2
-            border.width: 1
-            border.color: mouseArea.containsMouse ? ColorTheme.colors.light16 : "transparent"
+            function getInterval() { return interval }
 
             Text
             {
                 id: buttonText
                 anchors.centerIn: parent
-                color: ColorTheme.colors.light16
                 font.pixelSize: 11
+                font.capitalization: Font.AllUppercase
                 topPadding: 2
                 bottomPadding: 2
+                color: mouseArea.pressed
+                    ? ColorTheme.colors.light6
+                    : mouseArea.containsMouse
+                        ? ColorTheme.colors.light1
+                        : ColorTheme.buttonText
+                opacity: enabled ? 1 : 0.3
             }
 
             MouseArea
@@ -85,36 +83,40 @@ Item
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onPressed: parent.pressed()
+                onPressed: intervalSelected(getInterval())
             }
         }
 
         IntervalButton
         {
-            text: qsTr("Hour")
-            onPressed: intervalSelected(kMillisecondsPerHour)
-        }
-        IntervalButton
-        {
-            text: qsTr("Day")
-            onPressed: intervalSelected(24 * kMillisecondsPerHour)
-        }
-        IntervalButton
-        {
-            text: qsTr("Week")
-            onPressed: intervalSelected(24 * 7 * kMillisecondsPerHour)
-        }
-        IntervalButton
-        {
-            text: qsTr("Month")
-            onPressed:
+            text: qsTr("today")
+
+            function getInterval()
             {
-                const nowMs = Date.now().getTime()
-                let then = new Date(nowMs)
-                then.setMonth(then.getMonth() - 1)
-
-                intervalSelected(nowMs - then.getTime())
+                const now = range.end
+                const then = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                return now.getTime() - then.getTime()
             }
+        }
+        IntervalButton
+        {
+            text: qsTr("-1 hour")
+            interval: kMillisecondsPerHour
+        }
+        IntervalButton
+        {
+            text: qsTr("-24 hours")
+            interval: 24 * kMillisecondsPerHour
+        }
+        IntervalButton
+        {
+            text: qsTr("-7 days")
+            interval: 24 * 7 * kMillisecondsPerHour
+        }
+        IntervalButton
+        {
+            text: qsTr("-30 days")
+            interval: 30 * 24 * 7 * kMillisecondsPerHour
         }
     }
 }

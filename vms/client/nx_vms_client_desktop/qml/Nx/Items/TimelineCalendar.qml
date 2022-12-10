@@ -24,12 +24,12 @@ Control
 
     property bool monthPickerVisible: false
 
-    implicitWidth: 268
+    implicitWidth: 324
     implicitHeight: contentItem.implicitHeight
 
     background: Rectangle
     {
-        color: ColorTheme.colors.dark4
+        color: ColorTheme.colors.dark5
         radius: 2
     }
 
@@ -39,8 +39,15 @@ Control
         {
             x: 8
             width: parent.width - 2 * x
-            height: 1
-            color: ColorTheme.colors.dark13
+            height: 2
+            color: ColorTheme.colors.dark6
+
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                color: ColorTheme.colors.dark4
+            }
         }
 
         component Spacer: Item
@@ -65,14 +72,16 @@ Control
                 y: 6
                 width: 36
                 height: 36
-                leftPadding: 8
-                rightPadding: 8
-                topPadding: 8
-                bottomPadding: 8
+                leftPadding: 13
+                rightPadding: 13
+                topPadding: 13
+                bottomPadding: 13
+                icon.width: 10
+                icon.height: 10
 
                 flat: true
                 backgroundColor: "transparent"
-                textColor: hovered ? ColorTheme.text : ColorTheme.midlight
+                textColor: hovered ? ColorTheme.text : ColorTheme.light
             }
 
             ArrowButton
@@ -108,8 +117,9 @@ Control
                 y: 8
                 height: 32
 
-                font.pixelSize: 15
-                font.weight: Font.DemiBold
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                font.capitalization: Font.AllUppercase
                 color: yearMonthLabelMouseArea.containsMouse
                     ? ColorTheme.brightText : ColorTheme.text
                 text: monthPickerVisible
@@ -148,8 +158,8 @@ Control
                 delegate: Text
                 {
                     text: model.shortName
-                    font.pixelSize: 9
-                    font.weight: Font.DemiBold
+                    font.pixelSize: 10
+                    font.weight: Font.Medium
                     font.capitalization: Font.AllUppercase
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
@@ -168,7 +178,6 @@ Control
 
                 x: 8
                 width: parent.width - 2 * x
-                height: 28 * 6
 
                 locale: control.locale
 
@@ -178,7 +187,65 @@ Control
 
             Spacer {}
 
-            Splitter { color: ColorTheme.colors.dark6 }
+            Splitter {}
+
+            Spacer {}
+
+            TimeSelector
+            {
+                id: timeSelector
+
+                readonly property date visualSelectionEnd:
+                    DateUtils.addMilliseconds(control.selection.end, -1)
+
+                x: 21
+                width: parent.width - 2 * x
+
+                locale: control.locale
+                date: control.selection.start
+
+                minimumHour: DateUtils.areDatesEqual(selection.start, range.start)
+                    ? range.start.getHours() : 0
+
+                maximumHour: DateUtils.areDatesEqual(visualSelectionEnd, range.end)
+                    ? range.end.getHours() : 23
+
+                periodStorage: daysSelector.periodStorage
+                allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
+                periodsVisible: daysSelector.periodsVisible
+                displayOffset: daysSelector.displayOffset
+
+                enabled: DateUtils.areDatesEqual(selection.start, visualSelectionEnd)
+
+                Binding
+                {
+                    target: timeSelector
+                    property: "selectionStart"
+                    value: control.selection.start.getHours()
+                }
+                Binding
+                {
+                    target: timeSelector
+                    property: "selectionEnd"
+                    value: timeSelector.visualSelectionEnd.getHours()
+                }
+
+                onSelectionEdited: (start, end) =>
+                {
+                    control.selection = NxGlobals.dateRange(
+                        new Date(
+                            control.selection.start.getFullYear(),
+                            control.selection.start.getMonth(),
+                            control.selection.start.getDate(),
+                            start, 0, 0),
+                        new Date(
+                            visualSelectionEnd.getFullYear(),
+                            visualSelectionEnd.getMonth(),
+                            visualSelectionEnd.getDate(),
+                            end + 1, 0, 0)
+                    )
+                }
+            }
         }
 
         MonthPicker
@@ -204,82 +271,12 @@ Control
             }
         }
 
-        Spacer {}
-
-        TimeSelector
-        {
-            id: timeSelector
-
-            readonly property date visualSelectionEnd:
-                DateUtils.addMilliseconds(control.selection.end, -1)
-
-            x: 8
-            width: parent.width - 2 * x
-
-            locale: control.locale
-            date: control.selection.start
-            visible: DateUtils.areDatesEqual(control.selection.start, visualSelectionEnd)
-
-            minimumHour: DateUtils.areDatesEqual(selection.start, range.start)
-                ? range.start.getHours() : 0
-
-            maximumHour: DateUtils.areDatesEqual(visualSelectionEnd, range.end)
-                ? range.end.getHours() : 23
-
-            periodStorage: daysSelector.periodStorage
-            allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
-            periodsVisible: daysSelector.periodsVisible
-            displayOffset: daysSelector.displayOffset
-
-            Binding
-            {
-                target: timeSelector
-                property: "selectionStart"
-                value: control.selection.start.getHours()
-            }
-            Binding
-            {
-                target: timeSelector
-                property: "selectionEnd"
-                value: timeSelector.visualSelectionEnd.getHours()
-            }
-
-            onSelectionEdited: (start, end) =>
-            {
-                control.selection = NxGlobals.dateRange(
-                    new Date(
-                        control.selection.start.getFullYear(),
-                        control.selection.start.getMonth(),
-                        control.selection.start.getDate(),
-                        start, 0, 0),
-                    new Date(
-                        visualSelectionEnd.getFullYear(),
-                        visualSelectionEnd.getMonth(),
-                        visualSelectionEnd.getDate(),
-                        end + 1, 0, 0)
-                )
-            }
-        }
-
-        Item
-        {
-            width: parent.width
-            height: timeSelector.height
-            visible: !timeSelector.visible
-
-            Image
-            {
-                anchors.centerIn: parent
-                source: "image://svg/skin/misc/clock.svg"
-                sourceSize: Qt.size(32, 32)
-            }
-        }
-
         Spacer { height: 6 }
 
         QuickIntervalPanel
         {
             width: parent.width
+            range: daysSelector.range
 
             onIntervalSelected: interval =>
             {
