@@ -171,9 +171,9 @@
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>Caméra déconnectée</numerusform>
+        <numerusform>Caméra déconnectée</numerusform>
       </translation>
     </message>
   </context>
@@ -274,23 +274,23 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Faire une requête HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Contenu HTTP(S)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Type de contenu</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Méthode de requête</translation>
     </message>
   </context>
   <context>
@@ -392,19 +392,19 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>La connexion à la caméra (flux principal) a été fermée de façon inattendue.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>La connexion à la caméra (flux secondaire) a été fermée de façon inattendue.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>La connexion à l'appareil a été fermée de façon inattendue.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
+      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, car elle est trop lente ; l'heure système sera utilisée à la place.</translation>
     </message>
   </context>
   <context>
@@ -688,15 +688,15 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Erreur de stockage des analytiques &quot;%1&quot; base de données : permissions insuffisantes sur le point de montage.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Impossible d'initialiser le chiffrement AES lorsque l'enregistrement est activé dans l'archive média. Les données sont écrites non chiffrées.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Erreur RAID : %1.</translation>
     </message>
   </context>
   <context>
