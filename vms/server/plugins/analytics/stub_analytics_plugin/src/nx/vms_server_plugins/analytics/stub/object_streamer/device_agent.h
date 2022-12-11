@@ -36,10 +36,12 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:
-    std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>> generateObjects(
+    std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>> generateMetadata(
         int frameNumber,
         int64_t frameTimestampUs,
         int64_t durationUs);
+
+    nx::sdk::Uuid obtainObjectTrackIdFromRef(const std::string& objectTrackIdRef);
 
     sdk::Ptr<sdk::ISettingsResponse> makeSettingsResponse(
         const std::string& manifestFilePath,
@@ -52,6 +54,8 @@ private:
     std::set<std::string> m_disabledObjectTypeIds;
     int m_frameNumber = 0;
     int m_maxFrameNumber = 0;
+    std::map<std::string, nx::sdk::Uuid> m_trackIdByRef;
+
     int64_t m_lastFrameTimestampUs = -1;
     std::string m_pluginHomeDir;
     bool m_isInitialSettings = true;

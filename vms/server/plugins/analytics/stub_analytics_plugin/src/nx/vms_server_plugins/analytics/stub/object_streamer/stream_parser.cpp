@@ -56,6 +56,8 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
             continue;
         if (!parseTimestamp(objectDescription, &object.timestampUs, outIssues))
             continue;
+        if (!parseImageSource(objectDescription, &object.imageSource, outIssues))
+            continue;
 
         result.objectTypeIds.insert(object.typeId);
         result.objectsByFrameNumber[object.frameNumberToGenerateObject].push_back(
@@ -98,6 +100,13 @@ bool parseCommonFields(
     }
 
     outObject->frameNumberToGenerateObject = objectDescription[kFrameNumberField].int_value();
+
+    if (objectDescription[kEntryTypeField].is_string())
+    {
+        const std::string& entryType = objectDescription[kEntryTypeField].string_value();
+        if (entryType == kBestShotEntryType)
+            outObject->entryType = Object::EntryType::bestShot;
+    }
 
     return true;
 }
@@ -190,6 +199,18 @@ bool parseTimestamp(
     else if (!objectDescription[kTimestampUsField].is_null())
         outIssues->warnings.insert(Issue::timestampIsNotANumber);
 
+    return true;
+}
+
+bool parseImageSource(
+    const nx::kit::Json& objectDescription,
+    std::string* outImageSource,
+    Issues* /*outIssues*/)
+{
+    if (!objectDescription[kEntryTypeField].is_string())
+        return true;
+
+    *outImageSource = objectDescription[kImageSourceField].string_value();
     return true;
 }
 
