@@ -374,6 +374,11 @@ default build configuration - `Debug (minimal)`. If you need another build confi
 in the Visual Studio main toolbar - the CMake generation stage will be started immediately, and the
 build directory from the previously selected build configuration can be deleted manually.
 
+When performing the Generation for the first time, it will fail because the required CMake argument
+`-DcustomizationPackageFile=...` will not be passed. After the error, open
+"Manage Configurations..." in the configuration drop-down box in the Visual Studio toolbar, and add
+this argument to the "CMake command arguments:" field in the "Command arguments" section.
+
 If you don't need advanced debugging features, you may choose one of the Release configurations -
 the basics of visual debugging like breakpoints and step-by-step execution will work anyway in most
 cases, and the build time and disk usage will be noticeably lower than with a Debug configuration.
