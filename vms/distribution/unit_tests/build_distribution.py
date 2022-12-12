@@ -67,6 +67,7 @@ def get_go_unit_tests_list(tests_directory: str):
         "nx_cs_licenser_ut_cssapi_ut",
         "nx_cs_licenser_ut_httpclientfactory_ut",
         "nx_cs_licenser_ut_licapi_ut",
+        "nx_cs_licenser_ut_licensingpolicy_ut",
         "nx_cs_licenser_ut_model_ut",
         "nx_cs_licenser_ut_sysmapper_ut",
         "nx_go_libs_ut_nxconfig_ut",
