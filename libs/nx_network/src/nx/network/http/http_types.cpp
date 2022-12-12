@@ -142,9 +142,12 @@ void insertOrReplaceCorsHeaders(
 {
     if (!origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin)))
     {
-        insertOrReplaceHeader(headers, HttpHeader("Access-Control-Allow-Credentials", "true"));
-        insertOrReplaceHeader(
-            headers, HttpHeader("Access-Control-Allow-Origin", std::move(origin)));
+        insertOrReplaceHeader(headers, {"Access-Control-Allow-Credentials", "true"});
+        insertOrReplaceHeader(headers, {"Access-Control-Allow-Origin", std::move(origin)});
+    }
+    else if (!supportedOrigins.empty() && supportedOrigins.find(',') == std::string::npos)
+    {
+        insertOrReplaceHeader(headers, {"Access-Control-Allow-Origin", supportedOrigins});
     }
     if (method == Method::get)
         return;

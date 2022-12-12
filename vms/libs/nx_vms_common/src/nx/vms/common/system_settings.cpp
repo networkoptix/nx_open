@@ -682,10 +682,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Show Servers in the Resource Tree for non-admins"); });
 
     m_supportedOriginsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "supportedOrigins", "*", this, [] { return tr("HTTP header: Origin"); });
+         Names::supportedOrigins, "*", this, [] { return tr("HTTP header: Origin"); });
 
     m_frameOptionsHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "frameOptionsHeader", "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options"); });
+         Names::frameOptionsHeader, "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options"); });
 
     m_useHttpsOnlyCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
