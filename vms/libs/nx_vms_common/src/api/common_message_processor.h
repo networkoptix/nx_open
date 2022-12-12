@@ -88,7 +88,6 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
-    void connectionReset( QnCommonMessageProcessor*);
 
     void initialResourcesReceived();
 

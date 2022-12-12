@@ -29,9 +29,12 @@ constexpr auto kKeepUnauthorizedServerTimeout = std::chrono::seconds(15);
 
 } // namespace
 
-RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent)
+RemoteSession::RemoteSession(
+    RemoteConnectionPtr connection,
+    SystemContext* systemContext,
+    QObject* parent)
     :
-    base_type(connection, parent)
+    base_type(connection, systemContext, parent)
 {
     const auto username = QString::fromStdString(connection->credentials().username);
     const auto localSystemId = connection->moduleInformation().localSystemId.toString();
