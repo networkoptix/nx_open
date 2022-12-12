@@ -52,7 +52,7 @@ void ServerPrimaryInterfaceWatcher::onResourcesAdded(const QnResourceList& resou
         return;
 
     auto connection = this->connection();
-    if (!NX_ASSERT(connection, "Connection must already be established"));
+    if (!NX_ASSERT(connection, "Connection must already be established"))
         return;
 
     const auto address = connection->address();
