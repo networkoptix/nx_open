@@ -87,7 +87,9 @@ QnLayoutItemData QnWorkbenchItem::data() const
     if (!NX_ASSERT(m_resource) || !NX_ASSERT(m_layout))
         return {};
 
-    QnLayoutItemData data = m_layout->resource()->getItem(m_uuid);
+    QnLayoutItemData data = layoutItemFromResource(m_resource,
+        /*forceCloud*/ m_layout->resource()->hasFlags(Qn::cross_system));
+    data.uuid = m_uuid;
     submit(data);
     return data;
 }
