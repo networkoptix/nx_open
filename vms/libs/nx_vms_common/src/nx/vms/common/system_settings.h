@@ -50,6 +50,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(disabledVendors);
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
     DECLARE_SETTING_NAME(exposeServerEndpoints);
+    DECLARE_SETTING_NAME(frameOptionsHeader);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
@@ -70,6 +71,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(statisticsReportLastNumber);
     DECLARE_SETTING_NAME(statisticsReportLastTime);
     DECLARE_SETTING_NAME(statisticsReportLastVersion);
+    DECLARE_SETTING_NAME(supportedOrigins);
     DECLARE_SETTING_NAME(system2faEnabled);
     DECLARE_SETTING_NAME(systemName);
     DECLARE_SETTING_NAME(trafficEncryptionForced);
