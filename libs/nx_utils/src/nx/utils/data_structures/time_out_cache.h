@@ -10,6 +10,23 @@
 
 namespace nx::utils {
 
+namespace detail {
+
+template <class Value>
+struct Item
+{
+    Value value;
+    std::chrono::steady_clock::time_point lastAccessTime;
+};
+
+template<>
+struct Item<void>
+{
+    std::chrono::steady_clock::time_point lastAccessTime;
+};
+
+} // namespace detail
+
 /**
  * Cache which limits the life-time of its elements.
  * Implemented on top of LruCache.
@@ -25,18 +42,13 @@ namespace nx::utils {
  * effectively becomes an element lifetime.
  */
 template<
-    typename Key, typename Value,
+    typename Key, typename Value = void,
     template<typename...> class Dict = std::unordered_map
 >
 class TimeOutCache
 {
-    struct Item
-    {
-        Value value;
-        std::chrono::steady_clock::time_point lastAccessTime;
-    };
-
     static constexpr int kMaxExpiredElementsToRemoveAtOnce = 10;
+    using Item = detail::Item<Value>;
 
 public:
     TimeOutCache(
@@ -53,7 +65,9 @@ public:
     /**
      * Updates last access time of the element.
      */
-    std::optional<std::reference_wrapper<Value>> getValue(const Key& key)
+    template <class V = Value>
+    std::optional<std::reference_wrapper<V>> getValue(
+        const Key& key, typename std::enable_if_t<!std::is_same_v<V, void>>* = nullptr)
     {
         removeExpiredItems();
 
@@ -70,15 +84,17 @@ public:
         if (m_updateElementTimestampOnAccess)
             ((Item&) *item).lastAccessTime = nx::utils::monotonicTime();
 
-        return std::reference_wrapper<Value>(((Item&) *item).value);
+        return std::reference_wrapper<V>(((Item&) *item).value);
     }
 
-    std::optional<std::reference_wrapper<const Value>> peekValue(const Key& key) const
+    template <class V = Value>
+    std::optional<std::reference_wrapper<const V>> peekValue(
+        const Key& key, typename std::enable_if_t<!std::is_same_v<V, void>>* = nullptr) const
     {
         auto item = m_lruCache.peekValue(key);
         if (!item || isExpired(*item))
             return std::nullopt;
-        return std::reference_wrapper<const Value>(((const Item&)*item).value);
+        return std::reference_wrapper<const V>(((const Item&)*item).value);
     }
 
     template<class K, class V>
@@ -86,7 +102,19 @@ public:
     {
         removeExpiredItems();
 
-        Item item{std::forward<V>(value), nx::utils::monotonicTime()};
+        Item item = Item{std::forward<V>(value), nx::utils::monotonicTime()};
+
+        m_lruCache.put(std::forward<K>(key), std::move(item));
+    }
+
+
+    template<class K, class V = Value>
+    void put(K&& key, typename std::enable_if_t<std::is_same_v<V, void>>* = nullptr)
+    {
+        removeExpiredItems();
+
+        Item item = Item{nx::utils::monotonicTime()};
+
         m_lruCache.put(std::forward<K>(key), std::move(item));
     }
 
