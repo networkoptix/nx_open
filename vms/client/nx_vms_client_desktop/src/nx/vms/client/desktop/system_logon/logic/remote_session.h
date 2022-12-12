@@ -7,6 +7,8 @@
 
 namespace nx::vms::client::desktop {
 
+class SystemContext;
+
 /**
  * Desktop remote session takes into account the ability to run multiple client instances within
  * the same session.
@@ -17,7 +19,10 @@ class RemoteSession: public core::RemoteSession
     using base_type = core::RemoteSession;
 
 public:
-    RemoteSession(core::RemoteConnectionPtr connection, QObject* parent = nullptr);
+    RemoteSession(
+        core::RemoteConnectionPtr connection,
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
     /**

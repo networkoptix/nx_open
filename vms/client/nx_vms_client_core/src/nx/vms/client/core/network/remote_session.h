@@ -9,6 +9,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 #include "remote_connection_fwd.h"
 
@@ -24,7 +25,7 @@ namespace nx::vms::client::core {
  * * Watches actual cloud session and breaks current System connection in case user is logged out of
  *   cloud, being logged using cloud credentials (// TODO: #amalov).
  */
-class NX_VMS_CLIENT_CORE_API RemoteSession: public QObject
+class NX_VMS_CLIENT_CORE_API RemoteSession: public QObject, public SystemContextAware
 {
     using base_type = QObject;
     Q_OBJECT
@@ -44,7 +45,10 @@ public:
         /** Connected and ready to work. */
         connected)
 
-    RemoteSession(RemoteConnectionPtr connection, QObject* parent = nullptr);
+    RemoteSession(
+        RemoteConnectionPtr connection,
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
     void updatePassword(const QString& newPassword);
