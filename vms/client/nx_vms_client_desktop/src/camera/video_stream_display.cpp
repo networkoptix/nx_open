@@ -533,8 +533,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         {
             if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
                 return Status_Skipped;
-            NX_DEBUG(this,
-                "Reset video decoder: %1, codec: %2", frameResolution, data->compressionType);
+            NX_DEBUG(this, "Reset video decoder, resolution: %1(previous: %2), codec: %3, exist: %4",
+                frameResolution, decoderResolution, data->compressionType, dec != nullptr);
             m_decoderData.decoder.reset();
             dec = createVideoDecoder(data, m_mtDecoding);
             m_decoderData.decoder.reset(dec);
