@@ -27,7 +27,7 @@ public:
 
     const QString& caption() const { return m_caption; }
     const QString& description() const { return m_description; }
-    QnUuid engineId() const { return m_resourceId; }
+    QnUuid engineId() const { return m_engineResourceId; }
     QnUuid deviceId() const
     {
         if (!m_metadata.cameraRefs.empty())
@@ -39,7 +39,7 @@ public:
     nx::vms::api::EventLevel level() const { return m_metadata.level; }
 
 private:
-    const QnUuid m_resourceId;
+    const QnUuid m_engineResourceId;
     const QString m_caption;
     const QString m_description;
     /*const*/ EventMetaData m_metadata;

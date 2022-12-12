@@ -4,27 +4,22 @@
 
 #include <api/model/password_data.h>
 #include <core/misc/schedule_task.h>
+#include <core/misc/screen_snap.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource/camera_bookmark.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/misc/screen_snap.h>
-#include <utils/email/email.h>
 #include <licensing/license.h>
-
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
@@ -37,11 +32,13 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
-#include <nx/vms/event/event_parameters.h>
-#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/event/action_factory.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/action_factory.h>
+#include <nx/vms/event/rule.h>
+#include <utils/email/email.h>
 
 using namespace nx;
 using namespace nx::vms::api;

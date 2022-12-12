@@ -19,7 +19,7 @@ struct NX_VMS_COMMON_API NetworkIssueInfo
     nx::network::SocketAddress address;
     QString deviceName;
     nx::vms::api::StreamIndex stream = nx::vms::api::StreamIndex::undefined;
-    std::chrono::microseconds timeout;
+    std::chrono::microseconds timeout = std::chrono::microseconds::zero();
     QString message;
 
     bool isPrimaryStream() const;

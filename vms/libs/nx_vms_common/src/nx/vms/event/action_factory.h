@@ -2,15 +2,16 @@
 
 #pragma once
 
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/aggregation_info.h>
-#include <nx/vms/event/rule.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx {
 namespace vms {
 namespace event {
+
+class AggregationInfo;
 
 class NX_VMS_COMMON_API ActionFactory
 {

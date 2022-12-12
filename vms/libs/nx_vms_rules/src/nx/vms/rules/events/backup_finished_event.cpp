@@ -7,6 +7,11 @@
 
 namespace nx::vms::rules {
 
+QString BackupFinishedEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

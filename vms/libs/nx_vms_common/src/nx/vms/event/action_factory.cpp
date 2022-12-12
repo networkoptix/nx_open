@@ -2,10 +2,9 @@
 
 #include "action_factory.h"
 
-#include <core/resource/resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/actions/actions.h>
+#include <nx/vms/event/rule.h>
 
 using namespace nx::vms::common;
 
@@ -13,21 +12,12 @@ namespace nx {
 namespace vms {
 namespace event {
 
-QVector<QnUuid> toIdList(const QnResourceList& list)
-{
-    QVector<QnUuid> result;
-    result.reserve(list.size());
-    for (const QnResourcePtr& r: list)
-        result << r->getId();
-    return result;
-}
-
 AbstractActionPtr ActionFactory::instantiateAction(
     SystemContext* systemContext,
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
-    EventState state)
+    EventState state /*= EventState::undefined*/)
 {
     EventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
     runtimeParams.sourceServerId = moduleGuid;
