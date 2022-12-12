@@ -2,13 +2,9 @@
 
 #pragma once
 
-#include <cassert>
 #include <nx/utils/log/assert.h>
 
-#include <type_traits>
-
 #include <QtCore/QObject>
-#include <QtCore/QByteArray>
 #include <QtCore/QPointer>
 #include <QtCore/QList>
 #include <QtCore/QHash>

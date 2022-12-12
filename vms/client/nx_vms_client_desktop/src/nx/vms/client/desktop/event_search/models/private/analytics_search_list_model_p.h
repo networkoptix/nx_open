@@ -15,6 +15,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
 
 #include <analytics/db/analytics_db_types.h>
 #include <api/server_rest_connection_fwd.h>

@@ -7,29 +7,26 @@
 #include <set>
 #include <vector>
 
-#include <QtGui/QRegion>
-
+#include <analytics/common/object_metadata.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/latin1_array.h>
 #include <nx/utils/serialization/qt_core_types.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/url_query.h>
-
-#include <analytics/common/object_metadata.h>
-#include <common/common_globals.h>
 #include <recording/time_period.h>
 #include <utils/common/byte_array.h>
 
 #include "abstract_object_type_dictionary.h"
-#include "text_search_utils.h"
-#include <nx/utils/latin1_array.h>
 
 class QnResourcePool;
+
 namespace nx::analytics::taxonomy { class AbstractStateWatcher; }
 namespace nx::network::rest { class Params; }
 
 namespace nx::analytics::db {
+
+class TextMatcher;
 
 struct ObjectPosition
 {

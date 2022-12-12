@@ -30,7 +30,7 @@ struct NX_VMS_COMMON_API QnTimePeriod
     /**
      * Constructs a null time period.
      */
-    constexpr QnTimePeriod() = default;
+    QnTimePeriod() = default;
 
     /**
      * Constructor.
