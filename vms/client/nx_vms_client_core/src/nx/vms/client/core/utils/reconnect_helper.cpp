@@ -2,27 +2,22 @@
 
 #include "reconnect_helper.h"
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/discovery/manager.h>
 
 namespace nx::vms::client::core {
 
-ReconnectHelper::ReconnectHelper(std::optional<QnUuid> stickyReconnectTo)
+ReconnectHelper::ReconnectHelper(SystemContext* systemContext, bool stickyReconnect):
+    SystemContextAware(systemContext),
+    m_servers(systemContext->resourcePool()->servers()),
+    m_currentServerId(systemContext->currentServerId())
 {
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
-        stickyReconnectTo.value_or(QnUuid()));
-
-    if (currentServer && stickyReconnectTo.has_value())
-        m_servers.append(currentServer);
-    else  // List of all known m_servers. Should not be updated as we are disconnected.
-        m_servers.append(resourcePool()->servers());
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(m_currentServerId);
+    if (stickyReconnect && currentServer)
+        m_servers = {currentServer};
 
     // Check if there are no servers in the system (e.g connection was broken before resources are
     // received).
@@ -58,7 +53,7 @@ std::optional<nx::network::SocketAddress> ReconnectHelper::currentAddress() cons
 
     // Skip current server since connection will be restored automatically.
     // Prevents racing when connecting to several m_servers simultaneously.
-    if (server->getId() == qnClientCoreModule->networkModule()->currentServerId())
+    if (server->getId() == m_currentServerId)
         return std::nullopt;
 
     const auto discoverManager = appContext()->moduleDiscoveryManager();

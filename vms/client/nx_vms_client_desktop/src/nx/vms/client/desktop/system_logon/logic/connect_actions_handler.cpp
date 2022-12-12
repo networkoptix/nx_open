@@ -507,7 +507,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         return;
 
     setState(LogicalState::connecting);
-    const auto session = std::make_shared<desktop::RemoteSession>(connection);
+    const auto session = std::make_shared<desktop::RemoteSession>(connection, systemContext());
 
     session->setStickyReconnect(qnSettings->stickReconnectToServer());
     LogonData logonData = connection->createLogonData();

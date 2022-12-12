@@ -21,9 +21,9 @@
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
-#include <nx/vms/common/system_context.h>
 #include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -107,13 +107,17 @@ void RemoteSession::Private::updateTokenExpirationTime()
         QThread::currentThread());
 }
 
-RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent):
+RemoteSession::RemoteSession(
+    RemoteConnectionPtr connection,
+    SystemContext* systemContext,
+    QObject* parent)
+    :
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private())
 {
     // Audit id should be updated when establishing new session.
     // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
-    auto systemContext = qnClientCoreModule->commonModule()->systemContext();
     systemContext->updateRunningInstanceGuid();
 
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
@@ -284,8 +288,7 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
 
     // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
     // Setup audit id.
-    auto systemContext = qnClientCoreModule->commonModule()->systemContext();
-    connection->updateSessionId(systemContext->sessionId());
+    connection->updateSessionId(systemContext()->sessionId());
 
     // Setup message bus connection.
     connection->initializeMessageBusConnection(qnClientCoreModule->commonModule());
@@ -375,24 +378,7 @@ void RemoteSession::tryToRestoreConnection()
     if (d->reconnectHelper)
         return;
 
-    if (d->stickyReconnect)
-    {
-        d->reconnectHelper =
-            std::make_unique<ReconnectHelper>(connection()->moduleInformation().id);
-    }
-    else
-    {
-        d->reconnectHelper =
-            std::make_unique<ReconnectHelper>();
-    }
-
-    if (d->reconnectHelper->empty())
-    {
-        d->activeServerReconnectErrorCode = RemoteConnectionErrorCode::internalError;
-        checkIfReconnectFailed();
-        return;
-    }
-
+    d->reconnectHelper = std::make_unique<ReconnectHelper>(systemContext(), d->stickyReconnect);
     setState(State::reconnecting);
     reconnectStep();
 }
