@@ -2,27 +2,20 @@
 
 #include "analytics_db_types.h"
 
-#include <QtCore/QRegularExpression>
-
-#include <cmath>
-#include <sstream>
-
 #include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
-#include <utils/math/math.h>
-
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/network/rest/params.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/analytics/taxonomy/helpers.h>
+#include <utils/math/math.h>
 
+#include "text_search_utils.h"
 #include "analytics_db_utils.h"
 #include "config.h"
 

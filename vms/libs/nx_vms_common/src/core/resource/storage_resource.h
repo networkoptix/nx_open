@@ -4,7 +4,7 @@
 
 #include "abstract_storage_resource.h"
 #include <utils/crypt/encryptable.h>
-#include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/api/data/storage_status_list.h>
 
 class QnAbstractMediaStreamDataProvider;
 
