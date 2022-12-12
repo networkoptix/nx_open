@@ -17,11 +17,13 @@ namespace nx::vms::rules {
 DeviceIpConflictEvent::DeviceIpConflictEvent(
     std::chrono::microseconds timestamp,
     QnUuid serverId,
+    QnUuidList deviceIds,
     const QHostAddress& address,
     const QStringList& macAddrList)
     :
     base_type(timestamp),
     m_serverId(serverId),
+    m_deviceIds(deviceIds),
     m_ipAddress(address.toString()),
     m_macAddresses(macAddrList)
 {

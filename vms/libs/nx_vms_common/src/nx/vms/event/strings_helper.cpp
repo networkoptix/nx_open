@@ -424,7 +424,7 @@ QStringList StringsHelper::eventDetails(
         {
             result << tr("Conflicting Address: %1").arg(params.caption);
             int n = 0;
-            for (const auto& mac: params.description.split(IpConflictEvent::delimiter()))
+            for (const auto& mac: IpConflictEvent::decodeMacAddrList(params))
                 result << tr("MAC #%1: %2").arg(++n).arg(mac);
 
             break;
@@ -581,7 +581,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
     {
         case EventReason::networkNoFrame:
         {
-            int msecs = NetworkIssueEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
+            int msecs = NetworkIssueEvent::decodeTimeoutMsecs(reasonParamsEncoded);
             result = tr("No data received during last %n seconds.", "", msecs / 1000);
             break;
         }
@@ -589,7 +589,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         {
             QString message;
             bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(
-                reasonParamsEncoded, true, &message);
+                reasonParamsEncoded, &message);
             result = isPrimaryStream
                 ? tr("RTP error in primary stream (%1).").arg(message)
                 : tr("RTP error in secondary stream (%1).").arg(message);
@@ -598,7 +598,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::networkConnectionClosed:
         {
             const bool isPrimaryStream =
-                NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded, true);
+                NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded);
             const auto camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
 
             const auto deviceType =

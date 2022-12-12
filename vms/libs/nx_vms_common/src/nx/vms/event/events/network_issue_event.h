@@ -29,17 +29,10 @@ public:
         EventReason reasonCode,
         const nx::vms::rules::NetworkIssueInfo& info);
 
-    static int decodeTimeoutMsecs(const QString& encoded, const int defaultValue);
-    static QString encodeTimeoutMsecs(int msecs);
-
-    static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
-    static QString encodePrimaryStream(bool isPrimary);
-
-    static QString encodePrimaryStream(bool isPrimary, const QString& message);
-    static bool decodePrimaryStream(const QString& encoded, const bool defaultValue, QString* outMessage);
-
-private:
-    static QString encodeInfo(EventReason reason, const nx::vms::rules::NetworkIssueInfo& info);
+    static int decodeTimeoutMsecs(const QString& encoded);
+    static bool decodePrimaryStream(const QString& encoded);
+    static bool decodePrimaryStream(const QString& encoded, QString* outMessage);
+    static nx::vms::rules::NetworkIssueInfo decodeInfo(const EventParameters& params);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters,

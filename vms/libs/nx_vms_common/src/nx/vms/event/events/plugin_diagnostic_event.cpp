@@ -21,7 +21,7 @@ PluginDiagnosticEvent::PluginDiagnosticEvent(
     const QnVirtualCameraResourcePtr& device)
     :
     base_type(EventType::pluginDiagnosticEvent, QnResourcePtr(), timeStamp),
-    m_resourceId(engineResourceId),
+    m_engineResourceId(engineResourceId),
     m_caption(caption),
     m_description(description)
 {
@@ -43,7 +43,7 @@ bool PluginDiagnosticEvent::checkEventParams(const EventParameters& params) cons
 
     // Check Engine Resource id (null is used for 'Any Resource')
     const bool isValidResource = ruleResource.isNull()
-        || m_resourceId == ruleResource;
+        || m_engineResourceId == ruleResource;
 
     const bool isValidCamera = ruleCameras.empty()
         || (m_metadata.cameraRefs.size() == 1
@@ -61,7 +61,7 @@ bool PluginDiagnosticEvent::checkEventParams(const EventParameters& params) cons
 EventParameters PluginDiagnosticEvent::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.eventResourceId = m_resourceId;
+    params.eventResourceId = m_engineResourceId;
     params.caption = m_caption;
     params.description = m_description;
     params.metadata = m_metadata;

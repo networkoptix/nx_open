@@ -7,6 +7,12 @@
 
 namespace nx::vms::event {
 
+namespace {
+
+constexpr auto kDelimiter = QChar{'\n'};
+
+} // namespace
+
 IpConflictEvent::IpConflictEvent(
     const QnResourcePtr& resource,
     const QHostAddress& address,
@@ -18,8 +24,8 @@ IpConflictEvent::IpConflictEvent(
         EventType::cameraIpConflictEvent,
         resource,
         timeStamp,
-        address.toString(),
-        macAddrList.join(delimiter())),
+        address.toString(), //< Caption.
+        encodeMacAddrList(macAddrList)), //< Description.
     m_cameraRefs(cameraRefs)
 {
 }
@@ -30,6 +36,17 @@ EventParameters IpConflictEvent::getRuntimeParams() const
     params.metadata.cameraRefs.assign(m_cameraRefs.begin(), m_cameraRefs.end());
 
     return params;
+}
+
+QString IpConflictEvent::encodeMacAddrList(const QStringList& macAddrList)
+{
+    return macAddrList.join(kDelimiter);
+}
+
+
+QStringList IpConflictEvent::decodeMacAddrList(const EventParameters& params)
+{
+    return params.description.split(kDelimiter);
 }
 
 } // namespace nx::vms::event

@@ -12,7 +12,57 @@ namespace nx {
 namespace vms {
 namespace event {
 
-static const QChar kMessageSeparator(':');
+namespace {
+
+constexpr auto kMessageSeparator = QChar(':');
+
+QString encodeTimeoutMsecs(int msecs)
+{
+    return QString::number(msecs);
+}
+
+QString encodePrimaryStream(bool isPrimary)
+{
+    return QString::number(isPrimary);
+}
+
+QString encodePrimaryStream(bool isPrimary, const QString& message)
+{
+    return encodePrimaryStream(isPrimary) + kMessageSeparator + message;
+}
+
+QString encodeInfo(
+    EventReason reason,
+    const nx::vms::rules::NetworkIssueInfo& info)
+{
+    using namespace std::chrono;
+
+    switch (reason)
+    {
+        case EventReason::networkNoFrame:
+            return encodeTimeoutMsecs(duration_cast<milliseconds>(info.timeout).count());
+
+        case EventReason::networkRtpStreamError:
+        case EventReason::networkConnectionClosed:
+            return encodePrimaryStream(
+                info.stream == nx::vms::api::StreamIndex::primary,
+                info.message);
+
+        case EventReason::networkMulticastAddressConflict:
+            return QJson::serialized(NetworkIssueEvent::MulticastAddressConflictParameters{
+                .address = info.address,
+                .deviceName = info.deviceName,
+                .stream = info.stream});
+
+        case EventReason::networkMulticastAddressIsInvalid:
+            return QJson::serialized(info.address);
+
+        default:
+            return QString();
+    };
+}
+
+} // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json),
     MulticastAddressConflictParameters_Fields, (brief, true))
@@ -32,74 +82,78 @@ NetworkIssueEvent::NetworkIssueEvent(
 {
 }
 
-int NetworkIssueEvent::decodeTimeoutMsecs(const QString& encoded, const int defaultValue)
+int NetworkIssueEvent::decodeTimeoutMsecs(const QString& encoded)
 {
+    constexpr auto kDefaultTimeout = 5000;
+
     bool ok;
     int result = encoded.toInt(&ok);
     if (!ok)
-        return defaultValue;
+        return kDefaultTimeout;
     return result;
 }
 
-QString NetworkIssueEvent::encodeTimeoutMsecs(int msecs)
-{
-    return QString::number(msecs);
-}
-
-bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded, const bool defaultValue)
+bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded)
 {
     bool ok;
     bool result = encoded.toInt(&ok);
     if (!ok)
-        return defaultValue;
+        return true;
     return result;
 }
 
-QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary)
-{
-    return QString::number(isPrimary);
-}
-
-QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary, const QString& message)
-{
-    return encodePrimaryStream(isPrimary) + kMessageSeparator + message;
-}
-
-bool NetworkIssueEvent::decodePrimaryStream(
-    const QString& encoded, const bool defaultValue, QString* outMessage)
+bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded, QString* outMessage)
 {
     outMessage->clear();
     const auto delimiterPos = encoded.indexOf(kMessageSeparator);
     if (delimiterPos == -1)
-        return decodePrimaryStream(encoded, defaultValue);
+        return decodePrimaryStream(encoded);
 
     *outMessage = encoded.mid(delimiterPos + 1);
-    return decodePrimaryStream(encoded.left(delimiterPos), defaultValue);
+    return decodePrimaryStream(encoded.left(delimiterPos));
 }
 
-QString NetworkIssueEvent::encodeInfo(
-    EventReason reason,
-    const nx::vms::rules::NetworkIssueInfo& info)
+nx::vms::rules::NetworkIssueInfo NetworkIssueEvent::decodeInfo(const EventParameters& params)
 {
     using namespace std::chrono;
 
-    switch (reason)
+    nx::vms::rules::NetworkIssueInfo info;
+
+    switch (params.reasonCode)
     {
         case EventReason::networkNoFrame:
-            return encodeTimeoutMsecs(duration_cast<milliseconds>(info.timeout).count());
+            info.timeout = std::chrono::milliseconds(
+                decodeTimeoutMsecs(params.description));
+            break;
+
         case EventReason::networkRtpStreamError:
         case EventReason::networkConnectionClosed:
-            return encodePrimaryStream(info.stream == nx::vms::api::StreamIndex::primary, info.message);
+            info.stream = decodePrimaryStream(params.description, &info.message)
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary;
+            break;
+
         case EventReason::networkMulticastAddressConflict:
-            return QJson::serialized(MulticastAddressConflictParameters{
-                .address = info.address,
-                .deviceName = info.deviceName,
-                .stream = info.stream});
+        {
+            MulticastAddressConflictParameters conflict;
+            QJson::deserialize(params.description, &conflict);
+
+            info.address = conflict.address;
+            info.deviceName = conflict.deviceName;
+            info.stream = conflict.stream;
+
+            break;
+        }
         case EventReason::networkMulticastAddressIsInvalid:
-            return QJson::serialized(info.address);
+            QJson::deserialize(params.description, &info.address);
+            break;
+
         default:
-            return QString();
+            NX_ASSERT(false, "Unexpected reason: %1", params.reasonCode);
+            break;
     };
+
+    return info;
 }
 
 } // namespace event

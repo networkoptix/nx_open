@@ -15,6 +15,9 @@ class NX_VMS_RULES_API BackupFinishedEvent: public BasicEvent
     FIELD(QnUuid, serverId, setServerId)
 
 public:
+    BackupFinishedEvent() = default;
+
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();

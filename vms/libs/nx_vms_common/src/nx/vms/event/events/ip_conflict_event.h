@@ -21,9 +21,10 @@ public:
         qint64 timeStamp,
         const QStringList& cameraRefs);
 
-    static const QChar delimiter() { return '\n'; }
-
     virtual EventParameters getRuntimeParams() const override;
+
+    static QString encodeMacAddrList(const QStringList& macAddrList);
+    static QStringList decodeMacAddrList(const EventParameters& params);
 
 private:
     QStringList m_cameraRefs;
