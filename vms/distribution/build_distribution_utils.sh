@@ -542,6 +542,7 @@ distrib_copyServerBins() # additional_bins_to_copy...
     install -m 755 "${BUILD_DIR}/bin/mediaserver" "${stage_bin}/"
     install -m 755 "${BUILD_DIR}/bin/external.dat" "${stage_bin}/" #< TODO: Why "+x" is needed?
     for bin in "${additional_server_binaries[@]}"; do
+        echo "  Installing ${bin}..."
         install -m 755 "${bin}" "${stage_bin}/"
     done
 
