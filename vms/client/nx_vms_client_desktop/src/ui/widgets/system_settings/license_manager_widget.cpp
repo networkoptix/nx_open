@@ -333,7 +333,6 @@ void QnLicenseManagerWidget::updateLicenses()
         connected = true;
         break;
     }
-    NX_ASSERT(static_cast<bool>(connection()) == connected);
 
     setEnabled(connected);
 
