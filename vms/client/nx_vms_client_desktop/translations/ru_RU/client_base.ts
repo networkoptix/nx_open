@@ -7270,7 +7270,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Передать аудиопоток на</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
@@ -7306,7 +7306,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Передача аудиопотока на другое устройство</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
@@ -7342,7 +7342,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Использовать аудиопоток с этой камеры</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7368,7 +7368,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>У камеры нет ни видеозаписи, ни запланированной записи</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7384,7 +7384,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Какие данные копировать</translation>
     </message>
     <message>
       <source>Quality</source>
