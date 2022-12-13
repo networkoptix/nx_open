@@ -654,7 +654,7 @@ TEST(QnTimePeriodsListTest, excludePeriodList)
 void checkLists(const QnTimePeriodList& expectedList, const QnTimePeriodList& result)
 {
     ASSERT_EQ(expectedList.size(), result.size());
-    for (int i = 0; i < expectedList.size(); ++i)
+    for (size_t i = 0; i < expectedList.size(); ++i)
     {
         ASSERT_EQ(expectedList[i].startTimeMs, result[i].startTimeMs);
         ASSERT_EQ(expectedList[i].durationMs, result[i].durationMs);
@@ -914,6 +914,45 @@ TEST(QnTimePeriodsListTest, intersected)
         << QnTimePeriod(10, 40)
         << QnTimePeriod(70, 100);
     ASSERT_EQ(expected, intersection1);
+}
+
+TEST(QnTimePeriodsListTest, mergeSingle)
+{
+    // If only one list is provided it will be returned unmodified but capped by limit
+    QnTimePeriodList list;
+    list
+        << QnTimePeriod(0, 10)
+        << QnTimePeriod(20, 10)
+        << QnTimePeriod(30, 10)
+        << QnTimePeriod(40, 10);
+
+    const QnTimePeriodList resultNoLimit = QnTimePeriodList::mergeTimePeriods({ list });
+    ASSERT_EQ(list, resultNoLimit);
+
+    const QnTimePeriodList resultLimit = QnTimePeriodList::mergeTimePeriods({ list }, 2);
+    list.resize(2);
+    ASSERT_EQ(list, resultLimit);
+
+    //Wrong sorting remains after merge
+    std::reverse(list.begin(), list.end());
+    ASSERT_LT(list.back().endTime(), list.front().startTime());
+
+    const QnTimePeriodList resultReversed = QnTimePeriodList::mergeTimePeriods({ list });
+    ASSERT_EQ(list, resultReversed);
+}
+
+TEST(QnTimePeriodsListTest, simplifiedOrder)
+{
+    QnTimePeriodList list;
+    list
+        << QnTimePeriod(40, 10)
+        << QnTimePeriod(30, 10)
+        << QnTimePeriod(20, 10)
+        << QnTimePeriod(0, 10);
+    ASSERT_LT(list.back().endTime(), list.front().startTime());
+
+    list = list.simplified();
+    ASSERT_GT(list.back().endTime(), list.front().startTime());
 }
 
 } // namespace test
