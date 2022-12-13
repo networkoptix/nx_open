@@ -16,7 +16,7 @@ static constexpr milliseconds kOneSecond = 1000ms;
 
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject* parent):
     QObject(parent),
-    m_animationTimer(new QAnimationTimer(this)),
+    m_animationTimer(new QtBasedAnimationTimer(this)),
     m_currentWidget(nullptr),
     m_update(new nx::utils::PendingOperation())
 {
