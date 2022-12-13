@@ -204,7 +204,7 @@ void KineticProcessor::transition(State state) {
         mInitialSpeed = mCurrentSpeed = calculateSpeed();
         if(mState == state) { /* State may get changed in a callback. */
             if(timer() == nullptr) {
-                AnimationTimer *timer = new QAnimationTimer(this);
+                AnimationTimer *timer = new QtBasedAnimationTimer(this);
                 timer->addListener(this);
             }
 

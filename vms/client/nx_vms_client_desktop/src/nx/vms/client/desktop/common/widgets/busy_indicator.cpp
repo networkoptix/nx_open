@@ -19,7 +19,7 @@ namespace nx::vms::client::desktop {
 BusyIndicatorBase::BusyIndicatorBase(QObject* parent) :
     base_type(parent)
 {
-    auto animationTimer = new QAnimationTimer(this);
+    auto animationTimer = new QtBasedAnimationTimer(this);
     animationTimer->addListener(this);
     startListening();
 }

@@ -37,7 +37,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget* parent /* = 0*/):
 
     m_dragProcessor->setHandler(this);
 
-    setTimer(new QAnimationTimer(this));
+    setTimer(new QtBasedAnimationTimer(this));
     startListening();
 
     connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);

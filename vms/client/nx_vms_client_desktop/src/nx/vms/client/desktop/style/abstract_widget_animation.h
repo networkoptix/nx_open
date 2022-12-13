@@ -20,7 +20,7 @@ public:
     AbstractWidgetAnimation(QObject* parent = nullptr):
         QObject(parent)
     {
-        auto animationTimer = new QAnimationTimer(this);
+        auto animationTimer = new QtBasedAnimationTimer(this);
         setTimer(animationTimer);
         startListening();
     }
