@@ -304,15 +304,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on following devices:</source>
+        <source>Not enough licenses. Recording has been disabled on the following devices:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+        <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+        <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -403,7 +403,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
+        <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1628,7 +1628,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+        <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
