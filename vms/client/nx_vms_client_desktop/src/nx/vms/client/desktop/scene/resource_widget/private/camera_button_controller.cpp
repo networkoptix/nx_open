@@ -110,7 +110,7 @@ void CameraButtonController::createTwoWayAudioButton()
     {
         m_twoWayAudioWidget = new QnTwoWayAudioWidget(
             getDesktopUniqueId(),
-            m_camera->audioOutputDevice(),
+            m_camera,
             m_parentWidget);
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
         statisticsModule()->controls()->registerButton(
