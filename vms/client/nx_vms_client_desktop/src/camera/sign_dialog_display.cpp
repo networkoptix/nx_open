@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "sign_dialog_display.h"
-#include "export/sign_helper.h"
-#include "utils/common/synctime.h"
-#include "nx/streaming/archive_stream_reader.h"
-#include "core/resource/avi/avi_archive_delegate.h"
-#include "core/resource/resource.h"
+
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/resource.h>
+#include <export/sign_helper.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <utils/common/synctime.h>
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     QnCamDisplay(resource, /*Stream reader*/ nullptr)

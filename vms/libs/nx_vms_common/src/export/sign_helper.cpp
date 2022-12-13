@@ -2,33 +2,30 @@
 
 #include "sign_helper.h"
 
-#include <QtCore/QProcess>
-#include <QtCore/QTemporaryFile>
-
-#include "nx/streaming/video_data_packet.h"
-#include <nx/streaming/config.h>
-#include <nx/utils/log/log.h>
-
-#include <licensing/license.h>
-
-#include "utils/media/nalUnits.h"
-#include "utils/common/util.h"
-#include "utils/math/math.h"
-#include "utils/media/ffmpeg_helper.h"
-
-#include <nx/utils/scope_guard.h>
-
 extern "C" {
-#include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+    #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+    #undef AVPixFmtDescriptor
 #endif
 };
+
+#include <QtCore/QProcess>
+#include <QtCore/QTemporaryFile>
+
+#include <licensing/license.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <utils/common/util.h>
+#include <utils/math/math.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/nalUnits.h>
 
 using namespace nx::utils;
 

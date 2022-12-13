@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/url/url_builder.h>
-#include <nx/network/maintenance/server.h>
-#include <nx/network/maintenance/request_path.h>
 #include <nx/network/maintenance/log/request_path.h>
-#include "nx/network/http/auth_tools.h"
-#include "nx/network/http/http_async_client.h"
-#include "nx/network/socket_factory.h"
+#include <nx/network/maintenance/request_path.h>
+#include <nx/network/maintenance/server.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/url/url_builder.h>
 
 namespace nx::network::test {
 

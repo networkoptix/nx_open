@@ -9,7 +9,7 @@
 #include <set>
 
 #if defined(__APPLE__)
-#include "TargetConditionals.h"
+#include <TargetConditionals.h>
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #define NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
 #endif // TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR

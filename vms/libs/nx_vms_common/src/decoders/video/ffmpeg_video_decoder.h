@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include <QtGui/QImage>
-
-#include "abstract_video_decoder.h"
-#include "nx/streaming/video_data_packet.h"
 #include <deque>
 
-#include "utils/media/ffmpeg_helper.h"
+#include <QtGui/QImage>
+
+#include <nx/streaming/video_data_packet.h>
+#include <utils/media/ffmpeg_helper.h>
+
+#include "abstract_video_decoder.h"
 
 class FrameTypeExtractor;
 struct AVCodec;

@@ -1,18 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <atomic>
-
-#include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/system_error.h>
+#include <atomic>
 
+#include <common/common_module.h>
+#include <nx/metrics/metrics_storage.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/metrics/metrics_storage.h>
-#include <common/common_module.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
+
+#include "tcp_connection_processor.h"
 
 namespace {
     const std::chrono::seconds kDefaultSocketTimeout(5);

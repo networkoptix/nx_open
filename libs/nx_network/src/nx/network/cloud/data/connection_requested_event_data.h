@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <nx/network/cloud/cloud_connect_version.h>
+
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
-#include "nx/network/cloud/cloud_connect_version.h"
 
 namespace nx::hpm::api {
 

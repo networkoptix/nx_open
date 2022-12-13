@@ -3,19 +3,18 @@
 #ifndef QN_COMPRESSED_TIME_READER_H
 #define QN_COMPRESSED_TIME_READER_H
 
+#include <algorithm> /* For std::min. */
 #include <cassert>
 
-#include <algorithm> /* For std::min. */
-
-#include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
 #include <QtCore/QtEndian>
+#include <QtCore/QtGlobal>
+
+#include <nx/utils/log/assert.h>
+#include <recording/time_period.h>
 
 #include "binary_stream.h"
 #include "compressed_time_fwd.h"
-#include "recording/time_period.h"
-
-#include <nx/utils/log/assert.h>
 
 template<class Input>
 class QnCompressedTimeReader {

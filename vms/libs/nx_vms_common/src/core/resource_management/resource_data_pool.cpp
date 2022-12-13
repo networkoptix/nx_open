@@ -4,10 +4,10 @@
 
 #include <QtCore/QFile>
 
-#include <nx/fusion/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
 #include <device_vendor_names/device_vendor_names.h>
-#include "nx/utils/match/wildcard.h"
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/match/wildcard.h>
 
 namespace {
 

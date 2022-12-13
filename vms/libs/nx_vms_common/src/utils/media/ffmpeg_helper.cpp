@@ -5,27 +5,27 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
-#include "nalUnits.h"
-#include "bitStream.h"
-#include "core/resource/storage_resource.h"
+#include <core/resource/storage_resource.h>
+#include <nx/audio/format.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/media/utils.h>
-
-#include <nx/audio/format.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/utils/type_utils.h>
-#include <nx/utils/log/log.h>
 
 extern "C" {
 
 #include <libavutil/error.h>
-#include <libswresample/swresample.h>
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
+#include <libswresample/swresample.h>
 
 } // extern "C"
+
+#include "bitStream.h"
+#include "nalUnits.h"
 
 QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
 

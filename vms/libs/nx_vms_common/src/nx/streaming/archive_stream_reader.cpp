@@ -4,17 +4,16 @@
 
 #include <stdint.h>
 
+#include <core/resource/media_resource.h>
 #include <core/resource/security_cam_resource.h>
-
-#include "utils/common/util.h"
-#include "utils/media/externaltimesource.h"
-#include "utils/common/synctime.h"
-#include "core/resource/media_resource.h"
-#include "utils/common/sleep.h"
-#include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
-#include <utils/media/frame_type_extractor.h>
+#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/media/externaltimesource.h>
+#include <utils/media/frame_type_extractor.h>
 
 namespace {
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "nx/streaming/abstract_media_stream_data_provider.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 
 // difference between this class and pull reader is that run function does not have infinit loop
 // it quits after first getData

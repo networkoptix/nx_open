@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/user_role_data.h>
-#include <core/resource/user_resource.h>
 
 /**
 * This class represents subject of resource access - user or user role.

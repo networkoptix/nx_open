@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "messaging.h"
-#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket_factory.h>
+#include <nx/utils/thread/long_runnable.h>
+
+#include "messaging.h"
 
 namespace nx::network::pcp {
 

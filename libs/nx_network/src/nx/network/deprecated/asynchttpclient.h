@@ -6,11 +6,11 @@
 #include <map>
 #include <memory>
 
-#include "nx/network/abstract_socket.h"
-#include "nx/network/aio/abstract_pollable.h"
-#include "nx/network/aio/timer.h"
-#include "nx/network/http/http_async_client.h"
-#include "nx/network/http/http_stream_reader.h"
+#include <nx/network/abstract_socket.h>
+#include <nx/network/aio/abstract_pollable.h>
+#include <nx/network/aio/timer.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_stream_reader.h>
 
 namespace nx::network::http {
 

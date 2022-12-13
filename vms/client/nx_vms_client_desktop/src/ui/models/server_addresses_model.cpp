@@ -4,13 +4,10 @@
 
 #include <QtCore/QSet>
 
-#include "utils/common/util.h"
-
 #include <nx/network/http/http_types.h>
-
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-
-#include "nx/utils/string.h"
+#include <utils/common/util.h>
 
 using namespace nx::vms::client::desktop;
 

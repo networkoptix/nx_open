@@ -2,6 +2,7 @@
 
 #include "accessible_resource_proxy_source.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/system_context.h>

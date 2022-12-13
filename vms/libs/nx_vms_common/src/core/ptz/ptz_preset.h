@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
+#include <QtCore/QString>
 #include <QtGui/QVector3D>
 
-#include "ptz_fwd.h"
-
-#include <core/ptz/ptz_preset.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
-
 #include <nx/vms/common/ptz/coordinate_space.h>
 #include <nx/vms/common/ptz/vector.h>
+
+#include "ptz_fwd.h"
 
 static const QString kPresetsPropertyKey = "ptzPresets";
 static const QString kPtzPresetMappingPropertyName = "presetMapping";

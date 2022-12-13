@@ -2,14 +2,12 @@
 
 #include "thumbnails_stream_reader.h"
 
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
-
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 #include <core/resource/security_cam_resource.h>
-
-#include "core/resource/avi/avi_archive_delegate.h"
-#include "core/resource/avi/thumbnails_archive_delegate.h"
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek

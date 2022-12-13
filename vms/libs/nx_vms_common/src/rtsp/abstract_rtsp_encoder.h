@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "nx/streaming/media_data_packet.h"
-#include "utils/common/byte_array.h"
+#include <nx/streaming/media_data_packet.h>
+#include <utils/common/byte_array.h>
 
 /*
  * Base class for RTSP codec. Used for encode data only

@@ -3,15 +3,12 @@
 #pragma once
 
 #include <QtCore/QObject>
-
 #include <QtNetwork/QNetworkInterface>
 
-#include "nx/utils/thread/long_runnable.h"
-
-#include <nx/network/http/http_types.h>
-#include <nx/network/abstract_socket.h>
 #include <common/common_module_aware.h>
-
+#include <nx/network/abstract_socket.h>
+#include <nx/network/http/http_types.h>
+#include <nx/utils/thread/long_runnable.h>
 
 class QnTCPConnectionProcessor;
 

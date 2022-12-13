@@ -3,15 +3,13 @@
 #ifndef QN_COMPRESSED_TIME_WRITER_H
 #define QN_COMPRESSED_TIME_WRITER_H
 
-#include <cassert>
-
+#include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
-#include <QtCore/QVarLengthArray>
-#include "QtCore/qendian.h"
+
+#include <recording/time_period.h>
 
 #include "binary_stream.h"
 #include "compressed_time_fwd.h"
-#include "recording/time_period.h"
 
 template<class Output>
 class QnCompressedTimeWriter {

@@ -5,29 +5,25 @@
 #include <chrono>
 #include <optional>
 
-#include <nx/network/aio/unified_pollset.h>
-#include <nx/network/flash_socket/types.h>
-#include <nx/network/http/http_types.h>
-#include <nx/network/rest/result.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/gzip/gzip_compressor.h>
-
-#include <utils/common/util.h>
-
-#include "tcp_listener.h"
-#include "tcp_connection_priv.h"
-
 #ifndef Q_OS_WIN
-#   include <netinet/tcp.h>
+    #include <netinet/tcp.h>
 #endif
 
-#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <core/resource/resource.h>
-
-#include <nx/network/http/custom_headers.h>
-#include "common/common_module.h"
+#include <core/resource_management/resource_pool.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/network/aio/unified_pollset.h>
+#include <nx/network/flash_socket/types.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rest/result.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/log/log.h>
+#include <utils/common/util.h>
 
+#include "tcp_connection_priv.h"
+#include "tcp_listener.h"
 
 namespace {
 

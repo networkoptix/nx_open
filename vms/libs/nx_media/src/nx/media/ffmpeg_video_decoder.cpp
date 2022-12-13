@@ -1,22 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/utils/log/log.h>
-
-#include "ini.h"
 #include "ffmpeg_video_decoder.h"
+
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
 } // extern "C"
 
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <utils/media/ffmpeg_helper.h>
 
 #include "aligned_mem_video_buffer.h"
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include "ini.h"
 
 namespace nx {
 namespace media {

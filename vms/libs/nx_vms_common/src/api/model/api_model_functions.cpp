@@ -1,30 +1,30 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <licensing/hardware_info.h>
 #include <nx/fusion/model_functions.h>
+#include <utils/email/email.h>
 
+#include "audit/audit_record.h"
+#include "backup_status_reply.h"
 #include "camera_diagnostics_reply.h"
-#include "manual_camera_seach_reply.h"
-#include "storage_space_reply.h"
-#include "storage_status_reply.h"
-#include "time_reply.h"
-#include "hardware_ids_reply.h"
-#include "statistics_reply.h"
-#include "test_email_settings_reply.h"
-#include "ping_reply.h"
-#include "getnonce_reply.h"
-#include "system_settings_reply.h"
-#include "recording_stats_reply.h"
 #include "camera_list_reply.h"
 #include "configure_reply.h"
+#include "getnonce_reply.h"
+#include "hardware_ids_reply.h"
+#include "manual_camera_seach_reply.h"
+#include "ping_reply.h"
+#include "recording_stats_reply.h"
+#include "statistics_reply.h"
+#include "storage_space_reply.h"
+#include "storage_status_reply.h"
+#include "system_settings_reply.h"
+#include "test_email_settings_reply.h"
+#include "time_reply.h"
 #include "update_information_reply.h"
-#include "audit/audit_record.h"
-#include "licensing/hardware_info.h"
-#include "backup_status_reply.h"
-#include "virtual_camera_reply.h"
-#include "virtual_camera_status_reply.h"
 #include "virtual_camera_prepare_data.h"
 #include "virtual_camera_prepare_reply.h"
-#include <utils/email/email.h>
+#include "virtual_camera_reply.h"
+#include "virtual_camera_status_reply.h"
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnCameraDiagnosticsReply, (ubjson)(xml)(json)(csv_record), QnCameraDiagnosticsReply_Fields)

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>

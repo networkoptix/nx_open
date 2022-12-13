@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "stun_message_data.h"
+#include <nx/network/stun/extension/stun_extension_types.h>
 
-#include "nx/network/stun/extension/stun_extension_types.h"
+#include "stun_message_data.h"
 
 namespace nx::hpm::api {
 

@@ -7,8 +7,8 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
-#include "nx/streaming/video_data_packet.h"
-#include "utils/media/nalUnits.h"
+#include <nx/streaming/video_data_packet.h>
+#include <utils/media/nalUnits.h>
 
 namespace nx::media::h264 {
 

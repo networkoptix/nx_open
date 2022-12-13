@@ -7,10 +7,10 @@ extern "C" {
 #include <libswscale/swscale.h>
 } // extern "C"
 
-#include <utils/media/ffmpeg_helper.h>
 #include <nx/media/ffmpeg_audio_filter.h>
-#include <nx/utils/log/log.h>
 #include <nx/media/ini.h>
+#include <nx/utils/log/log.h>
+#include <utils/media/ffmpeg_helper.h>
 
 namespace nx {
 namespace media {

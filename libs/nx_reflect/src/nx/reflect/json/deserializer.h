@@ -8,12 +8,13 @@
 #include <tuple>
 #include <type_traits>
 
+#include <rapidjson/document.h>
+
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/type_utils.h>
 
-#include "rapidjson/document.h"
 #include "utils.h"
 
 namespace nx::reflect {

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>

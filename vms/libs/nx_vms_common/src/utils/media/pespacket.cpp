@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-//#include "stdafx.h"
 #include "pespacket.h"
 
 void PESPacket::serialize(quint64 pts, quint8 streamID)

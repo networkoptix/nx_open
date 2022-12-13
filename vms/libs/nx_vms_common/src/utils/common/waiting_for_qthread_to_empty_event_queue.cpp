@@ -2,10 +2,9 @@
 
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/utils/thread/mutex.h>
-
-#include "qcoreapplication.h"
-
 
 WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread* thread, int howManyTimesToWait )
 :

@@ -1,7 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "crop_image_filter.h"
-#include "utils/media/frame_info.h"
+
+#include <utils/media/frame_info.h>
+
 #include "../transcoder.h"
 
 extern "C" {

@@ -4,12 +4,13 @@
 
 #include <string>
 
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+
 #include <nx/reflect/basic_serializer.h>
 #include <nx/reflect/type_utils.h>
 
 #include "json_tags.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 
 namespace nx::reflect::json {
 

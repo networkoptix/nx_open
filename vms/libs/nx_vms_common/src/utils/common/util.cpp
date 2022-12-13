@@ -1,29 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "utils/common/util.h"
-
-#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
-    #include <sys/statvfs.h>
-    #include <sys/time.h>
-#endif
-
-#ifdef Q_OS_WIN32
-    #include <windows.h>
-    #include <mmsystem.h>
-#endif
-
-#include <QtCore/QDateTime>
-#include <QtCore/QStandardPaths>
-#include <QtGui/QDesktopServices>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtNetwork/QHostInfo>
+#include "util.h"
 
 #include <common/common_globals.h>
-
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
 QString strPadLeft(const QString &str, int len, char ch)

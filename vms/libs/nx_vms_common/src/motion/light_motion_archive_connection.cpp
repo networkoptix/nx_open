@@ -3,7 +3,7 @@
 #include "light_motion_archive_connection.h"
 
 #include <utils/common/synctime.h>
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 
 QnLightMotionArchiveConnection::QnLightMotionArchiveConnection(
     const QnMetaDataLightVector& data,
