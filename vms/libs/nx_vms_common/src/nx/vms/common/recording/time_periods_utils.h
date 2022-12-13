@@ -47,8 +47,8 @@ private:
     template <typename IteratorPeriod>
     static PeriodList mergeTimePeriodsInternal(
         const QVector<PeriodList>& nonEmptyPeriods,
-        std::vector<IteratorPeriod>& minIndices,
-        std::vector<IteratorPeriod>& maxIndices,
+        std::vector<IteratorPeriod>&& minIndices,
+        std::vector<IteratorPeriod>&& maxIndices,
         int limit)
     {
         if (limit <= 0)
@@ -161,8 +161,8 @@ private:
         }
         return mergeTimePeriodsInternal<typename PeriodList::const_iterator>(
             nonEmptyPeriods,
-            minIndices,
-            endIndices,
+            std::move(minIndices),
+            std::move(endIndices),
             limit);
     }
 
@@ -177,8 +177,8 @@ private:
         }
         auto result = mergeTimePeriodsInternal<typename PeriodList::const_reverse_iterator>(
             nonEmptyPeriods,
-            minIndexes,
-            endIndexes,
+            std::move(minIndexes),
+            std::move(endIndexes),
             std::numeric_limits<int>::max());
         if (limit > 0 && result.size() > limit)
             result.erase(result.begin(), result.begin() + (result.size() - limit));
