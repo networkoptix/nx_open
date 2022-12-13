@@ -2,9 +2,19 @@
 
 #include "common_message_processor.h"
 
+#include <unordered_map>
+
 #include <QtCore/QElapsedTimer>
 
-#include <common/common_module.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -16,27 +26,16 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_factory.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/videowall_resource.h>
-#include <core/resource/webpage_resource.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/discovery_data.h>
-#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/license_data.h>
-#include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/hardware_id_mapping.h>
+#include <nx/vms/api/data/runtime_data.h>
+#include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_context.h>
@@ -61,23 +60,6 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/network/socket_common.h>
-#include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/discovery_data.h>
-#include <nx/vms/api/data/event_rule_data.h>
-#include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/license_data.h>
-#include <nx/vms/api/data/resource_type_data.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/system_context.h>
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <utils/common/synctime.h>
 
 #include "runtime_info_manager.h"
@@ -85,12 +67,23 @@
 using namespace nx;
 using namespace nx::vms::api;
 
+struct QnCommonMessageProcessor::Private
+{
+    std::unordered_map<QnUuid, CameraAttributesData> cameraUserAttributesCache;
+    std::unordered_map<QnUuid, MediaServerUserAttributesData> serverUserAttributesCache;
+};
+
 QnCommonMessageProcessor::QnCommonMessageProcessor(
     nx::vms::common::SystemContext* context,
     QObject *parent)
     :
     base_type(parent),
-    nx::vms::common::SystemContextAware(context)
+    nx::vms::common::SystemContextAware(context),
+    d(new Private)
+{
+}
+
+QnCommonMessageProcessor::~QnCommonMessageProcessor()
 {
 }
 
@@ -778,7 +771,7 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
     {
         // It is possible that user attributes will be passed before Camera Resource is created,
         // so we need to cache them and assign to the Camera when it is created.
-        m_cameraUserAttributesCache[userAttributes.cameraId] = userAttributes;
+        d->cameraUserAttributesCache[userAttributes.cameraId] = userAttributes;
     }
 }
 
@@ -800,7 +793,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
     if (server)
         server->setUserAttributesAndNotify(attrs);
     else
-        m_serverUserAttributesCache[attrs.serverId] = attrs;
+        d->serverUserAttributesCache[attrs.serverId] = attrs;
 }
 
 void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverId)
@@ -968,7 +961,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList(
         if (server)
             server->setUserAttributes(serverAttrs);
         else
-            m_serverUserAttributesCache[serverAttrs.serverId] = serverAttrs;
+            d->serverUserAttributesCache[serverAttrs.serverId] = serverAttrs;
     }
 }
 
@@ -981,7 +974,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList(
         if (auto camera = pool->getResourceById<QnVirtualCameraResource>(cameraAttrs.cameraId))
             camera->setUserAttributes(cameraAttrs);
         else
-            m_cameraUserAttributesCache[cameraAttrs.cameraId] = cameraAttrs;
+            d->cameraUserAttributesCache[cameraAttrs.cameraId] = cameraAttrs;
     }
 }
 
@@ -1174,11 +1167,11 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getPhysicalId()),
             "You must fill camera ID as md5 hash of unique id");
 
-        auto iter = m_cameraUserAttributesCache.find(camera.id);
-        if (iter != m_cameraUserAttributesCache.cend())
+        auto iter = d->cameraUserAttributesCache.find(camera.id);
+        if (iter != d->cameraUserAttributesCache.cend())
         {
             qnCamera->setUserAttributes(iter->second);
-            m_cameraUserAttributesCache.erase(iter);
+            d->cameraUserAttributesCache.erase(iter);
         }
 
         updateResource(qnCamera, source);
@@ -1190,11 +1183,11 @@ void QnCommonMessageProcessor::updateResource(
 {
     QnMediaServerResourcePtr server = getResourceFactory()->createServer();
     ec2::fromApiToResource(serverData, server);
-    auto iter = m_serverUserAttributesCache.find(serverData.id);
-    if (iter != m_serverUserAttributesCache.cend())
+    auto iter = d->serverUserAttributesCache.find(serverData.id);
+    if (iter != d->serverUserAttributesCache.cend())
     {
         server->setUserAttributes(iter->second);
-        m_serverUserAttributesCache.erase(iter);
+        d->serverUserAttributesCache.erase(iter);
     }
     updateResource(server, source);
 }

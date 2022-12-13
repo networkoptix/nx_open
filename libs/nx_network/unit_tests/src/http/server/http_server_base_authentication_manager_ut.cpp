@@ -2,15 +2,15 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_async_client.h>
-#include <nx/network/http/test_http_server.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/server/http_server_base_authentication_manager.h>
 #include <nx/network/http/server/http_server_plain_text_credentials_provider.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/test_support/utils.h>
-#include "nx/network/http/auth_tools.h"
-#include "nx/network/http/http_types.h"
 
 namespace nx::network::http::server::test {
 

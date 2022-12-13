@@ -15,7 +15,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
-#include "nx/utils/app_info.h"
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 
 #include "../platform/win32_syscall_resolver.h"

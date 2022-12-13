@@ -2,9 +2,10 @@
 
 #include "tiled_image_filter.h"
 
-#include "utils/media/frame_info.h"
+#include <utils/common/util.h>
+#include <utils/media/frame_info.h>
+
 #include "crop_image_filter.h"
-#include "utils/common/util.h"
 
 QnTiledImageFilter::QnTiledImageFilter(const QnConstResourceVideoLayoutPtr& videoLayout):
     m_layout(videoLayout)

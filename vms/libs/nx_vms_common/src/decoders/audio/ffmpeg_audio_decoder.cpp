@@ -2,11 +2,9 @@
 
 #include "ffmpeg_audio_decoder.h"
 
-#include <cassert>
-
-#include "nx/streaming/audio_data_packet.h"
-#include "utils/media/ffmpeg_helper.h"
+#include <nx/streaming/audio_data_packet.h>
 #include <nx/utils/log/log_main.h>
+#include <utils/media/ffmpeg_helper.h>
 
 struct AVCodecContext;
 

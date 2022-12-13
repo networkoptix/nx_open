@@ -2,6 +2,8 @@
 
 #include "resource_access_subject.h"
 
+#include <core/resource/user_resource.h>
+
 QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
     m_user(user)
 {

@@ -2,6 +2,10 @@
 
 #pragma once
 
+extern "C" {
+#include <libavformat/avformat.h>
+} // extern "C"
+
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
@@ -9,10 +13,6 @@
 #include <licensing/license_fwd.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
-
-extern "C" {
-#include <libavformat/avformat.h>
-} // extern "C"
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::utils::QnCryptographicHash::Md5;

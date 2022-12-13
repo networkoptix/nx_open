@@ -2,23 +2,22 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QQueue>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QString>
 
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
+extern "C" {
+#include <libavcodec/avcodec.h>
 }
 
-#include "nx/streaming/audio_data_packet.h"
-#include "nx/streaming/video_data_packet.h"
-#include "filters/abstract_image_filter.h"
-
 #include <common/common_globals.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-#include "decoders/video/ffmpeg_video_decoder.h"
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/move_only_func.h>
+
+#include "filters/abstract_image_filter.h"
 
 class CLVideoDecoderOutput;
 

@@ -5,7 +5,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrlQuery>
 
-#include "network/authutil.h"
+#include <network/authutil.h>
 #include <nx/utils/log/assert.h>
 
 namespace QnMulticast

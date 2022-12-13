@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "nx/streaming/media_data_packet.h"
-#include "nx/streaming/audio_data_packet.h"
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
 
 class QnAbstractAudioDecoder
 {

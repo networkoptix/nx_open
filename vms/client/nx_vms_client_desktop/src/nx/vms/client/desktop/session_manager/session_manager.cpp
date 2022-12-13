@@ -3,20 +3,20 @@
 #include "session_manager.h"
 
 #include <chrono>
-#include <thread>
 #include <condition_variable>
+#include <thread>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
-#include <QtCore/QTimer>
-#include <QtCore/QStandardPaths>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QStandardPaths>
+#include <QtCore/QTimer>
 
-#include "nx/utils/file_system.h"
-#include "nx/utils/scope_guard.h"
-#include "nx/utils/log/log.h"
+#include <nx/utils/file_system.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 

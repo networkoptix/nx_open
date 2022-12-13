@@ -2,22 +2,20 @@
 
 #pragma once
 
-#include <unordered_map>
-
+#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/singleton.h>
-#include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/hardware_id_mapping.h>
-#include <nx/vms/api/data/runtime_data.h>
-#include <nx/vms/api/rules/event_info.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/api/data/data_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 
-namespace nx::vms::api { struct ServerRuntimeEventData; }
+Q_MOC_INCLUDE(<nx/vms/api/data/discovery_data.h>)
+Q_MOC_INCLUDE(<nx/vms/api/data/layout_tour_data.h>)
+Q_MOC_INCLUDE(<nx/vms/api/rules/rule.h>)
 
 class QnResourceFactory;
 
@@ -32,7 +30,7 @@ public:
     explicit QnCommonMessageProcessor(
         nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
-    virtual ~QnCommonMessageProcessor() {}
+    virtual ~QnCommonMessageProcessor();
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
@@ -192,6 +190,6 @@ protected:
     ec2::AbstractECConnectionPtr m_connection;
 
 private:
-    std::unordered_map<QnUuid, nx::vms::api::CameraAttributesData> m_cameraUserAttributesCache;
-    std::unordered_map<QnUuid, nx::vms::api::MediaServerUserAttributesData> m_serverUserAttributesCache;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };

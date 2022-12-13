@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "nx/streaming/media_data_packet.h"
-#include "core/resource/resource_media_layout.h"
-#include "utils/camera/camera_diagnostics.h"
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/media_data_packet.h>
+#include <utils/camera/camera_diagnostics.h>
 
 class QnAbstractMediaStreamProvider
 {

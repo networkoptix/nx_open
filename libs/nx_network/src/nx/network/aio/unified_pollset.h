@@ -5,10 +5,11 @@
 #include <map>
 #include <set>
 
+#include <nx/network/abstract_socket.h>
+#include <nx/network/system_socket.h>
+
 #include "abstract_pollset.h"
 #include "event_type.h"
-#include "nx/network/abstract_socket.h"
-#include "nx/network/system_socket.h"
 
 typedef int UDTSOCKET;
 

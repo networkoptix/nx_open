@@ -13,10 +13,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/storage_location.h>
+#include <recording/time_period.h>
 
-#include "recording/time_period.h"
-
-Q_MOC_INCLUDE("nx/streaming/archive_stream_reader.h")
+Q_MOC_INCLUDE(<nx/streaming/archive_stream_reader.h>)
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;

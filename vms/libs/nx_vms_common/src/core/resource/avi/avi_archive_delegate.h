@@ -2,25 +2,20 @@
 
 #pragma once
 
-#include <QtCore/QSharedPointer>
-
-#include <core/resource/avi/avi_archive_metadata.h>
-
-#include "nx/streaming/audio_data_packet.h"
-#include "nx/streaming/video_data_packet.h"
-
-#include <nx/streaming/abstract_archive_delegate.h>
-
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/move_only_func.h>
-
-#include <core/resource/motion_window.h>
-
-extern "C"
-{
+extern "C" {
 // For typedef struct AVIOContext.
 #include <libavformat/avio.h>
 };
+
+#include <QtCore/QSharedPointer>
+
+#include <core/resource/avi/avi_archive_metadata.h>
+#include <core/resource/motion_window.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 
 struct AVPacket;
 struct AVCodecContext;

@@ -4,21 +4,22 @@
 
 #include <QtCore/QThread>
 
-#include "nx/streaming/video_data_packet.h"
-#include "decoders/video/ffmpeg_video_decoder.h"
-#include "filters/abstract_image_filter.h"
-#include "filters/crop_image_filter.h"
+#include <common/common_module.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/metrics/metrics_storage.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <transcoding/transcoding_utils.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 #include <utils/media/av_options.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/log/log.h>
-#include <common/common_module.h>
-#include <nx/metrics/metrics_storage.h>
-#include <transcoding/transcoding_utils.h>
 #include <utils/media/utils.h>
+
+#include "filters/abstract_image_filter.h"
+#include "filters/crop_image_filter.h"
 
 namespace {
 const static int kMaxEncodedFrameSize = 1024 * 1024 * 5;

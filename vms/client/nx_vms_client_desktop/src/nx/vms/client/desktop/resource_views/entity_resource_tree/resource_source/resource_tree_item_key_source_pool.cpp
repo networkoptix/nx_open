@@ -2,7 +2,7 @@
 
 #include "resource_tree_item_key_source_pool.h"
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>

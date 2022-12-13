@@ -1,13 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "trace.h"
-#include "concurrentqueue.h"
 
 #include <fstream>
 #include <array>
 #include <cstdio>
 #include <memory>
 #include <mutex>
+
+#include <concurrentqueue.h>
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>

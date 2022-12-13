@@ -3,12 +3,13 @@
 #ifndef _QN_AUDIT_RECORD_H__
 #define _QN_AUDIT_RECORD_H__
 
-#include <nx/utils/uuid.h>
-#include "common/common_globals.h"
+#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include "auth_session.h"
-#include "nx/utils/latin1_array.h"
+#include <nx/utils/latin1_array.h>
 #include <nx/utils/qnbytearrayref.h>
+#include <nx/utils/uuid.h>
+
+#include "auth_session.h"
 
 struct NX_VMS_COMMON_API QnAuditRecord
 {

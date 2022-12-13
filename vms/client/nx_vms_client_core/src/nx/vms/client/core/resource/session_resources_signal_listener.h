@@ -7,6 +7,7 @@
 #include <api/common_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>

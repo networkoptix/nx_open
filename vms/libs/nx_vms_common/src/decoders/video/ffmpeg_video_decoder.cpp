@@ -8,12 +8,12 @@ extern "C" {
 #include <libavutil/imgutils.h>
 } // extern "C"
 
-#include "utils/media/nalUnits.h"
+#include <utils/media/nalUnits.h>
 
 #include <utils/math/math.h>
 #include <nx/utils/log/log.h>
 
-#include "utils/media/frame_type_extractor.h"
+#include <utils/media/frame_type_extractor.h>
 
 #include <nx/streaming/av_codec_media_context.h>
 #include <utils/media/utils.h>

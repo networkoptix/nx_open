@@ -5,18 +5,15 @@
 #include <QtCore/QDir>
 #include <QtGui/QImage>
 
-#include "avi_archive_delegate.h"
-
+#include <core/resource/avi/single_shot_file_reader.h>
 #include <core/resource/storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/fs/file.h>
 
-#include <nx/streaming/archive_stream_reader.h>
-#include <core/resource/avi/single_shot_file_reader.h>
-
-#include "core/storage/file_storage/layout_storage_resource.h"
-#include "nov_archive_delegate.h"
-
+#include "avi_archive_delegate.h"
 #include "filetypesupport.h"
+#include "nov_archive_delegate.h"
 
 namespace {
 

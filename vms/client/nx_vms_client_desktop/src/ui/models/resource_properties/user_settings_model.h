@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
-
+#include <core/resource/user_resource.h>
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 

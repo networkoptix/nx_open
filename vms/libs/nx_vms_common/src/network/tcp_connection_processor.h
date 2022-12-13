@@ -4,16 +4,15 @@
 
 #include <optional>
 
-#include <common/common_module_aware.h>
-
 #include <api/model/audit/auth_session.h>
+#include <common/common_module_aware.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/socket_delegate.h>
 #include <nx/network/socket.h>
+#include <nx/network/socket_delegate.h>
+#include <nx/string.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/byte_array.h>
-#include <nx/string.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;

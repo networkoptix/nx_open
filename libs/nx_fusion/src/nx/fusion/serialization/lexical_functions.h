@@ -5,16 +5,16 @@
 
 #include <chrono>
 
-#include <nx/utils/uuid.h>
-#include <QtCore/QUrl>
 #include <QtCore/QBitArray>
+#include <QtCore/QUrl>
 #include <QtGui/QColor>
 
-#include "lexical.h"
-
-#include "nx/utils/latin1_array.h"
-#include "nx/fusion/fusion/fusion_fwd.h"
+#include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/utils/latin1_array.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
+
+#include "lexical.h"
 
 namespace QnLexicalDetail {
     template<class T, class Temporary>

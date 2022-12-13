@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <QtCore/QObject>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>

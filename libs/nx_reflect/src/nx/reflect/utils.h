@@ -5,8 +5,7 @@
 namespace nx::reflect::detail {
 
 /**
- * Types in this namespace are introduced to get rid of "#include <type_traits>"
- * and "#include <utility>".
+ * Types in this namespace are introduced to get rid of the <type_traits> and <utility> includes.
  */
 
 template<bool B, typename T = void>

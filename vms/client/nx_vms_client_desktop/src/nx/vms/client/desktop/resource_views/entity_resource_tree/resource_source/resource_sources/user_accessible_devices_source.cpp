@@ -2,9 +2,10 @@
 
 #include "user_accessible_devices_source.h"
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/access_rights_types.h>
 
 namespace nx::vms::client::desktop {
