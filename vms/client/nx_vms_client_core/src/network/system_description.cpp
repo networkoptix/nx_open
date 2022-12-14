@@ -24,7 +24,8 @@ QnServerFields getChanges(const nx::vms::api::ModuleInformationWithAddresses& be
     const auto fieldsResult =
         (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
         | EXTRACT_CHANGE_FLAG(name, QnServerField::Name)
-        | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId));
+        | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId))
+        | EXTRACT_CHANGE_FLAG(version, QnServerField::Version);
 
     return (fieldsResult);
 }
@@ -176,6 +177,7 @@ QnServerFields QnSystemDescription::updateServer(
     m_remoteAddressesCache.remove(serverInfo.id);
     setName(serverInfo.systemName);
     emit serverChanged(serverInfo.id, changes);
+
     return changes;
 }
 

@@ -102,4 +102,5 @@ private:
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
     IdsSet m_reachableServers;
+    nx::vms::api::SoftwareVersion m_version;
 };
