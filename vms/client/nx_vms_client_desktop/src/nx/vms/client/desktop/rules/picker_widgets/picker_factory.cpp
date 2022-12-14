@@ -27,6 +27,8 @@ PickerWidget* PickerFactory::createWidget(
 
     if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
         pickerWidget = new CustomizableTextPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableIconField>())
+        pickerWidget = new CustomizableIconPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
         pickerWidget = new KeywordsPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
