@@ -112,6 +112,12 @@ ExportManager::ExportManager(QObject* parent):
 
 ExportManager::~ExportManager()
 {
+    while (!d->exportProcesses.empty())
+    {
+        auto process = d->exportProcesses.take(d->exportProcesses.lastKey());
+        if (process)
+            process->stop();
+    }
 }
 
 QnUuid ExportManager::startExport(const QnUuid& id, std::unique_ptr<AbstractExportTool>&& tool)

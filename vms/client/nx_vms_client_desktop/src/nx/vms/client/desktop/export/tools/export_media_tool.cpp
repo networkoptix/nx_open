@@ -143,6 +143,10 @@ struct ExportMediaTool::Private
 
     void cancelExport()
     {
+        // Double cancel is ok.
+        if (status == ExportProcessStatus::cancelling)
+            return;
+
         NX_ASSERT(status == ExportProcessStatus::exporting);
         setStatus(ExportProcessStatus::cancelling);
 
