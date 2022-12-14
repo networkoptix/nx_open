@@ -7,10 +7,13 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/common/widgets/icon_combo_box.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/action_builder_fields/content_type_field.h>
 #include <nx/vms/rules/action_builder_fields/http_method_field.h>
+#include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
 #include <nx/vms/rules/event_filter_fields/input_port_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -28,6 +31,7 @@ namespace nx::vms::client::desktop::rules {
  * - nx.actions.fields.contentType
  * - nx.actions.fields.httpMethod
  * - nx.events.fields.inputPort
+ * - nx.events.fields.customizableIcon
  */
 template<typename F>
 class DropdownTextPickerWidget: public FieldPickerWidget<F>
@@ -44,7 +48,7 @@ public:
         label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         mainLayout->addWidget(label);
 
-        comboBox = new QComboBox;
+        comboBox = createComboBox();
         comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         mainLayout->addWidget(comboBox);
 
@@ -62,7 +66,6 @@ public:
 private:
     using FieldPickerWidget<F>::connect;
     using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::tr;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -77,10 +80,9 @@ private:
 
     virtual void onFieldsSet() override
     {
-
         customizeComboBox();
 
-        setCurrentText();
+        setCurrentValue();
 
         connect(comboBox,
             &QComboBox::currentTextChanged,
@@ -91,9 +93,14 @@ private:
         connectLinkedFields();
     }
 
+    QComboBox* createComboBox()
+    {
+        return new QComboBox;
+    }
+
     void customizeComboBox();
 
-    void setCurrentText()
+    void setCurrentValue()
     {
         const auto fieldValue = field->value();
         {
@@ -111,16 +118,52 @@ private:
 
     void onCurrentTextChanged(const QString& text)
     {
-        if (auto value = text.trimmed(); value != kAutoValue)
+        if (const auto value = text.trimmed(); value != kAutoValue)
             field->setValue(value);
         else
             field->setValue({});
     }
 };
 
+using CustomizableIconPicker = DropdownTextPickerWidget<vms::rules::CustomizableIconField>;
+
+template<>
+QComboBox* CustomizableIconPicker::createComboBox()
+{
+    return new IconComboBox;
+}
+
+template<>
+void CustomizableIconPicker::customizeComboBox()
+{
+    constexpr auto kDropdownIconSize = 40;
+    const auto pixmapNames = SoftwareTriggerPixmaps::pixmapNames();
+    const auto nextEvenValue = [](int value) { return value + (value & 1); };
+    const auto columnCount = nextEvenValue(qCeil(qSqrt(pixmapNames.size())));
+
+    auto iconComboBox = static_cast<IconComboBox*>(comboBox);
+
+    iconComboBox->setColumnCount(columnCount);
+    iconComboBox->setItemSize({kDropdownIconSize, kDropdownIconSize});
+    iconComboBox->setPixmaps(SoftwareTriggerPixmaps::pixmapsPath(), pixmapNames);
+}
+
+template<>
+void CustomizableIconPicker::setCurrentValue()
+{
+    QSignalBlocker blocker{comboBox};
+    auto iconComboBox = static_cast<IconComboBox*>(comboBox);
+    iconComboBox->setCurrentIcon(SoftwareTriggerPixmaps::effectivePixmapName(field->value()));
+}
+
+template<>
+void CustomizableIconPicker::onCurrentTextChanged(const QString& /*text*/)
+{
+    auto iconComboBox = static_cast<IconComboBox*>(comboBox);
+    field->setValue(iconComboBox->currentIcon());
+}
+
 using HttpContentTypePicker = DropdownTextPickerWidget<vms::rules::ContentTypeField>;
-using HttpMethodPicker = DropdownTextPickerWidget<vms::rules::HttpMethodField>;
-using InputPortPicker = DropdownTextPickerWidget<vms::rules::InputPortField>;
 
 template<>
 void HttpContentTypePicker::customizeComboBox()
@@ -135,6 +178,8 @@ void HttpContentTypePicker::customizeComboBox()
     comboBox->addItem("application/xml");
 }
 
+using HttpMethodPicker = DropdownTextPickerWidget<vms::rules::HttpMethodField>;
+
 template<>
 void HttpMethodPicker::customizeComboBox()
 {
@@ -145,8 +190,10 @@ void HttpMethodPicker::customizeComboBox()
     comboBox->addItem("DELETE");
 }
 
+using InputPortPicker = DropdownTextPickerWidget<vms::rules::InputPortField>;
+
 template<>
-void InputPortPicker::setCurrentText()
+void InputPortPicker::setCurrentValue()
 {
     const auto fieldValue = field->value();
     const auto valueIndex = comboBox->findData(fieldValue);
@@ -238,7 +285,7 @@ void InputPortPicker::connectLinkedFields()
         [this]
         {
             customizeComboBox();
-            setCurrentText();
+            setCurrentValue();
             field->setValue(comboBox->currentData().toString());
         };
 
