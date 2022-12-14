@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Bruk hendelseskildeserver</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>Bruk hendelseskildekamera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Tving åpning av alarmvisning</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Vis også kildekamera</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Regel vil bare fungere for langvarige hendelser</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Vis også på kildekamera</translation>
     </message>
   </context>
   <context>

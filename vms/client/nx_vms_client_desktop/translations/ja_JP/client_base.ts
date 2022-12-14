@@ -1335,16 +1335,16 @@ License Key: %2</source>
 ライセンスキー: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を %1 に送信してアクティベーションファイルを取得してください。</translation>
-    </message>
-    <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
-    </message>
-    <message>
       <source>Copy Parameters</source>
       <translation>パラメータをコピー</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1556,9 +1556,9 @@ License Key: %2</source>
       <translation>アクティブなサーバーのいずれにもインターネット接続がないため、電子メール設定をテストできません</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
     </message>
   </context>
   <context>
@@ -11715,18 +11715,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>利用可能な次のパッチまたはリリースバージョンにアップグレードしてください。</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>システムは匿名の使用情報を送信します</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>ソフトウェア開発チームがユーザーエクスペリエンスを向上させるために使用します。</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>無効にするには、システム管理ダイアログに移動してください。</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>

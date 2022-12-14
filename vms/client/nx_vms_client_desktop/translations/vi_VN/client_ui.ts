@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Sử dụng máy chủ nguồn sự kiện</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Lực lượng báo động Giao diện mở</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Cũng hiển thị camera nguồn</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Quy tắc này sẽ chỉ làm việc cho các sự kiện kéo dài</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
     </message>
   </context>
   <context>

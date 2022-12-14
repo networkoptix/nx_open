@@ -1582,8 +1582,8 @@
       <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Chúng tôi khuyến nghị nên đặt giá trị tham số này là 2 hoặc nhiều hơn.</translation>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
     </message>
   </context>
   <context>

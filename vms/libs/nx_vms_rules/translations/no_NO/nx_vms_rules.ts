@@ -304,16 +304,16 @@
       <translation>Lisensproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende enheter:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende enheter:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende kameraer:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende kameraer:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende I / O-moduler:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende I/O-moduler:</translation>
     </message>
   </context>
   <context>
@@ -403,8 +403,8 @@
       <translation>Tilkoblingen til enheten ble uventet lukket.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation>Kunne ikke tvinge bruk av kameratid, da det henger for mye; Systemtid vil bli brukt i stedet.</translation>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Kunne ikke tvinge bruk av kameratid, da den henger for mye. Systemtid vil bli brukt i stedet.</translation>
     </message>
   </context>
   <context>

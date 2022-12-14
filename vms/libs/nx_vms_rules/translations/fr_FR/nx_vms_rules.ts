@@ -304,16 +304,16 @@
       <translation>Problème Licence</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Pas assez de licences. Enregistrement a été désactivé sur les périphériques suivants:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Pas assez de licences. Enregistrement a été désactivé sur les caméras suivantes:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Pas assez de licences. Enregistrement a été désactivé sur les modules I/O suivants:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -403,8 +403,8 @@
       <translation>La connexion à l'appareil a été fermée de façon inattendue.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, car elle est trop lente ; l'heure système sera utilisée à la place.</translation>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>

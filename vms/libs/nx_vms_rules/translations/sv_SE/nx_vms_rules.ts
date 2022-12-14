@@ -304,16 +304,16 @@
       <translation>Licensproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
       <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande kameror:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande I / O-moduler:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande I/O-moduler:</translation>
     </message>
   </context>
   <context>
@@ -403,8 +403,8 @@
       <translation>Anslutningen till enheten stängdes oväntat.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation>Det gick inte att tvinga fram kameratid, det släpar för mycket; Systemtiden kommer att användas.</translation>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Det gick inte att tvinga fram kameratid eftersom den släpar för mycket. Systemtid kommer att användas istället.</translation>
     </message>
   </context>
   <context>

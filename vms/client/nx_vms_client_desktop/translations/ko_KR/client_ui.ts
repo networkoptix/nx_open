@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>이벤트 소스 서버 사용</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>알람레이아웃 갈제로 열기</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>이벤트 발생 카메라 보여주기</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>지속되는 이벤트에서만 설정 적용됩니다.</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>이벤트 발생카메라 보이기</translation>
     </message>
   </context>
   <context>

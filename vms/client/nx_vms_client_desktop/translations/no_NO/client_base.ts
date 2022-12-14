@@ -1339,16 +1339,16 @@ License Key: %2</source>
 Lisensnøkkel: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>Hvis systemet ditt ikke har tilgang til Internett, send den medfølgende lisensnøkkelen og maskinvare-IDen til %1 for å motta aktiveringsfilen.</translation>
-    </message>
-    <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Hvis systemet ditt ikke har tilgang til Internett, send den medfølgende lisensnøkkelen og maskinvare-IDen til ditt regionale/lisensstøtteteam for å motta aktiveringsfilen:</translation>
-    </message>
-    <message>
       <source>Copy Parameters</source>
       <translation>Kopier parametere</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation>Hvis systemet ditt ikke har tilgang til Internett, vennligst send den medfølgende lisensnøkkelen og maskinvare-IDen til %1 for å motta aktiveringsfilen.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation>Hvis systemet ditt ikke har tilgang til Internett, vennligst send den medfølgende lisensnøkkelen og maskinvare-IDen til ditt regionale/lisensstøtteteam for å motta aktiveringsfilen:</translation>
     </message>
   </context>
   <context>
@@ -1567,9 +1567,9 @@ Lisensnøkkel: %2</translation>
       <translation>Kan ikke teste e-postinnstillinger på grunn av manglende internettforbindelse på de aktive serverne</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1 brukere vil begynne å motta e-poster umiddelbart etter at du har brukt innstillinger</translation>
+      <translation>%1 brukere vil begynne å motta e-poster umiddelbart etter at du har brukt disse innstillingene</translation>
     </message>
   </context>
   <context>
@@ -11881,18 +11881,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>Oppgrader til en neste tilgjengelig oppdatering eller utgivelsesversjon når den er tilgjengelig.</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>System sender anonym brukstatistikk</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Det vil bli brukt av programvareutviklingsteam for å forbedre brukeropplevelsen din.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>Gå til dialogboksen Systemadministrasjon for å deaktivere den.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>

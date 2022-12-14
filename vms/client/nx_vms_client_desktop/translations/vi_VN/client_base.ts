@@ -1335,16 +1335,16 @@ License Key: %2</source>
 Khóa giấy phép: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>Nếu Hệ thống của bạn không có quyền truy cập Internet, vui lòng gửi Khóa giấy phép và ID phần cứng được cung cấp tới %1 để nhận tệp kích hoạt.</translation>
-    </message>
-    <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Nếu Hệ thống của bạn không có quyền truy cập Internet, vui lòng gửi Khóa cấp phép và ID phần cứng được cung cấp cho nhóm hỗ trợ Khu vực/Giấy phép của bạn để nhận tệp kích hoạt:</translation>
-    </message>
-    <message>
       <source>Copy Parameters</source>
       <translation>Sao chép thông số</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1556,9 +1556,9 @@ Khóa giấy phép: %2</translation>
       <translation>Không thể kiểm tra cài đặt email do không có kết nối internet trên bất kỳ máy chủ nào đang hoạt động</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>Người dùng %1 sẽ bắt đầu nhận được email ngay sau khi bạn áp dụng cài đặt</translation>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
     </message>
   </context>
   <context>
@@ -11715,18 +11715,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>Vui lòng nâng cấp lên bản vá hoặc bản phát hành tiếp theo khi có sẵn.</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Hệ thống gửi thống kê sử dụng ẩn danh</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Nó sẽ được sử dụng bởi đội ngũ phát triển phần mềm để cải thiện kinh nghiệm người sử dụng.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>Để vô hiệu hóa nó, mở hộp thoại Quản trị Hệ thống.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
