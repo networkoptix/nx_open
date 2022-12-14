@@ -300,16 +300,16 @@
       <translation>授權問題</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>沒有足夠的授權. 以下設備錄影已被停用:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>沒有足夠的授權. 以下攝影機錄影已被停用:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>沒有足夠的授權. 以下 I/O 模組已被停用:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -398,8 +398,8 @@
       <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much; System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much; System time will be used instead.</translation>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>

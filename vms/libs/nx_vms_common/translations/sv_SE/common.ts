@@ -1628,7 +1628,7 @@
       <translation>Om några bilder ska cachelagras för den primära strömmen. Värden: &apos;ja&apos; - alltid aktiverat (kan använda mycket RAM-minne), &apos;nej&apos; - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), &apos;auto&apos; - liknande &apos;nej&apos;, men aktiverat när förbättrar användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran).</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
       <translation>Max antal HTTP-anslutningar med omkodning för servern. Chrome öppnar 2 anslutningar samtidigt och stänger sedan den första. Så det rekommenderas att ställa in värdet &apos;=2 till denna parameter.</translation>
     </message>
   </context>

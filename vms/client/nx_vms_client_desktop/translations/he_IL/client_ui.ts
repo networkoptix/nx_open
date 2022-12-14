@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>השתמש בשרת מקור האירוע</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>כפה פתיחת פריסת אזעקה</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>הצג גם את המצלמה המשוייכת</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>החוק יעבוד רק עבור חוקים מתמשכים</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>הצג גם במצלמת המקור</translation>
     </message>
   </context>
   <context>

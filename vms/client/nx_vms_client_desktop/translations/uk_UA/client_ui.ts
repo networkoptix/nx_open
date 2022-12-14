@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Використати вихідний сервер подій</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Примусове відкриття тривожної розкладки</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Показувати також камеру джерела події</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Правило буде працювати тільки для тривалих подій</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Також показувати на камері джерела події</translation>
     </message>
   </context>
   <context>

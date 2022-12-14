@@ -1339,16 +1339,16 @@ License Key: %2</source>
 Licensnyckel: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <source>Copy Parameters</source>
+      <translation>Kopiera parametrar</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
       <translation>Om ditt system inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till %1 för att ta emot aktiveringsfilen.</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
       <translation>Om ditt system inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala/licenssupportteam för att ta emot aktiveringsfilen:</translation>
-    </message>
-    <message>
-      <source>Copy Parameters</source>
-      <translation>Kopiera parametrar</translation>
     </message>
   </context>
   <context>
@@ -1567,7 +1567,7 @@ Licensnyckel: %2</translation>
       <translation>Det går inte att testa e-postinställningar på grund av ingen internetanslutning på någon av de aktiva servrarna</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 användare kommer att börja få e-postmeddelanden direkt efter att du har tillämpat inställningarna</translation>
     </message>
@@ -11883,18 +11883,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>Var god uppgradera till en nästa tillgänglig patch eller release version när den är tillgänglig.</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Systemet skickar anonym användarstatistik</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Den kommer att användas av mjukvaruutvecklingsteam för att förbättra användarupplevelsen.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>För att inaktivera det, gå till menyn Systemadministration.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>

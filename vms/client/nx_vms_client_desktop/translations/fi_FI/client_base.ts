@@ -1339,16 +1339,16 @@ License Key: %2</source>
 License Key: %2</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
-    </message>
-    <message>
-      <source>If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
-    </message>
-    <message>
       <source>Copy Parameters</source>
       <translation type="unfinished">Copy Parameters</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1567,9 +1567,9 @@ License Key: %2</translation>
       <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply settings</source>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply settings</translation>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
     </message>
   </context>
   <context>
@@ -11881,18 +11881,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>Päivitä seuraavaan käytettävissä olevaan korjaustiedostoon tai viimeisimpään versioon, kun se on käytettävissä.</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Järjestelmä lähettää anonyymejä käyttötilastoja</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Ohjelmistokehitystiimi käyttää palautetta parantamaan käyttäjäkokemustasi.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>Voit poistaa sen käytöstä valitsemalla Järjestelmänvalvonta-valintaikkunan.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>

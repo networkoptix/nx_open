@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Usar servidor de origen de eventos</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Forzar abrir el Diseño de Alarma</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>También mostrar cámara de origen</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Regla funciona solo para eventos prolongados</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>También mostrar en cámara de origen</translation>
     </message>
   </context>
   <context>

@@ -470,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Gebruik event bron server</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -2870,10 +2874,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Forceer het openen van een alarmlayout</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Toon ook de broncamera</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2892,10 +2892,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Regel werkt alleen voor langdurige evenementen</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Toon ook op broncamera</translation>
     </message>
   </context>
   <context>
