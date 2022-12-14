@@ -18,6 +18,7 @@ enum class QnServerField
     SystemName = 1 << 1,
     Host = 1 << 2,
     CloudId = 1 << 3,
+    Version = 1 << 4,
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)

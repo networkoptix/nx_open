@@ -143,6 +143,14 @@ struct CloudCrossSystemContext::Private
                 ensureConnection();
             });
 
+        if (!systemDescription->version().isNull()
+            && systemDescription->version() < kMinApiSupportedVersion)
+        {
+            // TODO: #mmalofeev add an ability to handle system version changes.
+            updateStatus(Status::unsupportedPermanently);
+            return;
+        }
+
         ensureConnection();
     }
 
