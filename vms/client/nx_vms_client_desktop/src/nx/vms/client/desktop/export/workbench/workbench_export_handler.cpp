@@ -345,6 +345,16 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
 
 WorkbenchExportHandler::~WorkbenchExportHandler()
 {
+    auto runningExports = d->runningExports.keys();
+    for (auto key: runningExports)
+        d->exportManager->stopExport(key);
+
+    // Try to gracefully wait until export is stopped.
+    constexpr auto kStopExportTimeLimitMs = 5000;
+    QElapsedTimer timeToStopExports;
+    timeToStopExports.start();
+    while (!d->runningExports.empty() && !timeToStopExports.hasExpired(kStopExportTimeLimitMs))
+        qApp->processEvents();
 }
 
 void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
