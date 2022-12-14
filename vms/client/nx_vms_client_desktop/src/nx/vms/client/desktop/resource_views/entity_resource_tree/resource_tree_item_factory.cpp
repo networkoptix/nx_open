@@ -228,9 +228,7 @@ GenericItem::DataProvider cloudSystemExtraInfoProvider(const QString& systemId)
             if (NX_ASSERT(context) &&
                 context->status() == CloudCrossSystemContext::Status::unsupportedPermanently)
             {
-                const auto cloudSystem = qnCloudStatusWatcher->cloudSystem(systemId);
-                if (NX_ASSERT(cloudSystem))
-                    return cloudSystem->version;
+                return context->systemDescription()->version().toString();
             }
 
             return QString{};
