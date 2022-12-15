@@ -21,6 +21,7 @@ Builder::Builder(Action* action):
     m_action(action)
 {
     action->setShortcutContext(Qt::WindowShortcut);
+    action->setAutoRepeat(false);
 }
 
 Action* Builder::action() const

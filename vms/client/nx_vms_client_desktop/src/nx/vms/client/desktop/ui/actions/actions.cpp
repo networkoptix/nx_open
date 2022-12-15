@@ -42,9 +42,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(ShowFpsAction)
         .flags(GlobalHotkey)
-        .shortcut(lit("Ctrl+Alt+F"))
-        .checkable()
-        .autoRepeat(false);
+        .shortcut("Ctrl+Alt+F")
+        .checkable();
 
     factory(DropResourcesAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
@@ -65,20 +64,17 @@ void initialize(Manager* manager, Action* root)
     factory(NextLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .shortcut(lit("Ctrl+Tab"))
-        .autoRepeat(false);
+        .shortcut("Ctrl+Tab");
 
     factory(PreviousLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .shortcut(lit("Ctrl+Shift+Tab"))
-        .autoRepeat(false);
+        .shortcut("Ctrl+Shift+Tab");
 
     factory(SelectAllAction)
         .flags(GlobalHotkey)
-        .shortcut(lit("Ctrl+A"))
-        .shortcutContext(Qt::WidgetWithChildrenShortcut)
-        .autoRepeat(false);
+        .shortcut("Ctrl+A")
+        .shortcutContext(Qt::WidgetWithChildrenShortcut);
 
     factory(SelectionChangeAction)
         .flags(NoTarget);
@@ -126,15 +122,13 @@ void initialize(Manager* manager, Action* root)
     factory(FreespaceAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .shortcut(lit("F11"))
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .shortcut("F11")
+        .condition(!condition::tourIsRunning());
 
     factory(FullscreenResourceAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .condition(!condition::tourIsRunning());
 
     factory(ShowTimeLineOnVideowallAction)
         .flags(NoTarget)
@@ -161,7 +155,7 @@ void initialize(Manager* manager, Action* root)
             | LayoutItemTarget | WidgetTarget | GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .shortcut(lit("Ctrl+L"))
+        .shortcut("Ctrl+L")
         .condition(!condition::tourIsRunning())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
 
@@ -222,7 +216,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(NotificationsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
-        .shortcut(lit("N"))
+        .shortcut("N")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Notifications tab"));
 
@@ -254,13 +248,13 @@ void initialize(Manager* manager, Action* root)
 
     factory(BookmarksTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
-        .shortcut(lit("B"))
+        .shortcut("B")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Bookmarks tab"));
 
     factory(EventsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
-        .shortcut(lit("E"))
+        .shortcut("E")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Events tab"));
 
@@ -305,9 +299,8 @@ void initialize(Manager* manager, Action* root)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Main Menu")) //< To be displayed on button tooltip
-        .shortcut(lit("Alt+Space"), Builder::Mac, true)
+        .shortcut(QString("Alt+Space"), Builder::Mac, true)
         .condition(!condition::tourIsRunning())
-        .autoRepeat(false)
         .icon(qnSkin->icon("titlebar/main_menu.png"));
 
     factory(OpenLoginDialogAction)
@@ -317,8 +310,7 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(ContextMenu::tr("Connect to Another Server..."),
             condition::isLoggedIn())
         .shortcut("Ctrl+Shift+C")
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .condition(!condition::tourIsRunning());
 
     factory(DisconnectAction)
         .flags(NoTarget)
@@ -328,7 +320,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Disconnect from Server"))
-        .autoRepeat(false)
         .shortcut("Ctrl+Shift+D")
         .condition(condition::isLoggedIn());
 
@@ -354,9 +345,8 @@ void initialize(Manager* manager, Action* root)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Tab"))
             .pulledText(ContextMenu::tr("New Tab"))
-            .shortcut(lit("Ctrl+T"))
+            .shortcut("Ctrl+T")
             .condition(!condition::tourIsRunning())
-            .autoRepeat(false) /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
             .icon(qnSkin->icon("titlebar/new_layout.png"));
 
         factory(OpenNewWindowAction)
@@ -364,66 +354,16 @@ void initialize(Manager* manager, Action* root)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Window"))
             .pulledText(ContextMenu::tr("New Window"))
-            .shortcut(lit("Ctrl+N"))
-            .autoRepeat(false)
+            .shortcut("Ctrl+N")
             .condition(condition::isLoggedIn()
                  && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
         factory(OpenWelcomeScreenAction)
-            .flags(Main | GlobalHotkey)
+            .flags(Main)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Welcome Screen"))
             .pulledText(ContextMenu::tr("Welcome Screen"))
-            .autoRepeat(false)
             .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
-
-        factory()
-            .flags(Main)
-            .separator();
-
-        factory(NewUserAction)
-            .flags(Main | Tree)
-            .requiredAdminPermissions()
-            .text(ContextMenu::tr("User..."))
-            .pulledText(ContextMenu::tr("New User..."))
-            .condition(
-                condition::treeNodeType(ResourceTree::NodeType::users)
-            )
-            .autoRepeat(false);
-
-        factory(NewVideoWallAction)
-            .flags(Main)
-            .requiredAdminPermissions()
-            .text(ContextMenu::tr("Video Wall..."))
-            .pulledText(ContextMenu::tr("New Video Wall..."))
-            .autoRepeat(false);
-
-        factory(NewWebPageAction)
-            .flags(Main | Tree)
-            .requiredAdminPermissions()
-            .text(ContextMenu::tr("Web Page..."))
-            .pulledText(ContextMenu::tr("Add Web Page..."))
-            .condition(
-                condition::treeNodeType(ResourceTree::NodeType::webPages)
-            )
-            .autoRepeat(false);
-
-        factory(NewLayoutTourAction)
-            .flags(Main | Tree | NoTarget)
-            .text(ContextMenu::tr("Showreel..."))
-            .pulledText(ContextMenu::tr("New Showreel..."))
-            .condition(condition::isLoggedIn()
-                && condition::treeNodeType(ResourceTree::NodeType::layoutTours)
-            )
-            .autoRepeat(false);
-
-        factory(NewVirtualCameraAction)
-            .flags(Main | NoTarget)
-            .requiredAdminPermissions()
-            .text(ContextMenu::tr("Virtual Camera..."))
-            .pulledText(ContextMenu::tr("New Virtual Camera..."))
-            .condition(condition::isLoggedIn())
-            .autoRepeat(false);
     }
     factory.endSubMenu();
 
@@ -447,7 +387,6 @@ void initialize(Manager* manager, Action* root)
     factory(ShowServersInTreeAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Show Servers"))
-        .autoRepeat(false)
         .checkable()
         .checked(false) //< This action will be kept in unchecked state.
         .condition(condition::isLoggedIn()
@@ -457,7 +396,6 @@ void initialize(Manager* manager, Action* root)
     factory(HideServersInTreeAction)
         .flags(Tree | NoTarget | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Show Servers"))
-        .autoRepeat(false)
         .checkable()
         .checked(true) //< This action will be kept in checked state.
         .condition(new HideServersInTreeCondition());
@@ -478,9 +416,8 @@ void initialize(Manager* manager, Action* root)
             .mode(DesktopMode)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
             .text(ContextMenu::tr("Files..."))
-            .shortcut(lit("Ctrl+O"))
-            .condition(!condition::tourIsRunning())
-            .autoRepeat(false);
+            .shortcut("Ctrl+O")
+            .condition(!condition::tourIsRunning());
 
         factory(OpenFolderAction)
             .flags(Main | Scene)
@@ -495,7 +432,6 @@ void initialize(Manager* manager, Action* root)
             .flags(Main | Tree | NoTarget)
             .text(ContextMenu::tr("Web Client..."))
             .pulledText(ContextMenu::tr("Open Web Client..."))
-            .autoRepeat(false)
             .condition(condition::isLoggedIn()
                 && condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                     ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices}));
@@ -505,16 +441,14 @@ void initialize(Manager* manager, Action* root)
     factory(SaveCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .condition(condition::isLayoutTourReviewMode())
-        .autoRepeat(false);
+        .condition(condition::isLayoutTourReviewMode());
 
     factory(SaveCurrentLayoutAction)
         .mode(DesktopMode)
         .flags(Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission)
         .text(ContextMenu::tr("Save Current Layout"))
-        .shortcut(lit("Ctrl+S"))
-        .autoRepeat(false) /* There is no point in saving the same layout many times in a row. */
+        .shortcut("Ctrl+S")
         .condition(ConditionWrapper(new SaveLayoutCondition(true))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
@@ -525,7 +459,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Current Layout As..."))
         .shortcut("Ctrl+Shift+S")
         .shortcut(QKeySequence("Ctrl+Alt+S"), Builder::Windows, false)
-        .autoRepeat(false)
         .condition(
             condition::isLoggedIn()
             && condition::applyToCurrentLayout(condition::canSaveLayoutAs())
@@ -536,7 +469,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Save Current Layout As Cloud..."))
-        .autoRepeat(false)
         .condition(
             condition::isLoggedIn()
             && condition::isLoggedInToCloud()
@@ -549,27 +481,23 @@ void initialize(Manager* manager, Action* root)
     factory(ShareLayoutAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
-        .autoRepeat(false)
         .requiredAdminPermissions();
 
     factory(ShareCameraAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
-        .autoRepeat(false)
         .requiredAdminPermissions();
 
     factory(ShareWebPageAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
-        .autoRepeat(false)
         .requiredAdminPermissions();
 
     factory(SaveCurrentVideoWallReviewAction)
         .flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Save Video Wall View"))
-        .shortcut(lit("Ctrl+S"))
-        .autoRepeat(false)
+        .shortcut("Ctrl+S")
         .condition(
             condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new SaveVideowallReviewCondition(true))
@@ -591,10 +519,9 @@ void initialize(Manager* manager, Action* root)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Start Screen Recording"))
             .toggledText(ContextMenu::tr("Stop Screen Recording"))
-            .shortcut(lit("Alt+R"))
+            .shortcut("Alt+R")
             .shortcut(Qt::Key_MediaRecord)
             .shortcutContext(Qt::ApplicationShortcut)
-            .autoRepeat(false)
             .condition(!condition::isLoggedIn()
                 || condition::allOpenedCamerasAllowExport());
 
@@ -606,8 +533,7 @@ void initialize(Manager* manager, Action* root)
     factory(EscapeHotkeyAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .autoRepeat(false)
-        .shortcut(lit("Esc"))
+        .shortcut("Esc")
         .text(ContextMenu::tr("Stop current action"));
 
     factory(FullscreenAction)
@@ -619,7 +545,6 @@ void initialize(Manager* manager, Action* root)
         .shortcutContext(Qt::ApplicationShortcut)
         .icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
 
-
     factory(MinimizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Minimize"))
@@ -629,16 +554,13 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Maximize"))
         .toggledText(ContextMenu::tr("Restore Down"))
-        .autoRepeat(false)
         .icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
-
 
     factory(FullscreenMaximizeHotkeyAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .autoRepeat(false)
-        .shortcut(lit("Alt+Enter"))
-        .shortcut(lit("Alt+Return"))
+        .shortcut("Alt+Enter")
+        .shortcut("Alt+Return")
         .shortcutContext(Qt::ApplicationShortcut)
         .condition(PreventWhenFullscreenTransition::condition());
 
@@ -669,7 +591,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("System Administration..."))
-        .shortcut(lit("Ctrl+Alt+A"))
+        .shortcut("Ctrl+Alt+A")
         .requiredAdminPermissions()
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
@@ -698,15 +620,12 @@ void initialize(Manager* manager, Action* root)
     factory(PreferencesGeneralTabAction)
         .flags(Main)
         .text(ContextMenu::tr("Local Settings..."))
-        //.shortcut(lit("Ctrl+P"))
-        .role(QAction::PreferencesRole)
-        .autoRepeat(false);
+        .role(QAction::PreferencesRole);
 
     factory(JoystickSettingsAction)
         .flags(Main)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Joystick Settings..."))
-        .autoRepeat(false)
         .condition(condition::joystickConnected());
 
     factory(OpenAuditLogAction)
@@ -718,11 +637,10 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Bookmark Log..."))
-        .shortcut(lit("Ctrl+B"))
+        .shortcut("Ctrl+B")
         .condition(
             condition::hasPermissionsForResources(Qn::ViewBookmarksPermission)
-            && !condition::tourIsRunning())
-        .autoRepeat(false);
+            && !condition::tourIsRunning());
 
     factory(LoginToCloud)
         .flags(NoTarget)
@@ -772,9 +690,8 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Event Rules..."))
-        .shortcut(lit("Ctrl+E"))
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .shortcut("Ctrl+E")
+        .condition(!condition::tourIsRunning());
 
     factory(CameraListAction)
         .flags(GlobalHotkey)
@@ -785,16 +702,58 @@ void initialize(Manager* manager, Action* root)
             ContextMenu::tr("Devices List"),
             ContextMenu::tr("Cameras List")
         ))
-        .shortcut(lit("Ctrl+M"))
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .shortcut("Ctrl+M")
+        .condition(!condition::tourIsRunning());
 
-    factory(MainMenuAddDeviceManuallyAction)
-        .flags(Main)
-        .text(ContextMenu::tr("Add Device..."))
-        .requiredAdminPermissions()
-        .condition(condition::isLoggedIn()
-            && !condition::tourIsRunning());
+    factory()
+        .flags(Main | Tree)
+        .text(ContextMenu::tr("Add"));
+
+    factory.beginSubMenu();
+    {
+        factory(MainMenuAddDeviceManuallyAction)
+            .flags(Main)
+            .text(ContextMenu::tr("Device"))
+            .requiredAdminPermissions();
+
+        factory(NewUserAction)
+            .flags(Main | Tree)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("User"))
+            .pulledText(ContextMenu::tr("Add User"))
+            .condition(
+                condition::treeNodeType(ResourceTree::NodeType::users)
+            );
+
+        factory(NewVideoWallAction)
+            .flags(Main)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Video Wall"));
+
+        factory(NewWebPageAction)
+            .flags(Main | Tree)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Web Page"))
+            .pulledText(ContextMenu::tr("Add Web Page"))
+            .condition(
+                condition::treeNodeType(ResourceTree::NodeType::webPages)
+            );
+
+        factory(NewLayoutTourAction)
+            .flags(Main | Tree)
+            .text(ContextMenu::tr("Showreel"))
+            .pulledText(ContextMenu::tr("Add Showreel"))
+            .condition(condition::isLoggedIn()
+                && condition::treeNodeType(ResourceTree::NodeType::layoutTours)
+            );
+
+        factory(MainMenuAddVirtualCameraAction)
+            .flags(Main)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Virtual Camera"))
+            .pulledText(ContextMenu::tr("Add Virtual Camera"));
+    }
+    factory.endSubMenu();
 
     factory(MergeSystems)
         .flags(Main | Tree)
@@ -829,11 +788,10 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("About..."))
-        .shortcut(lit("F1"))
+        .shortcut("F1")
         .shortcutContext(Qt::ApplicationShortcut)
         .role(QAction::AboutRole)
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .condition(!condition::tourIsRunning());
 
     factory()
         .flags(Main)
@@ -845,8 +803,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Window Configuration"))
         .conditionalText(ContextMenu::tr("Save Windows Configuration"),
             condition::hasOtherWindowsInSession())
-        .condition(condition::isLoggedIn() && !condition::hasSavedWindowsState())
-        .autoRepeat(false);
+        .condition(condition::isLoggedIn() && !condition::hasSavedWindowsState());
 
     factory()
         .flags(Main)
@@ -895,11 +852,10 @@ void initialize(Manager* manager, Action* root)
     factory(ExitAction)
         .flags(Main | GlobalHotkey)
         .text(ContextMenu::tr("Exit"))
-        .shortcut(lit("Alt+F4"))
-        .shortcut(lit("Ctrl+Q"), Builder::Mac, true)
+        .shortcut("Alt+F4")
+        .shortcut(QString("Ctrl+Q"), Builder::Mac, true)
         .shortcutContext(Qt::ApplicationShortcut)
         .role(QAction::QuitRole)
-        .autoRepeat(false)
         .icon(qnSkin->icon("titlebar/window_close.png"))
         .iconVisibleInMenu(false);
 
@@ -932,14 +888,14 @@ void initialize(Manager* manager, Action* root)
     factory(StartTimeSelectionAction)
         .flags(Slider | SingleTarget)
         .text(ContextMenu::tr("Mark Selection Start"))
-        .shortcut(lit("["))
+        .shortcut("[")
         .shortcutContext(Qt::WidgetShortcut)
         .condition(new TimePeriodCondition(NullTimePeriod, InvisibleAction));
 
     factory(EndTimeSelectionAction)
         .flags(Slider | SingleTarget)
         .text(ContextMenu::tr("Mark Selection End"))
-        .shortcut(lit("]"))
+        .shortcut("]")
         .shortcutContext(Qt::WidgetShortcut)
         .condition(new TimePeriodCondition(EmptyTimePeriod, InvisibleAction));
 
@@ -1103,13 +1059,11 @@ void initialize(Manager* manager, Action* root)
     factory(OpenInFolderAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Open Containing Folder"))
-        .autoRepeat(false)
         .condition(new OpenInFolderCondition());
 
     factory(IdentifyVideoWallAction)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Identify"))
-        .autoRepeat(false)
         .condition(
             condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new IdentifyVideoWallCondition()));
@@ -1118,7 +1072,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Attach to Video Wall..."))
-        .autoRepeat(false)
         .condition(
             condition::hasFlags(Qn::videowall, MatchMode::any)
         );
@@ -1127,15 +1080,13 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Switch to Video Wall mode..."))
-        .autoRepeat(false)
         .condition(new StartVideowallCondition());
 
     factory(SaveVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Video Wall"))
-        .shortcut(lit("Ctrl+S"))
+        .shortcut("Ctrl+S")
         .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
-        .autoRepeat(false)
         .condition(
             ConditionWrapper(new SaveVideowallReviewCondition(false))
         );
@@ -1144,7 +1095,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Save Current Matrix"))
-        .autoRepeat(false)
         .condition(
             ConditionWrapper(new NonEmptyVideowallCondition())
         );
@@ -1158,9 +1108,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
         .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
         .text(ContextMenu::tr("Delete"))
-        .shortcut(lit("Del"))
-        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false);
+        .shortcut("Del")
+        .shortcut(Qt::Key_Backspace, Builder::Mac, true);
 
     factory()
         .flags(Scene | Tree)
@@ -1170,13 +1119,11 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Stop Video Wall"))
-        .autoRepeat(false)
         .condition(condition::videowallIsRunning());
 
     factory(ClearVideoWallScreen)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Clear Screen"))
-        .autoRepeat(false)
         .condition(
             condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
             && ConditionWrapper(new DetachFromVideoWallCondition()));
@@ -1260,16 +1207,14 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallItemTarget | IntentionallyAmbiguous)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Delete"))
-        .shortcut(lit("Del"))
-        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false);
+        .shortcut("Del")
+        .shortcut(Qt::Key_Backspace, Builder::Mac, true);
 
     factory(MaximizeItemAction)
         .flags(Scene | SingleTarget)
         .text(ContextMenu::tr("Maximize Item"))
-        .shortcut(lit("Enter"))
-        .shortcut(lit("Return"))
-        .autoRepeat(false)
+        .shortcut("Enter")
+        .shortcut("Return")
         .condition(ConditionWrapper(new ItemZoomedCondition(false))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
@@ -1277,9 +1222,8 @@ void initialize(Manager* manager, Action* root)
     factory(UnmaximizeItemAction)
         .flags(Scene | SingleTarget)
         .text(ContextMenu::tr("Restore Item"))
-        .shortcut(lit("Enter"))
-        .shortcut(lit("Return"))
-        .autoRepeat(false)
+        .shortcut("Enter")
+        .shortcut("Return")
         .condition(ConditionWrapper(new ItemZoomedCondition(true))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
@@ -1299,6 +1243,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut("I")
         .shortcut("Alt+I")
+        .autoRepeat(true)
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 
@@ -1354,29 +1299,27 @@ void initialize(Manager* manager, Action* root)
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut("Alt+G")
+        .autoRepeat(true)
         .condition(ConditionWrapper(new SmartSearchCondition())
             && !condition::isLayoutTourReviewMode());
 
     factory(CheckFileSignatureAction)
         .flags(Scene | SingleTarget)
         .text(ContextMenu::tr("Check File Watermark"))
-        .shortcut(lit("Alt+C"))
-        .autoRepeat(false)
+        .shortcut("Alt+C")
         .condition(condition::hasFlags(Qn::local_video, MatchMode::any)
             && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
     factory(TakeScreenshotAction)
         .flags(Scene | SingleTarget | HotkeyOnly)
-        .shortcut(lit("Alt+S"))
-        .autoRepeat(false)
+        .shortcut("Alt+S")
         .condition(new TakeScreenshotCondition());
 
     factory(AdjustVideoAction)
         .flags(Scene | SingleTarget)
         .text(ContextMenu::tr("Image Enhancement..."))
-        .shortcut(lit("Alt+J"))
-        .autoRepeat(false)
+        .shortcut("Alt+J")
         .condition(ConditionWrapper(new AdjustVideoCondition())
             && !condition::isLayoutTourReviewMode());
 
@@ -1403,8 +1346,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Create Group"))
-        .shortcut(lit("Ctrl+G"))
-        .autoRepeat(false)
+        .shortcut("Ctrl+G")
         .requiredAdminPermissions()
         .condition(
             (condition::treeNodeType(ResourceTree::NodeType::resource)
@@ -1431,8 +1373,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
         .requiredAdminPermissions()
-        .shortcut(lit("F2"))
-        .autoRepeat(false)
+        .shortcut("F2")
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::customResourceGroup)
             && ConditionWrapper(new RenameResourceTreeGroupCondition()));
@@ -1442,9 +1383,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove Group"))
         .requiredAdminPermissions()
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false)
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::customResourceGroup)
             && ConditionWrapper(new RemoveResourceTreeGroupCondition()));
@@ -1456,9 +1396,8 @@ void initialize(Manager* manager, Action* root)
     factory(RemoveLayoutItemAction)
         .flags(Tree | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove from Layout"))
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false)
         .condition(new LayoutItemRemovalCondition());
 
     factory(RemoveLayoutItemFromSceneAction)
@@ -1466,9 +1405,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Remove from Layout"))
         .conditionalText(ContextMenu::tr("Remove from Showreel"),
             condition::isLayoutTourReviewMode())
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false)
         .condition(ConditionWrapper(new LayoutItemRemovalCondition())
             && !condition::tourIsRunning());
 
@@ -1476,18 +1414,16 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | Table | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .requiredTargetPermissions(Qn::RemovePermission)
         .text(ContextMenu::tr("Delete"))
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false)
         .condition(ConditionWrapper(new ResourceRemovalCondition()));
 
     factory(StopSharingLayoutAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Stop Sharing Layout"))
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .autoRepeat(false)
         .condition(new StopSharingCondition());
 
     factory()
@@ -1498,23 +1434,20 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Page..."))
         .childFactory(new WebPageFactory(manager))
-        .autoRepeat(false)
         .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne));
 
     factory(RenameResourceAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .requiredTargetPermissions(Qn::WritePermission | Qn::WriteNamePermission)
         .text(ContextMenu::tr("Rename"))
-        .shortcut(lit("F2"))
-        .autoRepeat(false)
+        .shortcut("F2")
         .condition(new RenameResourceCondition());
 
     factory(RenameVideowallEntityAction)
         .flags(Tree | SingleTarget | VideoWallItemTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
         .condition(condition::hasPermissionsForResources(Qn::Permission::WriteNamePermission))
         .text(ContextMenu::tr("Rename"))
-        .shortcut(lit("F2"))
-        .autoRepeat(false);
+        .shortcut("F2");
 
     factory()
         .flags(Tree | Table)
@@ -1524,14 +1457,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Web Page Settings..."))
-        .autoRepeat(false)
         .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne)
             && !condition::tourIsRunning());
 
     factory(DeleteFromDiskAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
-        .autoRepeat(false)
         .condition(condition::hasFlags(Qn::local_media, MatchMode::all)
             && condition::isTrue(ini().allowDeleteLocalFiles));
 
@@ -1539,7 +1470,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission)
         .text(ContextMenu::tr("Set as Layout Background"))
-        .autoRepeat(false)
         .condition(ConditionWrapper(new SetAsBackgroundCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
             && !condition::tourIsRunning()
@@ -1698,25 +1628,31 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Analytics Engine Settings..."))
         .condition(condition::isAnalyticsEngine());
 
-    factory(AddDeviceManuallyAction)
-        .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
-        .requiredAdminPermissions()
+    factory()
+        .flags(Main | Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Add"))
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && !ConditionWrapper(new FakeServerCondition(true)));
 
-    factory(AddProxiedWebPageAction)
-        .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Add Proxied Web Page..."))
-        .requiredAdminPermissions()
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
-            && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+    factory.beginSubMenu();
+    {
+        factory(AddDeviceManuallyAction)
+            .flags(Tree | SingleTarget | ResourceTarget)
+            .text(ContextMenu::tr("Device")) //< Intentionally hardcode devices here.
+            .requiredAdminPermissions();
+
+        factory(AddProxiedWebPageAction)
+            .flags(Tree | SingleTarget | ResourceTarget)
+            .text(ContextMenu::tr("Proxied Web Page"))
+            .requiredAdminPermissions();
+
+        factory(AddVirtualCameraAction)
+            .flags(Tree | SingleTarget | ResourceTarget)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Virtual Camera"));
+    }
+    factory.endSubMenu();
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1852,15 +1788,13 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Tab"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour))
-        .autoRepeat(false);
+        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
 
     factory(ReviewLayoutTourInNewWindowAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Window"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour))
-        .autoRepeat(false);
+        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
 
     factory().flags(Tree).separator().condition(
         condition::treeNodeType(ResourceTree::NodeType::layoutTour));
@@ -1869,9 +1803,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
         .mode(DesktopMode)
         .dynamicText(new LayoutTourTextFactory(manager))
-        .shortcut(lit("Alt+T"))
+        .shortcut("Alt+T")
         .checkable()
-        .autoRepeat(false)
         .condition(
             condition::tourIsRunning()
             || (condition::treeNodeType(ResourceTree::NodeType::layoutTour) && condition::
@@ -1886,8 +1819,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::isLayoutTourReviewMode()
             && ConditionWrapper(new StartCurrentLayoutTourCondition())
-        )
-        .autoRepeat(false);
+        );
 
     factory().flags(Tree).separator().condition(
         condition::treeNodeType(ResourceTree::NodeType::layoutTour));
@@ -1896,7 +1828,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Delete"))
-        .shortcut(lit("Del"))
+        .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
 
@@ -1906,11 +1838,10 @@ void initialize(Manager* manager, Action* root)
     factory(RenameLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
-        .shortcut(lit("F2"))
+        .shortcut("F2")
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::layoutTour)
-        )
-        .autoRepeat(false);
+        );
 
     factory(SaveLayoutTourAction)
         .flags(NoTarget)
@@ -1919,8 +1850,7 @@ void initialize(Manager* manager, Action* root)
     factory(RemoveCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .condition(condition::isLayoutTourReviewMode())
-        .autoRepeat(false);
+        .condition(condition::isLayoutTourReviewMode());
 
     factory().flags(Tree).separator().condition(
         condition::treeNodeType(ResourceTree::NodeType::layoutTour));
@@ -1931,8 +1861,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::layoutTour)
         )
-        .childFactory(new LayoutTourSettingsFactory(manager))
-        .autoRepeat(false);
+        .childFactory(new LayoutTourSettingsFactory(manager));
 
     factory()
         .flags(Scene)
@@ -1942,8 +1871,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Settings"))
         .condition(condition::isLayoutTourReviewMode())
-        .childFactory(new LayoutTourSettingsFactory(manager))
-        .autoRepeat(false);
+        .childFactory(new LayoutTourSettingsFactory(manager));
 
 #pragma endregion Layout Tours
 
@@ -1965,9 +1893,8 @@ void initialize(Manager* manager, Action* root)
         .flags(GlobalHotkey | TitleBar | ScopelessHotkey | SingleTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Close"))
-        .shortcut(lit("Ctrl+W"))
-        .condition(!condition::tourIsRunning())
-        .autoRepeat(false);
+        .shortcut("Ctrl+W")
+        .condition(!condition::tourIsRunning());
 
     factory(CloseAllButThisLayoutAction)
         .flags(TitleBar | SingleTarget)
@@ -1998,66 +1925,69 @@ void initialize(Manager* manager, Action* root)
 //        .shortcut(lit("Space")) - hotkey is handled directly in Main Window due to Qt issue
         .text(ContextMenu::tr("Play"))
         .toggledText(ContextMenu::tr("Pause"))
-        .autoRepeat(false)
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 
     factory(PreviousFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Ctrl+Left"))
+        .shortcut("Ctrl+Left")
+        .autoRepeat(true)
         .text(ContextMenu::tr("Previous Frame"))
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 
     factory(NextFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Ctrl+Right"))
+        .shortcut("Ctrl+Right")
+        .autoRepeat(true)
         .text(ContextMenu::tr("Next Frame"))
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 
     factory(JumpToStartAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Z"))
+        .shortcut("Z")
         .text(ContextMenu::tr("To Start"))
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 
     factory(JumpToEndAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("X"))
+        .shortcut("X")
         .text(ContextMenu::tr("To End"))
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 
     factory(VolumeUpAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Ctrl+Up"))
-        .text(ContextMenu::tr("Volume Down"))
+        .shortcut("Ctrl+Up")
+        .autoRepeat(true)
+        .text(ContextMenu::tr("Volume Up"))
         .condition(new TimelineVisibleCondition());
 
     factory(VolumeDownAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Ctrl+Down"))
-        .text(ContextMenu::tr("Volume Up"))
+        .shortcut("Ctrl+Down")
+        .autoRepeat(true)
+        .text(ContextMenu::tr("Volume Down"))
         .condition(new TimelineVisibleCondition());
 
     factory(ToggleMuteAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("U"))
+        .shortcut("U")
         .text(ContextMenu::tr("Toggle Mute"))
         .checkable()
         .condition(new TimelineVisibleCondition());
 
     factory(JumpToLiveAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("L"))
+        .shortcut("L")
         .text(ContextMenu::tr("Jump to Live"))
         .condition(new ArchiveCondition());
 
     factory(ToggleSyncAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("S"))
+        .shortcut("S")
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
@@ -2212,24 +2142,21 @@ void initialize(Manager* manager, Action* root)
         factory(OpenNewSceneAction)
             .flags(GlobalHotkey | Main | DevMode)
             .text("Open New Scene")
-            .shortcut("Ctrl+Shift+E")
-            .autoRepeat(false);
+            .shortcut("Ctrl+Shift+E");
 
         factory(OpenEventRulesDialogAction)
             .flags(GlobalHotkey | Main | DevMode)
             .mode(DesktopMode)
             .requiredAdminPermissions()
             .text("New Event Rules...")
-            .shortcut(lit("Ctrl+Alt+E"))
+            .shortcut("Ctrl+Alt+E")
             .condition(!condition::tourIsRunning()
-                && condition::hasNewEventRulesEngine())
-            .autoRepeat(false);
+                && condition::hasNewEventRulesEngine());
 
         factory(ShowDebugOverlayAction)
             .flags(GlobalHotkey | Main | DevMode)
             .text("Show Debug Overlay")
-            .shortcut("Ctrl+Alt+D")
-            .autoRepeat(false);
+            .shortcut("Ctrl+Alt+D");
 
         factory(ExportStandaloneClientAction)
             .flags(Main | DevMode)
@@ -2244,11 +2171,13 @@ void initialize(Manager* manager, Action* root)
         factory(DebugIncrementCounterAction)
             .flags(GlobalHotkey | Main | DevMode)
             .shortcut("Ctrl+Alt+Shift++")
+            .autoRepeat(true)
             .text("Increment Debug Counter");
 
         factory(DebugDecrementCounterAction)
             .flags(GlobalHotkey | Main | DevMode)
             .shortcut("Ctrl+Alt+Shift+-")
+            .autoRepeat(true)
             .text("Decrement Debug Counter");
 
     }

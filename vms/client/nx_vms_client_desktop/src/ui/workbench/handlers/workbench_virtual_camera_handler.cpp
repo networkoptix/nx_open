@@ -92,7 +92,9 @@ QnWorkbenchVirtualCameraHandler::QnWorkbenchVirtualCameraHandler(QObject* parent
 
     new QnVirtualCameraSessionDelegate(this);
 
-    connect(action(NewVirtualCameraAction), &QAction::triggered, this,
+    connect(action(AddVirtualCameraAction), &QAction::triggered, this,
+        &QnWorkbenchVirtualCameraHandler::at_newVirtualCameraAction_triggered);
+    connect(action(MainMenuAddVirtualCameraAction), &QAction::triggered, this,
         &QnWorkbenchVirtualCameraHandler::at_newVirtualCameraAction_triggered);
     connect(action(UploadVirtualCameraFileAction), &QAction::triggered, this,
         &QnWorkbenchVirtualCameraHandler::at_uploadVirtualCameraFileAction_triggered);
@@ -149,8 +151,11 @@ void QnWorkbenchVirtualCameraHandler::at_newVirtualCameraAction_triggered()
     if (!connection())
         return;
 
+    const auto params = menu()->currentParameters(sender());
+    const auto selectedServer = params.resource().dynamicCast<QnMediaServerResource>();
+
     std::unique_ptr<QnNewVirtualCameraDialog> dialog
-        = std::make_unique<QnNewVirtualCameraDialog>(mainWindowWidget());
+        = std::make_unique<QnNewVirtualCameraDialog>(mainWindowWidget(), selectedServer);
 
     if (dialog->exec() != QDialog::Accepted)
         return;

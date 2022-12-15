@@ -16,7 +16,7 @@
 
 using namespace nx::vms::client::desktop;
 
-QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent):
+QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMediaServerResourcePtr& selectedServer):
     base_type(parent),
     ui(new Ui::NewVirtualCameraDialog)
 {
@@ -29,7 +29,9 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent):
     //setHelpTopic(, Qn::);
 
     /* Set up combobox. */
-    QnResourceList servers = resourcePool()->servers();
+    QnResourceList servers = selectedServer
+        ? QnMediaServerResourceList({selectedServer})
+        : resourcePool()->servers();
     auto nameLess = [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
     std::sort(servers.begin(), servers.end(), nameLess);
 
