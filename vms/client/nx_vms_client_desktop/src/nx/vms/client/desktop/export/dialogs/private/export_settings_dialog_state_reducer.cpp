@@ -158,9 +158,13 @@ void ExportSettingsDialogState::setCacheDirLocation(const QString& location)
 State ExportSettingsDialogStateReducer::loadSettings(
     State state, const QnClientSettings* settings, const QString& cacheDirLocation)
 {
+    qint64 timestampOffsetMs =
+        state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs;
     state.exportMediaPersistentSettings = state.bookmarkName.isEmpty()
         ? settings->exportMediaSettings()
         : settings->exportBookmarkSettings();
+    state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs =
+        timestampOffsetMs;
 
     if (state.bookmarkName.isEmpty())
         state.exportMediaPersistentSettings.usedOverlays.removeOne(ExportOverlayType::bookmark);
