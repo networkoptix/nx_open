@@ -41,13 +41,15 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
-    using namespace std::placeholders;
+    m_queryQueue.setOnItemStayTimeout([this](auto&&... args) {
+        reportQueryCancellation(std::forward<decltype(args)>(args)...);
+    });
+
     if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
             > std::chrono::minutes::zero())
     {
-        m_queryQueue.enableItemStayTimeoutEvent(
-            m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
-            std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
+        m_queryQueue.setItemStayTimeout(
+            m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection);
     }
 
     if (m_connectionOptions.driverType == RdbmsDriverType::sqlite)
@@ -232,6 +234,13 @@ void AsyncSqlQueryExecutor::setCustomConnectionFactory(
 void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 {
     m_queryQueue.setConcurrentModificationQueryLimit(value);
+}
+
+void AsyncSqlQueryExecutor::setQueryTimeoutEnabled(bool enabled)
+{
+    m_queryQueue.setItemStayTimeout(enabled
+        ? std::make_optional(m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection)
+        : std::nullopt);
 }
 
 void AsyncSqlQueryExecutor::setQueryPriority(
