@@ -243,7 +243,7 @@ struct Ini: nx::kit::IniConfig
         " * \"low\" - all new layouts are opened with forced low resolution");
 
     // VMS-30701
-    NX_INI_FLAG(false, enableCameraReplacementFeature,
+    NX_INI_FLAG(true, enableCameraReplacementFeature,
         "[Feature] Makes Camera Replacement feature available in the client.");
 
     // VMS-16938
