@@ -1126,7 +1126,8 @@ enum IDType
     LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
-    NewVirtualCameraAction,
+    AddVirtualCameraAction,
+    MainMenuAddVirtualCameraAction,
     UploadVirtualCameraFileAction,
     UploadVirtualCameraFolderAction,
     CancelVirtualCameraUploadsAction,

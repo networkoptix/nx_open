@@ -15,7 +15,7 @@ class QnNewVirtualCameraDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit QnNewVirtualCameraDialog(QWidget* parent);
+    explicit QnNewVirtualCameraDialog(QWidget* parent, const QnMediaServerResourcePtr& selectedServer = {});
     virtual ~QnNewVirtualCameraDialog() override;
 
     QString name() const;
