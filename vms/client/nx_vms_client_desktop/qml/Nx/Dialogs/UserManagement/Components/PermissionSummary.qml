@@ -45,7 +45,7 @@ Grid
                 color: model.checkState == Qt.Checked
                     ? ColorTheme.colors.light10
                     : ColorTheme.colors.dark13
-                text: model.display
+                text: (model && model.display) || ""
             }
         }
     }
