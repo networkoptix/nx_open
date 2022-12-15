@@ -57,7 +57,7 @@ void ManagerLinux::enumerateDevices()
             "Model: %1, path: %2",
             modelAndManufacturer, path);
 
-        const auto config = getDeviceDescription(findDeviceModel(modelAndManufacturer));
+        const auto config = createDeviceDescription(findDeviceModel(modelAndManufacturer));
         DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
         DevicePtr device(deviceLinux);
         deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
