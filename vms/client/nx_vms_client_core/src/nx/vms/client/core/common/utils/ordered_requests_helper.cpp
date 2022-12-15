@@ -93,5 +93,47 @@ bool OrderedRequestsHelper::postJsonResult(
     return true;
 }
 
-} // namespace nx::vms::client::core
+bool OrderedRequestsHelper::getJsonResult(
+    const rest::ServerConnectionPtr& connection,
+    const QString& action,
+    const nx::network::rest::Params& params,
+    rest::JsonResultCallback&& callback,
+    QThread* thread)
+{
+    if (!connection)
+        return false;
 
+    const auto internalCallback = nx::utils::guarded(this,
+        [this, callback](
+            bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
+        {
+            if (handle != d->currentHandle)
+            {
+                NX_ASSERT(false, "Wrong requests order");
+                return;
+            }
+
+            if (callback)
+                callback(success, handle, result);
+
+            d->currentHandle = -1;
+            d->tryExecuteNextRequest();
+        });
+
+    const auto request =
+        [connection, action, params, callback, internalCallback, thread]() -> rest::Handle
+        {
+            if (connection)
+                return connection->getJsonResult(action, params, internalCallback, thread);
+
+            executeInThread(thread,
+                [callback]() { callback(/*success*/ false, /*handle*/ -1, /*result*/ {}); });
+
+            return -1;
+        };
+
+    d->addRequest(request);
+    return true;
+}
+
+} // namespace nx::vms::client::core
