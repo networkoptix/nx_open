@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 #include <QtCore/QString>
@@ -53,12 +54,11 @@ public:
      */
     QList<const Device*> devices() const;
 
-    JoystickDescriptor getDefaultDeviceDescription(const QString& model) const;
-    JoystickDescriptor getDeviceDescription(const QString& model) const;
-    void updateDeviceDescription(const JoystickDescriptor& config);
+    JoystickDescriptor createDeviceDescription(const QString& model);
 
-    /** Load config files. */
-    void loadConfig();
+    JoystickDescriptor getDefaultDeviceDescription(const QString& model) const;
+    const JoystickDescriptor& getDeviceDescription(const QString& model) const;
+    void updateDeviceDescription(const JoystickDescriptor& config);
 
     /** Save config files. */
     void saveConfig(const QString& model);
@@ -71,15 +71,16 @@ public:
 
 protected:
     virtual void enumerateDevices() = 0;
-    void loadConfig(
-        const QString& searchDir,
-        DeviceConfigs& destConfigs,
-        QMap<QString, QString>& destIdToRelativePath) const;
 
-    void loadGeneralConfig(
-        const QString& searchDir,
-        JoystickDescriptor& destConfig,
-        QMap<QString, QString>& destIdToRelativePath) const;
+    /** Load config files. */
+    void loadConfigs();
+
+    void loadConfig(
+        const QDir& searchDir,
+        DeviceConfigs& destConfigs,
+        QMap<QString, QString>& destIdToFileName) const;
+
+    void loadGeneralConfig(const QDir& searchDir, JoystickDescriptor& destConfig) const;
 
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
     void initializeDevice(
@@ -92,6 +93,9 @@ protected:
     QTimer* pollTimer() const;
 
     const DeviceConfigs& getKnownJoystickConfigs() const;
+
+private:
+    QDir getLocalConfigDirPath() const;
 
 protected:
     mutable nx::Mutex m_mutex;

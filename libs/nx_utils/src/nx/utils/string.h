@@ -35,7 +35,7 @@ NX_UTILS_API QString replaceCharacters(const QString &string, const char *symbol
 */
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement)
 {
-    return replaceCharacters(string, "\n\\/:*?\"<>|", replacement).trimmed();
+    return replaceCharacters(string, "/\0\t\n\\:*?\"<>|", replacement).trimmed();
 }
 
 /*!

@@ -110,7 +110,7 @@ void ManagerWindows::enumerateDevices()
 
             if (!m_devices.contains(path))
             {
-                const auto config = getDeviceDescription(modelName);
+                const auto config = createDeviceDescription(modelName);
 
                 const auto device = createDevice(
                     config,
