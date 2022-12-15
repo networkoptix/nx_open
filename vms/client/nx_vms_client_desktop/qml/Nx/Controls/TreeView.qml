@@ -497,7 +497,7 @@ FocusScope
                         }
                     }
 
-                    onDoubleClicked:
+                    onDoubleClicked: (mouse) =>
                     {
                         editingTimer.stop()
                         reselectOnRelease = false
@@ -656,7 +656,7 @@ FocusScope
         {
             target: listView
 
-            onPositionChanged:
+            onPositionChanged: (position) =>
             {
                 autoScroller.velocity = ProximityScrollHelper.velocity(
                     Qt.rect(0, 0, listView.width, listView.height),
@@ -807,7 +807,7 @@ FocusScope
         }
     }
 
-    Keys.onPressed:
+    Keys.onPressed: (event) =>
     {
         if (!listView.count)
             return
