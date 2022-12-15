@@ -121,11 +121,14 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
     }
 }
 
-void QueryQueue::enableItemStayTimeoutEvent(
-    std::chrono::milliseconds timeout,
-    ItemStayTimeoutHandler itemStayTimeoutHandler)
+void QueryQueue::setItemStayTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
+    NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
     m_itemStayTimeout = timeout;
+}
+
+void QueryQueue::setOnItemStayTimeout(ItemStayTimeoutHandler itemStayTimeoutHandler)
+{
     m_itemStayTimeoutHandler = std::move(itemStayTimeoutHandler);
 }
 
@@ -263,7 +266,7 @@ void QueryQueue::decreaseLimitCounters(AbstractExecutor* finishedQuery)
 
 void QueryQueue::removeExpiredElements(nx::Locker<nx::Mutex>* lock)
 {
-    if (!m_itemStayTimeout)
+    if (!m_itemStayTimeout || !m_itemStayTimeoutHandler)
         return;
 
     const auto minEnqueueTime = nx::utils::monotonicTime() - *m_itemStayTimeout;

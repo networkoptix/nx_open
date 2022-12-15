@@ -148,8 +148,8 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QStri
 
     if (settingsReader.contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
     {
-        maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-            nx::utils::parseTimerDuration(settingsReader.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
+        maxPeriodQueryWaitsForAvailableConnection = nx::utils::parseTimerDuration(
+            settingsReader.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString());
     }
 
     if (settingsReader.contains(kDbFailOnDbTuneError))

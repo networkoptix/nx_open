@@ -38,9 +38,9 @@ public:
     std::optional<value_type> pop(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
-    void enableItemStayTimeoutEvent(
-        std::chrono::milliseconds timeout,
-        ItemStayTimeoutHandler itemStayTimeoutHandler);
+    void setItemStayTimeout(std::optional<std::chrono::milliseconds> timeout);
+
+    void setOnItemStayTimeout(ItemStayTimeoutHandler itemStayTimeoutHandler);
 
     /**
      * @param value Zero - no limit. By default, zero.

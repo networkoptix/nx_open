@@ -201,6 +201,11 @@ public:
         return m_delegate->setConcurrentModificationQueryLimit(limit);
     }
 
+    virtual void setQueryTimeoutEnabled(bool enabled) override
+    {
+        return m_delegate->setQueryTimeoutEnabled(enabled);
+    }
+
     virtual QueryQueueStats stats() const override
     {
         return m_delegate->stats();

@@ -45,6 +45,12 @@ public:
      */
     virtual void setConcurrentModificationQueryLimit(int value) = 0;
 
+    /**
+     * @param enabled If set to false, then ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection
+     * timeout is not respected.
+     */
+    virtual void setQueryTimeoutEnabled(bool enabled) = 0;
+
     //---------------------------------------------------------------------------------------------
     // Asynchronous operations.
 
@@ -324,8 +330,8 @@ public:
     virtual const ConnectionOptions& connectionOptions() const override;
 
     virtual void setQueryPriority(QueryType queryType, int newPriority) override;
-
     virtual void setConcurrentModificationQueryLimit(int value) override;
+    virtual void setQueryTimeoutEnabled(bool enabled) override;
 
     /**
      * Overload for updates with no input data.

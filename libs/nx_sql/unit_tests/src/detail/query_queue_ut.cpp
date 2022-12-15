@@ -151,11 +151,9 @@ protected:
 
     void enableQueueItemTimeout()
     {
-        using namespace std::placeholders;
-
-        m_queryQueue.enableItemStayTimeoutEvent(
-            kQueryTimeout,
-            std::bind(&QueryQueue::processTimedOutQuery, this, _1));
+        m_queryQueue.setItemStayTimeout(kQueryTimeout);
+        m_queryQueue.setOnItemStayTimeout(
+            [this](auto&&... args) { processTimedOutQuery(std::forward<decltype(args)>(args)...); });
     }
 
     void raiseSelectQueryPriority()
@@ -257,11 +255,9 @@ protected:
 
     void thenAnotherModificationQueryCanBeReadFromTheQueue()
     {
-        using namespace std::placeholders;
-
-        m_queryQueue.enableItemStayTimeoutEvent(
-            std::chrono::hours(1),
-            std::bind(&QueryQueue::processTimedOutQuery, this, _1));
+        m_queryQueue.setItemStayTimeout(std::chrono::hours(1));
+        m_queryQueue.setOnItemStayTimeout(
+            [this](auto&&... args) { processTimedOutQuery(std::forward<decltype(args)>(args)...); });
 
         m_queryQueue.push(std::make_unique<QueryExecutorStub>(QueryType::modification));
         ASSERT_TRUE(static_cast<bool>(m_queryQueue.pop()));
@@ -477,9 +473,8 @@ public:
     {
         queryQueue().setConcurrentModificationQueryLimit(1000);
 
-        queryQueue().enableItemStayTimeoutEvent(
-            std::chrono::seconds(35),
-            [](auto&&...) {});
+        queryQueue().setItemStayTimeout(std::chrono::seconds(35));
+        queryQueue().setOnItemStayTimeout([](auto&&...) {});
     }
 
 protected:
