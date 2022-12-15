@@ -385,14 +385,14 @@ struct RemoteConnectionFactory::Private
         if (context)
         {
             NX_DEBUG(this, "Checking compatibility");
-            if (context->moduleInformation.isNewSystem())
-            {
-                context->setError(RemoteConnectionErrorCode::factoryServer);
-            }
-            else if (const auto incompatibilityReason = ServerCompatibilityValidator::check(
+            if (const auto incompatibilityReason = ServerCompatibilityValidator::check(
                 context->moduleInformation, context->logonData.purpose))
             {
                 context->setError(toErrorCode(*incompatibilityReason));
+            }
+            else if (context->moduleInformation.isNewSystem())
+            {
+                context->setError(RemoteConnectionErrorCode::factoryServer);
             }
         }
         return context && !context->failed();
