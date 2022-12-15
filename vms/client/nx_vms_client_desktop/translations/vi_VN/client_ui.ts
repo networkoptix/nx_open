@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Sử dụng camera nguồn sự kiện</translation>
     </message>
   </context>
   <context>

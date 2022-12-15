@@ -301,15 +301,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
     </message>
   </context>
   <context>
