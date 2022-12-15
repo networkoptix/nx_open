@@ -75,7 +75,8 @@ function _createItemsRecursively(parent, visualParent, model, depth)
         return null
     }
 
-    var item = component.createObject(visualParent, model)
+    delete model.type
+    var item = component.createObject(visualParent || null, model)
 
     if (item)
     {
