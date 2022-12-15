@@ -118,7 +118,8 @@ int CompatibilityVersionInstallationDialog::exec()
         nx::utils::guarded(this,
             [this](core::RemoteConnectionFactory::ConnectionOrError result)
             {
-                if (auto error = std::get_if<core::RemoteConnectionError>(&result))
+                if (auto error = std::get_if<core::RemoteConnectionError>(&result);
+                    error && error->code != core::RemoteConnectionErrorCode::factoryServer)
                 {
                     QnMessageBox::critical(
                         this,
