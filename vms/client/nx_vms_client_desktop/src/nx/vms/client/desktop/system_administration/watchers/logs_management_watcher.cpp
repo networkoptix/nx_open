@@ -806,7 +806,12 @@ struct LogsManagementWatcher::Private
             notificationManager, &workbench::LocalNotificationsManager::interactionRequested, q,
             [this, context](const QnUuid& notificationId)
             {
-                context->action(ui::action::LogsManagementAction)->trigger();
+                if (notificationId == clientLogLevelWarning
+                    || notificationId == serverLogLevelWarning
+                    || notificationId == logsDownloadNotification)
+                {
+                    context->action(ui::action::LogsManagementAction)->trigger();
+                }
             });
     }
 
