@@ -174,13 +174,12 @@ JoystickSettingsDialog::Private::~Private()
 
 bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
 {
-    manager->loadConfig();
     const QList<const Device*> devices = manager->devices();
     if (devices.empty())
         return false;
 
     const auto& device = devices.first();
-    JoystickDescriptor description = initWithDefaults
+    const JoystickDescriptor& description = initWithDefaults
         ? manager->getDefaultDeviceDescription(device->modelName())
         : manager->getDeviceDescription(device->modelName());
     buttonSettingsModel->init(description, device);
