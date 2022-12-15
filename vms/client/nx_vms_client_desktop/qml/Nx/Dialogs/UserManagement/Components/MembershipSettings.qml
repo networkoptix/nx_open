@@ -203,7 +203,7 @@ Item
                     onTextChanged:
                     {
                         // For text highlight.
-                        currentSearchRegExp = text 
+                        currentSearchRegExp = text
                             ? new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')
                             : ""
                         allGroupsListView.model.setFilterRegularExpression(currentSearchRegExp)
@@ -239,7 +239,8 @@ Item
 
             x: 0
             width: parent.width - editablePanel.anchors.leftMargin
-            height: parent.height - allGroupsListView.headerItem.height
+            height: parent.height
+                - (allGroupsListView.headerItem ? allGroupsListView.headerItem.height : 0)
         }
     }
 
