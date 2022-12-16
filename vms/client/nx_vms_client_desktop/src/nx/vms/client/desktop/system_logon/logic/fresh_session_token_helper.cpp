@@ -2,6 +2,9 @@
 
 #include "fresh_session_token_helper.h"
 
+#include <QtCore/QThread>
+#include <QtWidgets/QApplication>
+
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -46,23 +49,44 @@ FreshSessionTokenHelper::FreshSessionTokenHelper(QWidget* parent):
     NX_CRITICAL(m_parent);
 }
 
-nx::network::http::AuthToken FreshSessionTokenHelper::getToken(
+FreshSessionTokenHelper::~FreshSessionTokenHelper()
+{
+}
+
+common::SessionTokenHelperPtr FreshSessionTokenHelper::makeHelper(
+    QWidget* parent,
     const QString& title,
     const QString& mainText,
     const QString& actionText,
     ActionType actionType)
 {
+    auto result = new FreshSessionTokenHelper(parent);
+    result->m_title = title;
+    result->m_mainText = mainText;
+    result->m_actionText = actionText;
+    result->m_actionType = actionType;
+    return common::SessionTokenHelperPtr(result);
+}
+
+std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToken()
+{
+    if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
+        return {};
+
+    if (!m_parent)
+        return {};
+
     nx::network::http::AuthToken token;
     auto connection = this->connection();
     if (!connection)
-        return token;
+        return {};
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
     {
         token = OauthLoginDialog::login(
             m_parent,
-            title,
-            info(actionType).clientType,
+            m_title,
+            info(m_actionType).clientType,
             /*sessionAware*/ true,
             connection->moduleInformation().cloudSystemId
         ).credentials.authToken;
@@ -71,16 +95,19 @@ nx::network::http::AuthToken FreshSessionTokenHelper::getToken(
     {
         token = SessionRefreshDialog::refreshSession(
             m_parent,
-            title,
-            mainText,
+            m_title,
+            m_mainText,
             /*infoText*/ QString(),
-            actionText,
-            info(actionType).isImportant,
+            m_actionText,
+            info(m_actionType).isImportant,
             /*passwordValidationMode*/ false
         ).token;
     }
-
     NX_ASSERT(token.empty() || token.isBearerToken());
+
+    if (token.empty())
+        return {};
+
     return token;
 }
 

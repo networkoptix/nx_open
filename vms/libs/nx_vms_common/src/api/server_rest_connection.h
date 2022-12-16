@@ -45,6 +45,7 @@
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_diagnostics.h>
 
@@ -253,25 +254,25 @@ public:
      * Unbind the System from the Cloud and reset local admin password (optionally).
      */
     Handle unbindSystemFromCloud(
+        nx::vms::common::SessionTokenHelperPtr helper,
         const QString& password,
-        const std::string& ownerSessionToken,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 
     Handle dumpDatabase(
-        const std::string& ownerSessionToken,
+        nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
         QThread* targetThread);
 
     Handle restoreDatabase(
+        nx::vms::common::SessionTokenHelperPtr helper,
         const nx::vms::api::DatabaseDumpData& data,
-        const std::string& ownerSessionToken,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
 
     Handle putServerLogSettings(
+        nx::vms::common::SessionTokenHelperPtr helper,
         const QnUuid& serverId,
-        const std::string& ownerSessionToken,
         const nx::vms::api::ServerLogSettings& settings,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
@@ -814,6 +815,12 @@ public:
     static void setDebugFlag(DebugFlag flag, bool on);
 
 private:
+    template<typename ResultType>
+    Callback<ResultType> makeSessionAwareCallback(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::ClientPool::Request request,
+        Callback<ResultType> callback);
+
     template <typename ResultType>
     Handle executeRequest(
         const nx::network::http::ClientPool::Request& request,

@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -1094,13 +1095,10 @@ struct LogsManagementWatcher::Private
         }
 
         bool storeServerSettings(
-            const std::string& token,
+            nx::vms::common::SessionTokenHelperPtr helper,
             LogsManagementUnitPtr server,
             const ConfigurableLogSettings& settings)
         {
-            if (token.empty())
-                return false;
-
             auto existing = server->settings();
             if (!existing)
                 return false; //TODO: #spanasenko Report an error.
@@ -1123,8 +1121,8 @@ struct LogsManagementWatcher::Private
                 });
 
             q->connection()->serverApi()->putServerLogSettings(
+                helper,
                 server->id(),
-                token,
                 newSettings,
                 callback,
                 q->thread()
@@ -1439,8 +1437,8 @@ void LogsManagementWatcher::setUpdatesEnabled(bool enabled)
 }
 
 void LogsManagementWatcher::applySettings(
-    const std::string& token,
-    const ConfigurableLogSettings& settings)
+    const ConfigurableLogSettings& settings,
+    QWidget* parentWidget)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     NX_ASSERT(d->state == State::hasSelection);
@@ -1471,9 +1469,16 @@ void LogsManagementWatcher::applySettings(
     if (newClientSettings)
         storeAndApplyClientSettings(*newClientSettings);
 
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        parentWidget,
+        tr("Apply Settings"),
+        tr("Enter your account password"),
+        tr("Apply"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
     for (auto server: serversToStore)
     {
-        d->api->storeServerSettings(token, server, settings);
+        d->api->storeServerSettings(sessionTokenHelper, server, settings);
     }
 }
 

@@ -272,15 +272,15 @@ void ConnectToCurrentSystemTool::systemFound(
         return;
     }
 
-    const nx::network::http::AuthToken ownerSessionToken =
-        FreshSessionTokenHelper(mainWindowWidget())
-            .getToken(
-            tr("Merge Server to the System", "Dialog title"),
-            tr("Enter your account password to merge Server to the System"),
-            tr("Merge", "Merge Server to the current System (dialog button text)"),
-            FreshSessionTokenHelper::ActionType::merge);
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        mainWindowWidget(),
+        tr("Merge Server to the System", "Dialog title"),
+        tr("Enter your account password to merge Server to the System"),
+        tr("Merge", "Merge Server to the current System (dialog button text)"),
+        FreshSessionTokenHelper::ActionType::merge);
 
-    if (ownerSessionToken.empty())
+    auto ownerSessionToken = sessionTokenHelper->refreshToken();
+    if (!ownerSessionToken)
     {
         cancel();
         return;
@@ -288,7 +288,7 @@ void ConnectToCurrentSystemTool::systemFound(
 
     m_mergeTool->mergeSystem(
         m_mergeContextId,
-        ownerSessionToken.value,
+        ownerSessionToken->value,
         /*ownSettings*/ true,
         /*oneServer*/ true,
         /*ignoreIncompatible*/ true);

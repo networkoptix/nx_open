@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include <nx/network/http/auth_tools.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
 
@@ -12,7 +15,9 @@ namespace nx::vms::client::desktop {
 *
 * Intended to use with server owner API calls
 */
-class FreshSessionTokenHelper: public nx::vms::client::core::RemoteConnectionAware
+class FreshSessionTokenHelper:
+    public common::AbstractSessionTokenHelper,
+    public nx::vms::client::core::RemoteConnectionAware
 {
 public:
     enum class ActionType
@@ -26,15 +31,24 @@ public:
 
 public:
     FreshSessionTokenHelper(QWidget* parent);
+    virtual ~FreshSessionTokenHelper() override;
 
-    nx::network::http::AuthToken getToken(
+    static common::SessionTokenHelperPtr makeHelper(
+        QWidget* parent,
         const QString& title,
         const QString& mainText,
         const QString& actionText, //< Action button text.
         ActionType actionType);
 
+    std::optional<nx::network::http::AuthToken> refreshToken() override;
+
 private:
-    QWidget* m_parent = nullptr;
+
+    QPointer<QWidget> m_parent = nullptr;
+    QString m_title;
+    QString m_mainText;
+    QString m_actionText;
+    ActionType m_actionType = ActionType::updateSettings;
 };
 
 } // namespace nx::vms::client::desktop

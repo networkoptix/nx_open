@@ -170,11 +170,8 @@ void QnCloudManagementWidget::disconnectFromCloud()
         "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName());
 
-    auto authToken = FreshSessionTokenHelper(this).getToken(
-        title, mainText, tr("Disconnect"), FreshSessionTokenHelper::ActionType::unbind);
-
-    if (authToken.empty())
-        return;
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this, title, mainText, tr("Disconnect"), FreshSessionTokenHelper::ActionType::unbind);
 
     auto handler = nx::utils::guarded(
         this,
@@ -201,8 +198,8 @@ void QnCloudManagementWidget::disconnectFromCloud()
         });
 
     connectedServerApi()->unbindSystemFromCloud(
+        sessionTokenHelper,
         /*password*/ QString(),
-        authToken.value,
         std::move(handler),
         this->thread());
 }

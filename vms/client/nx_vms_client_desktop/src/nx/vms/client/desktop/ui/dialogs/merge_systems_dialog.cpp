@@ -227,13 +227,15 @@ void MergeSystemsDialog::at_mergeButton_clicked()
     const QString currentSystemName = systemSettings()->systemName();
     const QString targetSystemName = ui->remoteSystemRadioButton->text();
 
-    const auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
         tr("Merge Systems"),
         tr("Enter your account password to merge Systems"),
         tr("Merge", "Merge two Systems together (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
-    if (ownerSessionToken.empty())
+    const auto ownerSessionToken = sessionTokenHelper->refreshToken();
+    if (!ownerSessionToken)
         return;
 
     ui->credentialsGroupBox->setEnabled(false);
@@ -243,7 +245,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
     if (!ownSettings)
         context()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(false);
 
-    if (m_mergeTool->mergeSystem(m_mergeContextId, ownerSessionToken.value, ownSettings))
+    if (m_mergeTool->mergeSystem(m_mergeContextId, ownerSessionToken->value, ownSettings))
         ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
