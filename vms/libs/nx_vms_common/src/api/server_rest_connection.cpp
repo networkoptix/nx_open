@@ -270,21 +270,36 @@ namespace rest {
 
 struct ServerConnection::Private
 {
-    nx::network::http::ClientPool httpClientPool;
+    Private(
+        nx::vms::common::SystemContext* systemContext,
+        const QnUuid& serverId,
+        const nx::utils::log::Tag& logTag)
+        :
+        systemContext(systemContext),
+        serverId(serverId),
+        logTag(logTag),
+        httpClientPool(new nx::network::http::ClientPool())
+    {
+    }
 
-    QnUuid serverId;
-    nx::vms::common::SystemContext* systemContext = nullptr;
+    const nx::vms::common::SystemContext* systemContext = nullptr;
+    const QnUuid serverId;
+    const nx::utils::log::Tag logTag;
+    const QScopedPointer<nx::network::http::ClientPool> httpClientPool;
+
+    // While most fields of this struct never change during struct's lifetime, some data can be
+    // rarely updated. Therefore the following non-const fields should be protected by mutex.
+    nx::Mutex mutex;
 
     struct DirectConnect
     {
         QnUuid sessionId;
-        nx::vms::common::AbstractCertificateVerifier* certificateVerifier;
+        nx::vms::common::AbstractCertificateVerifier* certificateVerifier = nullptr;
         nx::network::SocketAddress address;
         nx::network::http::Credentials credentials;
     };
     std::optional<DirectConnect> directConnect;
-
-    nx::utils::log::Tag logTag;
+    std::map<Handle, Handle> substitutions;
 };
 
 ServerConnection::ServerConnection(
@@ -292,15 +307,15 @@ ServerConnection::ServerConnection(
     const QnUuid& serverId)
     :
     QObject(),
-    d(new Private())
+    d(new Private(
+        systemContext,
+        serverId,
+        nx::utils::log::Tag(
+            QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()))))
 {
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
     // QnMediaServerResource::restConnection() method to return weak pointer instead.
-    d->systemContext = systemContext;
-    d->serverId = serverId;
-    d->logTag = nx::utils::log::Tag(
-        QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()));
 }
 
 ServerConnection::ServerConnection(
@@ -321,29 +336,36 @@ ServerConnection::ServerConnection(
 
 void ServerConnection::updateSessionId(const QnUuid& sessionId)
 {
-    d->directConnect->sessionId = sessionId;
+    NX_MUTEX_LOCKER lock(&d->mutex);
+
+    if (NX_ASSERT(d->directConnect))
+        d->directConnect->sessionId = sessionId;
 }
 
 ServerConnection::~ServerConnection()
 {
-    d->httpClientPool.stop(/*invokeCallbacks*/ true);
+    d->httpClientPool->stop(/*invokeCallbacks*/ true);
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)
 {
+    NX_MUTEX_LOCKER lock(&d->mutex);
+
     if (NX_ASSERT(d->directConnect))
         d->directConnect->address = std::move(address);
 }
 
 void ServerConnection::updateCredentials(nx::network::http::Credentials credentials)
 {
+    NX_MUTEX_LOCKER lock(&d->mutex);
+
     if (NX_ASSERT(d->directConnect))
         d->directConnect->credentials = std::move(credentials);
 }
 
 void ServerConnection::setDefaultTimeouts(nx::network::http::AsyncClient::Timeouts timeouts)
 {
-    d->httpClientPool.setDefaultTimeouts(timeouts);
+    d->httpClientPool->setDefaultTimeouts(timeouts);
 }
 
 Handle ServerConnection::cameraHistoryAsync(
@@ -525,8 +547,8 @@ Handle ServerConnection::bindSystemToCloud(
 }
 
 Handle ServerConnection::unbindSystemFromCloud(
+    nx::vms::common::SessionTokenHelperPtr helper,
     const QString& password,
-    const std::string& ownerSessionToken,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
@@ -539,10 +561,11 @@ Handle ServerConnection::unbindSystemFromCloud(
             /*params*/ {{"userAgent", prepareUserAgent()}}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
-    request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
     auto handle = request.isValid()
-        ? executeRequest(request, callback, targetThread)
+        ? executeRequest(request, wrapper, targetThread)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -550,17 +573,18 @@ Handle ServerConnection::unbindSystemFromCloud(
 }
 
 Handle ServerConnection::dumpDatabase(
-    const std::string& ownerSessionToken,
+    nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
         prepareUrl("/rest/v1/system/database", /*params*/ {}));
-    request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(wrapper), targetThread)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -568,8 +592,8 @@ Handle ServerConnection::dumpDatabase(
 }
 
 Handle ServerConnection::restoreDatabase(
+    nx::vms::common::SessionTokenHelperPtr helper,
     const nx::vms::api::DatabaseDumpData& data,
-    const std::string& ownerSessionToken,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
@@ -578,10 +602,11 @@ Handle ServerConnection::restoreDatabase(
         prepareUrl("/rest/v1/system/database", /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
-    request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(wrapper), targetThread)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -589,8 +614,8 @@ Handle ServerConnection::restoreDatabase(
 }
 
 Handle ServerConnection::putServerLogSettings(
+    nx::vms::common::SessionTokenHelperPtr helper,
     const QnUuid& serverId,
-    const std::string& ownerSessionToken,
     const nx::vms::api::ServerLogSettings& settings,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -602,10 +627,11 @@ Handle ServerConnection::putServerLogSettings(
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(settings));
-    request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(wrapper), targetThread)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -1641,7 +1667,7 @@ Handle ServerConnection::testLdapSettingsAsync(
     nx::network::rest::Params params;
     params.insert(nx::network::http::header::kContentType, "application/json");
 
-    Timeouts timeouts = d->httpClientPool.defaultTimeouts();
+    Timeouts timeouts = d->httpClientPool->defaultTimeouts();
     timeouts.responseReadTimeout = settings.searchTimeoutS;
     timeouts.messageBodyReadTimeout = settings.searchTimeoutS;
 
@@ -1939,6 +1965,105 @@ Handle ServerConnection::executeDelete(
     return handle;
 }
 
+template<typename ResultType>
+Callback<ResultType> ServerConnection::makeSessionAwareCallback(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::network::http::ClientPool::Request request,
+    Callback<ResultType> callback)
+{
+    return
+        [this, helper, request, callback=std::move(callback)](
+            bool success, Handle handle, ResultType result)
+        {
+            // This function is executed in the target thread of an API request callback. It can
+            // call helper's refreshToken() method in a separate thread (e.g. requesting some user
+            // interaction) and resend the original request with updated credentials. After that
+            // the original callback is called in the target thread.
+            //
+            // Right now we have only one helper implementation, which must be called in qApp's
+            // thread to show a dialog. If that changes in future, we'll can either capture the
+            // interactionThread value from makeSessionAwareCallback(), or add a thread() method
+            // into the helper, depending on the actual helper implementation.
+            const auto interactionThread = qApp->thread();
+            const auto targetThread = QThread::currentThread();
+
+            if (auto error = std::get_if<nx::network::rest::Result>(&result);
+                error && error->error == nx::network::rest::Result::SessionExpired)
+            {
+                // Session is expired. Let's try to issue a new token and resend the request.
+                executeInThread(interactionThread,
+                    [this, helper, callback, success, handle, result, request, targetThread]
+                    {
+                        if (auto token = helper->refreshToken())
+                        {
+                            {
+                                // Update credentials.
+                                NX_MUTEX_LOCKER lock(&d->mutex);
+                                this->d->directConnect->credentials.authToken =
+                                        nx::network::http::BearerAuthToken(token->value);
+                            }
+
+                            const auto originalHandle = handle;
+
+                            // Make an auxiliary callback that will pass the original request
+                            // handle to the caller instead of an unknown-to-the-caller resended
+                            // request handle.
+                            Callback<ResultType> fixedCallback =
+                                [this, callback=std::move(callback), originalHandle](
+                                    bool success, Handle handle, ResultType result)
+                                {
+                                    NX_VERBOSE(d->logTag,
+                                        "Received responce for <%1>, which is a re-send of <%2>",
+                                        handle, originalHandle);
+
+                                    {
+                                        // Request is done. Remove the substitution.
+                                        NX_MUTEX_LOCKER lock(&d->mutex);
+                                        d->substitutions.erase(originalHandle);
+                                    }
+
+                                    callback(success, originalHandle, result);
+                                };
+
+                            // We need to update the request too, since it stores credentials.
+                            auto fixedRequest = request;
+                            fixedRequest.credentials->authToken =
+                                    nx::network::http::BearerAuthToken(token->value);
+
+                            // Resend the request.
+                            const auto handle = executeRequest(
+                                fixedRequest, std::move(fixedCallback), targetThread);
+
+                            NX_VERBOSE(d->logTag,
+                                "<%1> Sending <%2>(%3) with updated credentials",
+                                handle, originalHandle, request.url);
+
+                            {
+                                // Store the handles, so we'll be able to cancel the right request.
+                                NX_MUTEX_LOCKER lock(&d->mutex);
+                                d->substitutions[originalHandle] = handle;
+                            }
+                        }
+                        else
+                        {
+                            // Token was not updated. Process the callback in its target thread.
+                            executeInThread(targetThread,
+                                [callback=std::move(callback),
+                                    success, handle, result=std::move(result)]
+                                {
+                                    callback(success, handle, result);
+                                });
+                        }
+                    });
+
+                return;
+            }
+
+            // Default path -- pass the result to the original callback.
+            callback(success, handle, result);
+        };
+}
+
 template <typename ResultType>
 Handle ServerConnection::executeRequest(
     const nx::network::http::ClientPool::Request& request,
@@ -2069,8 +2194,29 @@ Handle ServerConnection::executeRequest(
 
 void ServerConnection::cancelRequest(const Handle& requestId)
 {
-    NX_VERBOSE(d->logTag, "<%1> Cancelling request...", requestId);
-    d->httpClientPool.terminate(requestId);
+    std::optional<Handle> actualId;
+    {
+        // Check if we had re-send this request with updated credentials.
+        NX_MUTEX_LOCKER lock(&d->mutex);
+
+        if (auto it = d->substitutions.find(requestId);
+            it != d->substitutions.end())
+        {
+            actualId = it->second;
+        }
+    }
+
+    if (actualId)
+    {
+        NX_VERBOSE(d->logTag,
+            "<%1> Cancelling request (which is actually <%2>)...", requestId, *actualId);
+        d->httpClientPool->terminate(*actualId);
+    }
+    else
+    {
+        NX_VERBOSE(d->logTag, "<%1> Cancelling request...", requestId);
+        d->httpClientPool->terminate(requestId);
+    }
 }
 
 nx::network::http::Credentials getRequestCredentials(
@@ -2089,8 +2235,8 @@ nx::network::http::Credentials getRequestCredentials(
 }
 
 bool setupAuth(
-    nx::vms::common::SystemContext* systemContext,
-    QnUuid serverId,
+    const nx::vms::common::SystemContext* systemContext,
+    const QnUuid& serverId,
     nx::network::http::ClientPool::Request& request,
     const QUrl& url)
 {
@@ -2192,20 +2338,29 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
 {
     nx::network::http::ClientPool::Request request;
 
-    if (d->directConnect)
+    bool isDirect = false, authIsSet = false;
+
     {
-        setupAuthDirect(
-            request,
-            d->directConnect->sessionId,
-            d->directConnect->address,
-            d->directConnect->credentials,
-            url.path(),
-            url.query());
+        NX_MUTEX_LOCKER lock(&d->mutex);
+
+        if (d->directConnect)
+        {
+            setupAuthDirect(
+                request,
+                d->directConnect->sessionId,
+                d->directConnect->address,
+                d->directConnect->credentials,
+                url.path(),
+                url.query());
+            isDirect = authIsSet = true;
+        }
     }
-    else if (!setupAuth(d->systemContext, d->serverId, request, url))
-    {
+
+    if (!isDirect)
+        authIsSet = setupAuth(d->systemContext, d->serverId, request, url);
+
+    if (!authIsSet)
         return nx::network::http::ClientPool::Request();
-    }
 
     request.method = method;
     request.contentType = contentType;
@@ -2232,7 +2387,7 @@ Handle ServerConnection::sendRequest(
     context->timeouts = timeouts;
     context->setTargetThread(thread);
 
-    Handle requestId = d->httpClientPool.sendRequest(context);
+    Handle requestId = d->httpClientPool->sendRequest(context);
 
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
     if (!requestId || context->isFinished())
@@ -2243,7 +2398,7 @@ Handle ServerConnection::sendRequest(
 
 Handle ServerConnection::sendRequest(const ContextPtr& context)
 {
-    Handle requestId = d->httpClientPool.sendRequest(context);
+    Handle requestId = d->httpClientPool->sendRequest(context);
 
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
     if (!requestId || context->isFinished())

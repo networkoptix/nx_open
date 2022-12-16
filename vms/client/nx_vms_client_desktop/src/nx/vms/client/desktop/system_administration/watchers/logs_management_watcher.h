@@ -113,9 +113,10 @@ public:
 
     void setUpdatesEnabled(bool enabled);
 
+    // parentWidget may be used to show a password request dialog, and therefore is mandatory.
     void applySettings(
-        const std::string& token,
-        const ConfigurableLogSettings& settings);
+        const ConfigurableLogSettings& settings,
+        QWidget* parentWidget);
 
     static nx::utils::log::Level defaultLogLevel();
     static nx::vms::api::ServerLogSettings clientLogSettings();

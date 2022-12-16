@@ -86,14 +86,6 @@ void QnDatabaseManagementWidget::backupDb()
         return;
     }
 
-    auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
-        tr("Save Database Backup"),
-        tr("Enter your account password to create backup"),
-        tr("Create"),
-        FreshSessionTokenHelper::ActionType::backup);
-    if (ownerSessionToken.empty())
-        return;
-
     resetStyle(ui->labelMessage);
     ui->labelMessage->setText(tr("Database backup is being downloaded from the server. Please wait."));
 
@@ -130,8 +122,16 @@ void QnDatabaseManagementWidget::backupDb()
         });
     m_state = State::backupStarted;
     updateVisible();
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Save Database Backup"),
+        tr("Enter your account password to create backup"),
+        tr("Create"),
+        FreshSessionTokenHelper::ActionType::backup);
+
     auto handle = connection->dumpDatabase(
-        ownerSessionToken.value, std::move(dumpDatabaseHandler), thread());
+        sessionTokenHelper, std::move(dumpDatabaseHandler), thread());
 
     connect(
         ui->cancelCreateBackupButton,
@@ -189,14 +189,6 @@ void QnDatabaseManagementWidget::restoreDb()
     if (button != QDialogButtonBox::Ok)
         return;
 
-    auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
-        tr("Restore from Database Backup"),
-        tr("Enter your account password to restore System from backup"),
-        tr("Restore"),
-        FreshSessionTokenHelper::ActionType::restore);
-    if (ownerSessionToken.empty())
-        return;
-
     nx::vms::api::DatabaseDumpData data;
     data.data = file.readAll();
     file.close();
@@ -226,8 +218,16 @@ void QnDatabaseManagementWidget::restoreDb()
 
     m_state = State::restoreStarted;
     updateVisible();
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Restore from Database Backup"),
+        tr("Enter your account password to restore System from backup"),
+        tr("Restore"),
+        FreshSessionTokenHelper::ActionType::restore);
+
     auto handle = connection->restoreDatabase(
-        data, ownerSessionToken.value, std::move(restoreDatabaseHandler), thread());
+        sessionTokenHelper, data, std::move(restoreDatabaseHandler), thread());
     connect(
         ui->cancelRestoreBackupButton,
         &QPushButton::clicked,
