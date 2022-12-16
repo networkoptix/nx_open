@@ -260,7 +260,6 @@ QList<ActionType> userAvailableActions()
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction,
         ActionType::buzzerAction,
-        ActionType::showIntercomInformer,
     };
 
     return result;
