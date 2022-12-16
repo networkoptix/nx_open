@@ -25,10 +25,10 @@ public:
     TwoWayAudioAvailabilityWatcher(QObject* parent = nullptr);
     virtual ~TwoWayAudioAvailabilityWatcher() override;
 
+    bool available() const;
+
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
-
-    bool available() const;
 
     /* Device to be used as an actual audio output. */
     QnVirtualCameraResourcePtr audioOutputDevice();
