@@ -634,27 +634,37 @@ distrib_createArchive() # archive dir command...
     echo "  Done"
 }
 
-# [in] WORK_DIR
 # [in] DISTRIBUTION_OUTPUT_DIR
 # [in] DISTRIBUTION_TAR_GZ
+# [in] GZIP_COMPRESSION_LEVEL
+# [in] STAGE
+# [in] WORK_DIR
 # [in] CURRENT_BUILD_DIR
+# [in] DISTRIBUTION_ZIP
 # [in] DISTRIBUTION_UPDATE_ZIP
-distrib_createUpdateZip() # file.tar.gz
+distrib_createZipDistributionPackage()
 {
-    local -r tar_gz_file="$1" && shift
-
     echo ""
-    echo "Creating \"update\" .zip"
+    echo "Creating distribution archive"
 
+    echo "  Creating .tar.gz distribution file"
+    local -r tar_gz_archive="${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_TAR_GZ}"
+    GZIP=-${GZIP_COMPRESSION_LEVEL} distrib_createArchive "${tar_gz_archive}" "${STAGE}" tar czf
+
+    echo "  Creating .zip distribution file"
     local -r zip_dir="${WORK_DIR}/zip"
     mkdir -p "${zip_dir}"
 
-    ln -s "${tar_gz_file}" "${zip_dir}/"
+    mv "${tar_gz_archive}" "${zip_dir}/"
     install -m 644 "${CURRENT_BUILD_DIR}/package.json" "${zip_dir}/"
     install -m 755 "${CURRENT_BUILD_DIR}/install.sh" "${zip_dir}/"
 
-    distrib_createArchive "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}" "${zip_dir}" \
-        zip `# Never compress .tar.gz file #` -0
+    # Set the compression level to 0 because there is no reason to try to compress .tar.gz file.
+    distrib_createArchive "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ZIP}" "${zip_dir}" zip -0
+
+    echo "  Creating update package"
+    cp "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ZIP}" \
+        "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}"
 }
 
 # TODO: Check, if we really need this function - may be it would be better to use "install" instead
