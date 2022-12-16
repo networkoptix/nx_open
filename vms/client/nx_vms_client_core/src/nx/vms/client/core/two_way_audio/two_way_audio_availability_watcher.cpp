@@ -26,7 +26,7 @@ struct TwoWayAudioAvailabilityWatcher::Private
     QnVirtualCameraResourcePtr audioOutput;
     std::unique_ptr<nx::vms::license::SingleCamLicenseStatusHelper> helper;
     nx::utils::ScopedConnections sourceConnections;
-    nx::utils::ScopedConnections targetConnections;
+    nx::utils::ScopedConnections audioOutputConnections;
 };
 
 void TwoWayAudioAvailabilityWatcher::Private::updateAudioOutput()
@@ -38,7 +38,6 @@ void TwoWayAudioAvailabilityWatcher::Private::updateAudioOutput()
         {
             if (!sourceCamera)
                 return {};
-
 
             const auto systemContext = SystemContext::fromResource(sourceCamera);
             const auto id = sourceCamera->audioOutputDeviceId();
@@ -53,17 +52,17 @@ void TwoWayAudioAvailabilityWatcher::Private::updateAudioOutput()
         return;
 
     if (audioOutput && audioOutput != sourceCamera)
-        targetConnections.release();
+        audioOutputConnections.release();
 
     audioOutput = camera;
     helper.reset(audioOutput && audioOutput->isIOModule()
-            ? new SingleCamLicenseStatusHelper(audioOutput)
-            : nullptr);
+        ? new SingleCamLicenseStatusHelper(audioOutput)
+        : nullptr);
 
     if (audioOutput)
     {
         const auto update = [this]() { updateAvailability(); };
-        targetConnections.add(
+        audioOutputConnections.add(
             connect(audioOutput.get(), &QnVirtualCameraResource::statusChanged, q, update));
 
         if (helper)
