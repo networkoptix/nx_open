@@ -610,13 +610,6 @@ signals:
     void backupPolicyChanged(const QnResourcePtr& resource);
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsChanged(const QnSecurityCamResourcePtr& camera);
-
-    void networkIssue(
-        const QnResourcePtr& resource,
-        std::chrono::microseconds timestamp,
-        nx::vms::api::EventReason reasonCode,
-        const nx::vms::rules::NetworkIssueInfo& info);
-
     void recordingActionChanged(const QnResourcePtr& resource);
 
 protected slots:
