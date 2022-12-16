@@ -86,14 +86,6 @@ void QnDatabaseManagementWidget::backupDb()
         return;
     }
 
-    auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
-        tr("Save Database Backup"),
-        tr("Enter your account password to create backup"),
-        tr("Create"),
-        FreshSessionTokenHelper::ActionType::backup);
-    if (ownerSessionToken.empty())
-        return;
-
     resetStyle(ui->labelMessage);
     ui->labelMessage->setText(tr("Database backup is being downloaded from the server. Please wait."));
 
@@ -101,13 +93,14 @@ void QnDatabaseManagementWidget::backupDb()
         [this, fileName](
             bool success,
             rest::Handle,
-            rest::ErrorOrData<QByteArray> errorOrData)
+            rest::ErrorOrData<nx::vms::api::DatabaseDumpData> errorOrData)
         {
             success = false;
-            if (auto data = std::get_if<QByteArray>(&errorOrData))
+            if (auto data = std::get_if<nx::vms::api::DatabaseDumpData>(&errorOrData))
             {
                 QFile file(fileName);
-                success = file.open(QIODevice::WriteOnly) && file.write(*data) == data->size();
+                success = file.open(QIODevice::WriteOnly)
+                    && file.write(data->data) == data->data.size();
             }
 
             if (success)
@@ -127,10 +120,19 @@ void QnDatabaseManagementWidget::backupDb()
             m_state = State::backupFinished;
             updateVisible(success);
         });
+
     m_state = State::backupStarted;
     updateVisible();
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Save Database Backup"),
+        tr("Enter your account password to create backup"),
+        tr("Create"),
+        FreshSessionTokenHelper::ActionType::backup);
+
     auto handle = connection->dumpDatabase(
-        ownerSessionToken.value, std::move(dumpDatabaseHandler), thread());
+        sessionTokenHelper, std::move(dumpDatabaseHandler), thread());
 
     connect(
         ui->cancelCreateBackupButton,
@@ -188,15 +190,8 @@ void QnDatabaseManagementWidget::restoreDb()
     if (button != QDialogButtonBox::Ok)
         return;
 
-    auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
-        tr("Restore from Database Backup"),
-        tr("Enter your account password to restore System from backup"),
-        tr("Restore"),
-        FreshSessionTokenHelper::ActionType::restore);
-    if (ownerSessionToken.empty())
-        return;
-
-    auto data = file.readAll();
+    nx::vms::api::DatabaseDumpData data;
+    data.data = file.readAll();
     file.close();
 
     resetStyle(ui->labelMessage);
@@ -224,8 +219,16 @@ void QnDatabaseManagementWidget::restoreDb()
 
     m_state = State::restoreStarted;
     updateVisible();
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Restore from Database Backup"),
+        tr("Enter your account password to restore System from backup"),
+        tr("Restore"),
+        FreshSessionTokenHelper::ActionType::restore);
+
     auto handle = connection->restoreDatabase(
-        data, ownerSessionToken.value, std::move(restoreDatabaseHandler), thread());
+        sessionTokenHelper, data, std::move(restoreDatabaseHandler), thread());
     connect(
         ui->cancelRestoreBackupButton,
         &QPushButton::clicked,
