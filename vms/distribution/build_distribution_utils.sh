@@ -629,7 +629,6 @@ distrib_createUpdateZip() # file.tar.gz
     mkdir -p "${zip_dir}"
 
     ln -s "${tar_gz_file}" "${zip_dir}/"
-    install -m 644 "${CURRENT_BUILD_DIR}/update.json" "${zip_dir}/"
     install -m 644 "${CURRENT_BUILD_DIR}/package.json" "${zip_dir}/"
     install -m 755 "${CURRENT_BUILD_DIR}/install.sh" "${zip_dir}/"
 
