@@ -1,6 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 option(runConanAutomatically "Run Conan automatically when configuring the project." ON)
+set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 
 find_program(CONAN_EXECUTABLE NAMES conan NO_CMAKE_SYSTEM_PATH NO_CMAKE_PATH)
 if(NOT CONAN_EXECUTABLE)
@@ -69,6 +70,7 @@ function(nx_run_conan)
     endif()
 
     list(APPEND flags ${CONAN_FLAGS})
+    list(APPEND flags ${extraConanArgs})
 
     list(TRANSFORM flags PREPEND "        " OUTPUT_VARIABLE flags)
 
