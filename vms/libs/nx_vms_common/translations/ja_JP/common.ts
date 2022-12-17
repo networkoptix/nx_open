@@ -1583,7 +1583,7 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
     </message>
   </context>
   <context>
