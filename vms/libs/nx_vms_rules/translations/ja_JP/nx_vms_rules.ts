@@ -301,15 +301,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにシステム時刻が使用されます。</translation>
     </message>
   </context>
   <context>

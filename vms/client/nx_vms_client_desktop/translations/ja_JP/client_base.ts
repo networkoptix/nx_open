@@ -1340,11 +1340,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を %1 に送信してアクティベーションファイルを取得してください。</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
     </message>
   </context>
   <context>
@@ -1558,7 +1558,7 @@ License Key: %2</source>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>これらの設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
     </message>
   </context>
   <context>
