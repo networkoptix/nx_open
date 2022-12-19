@@ -8,6 +8,7 @@
 #include "blank_picker_widget.h"
 #include "dropdown_text_picker_widget.h"
 #include "duration_picker_widget.h"
+#include "flags_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
@@ -59,6 +60,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new TargetUserPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())
         pickerWidget = new InputPortPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::AnalyticsEventLevelField>())
+        pickerWidget = new FlagsPickerWidget<nx::vms::rules::AnalyticsEventLevelField>(context, parent);
     else
         pickerWidget = new BlankPickerWidget(context, parent);
 
