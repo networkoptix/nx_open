@@ -1446,7 +1446,7 @@ void QnSecurityCamResource::setPrimaryStreamRecorded(bool value)
 
 bool QnSecurityCamResource::isSecondaryStreamRecorded() const
 {
-    if (!hasDualStreamingInternal())
+    if (!hasDualStreamingInternal() && isDualStreamingDisabled())
         return false;
 
     const bool forbidden =
@@ -1456,7 +1456,7 @@ bool QnSecurityCamResource::isSecondaryStreamRecorded() const
 
 void QnSecurityCamResource::setSecondaryStreamRecorded(bool value)
 {
-    if (!hasDualStreamingInternal())
+    if (!hasDualStreamingInternal() && isDualStreamingDisabled())
         return;
 
     const QString valueStr = value ? "" : "1";
