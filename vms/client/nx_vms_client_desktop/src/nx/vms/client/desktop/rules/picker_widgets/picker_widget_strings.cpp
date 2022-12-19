@@ -29,4 +29,19 @@ QString DropdownTextPickerWidgetStrings::autoValue()
     return tr("Auto");
 }
 
+QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventLevel)
+{
+    switch(eventLevel)
+    {
+        case api::EventLevel::ErrorEventLevel:
+            return tr("Error");
+        case api::EventLevel::WarningEventLevel:
+            return tr("Warning");
+        case api::EventLevel::InfoEventLevel:
+            return tr("Info");
+        default:
+            return tr("Undefined");
+    }
+}
+
 } // namespace nx::vms::client::desktop::rules
