@@ -9,10 +9,6 @@ class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class NotificationListModel;
-class SystemHealthListModel;
-class LocalNotificationsListModel;
-
 class NotificationTabModel: public ConcatenationListModel
 {
     Q_OBJECT
@@ -21,10 +17,6 @@ class NotificationTabModel: public ConcatenationListModel
 public:
     explicit NotificationTabModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~NotificationTabModel() override;
-
-    NotificationListModel* notificationsModel() const;
-    SystemHealthListModel* systemHealthModel() const;
-    LocalNotificationsListModel* localNotificationsModel() const;
 
 private:
     struct Private;
