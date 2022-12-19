@@ -66,7 +66,7 @@ void QnThumbnailRequestData::loadFromParams(
 
     request.rotation = QnLexical::deserialized(params.value(kRotateParam), request.rotation);
     request.crop = QnLexical::deserialized<QRectF>(params.value(kCropParam), request.crop);
-    auto& size = request.size;
+    QSize& size = request.size;
     size.setHeight(QnLexical::deserialized(params.value(kHeightParam), size.height()));
     if (params.contains(kWidthParam))
         size.setWidth(QnLexical::deserialized(params.value(kWidthParam), size.width()));
@@ -104,8 +104,8 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
     result.insert(kRotateParam, request.rotation);
     if (!request.crop.isNull())
         result.insert(kCropParam, QnLexical::serialized(request.crop));
-    result.insert(kHeightParam, request.size.height());
-    result.insert(kWidthParam, request.size.width());
+    result.insert(kHeightParam, request.size.size.height());
+    result.insert(kWidthParam, request.size.size.width());
     result.insert(kImageFormatParam, nx::reflect::toString(request.format));
     result.insert(kRoundMethodParam, nx::reflect::toString(request.roundMethod));
     result.insert(kAspectRatioParam, nx::reflect::toString(request.aspectRatio));
@@ -133,7 +133,7 @@ std::optional<QString> QnThumbnailRequestData::getError() const
             .arg(kIgnoreExternalArchiveParam);
     }
 
-    const auto& size = request.size;
+    const QSize size = request.size;
     if (size.height() > 0 && size.height() < nx::api::CameraImageRequest::kMinimumSize)
         return QString("Height cannot be less than %1").arg(nx::api::CameraImageRequest::kMinimumSize);
     if (size.width() > 0 && size.width() < nx::api::CameraImageRequest::kMinimumSize)

@@ -9,17 +9,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/resolution_data.h>
 
 namespace nx::vms::api {
-
-class ThumbnailSize: public QSize
-{
-public:
-    using QSize::QSize;
-    ThumbnailSize(const QSize& size): QSize(size) {}
-};
-
-bool deserialize(QnJsonContext* ctx, const QJsonValue& value, ThumbnailSize* target);
 
 class ThumbnailCrop: public QRectF
 {
@@ -122,7 +114,7 @@ struct NX_VMS_API ThumbnailFilter
      * auto-sizing if only height or only width is positive then aspect ratio is used to calculate
      * the other value, and if both values are not positive then the original frame size is used.
      */
-    ThumbnailSize size;
+    ResolutionData size;
 
     /**%apidoc[opt] Resulting image format. Default is `jpg`. */
     ThumbnailFormat format = ThumbnailFormat::jpg;
