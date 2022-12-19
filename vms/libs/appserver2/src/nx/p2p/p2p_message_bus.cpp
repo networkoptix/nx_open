@@ -886,7 +886,8 @@ void MessageBus::sendTransactionImpl(
 
     if (transportHeader.via.find(remotePeer.id) != transportHeader.via.end())
     {
-        NX_VERBOSE(this, "Peer %1 already handled transaction %2", remotePeer.id, srcTran);
+        NX_VERBOSE(this, "Ignore send transaction %1-->%2. Destination peer already handled transaction %3",
+            peerName(localPeer().id), peerName(remotePeer.id), srcTran);
         return;
     }
 
@@ -1170,8 +1171,13 @@ void MessageBus::gotTransaction(
 
     PersistentIdData peerId(tran.params.peer);
 
-    if (m_lastRuntimeInfo[peerId] == tran.params)
-        return; //< Already processed. Ignore same transaction.
+    if (m_lastRuntimeInfo.value(peerId) == tran.params)
+    {
+        NX_VERBOSE(this, "Peer %1 ignore runtimeInfo from peer %2 because it is already processed",
+            peerName(localPeer().id), peerName(peerId.id));
+        sendTransaction(tran, transportHeader); //< Proxy transaction.
+        return; //< Already processed on the local peer.
+    }
 
     if (peerId.id == localPeer().id)
     {
