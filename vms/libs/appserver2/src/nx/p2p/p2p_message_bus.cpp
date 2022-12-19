@@ -1042,15 +1042,16 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     // merge current and new subscription
     auto& oldSubscription = context(connection)->remoteSubscription;
     auto itrOldSubscription = oldSubscription.values.begin();
+    QList<nx::vms::api::PersistentIdData> subscriptionDelta;
     for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
     {
         while (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() < itr.key())
             ++itrOldSubscription;
 
         if (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() == itr.key())
-        {
             itr.value() = std::max(itr.value(), itrOldSubscription.value());
-        }
+        else
+            subscriptionDelta.push_back(itr.key());
     }
 
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(connection->remotePeer()));
@@ -1063,7 +1064,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
         if (!selectAndSendTransactions(connection, std::move(newSubscription), false))
             return false;
     }
-    sendRuntimeData(connection, context(connection)->remoteSubscription.values.keys());
+    sendRuntimeData(connection, subscriptionDelta);
     return true;
 }
 
