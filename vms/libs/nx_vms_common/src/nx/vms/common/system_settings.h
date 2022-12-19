@@ -479,6 +479,9 @@ public:
 
     bool system2faEnabled() const;
 
+    std::chrono::seconds cloudStorageUpdatePeriod() const;
+    void setCloudStorageUpdatePeriod(std::chrono::seconds period);
+
     void update(const vms::api::SystemSettings& value);
 
 signals:
@@ -529,6 +532,7 @@ signals:
     void showServersInTreeForNonAdminsChanged();
     void backupSettingsChanged();
     void showMouseTimelinePreviewChanged();
+    void cloudStorageUpdatePeriodChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -680,6 +684,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_cloudStorageUpdatePeriodAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
