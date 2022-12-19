@@ -42,7 +42,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/media/audio_player.h>
-#include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -333,6 +332,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 {
     using namespace std::chrono;
 
+    if (action->actionType() == ActionType::showIntercomInformer)
+        return;
+
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
 
@@ -414,23 +416,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         eventData.actionParameters = alarmCameras;
         eventData.previewCamera = camera;
         eventData.cameras = alarmCameras;
-    }
-    else if (actionType == ActionType::showIntercomInformer)
-    {
-        // Id is fixed and equal to intercom id, so this informer will be removed
-        // when another client instance via changing toogle state.
-        eventData.id = action->getParams().actionResourceId;
-        eventData.actionId = action::OpenIntercomLayoutAction;
-        eventData.title = tr("Calling...");
-        eventData.description.clear();
-        const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(camera);
-        eventData.actionParameters = resourcePool()->getResourceById(intercomLayoutId);
-        eventData.actionParameters.setArgument(Qn::ActionDataRole, action);
-        eventData.previewCamera = camera;
-        eventData.removable = false;
-
-        // Recreate informer on the top in case of several calls in a short period.
-        q->removeEvent(eventData.id);
     }
     else
     {
@@ -608,21 +593,14 @@ void NotificationListModel::Private::setupClientAction(
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
 {
+    if (action->actionType() == ActionType::showIntercomInformer)
+        return;
+
     const auto actionId = action->getParams().actionId;
     if (!actionId.isNull())
     {
         q->removeEvent(actionId);
         return;
-    }
-
-    if (action->actionType() == ActionType::showIntercomInformer)
-    {
-        const auto id = action->getParams().actionResourceId;
-        if (!id.isNull())
-        {
-            q->removeEvent(id);
-            return;
-        }
     }
 
     const auto ruleId = action->getRuleId();
@@ -775,9 +753,6 @@ QString NotificationListModel::Private::tooltip(const vms::event::AbstractAction
 QPixmap NotificationListModel::Private::pixmapForAction(
     const vms::event::AbstractActionPtr& action, const QColor& color) const
 {
-    if (action->actionType() == ActionType::showIntercomInformer)
-        return qnSkin->pixmap("events/call.svg");
-
     switch (QnNotificationLevel::valueOf(action))
     {
         case QnNotificationLevel::Value::CriticalNotification:
