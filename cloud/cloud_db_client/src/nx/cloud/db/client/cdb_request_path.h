@@ -89,7 +89,8 @@ static constexpr char kDiscoveryCloudModuleXmlPath[] = "/discovery/v1/cloud_modu
 
 static constexpr char kApiPrefix[] = "/cdb";
 
-static constexpr char kApiDocPrefix[] = "/cdb/docs/api";
+static constexpr char kPublicApiDocPrefix[] = "/cdb/docs/api";
+static constexpr char kInternalApiDocPrefix[] = "/cdb/docs/internal-api";
 
 static constexpr char kSystemIdParam[] = "systemId";
 static constexpr char kServerIdParam[] = "serverId";
