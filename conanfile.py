@@ -56,9 +56,9 @@ class NxOpenConan(ConanFile):
         "useClang": False,
     }
 
-    ffmpeg_version = "4.4"
+    ffmpeg_version_and_revision = "4.4#c466a4cd83fb41e24104060a371c688c"
     requires = (
-        f"ffmpeg/{ffmpeg_version}" "#25419419d970893ebb7b5213d879c77c",
+        f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
         "qt/6.4.1" "#e5f378ecdbcc948496a08d46175c58fd",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
