@@ -331,7 +331,7 @@ TEST_F(TimeSynchronizationWidgetReducerTest, selectServerWhenWasDisabled)
     ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
 }
 
-// Selecting invalid server must sync the system with the Internet.
+// Selecting invalid server disables synchronization (as well as initialization by incorrect data).
 TEST_F(TimeSynchronizationWidgetReducerTest, selectInvalidServer)
 {
     const auto id = QnUuid::createUuid();
@@ -346,7 +346,7 @@ TEST_F(TimeSynchronizationWidgetReducerTest, selectInvalidServer)
 
     assertIsActual(result);
     ASSERT_TRUE(result.primaryServer.isNull());
-    ASSERT_EQ(result.status, State::Status::synchronizedWithInternet);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
 }
 
 TEST_F(TimeSynchronizationWidgetReducerTest, selectServerTwice)
@@ -362,6 +362,39 @@ TEST_F(TimeSynchronizationWidgetReducerTest, selectServerTwice)
     State result;
     std::tie(changed, result) = Reducer::selectServer(std::move(state), id);
     ASSERT_FALSE(changed);
+}
+
+TEST_F(TimeSynchronizationWidgetReducerTest, removePrimaryServer)
+{
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::removeServer(std::move(state), id);
+
+    assertIsActual(result);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+TEST_F(TimeSynchronizationWidgetReducerTest, removeArbitaryServer)
+{
+    const auto primaryId = QnUuid::createUuid();
+    const auto id = QnUuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ primaryId,
+        /*servers*/ {server(primaryId), server(id)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::removeServer(std::move(state), id);
+
+    assertIsActual(result);
+    ASSERT_EQ(result.status, State::Status::singleServerLocalTime);
 }
 
 } // namespace test
