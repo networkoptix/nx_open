@@ -2,29 +2,19 @@
 
 #include "quality_picker_widget.h"
 
-#include "ui_quality_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
 
 namespace nx::vms::client::desktop::rules {
 
 QualityPickerWidget::QualityPickerWidget(common::SystemContext* context, QWidget* parent):
-    PickerWidget(context, parent),
-    ui(new Ui::QualityPickerWidget)
+    PickerWidget(context, parent)
 {
-    ui->setupUi(this);
-}
+    auto contentLayout = new QHBoxLayout;
+    m_comboBox = new QComboBox;
+    m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    contentLayout->addWidget(m_comboBox);
 
-QualityPickerWidget::~QualityPickerWidget()
-{
-}
-
-void QualityPickerWidget::setReadOnly(bool value)
-{
-    ui->qualityComboBox->setEnabled(!value);
-}
-
-void QualityPickerWidget::onDescriptorSet()
-{
-    ui->label->setText(fieldDescriptor->displayName);
+    m_contentWidget->setLayout(contentLayout);
 }
 
 } // namespace nx::vms::client::desktop::rules

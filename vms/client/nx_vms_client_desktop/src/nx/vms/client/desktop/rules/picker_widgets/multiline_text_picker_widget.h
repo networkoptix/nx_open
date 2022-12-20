@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include "picker_widget.h"
-
-#include "ui_multiline_text_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QTextEdit>
 
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
+
+#include "picker_widget.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -21,38 +23,36 @@ class MultilineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
     MultilineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
-        FieldPickerWidget<F>(context, parent),
-        ui(new Ui::MultilineTextPickerWidget)
+        FieldPickerWidget<F>(context, parent)
     {
-        ui->setupUi(this);
+        auto contentLayout = new QHBoxLayout;
+
+        m_textEdit = new QTextEdit;
+        m_textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        contentLayout->addWidget(m_textEdit);
+
+        m_contentWidget->setLayout(contentLayout);
     }
 
-    virtual void setReadOnly(bool value) override
-    {
-        ui->textEdit->setReadOnly(value);
-    };
-
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QScopedPointer<Ui::MultilineTextPickerWidget> ui;
+    QTextEdit* m_textEdit;
 
     virtual void onDescriptorSet() override
     {
-        ui->label->setText(fieldDescriptor->displayName);
-        ui->textEdit->setPlaceholderText(fieldDescriptor->description);
+        FieldPickerWidget<F>::onDescriptorSet();
+        m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
     virtual void onFieldsSet() override
     {
         {
-            const QSignalBlocker blocker{ui->textEdit};
-            ui->textEdit->setText(text());
+            const QSignalBlocker blocker{m_textEdit};
+            m_textEdit->setText(text());
         }
 
-        connect(ui->textEdit,
+        connect(m_textEdit,
             &QTextEdit::textChanged,
             this,
             &MultilineTextPickerWidget<F>::onTextChanged,
@@ -61,7 +61,7 @@ private:
 
     void onTextChanged()
     {
-        setText(ui->textEdit->toPlainText());
+        setText(m_textEdit->toPlainText());
     }
 
     QString text();
@@ -73,13 +73,13 @@ using TextWithFieldsPicker = MultilineTextPickerWidget<vms::rules::TextWithField
 template<>
 QString TextWithFieldsPicker::text()
 {
-    return field->text();
+    return m_field->text();
 }
 
 template<>
 void TextWithFieldsPicker::setText(const QString& text)
 {
-    field->setText(text);
+    m_field->setText(text);
 }
 
 } // namespace nx::vms::client::desktop::rules

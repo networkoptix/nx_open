@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "picker_widget.h"
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 
-namespace Ui { class VolumePickerWidget; }
+#include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -14,14 +15,10 @@ class VolumePickerWidget: public PickerWidget
 
 public:
     VolumePickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
-    virtual ~VolumePickerWidget() override;
-
-    virtual void setReadOnly(bool value) override;
 
 private:
-    QScopedPointer<Ui::VolumePickerWidget> ui;
-
-    virtual void onDescriptorSet() override;
+    QSlider* m_slider{};
+    QPushButton* m_pushButton{};
 };
 
 } // namespace nx::vms::client::desktop::rules

@@ -5,15 +5,14 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 
-#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/action_builder_fields/password_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_filter_fields/keywords_field.h>
 #include <nx/vms/rules/event_filter_fields/text_field.h>
-#include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -35,52 +34,34 @@ public:
     OnelineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
-        auto mainLayout = new QHBoxLayout;
-        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        auto contentLayout = new QHBoxLayout;
 
-        label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        mainLayout->addWidget(label);
+        m_lineEdit = createLineEdit();
+        m_lineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        contentLayout->addWidget(m_lineEdit);
 
-        lineEdit = createLineEdit();
-        lineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        mainLayout->addWidget(lineEdit);
-
-        mainLayout->setStretch(0, 1);
-        mainLayout->setStretch(1, 5);
-
-        setLayout(mainLayout);
-    }
-
-    virtual void setReadOnly(bool value) override
-    {
-        lineEdit->setReadOnly(value);
+        m_contentWidget->setLayout(contentLayout);
     }
 
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QnElidedLabel* label{};
-    QLineEdit* lineEdit{};
+    QLineEdit* m_lineEdit{};
 
     virtual void onDescriptorSet() override
     {
-        label->setText(fieldDescriptor->displayName);
-        lineEdit->setPlaceholderText(fieldDescriptor->description);
+        FieldPickerWidget<F>::onDescriptorSet();
+        m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
     virtual void onFieldsSet() override
     {
         {
-            const QSignalBlocker blocker{lineEdit};
-            lineEdit->setText(text());
+            const QSignalBlocker blocker{m_lineEdit};
+            m_lineEdit->setText(text());
         }
 
-        connect(lineEdit,
+        connect(m_lineEdit,
             &QLineEdit::textEdited,
             this,
             &OnelineTextPickerWidget<F>::onTextChanged,
@@ -94,12 +75,12 @@ private:
 
     QString text() const
     {
-        return field->value();
+        return m_field->value();
     }
 
     void setText(const QString& text)
     {
-        field->setValue(text);
+        m_field->setValue(text);
     }
 
     QLineEdit* createLineEdit()
@@ -126,13 +107,13 @@ QLineEdit* PasswordPicker::createLineEdit()
 template<>
 QString KeywordsPicker::text() const
 {
-    return field->string();
+    return m_field->string();
 }
 
 template<>
 void KeywordsPicker::setText(const QString& text)
 {
-    field->setString(text);
+    m_field->setString(text);
 }
 
 } // namespace nx::vms::client::desktop::rules

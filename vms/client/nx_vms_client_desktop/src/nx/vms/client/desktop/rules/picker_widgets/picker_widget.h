@@ -12,6 +12,8 @@
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
 
+class QnElidedLabel;
+
 namespace nx::vms::client::desktop::rules {
 
 /**
@@ -39,14 +41,14 @@ public:
      */
     virtual void setFields(const QHash<QString, vms::rules::Field*>& fields);
 
-    virtual void setReadOnly(bool value) = 0;
+    virtual void setReadOnly(bool value);
 
 protected:
     /**
      * Called when descriptor is set. Here derived classes must customize properties
      * according to the fieldDescriptor.
      */
-    virtual void onDescriptorSet() = 0;
+    virtual void onDescriptorSet();
 
     /**
      * Calls when field and linkedFields are set. Here derived classes must cast the field to
@@ -55,7 +57,9 @@ protected:
      */
     virtual void onFieldsSet();
 
-    std::optional<vms::rules::FieldDescriptor> fieldDescriptor;
+    QnElidedLabel* m_label{};
+    QWidget* m_contentWidget{};
+    std::optional<vms::rules::FieldDescriptor> m_fieldDescriptor;
 };
 
 template<typename F>
@@ -69,43 +73,49 @@ public:
 
     virtual void setFields(const QHash<QString, vms::rules::Field*>& fields) override
     {
-        if (!NX_ASSERT(fieldDescriptor))
+        if (!NX_ASSERT(m_fieldDescriptor))
             return;
 
         disconnectFromFields();
 
-        field = dynamic_cast<F*>(fields.value(fieldDescriptor->fieldName));
+        m_field = dynamic_cast<F*>(fields.value(m_fieldDescriptor->fieldName));
 
-        if (field)
+        if (m_field)
         {
-            for (const auto linkedFieldName: fieldDescriptor->linkedFields)
+            for (const auto linkedFieldName: m_fieldDescriptor->linkedFields)
             {
                 const auto linkedField = fields.value(linkedFieldName);
                 if (NX_ASSERT(linkedField))
-                    linkedFields[linkedFieldName] = linkedField;
+                    m_linkedFields[linkedFieldName] = linkedField;
             }
 
             onFieldsSet();
         }
     }
 
+    template<typename T>
+    T* getLinkedField(const char* fieldName) const
+    {
+        return dynamic_cast<T*>(m_linkedFields.value(fieldName).data());
+    }
+
 protected:
     static_assert(std::is_base_of<vms::rules::Field, F>());
 
     /** The field described in the descriptor, the picker gets value for. */
-    QPointer<F> field{};
+    QPointer<F> m_field{};
 
     /** Another fields from the entity(ActionBuilder or EventFilter fields). */
-    QHash<QString, QPointer<vms::rules::Field>> linkedFields;
+    QHash<QString, QPointer<vms::rules::Field>> m_linkedFields;
 
 private:
     /** Disconnect the picker from the fields. */
     void disconnectFromFields()
     {
-        if (field)
-            field->disconnect(this);
+        if (m_field)
+            m_field->disconnect(this);
 
-        for (const auto& linkedField: linkedFields)
+        for (const auto& linkedField: m_linkedFields)
         {
             if (linkedField)
                 linkedField->disconnect(this);

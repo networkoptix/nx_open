@@ -2,29 +2,19 @@
 
 #include "preset_picker_widget.h"
 
-#include "ui_preset_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
 
 namespace nx::vms::client::desktop::rules {
 
 PresetPickerWidget::PresetPickerWidget(common::SystemContext* context, QWidget* parent):
-    PickerWidget(context, parent),
-    ui(new Ui::PresetPickerWidget)
+    PickerWidget(context, parent)
 {
-    ui->setupUi(this);
-}
+    auto contentLayout = new QHBoxLayout;
+    m_comboBox = new QComboBox;
+    m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    contentLayout->addWidget(m_comboBox);
 
-PresetPickerWidget::~PresetPickerWidget()
-{
-}
-
-void PresetPickerWidget::setReadOnly(bool value)
-{
-    ui->presetComboBox->setEnabled(!value);
-}
-
-void PresetPickerWidget::onDescriptorSet()
-{
-    ui->label->setText(fieldDescriptor->displayName);
+    m_contentWidget->setLayout(contentLayout);
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -11,6 +11,9 @@
 #include "flags_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
+#include "nx/vms/client/desktop/rules/picker_widgets/volume_picker_widget.h"
+#include "nx/vms/rules/action_builder_fields/volume_field.h"
+#include "nx/vms/rules/actions/speak_action.h"
 #include "oneline_text_picker_widget.h"
 #include "source_picker_widget.h"
 #include "state_picker_widget.h"
@@ -62,6 +65,10 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new InputPortPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::AnalyticsEventLevelField>())
         pickerWidget = new FlagsPickerWidget<nx::vms::rules::AnalyticsEventLevelField>(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEngineField>())
+        pickerWidget = new AnalyticsEnginePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
+        pickerWidget = new VolumePickerWidget(context, parent);
     else
         pickerWidget = new BlankPickerWidget(context, parent);
 
