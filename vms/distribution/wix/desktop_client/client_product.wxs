@@ -101,7 +101,7 @@
             Return="ignore"
             Impersonate="no" />
 
-        <?if ${developerBuild} = true ?>
+        <?if ${developerBuild} ~= "true" ?>
             <CustomAction Id="developerDebugInfo" Script="vbscript">
                 <![CDATA[
                     Function testProperty(x)
@@ -133,7 +133,7 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <?if ${developerBuild} = true ?>
+            <?if ${developerBuild} ~= "true" ?>
                 <Custom Action="developerDebugInfo" After="InstallInitialize" />
             <?endif?>
 
