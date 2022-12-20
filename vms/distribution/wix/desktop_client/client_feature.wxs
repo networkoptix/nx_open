@@ -141,7 +141,7 @@
                         </File>
                     </Component>
 
-                    <?if ${customization.mobile.enabled} = true ?>
+                    <?if ${customization.mobile.enabled} ~= "true" ?>
                         <Component Id="MobileHelp">
                             <File
                                 Id="mobilehelp"
@@ -229,7 +229,7 @@
             <ComponentRef Id="NovFileAssociation"/>
 
             <ComponentRef Id="MiniLauncherExecutable" />
-            <?if ${customization.mobile.enabled} = true ?>
+            <?if ${customization.mobile.enabled} ~= "true" ?>
                 <ComponentRef Id="MobileHelp" />
             <?endif?>
             <ComponentRef Id="QuickStartGuide" />
