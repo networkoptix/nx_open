@@ -6,6 +6,7 @@ os=Macos
 arch=x86_64
 compiler=apple-clang
 compiler.libcxx=libc++
+ffmpeg:os.version=10.14
 
 build_type=Release
 
