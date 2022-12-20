@@ -2,29 +2,19 @@
 
 #include "input_id_picker_widget.h"
 
-#include "ui_input_id_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
 
 namespace nx::vms::client::desktop::rules {
 
 InputIDPickerWidget::InputIDPickerWidget(common::SystemContext* context, QWidget* parent):
-    PickerWidget(context, parent),
-    ui(new Ui::InputIDPickerWidget)
+    PickerWidget(context, parent)
 {
-    ui->setupUi(this);
-}
+    auto contentLayout = new QHBoxLayout;
+    m_comboBox = new QComboBox;
+    m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    contentLayout->addWidget(m_comboBox);
 
-InputIDPickerWidget::~InputIDPickerWidget()
-{
-}
-
-void InputIDPickerWidget::setReadOnly(bool value)
-{
-    ui->inputIDComboBox->setEnabled(!value);
-}
-
-void InputIDPickerWidget::onDescriptorSet()
-{
-    ui->label->setText(fieldDescriptor->displayName);
+    m_contentWidget->setLayout(contentLayout);
 }
 
 } // namespace nx::vms::client::desktop::rules

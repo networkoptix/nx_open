@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "picker_widget.h"
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QPushButton>
 
-namespace Ui { class SoundPickerWidget; }
+#include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -14,14 +15,10 @@ class SoundPickerWidget: public PickerWidget
 
 public:
     SoundPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
-    virtual ~SoundPickerWidget() override;
-
-    virtual void setReadOnly(bool value) override;
 
 private:
-    QScopedPointer<Ui::SoundPickerWidget> ui;
-
-    virtual void onDescriptorSet() override;
+    QComboBox* m_comboBox{};
+    QPushButton* m_pushButton{};
 };
 
 } // namespace nx::vms::client::desktop::rules

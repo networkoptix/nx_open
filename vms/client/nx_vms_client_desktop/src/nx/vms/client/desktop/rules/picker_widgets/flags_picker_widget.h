@@ -7,10 +7,10 @@
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
-#include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
 #include "picker_widget_strings.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -27,15 +27,7 @@ public:
     FlagsPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
-        auto mainLayout = new QHBoxLayout;
-        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
-
-        label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        mainLayout->addWidget(label);
-
-        flagsLayout = new QHBoxLayout;
+        auto flagsLayout = new QHBoxLayout;
         flagsLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
         for (const auto& [flag, displayString]: getFlags())
         {
@@ -46,37 +38,17 @@ public:
             checkBoxes.insert({checkBox, flag});
         }
 
-        mainLayout->addLayout(flagsLayout);
-
-        mainLayout->setStretch(0, 1);
-        mainLayout->setStretch(1, 5);
-
-        setLayout(mainLayout);
-    }
-
-    void setReadOnly(bool value) override
-    {
-        flagsLayout->setEnabled(!value);
+        m_contentWidget->setLayout(flagsLayout);
     }
 
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QnElidedLabel* label{};
-    QHBoxLayout* flagsLayout{};
     std::map<QCheckBox*, typename F::value_type::enum_type> checkBoxes;
-
-    virtual void onDescriptorSet() override
-    {
-        label->setText(fieldDescriptor->displayName);
-    }
 
     virtual void onFieldsSet() override
     {
-        const auto fieldValue = field->value();
+        const auto fieldValue = m_field->value();
         for (const auto& [checkBox, flag]: checkBoxes)
         {
             {
@@ -101,7 +73,7 @@ private:
                 newValue.setFlag(flag);
         }
 
-        field->setValue(newValue);
+        m_field->setValue(newValue);
     }
 
     // Returns map of the flag values and corresponding display string intended for displaying to

@@ -23,6 +23,7 @@
 
 #include "picker_widget.h"
 #include "picker_widget_strings.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -42,80 +43,48 @@ public:
     SourcePickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
-        auto mainLayout = new QHBoxLayout;
-        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        auto contentLayout = new QHBoxLayout;
+        contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-        label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        mainLayout->addWidget(label);
+        m_selectResourceButton = createSelectButton();
+        m_selectResourceButton->setSizePolicy(
+            QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        contentLayout->addWidget(m_selectResourceButton);
 
         {
-            auto selectButtonLayout = new QHBoxLayout;
-            selectButtonLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+            auto alertWidget = new QWidget;
+            alertWidget->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
 
-            selectResourceButton = createSelectButton();
-            selectResourceButton->setSizePolicy(
-                QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-            selectButtonLayout->addWidget(selectResourceButton);
+            auto alertLayout = new QHBoxLayout;
+            alertLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-            {
-                auto alertWidget = new QWidget;
-                alertWidget->setSizePolicy(
-                    QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+            m_alertLabel = new QnElidedLabel;
+            setWarningStyle(m_alertLabel);
+            m_alertLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            alertLayout->addWidget(m_alertLabel);
 
-                auto alertLayout = new QHBoxLayout;
-                alertLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+            alertWidget->setLayout(alertLayout);
 
-                alertLabel = new QnElidedLabel;
-                setWarningStyle(alertLabel);
-                alertLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                alertLayout->addWidget(alertLabel);
-
-                alertWidget->setLayout(alertLayout);
-
-                selectButtonLayout->addWidget(alertWidget);
-            }
-
-            selectButtonLayout->setStretch(0, 5);
-            selectButtonLayout->setStretch(1, 3);
-
-            mainLayout->addLayout(selectButtonLayout);
+            contentLayout->addWidget(alertWidget);
         }
 
-        mainLayout->setStretch(0, 1);
-        mainLayout->setStretch(1, 5);
+        contentLayout->setStretch(0, 5);
+        contentLayout->setStretch(1, 3);
 
-        setLayout(mainLayout);
-    }
-
-    virtual void setReadOnly(bool value) override
-    {
-        selectResourceButton->setEnabled(!value);
+        m_contentWidget->setLayout(contentLayout);
     }
 
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::tr;
-    using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
-    using FieldPickerWidget<F>::resourcePool;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QnElidedLabel* label{};
-    QnSelectResourcesButton* selectResourceButton{};
-    QnElidedLabel* alertLabel{};
-
-    virtual void onDescriptorSet() override
-    {
-        label->setText(fieldDescriptor->displayName);
-    }
+    QnSelectResourcesButton* m_selectResourceButton{};
+    QnElidedLabel* m_alertLabel{};
 
     virtual void onFieldsSet() override
     {
         updateUi();
 
-        connect(selectResourceButton,
+        connect(m_selectResourceButton,
             &QPushButton::clicked,
             this,
             &SourcePickerWidget<F>::onSelectResourceButtonClicked,
@@ -135,37 +104,37 @@ private:
 
     void updateUi()
     {
-        auto resourceList = resourcePool()->template getResourcesByIds<QnUserResource>(field->ids());
+        auto resourceList = resourcePool()->template getResourcesByIds<QnUserResource>(m_field->ids());
 
-        auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
-        if (field->acceptAll())
+        auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(m_selectResourceButton);
+        if (m_field->acceptAll())
             selectUsersButtonPtr->selectAll();
         else
             selectUsersButtonPtr->selectUsers(resourceList);
 
-        if (resourceList.isEmpty() && !field->acceptAll())
+        if (resourceList.isEmpty() && !m_field->acceptAll())
         {
-            alertLabel->setText(SourcePickerWidgetStrings::selectUser());
-            alertLabel->setVisible(true);
+            m_alertLabel->setText(SourcePickerWidgetStrings::selectUser());
+            m_alertLabel->setVisible(true);
         }
         else
         {
-            alertLabel->setVisible(false);
+            m_alertLabel->setVisible(false);
         }
     }
 
     void select()
     {
-        auto selectedUsers = field->ids();
+        auto selectedUsers = m_field->ids();
 
         ui::SubjectSelectionDialog dialog(this);
-        dialog.setAllUsers(field->acceptAll());
+        dialog.setAllUsers(m_field->acceptAll());
         dialog.setCheckedSubjects(selectedUsers);
         if (dialog.exec() == QDialog::Rejected)
             return;
 
-        field->setAcceptAll(dialog.allUsers());
-        field->setIds(dialog.totalCheckedUsers());
+        m_field->setAcceptAll(dialog.allUsers());
+        m_field->setIds(dialog.totalCheckedUsers());
     }
 };
 
@@ -189,9 +158,9 @@ QnSelectResourcesButton* ServerPicker::createSelectButton()
 template<>
 void CameraPicker::updateUi()
 {
-    auto resourceList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
+    auto resourceList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
 
-    auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(selectResourceButton);
+    auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(m_selectResourceButton);
     selectDeviceButtonPtr->selectDevices(resourceList);
 
     if (resourceList.isEmpty())
@@ -200,55 +169,55 @@ void CameraPicker::updateUi()
         const auto deviceType
             = QnDeviceDependentStrings::calculateDeviceType(resourcePool(), allCameras);
 
-        alertLabel->setText(SourcePickerWidgetStrings::selectDevice(deviceType));
-        alertLabel->setVisible(true);
+        m_alertLabel->setText(SourcePickerWidgetStrings::selectDevice(deviceType));
+        m_alertLabel->setVisible(true);
     }
     else
     {
-        alertLabel->setVisible(false);
+        m_alertLabel->setVisible(false);
     }
 }
 
 template<>
 void ServerPicker::updateUi()
 {
-    auto resourceList = resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
+    auto resourceList = resourcePool()->getResourcesByIds<QnMediaServerResource>(m_field->ids());
 
-    auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(selectResourceButton);
+    auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(m_selectResourceButton);
     selectServersButtonPtr->selectServers(resourceList);
 
     if (resourceList.isEmpty())
     {
-        alertLabel->setText(SourcePickerWidgetStrings::selectServer());
-        alertLabel->setVisible(true);
+        m_alertLabel->setText(SourcePickerWidgetStrings::selectServer());
+        m_alertLabel->setVisible(true);
     }
     else
     {
-        alertLabel->setVisible(false);
+        m_alertLabel->setVisible(false);
     }
 }
 
 template<>
 void CameraPicker::select()
 {
-    auto selectedCameras = field->ids();
+    auto selectedCameras = m_field->ids();
 
     CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
         selectedCameras,
         this);
 
-    field->setIds(selectedCameras);
+    m_field->setIds(selectedCameras);
 }
 
 template<>
 void ServerPicker::select()
 {
-    auto selectedServers = field->ids();
+    auto selectedServers = m_field->ids();
 
     const auto serverFilter = [](const QnMediaServerResourcePtr&){ return true; };
     ServerSelectionDialog::selectServers(selectedServers, serverFilter, QString{}, this);
 
-    field->setIds(selectedServers);
+    m_field->setIds(selectedServers);
 }
 
 } // namespace nx::vms::client::desktop::rules

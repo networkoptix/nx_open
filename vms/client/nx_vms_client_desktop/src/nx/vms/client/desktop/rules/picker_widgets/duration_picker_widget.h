@@ -4,11 +4,10 @@
 
 #include <QtWidgets/QHBoxLayout>
 
-#include <nx/vms/client/desktop/style/helper.h>
 #include <ui/widgets/business/time_duration_widget.h>
-#include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -20,56 +19,38 @@ public:
     DurationPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
-        auto mainLayout = new QHBoxLayout;
-        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        auto contentLayout = new QHBoxLayout;
 
-        label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        mainLayout->addWidget(label);
-
-        timeDurationWidget = new TimeDurationWidget;
-        timeDurationWidget->setSizePolicy(
+        m_timeDurationWidget = new TimeDurationWidget;
+        m_timeDurationWidget->setSizePolicy(
             QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
-        timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
-        timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
 
-        mainLayout->addWidget(timeDurationWidget);
+        contentLayout->addWidget(m_timeDurationWidget);
 
-        mainLayout->setStretch(0, 1);
-        mainLayout->setStretch(1, 5);
-
-        setLayout(mainLayout);
-    }
-
-    virtual void setReadOnly(bool value) override
-    {
-        timeDurationWidget->setEnabled(!value);
+        m_contentWidget->setLayout(contentLayout);
     }
 
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QnElidedLabel* label{};
-    TimeDurationWidget* timeDurationWidget;
+    TimeDurationWidget* m_timeDurationWidget;
 
     virtual void onDescriptorSet() override
     {
-        label->setText(fieldDescriptor->displayName);
+        m_label->setText(m_fieldDescriptor->displayName);
     }
 
     virtual void onFieldsSet() override
     {
         {
-            QSignalBlocker blocker{timeDurationWidget};
-            timeDurationWidget->setValue(field->value().count());
+            QSignalBlocker blocker{m_timeDurationWidget};
+            m_timeDurationWidget->setValue(m_field->value().count());
         }
 
-        connect(timeDurationWidget,
+        connect(m_timeDurationWidget,
             &TimeDurationWidget::valueChanged,
             this,
             &DurationPickerWidget::onValueChanged,
@@ -78,7 +59,7 @@ private:
 
     void onValueChanged()
     {
-        field->setValue(std::chrono::seconds(timeDurationWidget->value()));
+        m_field->setValue(std::chrono::seconds(m_timeDurationWidget->value()));
     }
 };
 

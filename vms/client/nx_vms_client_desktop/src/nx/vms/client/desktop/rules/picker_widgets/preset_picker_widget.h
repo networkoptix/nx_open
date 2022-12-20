@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "picker_widget.h"
+#include <QtWidgets/QComboBox>
 
-namespace Ui { class PresetPickerWidget; }
+#include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -14,14 +14,9 @@ class PresetPickerWidget: public PickerWidget
 
 public:
     PresetPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
-    virtual ~PresetPickerWidget() override;
-
-    virtual void setReadOnly(bool value) override;
 
 private:
-    QScopedPointer<Ui::PresetPickerWidget> ui;
-
-    virtual void onDescriptorSet() override;
+    QComboBox* m_comboBox{};
 };
 
 } // namespace nx::vms::client::desktop::rules

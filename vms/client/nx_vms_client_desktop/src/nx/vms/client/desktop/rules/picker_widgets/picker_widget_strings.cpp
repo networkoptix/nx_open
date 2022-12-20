@@ -4,6 +4,11 @@
 
 namespace nx::vms::client::desktop::rules {
 
+QString CommonPickerWidgetStrings::testButtonDisplayText()
+{
+    return tr("Test");
+}
+
 QString SourcePickerWidgetStrings::selectServer()
 {
     return tr("Select at least one Server");

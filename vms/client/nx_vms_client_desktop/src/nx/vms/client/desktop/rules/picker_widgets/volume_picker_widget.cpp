@@ -2,30 +2,38 @@
 
 #include "volume_picker_widget.h"
 
-#include "ui_volume_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
+
+#include <nx/vms/client/desktop/style/helper.h>
+
+#include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
 VolumePickerWidget::VolumePickerWidget(common::SystemContext* context, QWidget* parent):
-    PickerWidget(context, parent),
-    ui(new Ui::VolumePickerWidget)
+    PickerWidget(context, parent)
 {
-    ui->setupUi(this);
-}
+    auto contentLayout = new QHBoxLayout;
 
-VolumePickerWidget::~VolumePickerWidget()
-{
-}
+    contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+    contentLayout->setObjectName("contentLayout");
+    m_slider = new QSlider;
+    m_slider->setOrientation(Qt::Horizontal);
+    contentLayout->addWidget(m_slider);
 
-void VolumePickerWidget::setReadOnly(bool value)
-{
-    ui->volumeSlider->setEnabled(!value);
-    ui->testPushButton->setEnabled(!value);
-}
+    auto buttonLayout = new QHBoxLayout;
 
-void VolumePickerWidget::onDescriptorSet()
-{
-    ui->label->setText(fieldDescriptor->displayName);
+    buttonLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+    m_pushButton = new QPushButton;
+    m_pushButton->setText(CommonPickerWidgetStrings::testButtonDisplayText());
+    buttonLayout->addWidget(m_pushButton);
+
+    auto horizontalSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    buttonLayout->addItem(horizontalSpacer);
+
+    contentLayout->addLayout(buttonLayout);
+
+    m_contentWidget->setLayout(contentLayout);
 }
 
 } // namespace nx::vms::client::desktop::rules

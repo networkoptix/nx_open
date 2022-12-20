@@ -14,8 +14,6 @@ class BlankPickerWidget: public PickerWidget
 public:
     BlankPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
 
-    virtual void setReadOnly(bool value) override;
-
 private:
     virtual void onDescriptorSet() override;
 };

@@ -10,10 +10,6 @@ BlankPickerWidget::BlankPickerWidget(common::SystemContext* context, QWidget* pa
     setVisible(false);
 }
 
-void BlankPickerWidget::setReadOnly(bool /*value*/)
-{
-}
-
 void BlankPickerWidget::onDescriptorSet()
 {
 }

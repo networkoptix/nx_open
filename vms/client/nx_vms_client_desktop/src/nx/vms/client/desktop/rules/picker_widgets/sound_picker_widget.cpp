@@ -2,30 +2,34 @@
 
 #include "sound_picker_widget.h"
 
-#include "ui_sound_picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
+
+#include <nx/vms/client/desktop/style/helper.h>
+
+#include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
 SoundPickerWidget::SoundPickerWidget(common::SystemContext* context, QWidget* parent):
-    PickerWidget(context, parent),
-    ui(new Ui::SoundPickerWidget)
+    PickerWidget(context, parent)
 {
-    ui->setupUi(this);
-}
+    auto contentLayout = new QHBoxLayout;
 
-SoundPickerWidget::~SoundPickerWidget()
-{
-}
+    contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+    m_comboBox = new QComboBox;
+    contentLayout->addWidget(m_comboBox);
 
-void SoundPickerWidget::setReadOnly(bool value)
-{
-    ui->soundComboBox->setEnabled(!value);
-    ui->managePushButton->setEnabled(!value);
-}
+    auto buttonLayout = new QHBoxLayout;
+    m_pushButton = new QPushButton;
+    m_pushButton->setText(CommonPickerWidgetStrings::testButtonDisplayText());
+    buttonLayout->addWidget(m_pushButton);
 
-void SoundPickerWidget::onDescriptorSet()
-{
-    ui->label->setText(fieldDescriptor->displayName);
+    auto horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    buttonLayout->addItem(horizontalSpacer);
+
+    contentLayout->addLayout(buttonLayout);
+
+    m_contentWidget->setLayout(contentLayout);
 }
 
 } // namespace nx::vms::client::desktop::rules

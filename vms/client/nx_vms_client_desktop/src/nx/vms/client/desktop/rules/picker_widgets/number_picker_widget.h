@@ -5,11 +5,10 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QSpinBox>
 
-#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/int_field.h>
-#include <ui/widgets/common/elided_label.h>
 
 #include "picker_widget.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -20,55 +19,25 @@ public:
     NumberPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
-        auto mainLayout = new QHBoxLayout;
-        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+        auto contentLayout = new QHBoxLayout;
 
-        label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        mainLayout->addWidget(label);
+        m_valueSpinBox = new QSpinBox;
+        contentLayout->addWidget(m_valueSpinBox);
+        contentLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-        {
-            auto spinboxLayout = new QHBoxLayout;
-
-            valueSpinBox = new QSpinBox;
-            spinboxLayout->addWidget(valueSpinBox);
-
-            spinboxLayout->addItem(
-                new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-            mainLayout->addLayout(spinboxLayout);
-        }
-
-        mainLayout->setStretch(0, 1);
-        mainLayout->setStretch(1, 5);
-
-        setLayout(mainLayout);
-    }
-
-    virtual void setReadOnly(bool value) override
-    {
-        valueSpinBox->setEnabled(!value);
+        m_contentWidget->setLayout(contentLayout);
     }
 
 private:
-    using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::fieldDescriptor;
-    using FieldPickerWidget<F>::field;
+    PICKER_WIDGET_COMMON_USINGS
 
-    QnElidedLabel* label{};
-    QSpinBox* valueSpinBox{};
-
-    virtual void onDescriptorSet() override
-    {
-        label->setText(fieldDescriptor->displayName);
-    }
+    QSpinBox* m_valueSpinBox{};
 
     virtual void onFieldsSet() override
     {
-        valueSpinBox->setValue(field->value());
+        m_valueSpinBox->setValue(m_field->value());
 
-        connect(valueSpinBox,
+        connect(m_valueSpinBox,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
             &NumberPickerWidget<F>::onValueChanged,
@@ -77,7 +46,7 @@ private:
 
     void onValueChanged(int value)
     {
-        field->setValue(value);
+        m_field->setValue(value);
     }
 };
 

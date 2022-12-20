@@ -9,6 +9,14 @@
 
 namespace nx::vms::client::desktop::rules {
 
+class CommonPickerWidgetStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(SourcePickerWidgetStrings)
+
+public:
+    static QString testButtonDisplayText();
+};
+
 class SourcePickerWidgetStrings
 {
     Q_DECLARE_TR_FUNCTIONS(SourcePickerWidgetStrings)
