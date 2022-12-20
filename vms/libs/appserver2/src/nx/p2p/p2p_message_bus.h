@@ -140,6 +140,8 @@ protected:
         const P2pConnectionPtr& connection,
         const QByteArray& payload,
         nx::Locker<nx::Mutex>* lock);
+    virtual void onThreadStopped() {}
+
 protected:
     static QString peerName(const QnUuid& id);
     QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;

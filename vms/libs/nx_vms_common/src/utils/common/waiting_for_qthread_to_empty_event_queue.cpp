@@ -7,17 +7,17 @@
 
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "qcoreapplication.h"
 
-
-WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread* thread, int howManyTimesToWait )
+WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue(QThread* thread, int howManyTimesToWait)
 :
-    m_howManyTimesToWait( howManyTimesToWait ),
+    m_howManyTimesToWait(howManyTimesToWait),
     m_waitsDone( 0 )
 {
-    moveToThread( thread );
+    moveToThread(thread);
 }
 
 void WaitingForQThreadToEmptyEventQueue::join()
@@ -26,24 +26,27 @@ void WaitingForQThreadToEmptyEventQueue::join()
     metaObject()->invokeMethod(this, "doneWaiting", Qt::QueuedConnection);
     if (thread() == QThread::currentThread())
     {
-        while( m_waitsDone < m_howManyTimesToWait )
+        while (m_waitsDone < m_howManyTimesToWait)
             qApp->processEvents();
     }
-    else {
-        NX_MUTEX_LOCKER lk( &m_mutex );
-        while( m_waitsDone < m_howManyTimesToWait )
-            m_condVar.wait( lk.mutex() );
+    else 
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        NX_VERBOSE(this, "Start waiting for counter value %1", m_howManyTimesToWait);
+        while (m_waitsDone < m_howManyTimesToWait)
+            m_condVar.wait(lk.mutex());
+        NX_VERBOSE(this, "Waiting for counter value %1 is finished", m_howManyTimesToWait);
     }
 }
 
 void WaitingForQThreadToEmptyEventQueue::doneWaiting()
 {
-    NX_MUTEX_LOCKER lk( &m_mutex );
-
+    NX_MUTEX_LOCKER lk(&m_mutex);
     ++m_waitsDone;
-    if( m_waitsDone < m_howManyTimesToWait )
+    NX_VERBOSE(this, "Increase doneWaiting counter to %1", m_waitsDone);
+    if(m_waitsDone < m_howManyTimesToWait)
     {
-        metaObject()->invokeMethod( this, "doneWaiting", Qt::QueuedConnection );
+        metaObject()->invokeMethod( this, "doneWaiting", Qt::QueuedConnection);
         return;
     }
 
