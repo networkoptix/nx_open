@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_data.h"
 
 #include <cassert>
 #include <functional>
@@ -15,6 +14,7 @@
 #include <nx/vms/api/data/credentials.h>
 #include <nx/vms/common/ptz/override.h>
 
+#include "resource_data.h"
 #include "resource_property_key.h"
 
 using namespace nx::vms::common;

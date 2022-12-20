@@ -77,13 +77,17 @@ struct NX_VMS_API LdapSettingsBase
 
 struct NX_VMS_API LdapSettingSearchFilter
 {
+    /**%apidoc[opt] */
+    QString name;
+
     QString base;
-    QString groupFilter;
-    QString userFilter;
+
+    /**%apidoc[opt] */
+    QString filter;
 
     bool operator==(const LdapSettingSearchFilter&) const = default;
 };
-#define LdapSettingSearchFilter_Fields (base)(groupFilter)(userFilter)
+#define LdapSettingSearchFilter_Fields (name)(base)(filter)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettingSearchFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API LdapSettings: LdapSettingsBase
@@ -137,6 +141,15 @@ struct NX_VMS_API LdapUser
 };
 #define LdapUser_Fields (dn)(login)(fullName)(email)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(LdapUser, (json))
+
+struct LdapStatus
+{
+    bool isRunning = false;
+    QString message;
+    std::optional<std::chrono::seconds> timeSinceSyncS;
+};
+#define LdapStatus_Fields (isRunning)(message)(timeSinceSyncS)
+NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
 
 } // namespace nx::vms::api
 

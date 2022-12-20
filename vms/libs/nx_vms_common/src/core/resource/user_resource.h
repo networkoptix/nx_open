@@ -84,7 +84,7 @@ public:
     static const QnUuid kAdminGuid;
     static const QString kIntegrationRequestDataProperty;
 
-    QnUserResource(nx::vms::api::UserType userType, QString externalId);
+    QnUserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId);
     virtual ~QnUserResource();
 
     nx::vms::api::UserType userType() const;
@@ -156,7 +156,9 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-    QString externalId() const;
+    // External identification data, like dn and valid for LDAP users.
+    nx::vms::api::UserExternalId externalId() const;
+    void setExternalId(const nx::vms::api::UserExternalId& value);
 
     std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData() const;
     void setIntegrationRequestData(
@@ -182,6 +184,7 @@ signals:
 
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
+    void externalIdChanged(const QnResourcePtr& user);
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
@@ -202,7 +205,7 @@ private:
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;
-    QString m_externalId;
+    nx::vms::api::UserExternalId m_externalId;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)

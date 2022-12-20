@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "resource_data.h"
-
 #include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>
@@ -11,6 +9,9 @@
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
+
+#include "resource_data.h"
+#include "user_external_id.h"
 
 namespace nx::vms::api {
 
@@ -95,10 +96,8 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[opt] Full name of the user.*/
     QString fullName;
 
-    /**%apidoc[readonly]
-     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
-     */
-    QString externalId;
+    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    UserExternalId externalId;
 
     // TODO: Remove when /ec2/getUsers and /ec2/saveUser compatibility below 5.1 can be dropped.
     bool adaptFromDeprecatedApi();

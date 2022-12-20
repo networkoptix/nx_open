@@ -11,6 +11,7 @@
 #include "access_rights_data.h"
 #include "user_data.h"
 #include "user_role_data.h"
+#include "user_external_id.h"
 
 namespace nx::vms::api {
 
@@ -30,10 +31,8 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] Only local User Groups are supposed to be created by the API. */
     UserType type = UserType::local;
 
-    /**%apidoc[opt]
-     * An external id, for example, a Distinguished Name (DN) if this Group is imported from LDAP.
-     */
-    QString externalId;
+    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    std::optional<UserExternalId> externalId;
 
     /**%apidoc[opt] */
     GlobalPermissions permissions;

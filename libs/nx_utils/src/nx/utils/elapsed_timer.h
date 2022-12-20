@@ -50,6 +50,14 @@ public:
         return std::chrono::duration_cast<Duration>(nx::utils::monotonicTime() - *m_start);
     }
 
+    template<typename TargetDuration = Duration>
+    std::optional<TargetDuration> maybeElapsed() const
+    {
+        if (!isValid())
+            return std::nullopt;
+        return std::chrono::duration_cast<TargetDuration>(nx::utils::monotonicTime() - *m_start);
+    }
+
     bool hasExpired(Duration value) const
     {
         if (!isValid())

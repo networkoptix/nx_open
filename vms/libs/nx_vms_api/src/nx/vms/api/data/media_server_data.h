@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "resource_data.h"
-
 #include <QtCore/QString>
 
 #include <nx/vms/api/types/day_of_week.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
+
+#include "resource_data.h"
 
 namespace nx::vms::api {
 
