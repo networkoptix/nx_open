@@ -131,6 +131,9 @@ Result TimeSynchronizationWidgetReducer::selectServer(State state, const QnUuid&
     state.enabled = true;
     state.primaryServer = serverId;
     state.primaryServer = actualPrimaryServer(state).id;
+    if (state.primaryServer != serverId)
+        state.enabled = false;
+
     state.status = actualStatus(state);
     state.hasChanges = true;
     return {true, std::move(state)};
@@ -160,6 +163,10 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const QnUuid&
     if (it != servers.end())
     {
         servers.erase(it);
+        if (state.primaryServer == id)
+            state.enabled = false;
+
+        state.primaryServer = actualPrimaryServer(state).id;
         state.status = actualStatus(state);
         state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
         return {true, std::move(state)};
@@ -236,12 +243,7 @@ State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
     if (!state.enabled)
         return State::Status::notSynchronized;
 
-    if (state.servers.isEmpty())
-        return State::Status::notSynchronized; //< Reachable during disconnect. Any value is ok here.
-
-    const auto primaryServer = actualPrimaryServer(state);
-    NX_ASSERT(state.primaryServer == primaryServer.id);
-
+    // Primary server isn't set. VMS time should be synchronized with the Internet, if possible.
     if (state.primaryServer.isNull())
     {
         return hasInternet(state)
@@ -249,16 +251,30 @@ State::Status TimeSynchronizationWidgetReducer::actualStatus(const State& state)
             : State::Status::noInternetConnection;
     }
 
+    // Primary server is set but missing (e.g. during disconnect).
+    if (std::none_of(
+        state.servers.cbegin(),
+        state.servers.cend(),
+        [id = state.primaryServer](const auto& info) { return info.id == id; }))
+    {
+        return State::Status::notSynchronized;
+    }
+
+    // We have a separate status code for a single-server systems.
     if (state.servers.size() == 1)
     {
         NX_ASSERT(state.servers.first().id == state.primaryServer);
         return State::Status::singleServerLocalTime;
     }
 
-    if (!primaryServer.online)
-        return State::Status::selectedServerIsOffline;
+    // Find the primary server's info.
+    const auto primaryServer = actualPrimaryServer(state);
+    NX_ASSERT(state.primaryServer == primaryServer.id);
 
-    return State::Status::synchronizedWithSelectedServer;
+    // Check server's status.
+    return primaryServer.online
+        ? State::Status::synchronizedWithSelectedServer
+        : State::Status::selectedServerIsOffline;
 }
 
 } // namespace nx::vms::client::desktop
