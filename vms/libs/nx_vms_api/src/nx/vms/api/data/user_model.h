@@ -13,6 +13,7 @@
 #include "resource_data.h"
 #include "type_traits.h"
 #include "user_data_ex.h"
+#include "user_external_id.h"
 
 namespace nx::vms::api {
 
@@ -104,7 +105,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     /**%apidoc[unused]
      * %// This field is invisible but required for PATCH.
      */
-    std::optional<QString> externalId;
+    std::optional<UserExternalId> externalId;
 
     bool operator==(const UserModelV1& other) const = default;
 
@@ -132,10 +133,8 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<QnUuid> userGroupIds;
 
-    /**%apidoc[readonly]
-     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
-     */
-    std::optional<QString> externalId;
+    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    std::optional<UserExternalId> externalId;
 
     /**%apidoc Resource ids with access rights for the User. */
     std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;

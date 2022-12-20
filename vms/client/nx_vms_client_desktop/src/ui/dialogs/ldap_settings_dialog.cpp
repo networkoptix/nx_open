@@ -159,7 +159,7 @@ nx::vms::api::LdapSettings QnLdapSettingsDialogPrivate::settings() const
     if (!searchBase.isEmpty() || !searchFilter.isEmpty())
     {
         result.filters.push_back(
-            {.base = searchBase, .groupFilter = QString(), .userFilter = searchFilter});
+            {.base = searchBase, .filter = searchFilter});
     }
     result.searchTimeoutS = std::chrono::seconds(q->ui->searchTimeoutSSpinBox->value());
     // TODO: Support searchPageSize.
@@ -190,7 +190,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     else
     {
         q->ui->searchBaseLineEdit->setText(settings.filters[0].base.trimmed());
-        q->ui->searchFilterLineEdit->setText(settings.filters[0].userFilter.trimmed());
+        q->ui->searchFilterLineEdit->setText(settings.filters[0].filter.trimmed());
     }
 
     q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS.count());

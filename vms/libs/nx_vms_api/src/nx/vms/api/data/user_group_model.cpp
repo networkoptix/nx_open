@@ -18,7 +18,8 @@ UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
     userRole.description = std::move(description);
     userRole.isPredefined = isPredefined;
     userRole.isLdap = (type == UserType::ldap);
-    userRole.externalId = std::move(externalId);
+    if (externalId)
+        userRole.externalId = std::move(*externalId);
     userRole.permissions = std::move(permissions);
     userRole.parentRoleIds = std::move(parentGroupIds);
 
@@ -47,7 +48,8 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
         model.type = baseData.isLdap ? UserType::ldap : UserType::local;
-        model.externalId = std::move(baseData.externalId);
+        if (!baseData.externalId.isEmpty())
+            model.externalId = std::move(baseData.externalId);
         model.permissions = std::move(baseData.permissions);
         model.isPredefined = baseData.isPredefined;
         model.parentGroupIds = std::move(baseData.parentRoleIds);

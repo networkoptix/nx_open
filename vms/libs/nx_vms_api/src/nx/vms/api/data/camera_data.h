@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "resource_data.h"
-
 #include <QtCore/QString>
 
 #include <nx/utils/latin1_array.h>
+
+#include "resource_data.h"
 
 namespace nx::vms::api {
 

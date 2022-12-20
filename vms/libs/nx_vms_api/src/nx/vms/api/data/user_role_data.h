@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include "id_data.h"
+#include "user_external_id.h"
 
 #include <nx/vms/api/types/access_rights_types.h>
 
@@ -33,10 +34,8 @@ struct NX_VMS_API UserRoleData: IdData
     /**%apidoc[opt] */
     QString description;
 
-    /**%apidoc[readonly]
-     * An external id, for example, a Distinguished Name (DN) if this Role is imported from LDAP.
-     */
-    QString externalId;
+    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    UserExternalId externalId;
 
     UserRoleData() = default;
     UserRoleData(

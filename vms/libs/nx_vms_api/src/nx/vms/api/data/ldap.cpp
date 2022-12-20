@@ -28,7 +28,7 @@ LdapSettingsDeprecated::LdapSettingsDeprecated(LdapSettings settings)
     if (!settings.filters.empty())
     {
         searchBase = settings.filters[0].base;
-        searchFilter = settings.filters[0].userFilter;
+        searchFilter = settings.filters[0].filter;
     }
 }
 
@@ -36,5 +36,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsDeprecated, (json), LdapSettingsDep
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettings, (json), LdapSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapUser, (json), LdapUser_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapStatus, (json), LdapStatus_Fields)
 
 } // namespace nx::vms::api
