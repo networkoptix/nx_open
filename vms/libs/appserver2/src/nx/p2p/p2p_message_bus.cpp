@@ -107,7 +107,12 @@ MessageBus::MessageBus(
             }
             m_timer->start(500);
         });
-    connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
+    connect(m_thread, &QThread::finished, 
+        [this]() 
+        { 
+            m_timer->stop();
+            onThreadStopped();
+        });
 }
 
 MessageBus::~MessageBus()
@@ -447,6 +452,12 @@ void MessageBus::MiscData::update()
 void MessageBus::doPeriodicTasks()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!isStarted())
+    {
+        NX_VERBOSE(this, "P2p message bus is not started. Skip periodic tasks");
+        return;
+    }
+
     createOutgoingConnections(getCurrentSubscription()); //< Open new connections.
 }
 

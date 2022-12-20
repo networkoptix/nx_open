@@ -41,15 +41,13 @@ void TransactionMessageBusBase::start()
 
 void TransactionMessageBusBase::stop()
 {
+    NX_VERBOSE(this, "Before stop");
     if (m_thread->isRunning())
     {
-        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
-        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
-        waitingForObjectsToBeFreed.join();
-
         m_thread->exit();
         m_thread->wait();
     }
+    NX_VERBOSE(this, "After stop");
 }
 
 void TransactionMessageBusBase::setHandler(ECConnectionNotificationManager* handler)
