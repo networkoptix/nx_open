@@ -34,6 +34,17 @@ protected:
         ASSERT_EQ(val, query.queryItemValue<T>(key));
         ASSERT_EQ(expectedStr, query.queryItemValue<std::string>(key));
     }
+
+    void assertBoolValueParsedAs(
+        const std::string& query,
+        const std::vector<std::pair<std::string, bool>>& expected)
+    {
+        nx::utils::UrlQuery q(QString::fromStdString(query));
+        for (auto& item: expected)
+        {
+            ASSERT_EQ(item.second, q.queryItemValue<bool>(item.first));
+        }
+    }
 };
 
 TEST_F(UrlQuery, simple_types_representation)
@@ -46,6 +57,15 @@ TEST_F(UrlQuery, simple_types_representation)
 
     assertRepresentedAs(std::string("Hello, world!"), "Hello, world!");
     assertRepresentedAs(QString("Hello, world!"), "Hello, world!");
+}
+
+TEST_F(UrlQuery, different_bool_encodings_are_parsed_correctly)
+{
+    assertBoolValueParsedAs("a=1&b=0", {{"a", true}, {"b", false}});
+    assertBoolValueParsedAs("a=true&b=false", {{"a", true}, {"b", false}});
+    assertBoolValueParsedAs("a=TRUE&b=fAlSe", {{"a", true}, {"b", false}});
+    assertBoolValueParsedAs("a&b", {{"a", true}, {"b", true}});
+    assertBoolValueParsedAs("a", {{"a", true}, {"b", false}});
 }
 
 } // namespace nx::utils::test

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <string_view>
-
 #include <QUrlQuery>
+#include <string_view>
 
 #include <nx/utils/log/to_string.h>
 #include <nx/utils/std/charconv.h>
+#include <nx/utils/std_string_utils.h>
 
 namespace nx::utils {
 
@@ -128,7 +128,26 @@ public:
         bool* ok = nullptr) const
     {
         int value = 0;
-        const auto str = m_query.queryItemValue(prepareKey(key), encoding).toStdString();
+        const auto preparedKey = prepareKey(key);
+        if (!m_query.hasQueryItem(preparedKey))
+        {
+            if (ok)
+                *ok = false;
+            return false;
+        }
+        const auto str = m_query.queryItemValue(preparedKey, encoding).toStdString();
+        if (str.empty() || nx::utils::stricmp(str, "true") == 0)
+        {
+            if (ok)
+                *ok = true;
+            return true;
+        }
+        if (nx::utils::stricmp(str, "false") == 0)
+        {
+            if (ok)
+                *ok = true;
+            return false;
+        }
         const auto result =
             charconv::from_chars(&str.front(), &str.front() + str.size(), value, 10);
         if (ok)

@@ -15,6 +15,8 @@ ApiRequestErrorClass fromHttpStatus(StatusCode::Value statusCode)
             return ApiRequestErrorClass::unauthorized;
         case StatusCode::notFound:
             return ApiRequestErrorClass::notFound;
+        case StatusCode::conflict:
+            return ApiRequestErrorClass::conflict;
         default:
             if (statusCode % 100 == 4)
                 return ApiRequestErrorClass::badRequest;

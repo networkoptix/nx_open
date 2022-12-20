@@ -19,6 +19,7 @@ NX_REFLECTION_ENUM_CLASS(ApiRequestErrorClass,
     logicError,
     notFound,
     ioError,
+    conflict,
     //!indicates server bug?
     internalError
 )
@@ -161,6 +162,9 @@ inline nx::network::http::StatusCode::Value ApiRequestResult::calculateHttpStatu
             // Using "404 Not Found" to signal any logic error.
             // It is allowed by HTTP. See [rfc2616, 10.4.5] for details
             return nx::network::http::StatusCode::notFound;
+
+        case ApiRequestErrorClass::conflict:
+            return nx::network::http::StatusCode::conflict;
 
         case ApiRequestErrorClass::ioError:
             return nx::network::http::StatusCode::serviceUnavailable;
