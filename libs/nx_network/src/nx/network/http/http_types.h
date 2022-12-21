@@ -416,8 +416,8 @@ public:
     /**
      * Encodes the URL before putting it into the HTTP request.
      */
-    static std::string encodeUrl(
-        const nx::utils::Url& url, EncodeUrlParts parts = EncodeUrlParts::all);
+    std::string encodeUrl(
+        const nx::utils::Url& url, EncodeUrlParts parts = EncodeUrlParts::all) const;
 };
 
 inline bool operator==(const RequestLine& left, const RequestLine& right)
