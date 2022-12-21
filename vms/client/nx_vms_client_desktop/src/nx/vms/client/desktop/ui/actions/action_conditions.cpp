@@ -275,6 +275,9 @@ public:
             return InvisibleAction;
 
         auto systemContext = SystemContext::fromResource(camera);
+        if (!systemContext->virtualCameraManager())
+            return InvisibleAction;
+
         const auto state = systemContext->virtualCameraManager()->state(camera);
         return m_delegate(state);
     }
