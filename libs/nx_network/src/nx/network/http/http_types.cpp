@@ -584,7 +584,7 @@ std::string RequestLine::toString() const
     return std::string(nx::utils::trim((std::string_view) buf));
 }
 
-std::string RequestLine::encodeUrl(const nx::utils::Url& url, EncodeUrlParts parts)
+std::string RequestLine::encodeUrl(const nx::utils::Url& url, EncodeUrlParts parts) const
 {
     QString encoded;
     switch (parts)
@@ -600,7 +600,9 @@ std::string RequestLine::encodeUrl(const nx::utils::Url& url, EncodeUrlParts par
 
     // Encoding '+' to '%2B' since there are buggy HTTP servers out there that decode '+' as space
     // which is unexpected and undesirable.
-    return nx::utils::replace(encoded.toStdString(), "\\+", "%2B");
+    if (version.protocol == "HTTP")
+        return nx::utils::replace(encoded.toStdString(), "\\+", "%2B");
+    return encoded.toStdString();
 }
 
 //-------------------------------------------------------------------------------------------------
