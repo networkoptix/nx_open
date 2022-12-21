@@ -351,6 +351,8 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         # third-party
         libquazip
         libudt
+        liblber-2.4
+        libldap_r-2.4
 
         # additional libraries
         "${additional_server_libs[@]}"
