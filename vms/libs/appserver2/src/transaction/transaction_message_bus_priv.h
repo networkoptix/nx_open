@@ -33,8 +33,8 @@ bool handleTransactionParams(
     auto transaction = QnTransaction<Param>(abstractTransaction);
     if (!QnUbjson::deserialize(stream, &transaction.params))
     {
-        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
-        return false;
+        return NX_ASSERT(false, "Can't deserialize UBJSON transaction: %1",
+            abstractTransaction.command);
     }
     if (!abstractTransaction.persistentInfo.isNull())
         bus->ubjsonTranSerializer()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
@@ -59,8 +59,8 @@ bool handleTransactionParams(
     auto transaction = QnTransaction<Param>(abstractTransaction);
     if (!QJson::deserialize(jsonData["params"], &transaction.params))
     {
-        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
-        return false;
+        return NX_ASSERT(false, "Can't deserialize JSON transaction: %1",
+            abstractTransaction.command);
     }
     function(transaction);
     return true;
