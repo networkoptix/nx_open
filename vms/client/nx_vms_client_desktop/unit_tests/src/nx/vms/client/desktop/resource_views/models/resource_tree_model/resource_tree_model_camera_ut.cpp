@@ -132,6 +132,46 @@ TEST_F(ResourceTreeModelTest, recorderIconType)
     ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Recorder)(recorderIndex));
 }
 
+TEST_F(ResourceTreeModelTest, recorderNameIsNotDefaultIfUserDefinedNameExists)
+{
+    static constexpr auto kDefaultGroupName = "default_group_name";
+    static constexpr auto kUserGroupName = "user_group_name";
+
+    QList<QnVirtualCameraResourcePtr> cameraList;
+
+    // When server is added to the resource pool.
+    const auto server = addServer("server");
+
+    // When two recorder cameras with non-empty default group name are added to the server.
+    cameraList.push_back(addRecorderCamera("camera", kUniqueGroupName, server->getId()));
+    cameraList.push_back(addRecorderCamera("camera", kUniqueGroupName, server->getId()));
+    for (const auto& camera: cameraList)
+        camera->setDefaultGroupName(kDefaultGroupName);
+
+    // When user defined group name is set to the first camera;
+    cameraList.first()->setUserDefinedGroupName(kUserGroupName);
+
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // Then exactly one node with user group name display text appears in the resource tree and
+    // there are no other group names appear in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUserGroupName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueGroupName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kDefaultGroupName)));
+
+    logout();
+
+    // Order of cameras doesn't matter.
+    cameraList.first()->setUserDefinedGroupName({});
+    cameraList.last()->setUserDefinedGroupName(kUserGroupName);
+
+    loginAsAdmin("admin");
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUserGroupName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueGroupName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kDefaultGroupName)));
+}
+
 TEST_F(ResourceTreeModelTest, virtualCameraIconType)
 {
     // When User with administrator permissions is logged in.
