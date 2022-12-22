@@ -35,6 +35,7 @@ LdapSettingsDeprecated::LdapSettingsDeprecated(LdapSettings settings)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsDeprecated, (json), LdapSettingsDeprecated_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettings, (json), LdapSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsChange, (json), LdapSettingsChange_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapUser, (json), LdapUser_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapStatus, (json), LdapStatus_Fields)
 

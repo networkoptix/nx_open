@@ -115,6 +115,14 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     (filters)(continuousSync)(continuousSyncIntervalS)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 
+struct NX_VMS_API LdapSettingsChange: LdapSettings
+{
+    /**%apidoc[opt] Remove all existing LDAP users and groups from VMS. */
+    bool removeRecords = false;
+};
+#define LdapSettingsChange_Fields LdapSettings_Fields (removeRecords)
+QN_FUSION_DECLARE_FUNCTIONS(LdapSettingsChange, (json), NX_VMS_API)
+
 // TODO: Remove this struct after `/api/testLdapSettings` support is dropped.
 struct NX_VMS_API LdapSettingsDeprecated: LdapSettingsBase
 {
@@ -142,13 +150,21 @@ struct NX_VMS_API LdapUser
 #define LdapUser_Fields (dn)(login)(fullName)(email)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(LdapUser, (json))
 
-struct LdapStatus
+struct NX_VMS_API LdapStatus
 {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(State,
+        online,
+        unstable,
+        offline);
+
+    /**%apidoc Server connection state. */
+    State state = State::offline;
+
     bool isRunning = false;
     QString message;
     std::optional<std::chrono::seconds> timeSinceSyncS;
 };
-#define LdapStatus_Fields (isRunning)(message)(timeSinceSyncS)
+#define LdapStatus_Fields (state)(isRunning)(message)(timeSinceSyncS)
 NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
 
 } // namespace nx::vms::api
