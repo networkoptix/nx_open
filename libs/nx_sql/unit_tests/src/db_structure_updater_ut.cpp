@@ -219,7 +219,7 @@ protected:
         const std::string& script)
     {
         m_executedScripts.push_back(script);
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
 private:

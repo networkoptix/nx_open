@@ -29,7 +29,7 @@ DBResult Transaction::begin()
     if (m_connection->begin())
     {
         m_started = true;
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
     else
     {
@@ -47,16 +47,16 @@ DBResult Transaction::commit()
         return dbError;
     }
     m_started = false;
-    notifyOnTransactionCompletion(DBResult::ok);
-    return DBResult::ok;
+    notifyOnTransactionCompletion(DBResultCode::ok);
+    return DBResultCode::ok;
 }
 
 DBResult Transaction::rollback()
 {
     NX_ASSERT(m_started);
     m_started = false;
-    notifyOnTransactionCompletion(DBResult::cancelled);
-    return m_connection->rollback() ? DBResult::ok : DBResult::ioError;
+    notifyOnTransactionCompletion(DBResultCode::cancelled);
+    return m_connection->rollback() ? DBResultCode::ok : DBResultCode::ioError;
 }
 
 bool Transaction::isActive() const
@@ -70,7 +70,7 @@ void Transaction::addOnSuccessfulCommitHandler(
     addOnTransactionCompletionHandler(
         [func = std::move(func)](DBResult result)
         {
-            if (result == DBResult::ok)
+            if (result == DBResultCode::ok)
                 func();
         });
 }

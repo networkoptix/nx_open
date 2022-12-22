@@ -61,7 +61,7 @@ public:
             [func = std::move(func)](QueryContext* queryContext)
             {
                 func(queryContext);
-                return nx::sql::DBResult::ok;
+                return nx::sql::DBResultCode::ok;
             });
     }
 

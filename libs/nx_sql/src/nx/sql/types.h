@@ -6,6 +6,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string_view>
+#include <string>
 
 #include <nx/reflect/instrument.h>
 
@@ -16,8 +17,7 @@ class QnSettings;
 
 namespace nx::sql {
 
-enum class DBResult
-{
+NX_REFLECTION_ENUM_CLASS(DBResultCode,
     ok,
     statementError,
     ioError,
@@ -31,10 +31,28 @@ enum class DBResult
     uniqueConstraintViolation,
     connectionError,
     logicError,
-    endOfData,
+    endOfData
+);
+
+struct NX_SQL_API DBResult
+{
+    DBResultCode code = DBResultCode::ok;
+    std::string text;
+
+    DBResult(DBResultCode code = DBResultCode::ok, std::string text = std::string());
+
+    bool ok() const;
+    std::string toString() const;
+
+    bool operator==(const DBResult&) const = default;
+    bool operator==(DBResultCode) const;
+
+    static DBResult success() { return DBResult(DBResultCode::ok); };
 };
 
-NX_SQL_API const char* toString(DBResult value);
+//-------------------------------------------------------------------------------------------------
+
+//NX_SQL_API const char* toString(DBResult value);
 
 NX_REFLECTION_ENUM_CLASS(RdbmsDriverType,
     unknown,
@@ -63,7 +81,7 @@ public:
     std::chrono::seconds inactivityTimeout = std::chrono::minutes(10);
     /**
      * If scheduled request has not received DB connection during this timeout
-     * it will be cancelled with DBResult::cancelled error code.
+     * it will be cancelled with DBResultCode::cancelled error code.
      * By default it is one minute.
      * NOTE: Set to zero to disable this timeout.
      */
@@ -108,7 +126,7 @@ class NX_SQL_API Exception:
 
 public:
     Exception(DBResult dbResult);
-    Exception(DBResult dbResult, const std::string& errorDescription);
+    Exception(DBResultCode code, const std::string& error);
 
     DBResult dbResult() const;
 

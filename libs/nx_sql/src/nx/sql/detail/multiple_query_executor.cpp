@@ -28,7 +28,7 @@ DBResult MultipleQueryExecutor::executeQuery(AbstractDbConnection* const connect
     Queries::iterator unexecutedQueriesRangeStart = m_queries.begin();
 
     auto result = transaction.begin();
-    if (result != DBResult::ok)
+    if (result != DBResultCode::ok)
     {
         reportQueryFailure(unexecutedQueriesRangeStart, m_queries.end(), result);
         return result;
@@ -37,7 +37,7 @@ DBResult MultipleQueryExecutor::executeQuery(AbstractDbConnection* const connect
     std::tie(result, unexecutedQueriesRangeStart) =
         executeQueries(connection, &transaction);
 
-    if (result != DBResult::ok)
+    if (result != DBResultCode::ok)
     {
         transaction.rollback();
         reportQueryFailure(unexecutedQueriesRangeStart, m_queries.end(), result);
@@ -52,7 +52,7 @@ std::tuple<DBResult, typename MultipleQueryExecutor::Queries::iterator>
         AbstractDbConnection* const connection,
         Transaction* transaction)
 {
-    DBResult result = DBResult::ok;
+    DBResult result = DBResultCode::ok;
 
     Queries::iterator queryToExecuteIter = m_queries.begin();
     for (queryToExecuteIter = m_queries.begin();
@@ -61,7 +61,7 @@ std::tuple<DBResult, typename MultipleQueryExecutor::Queries::iterator>
     {
         (*queryToExecuteIter)->setExternalTransaction(transaction);
         result = (*queryToExecuteIter)->execute(connection);
-        if (result == DBResult::ok)
+        if (result == DBResultCode::ok)
             continue;
 
         // Queries that have been already invoked will report result themselves.

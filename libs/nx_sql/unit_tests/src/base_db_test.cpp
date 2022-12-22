@@ -47,7 +47,7 @@ DBResult BasicFixture::executeUpdate(const std::string_view& queryText)
             auto query = queryContext->connection()->createQuery();
             query->prepare(queryText);
             query->exec();
-            return DBResult::ok;
+            return DBResultCode::ok;
         });
 }
 

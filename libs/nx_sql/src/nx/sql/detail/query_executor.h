@@ -57,7 +57,7 @@ protected:
     template<typename Func, typename... Args>
     DBResult invokeDbQueryFunc(Func& func, const Args&... args)
     {
-        DBResult dbResult = DBResult::ok;
+        DBResult dbResult;
         try
         {
             dbResult = func(args...);
@@ -69,10 +69,12 @@ protected:
         }
         catch (const std::exception& e)
         {
-            // TODO: #akolesnikov Propagate exception further so that "execute query sync" function throws this exception.
-            NX_DEBUG(this, nx::format("Caught exception. %1").arg(e.what()));
-            dbResult = DBResult::logicError;
+            // TODO: #akolesnikov Propagate exception further so that "execute query sync"
+            // function throws this exception.
+            NX_DEBUG(this, "Caught exception. %1", e.what());
+            dbResult = DBResult(DBResultCode::logicError, e.what());
         }
+
         return dbResult;
     }
 
@@ -176,27 +178,27 @@ private:
         QueryContext queryContext(connection, &transaction);
 
         auto result = transaction.begin();
-        if (result != DBResult::ok)
+        if (result != DBResultCode::ok)
         {
             invokeCompletionHandlerWithDefaultValues(result);
             return result;
         }
 
         result = executeQueryUnderTransaction(&queryContext);
-        if (result != DBResult::ok)
+        if (result != DBResultCode::ok)
         {
             transaction.rollback();
             return result;
         }
 
         result = transaction.commit();
-        if (result != DBResult::ok)
+        if (result != DBResultCode::ok)
         {
             transaction.rollback();
             return result;
         }
 
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     void invokeCompletionHandlerWithDefaultValues(DBResult errorCode)
@@ -213,7 +215,7 @@ private:
     DBResult executeQueryUnderTransaction(QueryContext* queryContext)
     {
         auto result = doQuery(queryContext);
-        if (result != DBResult::ok)
+        if (result != DBResultCode::ok)
         {
             queryContext->transaction()->addOnTransactionCompletionHandler(
                 std::bind(&BaseUpdateExecutor::invokeCompletionHandlerWithDefaultValues, this,
@@ -225,13 +227,13 @@ private:
             std::bind(&BaseUpdateExecutor::reportQueryResult, this,
                 queryContext->connection(), std::placeholders::_1));
 
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     DBResult executeQueryWithoutTransaction(QueryContext* queryContext)
     {
         auto result = doQuery(queryContext);
-        if (result != DBResult::ok)
+        if (result != DBResultCode::ok)
         {
             invokeCompletionHandlerWithDefaultValues(result);
             return result;
@@ -239,12 +241,12 @@ private:
 
         reportSuccess();
 
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     void reportQueryResult(AbstractDbConnection* connection, DBResult dbResult)
     {
-        if (dbResult == DBResult::ok)
+        if (dbResult == DBResultCode::ok)
         {
             // In case of transaction success (query succeeded & committed).
             reportSuccess();

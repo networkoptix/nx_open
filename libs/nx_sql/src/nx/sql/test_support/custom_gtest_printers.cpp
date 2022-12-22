@@ -8,7 +8,7 @@ namespace nx::sql {
 
 void PrintTo(const DBResult val, ::std::ostream* os)
 {
-    *os << toString(val);
+    *os << val.toString();
 }
 
 } // namespace nx::sql

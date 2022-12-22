@@ -146,11 +146,6 @@ public:
         return m_delegate->lastError();
     }
 
-    virtual std::string lastErrorText()
-    {
-        return m_delegate->lastErrorText();
-    }
-
     virtual std::unique_ptr<AbstractSqlQuery> createQuery()
     {
         return m_delegate->createQuery();

@@ -91,7 +91,8 @@ public:
     template<
         typename DbFunc,
         typename =
-            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>
+    >
     void executeUpdate(
         DbFunc dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
@@ -101,7 +102,7 @@ public:
             [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) mutable -> DBResult
             {
                 dbUpdateFunc(queryContext);
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             std::move(completionHandler),
             queryAggregationKey);
@@ -116,7 +117,11 @@ public:
         typename DbFunc,
         typename CompletionHandler,
         typename AppResult = std::invoke_result_t<DbFunc, QueryContext*>,
-        typename = std::enable_if_t<!std::is_same_v<AppResult, void> && !std::is_same_v<AppResult, DBResult>>
+        typename = std::enable_if_t<
+            !std::is_same_v<AppResult, void>
+            && !std::is_same_v<AppResult, DBResult>
+            && !std::is_same_v<AppResult, DBResultCode>
+        >
     >
     void executeUpdate(
         DbFunc dbUpdateFunc,
@@ -132,7 +137,7 @@ public:
             },
             [handler = std::move(handler), result = std::move(result)](DBResult dbResult) mutable
             {
-                handler(dbResult, std::move(*result));
+                handler(std::move(dbResult), std::move(*result));
             },
             queryAggregationKey);
     }
@@ -143,7 +148,8 @@ public:
     template<
         typename DbFunc,
         typename =
-            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>
+    >
     void executeSelect(
         DbFunc dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
@@ -152,7 +158,7 @@ public:
             [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
             {
                 dbUpdateFunc(queryContext);
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             std::move(completionHandler));
     }
@@ -191,15 +197,15 @@ public:
                 {
                     resultAvailable.set_value(queryFunc(queryContext));
                 }
-                return nx::sql::DBResult::ok;
+                return DBResult::success();
             },
             [&queryDonePromise](nx::sql::DBResult dbResult)
             {
-                queryDonePromise.set_value(dbResult);
+                queryDonePromise.set_value(std::move(dbResult));
             });
 
         const auto dbResult = queryDonePromise.get_future().get();
-        if (dbResult != nx::sql::DBResult::ok)
+        if (dbResult != nx::sql::DBResultCode::ok)
             throw nx::sql::Exception(dbResult);
 
         return resultAvailable.get_future().get();
@@ -236,14 +242,14 @@ public:
             [&queryFunc, &result](nx::sql::QueryContext* queryContext)
             {
                 result = queryFunc(queryContext);
-                return nx::sql::DBResult::ok;
+                return nx::sql::DBResultCode::ok;
             },
             [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
         const auto dbResult = queryDonePromise.get_future().get();
-        if (dbResult != nx::sql::DBResult::ok)
+        if (dbResult != nx::sql::DBResultCode::ok)
             throw nx::sql::Exception(dbResult);
 
         return result;

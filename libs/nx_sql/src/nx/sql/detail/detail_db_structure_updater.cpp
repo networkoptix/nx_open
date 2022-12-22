@@ -122,7 +122,7 @@ void DbStructureUpdater::applyUpdate(
     if (!execDbUpdate(queryContext, dbUpdate))
     {
         NX_INFO(this, "Error applying schema %1 update %2", m_schemaName, dbUpdate.name);
-        throw nx::sql::Exception(nx::sql::DBResult::statementError);
+        throw nx::sql::Exception(nx::sql::DBResultCode::statementError);
     }
 
     recordSuccessfulUpdate(queryContext, dbUpdate);
@@ -140,7 +140,7 @@ bool DbStructureUpdater::execDbUpdate(
 
     if (dbUpdate.func)
     {
-        if (auto result = dbUpdate.func(queryContext); result != nx::sql::DBResult::ok)
+        if (auto result = dbUpdate.func(queryContext); result != nx::sql::DBResultCode::ok)
         {
             NX_WARNING(this, "Error executing update function. %1", result);
             return false;

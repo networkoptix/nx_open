@@ -108,7 +108,7 @@ public:
 private:
     QSqlQuery m_sqlQuery;
 
-    DBResult getLastErrorCode();
+    DBResult getLastError();
 };
 
 } // namespace nx::sql

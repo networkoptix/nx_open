@@ -39,7 +39,7 @@ public:
     {
         if (m_onQueryExecuted)
             m_onQueryExecuted();
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     virtual void reportErrorWithoutExecution(DBResult /*errorCode*/) override
@@ -105,12 +105,7 @@ public:
 
     virtual DBResult lastError() override
     {
-        return DBResult::ok;
-    }
-
-    virtual std::string lastErrorText() override
-    {
-        return std::string();
+        return DBResultCode::ok;
     }
 
     virtual std::unique_ptr<AbstractSqlQuery> createQuery() override
@@ -456,7 +451,7 @@ protected:
 
     virtual DBResult executeQuery(AbstractDbConnection* const /*connection*/) override
     {
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     virtual void reportErrorWithoutExecution(DBResult /*errorCode*/) override {}

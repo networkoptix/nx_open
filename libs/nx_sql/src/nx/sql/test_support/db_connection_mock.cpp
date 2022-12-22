@@ -21,21 +21,21 @@ DbConnectionMock::~DbConnectionMock()
 
 bool DbConnectionMock::open()
 {
-    return *m_forcedError == DBResult::ok
+    return *m_forcedError == DBResultCode::ok
         ? base_type::open()
         : false;
 }
 
 bool DbConnectionMock::begin()
 {
-    return *m_forcedError == DBResult::ok
+    return *m_forcedError == DBResultCode::ok
         ? base_type::begin()
         : false;
 }
 
 DBResult DbConnectionMock::lastError()
 {
-    return *m_forcedError == DBResult::ok
+    return *m_forcedError == DBResultCode::ok
         ? base_type::lastError()
         : *m_forcedError;
 }
