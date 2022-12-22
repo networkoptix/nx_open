@@ -43,7 +43,6 @@ QString IpConflictEvent::encodeMacAddrList(const QStringList& macAddrList)
     return macAddrList.join(kDelimiter);
 }
 
-
 QStringList IpConflictEvent::decodeMacAddrList(const EventParameters& params)
 {
     return params.description.split(kDelimiter);

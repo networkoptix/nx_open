@@ -17,7 +17,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
     const RulePtr& rule,
     const AbstractEventPtr& event,
     const QnUuid& moduleGuid,
-    EventState state /*= EventState::undefined*/)
+    EventState state)
 {
     EventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
     runtimeParams.sourceServerId = moduleGuid;
@@ -30,7 +30,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
     if (hasToggleState(event->getEventType(), runtimeParams, systemContext) &&
         hasToggleState(rule->actionType()))
     {
-        EventState value = state != EventState::undefined ? state : event->getToggleState();
+        EventState value = (state != EventState::undefined) ? state : event->getToggleState();
         result->setToggleState(value);
     }
 
@@ -45,7 +45,8 @@ AbstractActionPtr ActionFactory::instantiateAction(
     const QnUuid& moduleGuid,
     const AggregationInfo& aggregationInfo)
 {
-    AbstractActionPtr result = instantiateAction(systemContext, rule, event, moduleGuid);
+    auto result =
+        instantiateAction(systemContext, rule, event, moduleGuid, EventState::undefined);
     if (!result)
         return result;
 
@@ -94,7 +95,7 @@ AbstractActionPtr ActionFactory::createAction(
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:
-            NX_ASSERT(false, "All action types must be handled.");
+            NX_ASSERT(false, "Unexpected action type: %1", actionType);
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
     }
 }

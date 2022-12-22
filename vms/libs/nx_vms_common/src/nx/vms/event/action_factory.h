@@ -21,7 +21,7 @@ public:
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,
-        EventState state = EventState::undefined);
+        EventState state);
 
     static AbstractActionPtr instantiateAction(
         nx::vms::common::SystemContext* systemContext,
