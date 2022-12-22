@@ -154,19 +154,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Bu eklentiyi yapılandırmak için Kamera Ayarlarını kontrol edin.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Bu eklentiyi yapılandırmak için Sistem Yönetimi ayarlarını kontrol edin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Bu eklentinin Sistem düzeyinde ayarı yoktur.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Bu eklentinin bu kamera için ayarı yok.</translation>
     </message>
   </context>
   <context>
@@ -1077,7 +1077,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
     </message>
   </context>
   <context>

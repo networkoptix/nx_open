@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Günlük Yönetimi</translation>
     </message>
     <message>
       <source>Download</source>
@@ -130,11 +130,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Bitti</translation>
+      <translation>Tamamlandı</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Dosya Klasörünü Aç</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Olay kaynağı kamerasını kullan</translation>
     </message>
   </context>
   <context>
@@ -647,7 +647,7 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF Ayarları</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
@@ -659,19 +659,19 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Birincil akışı kaydetme</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>İkincil akışı kaydetme</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>İkincil Akış Profili</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Birincil Akış Profili</translation>
     </message>
   </context>
   <context>
@@ -789,7 +789,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Kamera Değişimi</translation>
     </message>
     <message>
       <source>Name</source>
@@ -805,11 +805,11 @@
     </message>
     <message>
       <source>Next</source>
-      <translation>İleri</translation>
+      <translation>Sonraki</translation>
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Yeni Cihaz</translation>
     </message>
   </context>
   <context>
@@ -898,19 +898,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Yapılabilecek işlemler</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Video Dışa Aktarma</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Canlı Video ve Arşiv</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -918,31 +918,31 @@
     </message>
     <message>
       <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
+      <translation>Gelecekte</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Showreel</translation>
+      <translation>Kamera Tur</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Yardım sayfasında daha fazlasını okuyun</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Bu pencereyi tekrar gösterme</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Cloud Layouts'a Giriş</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Hareket Arama</translation>
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Yer İmlerini, Nesneleri, Olayları Arama</translation>
     </message>
   </context>
   <context>
@@ -971,11 +971,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Bu eylem yalnızca anlık olaylar için ayarlanabilir</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Başka bir etkinlik veya eylem seçin</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Sistem yönetimi verilerinin yedeğini oluşturun veya Sistem yönetimi verilerini yedekten geri yükleyin</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1028,11 +1028,11 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Mesaj&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Klasör aç</translation>
     </message>
   </context>
   <context>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Genel olay</translation>
     </message>
   </context>
   <context>
@@ -1186,23 +1186,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) Bağlantısı</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) İçeriği</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>İçerik Türü</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Kimlik Doğrulama Türü</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>İstek Yöntemi</translation>
     </message>
   </context>
   <context>
@@ -1331,19 +1331,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Yorum Ekle</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Takvimi Ayarla</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Test Eylemi</translation>
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Yorum ekle</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Bilgisayarın boştayken uyku moduna girmesine izin ver</translation>
     </message>
   </context>
   <context>
@@ -1795,19 +1795,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Günlük Kaydı Düzeyi</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Dosyayı Boyuta Göre Böl</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Zamana Göre Böl</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Maksimum Sesi Sınırla</translation>
     </message>
   </context>
   <context>
@@ -1845,7 +1845,7 @@
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation>Varsayılana Sıfırla</translation>
+      <translation>Varsayılan Ayarlara Geri Dön</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1853,23 +1853,23 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Bitti</translation>
+      <translation>Tamamlandı</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Tekrar Dene</translation>
+      <translation>Yeniden dene</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>İndirme tamamlandı!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Günlükler seçilen klasöre kaydedilemedi</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Dosya Klasörünü Aç</translation>
     </message>
   </context>
   <context>
@@ -2052,7 +2052,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Bağlantı Ayarları</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2068,15 +2068,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Sunucu adresi</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Güvenlik Protokolü</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>E-posta Ayarları</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -2201,7 +2201,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Standart</translation>
+      <translation>Önayar</translation>
     </message>
   </context>
   <context>
@@ -2612,23 +2612,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Alarm/Olay Kuralları</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Yeni kural</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Kuralı Sil</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Bir Kural Seçin</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Varsayılan Kuralları Sıfırla</translation>
     </message>
   </context>
   <context>
@@ -2932,11 +2932,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Ses</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Yönet</translation>
     </message>
   </context>
   <context>
@@ -3005,7 +3005,7 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Analitik verileri büyük miktarda yer kaplayabilir. Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
     </message>
   </context>
   <context>
@@ -3073,7 +3073,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>Bulut bildirimleri için özel dil</translation>
     </message>
   </context>
   <context>
@@ -3141,11 +3141,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Grup Ekle</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Grup bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -3156,11 +3156,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Kullanıcı Ekle</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Kullanıcı bulunamadı</translation>
     </message>
   </context>
   <context>

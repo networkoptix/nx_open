@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Kamerayı Değiştir...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Ücretsiz lisans etkinleştirilemedi</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1340,7 +1340,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Parametreleri Kopyala</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
@@ -1493,7 +1493,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Güvensiz</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1505,7 +1505,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>Url geçerli değil.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1513,11 +1513,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktif</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Yapılandırılmadı</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1525,7 +1525,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>E-posta adresinizi veya SMTP sunucunuzu ayarlayın</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -1890,7 +1890,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -1898,7 +1898,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>İndirme tamamlandı!</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
@@ -2510,7 +2510,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -3582,7 +3582,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -4394,7 +4394,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -4578,7 +4578,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -5493,15 +5493,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Kullanıcı yönetimi</translation>
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Zaman Senkronizasyonu</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Yönlendirme</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5654,7 +5654,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Analitik verileri için depolama ayarlanmamış</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
@@ -6732,7 +6732,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>Kısmen Taşı</translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
@@ -6774,11 +6774,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>En az bir Sunucu seçin</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>En az bir kullanıcı seçin</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -7054,7 +7054,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Günlük Yönetimi</translation>
     </message>
   </context>
   <context>
@@ -8260,7 +8260,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Bilinmeyen kamera</translation>
     </message>
   </context>
   <context>
@@ -9065,11 +9065,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>Ayarları Uygula</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
