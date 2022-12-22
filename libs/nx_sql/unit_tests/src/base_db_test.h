@@ -59,14 +59,14 @@ protected:
                     records.push_back(std::move(data));
                 }
 
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             [&queryCompletedPromise](DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
             });
 
-        NX_GTEST_ASSERT_EQ(DBResult::ok, future.get());
+        NX_GTEST_ASSERT_EQ(DBResultCode::ok, future.get());
 
         return records;
     }

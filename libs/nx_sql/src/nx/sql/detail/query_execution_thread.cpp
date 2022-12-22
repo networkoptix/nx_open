@@ -132,25 +132,23 @@ AbstractDbConnection* QueryExecutionThread::connection()
 
 void QueryExecutionThread::handleExecutionResult(DBResult result)
 {
-    switch (result)
+    switch (result.code)
     {
-        case DBResult::ok:
-        case DBResult::cancelled:
+        case DBResultCode::ok:
+        case DBResultCode::cancelled:
             m_numberOfFailedRequestsInARow = 0;
             break;
 
         default:
         {
             ++m_numberOfFailedRequestsInARow;
-            if (isDbErrorRecoverable(result))
+            if (isDbErrorRecoverable(result.code))
             {
-                NX_DEBUG(this, nx::format("DB query failed with result code %1. Db text %2")
-                    .args(result, m_dbConnectionHolder.dbConnection()->lastErrorText()));
+                NX_DEBUG(this, "DB query failed with result %1", result);
             }
             else
             {
-                NX_WARNING(this, nx::format("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .args(result, m_dbConnectionHolder.dbConnection()->lastErrorText()));
+                NX_WARNING(this, "Dropping DB connection due to unrecoverable error %1", result);
                 closeConnection();
                 break;
             }
@@ -158,10 +156,8 @@ void QueryExecutionThread::handleExecutionResult(DBResult result)
             if (m_numberOfFailedRequestsInARow >=
                 connectionOptions().maxErrorsInARowBeforeClosingConnection)
             {
-                NX_WARNING(this, nx::format("Dropping DB connection due to %1 errors in a row. "
-                    "Last error %2. Db text %3")
-                    .args(m_numberOfFailedRequestsInARow, result,
-                        m_dbConnectionHolder.dbConnection()->lastErrorText()));
+                NX_WARNING(this, "Dropping DB connection due to %1 errors in a row. Last error %2",
+                    m_numberOfFailedRequestsInARow, result);
                 closeConnection();
                 break;
             }
@@ -175,20 +171,20 @@ void QueryExecutionThread::closeConnection()
     m_state = ConnectionState::closed;
 }
 
-bool QueryExecutionThread::isDbErrorRecoverable(DBResult dbResult)
+bool QueryExecutionThread::isDbErrorRecoverable(DBResultCode code)
 {
-    switch (dbResult)
+    switch (code)
     {
-        case DBResult::notFound:
-        case DBResult::statementError:
-        case DBResult::cancelled:
-        case DBResult::retryLater:
-        case DBResult::uniqueConstraintViolation:
-        case DBResult::logicError:
+        case DBResultCode::notFound:
+        case DBResultCode::statementError:
+        case DBResultCode::cancelled:
+        case DBResultCode::retryLater:
+        case DBResultCode::uniqueConstraintViolation:
+        case DBResultCode::logicError:
             return true;
 
-        case DBResult::ioError:
-        case DBResult::connectionError:
+        case DBResultCode::ioError:
+        case DBResultCode::connectionError:
             return false;
 
         default:

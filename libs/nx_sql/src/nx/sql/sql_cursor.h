@@ -46,7 +46,7 @@ public:
             });
         auto result = recordFetched.get_future().get();
 
-        if (std::get<0>(result) == DBResult::ok)
+        if (std::get<0>(result) == DBResultCode::ok)
             return std::get<1>(result);
 
         return std::nullopt;

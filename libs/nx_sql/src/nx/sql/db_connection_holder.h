@@ -38,6 +38,8 @@ public:
 
     std::shared_ptr<nx::sql::QueryContext> begin();
 
+    DBResult lastError() const;
+
 private:
     const ConnectionOptions m_connectionOptions;
     std::unique_ptr<AbstractDbConnection> m_connection;

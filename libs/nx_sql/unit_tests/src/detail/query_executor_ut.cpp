@@ -44,12 +44,12 @@ protected:
 private:
     std::unique_ptr<DbConnectionHolder> m_dbConnectionHolder;
     std::optional<DBResult> m_expectedResult;
-    DBResult m_executeResult = DBResult::ok;
-    DBResult m_resultProvidedToCompletionHandler = DBResult::ok;
+    DBResult m_executeResult = DBResultCode::ok;
+    DBResult m_resultProvidedToCompletionHandler = DBResultCode::ok;
 
     DBResult queryFunctionThatAlwaysThrows(QueryContext*)
     {
-        m_expectedResult = DBResult::statementError;
+        m_expectedResult = DBResultCode::statementError;
         throw Exception(*m_expectedResult);
     }
 

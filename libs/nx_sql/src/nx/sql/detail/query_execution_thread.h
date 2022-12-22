@@ -58,7 +58,7 @@ private:
     void queryExecutionThreadMain();
     void closeConnection();
 
-    static bool isDbErrorRecoverable(DBResult dbResult);
+    static bool isDbErrorRecoverable(DBResultCode code);
 };
 
 } // namespace nx::sql::detail

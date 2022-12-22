@@ -28,7 +28,6 @@ public:
     virtual bool rollback() = 0;
 
     virtual DBResult lastError() = 0;
-    virtual std::string lastErrorText() = 0;
 
     virtual std::unique_ptr<AbstractSqlQuery> createQuery() = 0;
 

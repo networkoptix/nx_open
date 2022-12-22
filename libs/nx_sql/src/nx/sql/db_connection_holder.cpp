@@ -42,7 +42,7 @@ bool DbConnectionHolder::open()
     {
         NX_WARNING(this, "Failed to establish connection to %1 DB %2 at %3:%4. %5",
             connectionOptions().driverType, connectionOptions().dbName, connectionOptions().hostName,
-            connectionOptions().port, toString(m_connection->lastError()));
+            connectionOptions().port, m_connection->lastError());
         return false;
     }
 
@@ -68,6 +68,11 @@ void DbConnectionHolder::close()
 std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::begin()
 {
     return createNewTran();
+}
+
+DBResult DbConnectionHolder::lastError() const
+{
+    return m_connection->lastError();
 }
 
 bool DbConnectionHolder::tuneConnection()
@@ -114,7 +119,7 @@ std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::createNewTran()
         };
 
     auto transaction = std::make_unique<nx::sql::Transaction>(dbConnection());
-    if (transaction->begin() != nx::sql::DBResult::ok)
+    if (transaction->begin() != nx::sql::DBResultCode::ok)
         return nullptr;
     return std::shared_ptr<nx::sql::QueryContext>(
         new nx::sql::QueryContext(dbConnection(), transaction.release()),

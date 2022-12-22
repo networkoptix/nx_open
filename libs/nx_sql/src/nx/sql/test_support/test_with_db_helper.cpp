@@ -60,7 +60,7 @@ void TestWithDbHelper::cleanDatabase()
     {
         DbConnectionHolder dbConnectionHolder(m_dbConnectionOptions);
         if (!dbConnectionHolder.open())
-            throw Exception(DBResult::ioError);
+            throw Exception(dbConnectionHolder.lastError());
 
         const bool result = SqlQueryExecutionHelper::execSQLScript(nx::format(R"sql(
                 DROP DATABASE %1;
@@ -68,7 +68,7 @@ void TestWithDbHelper::cleanDatabase()
             )sql").args(m_dbConnectionOptions.dbName).toUtf8(),
             *dbConnectionHolder.dbConnection());
         if (!result)
-            throw Exception(DBResult::ioError);
+            throw Exception(DBResultCode::ioError);
     }
 }
 

@@ -75,7 +75,7 @@ void StatisticsCollector::updateStatisticsWithNewValue(
 {
     if (queryStatistics.result)
     {
-        if (*queryStatistics.result == DBResult::ok)
+        if (*queryStatistics.result == DBResultCode::ok)
             ++m_currentStatistics.requestsSucceeded;
         else
             ++m_currentStatistics.requestsFailed;
@@ -132,7 +132,7 @@ void StatisticsCollector::removeValueFromStatistics(const QueryExecutionInfo& qu
 {
     if (queryStatistics.result)
     {
-        if (*queryStatistics.result == DBResult::ok)
+        if (*queryStatistics.result == DBResultCode::ok)
             --m_currentStatistics.requestsSucceeded;
         else
             --m_currentStatistics.requestsFailed;

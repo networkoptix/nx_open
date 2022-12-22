@@ -32,9 +32,7 @@ void SqlQuery::prepare(const std::string_view& query)
     if (!m_sqlQuery.prepare(QString::fromUtf8(query.data(), query.size())))
     {
         NX_DEBUG(this, "Error preparing query %1. %2", query, m_sqlQuery.lastError().text());
-        throw Exception(
-            getLastErrorCode(),
-            m_sqlQuery.lastError().text().toStdString());
+        throw Exception(getLastError());
     }
 }
 
@@ -90,9 +88,7 @@ void SqlQuery::exec()
         NX_TRACE(this, "Query %1 failed. %2", m_sqlQuery.lastQuery(),
             m_sqlQuery.lastError().text());
 
-        throw Exception(
-            getLastErrorCode(),
-            m_sqlQuery.lastError().text().toStdString());
+        throw Exception(getLastError());
     }
 }
 
@@ -148,17 +144,27 @@ void SqlQuery::exec(AbstractDbConnection* connection, const QByteArray& queryTex
     exec(*connection->qtSqlConnection(), queryText);
 }
 
-DBResult SqlQuery::getLastErrorCode()
+DBResult SqlQuery::getLastError()
 {
+    DBResult res;
+
     switch (m_sqlQuery.lastError().type())
     {
         case QSqlError::StatementError:
-            return DBResult::statementError;
+            res.code = DBResultCode::statementError;
+            break;
+
         case QSqlError::ConnectionError:
-            return DBResult::connectionError;
+            res.code = DBResultCode::connectionError;
+            break;
+
         default:
-            return DBResult::ioError;
+            res.code = DBResultCode::ioError;
     }
+
+    res.text = m_sqlQuery.lastError().text().toStdString();
+
+    return res;
 }
 
 
@@ -171,12 +177,12 @@ DBResult SqlQuery::getLastErrorCode()
 //    AbstractDbConnection* const connection,
 //    DBResult result) const
 //{
-//    if (result != DBResult::ioError)
+//    if (result != DBResultCode::ioError)
 //        return result;
 //    switch (connection->lastError().type())
 //    {
 //        case QSqlError::StatementError:
-//            return DBResult::statementError;
+//            return DBResultCode::statementError;
 //        case QSqlError::ConnectionError:
 //            return DBResult::connectionError;
 //        default:

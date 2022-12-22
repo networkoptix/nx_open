@@ -58,7 +58,7 @@ public:
         {
             m_prepareCursorFunc(m_query.get());
             m_query->exec();
-            nx::utils::swapAndCall(m_cursorCreatedHandler, DBResult::ok, m_id);
+            nx::utils::swapAndCall(m_cursorCreatedHandler, DBResultCode::ok, m_id);
         }
         catch (const Exception& e)
         {
@@ -70,7 +70,7 @@ public:
     Record fetchNextRecord()
     {
         if (!m_query->next())
-            throw Exception(DBResult::endOfData);
+            throw Exception(DBResultCode::endOfData);
         Record record;
         m_readRecordFunc(m_query.get(), &record);
         return record;
@@ -193,7 +193,7 @@ public:
     {
         auto record = std::move(*m_record);
         m_record = std::nullopt;
-        m_completionHandler(DBResult::ok, std::move(record));
+        m_completionHandler(DBResultCode::ok, std::move(record));
     }
 
     virtual void reportError(DBResult resultCode) override
@@ -238,7 +238,7 @@ protected:
         auto cursorHandler = cursorContextPool()->cursorHander(m_task->cursorId());
         if (!cursorHandler)
         {
-            m_task->reportError(DBResult::notFound);
+            m_task->reportError(DBResultCode::notFound);
             // Unknown cursor id is not a reason to close connection, so reporting ok.
             return;
         }
@@ -252,7 +252,7 @@ protected:
         {
             cursorContextPool()->remove(m_task->cursorId());
             m_task->reportError(e.dbResult());
-            if (e.dbResult() != DBResult::endOfData) //< End of cursor data is not an error actually.
+            if (e.dbResult() != DBResultCode::endOfData) //< End of cursor data is not an error actually.
                 throw;
         }
     }

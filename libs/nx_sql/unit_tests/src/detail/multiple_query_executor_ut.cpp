@@ -44,12 +44,7 @@ public:
 
     virtual DBResult lastError() override
     {
-        return DBResult::ioError;
-    }
-
-    virtual std::string lastErrorText() override
-    {
-        return std::string();
+        return {DBResultCode::ioError, ""};
     }
 
     virtual std::unique_ptr<AbstractSqlQuery> createQuery() override
@@ -103,7 +98,7 @@ protected:
         for (int i = 0; i < queryCount; ++i)
         {
             m_queries.push_back(std::make_unique<UpdateWithoutAnyDataExecutor>(
-                [](QueryContext*) { return DBResult::ok; },
+                [](QueryContext*) { return DBResultCode::ok; },
                 std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1),
                 std::string()));
         }
@@ -117,7 +112,7 @@ protected:
         m_queries.insert(
             m_queries.begin() + pos,
             std::make_unique<UpdateWithoutAnyDataExecutor>(
-                [](QueryContext*) { return DBResult::ioError; },
+                [](QueryContext*) { return DBResultCode::ioError; },
                 std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1),
                 std::string()));
     }
@@ -133,17 +128,17 @@ protected:
     {
         m_queryCount = m_queries.size();
         detail::MultipleQueryExecutor multipleQueryExecutor(std::move(m_queries));
-        multipleQueryExecutor.reportErrorWithoutExecution(DBResult::ioError);
+        multipleQueryExecutor.reportErrorWithoutExecution(DBResultCode::ioError);
     }
 
     void thenExecuteSucceeded()
     {
-        ASSERT_EQ(DBResult::ok, m_execResult);
+        ASSERT_EQ(DBResultCode::ok, m_execResult);
     }
 
     void thenExecuteFailed()
     {
-        ASSERT_NE(DBResult::ok, m_execResult);
+        ASSERT_NE(DBResultCode::ok, m_execResult);
     }
 
     void andEveryQueryHasReportedFailure()
@@ -151,7 +146,7 @@ protected:
         ASSERT_EQ(m_queryCount, m_queryResults.size());
         for (const auto& queryResult: m_queryResults)
         {
-            ASSERT_NE(DBResult::ok, queryResult);
+            ASSERT_NE(DBResultCode::ok, queryResult);
         }
     }
 
@@ -160,7 +155,7 @@ protected:
         ASSERT_EQ(m_queryCount, m_queryResults.size());
         for (const auto& queryResult : m_queryResults)
         {
-            ASSERT_EQ(DBResult::ok, queryResult);
+            ASSERT_EQ(DBResultCode::ok, queryResult);
         }
     }
 
@@ -181,7 +176,7 @@ protected:
 private:
     std::vector<std::unique_ptr<AbstractExecutor>> m_queries;
     std::vector<DBResult> m_queryResults;
-    DBResult m_execResult = DBResult::ok;
+    DBResult m_execResult = DBResultCode::ok;
     int m_queryCount = 0;
     DbConnectionStub m_dbConnection;
 

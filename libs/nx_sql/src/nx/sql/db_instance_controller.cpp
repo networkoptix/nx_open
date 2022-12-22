@@ -95,38 +95,45 @@ bool InstanceController::configureDb()
             cacheFilledPromise.set_value(dbResult);
         });
 
-    return future.get() == DBResult::ok;
+    return future.get() == DBResultCode::ok;
 }
 
 DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
 {
-    QSqlQuery enableAutoVacuumQuery(*queryContext->connection()->qtSqlConnection());
-    enableAutoVacuumQuery.prepare("PRAGMA auto_vacuum = 1");
-    if (!enableAutoVacuumQuery.exec())
+    auto enableAutoVacuumQuery = queryContext->connection()->createQuery();
+    enableAutoVacuumQuery->prepare("PRAGMA auto_vacuum = 1");
+    try
     {
-        NX_WARNING(
-            this,
-            nx::format("Failed to enable auto vacuum mode. %1")
-                .arg(enableAutoVacuumQuery.lastError().text()));
-        return DBResult::ioError;
+        enableAutoVacuumQuery->exec();
+    }
+    catch (const Exception& e)
+    {
+        NX_WARNING(this, "Failed to enable auto vacuum mode. %1", e.what());
+        return e.dbResult();
     }
 
-    QSqlQuery enableWalQuery(*queryContext->connection()->qtSqlConnection());
-    enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-    if (!enableWalQuery.exec())
+    auto enableWalQuery = queryContext->connection()->createQuery();
+    enableWalQuery->prepare("PRAGMA journal_mode = WAL");
+    try
     {
-        NX_WARNING(this, nx::format("Failed to enable WAL mode. %1")
-            .arg(enableWalQuery.lastError().text()));
-        return DBResult::ioError;
+        enableWalQuery->exec();
+    }
+    catch (const Exception& e)
+    {
+        NX_WARNING(this, "Failed to enable WAL mode. %1", e.what());
+        return e.dbResult();
     }
 
-    QSqlQuery enableFKQuery(*queryContext->connection()->qtSqlConnection());
-    enableFKQuery.prepare("PRAGMA foreign_keys = ON");
-    if (!enableFKQuery.exec())
+    auto enableFKQuery = queryContext->connection()->createQuery();
+    enableFKQuery->prepare("PRAGMA foreign_keys = ON");
+    try
     {
-        NX_WARNING(this, nx::format("Failed to enable foreign keys. %1")
-            .arg(enableFKQuery.lastError().text()));
-        return DBResult::ioError;
+        enableFKQuery->exec();
+    }
+    catch (const Exception& e)
+    {
+        NX_WARNING(this, "Failed to enable foreign keys. %1", e.what());
+        return e.dbResult();
     }
 
     //QSqlQuery setLockingModeQuery(*connection);
@@ -135,10 +142,10 @@ DBResult InstanceController::configureSqliteInstance(QueryContext* queryContext)
     //{
     //    NX_WARNING(this, nx::format("sqlite configure. Failed to set locking mode. %1")
     //        .arg(setLockingModeQuery.lastError().text()));
-    //    return DBResult::ioError;
+    //    return DBResultCode::ioError;
     //}
 
-    return DBResult::ok;
+    return DBResultCode::ok;
 }
 
 } // namespace nx::sql

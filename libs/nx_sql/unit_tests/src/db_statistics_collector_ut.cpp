@@ -41,7 +41,7 @@ protected:
         QueryExecutionInfo queryInfo;
         queryInfo.executionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
         queryInfo.waitForExecutionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
-        queryInfo.result = DBResult::ok;
+        queryInfo.result = DBResultCode::ok;
         m_statisticsCollector.recordQuery(queryInfo);
         m_records.push_back(queryInfo);
     }
@@ -64,7 +64,7 @@ protected:
         {
             if (record.result)
             {
-                if (*record.result == DBResult::ok)
+                if (*record.result == DBResultCode::ok)
                     ++queryStatistics.requestsSucceeded;
                 else
                     ++queryStatistics.requestsFailed;

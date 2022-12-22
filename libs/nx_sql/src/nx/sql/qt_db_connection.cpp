@@ -72,24 +72,27 @@ bool QtDbConnection::rollback()
 
 DBResult QtDbConnection::lastError()
 {
+    DBResult res;
     switch (m_connection.lastError().type())
     {
         case QSqlError::StatementError:
-            return DBResult::statementError;
+            res.code = DBResultCode::statementError;
+            break;
+
         case QSqlError::ConnectionError:
-            return DBResult::connectionError;
+            res.code = DBResultCode::connectionError;
+            break;
 
         case QSqlError::NoError: //< Qt not always sets error code correctly.
         case QSqlError::TransactionError:
         case QSqlError::UnknownError:
         default:
-            return DBResult::ioError;
+            res.code = DBResultCode::ioError;
+            break;
     }
-}
 
-std::string QtDbConnection::lastErrorText()
-{
-    return m_connection.lastError().text().toStdString();
+    res.text = m_connection.lastError().text().toStdString();
+    return res;
 }
 
 std::unique_ptr<AbstractSqlQuery> QtDbConnection::createQuery()

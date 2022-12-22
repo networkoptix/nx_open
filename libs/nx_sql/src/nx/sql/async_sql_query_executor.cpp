@@ -129,7 +129,7 @@ DBResult AsyncSqlQueryExecutor::execSqlScript(
     const std::string& script)
 {
     nx::sql::SqlQueryExecutionHelper::execSQLScript(queryContext, script);
-    return DBResult::ok;
+    return DBResultCode::ok;
 }
 
 bool AsyncSqlQueryExecutor::init()
@@ -322,7 +322,7 @@ void AsyncSqlQueryExecutor::reportQueryCancellation(
     std::unique_ptr<detail::AbstractExecutor> expiredQuery)
 {
     // We are in a random db request execution thread.
-    expiredQuery->reportErrorWithoutExecution(DBResult::cancelled);
+    expiredQuery->reportErrorWithoutExecution(DBResultCode::cancelled);
 }
 
 void AsyncSqlQueryExecutor::onConnectionClosed(

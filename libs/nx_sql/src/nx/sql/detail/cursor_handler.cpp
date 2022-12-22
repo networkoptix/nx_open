@@ -80,7 +80,7 @@ DBResult BasicCursorOperationExecutor::executeQuery(AbstractDbConnection* const 
 
     executeCursor(connection);
 
-    return DBResult::ok;
+    return DBResultCode::ok;
 }
 
 //-------------------------------------------------------------------------------------------------

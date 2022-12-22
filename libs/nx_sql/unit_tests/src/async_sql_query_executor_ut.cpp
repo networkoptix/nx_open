@@ -70,7 +70,7 @@ class DbAsyncSqlQueryExecutor:
 
 public:
     DbAsyncSqlQueryExecutor():
-        m_forcedDbConnectionError(std::make_shared<DBResult>(DBResult::ok))
+        m_forcedDbConnectionError(std::make_shared<DBResult>(DBResultCode::ok))
     {
         setConnectionFactory([this](auto&&... args) {
             return createConnection(std::forward<decltype(args)>(args)...);
@@ -96,15 +96,15 @@ protected:
     {
         std::vector<Company> generatedData;
 
-        EXPECT_EQ(DBResult::ok, executeUpdate(
+        EXPECT_EQ(DBResultCode::ok, executeUpdate(
             "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
         generatedData.push_back(Company{"Example company 1", 1975});
 
-        EXPECT_EQ(DBResult::ok, executeUpdate(
+        EXPECT_EQ(DBResultCode::ok, executeUpdate(
             "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
         generatedData.push_back(Company{"Example company 2", 1998});
 
-        EXPECT_EQ(DBResult::ok, executeUpdate(
+        EXPECT_EQ(DBResultCode::ok, executeUpdate(
             "INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)"));
         generatedData.push_back(Company{"Example company 3", 2010});
 
@@ -177,10 +177,10 @@ protected:
                     queries.begin(), queries.end(),
                     [this](std::unique_ptr<SqlQuery>& query)
                     {
-                        saveQueryResult(query->next() ? DBResult::ok : DBResult::ioError);
+                        saveQueryResult(query->next() ? DBResultCode::ok : DBResultCode::ioError);
                     });
 
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             nullptr);
     }
@@ -194,7 +194,7 @@ protected:
     {
         for (int i = 0; i < m_issuedRequestCount; ++i)
         {
-            ASSERT_EQ(DBResult::ok, m_queryResults.pop());
+            ASSERT_EQ(DBResultCode::ok, m_queryResults.pop());
         }
     }
 
@@ -207,18 +207,18 @@ protected:
     {
         BaseDbTest::initializeDatabase();
 
-        ASSERT_EQ(DBResult::ok, executeUpdate(
+        ASSERT_EQ(DBResultCode::ok, executeUpdate(
             "CREATE TABLE company(name VARCHAR(256), yearFounded INTEGER)"));
     }
 
     void emulateUnrecoverableQueryError()
     {
-        emulateQueryError(DBResult::connectionError);
+        emulateQueryError(DBResultCode::connectionError);
     }
 
     void emulateRecoverableQueryError()
     {
-        emulateQueryError(DBResult::uniqueConstraintViolation);
+        emulateQueryError(DBResultCode::uniqueConstraintViolation);
     }
 
     void startHangingReadQuery()
@@ -236,7 +236,7 @@ protected:
                 query->exec();
                 queryExecuted.set_value();
                 m_finishHangingQuery.get_future().wait();
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
@@ -259,7 +259,7 @@ protected:
                 // At this point we have active DB transaction with something in rollback journal.
                 queryExecuted.set_value();
                 m_finishHangingQuery.get_future().wait();
-                return DBResult::ok;
+                return DBResultCode::ok;
             },
             std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
@@ -269,17 +269,17 @@ protected:
     void finishHangingQuery()
     {
         m_finishHangingQuery.set_value();
-        ASSERT_EQ(DBResult::ok, m_queryResults.pop());
+        ASSERT_EQ(DBResultCode::ok, m_queryResults.pop());
     }
 
     void makeDbUnavailable()
     {
-        *m_forcedDbConnectionError = DBResult::connectionError;
+        *m_forcedDbConnectionError = DBResultCode::connectionError;
     }
 
     void makeDbAvailable()
     {
-        *m_forcedDbConnectionError = DBResult::ok;
+        *m_forcedDbConnectionError = DBResultCode::ok;
     }
 
 private:
@@ -308,7 +308,7 @@ private:
         return connection;
     }
 
-    void emulateQueryError(DBResult dbResultToEmulate)
+    void emulateQueryError(DBResultCode dbResultToEmulate)
     {
         const auto dbResult = executeQuery(
             [dbResultToEmulate](nx::sql::QueryContext* /*queryContext*/)
@@ -340,7 +340,7 @@ private:
         query.setForwardOnly(true);
         query.prepare("SELECT * FROM company");
         query.exec();
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     DBResult insertSomeData(QueryContext* queryContext)
@@ -360,7 +360,7 @@ private:
             nx::format("INSERT INTO company (name, yearFounded) VALUES ('%1', %2)")
                 .args(nx::utils::generateRandomName(7), nx::utils::random::number<int>(1, 2017)).toStdString());
         query.exec();
-        return DBResult::ok;
+        return DBResultCode::ok;
     }
 
     void saveQueryResult(DBResult dbResult)
@@ -372,7 +372,7 @@ private:
 TEST_F(DbAsyncSqlQueryExecutor, able_to_execute_query)
 {
     initializeDatabase();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)"));
     const auto companies = executeSelect<Company>("SELECT * FROM company");
 
@@ -389,10 +389,10 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_reopens_after_error)
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
 
     initializeDatabase();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     emulateUnrecoverableQueryError();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
@@ -409,10 +409,10 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_does_not_reopen_after_recoverable_
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(1);
 
     initializeDatabase();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     emulateRecoverableQueryError();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
@@ -431,11 +431,11 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
 
     initializeDatabase();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     for (int i = 0; i < connectionOptions().maxErrorsInARowBeforeClosingConnection + 1; ++i)
         emulateRecoverableQueryError();
-    ASSERT_EQ(DBResult::ok, executeUpdate(
+    ASSERT_EQ(DBResultCode::ok, executeUpdate(
         "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
@@ -454,17 +454,17 @@ TEST_F(DbAsyncSqlQueryExecutor, reconnect_after_db_failure)
 {
     // Given working DB.
     initializeDatabase();
-    ASSERT_EQ(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Foo', 1975)"));
+    ASSERT_EQ(DBResultCode::ok, executeUpdate("INSERT INTO company VALUES ('Foo', 1975)"));
 
     makeDbUnavailable();
 
     // Then query fails.
-    ASSERT_NE(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
+    ASSERT_NE(DBResultCode::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
 
     makeDbAvailable();
 
     // Then DB becomes available again.
-    ASSERT_EQ(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
+    ASSERT_EQ(DBResultCode::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
 }
 
 //-------------------------------------------------------------------------------------------------

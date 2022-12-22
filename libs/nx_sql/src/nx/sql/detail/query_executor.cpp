@@ -99,7 +99,7 @@ DBResult UpdateWithoutAnyDataExecutor::doQuery(QueryContext* queryContext)
 
 void UpdateWithoutAnyDataExecutor::reportSuccess()
 {
-    invokeCompletionHandler(DBResult::ok);
+    invokeCompletionHandler(DBResultCode::ok);
 }
 
 //-------------------------------------------------------------------------------------------------

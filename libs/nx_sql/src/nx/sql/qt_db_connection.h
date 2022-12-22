@@ -23,7 +23,6 @@ public:
     virtual bool rollback() override;
 
     virtual DBResult lastError() override;
-    virtual std::string lastErrorText() override;
 
     virtual std::unique_ptr<AbstractSqlQuery> createQuery() override;
 
