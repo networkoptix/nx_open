@@ -32,13 +32,38 @@ RecorderItemDataHelper::RecorderItemDataHelper(
 QString RecorderItemDataHelper::groupedDeviceName(const QString& recorderGroupId) const
 {
     const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
-    for (const auto& camera: camerasSet)
-    {
-        const auto userDefinedGroupName = camera->getUserDefinedGroupName();
-        if (!userDefinedGroupName.isEmpty())
-            return userDefinedGroupName;
-    }
-    return recorderGroupId;
+
+    const auto getUserDefinedGroupName =
+        [&camerasSet]
+        {
+            for (const auto& camera: camerasSet)
+            {
+                // Avoid QnSecurityCamResource::getUserDefinedGroupName() fallback to
+                // QnSecurityCamResource::getDefaultGroupName().
+                const auto groupName = camera->getUserDefinedGroupName();
+                if (!groupName.isEmpty() && groupName != camera->getDefaultGroupName())
+                    return groupName;
+            }
+            return QString();
+        };
+
+    const auto getDefaultGroupName =
+        [&camerasSet]
+        {
+            for (const auto& camera: camerasSet)
+            {
+                if (const auto groupName = camera->getDefaultGroupName(); !groupName.isEmpty())
+                    return groupName;
+            }
+            return QString();
+        };
+
+    if (const auto userGroupName = getUserDefinedGroupName(); !userGroupName.isEmpty())
+        return userGroupName;
+    else if (const auto defaultGroupName = getDefaultGroupName(); !defaultGroupName.isEmpty())
+        return defaultGroupName;
+    else
+        return recorderGroupId;
 }
 
 bool RecorderItemDataHelper::isMultisensorCamera(const QString& recorderGroupId) const
