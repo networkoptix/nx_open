@@ -43,7 +43,7 @@ struct NX_VMS_COMMON_API ActionParameters
     /**%apidoc Stream quality for recording. */
     Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;
 
-    /**%apidoc For Bookmarks - the epsilon which the Bookmark end time is extended by, in seconds. */
+    /**%apidoc For Bookmarks - the epsilon which the Bookmark end time is extended by, in ms. */
     int recordAfter = 0;
 
     /**%apidoc Id of Device Output. */
