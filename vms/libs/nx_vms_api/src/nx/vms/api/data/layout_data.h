@@ -14,29 +14,6 @@
 
 namespace nx::vms::api {
 
-class LayoutItemId: public QnUuid
-{
-public:
-    LayoutItemId() = default;
-    LayoutItemId(const QnUuid& id, const QnUuid& layoutId): QnUuid(id), layoutId(layoutId) {}
-    QnUuid layoutId;
-};
-
-/**%apidoc
- * Layout Item filter
- * %param id Layout Item unique id.
- */
-struct NX_VMS_API LayoutItemFilter: IdData
-{
-    LayoutItemFilter() = default;
-    LayoutItemFilter(const LayoutItemId& id): IdData(id), layoutId(id.layoutId) {}
-
-    /**%apidoc Layout unique id.*/
-    QnUuid layoutId;
-};
-#define LayoutItemFilter_Fields (id)(layoutId)
-QN_FUSION_DECLARE_FUNCTIONS(LayoutItemFilter, (json), NX_VMS_API)
-
 /**%apidoc
  * Layout Item information object
  * %param [readonly] id Item unique id.
@@ -73,9 +50,6 @@ struct NX_VMS_API LayoutItemData: IdData
 
     /**%apidoc Device unique id.*/
     QnUuid resourceId;
-
-    /**%apidoc [readonly] Layout unique id.*/
-    QnUuid layoutId;
 
     /**%apidoc [opt] If the item represents a local file - the URL of the file. For cross-System
      * layouts, contains the special URL of the Device. Otherwise is empty. Can be filled with the
@@ -125,11 +99,9 @@ struct NX_VMS_API LayoutItemData: IdData
     bool displayRoi = true;
 
     bool operator==(const LayoutItemData& other) const;
-
-    LayoutItemId getId() const { return{id, layoutId}; }
 };
 #define LayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation) \
-    (resourceId)(layoutId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
+    (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
     (contrastParams)(dewarpingParams)(displayInfo)(displayAnalyticsObjects)(displayRoi)(controlPtz)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutItemData)
 NX_REFLECTION_INSTRUMENT(LayoutItemData, LayoutItemData_Fields)
@@ -189,6 +161,43 @@ struct NX_VMS_API LayoutData: ResourceData
     (fixedWidth)(fixedHeight)(logicalId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutData)
 NX_REFLECTION_INSTRUMENT(LayoutData, LayoutData_Fields)
+
+class NX_VMS_API LayoutItemId: public QnUuid
+{
+public:
+    LayoutItemId() = default;
+    LayoutItemId(const QnUuid& id, const QnUuid& layoutId): QnUuid(id), layoutId(layoutId) {}
+    QnUuid layoutId;
+};
+
+/**%apidoc
+ * Layout Item filter
+ * %param id Layout Item unique id.
+ */
+struct NX_VMS_API LayoutItemFilter: IdData
+{
+    LayoutItemFilter() = default;
+    LayoutItemFilter(const LayoutItemId& id): IdData(id), layoutId(id.layoutId) {}
+
+    /**%apidoc Layout unique id.*/
+    QnUuid layoutId;
+};
+#define LayoutItemFilter_Fields (id)(layoutId)
+QN_FUSION_DECLARE_FUNCTIONS(LayoutItemFilter, (json), NX_VMS_API)
+
+struct NX_VMS_API LayoutItemModel: LayoutItemData
+{
+    /**%apidoc [readonly] Layout unique id.*/
+    QnUuid layoutId;
+
+    LayoutItemModel() = default;
+    LayoutItemModel(LayoutItemData data, QnUuid layoutId_);
+
+    LayoutItemId getId() const { return {id, layoutId}; }
+};
+#define LayoutItemModel_Fields LayoutItemData_Fields (layoutId)
+QN_FUSION_DECLARE_FUNCTIONS(LayoutItemModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LayoutItemModel, LayoutItemModel_Fields)
 
 } // namespace nx::vms::api
 
