@@ -1108,7 +1108,7 @@
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Yasaklı.</translation>
     </message>
     <message>
       <source>Conflict.</source>
@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Hizmet kullanılamıyor.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1148,7 +1148,7 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Oturum süresi doldu.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>SMTP adı</translation>
     </message>
     <message>
       <source>LDAP URI</source>
@@ -1392,7 +1392,7 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Yedekleme ayarları</translation>
     </message>
     <message>
       <source>Cloud host override</source>

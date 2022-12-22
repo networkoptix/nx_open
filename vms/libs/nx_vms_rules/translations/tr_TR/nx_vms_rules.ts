@@ -726,7 +726,7 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation>Durum: %1</translation>
+      <translation>Olay: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
