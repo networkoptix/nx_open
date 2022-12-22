@@ -1980,7 +1980,7 @@ void QnTimeSlider::updateLivePreview()
         m_livePreview->showAt(
             globalCursorPos,
             globalRect,
-            tooltipTimeContent(timeFromPosition(localCursorPos)));
+            tooltipTimeContent(timeFromPosition(localCursorPos) - localOffset()));
 
         m_livePreview->widget()->raise();
     }
