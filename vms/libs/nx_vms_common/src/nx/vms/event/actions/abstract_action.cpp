@@ -17,6 +17,7 @@ ActionFlags getFlags(ActionType actionType)
         {ActionType::bookmarkAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::cameraOutputAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::cameraRecordingAction, {ActionFlag::canUseSourceCamera}},
+        {ActionType::fullscreenCameraAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::playSoundAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::playSoundOnceAction, {ActionFlag::canUseSourceCamera}},
         {ActionType::sayTextAction, {ActionFlag::canUseSourceCamera}},
