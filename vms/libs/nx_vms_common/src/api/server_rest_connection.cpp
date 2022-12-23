@@ -2225,8 +2225,10 @@ Handle ServerConnection::sendRequest(
     if (!NX_ASSERT(certificateVerifier))
         return 0;
 
-    ContextPtr context(new nx::network::http::ClientPool::Context(d->serverId,
-        certificateVerifier->makeAdapterFunc(request.gatewayId.value_or(d->serverId))));
+    ContextPtr context(new nx::network::http::ClientPool::Context(
+        d->serverId,
+        certificateVerifier->makeAdapterFunc(
+            request.gatewayId.value_or(d->serverId), request.url)));
     context->request = request;
     context->completionFunc = callback;
     context->timeouts = timeouts;
