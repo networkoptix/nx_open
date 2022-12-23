@@ -93,7 +93,7 @@ QString ManagerLinux::findDeviceModel(const QString& modelAndManufacturer) const
             return model == config.model;
         });
 
-    return iter != knownConfigsList.end() ? iter->model : "";
+    return iter != knownConfigsList.end() ? iter->model : modelAndManufacturer;
 }
 
 } // namespace nx::vms::client::desktop::joystick
