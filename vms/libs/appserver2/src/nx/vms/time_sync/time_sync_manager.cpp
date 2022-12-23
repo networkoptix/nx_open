@@ -89,9 +89,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
     bool sslRequired)
 {
     auto socket = nx::network::SocketFactory::createStreamSocket(
-        systemContext()->certificateVerifier()->makeAdapterFunc(
-            route.gatewayId.isNull() ? route.id : route.gatewayId),
-        sslRequired);
+        systemContext()->certificateVerifier()->makeAdapterFunc(route), sslRequired);
     if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
         return socket;
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
@@ -125,8 +123,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
         .setPort(route.addr.port)
         .setPath(kTimeSyncUrlPath);
 
-    const bool sslRequired = url.scheme() == nx::network::http::kSecureUrlSchemeName;
-    auto socket = connectToRemoteHost(route, sslRequired);
+    auto socket = connectToRemoteHost(route, /*sslRequired*/ true);
 
     if (!socket)
     {
@@ -140,7 +137,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     auto httpClient = std::make_unique<nx::network::http::HttpClient>(
         std::move(socket),
         systemContext()->certificateVerifier()->makeAdapterFunc(
-            route.gatewayId.isNull() ? route.id : route.gatewayId));
+            route.gatewayId.isNull() ? route.id : route.gatewayId, url));
     httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toStdString());
 
