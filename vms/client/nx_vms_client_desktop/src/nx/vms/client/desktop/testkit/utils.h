@@ -104,25 +104,29 @@ enum KeyOption {
  * Also supports sequences like `<Enter>`, `<Ctrl+S>` etc.
  */
 Qt::KeyboardModifiers sendKeys(
-    QJSValue object,
     QString keys,
+    QJSValue object = {},
     KeyOption option = KeyType,
     Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
 /**
  * Sends mouse event(s) to the specified window.
+ * @param button Button that caused the event. If the event type is MouseMove, the appropriate button for this event is Qt::NoButton. 
+ * @param buttons State of all buttons at the time of the event.
+ * @param modifiers State of all keyboard modifiers.
  */
 Qt::MouseButtons sendMouse(
-    QWindow* windowHandle,
     QPoint screenPos,
     QString eventType,
     Qt::MouseButton button,
-    Qt::KeyboardModifiers modifiers,
     Qt::MouseButtons buttons,
-    bool nativeSetPos,
+    Qt::KeyboardModifiers modifiers,
+    QWindow* windowHandle = nullptr,
+    bool nativeSetPos = false,
     QPoint pixelDelta = {},
     QPoint angleDelta = {},
-    bool inverted = false);
+    bool inverted = false,
+    int scrollDelta = 0);
 
 /** Property type or method return type info. */
 QVariantMap getMetaInfo(const QMetaObject* meta, QString methodOrProperty);
