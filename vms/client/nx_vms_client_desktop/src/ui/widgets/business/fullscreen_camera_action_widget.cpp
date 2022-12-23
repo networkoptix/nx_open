@@ -30,12 +30,6 @@ QnFullscreenCameraActionWidget::QnFullscreenCameraActionWidget(
     ui->layoutWarningWidget->setVisible(false);
     setWarningStyle(ui->layoutWarningWidget);
 
-    connect(
-        ui->useSourceCheckBox,
-        &QCheckBox::clicked,
-        this,
-        &QnFullscreenCameraActionWidget::paramsChanged);
-
     connect(ui->selectCameraButton, &QPushButton::clicked,
         this, &QnFullscreenCameraActionWidget::openCameraSelectionDialog);
 
@@ -63,8 +57,7 @@ QnFullscreenCameraActionWidget::~QnFullscreenCameraActionWidget()
 void QnFullscreenCameraActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->selectCameraButton);
-    setTabOrder(ui->selectCameraButton, ui->useSourceCheckBox);
-    setTabOrder(ui->useSourceCheckBox, ui->selectLayoutButton);
+    setTabOrder(ui->selectCameraButton, ui->selectLayoutButton);
     setTabOrder(ui->selectLayoutButton, after);
 }
 
@@ -75,14 +68,8 @@ void QnFullscreenCameraActionWidget::at_model_dataChanged(Fields fields)
 
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    if (fields.testFlag(Field::eventType))
-    {
-        ui->useSourceCheckBox->setEnabled(model()->actionCanUseSourceCamera());
-    }
-
     if (fields.testFlag(Field::actionParams))
     {
-        ui->useSourceCheckBox->setChecked(model()->isActionUsingSourceCamera());
         ui->rewindForWidget->setValue(duration_cast<seconds>(
             milliseconds(model()->actionParams().recordBeforeMs)));
     }
@@ -199,7 +186,6 @@ void QnFullscreenCameraActionWidget::paramsChanged()
     QScopedValueRollback<bool> guard(m_updating, true);
 
     auto params = model()->actionParams();
-    params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);
 
     updateCameraButton();

@@ -1193,6 +1193,10 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
         case Column::target:
         {
             auto filtered = filterActionResources(this, m_actionResources, m_actionType);
+
+            if (isActionUsingSourceCamera())
+                return true;
+
             switch (m_actionType)
             {
                 case ActionType::sendMailAction:
@@ -1257,13 +1261,6 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
 
-                case vms::api::showTextOverlayAction:
-                case vms::api::showOnAlarmLayoutAction:
-                {
-                    if (isActionUsingSourceCamera())
-                        return true;
-                    break;
-                }
                 case ActionType::execHttpRequestAction:
                 {
                     QUrl url(m_actionParams.url);
