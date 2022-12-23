@@ -12,6 +12,7 @@
 #include <QtWidgets/QApplication>
 
 #include <client_core/client_core_module.h>
+#include <nx/build_info.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 
 #include "highlighter.h"
@@ -356,6 +357,8 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
         button = Qt::LeftButton;
 
     Qt::KeyboardModifiers modifiers(parameters.property("modifiers").toInt());
+    if (!nx::build_info::isWindows())
+        modifiers |= QGuiApplication::keyboardModifiers();
 
     if (!window)
     {
@@ -365,16 +368,17 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
     }
 
     utils::sendMouse(
-        window,
         screenPos,
         parameters.property("type").toString(),
-        button,
-        modifiers | QGuiApplication::keyboardModifiers(),
-        QGuiApplication::mouseButtons(),
+        /* mouseButton */ button,
+        /* mouseButtons */ QGuiApplication::mouseButtons(),
+        modifiers,
+        window,
         parameters.property("native").toBool(),
         valueToPoint(parameters.property("pixelDelta")),
         valueToPoint(parameters.property("angleDelta")),
-        parameters.property("inverted").toBool());
+        parameters.property("inverted").toBool(),
+        parameters.property("scrollDelta").toInt());
 }
 
 void TestKit::keys(QJSValue object, QString keys, QString input)
@@ -387,7 +391,7 @@ void TestKit::keys(QJSValue object, QString keys, QString input)
     else if (input == "RELEASE")
         option = utils::KeyRelease;
 
-    utils::sendKeys(object, keys, option, QGuiApplication::queryKeyboardModifiers());
+    utils::sendKeys(keys, object, option, QGuiApplication::queryKeyboardModifiers());
 }
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)

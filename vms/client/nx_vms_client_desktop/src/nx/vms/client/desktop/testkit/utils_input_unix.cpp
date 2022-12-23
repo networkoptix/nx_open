@@ -123,8 +123,8 @@ Qt::KeyboardModifiers sendKey(
 } // namespace
 
 Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
-    QJSValue object,
     QString keys,
+    QJSValue object,
     KeyOption option,
     Qt::KeyboardModifiers modifiers)
 {
@@ -197,16 +197,17 @@ Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
 }
 
 Qt::MouseButtons sendMouse(
-    QWindow* windowHandle,
     QPoint screenPos,
     QString eventType,
     Qt::MouseButton button,
-    Qt::KeyboardModifiers modifiers,
     Qt::MouseButtons buttons,
+    Qt::KeyboardModifiers modifiers,
+    QWindow* windowHandle,
     bool nativeSetPos,
     QPoint pixelDelta,
     QPoint angleDelta,
-    bool inverted)
+    bool inverted,
+    int scrollDelta)
 {
     static int lastMouseTimestamp = 0;
 
