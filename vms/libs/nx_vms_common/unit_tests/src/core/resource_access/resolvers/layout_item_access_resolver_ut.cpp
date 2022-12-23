@@ -132,6 +132,43 @@ TEST_F(LayoutItemAccessResolverTest, itemAccessViaVideowall)
         videowallItemAccessRights(testRights));
 }
 
+TEST_F(LayoutItemAccessResolverTest, resolvedAccessIsAccumulated)
+{
+    auto videowall1 = addVideoWall();
+    auto videowallLayout1 = addLayoutForVideoWall(videowall1);
+
+    auto videowall2 = addVideoWall();
+    auto videowallLayout2 = addLayoutForVideoWall(videowall2);
+
+    auto sharedLayout1 = addLayout();
+    ASSERT_TRUE(sharedLayout1->isShared());
+
+    auto sharedLayout2 = addLayout();
+    ASSERT_TRUE(sharedLayout2->isShared());
+
+    auto camera = addCamera();
+    addToLayout(sharedLayout1, camera);
+    addToLayout(sharedLayout2, camera);
+    addToLayout(videowallLayout1, camera);
+    addToLayout(videowallLayout2, camera);
+
+    manager->setOwnResourceAccessMap(kTestSubjectId, {
+        {camera->getId(), AccessRight::view | AccessRight::edit},
+        {sharedLayout1->getId(), AccessRight::viewArchive},
+        {sharedLayout2->getId(), AccessRight::userInput},
+        {videowall1->getId(), AccessRight::viewBookmarks},
+        {videowall2->getId(), AccessRight::manageBookmarks}});
+
+    const AccessRights expectedRights = AccessRight::view
+        | AccessRight::edit
+        | AccessRight::viewArchive
+        | AccessRight::userInput
+        | AccessRight::viewBookmarks
+        | AccessRight::manageBookmarks;
+
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), expectedRights);
+}
+
 TEST_F(LayoutItemAccessResolverTest, noItemAccessViaPrivateLayout)
 {
     auto layout = addLayout();
