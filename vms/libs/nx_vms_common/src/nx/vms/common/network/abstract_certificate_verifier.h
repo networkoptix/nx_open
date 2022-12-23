@@ -4,7 +4,9 @@
 
 #include <QtCore/QObject>
 
+#include <network/router.h>
 #include <nx/network/socket_factory.h>
+#include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::common {
@@ -23,7 +25,22 @@ public:
         QObject* parent = nullptr);
     virtual ~AbstractCertificateVerifier();
 
-    virtual nx::network::ssl::AdapterFunc makeAdapterFunc(const QnUuid& serverId) = 0;
+    virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
+        const QnUuid& serverId, const nx::utils::Url& url = {}) = 0;
+
+    nx::network::ssl::AdapterFunc makeAdapterFunc(
+        const QnUuid& serverId, const nx::network::SocketAddress& endpoint)
+    {
+        nx::utils::Url url;
+        url.setHost(endpoint.address.toString());
+        url.setPort(endpoint.port);
+        return makeAdapterFunc(serverId, url);
+    }
+
+    nx::network::ssl::AdapterFunc makeAdapterFunc(const QnRoute& route)
+    {
+        return makeAdapterFunc(route.gatewayId.isNull() ? route.id : route.gatewayId, route.addr);
+    }
 
 protected:
     void loadTrustedCertificate(const QByteArray& data, const QString& name);
