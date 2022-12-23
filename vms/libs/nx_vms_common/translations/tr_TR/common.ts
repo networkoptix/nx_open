@@ -1113,7 +1113,7 @@
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Uyuşmazlık.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1123,7 +1123,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Uygulanmadı.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1136,7 +1136,7 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Desteklenmeyen ortam türü.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
@@ -1187,7 +1187,7 @@
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Destek E-posta bağlantısı</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
@@ -1199,7 +1199,7 @@
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>SMTP zaman aşımı (saniye)</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1215,7 +1215,7 @@
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP Yönetici şifresi</translation>
     </message>
     <message>
       <source>LDAP search base</source>
@@ -1452,11 +1452,11 @@
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Hedef güncelleme bilgileri</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Yüklü güncelleme bilgileri</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1464,7 +1464,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>İstemci güncelleme ayarları</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Dışa aktarılan video için varsayılan kod çözücü</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>VMS Server sürümüne özgü özellikler</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
@@ -1536,15 +1536,15 @@
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Video akış süresini kontrol et (milisaniye)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Depolama şifrelemesi etkin</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Mevcut depolama şifreleme anahtarı</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
@@ -1560,11 +1560,11 @@
     </message>
     <message>
       <source>Language for Cloud notifications</source>
-      <translation type="unfinished">Language for Cloud notifications</translation>
+      <translation>Bulut bildirimleri için dil</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+      <translation>Medya arabellek boyutu (KB, 10KB-4MB)</translation>
     </message>
     <message>
       <source>Enable cross-domain policy</source>
@@ -1572,15 +1572,15 @@
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>P2P için WebSocket'ı etkinleştirin</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>Yönetici olmayanlar için Kaynak Ağacında Sunucuları Göster</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Kameralar için yalnızca HTTPS kullanın</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>Sistem için 2FA sorgulamayı etkinleştirin</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -2243,7 +2243,7 @@
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Çoklu yayın adres çakışması algılandı.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
@@ -2287,7 +2287,7 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID hatası: %1.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
