@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Arşiv filtresi...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1017,19 +1017,19 @@
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>Geçerli Düzeni Bulut Olarak Kaydet...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>Düzeni Bulut Olarak Kaydet...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Bulut Düzenini Kaydet</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Bulut Düzenini Farklı Kaydet...</translation>
     </message>
   </context>
   <context>
@@ -1335,8 +1335,7 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Donanım Kimliği: %1 Lisans Anahtarı: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
@@ -1530,21 +1529,21 @@ License Key: %2</translation>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 kullanıcılar e-posta alıyor</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 mevcut değil</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>%1üzerinden yönlendir</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>SMTP sunucusu üzerinden yönlendirme</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1564,7 +1563,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>Sunucuların hiçbirinde internet bağlantısı olmadığından e-posta ayarları test edilemiyor</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -1902,7 +1901,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>NVIDIA donanım hızlandırma beta modunda</translation>
     </message>
   </context>
   <context>
@@ -2218,22 +2217,22 @@ License Key: %2</translation>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>%1 ile bağlantı kuruldu</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>%1 ile bağlantı kesildi</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>%2 üzerinden %1 bağlı</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>%2 üzerinden %1 ile bağlantı kesildi</translation>
     </message>
   </context>
   <context>
@@ -2552,7 +2551,7 @@ License Key: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1$ çalışıyor</translation>
     </message>
   </context>
   <context>
@@ -5180,7 +5179,7 @@ to %1</source>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>BİLGİ GEREKİYOR</translation>
     </message>
     <message>
       <source>Provide</source>
@@ -5658,7 +5657,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Sistem depolaması analitik veriler için kullanıldı</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5666,7 +5665,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>Uzaktan arşiv senkronizasyonu mevcut</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -7421,7 +7420,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Kapıyı Aç</translation>
     </message>
   </context>
   <context>
@@ -7600,7 +7599,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Kamera değişimi iptal edilsin mi?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
@@ -7608,7 +7607,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Transfer edilemez:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7935,15 +7934,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Filtresiz</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Yalnızca ana depolama</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Yalnızca yedek depolama</translation>
     </message>
   </context>
   <context>
@@ -7955,7 +7954,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>İzin ver</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
@@ -8060,7 +8059,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Kameraları Göstermek İçin Tıklayın</translation>
     </message>
   </context>
   <context>
@@ -8174,7 +8173,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
@@ -8440,7 +8439,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>BİLGİ GEREKİYOR</translation>
     </message>
   </context>
   <context>
@@ -8679,7 +8678,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -8970,7 +8969,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
+      <translation>Güncel Seviye</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8986,7 +8985,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Uyarı</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8994,11 +8993,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Hata ayıklama</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Ayrıntılı</translation>
     </message>
   </context>
   <context>
@@ -9016,7 +9015,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
+      <translation>İndirme bekleniyor...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -9027,15 +9026,15 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>Günlükler indirildi</translation>
     </message>
     <message>
       <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
+      <translation>Günlükler indirilemedi</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>İstemcide hata ayıklama günlüğü etkinleştirildi</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
@@ -9050,14 +9049,14 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloading canceled</source>
-      <translation type="unfinished">Logs downloading canceled</translation>
+      <translation>Günlüklerin indirilmesi iptal edildi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Şifrenizi girin</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9636,7 +9635,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Current System</source>
-      <translation type="unfinished">Current System</translation>
+      <translation>Geçerli sistem</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -9693,7 +9692,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
-      <translation type="unfinished">This tab will be available in future versions</translation>
+      <translation>Bu sekme gelecekteki sürümlerde kullanılabilecektir</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -10416,7 +10415,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>Sunucu ID: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
@@ -10426,15 +10425,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>Özel Sertifika</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>Otomatik Oluşturulan Sertifika</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>Bilinmeyen Sertifika</translation>
     </message>
   </context>
   <context>
@@ -10703,7 +10702,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
+      <translation>İçe aktarma işlemi devam ediyor...</translation>
     </message>
     <message>
       <source>Import archive from %1 completed</source>
@@ -10932,7 +10931,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>LDAP grubu</translation>
     </message>
     <message>
       <source>Built-in group</source>
@@ -10940,7 +10939,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Özel grup</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10952,7 +10951,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Üyesi</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10995,7 +10994,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Gruplar</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11018,7 +11017,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -11037,11 +11036,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Gruplar</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11453,11 +11452,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>Belirtilen kimliğe sahip bir öğe bulunamıyor</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>Belirtilen kimliğe sahip bir kaynak bulunamıyor.</translation>
     </message>
   </context>
   <context>
@@ -11483,7 +11482,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Kaydedilmedi</translation>
     </message>
   </context>
   <context>
@@ -11502,11 +11501,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <translation>Kurallar geri yüklenemedi.</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -11959,7 +11958,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Klasör Seç...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
@@ -12034,7 +12033,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Düzeni Bulut Olarak Kaydet</translation>
     </message>
   </context>
   <context>
@@ -12209,7 +12208,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>İstemci güncellemesi kontrol edilemiyor. İnternet bağlantınızı kontrol edin ve tekrar deneyin.</translation>
     </message>
   </context>
 </TS>
