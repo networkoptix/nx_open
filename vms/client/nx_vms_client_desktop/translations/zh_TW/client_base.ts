@@ -7252,7 +7252,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>掛電話</translation>
     </message>
   </context>
   <context>
