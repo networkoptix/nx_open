@@ -265,7 +265,7 @@ ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUui
             if (!item.resource.id.isNull()
                 && (allowDesktopCameras || !desktopCameraIds.contains(item.resource.id)))
             {
-                accessMap[item.resource.id] = accessRights;
+                accessMap[item.resource.id] |= accessRights;
             }
         }
     }
