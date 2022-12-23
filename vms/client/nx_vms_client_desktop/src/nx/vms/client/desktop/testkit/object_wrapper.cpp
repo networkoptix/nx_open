@@ -70,12 +70,12 @@ void ObjectWrapper::activate()
                 if (rect.isValid() && window)
                 {
                     utils::sendMouse(
-                        window,
                         rect.center(),
                         "click",
-                        Qt::LeftButton,
+                        /* mouseButton */ Qt::LeftButton,
+                        /* mouseButtons */ Qt::NoButton,
                         Qt::NoModifier,
-                        Qt::NoButton,
+                        window,
                         true);
                 }
                 else
