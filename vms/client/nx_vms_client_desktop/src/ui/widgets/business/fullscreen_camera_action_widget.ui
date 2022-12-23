@@ -11,41 +11,14 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="6" column="1">
-    <widget class="QPushButton" name="selectLayoutButton">
+   <item row="2" column="0">
+    <widget class="QLabel" name="cameraLabel">
      <property name="text">
-      <string notr="true">&lt;Select Layout&gt;</string>
+      <string>Camera</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QCheckBox" name="useSourceCheckBox"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="sourceCameraLabel">
-       <property name="text">
-        <string>Source camera</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="8" column="0">
+   <item row="7" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -58,34 +31,24 @@
      </property>
     </spacer>
    </item>
-   <item row="5" column="1" colspan="2">
-    <widget class="QnWordWrappedLabel" name="layoutWarningWidget" native="true"/>
+   <item row="0" column="0" colspan="3">
+    <widget class="nx::vms::client::desktop::RewindForWidget" name="rewindForWidget" native="true"/>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="cameraLabel">
+   <item row="5" column="1">
+    <widget class="QPushButton" name="selectLayoutButton">
      <property name="text">
-      <string>Camera</string>
+      <string notr="true">&lt;Select Layout&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="layoutLabel">
-     <property name="text">
-      <string>On layout</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
+   <item row="2" column="1">
     <widget class="QPushButton" name="selectCameraButton">
      <property name="text">
       <string notr="true">&lt;Select Camera&gt;</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="3">
-    <widget class="nx::vms::client::desktop::RewindForWidget" name="rewindForWidget" native="true"/>
-   </item>
-   <item row="3" column="2">
+   <item row="2" column="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -97,6 +60,16 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="QnWordWrappedLabel" name="layoutWarningWidget" native="true"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="layoutLabel">
+     <property name="text">
+      <string>On layout</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
