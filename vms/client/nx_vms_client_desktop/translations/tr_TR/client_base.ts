@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Sisteme bağlanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -926,15 +926,15 @@
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Pencere Yapılandırmasını Kaydet</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Pencere Yapılandırmasını Kaydet</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Pencere Yapılandırması</translation>
     </message>
     <message>
       <source>Save Current State</source>
@@ -950,11 +950,11 @@
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Tüm pencereleri kapat</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Yer İşaretini Sil...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Döndür</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -993,11 +993,11 @@
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Paneli Göster</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Paneli Gizle</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Gelişmiş...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1021,7 +1021,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Hesap Güvenliği...</translation>
     </message>
   </context>
   <context>
@@ -1721,7 +1721,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3953,7 +3953,7 @@ to %1</source>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Nesne Arama</translation>
     </message>
   </context>
   <context>
@@ -5105,7 +5105,7 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARŞİV ŞİFRELİ</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
@@ -5113,7 +5113,7 @@ to %1</source>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Kilidi Aç</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
@@ -5892,7 +5892,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Daha Fazla Bilgi</translation>
     </message>
   </context>
   <context>
@@ -5967,7 +5967,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Parola sıfırlama gerekli</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -6046,7 +6046,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Web Sayfası</translation>
     </message>
     <message>
       <source>Connect anyway</source>
@@ -7344,7 +7344,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Silecek</translation>
     </message>
     <message>
       <source>Mute</source>
@@ -7684,7 +7684,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
@@ -7801,7 +7801,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seç</translation>
     </message>
   </context>
   <context>

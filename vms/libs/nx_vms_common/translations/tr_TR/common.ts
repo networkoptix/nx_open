@@ -20,7 +20,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Kullanıcı mevcut değil.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Şifrenin süresi doldu. Lütfen sistem yöneticinize başvurun.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -1710,7 +1710,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Analiz Nesnesi Algılandı</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
@@ -1735,7 +1735,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Nesne tespit edildi</translation>
     </message>
     <message>
       <source>Archive backup failed</source>

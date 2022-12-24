@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Otomatik istemci güncellemeleri</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne türü</translation>
     </message>
   </context>
   <context>
@@ -108,7 +108,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Gelişmiş Nesne Arama</translation>
     </message>
     <message>
       <source>Select area</source>
