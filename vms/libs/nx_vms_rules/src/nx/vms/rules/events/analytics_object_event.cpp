@@ -99,9 +99,10 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .displayName = tr("Analytics Object Detected"),
         .description = {},
         .fields = {
-            {fieldMetatype<SourceCameraField>(), "cameraId", tr("Camera")},
-            {fieldMetatype<AnalyticsObjectTypeField>(), "objectTypeId", tr("Object Type")},
-            {fieldMetatype<AnalyticsObjectAttributesField>(), "attributes", tr("Attributes")},
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
+            makeFieldDescriptor<AnalyticsObjectTypeField>(
+                "objectTypeId", tr("Object Type"), {}, {}, {utils::kCameraIdFieldName}),
+            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },
         .permissions = {
             .resourcePermissions = {

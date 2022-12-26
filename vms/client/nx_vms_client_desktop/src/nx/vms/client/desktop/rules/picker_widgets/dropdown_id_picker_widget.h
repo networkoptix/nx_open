@@ -6,11 +6,13 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_type_field.h>
+#include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/widgets/common/tree_combo_box.h>
@@ -48,9 +50,11 @@ private:
 
     D* m_comboBox{};
 
-    void initializeComboBox();
+    void initializeComboBox()
+    {
+    }
 
-    virtual void onFieldsSet() override
+    void onFieldsSet() override
     {
         customizeComboBox();
         setCurrentValue();
@@ -114,9 +118,8 @@ private:
 
         if (sourceCameraField->acceptAll())
             return resourcePool()->getAllCameras();
-        else
-            return resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
 
+        return resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
     }
 };
 
@@ -213,7 +216,7 @@ void AnalyticsEventTypePicker::setCurrentValue()
             /*hits*/ 10,
             Qt::MatchExactly | Qt::MatchRecursive);
 
-        if (selectableItems.size())
+        if (!selectableItems.empty())
         {
             // Use the first selectable item
             m_comboBox->setCurrentIndex(selectableItems.front());
@@ -261,6 +264,31 @@ void AnalyticsEventTypePicker::customizeComboBox()
         m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
 
     m_comboBox->setEnabled(sourceModel->isValid());
+}
+
+using AnalyticsObjectTypePicker = DropdownIdPickerWidget<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>;
+
+template<>
+void AnalyticsObjectTypePicker::setCurrentValue()
+{
+    QSignalBlocker blocker{m_comboBox};
+
+    m_comboBox->setSelectedMainObjectTypeId(m_field->value());
+}
+
+template<>
+void AnalyticsObjectTypePicker::updateFieldValue()
+{
+    m_field->setValue(m_comboBox->selectedMainObjectTypeId());
+}
+
+template<>
+void AnalyticsObjectTypePicker::customizeComboBox()
+{
+    QSignalBlocker blocker{m_comboBox};
+
+    const auto ids = getCameras().ids();
+    m_comboBox->setDevices(QnUuidSet{ids.begin(), ids.end()});
 }
 
 } // namespace nx::vms::client::desktop::rules
