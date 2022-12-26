@@ -93,7 +93,6 @@ const QString kDeviceID("DeviceID");
 
 namespace Server {
 
-const QString kTimezoneUtcOffset("timezoneUtcOffset");
 const QString kCpuArchitecture("cpuArchitecture");
 const QString kCpuModelName("cpuModelName");
 const QString kPhysicalMemory("physicalMemory");
