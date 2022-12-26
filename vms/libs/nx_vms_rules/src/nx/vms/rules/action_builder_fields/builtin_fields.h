@@ -4,6 +4,7 @@
 
 #include "content_type_field.h"
 #include "email_message_field.h"
+#include "event_devices_field.h"
 #include "event_id_field.h"
 #include "extract_detail_field.h"
 #include "flag_field.h"
@@ -15,4 +16,5 @@
 #include "target_user_field.h"
 #include "text_field.h"
 #include "text_with_fields.h"
+#include "time_field.h"
 #include "volume_field.h"

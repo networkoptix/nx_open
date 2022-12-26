@@ -10,7 +10,7 @@
 #include "http_action.h"
 #include "open_layout_action.h"
 #include "panic_recording_action.h"
-#include "play_sound_acion.h"
+#include "play_sound_action.h"
 #include "ptz_preset_action.h"
 #include "push_notification_action.h"
 #include "repeat_sound_action.h"

@@ -16,13 +16,12 @@ namespace nx::vms::rules {
 
 class ActionBuilderField;
 class Aggregator;
-class BasicAction;
 
 /**
  * Action builders are used to construct actual action parameters from action settings
  * contained in rules, and fields of events that triggered these rules.
  */
-class NX_VMS_RULES_API /*FieldBased*/ActionBuilder: public QObject
+class NX_VMS_RULES_API ActionBuilder: public QObject
 {
     Q_OBJECT
 

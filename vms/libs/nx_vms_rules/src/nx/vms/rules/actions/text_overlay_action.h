@@ -12,8 +12,7 @@ class NX_VMS_RULES_API TextOverlayAction: public BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.showTextOverlay")
 
-    FIELD(QnUuidSet, devices, setDevices)
-    FIELD(bool, useSource, setUseSource)
+    FIELD(QnUuidList, deviceIds, setDeviceIds)
     FIELD(std::chrono::microseconds, duration, setDuration)
     FIELD(QString, text, setText)
 

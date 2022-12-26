@@ -29,7 +29,6 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
     FIELD(QnUuid, serverId, setServerId)
-    FIELD(QnUuid, cameraId, setCameraId)
     FIELD(QnUuidList, deviceIds, setDeviceIds)
 
     // Analytics data fields.

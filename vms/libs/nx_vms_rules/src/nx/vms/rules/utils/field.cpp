@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/optional_time_field.h"
+#include "../aggregated_event.h"
 #include "../event_filter_fields/state_field.h"
 
 namespace nx::vms::rules::utils {
@@ -39,6 +40,16 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
         fieldName,
         {},
         {{ "detailName", detailName }});
+}
+
+QnUuidList getDeviceIds(const AggregatedEventPtr& event)
+{
+    QnUuidList result;
+    result << getFieldValue<QnUuid>(event, utils::kCameraIdFieldName);
+    result << getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
+    result.removeAll(QnUuid());
+
+    return result;
 }
 
 } // namespace nx::vms::rules::utils

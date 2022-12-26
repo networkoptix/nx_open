@@ -133,16 +133,6 @@ EventPtr permissionFilter(
     return event;
 }
 
-QnUuidList getDeviceIds(const AggregatedEventPtr& event)
-{
-    QnUuidList result;
-    result << utils::getFieldValue<QnUuid>(event, utils::kCameraIdFieldName);
-    result << utils::getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
-    result.removeAll(QnUuid());
-
-    return result;
-}
-
 QByteArray getUuidsHash(const QnUuidList& ids)
 {
     QByteArray result;
@@ -417,7 +407,7 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
         if (!filteredAggregatedEvent)
             continue;
 
-        auto hash = getUuidsHash(getDeviceIds(filteredAggregatedEvent));
+        auto hash = getUuidsHash(utils::getDeviceIds(filteredAggregatedEvent));
         auto it = eventUsersMap.find(hash);
 
         if (it == eventUsersMap.end())
