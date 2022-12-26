@@ -18,7 +18,7 @@ const ItemDescriptor& SpeakAction::manifest()
         .id = utils::type<SpeakAction>(),
         .displayName = tr("Speak"),
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>("devices", tr("Cameras")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Speak to users")),
             makeFieldDescriptor<TextWithFields>("text", tr("Speak the following"), {},

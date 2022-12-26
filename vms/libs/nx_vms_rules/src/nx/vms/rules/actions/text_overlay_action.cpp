@@ -6,6 +6,7 @@
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../utils/field.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -17,8 +18,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .displayName = tr("Show text overlay"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>("devices", tr("Cameras")),
-            makeFieldDescriptor<FlagField>("useSource", tr("Also show on source camera")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             makeFieldDescriptor<OptionalTimeField>("duration", tr("Display text for")),
             makeFieldDescriptor<TextWithFields>("text", tr("Text"), {},
                 {

@@ -117,9 +117,6 @@ QnVirtualCameraResourceList getActionDevices(
     const QString& cloudSystemId)
 {
     auto deviceIds = action->deviceIds();
-    if (deviceIds.isEmpty())
-        deviceIds << action->cameraId();
-
     deviceIds.removeAll(QnUuid());
 
     if (deviceIds.isEmpty())

@@ -46,6 +46,7 @@ void Initializer::registerEvents() const
 void Initializer::registerActions() const
 {
     // Register built-in actions.
+    registerAction<BookmarkAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<SendEmailAction>();
@@ -89,6 +90,7 @@ void Initializer::registerFields() const
         fieldMetatype<ExtractDetailField>(),
         [this] { return new ExtractDetailField(this->m_context); });
     registerActionField<EventIdField>();
+    registerActionField<EventDevicesField>();
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();
@@ -100,6 +102,7 @@ void Initializer::registerFields() const
         fieldMetatype<TextWithFields>(),
         [this] { return new TextWithFields(this->m_context); });
     registerActionField<Substitution>();
+    registerActionField<TimeField>();
     registerActionField<VolumeField>();
 }
 

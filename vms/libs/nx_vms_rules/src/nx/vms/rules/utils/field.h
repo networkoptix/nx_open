@@ -44,4 +44,6 @@ T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
     return value.value<T>();
 }
 
+NX_VMS_RULES_API QnUuidList getDeviceIds(const AggregatedEventPtr& event);
+
 } // namespace nx::vms::rules::utils

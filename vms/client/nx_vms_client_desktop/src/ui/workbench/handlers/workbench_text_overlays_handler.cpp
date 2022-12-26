@@ -253,15 +253,8 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
         return;
 
     const auto ruleId = overlayAction->ruleId();
-    QnUuidSet deviceIds = overlayAction->devices();
-
-    // TODO: #amalov Implement "use source" logic via field mechanics.
-    if (overlayAction->useSource())
-    {
-        // deviceIds << overlayAction->source();
-    }
-
-    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);
+    const auto cameras =
+        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(overlayAction->deviceIds());
 
     Q_D(QnWorkbenchTextOverlaysHandler);
 

@@ -132,6 +132,13 @@ public:
         testManifestValidity<T>();
         testPermissionsValidity<T>();
 
+        // Check if all fields are registered.
+        for (const auto& field : manifest.fields)
+        {
+            SCOPED_TRACE(nx::format("Event field id: %1", field.id).toStdString());
+            EXPECT_TRUE(engine->isEventFieldRegistered(field.id));
+        }
+
         ASSERT_TRUE(registerEvent<T>());
 
         const auto filter = engine->buildEventFilter(manifest.id);
@@ -152,6 +159,14 @@ public:
         SCOPED_TRACE(nx::format("Action id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
+
+        // Check if all fields are registered.
+        for (const auto& field : manifest.fields)
+        {
+            SCOPED_TRACE(nx::format("Action field id: %1", field.id).toStdString());
+            EXPECT_TRUE(engine->isActionFieldRegistered(field.id));
+        }
+
         ASSERT_TRUE(registerAction<T>());
 
         const auto builder = engine->buildActionBuilder(manifest.id);
@@ -195,10 +210,9 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<SourceUserField>(systemContext());
     testEventFieldRegistration<UniqueIdField>();
 
-    // TODO: #amalov Uncomment all types after manifest definition.
     testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
-    //testEventRegistration<BackupFinishedEvent>(); // Deprecated
+    testEventRegistration<BackupFinishedEvent>();
     testEventRegistration<CameraInputEvent>();
     testEventRegistration<DebugEvent>();
     testEventRegistration<DeviceDisconnectedEvent>();
@@ -225,6 +239,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ContentTypeField>();
     testActionFieldRegistration<EmailMessageField>(systemContext());
     testActionFieldRegistration<EventIdField>();
+    testActionFieldRegistration<EventDevicesField>();
     testActionFieldRegistration<ExtractDetailField>(systemContext());
     testActionFieldRegistration<FlagField>();
     testActionFieldRegistration<HttpMethodField>();
@@ -234,10 +249,11 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
+    testActionFieldRegistration<TimeField>();
     testActionFieldRegistration<VolumeField>();
 
     // TODO: #amalov Uncomment all types after manifest definition.
-    //testActionRegistration<BookmarkAction>();
+    testActionRegistration<BookmarkAction>();
     //testActionRegistration<DeviceOutputAction>();
     //testActionRegistration<DeviceRecordingAction>();
     //testActionRegistration<EnterFullscreenAction>();
