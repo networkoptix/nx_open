@@ -19,20 +19,23 @@
 
 namespace nx::utils {
 
-QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement)
+QString replaceCharacters(
+    const QString &string,
+    std::string_view symbols,
+    const QChar &replacement)
 {
-    if (!symbols)
+    if (symbols.empty())
         return string;
 
     bool mask[256];
     memset(mask, 0, sizeof(mask));
-    while (*symbols)
-        mask[static_cast<int>(*symbols++)] = true; /* Static cast is here to silence GCC's -Wchar-subscripts. */
+    for (const auto s: symbols)
+        mask[static_cast<int>(s)] = true; /* Static cast is here to silence GCC's -Wchar-subscripts. */
 
     QString result = string;
     for (int i = 0; i < result.size(); i++)
     {
-        ushort c = result[i].unicode();
+        const ushort c = result[i].unicode();
         if (c >= 256 || !mask[c])
             continue;
 
