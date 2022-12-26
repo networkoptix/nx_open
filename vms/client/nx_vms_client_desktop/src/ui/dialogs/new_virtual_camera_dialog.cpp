@@ -29,12 +29,13 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMedi
     //setHelpTopic(, Qn::);
 
     /* Set up combobox. */
-    QnResourceList servers = selectedServer
-        ? QnMediaServerResourceList({selectedServer})
-        : resourcePool()->servers();
+    QnResourceList servers = resourcePool()->servers();
     auto nameLess = [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
     std::sort(servers.begin(), servers.end(), nameLess);
-
+    auto selectedServerIndex = servers.indexOf(selectedServer);
+    if (selectedServerIndex == -1)
+        selectedServerIndex = servers.indexOf(currentServer());
+    
     m_model = new QnResourceListModel(this);
     m_model->setHasCheckboxes(false);
     m_model->setReadOnly(true);
@@ -42,6 +43,7 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMedi
     m_model->setResources(servers);
 
     ui->serverComboBox->setModel(m_model);
+    ui->serverComboBox->setCurrentIndex(selectedServerIndex);
     ui->serverComboBox->setEditable(false);
 
     if (servers.size() == 1)

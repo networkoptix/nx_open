@@ -713,14 +713,14 @@ void initialize(Manager* manager, Action* root)
     {
         factory(MainMenuAddDeviceManuallyAction)
             .flags(Main)
-            .text(ContextMenu::tr("Device"))
+            .text(ContextMenu::tr("Device..."))
             .requiredAdminPermissions();
 
         factory(NewUserAction)
             .flags(Main | Tree)
             .requiredAdminPermissions()
-            .text(ContextMenu::tr("User"))
-            .pulledText(ContextMenu::tr("Add User"))
+            .text(ContextMenu::tr("User..."))
+            .pulledText(ContextMenu::tr("Add User..."))
             .condition(
                 condition::treeNodeType(ResourceTree::NodeType::users)
             );
@@ -728,21 +728,21 @@ void initialize(Manager* manager, Action* root)
         factory(NewVideoWallAction)
             .flags(Main)
             .requiredAdminPermissions()
-            .text(ContextMenu::tr("Video Wall"));
+            .text(ContextMenu::tr("Video Wall..."));
 
         factory(NewWebPageAction)
             .flags(Main | Tree)
             .requiredAdminPermissions()
-            .text(ContextMenu::tr("Web Page"))
-            .pulledText(ContextMenu::tr("Add Web Page"))
+            .text(ContextMenu::tr("Web Page..."))
+            .pulledText(ContextMenu::tr("Add Web Page..."))
             .condition(
                 condition::treeNodeType(ResourceTree::NodeType::webPages)
             );
 
         factory(NewLayoutTourAction)
             .flags(Main | Tree)
-            .text(ContextMenu::tr("Showreel"))
-            .pulledText(ContextMenu::tr("Add Showreel"))
+            .text(ContextMenu::tr("Showreel..."))
+            .pulledText(ContextMenu::tr("Add Showreel..."))
             .condition(condition::isLoggedIn()
                 && condition::treeNodeType(ResourceTree::NodeType::layoutTours)
             );
@@ -750,8 +750,8 @@ void initialize(Manager* manager, Action* root)
         factory(MainMenuAddVirtualCameraAction)
             .flags(Main)
             .requiredAdminPermissions()
-            .text(ContextMenu::tr("Virtual Camera"))
-            .pulledText(ContextMenu::tr("Add Virtual Camera"));
+            .text(ContextMenu::tr("Virtual Camera..."))
+            .pulledText(ContextMenu::tr("Add Virtual Camera..."));
     }
     factory.endSubMenu();
 
@@ -1639,20 +1639,24 @@ void initialize(Manager* manager, Action* root)
     {
         factory(AddDeviceManuallyAction)
             .flags(Tree | SingleTarget | ResourceTarget)
-            .text(ContextMenu::tr("Device")) //< Intentionally hardcode devices here.
+            .text(ContextMenu::tr("Device...")) //< Intentionally hardcode devices here.
             .requiredAdminPermissions();
 
         factory(AddProxiedWebPageAction)
             .flags(Tree | SingleTarget | ResourceTarget)
-            .text(ContextMenu::tr("Proxied Web Page"))
+            .text(ContextMenu::tr("Proxied Web Page..."))
             .requiredAdminPermissions();
 
         factory(AddVirtualCameraAction)
             .flags(Tree | SingleTarget | ResourceTarget)
             .requiredAdminPermissions()
-            .text(ContextMenu::tr("Virtual Camera"));
+            .text(ContextMenu::tr("Virtual Camera..."));
     }
     factory.endSubMenu();
+
+    factory()
+        .flags(Tree)
+        .separator();
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
