@@ -26,7 +26,10 @@ namespace nx::utils {
 * \param replacement                   Character to use as a replacement.
 * \returns                             String with all characters from symbols replaced with replacement.
 */
-NX_UTILS_API QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement);
+NX_UTILS_API QString replaceCharacters(
+    const QString &string,
+    std::string_view symbols,
+    const QChar &replacement);
 
 /**
 * \param string                        String to perform replacement on.
@@ -35,7 +38,8 @@ NX_UTILS_API QString replaceCharacters(const QString &string, const char *symbol
 */
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement)
 {
-    return replaceCharacters(string, "/\0\t\n\\:*?\"<>|", replacement).trimmed();
+    return replaceCharacters(
+        string, std::string_view("/\0\t\n\\:*?\"<>|", 12), replacement).trimmed();
 }
 
 /*!
