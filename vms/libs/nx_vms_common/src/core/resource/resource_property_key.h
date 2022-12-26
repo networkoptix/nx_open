@@ -147,7 +147,6 @@ NX_VMS_COMMON_API extern const QString kDeviceID;
 
 namespace Server {
 
-NX_VMS_COMMON_API extern const QString kTimezoneUtcOffset;
 NX_VMS_COMMON_API extern const QString kCpuArchitecture;
 NX_VMS_COMMON_API extern const QString kCpuModelName;
 NX_VMS_COMMON_API extern const QString kPhysicalMemory;
