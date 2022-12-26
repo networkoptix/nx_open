@@ -90,6 +90,13 @@ TEST(replaceStrings, specialCharacters)
         QString("***"));
 }
 
+TEST(replaceCharacters, nonFileNameCharacters)
+{
+    ASSERT_EQ(
+        replaceNonFileNameCharacters("urn:uuid:1ec4ec50-1dd2-11b2-80f3-86228563f76f", '_'),
+        "urn_uuid_1ec4ec50-1dd2-11b2-80f3-86228563f76f");
+}
+
 //-------------------------------------------------------------------------------------------------
 // bytes <-> string
 
