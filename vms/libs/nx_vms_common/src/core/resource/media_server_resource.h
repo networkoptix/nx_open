@@ -135,6 +135,7 @@ public:
 
     /** Server local timezone. */
     qint64 utcOffset(qint64 defaultValue = Qn::InvalidUtcOffset) const;
+    void setUtcOffset(qint64 value);
 
     /**
      * This function is needed for the Client. Client may insert a fake Server with overridden Id
@@ -215,4 +216,7 @@ private:
     // This extension initialized only for EDGE servers.
     nx::core::resource::edge::EdgeServerStateTracker* edgeServerStateTracker();
     QScopedPointer<nx::core::resource::edge::EdgeServerStateTracker> m_edgeServerStateTracker;
+
+    // TODO: #sivanov Move to the client code, it's used only there.
+    std::atomic<qint64> m_utcOffset = Qn::InvalidUtcOffset;
 };
