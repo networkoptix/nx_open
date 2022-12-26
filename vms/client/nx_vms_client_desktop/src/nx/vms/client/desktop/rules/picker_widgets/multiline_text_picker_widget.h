@@ -22,7 +22,7 @@ template<typename F>
 class MultilineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    MultilineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    MultilineTextPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

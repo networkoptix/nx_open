@@ -16,7 +16,7 @@ template<typename F>
 class StatePickerWidget: public FieldPickerWidget<F>
 {
 public:
-    StatePickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    StatePickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

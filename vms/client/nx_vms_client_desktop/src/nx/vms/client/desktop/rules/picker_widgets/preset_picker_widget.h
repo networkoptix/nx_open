@@ -13,7 +13,7 @@ class PresetPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    PresetPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
+    PresetPickerWidget(SystemContext* context, QWidget* parent = nullptr);
 
 private:
     QComboBox* m_comboBox{};

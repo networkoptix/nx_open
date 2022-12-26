@@ -12,9 +12,9 @@ namespace nx::vms::client::desktop::rules {
 using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 
-PickerWidget::PickerWidget(common::SystemContext* context, QWidget* parent):
+PickerWidget::PickerWidget(SystemContext* context, QWidget* parent):
     QWidget(parent),
-    common::SystemContextAware(context)
+    SystemContextAware(context)
 {
     auto mainLayout = new QHBoxLayout;
     mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());

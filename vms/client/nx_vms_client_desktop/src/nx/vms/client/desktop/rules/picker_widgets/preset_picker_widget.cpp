@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PresetPickerWidget::PresetPickerWidget(common::SystemContext* context, QWidget* parent):
+PresetPickerWidget::PresetPickerWidget(SystemContext* context, QWidget* parent):
     PickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;

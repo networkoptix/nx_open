@@ -8,12 +8,12 @@
 
 namespace nx::vms::client::desktop::rules {
 
-class InputIDPickerWidget: public PickerWidget
+class InputIdPickerWidget: public PickerWidget
 {
     Q_OBJECT
 
 public:
-    InputIDPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
+    InputIdPickerWidget(SystemContext* context, QWidget* parent = nullptr);
 
 private:
     QComboBox* m_comboBox{};

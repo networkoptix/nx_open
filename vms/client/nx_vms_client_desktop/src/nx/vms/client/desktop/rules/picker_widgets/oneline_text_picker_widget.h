@@ -31,7 +31,7 @@ template<typename F>
 class OnelineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    OnelineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    OnelineTextPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

@@ -6,6 +6,7 @@
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 
 #include "blank_picker_widget.h"
+#include "dropdown_id_picker_widget.h"
 #include "dropdown_text_picker_widget.h"
 #include "duration_picker_widget.h"
 #include "flags_picker_widget.h"
@@ -24,7 +25,7 @@ using nx::vms::rules::fieldMetatype;
 
 PickerWidget* PickerFactory::createWidget(
     const vms::rules::FieldDescriptor& descriptor,
-    common::SystemContext* context,
+    SystemContext* context,
     QWidget* parent)
 {
     PickerWidget* pickerWidget{};
@@ -67,6 +68,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new FlagsPickerWidget<nx::vms::rules::AnalyticsEventLevelField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEngineField>())
         pickerWidget = new AnalyticsEnginePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEventTypeField>())
+        pickerWidget = new AnalyticsEventTypePicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
         pickerWidget = new VolumePickerWidget(context, parent);
     else

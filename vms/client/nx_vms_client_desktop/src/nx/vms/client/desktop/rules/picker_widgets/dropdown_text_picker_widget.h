@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 
@@ -11,16 +10,12 @@
 #include <nx/vms/client/desktop/common/widgets/icon_combo_box.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/rules/action_builder_fields/content_type_field.h>
 #include <nx/vms/rules/action_builder_fields/http_method_field.h>
-#include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
 #include <nx/vms/rules/event_filter_fields/input_port_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
-#include <ui/widgets/common/tree_combo_box.h>
 
 #include "picker_widget.h"
 #include "picker_widget_strings.h"
@@ -41,7 +36,7 @@ template<typename F, typename D = QComboBox>
 class DropdownTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit DropdownTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    explicit DropdownTextPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -305,111 +300,6 @@ void InputPortPicker::connectLinkedFields()
         &SourceCameraField::idsChanged,
         this,
         &InputPortPicker::onLinkedFieldChanged);
-}
-
-using AnalyticsEnginePicker = DropdownTextPickerWidget<vms::rules::AnalyticsEngineField, QnTreeComboBox>;
-
-template<>
-void AnalyticsEnginePicker::initializeComboBox()
-{
-    auto treeComboBox = static_cast<QnTreeComboBox*>(m_comboBox);
-
-    auto pluginDiagnosticEventModel = new ui::PluginDiagnosticEventModel(this);
-    auto sortModel = new QSortFilterProxyModel(this);
-    sortModel->setDynamicSortFilter(true);
-    sortModel->setSourceModel(pluginDiagnosticEventModel);
-
-    treeComboBox->setModel(sortModel);
-}
-
-template<>
-void AnalyticsEnginePicker::setCurrentValue()
-{
-    auto treeComboBox = static_cast<QnTreeComboBox*>(m_comboBox);
-    QSignalBlocker blocker{treeComboBox};
-
-    QnUuid pluginId = m_field->value();
-    if (pluginId.isNull())
-    {
-        pluginId = treeComboBox->itemData(
-            0,
-            ui::PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
-    }
-
-    auto pluginListModel = treeComboBox->model();
-
-    auto items = pluginListModel->match(
-        pluginListModel->index(0, 0),
-        ui::PluginDiagnosticEventModel::PluginIdRole,
-        /*value*/ QVariant::fromValue(pluginId),
-        /*hits*/ 1,
-        Qt::MatchExactly | Qt::MatchRecursive);
-
-    if (items.size() == 1)
-        treeComboBox->setCurrentIndex(items.front());
-}
-
-template<>
-QnUuid AnalyticsEnginePicker::currentValue() const
-{
-    const auto treeComboBox = static_cast<QnTreeComboBox*>(m_comboBox);
-    return treeComboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
-}
-
-template<>
-void AnalyticsEnginePicker::customizeComboBox()
-{
-    using vms::rules::SourceCameraField;
-
-    auto treeComboBox = static_cast<QnTreeComboBox*>(m_comboBox);
-    QSignalBlocker blocker{treeComboBox};
-
-    treeComboBox->clear();
-
-    auto sourceCameraField
-        = getLinkedField<SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
-    if (!NX_ASSERT(sourceCameraField))
-        return;
-
-    QnVirtualCameraResourceList cameras;
-
-    if (sourceCameraField->acceptAll())
-        cameras = resourcePool()->getAllCameras();
-    else
-        cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
-
-    auto sourceModel = static_cast<ui::PluginDiagnosticEventModel*>(
-        static_cast<QSortFilterProxyModel*>(treeComboBox->model())->sourceModel());
-
-    sourceModel->filterByCameras(
-        resourcePool()->getResources<vms::common::AnalyticsEngineResource>(),
-        cameras);
-
-    treeComboBox->setEnabled(sourceModel->isValid());
-    treeComboBox->model()->sort(0);
-}
-
-template<>
-void AnalyticsEnginePicker::connectLinkedFields()
-{
-    using vms::rules::SourceCameraField;
-
-    auto sourceCameraField =
-        getLinkedField<SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
-    if (!NX_ASSERT(sourceCameraField))
-        return;
-
-    connect(
-        sourceCameraField,
-        &SourceCameraField::acceptAllChanged,
-        this,
-        &AnalyticsEnginePicker::onLinkedFieldChanged);
-
-    connect(
-        sourceCameraField,
-        &SourceCameraField::idsChanged,
-        this,
-        &AnalyticsEnginePicker::onLinkedFieldChanged);
 }
 
 } // namespace nx::vms::client::desktop::rules

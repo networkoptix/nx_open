@@ -40,7 +40,7 @@ template<typename F>
 class SourcePickerWidget: public FieldPickerWidget<F>
 {
 public:
-    SourcePickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    SourcePickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

@@ -6,7 +6,7 @@
 
 #include "picker_widget.h"
 
-namespace nx::vms::common { class SystemContext; }
+namespace nx::vms::client::desktop { class SystemContext; }
 
 namespace nx::vms::client::desktop::rules {
 
@@ -15,7 +15,7 @@ class PickerFactory
 public:
     static PickerWidget* createWidget(
         const vms::rules::FieldDescriptor& descriptor,
-        common::SystemContext* context,
+        SystemContext* context,
         QWidget* parent = nullptr);
 };
 

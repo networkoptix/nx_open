@@ -14,7 +14,7 @@ class VolumePickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    VolumePickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
+    VolumePickerWidget(SystemContext* context, QWidget* parent = nullptr);
 
 private:
     QSlider* m_slider{};

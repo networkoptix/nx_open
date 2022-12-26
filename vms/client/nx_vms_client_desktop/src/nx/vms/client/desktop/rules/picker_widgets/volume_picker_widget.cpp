@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-VolumePickerWidget::VolumePickerWidget(common::SystemContext* context, QWidget* parent):
+VolumePickerWidget::VolumePickerWidget(SystemContext* context, QWidget* parent):
     PickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;

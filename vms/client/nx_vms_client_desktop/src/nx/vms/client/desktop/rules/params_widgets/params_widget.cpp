@@ -13,9 +13,9 @@ using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 using ItemDescriptor = vms::rules::ItemDescriptor;
 
-ParamsWidget::ParamsWidget(common::SystemContext* context, QWidget* parent):
+ParamsWidget::ParamsWidget(SystemContext* context, QWidget* parent):
     QWidget(parent),
-    common::SystemContextAware(context)
+    SystemContextAware(context)
 {
 }
 
