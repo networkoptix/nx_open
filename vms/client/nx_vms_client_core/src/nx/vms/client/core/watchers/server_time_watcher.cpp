@@ -188,8 +188,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
             if (server->utcOffset() == offset)
                 return;
 
-            server->setProperty(ResourcePropertyKey::Server::kTimezoneUtcOffset,
-                QString::number(offset));
+            server->setUtcOffset(offset);
             emit displayOffsetsChanged();
         });
 

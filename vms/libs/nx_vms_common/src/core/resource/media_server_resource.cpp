@@ -451,6 +451,7 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr& source, Notifier
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
         m_authKey = localOther->m_authKey;
+        m_utcOffset = localOther->m_utcOffset.load();
 
     }
 
@@ -692,13 +693,13 @@ qint64 QnMediaServerResource::currentStatusTime() const
 
 qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
 {
-    bool present = true;
-    const auto offset = getProperty(
-        ResourcePropertyKey::Server::kTimezoneUtcOffset).toLongLong(&present);
+    const qint64 value = m_utcOffset;
+    return value == Qn::InvalidUtcOffset ? defaultValue : value;
+}
 
-    if (present && offset != Qn::InvalidUtcOffset)
-        return offset;
-    return defaultValue;
+void QnMediaServerResource::setUtcOffset(qint64 value)
+{
+    m_utcOffset = value;
 }
 
 QString QnMediaServerResource::getAuthKey() const
