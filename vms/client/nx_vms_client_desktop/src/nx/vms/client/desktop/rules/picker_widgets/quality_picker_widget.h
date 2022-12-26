@@ -13,7 +13,7 @@ class QualityPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    QualityPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
+    QualityPickerWidget(SystemContext* context, QWidget* parent = nullptr);
 
 private:
     QComboBox* m_comboBox{};

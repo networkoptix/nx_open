@@ -16,7 +16,7 @@ template<typename F>
 class DurationPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    DurationPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    DurationPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

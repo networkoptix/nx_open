@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-InputIDPickerWidget::InputIDPickerWidget(common::SystemContext* context, QWidget* parent):
+InputIdPickerWidget::InputIdPickerWidget(SystemContext* context, QWidget* parent):
     PickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;

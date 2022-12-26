@@ -24,7 +24,7 @@ template<typename F>
 class FlagsPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    FlagsPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    FlagsPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto flagsLayout = new QHBoxLayout;

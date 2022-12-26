@@ -16,7 +16,7 @@ template<typename F>
 class NumberPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    NumberPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+    NumberPickerWidget(SystemContext* context, QWidget* parent = nullptr):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

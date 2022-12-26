@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-CommonParamsWidget::CommonParamsWidget(common::SystemContext* context, QWidget* parent):
+CommonParamsWidget::CommonParamsWidget(SystemContext* context, QWidget* parent):
     ParamsWidget(context, parent)
 {
 }

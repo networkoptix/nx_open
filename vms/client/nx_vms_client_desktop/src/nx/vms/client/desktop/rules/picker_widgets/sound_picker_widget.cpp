@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SoundPickerWidget::SoundPickerWidget(common::SystemContext* context, QWidget* parent):
+SoundPickerWidget::SoundPickerWidget(SystemContext* context, QWidget* parent):
     PickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;

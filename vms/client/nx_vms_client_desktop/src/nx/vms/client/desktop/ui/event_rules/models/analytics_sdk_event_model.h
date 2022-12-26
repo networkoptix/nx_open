@@ -29,6 +29,11 @@ public:
         const QnVirtualCameraResourceList& cameras,
         const nx::vms::event::EventParameters& currentEventParameters);
 
+    void loadFromCameras(
+        const QnVirtualCameraResourceList& cameras,
+        QnUuid engineId,
+        QString eventTypeId);
+
     bool isValid() const;
 };
 

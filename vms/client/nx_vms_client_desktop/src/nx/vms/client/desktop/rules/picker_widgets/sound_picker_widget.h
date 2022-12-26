@@ -14,7 +14,7 @@ class SoundPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    SoundPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
+    SoundPickerWidget(SystemContext* context, QWidget* parent = nullptr);
 
 private:
     QComboBox* m_comboBox{};
