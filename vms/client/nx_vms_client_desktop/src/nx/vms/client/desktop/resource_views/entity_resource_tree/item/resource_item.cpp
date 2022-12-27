@@ -8,6 +8,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
@@ -205,6 +206,13 @@ QVariant ResourceItem::resourceIconKeyData() const
 
             const bool nonExportedLayout = m_resource->hasFlags(Qn::layout)
                 && !m_resource->hasFlags(Qn::exported_layout);
+
+            if (const auto server = m_resource.staticCast<QnMediaServerResource>())
+            {
+                m_connectionsGuard.add(server->connect(server.get(),
+                    &QnMediaServerResource::compatibilityChanged,
+                    discardIconCache));
+            }
 
             if (nonExportedLayout || m_resource->hasFlags(Qn::web_page))
             {

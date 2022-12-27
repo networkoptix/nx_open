@@ -2,11 +2,25 @@
 
 #include "fake_server_resource_source.h"
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/system_helpers.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
+
+namespace {
+
+// Returns whether the resource is a fake server and not belongs to the current system.
+bool isTargetFakeServer(const QnResourcePtr& resource)
+{
+    if(const auto fakeServer = resource.dynamicCast<QnFakeMediaServerResource>())
+        return !helpers::serverBelongsToCurrentSystem(fakeServer);
+
+    return false;
+}
+
+} // namespace
 
 FakeServerResourceSource::FakeServerResourceSource(
     const QnResourcePool* resourcePool)
@@ -17,18 +31,24 @@ FakeServerResourceSource::FakeServerResourceSource(
     if (!NX_ASSERT(m_resourcePool))
         return;
 
-    connect(m_resourcePool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
+    connect(m_resourcePool, &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
         {
-            if (resource->hasFlags(Qn::server) && resource->hasFlags(Qn::fake))
-                emit resourceAdded(resource);
+            for (const auto& resource: resources)
+            {
+                if (isTargetFakeServer(resource))
+                    emit resourceAdded(resource);
+            }
         });
 
-    connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(m_resourcePool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            if (resource->hasFlags(Qn::server) && resource->hasFlags(Qn::fake))
-                emit resourceRemoved(resource);
+            for (const auto& resource: resources)
+            {
+                if (isTargetFakeServer(resource))
+                    emit resourceRemoved(resource);
+            }
         });
 }
 
@@ -40,12 +60,11 @@ QVector<QnResourcePtr> FakeServerResourceSource::getResources()
     const auto incompatibleServers = m_resourcePool->getIncompatibleServers();
 
     QVector<QnResourcePtr> result;
-    std::transform(std::cbegin(incompatibleServers), std::cend(incompatibleServers),
-        std::back_inserter(result),
-        [](const QnMediaServerResourcePtr& server)
-        {
-            return server.staticCast<QnResource>();
-        });
+    for (const auto& server: incompatibleServers)
+    {
+        if (isTargetFakeServer(server))
+            result << server;
+    }
 
     return result;
 }
