@@ -7,7 +7,7 @@ if(withMediaServer OR openSourceBuild)
     add_subdirectory(server)
 endif()
 
-if(withDistributions)
+if(withDistributions OR withUnitTestsArchive)
     add_subdirectory(distribution)
 endif()
 
