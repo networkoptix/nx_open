@@ -57,6 +57,10 @@ void ManagerLinux::enumerateDevices()
             "Model: %1, path: %2",
             modelAndManufacturer, path);
 
+        const auto model = findDeviceModel(modelAndManufacturer);
+        if (model.isEmpty())
+            continue;
+
         const auto config = createDeviceDescription(findDeviceModel(modelAndManufacturer));
         DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
         DevicePtr device(deviceLinux);
@@ -93,7 +97,7 @@ QString ManagerLinux::findDeviceModel(const QString& modelAndManufacturer) const
             return model == config.model;
         });
 
-    return iter != knownConfigsList.end() ? iter->model : modelAndManufacturer;
+    return iter != knownConfigsList.end() ? iter->model : "";
 }
 
 } // namespace nx::vms::client::desktop::joystick
