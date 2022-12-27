@@ -1325,7 +1325,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>%1 için erişiminiz yok. Lütfen internet bağlantınızı kontrol edin.</translation>
     </message>
   </context>
 </TS>

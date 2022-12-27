@@ -1153,7 +1153,7 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Geçersiz parametre "%1": %2.</translation>
     </message>
   </context>
   <context>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>LDAP arama zaman aşımı (saniye)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
@@ -1303,11 +1303,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Bulut Sistem Kimliği</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Bulut yetkilendirme anahtarı</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1327,7 +1327,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Cihaz sağlayıcılarını devre dışı bırakın</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1335,7 +1335,7 @@
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Küçük resimler otomatik güncelleme</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
@@ -1376,7 +1376,7 @@
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Otomatik cihaz bulmayı etkinleştir</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1400,7 +1400,7 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Arecont için RTSP'yi etkinleştirin</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1424,7 +1424,7 @@
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>RTP deneme sayısı</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1516,11 +1516,11 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Güncellemelerin saklandığı Kalıcı Sunucular</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Güncellemelerin saklandığı Kalıcı Sunucular</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
@@ -1528,7 +1528,7 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Kayıt için ilave yerel FS depolama türleri</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>HTTP başlığı: Kaynak</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>

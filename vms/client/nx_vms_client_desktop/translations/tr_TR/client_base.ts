@@ -1343,11 +1343,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Sisteminizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen sağlanan Lisans Anahtarını ve Donanım Kimliğini %1 gönderin.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Sisteminizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen Lisans Anahtarınızı ve Sunucu Donanım Kimliğinizi Bölge / Lisans destek ekibinize gönderin:</translation>
     </message>
   </context>
   <context>
@@ -1568,7 +1568,7 @@ License Key: %2</source>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 kullanıcı, siz bu ayarları uyguladıktan sonra e-posta almaya başlayacak</translation>
     </message>
   </context>
   <context>
@@ -1893,7 +1893,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Günlükler seçilen klasöre kaydedilemedi</translation>
     </message>
     <message>
       <source>Download complete!</source>
@@ -3120,7 +3120,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>Sistemde oturum açılamadı &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3222,7 +3222,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Veritabanı başarıyla geri yüklendi. Sunucu uygulaması kısa süre içinde yeniden başlatılacak.</translation>
     </message>
   </context>
   <context>
@@ -4382,7 +4382,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>Bu ayarlar sadece oturum açmış olduğunuz Sistem için geçerlidir ve gelecek sürümlerde kaldırılacaktır.</translation>
     </message>
   </context>
   <context>
@@ -5033,11 +5033,11 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>Yük devretmenin etkinleştirildiği sunucular, aynı Konum Kimliğine sahip çevrimdışı Sunuculardan kameraları otomatik olarak devir alacaktır.</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>Sunucudan alınan sertifika, sabitlenen sertifikayla eşleşmiyor.</translation>
     </message>
   </context>
   <context>
@@ -5183,7 +5183,7 @@ to %1</source>
     </message>
     <message>
       <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
+      <translation>Sağlamak</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
@@ -5649,7 +5649,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+      <translation>Uzak arşiv senkronizasyonu durduruldu</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
@@ -5669,7 +5669,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
     </message>
   </context>
   <context>
@@ -6727,7 +6727,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>Seçilen cihazlardan bazıları %1 üzerine taşınabilir</translation>
     </message>
     <message>
       <source>Move Partially</source>
@@ -6789,7 +6789,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>En az bir Giriş/Çıkış modülü seçin</translation>
     </message>
   </context>
   <context>
@@ -7595,7 +7595,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Kamera değiştirilemedi</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
@@ -7603,7 +7603,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Kısmen transfer edilecek:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
@@ -7619,15 +7619,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Değiştirilecek Kamera</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>Aktarım Verileri</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Kamera değiştirildi!</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
@@ -7635,16 +7635,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>Bazı veriler ve ayarlar yeni kamerayla uyumlu olmayabilir</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>%1, Sistemden kaldırılacak ve seçilen kamera ile değiştirilecektir</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>Sunucu kullanılamadığı için Kamera Değiştirme işlemi mümkün değildir.</translation>
     </message>
   </context>
   <context>
@@ -8067,7 +8067,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Introducing %1 Layouts</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
+      <translation>%1 Ekran Düzeni Tanıtımı</translation>
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
@@ -8075,7 +8075,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>%1 hakkında daha fazlasını okuyun</translation>
     </message>
     <message>
       <source>help page</source>
@@ -8087,12 +8087,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Kopyala)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Kopya %2)</translation>
     </message>
   </context>
   <context>
@@ -8931,7 +8931,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>Dosyayı Boyuta Göre Böl için ayarlanan değerden büyük veya bu değere eşit olmalıdır</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
@@ -8965,7 +8965,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
+      <translation>Ünite</translation>
     </message>
     <message>
       <source>Current Level</source>
@@ -9038,12 +9038,12 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>Hata ayıklama günlüğü etkinleştirildi, bu sistem performansının düşmesine neden olabilir.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Hata ayıklama günlüğü Sunucu %n üzerinde etkinleştirildi</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
       </translation>
     </message>
@@ -9595,7 +9595,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>İstemci paketleri Sunuculara yükleniyor...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9629,7 +9629,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+        <numerusform>%n bildirimleri</numerusform>
         <numerusform>%n notifications</numerusform>
       </translation>
     </message>
@@ -10678,19 +10678,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Değiştirilen kamera keşfedildi</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>Kamera %1, %2 ile değiştirildi.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>İki cihazı kullanmaya devam etmek için &quot;Geri Al&quot; düğmesine tıklayın.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Değiştirmeyi Geri Al</translation>
     </message>
     <message>
       <source>Export</source>
@@ -10706,56 +10706,56 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
+      <translation>%1 üzerinden arşivi içe aktarma tamamlandı</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
+      <translation>%1 üzerinden arşivi içe aktarma başarısız oldu</translation>
     </message>
     <message>
       <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
+      <translation>%1 üzerinden arşivi içe aktarma durduruldu</translation>
     </message>
     <message>
       <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
+      <translation>%1 üzerinden arşivi içe aktar</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+        <numerusform>%n Sunucuda yedek depolama yapılandırılmamış</numerusform>
         <numerusform>Backup storage is not configured on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>%n Sunucuda Analitik Verileri için depolama yapılandırılmamış</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+        <numerusform>%n Sunucusundaki sistem depolaması analiz verileri için kullanılır</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
       </translation>
     </message>
     <message>
       <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
+      <translation>%1üzerinde aktarılmamış arşiv bulundu</translation>
     </message>
     <message>
       <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
+      <translation>%1 Kamera üzerinde içe aktarılmamış arşiv bulundu</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+      <translation>Arşiv akışı ayarları kullanıcı tarafından değiştirildi</translation>
     </message>
     <message>
       <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
+      <translation>Kayıt ayarları kullanıcı tarafından değiştirildi</translation>
     </message>
   </context>
   <context>
@@ -10824,7 +10824,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
+      <translation>Bu eylem diğer Sistemlerden gelen bildirimler için desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -10935,7 +10935,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Yerleşik grup</translation>
     </message>
     <message>
       <source>Custom group</source>
@@ -11946,15 +11946,15 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Değiştirme işlemini geri alma başarıyla tamamlandı!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Uyumluluk sorunları nedeniyle bazı ayarlar değiştirilen kameradan aktarılamayabilir.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>Değiştirme geri alınsın mı?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -11962,7 +11962,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>Sunucuda değiştirilecek uygun kamera yok &quot;%1&quot;</translation>
     </message>
   </context>
   <context>

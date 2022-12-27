@@ -44,7 +44,7 @@
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Nesne algılandı</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Analiz Nesnesi Algılandı</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne Türü</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Öznitellikler</translation>
     </message>
   </context>
   <context>
@@ -76,14 +76,14 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Yedekleme Tamamlandı</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Bilinmeyen olay</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
@@ -121,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Hata Ayıklama Olayı</translation>
     </message>
     <message>
       <source>Action</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Değer</translation>
     </message>
   </context>
   <context>
@@ -161,18 +161,18 @@
     <message numerus="yes">
       <source>Device Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Cihaz Bağlantısı Kesildi</numerusform>
         <numerusform>Device Disconnected</numerusform>
       </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>Cihaz Kimliği</translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
       <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Kamera Bağlantısı Kesildi</numerusform>
         <numerusform>Camera Disconnected</numerusform>
       </translation>
     </message>
@@ -262,7 +262,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Eylem aralığı</translation>
     </message>
     <message>
       <source>Login</source>
@@ -274,15 +274,15 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>HTTP(S) isteği yap</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) Bağlantısı</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) İçeriği</translation>
     </message>
     <message>
       <source>Content Type</source>
@@ -313,7 +313,7 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Yeterli lisans yok. Aşağıdaki G/Ç modüllerinde kayıt devre dışı bırakıldı:</translation>
     </message>
   </context>
   <context>
@@ -332,7 +332,7 @@
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>Kamerada Hareket</translation>
     </message>
   </context>
   <context>
@@ -362,11 +362,11 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP paket kaybı algılandı.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Kamera saati normale döndü.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
@@ -384,7 +384,7 @@
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Çok noktaya yayın adres çakışması algılandı.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
@@ -411,7 +411,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Bildirimi Göster</translation>
     </message>
     <message>
       <source>To</source>
@@ -419,11 +419,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Eylem aralığı</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Onaya Zorla</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -435,7 +435,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>İpucu</translation>
     </message>
   </context>
   <context>
@@ -505,15 +505,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Eylem aralığı</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Diğer alıcılar</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>E-Posta İletisi</translation>
     </message>
   </context>
   <context>
@@ -524,7 +524,7 @@
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Sunucu Sertifikası Hatası</translation>
     </message>
   </context>
   <context>
@@ -564,11 +564,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Sunucuyla bağlantı kesildi.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Sunucu beklenmedik biçimde durdu.</translation>
     </message>
   </context>
   <context>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Eylem aralığı</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID hatası: %1.</translation>
     </message>
   </context>
   <context>
@@ -734,15 +734,15 @@
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Eklenti: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Başlık: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Gerekçe: %1</translation>
     </message>
   </context>
   <context>
