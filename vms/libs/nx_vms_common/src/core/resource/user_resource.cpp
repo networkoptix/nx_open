@@ -508,7 +508,7 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
         bool isEmptyOtherPasswordAcceptable = false;
         if (m_hash != localOther->m_hash)
         {
-            if (m_password.isEmpty() && localOther->m_password.isEmpty())
+            if (m_password.isEmpty() && localOther->m_password.isEmpty() && m_hash != QnUserHash())
             {
                 notifiers <<
                     [other, r = toSharedPointer(this)]
