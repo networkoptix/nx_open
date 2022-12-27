@@ -135,13 +135,17 @@ def archiveByGlob(archiver, category, target_dir, source_dir, pattern, recursive
 
 
 def archiveSdkUnitTests(archiver, conf, src_bin_dir):
-    ut_file_pattetns = {
+    ut_file_patterns = {
         "Linux": ["*.so*", "*_ut"],
         "Windows": ["*.dll", "*.pdb", "*_ut.exe"],
         "Darwin": ["*.dylib", "*_ut"]
     }[conf.CMAKE_SYSTEM_NAME]
     source_dir = Path(conf.METADATA_SDK_BUILD_DIR)
-    file_list = itertools.chain.from_iterable(source_dir.glob(f"**/{p}") for p in ut_file_pattetns)
+    file_list = list(
+        itertools.chain.from_iterable(source_dir.glob(f"**/{p}") for p in ut_file_patterns))
+    if not file_list:
+        logging.info("No SDK unit test executables found")
+        return
 
     target_dir = Path("nx_metadata_sdk")
     for f in file_list:
@@ -161,10 +165,12 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
         join(src_bin_dir, "analytics_plugin_ut.cfg"),
         target_dir / "analytics_plugin_ut.cfg")
 
+
 def main():
     isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
     isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
     withClient = parse_boolean(conf.WITH_CLIENT)
+    withMediaServer = parse_boolean(conf.WITH_MEDIA_SERVER)
 
     bin_dir = "bin"
     lib_dir = bin_dir if isWindows else "lib"
