@@ -22,7 +22,6 @@
             <Component><File Name="nx_branding.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_build_info.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="nx_vms_json_rpc.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="cudart64_110.dll" KeyPath="yes" DiskId="2"/></Component>
