@@ -224,7 +224,7 @@ Below are the usage examples, where `<build>` is `./build.sh` on Linux and `buil
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithTests=ON -DwithUnitTestsArchive=ON
+    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF
     ```
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
