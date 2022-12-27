@@ -123,6 +123,13 @@ TEST_F(ResourceTreeModelTest, serverIconStatus)
     ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Offline)(
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 
+    // When server is offline, it is marked as incompatible.
+    server->setCompatible(false);
+
+    // Then server icon has Incompatible decoration.
+    ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Incompatible)(
+        uniqueMatchingIndex(kUniqueServerNameCondition)));
+
     // When Unauthorized status is set to the server resource.
     server->setStatus(nx::vms::api::ResourceStatus::unauthorized);
 

@@ -47,6 +47,12 @@ bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
         && appContext()->currentSystemContext()->currentServerId() == server->getId();
 }
 
+bool isCompatibleServer(const QnResourcePtr& resource)
+{
+    auto server = resource.dynamicCast<QnMediaServerResource>();
+    return NX_ASSERT(server) && server->isCompatible();
+}
+
 QIcon loadIcon(const QString& name)
 {
     static const QnIcon::Suffixes kResourceIconSuffixes({
@@ -74,7 +80,12 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
             return Status::Online;
         }
         case nx::vms::api::ResourceStatus::offline:
+        {
+            if (key == Key::Server && !isCompatibleServer(resource))
+                return Status::Incompatible;
+
             return Status::Offline;
+        }
 
         case nx::vms::api::ResourceStatus::unauthorized:
             return Status::Unauthorized;

@@ -126,10 +126,8 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& nam
 
 QnMediaServerResourcePtr ResourceTreeModelTest::addFakeServer(const QString& name) const
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
-    server->setIdUnsafe(QnUuid::createUuid());
+    QnMediaServerResourcePtr server(new QnFakeMediaServerResource());
     server->setName(name);
-    server->setFlags(Qn::ResourceFlag::fake_server);
     resourcePool()->addResource(server);
     return server;
 }
