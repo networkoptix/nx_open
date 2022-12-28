@@ -819,4 +819,9 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
+EventCache& Engine::eventCache()
+{
+    return m_eventCache;
+}
+
 } // namespace nx::vms::rules

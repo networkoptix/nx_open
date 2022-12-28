@@ -27,6 +27,7 @@ class NX_VMS_RULES_API ActionBuilder: public QObject
 
 public:
     using ActionConstructor = std::function<BasicAction*()>;
+    using Actions = std::vector<ActionPtr>;
 
     ActionBuilder(const QnUuid& id, const QString& actionType, const ActionConstructor& ctor);
     virtual ~ActionBuilder();
@@ -73,9 +74,12 @@ public:
      * built. Depends on the aggregation interval the event could be processed immediately
      * or aggregated and processed after the aggregation interval is triggered.
      */
-    void process(EventPtr event);
+    void process(const EventPtr& event);
 
     std::chrono::microseconds aggregationInterval() const;
+
+    /** Action require separate start and end events.*/
+    bool isProlonged() const;
 
     void connectSignals();
 
@@ -98,7 +102,7 @@ private:
     void onTimeout();
     void updateState();
     void setAggregationInterval(std::chrono::microseconds interval);
-    void buildAndEmitActionForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
+    Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
     ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
 
     QnUuid m_id;
@@ -106,10 +110,14 @@ private:
     QString m_actionType;
     ActionConstructor m_constructor;
     std::map<QString, std::unique_ptr<ActionBuilderField>> m_fields;
-    QList<ActionBuilderField*> m_targetFields;
+
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
     QTimer m_timer;
     QSharedPointer<Aggregator> m_aggregator;
+
+    // Running flag for prolonged actions.
+    bool m_isActionRunning = false;
+
     bool m_updateInProgress = false;
 
     template<class T>

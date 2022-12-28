@@ -32,6 +32,9 @@ public:
     /** Returns initial event timestamp. */
     std::chrono::microseconds timestamp() const;
 
+    /** Returns initial event state. */
+    State state() const;
+
     /** Event id, may be used for action deduplication.*/
     QnUuid id() const;
 

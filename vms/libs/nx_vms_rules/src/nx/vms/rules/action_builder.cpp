@@ -26,6 +26,7 @@
 #include "basic_action.h"
 #include "basic_event.h"
 #include "engine.h"
+#include "utils/action.h"
 #include "utils/field.h"
 #include "utils/type.h"
 
@@ -279,7 +280,7 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
     return {};
 }
 
-void ActionBuilder::process(EventPtr event)
+void ActionBuilder::process(const EventPtr& event)
 {
     if (m_aggregator && !m_timer.isActive())
         m_timer.start();
@@ -318,6 +319,11 @@ microseconds ActionBuilder::aggregationInterval() const
     return m_interval;
 }
 
+bool ActionBuilder::isProlonged() const
+{
+    return nx::vms::rules::isProlonged(Engine::instance(), this);
+}
+
 void ActionBuilder::connectSignals()
 {
     for (const auto& [name, field]: m_fields)
@@ -353,17 +359,26 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
     if (!NX_ASSERT(m_constructor) || !NX_ASSERT(aggregatedEvent))
         return;
 
+    Actions actions;
+
     if (m_fields.contains(utils::kUsersFieldName))
-        buildAndEmitActionForTargetUsers(aggregatedEvent);
+        actions = buildActionsForTargetUsers(aggregatedEvent);
     else
-        emit action(buildAction(aggregatedEvent));
+        actions.push_back(buildAction(aggregatedEvent));
+
+    for (const auto& action: actions)
+    {
+        if(action)
+            emit this->action(action);
+    }
 }
 
-void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& aggregatedEvent)
+ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
+    const AggregatedEventPtr& aggregatedEvent)
 {
     auto targetUsersField = fieldByNameImpl<TargetUserField>(utils::kUsersFieldName);
     if (!NX_ASSERT(targetUsersField))
-        return;
+        return {};
 
     UuidSelection initialFieldValue {
         .ids = targetUsersField->ids(),
@@ -416,6 +431,8 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
             it->second.userIds << user->getId();
     }
 
+    Actions result;
+
     for (auto& [key, value]: eventUsersMap)
     {
         NX_VERBOSE(this, "Building action for users: %1", value.userIds);
@@ -425,11 +442,13 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
             .ids = std::move(value.userIds),
             .all = false});
 
-        emit action(buildAction(value.event));
+        result.push_back(buildAction(value.event));
     }
 
     // Recover initial target users selection.
     targetUsersField->setSelection(initialFieldValue);
+
+    return result;
 }
 
 ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
@@ -437,6 +456,14 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
     ActionPtr action(m_constructor());
     if (!action)
         return {};
+
+    const bool isProlonged = this->isProlonged();
+    if (isProlonged &&
+        ((m_isActionRunning && aggregatedEvent->state() == State::started)
+            || (!m_isActionRunning && aggregatedEvent->state() == State::stopped)))
+    {
+        return {};
+    }
 
     action->setRuleId(m_ruleId);
 
@@ -459,6 +486,13 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
                 action->setProperty(propertyName, aggregatedEvent->property(propertyName));
             }
         }
+    }
+
+    // TODO: #amalov The flag is taken from the old engine algorithms.
+    // Think of more clever solution to support "Use source" flag.
+    if (action && isProlonged)
+    {
+        m_isActionRunning = (action->state() == State::started);
     }
 
     return action;

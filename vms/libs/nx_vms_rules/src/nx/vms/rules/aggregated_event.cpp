@@ -41,6 +41,11 @@ std::chrono::microseconds AggregatedEvent::timestamp() const
     return uniqueCount() > 0 ? initialEvent()->timestamp() : std::chrono::microseconds::zero();
 }
 
+State AggregatedEvent::state() const
+{
+    return NX_ASSERT(uniqueCount() > 0) ? initialEvent()->state() : State::none;
+}
+
 QVariantMap AggregatedEvent::details(common::SystemContext* context) const
 {
     if(uniqueCount() == 0)

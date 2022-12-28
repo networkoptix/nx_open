@@ -5,9 +5,10 @@
 
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_executor.h>
-#include <nx/vms/rules/event_connector.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_connector.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
@@ -18,6 +19,10 @@
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
+
+static const auto resourceA = QnUuid("00000000-0000-0000-0001-00000000000A");
+static const auto resourceB = QnUuid("00000000-0000-0000-0001-00000000000B");
+static const auto resourceC = QnUuid("00000000-0000-0000-0001-00000000000C");
 
 class TestActionExecutor: public ActionExecutor
 {
@@ -53,8 +58,20 @@ protected:
 
         auto rule = std::make_unique<Rule>(QnUuid::createUuid());
         rule->setEnabled(true);
-        rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
-        rule->addActionBuilder(engine->buildActionBuilder(utils::type<TestProlongedAction>()));
+
+        auto filter = engine->buildEventFilter(utils::type<TestEvent>());
+        ASSERT_TRUE(filter);
+        rule->addEventFilter(std::move(filter));
+
+        auto builder = engine->buildActionBuilder(utils::type<TestProlongedAction>());
+        ASSERT_TRUE(builder);
+
+        auto devicesField = dynamic_cast<TargetDeviceField*>(
+            builder->fields().value(utils::kDeviceIdsFieldName));
+        ASSERT_TRUE(devicesField);
+        devicesField->setIds({resourceC});
+
+        rule->addActionBuilder(std::move(builder));
 
         engine->updateRule(std::move(rule));
     }
@@ -65,10 +82,11 @@ protected:
         engine.reset();
     }
 
-    void whenTestEventFired(State state)
+    void whenTestEventFired(State state, QnUuid cameraId = resourceA)
     {
         auto startEvent = QSharedPointer<TestEvent>::create();
         startEvent->setState(state);
+        startEvent->m_cameraId = cameraId;
 
         connector.process(startEvent);
     }
@@ -84,6 +102,22 @@ protected:
         EXPECT_EQ(action->state(), state);
     }
 
+    void thenTotalActionsExecuted(size_t size)
+    {
+        ASSERT_EQ(executor.actions.size(), size);
+    }
+
+    QSharedPointer<TestProlongedAction> lastAction()
+    {
+        return executor.actions.back().staticCast<TestProlongedAction>();
+    }
+
+    void thenActionExecuted(size_t index, State state, QnUuid resourceId)
+    {
+        thenProlongedActionExecuted(index, state);
+        EXPECT_EQ(lastAction()->m_deviceIds, QnUuidList{resourceId});
+    }
+
     std::unique_ptr<Engine> engine;
     std::unique_ptr<Plugin> plugin;
     TestEventConnector connector;
@@ -97,9 +131,39 @@ TEST_F(ProlongedActionsTest, sanity)
 {
     whenTestEventFired(State::started);
     thenProlongedActionExecuted(0, State::started);
+    ASSERT_EQ(lastAction()->m_deviceIds, QnUuidList{resourceC});
 
     whenTestEventFired(State::stopped);
     thenProlongedActionExecuted(1, State::stopped);
+}
+
+TEST_F(ProlongedActionsTest, ignoreRepeatedStart)
+{
+    whenTestEventFired(State::started);
+    thenProlongedActionExecuted(0, State::started);
+
+    whenTestEventFired(State::started);
+    thenTotalActionsExecuted(1);
+
+    whenTestEventFired(State::started);
+    thenTotalActionsExecuted(1);
+}
+
+TEST_F(ProlongedActionsTest, ignoreStopWithoutStart)
+{
+    whenTestEventFired(State::stopped);
+    thenTotalActionsExecuted(0);
+}
+
+TEST_F(ProlongedActionsTest, startByDifferentResources)
+{
+    whenTestEventFired(State::started, resourceA);
+    thenActionExecuted(0, State::started, resourceC);
+    thenTotalActionsExecuted(1);
+
+    whenTestEventFired(State::started, resourceB);
+    thenTotalActionsExecuted(1);
+    // The action should not be started twice on the same resource.
 }
 
 } // nx::vms::rules::test
