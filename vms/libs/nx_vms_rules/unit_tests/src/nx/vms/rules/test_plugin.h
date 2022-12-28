@@ -4,6 +4,7 @@
 
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
 
 #include "test_field.h"
 #include "test_event.h"
@@ -24,6 +25,8 @@ public:
     {
         registerEventField<StateField>();
         registerEventField<TestEventField>();
+
+        registerActionField<TargetDeviceField>();
     }
 
     virtual void registerEvents() const override

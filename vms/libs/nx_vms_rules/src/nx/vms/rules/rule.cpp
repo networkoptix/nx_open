@@ -40,6 +40,7 @@ void Rule::addActionBuilder(std::unique_ptr<ActionBuilder> builder)
 void Rule::insertEventFilter(int index, std::unique_ptr<EventFilter> filter)
 {
     // TODO: assert, connect signals
+    NX_ASSERT(filter);
     m_filters.insert(m_filters.begin() + index, std::move(filter));
     updateState();
 }
@@ -47,6 +48,7 @@ void Rule::insertEventFilter(int index, std::unique_ptr<EventFilter> filter)
 void Rule::insertActionBuilder(int index, std::unique_ptr<ActionBuilder> builder)
 {
     // TODO: assert, connect signals
+    NX_ASSERT(builder);
     m_builders.insert(m_builders.begin() + index, std::move(builder));
     updateState();
 }

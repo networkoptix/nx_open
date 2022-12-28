@@ -16,6 +16,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
+#include "event_cache.h"
 #include "rules_fwd.h"
 
 namespace nx::vms::api::rules {
@@ -202,6 +203,8 @@ public:
     void processEvent(const EventPtr& event);
     void processAnalyticsEvents(const std::vector<EventPtr>& events);
 
+    EventCache& eventCache();
+
 public: // Declare following methods public for testing purposes.
     std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
     api::Rule serialize(const Rule* rule) const;
@@ -251,6 +254,8 @@ private:
 
     QMap<QString, ItemDescriptor> m_eventDescriptors;
     QMap<QString, ItemDescriptor> m_actionDescriptors;
+
+    EventCache m_eventCache;
 };
 
 } // namespace nx::vms::rules

@@ -75,30 +75,19 @@ public:
 signals:
     void stateChanged();
 
-public: // For testing.
-    void cleanupOldEventsFromCache(
-        std::chrono::milliseconds eventTimeout,
-        std::chrono::milliseconds cleanupTimeout) const;
-
 private:
-    void updateState();
-
-    bool wasEventCached(const QString& cacheKey) const;
-    void cacheEvent(const QString& cacheKey) const;
-
+    /** Match all event fields excluding state. */
     bool matchFields(const EventPtr& event) const;
+    /** Match state field only. */
     bool matchState(const EventPtr& event) const;
+
+    void updateState();
 
 private:
     QnUuid m_id;
     QString m_eventType;
     std::map<QString, std::unique_ptr<EventFilterField>> m_fields;
     bool m_updateInProgress = false;
-
-    mutable std::set<QString> m_runningEvents;
-
-    mutable std::map<QString, nx::utils::ElapsedTimer> m_cachedEvents;
-    mutable nx::utils::ElapsedTimer m_cacheTimer;
 };
 
 } // namespace nx::vms::rules
