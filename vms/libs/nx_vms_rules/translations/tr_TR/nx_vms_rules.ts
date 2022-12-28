@@ -49,7 +49,7 @@
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 kamerada &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 olay gerçekleşti</translation>
     </message>
   </context>
   <context>
@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Kamerada Giriş Sinyali</translation>
     </message>
     <message>
       <source>State</source>
@@ -286,11 +286,11 @@
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>İçerik Türü</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>İstek Yöntemi</translation>
     </message>
   </context>
   <context>
@@ -305,11 +305,11 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
@@ -348,17 +348,17 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>Son %n saniye süresince veri alınamadı.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>Birincil akışta RTP hatası (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>İkincil akışta RTP hatası (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Aygıt ağ isteklerine yanıt vermiyor.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -660,11 +660,11 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>%1 Üzerinde G/Ç hatası meydana geldi.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>%1 'i Kaydetmek İçin Yeterli HDD/SSD Hızı Yok.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
