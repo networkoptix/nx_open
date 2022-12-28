@@ -2,11 +2,12 @@
 
 #include "thread.h"
 
-#include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/build_info.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/log/log.h>
 
 #include "thread_util.h"
-#include <nx/build_info.h>
 
 namespace nx {
 namespace utils {
@@ -93,6 +94,7 @@ void Thread::start(Priority priority)
 
 void Thread::pleaseStop()
 {
+    NX_VERBOSE(this, __func__);
     m_needStop = true;
     if (m_onPause)
         resume();
@@ -100,6 +102,7 @@ void Thread::pleaseStop()
 
 void Thread::stop()
 {
+    NX_VERBOSE(this, __func__);
 #if defined(_DEBUG)
     if (m_type)
     {
@@ -111,7 +114,6 @@ void Thread::stop()
         m_type = nullptr; //< So that we don't check it again.
     }
 #endif
-
     pleaseStop();
     wait();
 }

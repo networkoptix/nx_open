@@ -171,6 +171,7 @@ void QnResourceDiscoveryManager::stop()
 
 void QnResourceDiscoveryManager::pleaseStop()
 {
+    NX_DEBUG(this, "Please Stop");
     if (isRunning())
     {
         NX_MUTEX_LOCKER lock(&m_searchersListMutex);

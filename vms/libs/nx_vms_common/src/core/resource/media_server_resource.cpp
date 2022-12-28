@@ -3,7 +3,6 @@
 #include "media_server_resource.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QTimer>
 #include <QtCore/QUrl>
 
 #include <api/model/ping_reply.h>
