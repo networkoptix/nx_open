@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -22,6 +23,7 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -79,6 +81,7 @@ namespace nx::vms::client::desktop {
 
 BackupStatusWidget::BackupStatusWidget(QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
     ui(new Ui::BackupStatusWidget())
 {
     ui->setupUi(this);
@@ -229,24 +232,64 @@ void BackupStatusWidget::updateBackupStatus()
     const auto backupPositionRequestHandles = std::make_shared<std::set<rest::Handle>>();
 
     const auto currentTimePoint = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
-    const auto backupTimePoint = std::make_shared<milliseconds>(currentTimePoint);
+    const auto resultBackupTimePoint = std::make_shared<milliseconds>(currentTimePoint);
+
+    const auto resourcePool = cameras.first()->resourcePool();
 
     const auto actualPositionCallback = nx::utils::guarded(this,
         [this, mutex, server = m_server, backupPositionRequestHandles,
-            currentTimePoint, backupTimePoint]
+            resultBackupTimePoint, resourcePool]
         (bool success, rest::Handle requestId, nx::vms::api::BackupPositionEx actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
             if (auto count = backupPositionRequestHandles->erase(requestId); count > 0 && success)
             {
-                const auto deviceBackupTimePoint = currentTimePoint -
-                    std::max(actualPosition.toBackupHighMs, actualPosition.toBackupLowMs);
-                *backupTimePoint = std::min(*backupTimePoint, deviceBackupTimePoint);
+                const auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(
+                    actualPosition.deviceId);
+                if (!NX_ASSERT(camera))
+                    return;
+
+                std::vector<milliseconds> backupTimePoints;
+                backupTimePoints.push_back(*resultBackupTimePoint);
+
+                const auto addBackupTimePoint =
+                    [&backupTimePoints](std::chrono::system_clock::time_point timePoint)
+                    {
+                        if (timePoint != nx::vms::api::kDefaultBackupPosition
+                            && timePoint != nx::vms::api::kBackupFailurePosition)
+                        {
+                            backupTimePoints.push_back(
+                                duration_cast<milliseconds>(timePoint.time_since_epoch()));
+                        }
+                    };
+
+                switch (camera->getActualBackupQualities())
+                {
+                    case nx::vms::api::CameraBackupQuality::CameraBackup_LowQuality:
+                        addBackupTimePoint(actualPosition.positionLowMs);
+                        break;
+
+                    case nx::vms::api::CameraBackupQuality::CameraBackup_HighQuality:
+                        addBackupTimePoint(actualPosition.positionHighMs);
+                        break;
+
+                    case nx::vms::api::CameraBackupQuality::CameraBackup_Both:
+                        addBackupTimePoint(actualPosition.positionLowMs);
+                        addBackupTimePoint(actualPosition.positionHighMs);
+                        break;
+
+                    default:
+                        NX_ASSERT(false, "Unexpected backup quality for a camera");
+                        break;
+                }
+
+                std::sort(backupTimePoints.begin(), backupTimePoints.end());
+                *resultBackupTimePoint = backupTimePoints.front();
 
                 if (backupPositionRequestHandles->empty())
                 {
                     executeLater(
-                        [this, server, timePoint = *backupTimePoint]
+                        [this, server, timePoint = *resultBackupTimePoint]
                         {
                             onBackupTimePointCalculated(server, timePoint);
                         }, this);
@@ -305,10 +348,13 @@ void BackupStatusWidget::onBackupTimePointCalculated(
             return result;
         };
 
-    const auto backupDateTimePoint = QDateTime::fromMSecsSinceEpoch(backupTimePoint.count());
+    const auto serverTimeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    const auto backupPointDateTime =
+        serverTimeWatcher->displayTime(m_server, backupTimePoint.count());
+
     ui->backupTimePointLabel->setText(backupTimePointLabelText
-        .arg(formatDateTime(time::toString(backupDateTimePoint.date())))
-        .arg(formatDateTime(time::toString(backupDateTimePoint.time()))));
+        .arg(formatDateTime(time::toString(backupPointDateTime.date())))
+        .arg(formatDateTime(time::toString(backupPointDateTime.time()))));
 }
 
 void BackupStatusWidget::showEvent(QShowEvent* event)
