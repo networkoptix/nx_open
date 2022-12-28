@@ -77,6 +77,7 @@ void DeviceSearcher::pleaseStop()
 void DeviceSearcher::stop()
 {
     //stopping dispatching discover packets
+    NX_DEBUG(this, "Stopping...");
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         NX_WRITE_LOCKER lock(&m_stoppingLock);
@@ -116,6 +117,7 @@ void DeviceSearcher::stop()
     }
     m_httpClients.clear();
     m_handlerGuard.reset();
+    NX_DEBUG(this, "Stopped");
 }
 
 void DeviceSearcher::registerHandler(SearchHandler* handler, const QString& deviceType)

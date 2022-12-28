@@ -24,8 +24,10 @@ class OrphanCameraWatcher : public QObject, public /*mixin*/ QnCommonModuleAware
 
 public:
     OrphanCameraWatcher(QnCommonModule* commonModule);
+    virtual ~OrphanCameraWatcher() override;
     void start();
     void update();
+    void stop();
 
     /** Just emits doChangeInterval that changes the interval in the timer's thread. */
     void changeIntervalAsync(std::chrono::milliseconds interval);

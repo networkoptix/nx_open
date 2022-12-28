@@ -47,6 +47,16 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
         Qt::QueuedConnection);
 }
 
+OrphanCameraWatcher::~OrphanCameraWatcher()
+{
+    stop();
+}
+
+void OrphanCameraWatcher::stop()
+{
+    m_timer.stop();
+}
+
 void OrphanCameraWatcher::start()
 {
     m_timer.stop();
