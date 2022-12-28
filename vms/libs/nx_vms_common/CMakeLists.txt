@@ -53,7 +53,7 @@ target_compile_definitions(nx_vms_common
         NX_STATISTICS_SERVER_PASSWORD="${statisticsServerPassword}"
 )
 if(LINUX)
-    add_dependencies(nx_vms_common libgl_stub)
+    add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub)
 endif()
 
 if("${arch}" STREQUAL "arm" OR "${arch}" STREQUAL "arm64")
