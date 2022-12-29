@@ -308,18 +308,18 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
     static const auto kLicenceIconPath = lit("item_placeholders/license.png");
     static const IntStringHash kIconPaths
     {
-        { Qn::UnauthorizedOverlay, lit("item_placeholders/unauthorized.png") },
-        { Qn::AccessDeniedOverlay, lit("item_placeholders/access_denied.png") },
-        { Qn::OfflineOverlay, lit("item_placeholders/no_signal.png") },
+        { Qn::UnauthorizedOverlay, "item_placeholders/unauthorized.png" },
+        { Qn::AccessDeniedOverlay, "item_placeholders/access_denied.png" },
+        { Qn::OfflineOverlay, "item_placeholders/offline.svg" },
         { Qn::AnalogWithoutLicenseOverlay, kLicenceIconPath },
         { Qn::VideowallWithoutLicenseOverlay, kLicenceIconPath },
-        { Qn::ServerUnauthorizedOverlay, lit("item_placeholders/no_access.png") },
-        { Qn::IoModuleDisabledOverlay, lit("item_placeholders/disabled.png") },
-        { Qn::NoVideoDataOverlay, lit("item_placeholders/sound.png") },
-        { Qn::PausedOverlay, lit("item_placeholders/pause.png") },
-        { Qn::PasswordRequiredOverlay, lit("item_placeholders/alert.png") },
-        { Qn::CannotDecryptMediaOverlay, lit("item_placeholders/encrypted.svg") },
-        { Qn::InformationRequiredOverlay, lit("item_placeholders/alert.png") },
+        { Qn::ServerUnauthorizedOverlay, "item_placeholders/no_access.png" },
+        { Qn::IoModuleDisabledOverlay, "item_placeholders/disabled.png" },
+        { Qn::NoVideoDataOverlay, "item_placeholders/sound.png" },
+        { Qn::PausedOverlay, "item_placeholders/pause.png" },
+        { Qn::PasswordRequiredOverlay, "item_placeholders/alert.png" },
+        { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
+        { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },
     };
 
     return extractValue(overlay, kIconPaths);
