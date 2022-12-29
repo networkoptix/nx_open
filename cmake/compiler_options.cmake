@@ -404,11 +404,3 @@ unset(_qml_debug)
 if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
-
-if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR targetDevice STREQUAL "edge1")
-    set(_stripBinaries ON)
-else()
-    set(_stripBinaries OFF)
-endif()
-
-nx_option(stripBinaries "Strip the resulting binaries" ${_stripBinaries})

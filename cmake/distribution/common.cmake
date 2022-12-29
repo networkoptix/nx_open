@@ -2,12 +2,18 @@
 
 include_guard(GLOBAL)
 
-include(CMakeParseArguments)
-
 include(utils)
 
 set(nx_vms_distribution_dir "${open_source_root}/vms/distribution")
 set(vms_distribution_common_dir ${nx_vms_distribution_dir}/common)
+
+set(stripServerBinaries "AUTO" CACHE
+    STRING "Strip binaries in Linux Server distributions. One of [AUTO ON OFF].")
+if(NOT stripServerBinaries MATCHES "^(AUTO|ON|OFF)?$")
+    message(FATAL_ERROR
+        "Bad value of \"stripServerBinaries\" parameter: \"${stripServerBinaries}\". Must be "
+        "either \"AUTO\", \"ON\" or \"OFF\".")
+endif()
 
 function(nx_generate_package_json file_name)
     cmake_parse_arguments(
@@ -80,6 +86,18 @@ function(nx_create_distribution_package)
 endfunction()
 
 function(nx_prepare_build_distribution_conf)
+    cmake_parse_arguments(ARGS "" "STRIP_BINARIES" "" ${ARGN})
+
+    if(NOT ARGS_STRIP_BINARIES MATCHES "^(ON|OFF)$")
+        message(FATAL_ERROR "Wrong value of STRIP_BINARIES parameter: must be \"ON\" or \"OFF\"")
+    endif()
+
+    if(stripServerBinaries STREQUAL "AUTO")
+        set(strip_server_distribution_binaries ${ARGS_STRIP_BINARIES})
+    else()
+        set(strip_server_distribution_binaries ${stripServerBinaries})
+    endif()
+
     file(COPY_FILE
         "${open_source_root}/vms/distribution/build_distribution_common.conf.in"
         "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf.in"

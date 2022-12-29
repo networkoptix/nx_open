@@ -158,6 +158,35 @@ distrib_copyMediaserverPluginsToDir() # plugins-folder-name target-dir plugin_li
     done
 }
 
+distrib_stripDirectory() # directory [additional_files...]
+{
+    local -r dir="$1" && shift;
+    local -a additional_files=("$@")
+
+    local -a files;
+    readarray -d "" files < <(find "${dir}" -name "*.so" -print0)
+    for file in "${additional_files[@]}"; do
+        local -a tmp
+        readarray -d "" tmp < <(find "${dir}" -name "${file}" -print0)
+        files+=("${tmp[@]}")
+    done
+
+    local file
+    for file in "${files[@]}"; do
+        if [[ -z "${file}" ]]; then
+            continue
+        fi
+
+        echo "  Stripping ${file}"
+        local -i strip_status=0
+         "${STRIP}" "${file}" || strip_status="$?"
+        if [[ "${strip_status}" != 0 ]]; then
+            echo "\"strip\" failed (status ${strip_status}) for ${file}" >&2
+            exit "${strip_status}"
+        fi
+    done
+}
+
 # Global variables - need to be accessible in onExit().
 declare distrib_WORK_DIR
 declare -i distrib_VERBOSE
@@ -643,6 +672,25 @@ distrib_setPermissionsInStageDir()
     if [[ "${SERVER_SCRIPTS_DIR-}" ]]; then
         chmod 755 "${STAGE}/${SERVER_SCRIPTS_DIR}"/*
     fi
+}
+
+# [in] STAGE
+# [in] BIN_INSTALL_PATH
+# [in] LIB_INSTALL_PATH
+distrib_stripDistributionIfNeeded()
+{
+    if [[ "${STRIP_BINARIES}" != "ON" ]]; then
+        return
+    fi
+
+    echo ""
+    echo "Stripping distribution"
+
+    local -a server_executables=("mediaserver" "root-tool" "testcamera")
+    distrib_stripDirectory "${STAGE}/${BIN_INSTALL_PATH}" "${server_executables[@]}"
+
+    local -r lib_path="${ALT_LIB_INSTALL_PATH-"${LIB_INSTALL_PATH}"}"
+    distrib_stripDirectory "${STAGE}/${lib_path}"
 }
 
 # Prepare to build the distribution archives/packages.
