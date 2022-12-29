@@ -16,6 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
+#include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/watermark_proxy_provider.h>
@@ -107,15 +108,9 @@ struct LayoutThumbnailLoader::Private
 
         auto offlineWidgetLayout = new QVBoxLayout(offlineWidget.get());
         offlineWidgetLayout->setSpacing(0);
-        offlineWidgetLayout->addStretch(1);
-
-        auto pixmap = qnSkin->pixmap(":/skin/item_placeholders/no_signal.png");
-        if (!pixmap.isNull())
-        {
-            auto noSignalImage = new QLabel();
-            noSignalImage->setPixmap(pixmap);
-            offlineWidgetLayout->addWidget(noSignalImage, 0, Qt::AlignCenter);
-        }
+        offlineWidgetLayout->setContentsMargins(6, 2, 6, 6);
+        auto noSignalImage = new ScalableImageWidget(":/skin/item_placeholders/offline.svg");
+        offlineWidgetLayout->addWidget(noSignalImage, 3, Qt::AlignHCenter);
 
         auto noSignalText = new AutoscaledPlainText();
         noSignalText->setText(tr("OFFLINE"));
@@ -123,8 +118,7 @@ struct LayoutThumbnailLoader::Private
         noSignalText->setContentsMargins(kMinIndicationMargins);
         noSignalText->setFont(font);
         setPaletteColor(noSignalText, QPalette::WindowText, colorTheme()->color("red_core"));
-        offlineWidgetLayout->addWidget(noSignalText, 0, Qt::AlignCenter);
-        offlineWidgetLayout->addStretch(1);
+        offlineWidgetLayout->addWidget(noSignalText, 1, Qt::AlignHCenter);
 
         nonCameraWidget->setText(tr("NOT A CAMERA"));
         nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
