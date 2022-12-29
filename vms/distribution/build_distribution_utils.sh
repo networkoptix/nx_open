@@ -358,8 +358,6 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_onvif
         libnx_ldap
         libnx_vms_json_rpc
-        libsrtp2
-        libusrsctp
 
         # third-party
         libquazip
