@@ -13,12 +13,21 @@ class NX_VMS_RULES_API TargetDeviceField: public ResourceFilterActionField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.devices")
 
-    FIELD(bool, useSource, setUseSource)
+    Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 
 public:
     TargetDeviceField() = default;
 
+    bool useSource() const;
+    void setUseSource(bool value);
+
     QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+
+signals:
+    void useSourceChanged();
+
+private:
+    bool m_useSource = false;
 };
 
 } // namespace nx::vms::rules

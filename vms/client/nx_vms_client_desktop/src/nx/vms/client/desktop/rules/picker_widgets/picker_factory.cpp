@@ -13,7 +13,7 @@
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
-#include "source_picker_widget.h"
+#include "resource_picker_widget.h"
 #include "state_picker_widget.h"
 #include "volume_picker_widget.h"
 
@@ -43,7 +43,7 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
         pickerWidget = new StatePickerWidget<nx::vms::rules::FlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceCameraField>())
-        pickerWidget = new CameraPicker(context, parent);
+        pickerWidget = new SourceCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())
         pickerWidget = new ServerPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceUserField>())
@@ -74,6 +74,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new OnelineTextPickerWidget<vms::rules::AnalyticsObjectAttributesField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
         pickerWidget = new VolumePickerWidget(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::TargetDeviceField>())
+        pickerWidget = new TargetCameraPicker(context, parent);
     else
         pickerWidget = new BlankPickerWidget(context, parent);
 

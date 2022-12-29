@@ -9,17 +9,17 @@ QString CommonPickerWidgetStrings::testButtonDisplayText()
     return tr("Test");
 }
 
-QString SourcePickerWidgetStrings::selectServer()
+QString ResourcePickerWidgetStrings::selectServer()
 {
     return tr("Select at least one Server");
 }
 
-QString SourcePickerWidgetStrings::selectUser()
+QString ResourcePickerWidgetStrings::selectUser()
 {
     return tr("Select at least one user");
 }
 
-QString SourcePickerWidgetStrings::selectDevice(QnCameraDeviceType deviceType)
+QString ResourcePickerWidgetStrings::selectDevice(QnCameraDeviceType deviceType)
 {
     static const QnCameraDeviceStringSet deviceStringSet{
         tr("Select at least one device"),
@@ -27,6 +27,11 @@ QString SourcePickerWidgetStrings::selectDevice(QnCameraDeviceType deviceType)
         tr("Select at least one I/O module")
     };
     return deviceStringSet.getString(deviceType);
+}
+
+QString ResourcePickerWidgetStrings::useEventSourceString()
+{
+    return tr("Use event source camera");
 }
 
 QString DropdownTextPickerWidgetStrings::autoValue()
