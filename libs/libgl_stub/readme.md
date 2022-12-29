@@ -1,3 +1,5 @@
+# OpenGL Stub
+
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 This library is just a stub for libGL.so which is required by libQt5Gui in Linuxes where we provide
