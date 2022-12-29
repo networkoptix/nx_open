@@ -37,8 +37,20 @@ set(open_source_root "${CMAKE_SOURCE_DIR}")
 include(cmake/utils.cmake)
 nx_init_known_files_list()
 include(cmake/ninja_tool.cmake)
+
+# "AUTO" is used to autodetect the build number from git.
+set(buildNumber "AUTO" CACHE STRING "Build number")
 include(cmake/vcs_helpers.cmake)
-nx_vcs_get_info(CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs)
+if(buildNumber STREQUAL "AUTO")
+    nx_vcs_get_info(
+        CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs BUILD_NUMBER buildNumber
+    )
+    if(buildNumber STREQUAL "0")
+        message(WARNING "ATTENTION: No compatible Server version found. Setting buildNumber to 0.")
+    endif()
+else()
+    nx_vcs_get_info(CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs)
+endif()
 if(NOT changeSet OR NOT branch OR NOT currentRefs)
     message(FATAL_ERROR "VCS info cannot be read.")
 endif()
