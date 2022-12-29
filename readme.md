@@ -342,6 +342,14 @@ you need to connect to a Server with a different customization, the following op
 to `desktop_client.ini`: `developerMode=true`. For the details, see the documentation for the
 IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
 
+During the Generation stage, the build system tries to determine the compatible Server version
+checking the git tags. It searches for the first commit common for the current branch and one of
+the "protected" branches (corresponding to stable VMS versions), and checks if it has a "release"
+tag of the form "vms/#.#/#####_...". If no such tag is found, the build number is set to 0 and a
+warning is produced, otherwise the build number is extracted from the tag. To bypass this
+algorithm, pass "-DbuildNumber=<custom_build_number>" to cmake; to get back to it, make a clean
+build or pass `-DbuildNumber=AUTO`.
+
 ### Automatic VMS updates
 
 The VMS product includes a comprehensive auto-update support, but this feature is turned off for
