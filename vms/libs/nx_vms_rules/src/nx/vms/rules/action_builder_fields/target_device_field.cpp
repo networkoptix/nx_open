@@ -6,6 +6,20 @@
 
 namespace nx::vms::rules {
 
+bool TargetDeviceField::useSource() const
+{
+    return m_useSource;
+}
+
+void TargetDeviceField::setUseSource(bool value)
+{
+    if (m_useSource != value)
+    {
+        m_useSource = value;
+        emit useSourceChanged();
+    }
+}
+
 QVariant TargetDeviceField::build(const AggregatedEventPtr& event) const
 {
     auto deviceIds = ids().values();
