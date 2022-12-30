@@ -12,7 +12,7 @@ class NX_VMS_RULES_API VolumeField: public SimpleTypeActionField<float, VolumeFi
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.volume")
 
-    Q_PROPERTY(bool value READ value WRITE setValue)
+    Q_PROPERTY(float value READ value WRITE setValue NOTIFY valueChanged)
 
     static constexpr auto kDefaultVolume = 0.8f;
 

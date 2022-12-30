@@ -58,6 +58,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new PasswordPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
         pickerWidget = new DurationPickerWidget<nx::vms::rules::OptionalTimeField>(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TimeField>())
+        pickerWidget = new DurationPickerWidget<nx::vms::rules::TimeField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
         pickerWidget = new TargetUserPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())

@@ -38,11 +38,6 @@ private:
 
     TimeDurationWidget* m_timeDurationWidget;
 
-    virtual void onDescriptorSet() override
-    {
-        m_label->setText(m_fieldDescriptor->displayName);
-    }
-
     virtual void onFieldsSet() override
     {
         {

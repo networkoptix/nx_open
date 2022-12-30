@@ -15,6 +15,7 @@ static constexpr auto kDeviceIdsFieldName = "deviceIds";
 static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
+static constexpr auto kTextFieldName = "text";
 static constexpr auto kServerIdFieldName = "serverId";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kUsersFieldName = "users";
