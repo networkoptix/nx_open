@@ -447,7 +447,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     //< Cloud storage isn't tied to any server and is readable for all.
     if (!parentServer)
+    {
+        if (hasAdminPermissions(subject))
+            return Qn::ReadWriteSavePermission;
+
         return Qn::ReadPermission;
+    }
 
     const auto serverPermissions = permissions(subject, parentServer);
 
