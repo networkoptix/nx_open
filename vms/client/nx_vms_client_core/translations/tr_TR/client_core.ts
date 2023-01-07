@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>Sunucu uyumsuz.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>Oturum süresi doldu. Sifrenizi tekrar giriniz.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -152,7 +152,7 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
@@ -179,7 +179,7 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Lütfen tekrar giriş yapın %1.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>

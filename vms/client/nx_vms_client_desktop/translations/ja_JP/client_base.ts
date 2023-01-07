@@ -11353,7 +11353,8 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>更にブックマークを表示するにはタイムラインをズームします</translation>
+      <translation>ほかのブックマークを表示するには
+タイムラインをズームしてください</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>

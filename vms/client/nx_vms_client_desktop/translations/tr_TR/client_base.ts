@@ -938,15 +938,15 @@
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Mevcut Durumu Kaydet</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Kayıtlı Durumu Geri Yükle</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Kayıtlı Durumu Sil</translation>
     </message>
     <message>
       <source>Close all Windows</source>
@@ -958,7 +958,7 @@
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Yer imlerini sil...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -977,19 +977,19 @@
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Grup Oluştur</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Grubu Kaldır</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Proxy Web Sayfası Ekle...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Hücre Aralığı</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1001,7 +1001,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick Ayarları...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Web Sayfası Ayarları...</translation>
     </message>
     <message>
       <source>Account Security...</source>
@@ -1725,7 +1725,7 @@
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -2751,7 +2751,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Oturumunuz kapatılacak.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -3034,7 +3034,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Veri Tabanı Yedeğini Kaydet</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3042,11 +3042,11 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Oluştur</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Veritabanı Yedeğinden Geri Yükleme</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3481,7 +3481,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Lütfen şifre girin.</translation>
     </message>
   </context>
   <context>
@@ -3949,7 +3949,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Hareket Arama</translation>
     </message>
     <message>
       <source>Object Search</source>
@@ -4529,7 +4529,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Tam ekrana geç</translation>
     </message>
   </context>
   <context>
@@ -4833,7 +4833,7 @@ to %1</source>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+        <numerusform>Sertifikalar</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
@@ -6702,7 +6702,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Yine de taşınsın mı?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6985,7 +6985,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Seçilen kamera</translation>
     </message>
     <message>
       <source>Chosen device</source>
