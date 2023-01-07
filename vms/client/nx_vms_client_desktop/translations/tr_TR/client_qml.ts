@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Bu güncellemeyi hızlandırın</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
@@ -97,11 +97,11 @@
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>yeni sonuçlar</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Tarafından tespit edilen</translation>
     </message>
   </context>
   <context>
@@ -137,13 +137,13 @@
     <message numerus="yes">
       <source>%n new results</source>
       <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n yeni sonuç</numerusform>
         <numerusform>%n new results</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>yeni sonuçlar</translation>
     </message>
   </context>
   <context>
@@ -218,11 +218,11 @@
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Seçili kamera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Aygıt seçin...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
@@ -248,11 +248,11 @@
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Seçilen cihaz</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Seçilen kamera</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Ulaşılamaz</translation>
     </message>
     <message>
       <source>Incompatible</source>
@@ -271,7 +271,7 @@
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Bekliyor</translation>
     </message>
   </context>
   <context>
@@ -299,18 +299,18 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Daha fazla okumak için simgeye tıklayın</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Sütunu kaldır</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Sütun ekle</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Önceki Nesne</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Sonraki Nesne</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
@@ -664,7 +664,7 @@
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Kamera Seç...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -719,11 +719,11 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Mevcut</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Yok</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Ön izleme Yok</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
@@ -880,7 +880,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>kimden</translation>
     </message>
     <message>
       <source>to</source>
@@ -891,7 +891,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne Türü</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -925,7 +925,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Başka bir şey aramayı dene</translation>
     </message>
   </context>
   <context>
@@ -957,7 +957,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Tüm Türler</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -996,11 +996,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Ön izleme yüklenemiyor</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Önizleme eski</translation>
     </message>
   </context>
   <context>
@@ -1055,7 +1055,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seç</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1161,7 +1161,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Sinyal yok</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1173,11 +1173,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Erişim yok</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Cihaz devre dışı</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1219,11 +1219,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Favori Sistem Yok</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Gizli Sistem Yok</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
@@ -1254,11 +1254,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Favorilere Ekle</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Favorilerden Çıkar</translation>
     </message>
   </context>
   <context>
@@ -1298,7 +1298,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Gizli</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1306,18 +1306,18 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoriler</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Resmi Web Site</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Yardım ve Kullanım Kılavuzu</translation>
     </message>
     <message>
       <source>Support</source>

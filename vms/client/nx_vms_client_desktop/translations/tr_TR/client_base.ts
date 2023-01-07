@@ -922,15 +922,15 @@
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Mevcut Durumu Kaydet</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Kayıtlı Durumu Geri Yükle</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Kayıtlı Durumu Sil</translation>
     </message>
     <message>
       <source>Close all Windows</source>
@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Yer imlerini sil...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -961,19 +961,19 @@
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Grup Oluştur</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Grubu Kaldır</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Proxy Web Sayfası Ekle...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Hücre Aralığı</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick Ayarları...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Web Sayfası Ayarları...</translation>
     </message>
     <message>
       <source>Account Security...</source>
@@ -1853,7 +1853,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -2923,7 +2923,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Oturumunuz kapatılacak.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -3190,7 +3190,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Veri Tabanı Yedeğini Kaydet</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3198,11 +3198,11 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Oluştur</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Veritabanı Yedeğinden Geri Yükleme</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3727,7 +3727,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Lütfen şifre girin.</translation>
     </message>
   </context>
   <context>
@@ -4195,7 +4195,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Hareket Arama</translation>
     </message>
     <message>
       <source>Object Search</source>
@@ -4712,7 +4712,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Tam ekrana geç</translation>
     </message>
   </context>
   <context>
@@ -5016,7 +5016,7 @@ to %1</source>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+        <numerusform>Sertifikalar</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
@@ -6184,7 +6184,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>&quot;%1&quot; dosyası açılamadı. Lütfen klasörün erişilebilir olup olmadığını kontrol edin.</translation>
     </message>
   </context>
   <context>
@@ -6691,7 +6691,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Yine de taşınsın mı?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6736,7 +6736,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
@@ -7031,7 +7031,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Seçilen kamera</translation>
     </message>
     <message>
       <source>Chosen device</source>
@@ -7508,7 +7508,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <translation>Kamera&apos; deposuna kaydedilen video, ana arşive otomatik olarak yüklenmeyecektir.</translation>
     </message>
   </context>
   <context>
@@ -7631,7 +7631,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>Eski kamera&apos; verilerinin yeni kameraya aktarılıp aktarılamayacağı kontrol ediliyor.</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -7950,7 +7950,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Bir belirteç sağlamak için onayınız gerekiyor</translation>
     </message>
     <message>
       <source>Allow</source>
@@ -7958,7 +7958,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>Bu web sayfası yetkilendirme için hesabınıza erişim istiyor</translation>
     </message>
   </context>
   <context>
@@ -8071,7 +8071,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Düzenler, farklı Sistemlerdeki cihazlarla çalışmanıza izin veren &lt;b&gt;sistemler arası düzenlerdir&lt;/b&gt;. Şu anda normal mizanpajların yalnızca bazı özellikleri mevcuttur, ancak gelecek sürümlerde %1 Düzen'in yeteneklerini genişletmeye devam edeceğiz</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
@@ -8935,19 +8935,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>Değer ayarlanan maksimum değerden küçük veya bu değere eşit olmalıdır</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>Seçilen Günlük Düzeyi yeterli bilgi toplamıyor olabilir.
+Günlüğe Kaydetme Düzeyi &quot;%1&quot; size daha ayrıntılı bilgi sağlayacaktır.</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Seçilen Kayıt Düzeyi, sistem&apos; performansını düşürebilir.
+Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına döndürmeyi unutmayın.</translation>
     </message>
   </context>
   <context>
@@ -9629,7 +9629,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n bildirimleri</numerusform>
+        <numerusform>%n bildirimler</numerusform>
         <numerusform>%n notifications</numerusform>
       </translation>
     </message>
@@ -9681,7 +9681,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Yerel bir düzen mi arıyorsunuz? Burada bir seçenek olarak yerel düzenlerini görüntülemek için &quot;Göster&quot; listesinden yalnızca bir kullanıcı seçin.</translation>
     </message>
   </context>
   <context>
@@ -9948,7 +9948,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>Web sayfası, Masaüstü İstemcisi ile etkileşim kurabilir ve kullanıcı oturumuna erişim talep edebilir</translation>
     </message>
   </context>
   <context>
@@ -10420,8 +10420,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>Birisi, kişisel bilgilerinizi çalmak için %1'in kimliğine bürünüyor olabilir.
+%2 Sunucu SSL sertifikasını değiştirmediyseniz bu sertifikayı sabitlemeyin.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
@@ -10723,21 +10723,21 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>%n Sunucuda yedek depolama yapılandırılmamış</numerusform>
+        <numerusform>%n Sunucusunda yedek depolama yapılandırılmamış</numerusform>
         <numerusform>Backup storage is not configured on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>%n Sunucuda Analitik Verileri için depolama yapılandırılmamış</numerusform>
+        <numerusform>%n Sunucusunda Analitik Verileri için depolama yapılandırılmamış</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>%n Sunucusundaki sistem depolaması analiz verileri için kullanılır</numerusform>
+        <numerusform>%n Sunucusu üzerindeki sistem depolaması analiz verileri için kullanıldı</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
       </translation>
     </message>
@@ -11025,7 +11025,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>Özet Kimlik Doğrulamasına Sahip Kullanıcılar</translation>
     </message>
   </context>
   <context>

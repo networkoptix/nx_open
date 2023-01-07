@@ -1099,11 +1099,11 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Gerekli parametre eksik: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>İstek işlenemedi.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
@@ -1211,7 +1211,7 @@
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP yönetici DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
@@ -1227,7 +1227,7 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>LDAP şifresinin geçerlilik süresi (milisaniye)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
@@ -1235,31 +1235,31 @@
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Anonim istatistik raporuna izin verilir</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Anonim istatistik raporu son</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Anonim istatistik raporunun son versiyonu</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Anonim istatistik raporu son sayısı</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Anonim istatistik zaman döngüsü</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Anonim istatistik raporu güncellemeden sonra gecikme</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Anonim İstatistik Rapor Sunucu URL'si</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
@@ -1267,11 +1267,11 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Canlılık güncelleme aralığı (saniye, 1saniye-1saat)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Proxy bağlantı zaman aşımı (saniye, 1saniye-1saat)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1279,11 +1279,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Birincil zaman senkronizasyon sunucusu</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Yerel ve kaynak zaman arasındaki maksimum fark (milisaniye)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1331,7 +1331,7 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Kamera ayarlarını optimize edin</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
@@ -1360,7 +1360,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Denetim izi takip süresi (gün, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1368,7 +1368,7 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>HTTPS'yi zorunlu kılın (veri trafiği şifrelemesi)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
@@ -1380,15 +1380,15 @@
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Otomatik güncelleme bildirimlerini etkinleştir</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Güncelleme bildirimlerini etkinleştir</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>UPNP bağlantı noktası eşlemeyi etkinleştir</translation>
     </message>
     <message>
       <source>Backup settings</source>
@@ -1404,7 +1404,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Sıralı Flir ONVIF arama aracını etkinleştir</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
@@ -1440,15 +1440,15 @@
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Bulut bağlantılı geçiş kullanımını etkinleştir</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Bulut bağlantı geçişleri için SSL'yi zorunlu kılın</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>UÇ'ta kaydı etkinleştir</translation>
     </message>
     <message>
       <source>Target update information</source>
@@ -1556,7 +1556,7 @@
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Fare zaman çizelgesi önizlemesini göster</translation>
     </message>
     <message>
       <source>Language for Cloud notifications</source>
@@ -1568,7 +1568,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Etki alanları arası politikayı etkinleştir</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1593,11 +1593,11 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Otomatik bulma için IP adreslerini açığa çıkarın</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Sunucu cihaza bağlandığında GÇ bağlantı noktası durumunu koruyun</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
@@ -2291,15 +2291,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Yeterli lisans yok. Aşağıdaki G/Ç modülleri devre dışı bırakıldı:</translation>
     </message>
   </context>
   <context>
