@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/jsapi/globals.h>
 #include <nx/vms/client/desktop/jsapi/logger.h>
 #include <nx/vms/client/desktop/jsapi/resources.h>
+#include <nx/vms/client/desktop/jsapi/self.h>
 #include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
@@ -880,7 +881,7 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.tab",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Tab(context, item, parent);
+            return new jsapi::Tab(context, parent);
         });
 
     registerApiObjectWithFactory("vms.resources",
@@ -899,6 +900,12 @@ void WebViewController::initClientApiSupport(
         [=](QObject* parent) -> QObject*
         {
             return new jsapi::Auth(authCondition, parent);
+        });
+
+    registerApiObjectWithFactory("vms.self",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Self(item, parent);
         });
 
     registerApiObjectWithFactory("vms",
