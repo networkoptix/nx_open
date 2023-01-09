@@ -50,6 +50,9 @@ enum WidgetButtons
 
     // Navigate back, web pages only.
     BackButton = 1 << 16,
+
+    // Indicate if video stream is paused
+    PauseButton = 1 << 17,
 };
 
 } // namespace Qn

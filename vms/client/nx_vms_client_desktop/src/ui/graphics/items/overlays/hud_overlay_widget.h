@@ -9,8 +9,10 @@
 class QnResourceTitleItem;
 class QnViewportBoundWidget;
 class QnHtmlTextItem;
-
+class QnImageButtonBar;
 class QnHudOverlayWidgetPrivate;
+
+namespace nx::vms::client::desktop { class ResourceBottomItem; }
 
 class QnHudOverlayWidget: public GraphicsWidget
 {
@@ -24,14 +26,14 @@ public:
     /** Resource title bar item. */
     QnResourceTitleItem* title() const;
 
+    /** Resource bottom bar item. */
+    nx::vms::client::desktop::ResourceBottomItem* bottom() const;
+
     /** Everything under title bar. */
     QnViewportBoundWidget* content() const;
 
     /** Resource details text item. */
     QnHtmlTextItem* details() const;
-
-    /** Resource position text item. */
-    QnHtmlTextItem* position() const;
 
     /** Left container for additional data (above details). */
     QGraphicsWidget* left() const;

@@ -2,14 +2,13 @@
 
 #include "overlayed.h"
 
-#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsScene>
 
+#include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
-
-#include <nx/vms/client/desktop/workbench/workbench_animations.h>
-#include <nx/utils/math/fuzzy.h>
 
 using nx::vms::client::core::Rotation;
 
@@ -20,7 +19,6 @@ detail::OverlayedBase::OverlayWidget::OverlayWidget()
     , boundWidget(nullptr)
     , rotationTransform(nullptr)
 {}
-
 
 void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget) {
     m_widget = widget;
@@ -37,11 +35,13 @@ void detail::OverlayedBase::updateOverlaysRotation() {
     }
 }
 
-
-int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget *widget) const {
-    for(int i = 0; i < m_overlayWidgets.size(); i++)
-        if(m_overlayWidgets[i].widget == widget)
+int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget* widget) const 
+{
+    for (int i = 0; i < m_overlayWidgets.size(); i++)
+    {
+        if (m_overlayWidgets[i].widget == widget)
             return i;
+    }
     return -1;
 }
 
@@ -182,6 +182,9 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     const qreal opacity = visible ? 1.0 : 0.0;
     if (animate)
     {
+        if (!widget->scene())
+            return;
+
         using namespace nx::vms::client::desktop::ui::workbench;
         auto animator = opacityAnimator(widget);
 

@@ -68,6 +68,13 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
 void QnHtmlTextItemPrivate::updatePixmap() {
     Q_Q(QnHtmlTextItem);
 
+    if (html.isEmpty() && icon.size().isEmpty())
+    {
+        q->setMinimumSize(QSize());
+        q->setMaximumSize(QSize());
+        return;
+    }
+
     const int maxTextWidth = (options.maxWidth - options.horPadding * 2);
 
     static const QFont kDefaultFont = []()
@@ -90,14 +97,18 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     td.defaultTextOption().setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
     static const auto ratio = qApp->devicePixelRatio();
-    auto width = td.documentLayout()->documentSize().width() + options.horPadding * 2;
-    const auto height = td.documentLayout()->documentSize().height() + options.vertPadding * 2;
     auto iconSize = icon.size() / ratio;
+    auto width = td.documentLayout()->documentSize().width() + options.horPadding * 2;
+    auto height = td.documentLayout()->documentSize().height() + options.vertPadding * 2;
 
     if (!iconSize.isEmpty())
+    {
         width += (iconSize.width() + options.horSpacing);
+    }
 
-    const auto baseSize = QSize(width, height);
+    const auto baseSize = html.isEmpty()
+        ? iconSize + QSize(options.horPadding * 2, options.vertPadding * 2)
+        : QSize(width, height);
     const auto pixmapSize = baseSize * ratio;
 
     pixmap = QPixmap(pixmapSize);
@@ -114,16 +125,22 @@ void QnHtmlTextItemPrivate::updatePixmap() {
 
     {
         const QnScopedPainterAntialiasingRollback antialiasing(&painter, true);
-        painter.drawRoundedRect(QRectF(QPointF(), baseSize), options.borderRadius, options.borderRadius);
+        painter.drawRoundedRect(
+            QRectF(QPointF(), baseSize), options.borderRadius, options.borderRadius);
     }
 
-    painter.translate(options.horPadding, options.vertPadding);
+    painter.translate(options.horPadding, 0);
     if (!iconSize.isEmpty())
     {
+        auto offset = (height - iconSize.height()) / 2;
+        if (html.isEmpty())
+            offset = options.vertPadding;
+        painter.translate(0, offset);
         painter.drawPixmap(0, 0, icon);
-        painter.translate(options.horSpacing + iconSize.width(), 0);
+        painter.translate(options.horSpacing + iconSize.width(), -offset);
     }
 
+    painter.translate(0, options.vertPadding);
     td.drawContents(&painter);
     q->setMinimumSize(baseSize);
     q->setMaximumSize(baseSize);
@@ -185,7 +202,7 @@ QnHtmlTextItemOptions QnHtmlTextItem::options() const {
     return d->options;
 }
 
-void QnHtmlTextItem::setOptions( const QnHtmlTextItemOptions &options ) {
+void QnHtmlTextItem::setOptions(const QnHtmlTextItemOptions &options) {
     Q_D(QnHtmlTextItem);
     if (d->options == options)
         return;

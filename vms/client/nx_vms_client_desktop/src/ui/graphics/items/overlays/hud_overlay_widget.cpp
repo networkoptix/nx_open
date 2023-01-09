@@ -3,10 +3,9 @@
 #include "hud_overlay_widget.h"
 #include "private/hud_overlay_widget_p.h"
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
-
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -28,6 +27,12 @@ QnResourceTitleItem* QnHudOverlayWidget::title() const
     return d->title;
 }
 
+nx::vms::client::desktop::ResourceBottomItem* QnHudOverlayWidget::bottom() const
+{
+    Q_D(const QnHudOverlayWidget);
+    return d->bottom;
+}
+
 QnViewportBoundWidget* QnHudOverlayWidget::content() const
 {
     Q_D(const QnHudOverlayWidget);
@@ -38,12 +43,6 @@ QnHtmlTextItem* QnHudOverlayWidget::details() const
 {
     Q_D(const QnHudOverlayWidget);
     return d->details;
-}
-
-QnHtmlTextItem* QnHudOverlayWidget::position() const
-{
-    Q_D(const QnHudOverlayWidget);
-    return d->position;
 }
 
 QGraphicsWidget* QnHudOverlayWidget::left() const
