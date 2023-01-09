@@ -11,7 +11,6 @@
 #include "globals.h"
 
 class QnWorkbenchContext;
-class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop::jsapi {
 
@@ -24,7 +23,7 @@ class Tab: public QObject
     using base_type = QObject;
 
 public:
-    Tab(QnWorkbenchContext* context, QnWorkbenchItem* item, QObject* parent = nullptr);
+    Tab(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~Tab() override;
 
     /** State of the tab, including all items and layout information. */
@@ -57,9 +56,6 @@ public:
 
     /** Save layout. */
     Q_INVOKABLE QJsonObject saveLayout();
-
-    /** Sets the web-page widget minimal interface mode. */
-    Q_INVOKABLE QJsonObject setItemMinimalInterfaceMode(bool value);
 
 signals:
     void itemAdded(const QJsonObject& item);
