@@ -17,7 +17,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -74,7 +73,6 @@ struct TabApiBackend::Private: public QObject
 {
     TabApiBackend* const q;
     QnWorkbenchContext* const context;
-    QnWorkbenchItem* const item;
     QnWorkbenchLayout* const layout;
     QnWorkbenchDisplay* const display;
     QnWorkbenchNavigator* const navigator;
@@ -87,7 +85,6 @@ struct TabApiBackend::Private: public QObject
     Private(
         TabApiBackend* q,
         QnWorkbenchContext* context,
-        QnWorkbenchItem* item,
         QnWorkbenchLayout* layout);
 
     void updateLayoutItemData(
@@ -127,12 +124,10 @@ struct TabApiBackend::Private: public QObject
 TabApiBackend::Private::Private(
     TabApiBackend* q,
     QnWorkbenchContext* context,
-    QnWorkbenchItem* item,
     QnWorkbenchLayout* layout)
     :
     q(q),
     context(context),
-    item(item),
     layout(layout),
     display(context->display()),
     navigator(context->navigator())
@@ -638,12 +633,11 @@ bool TabApiBackend::Private::hasPermissions(
 
 TabApiBackend::TabApiBackend(
     QnWorkbenchContext* context,
-    QnWorkbenchItem* item,
     QnWorkbenchLayout* layout,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, context, item, layout))
+    d(new Private(this, context, layout))
 {
 }
 
@@ -813,21 +807,6 @@ Error TabApiBackend::saveLayout()
     return success
         ? Error::success()
         : Error::failed();
-}
-
-Error TabApiBackend::setItemMinimalInterfaceMode(bool value)
-{
-    if (!d->item)
-        return Error::failed();
-
-    const auto resourceWidget = d->context->display()->widget(d->item);
-    const auto webWidget = dynamic_cast<QnWebResourceWidget*>(resourceWidget);
-
-    if (!webWidget)
-        return Error::failed();
-
-    webWidget->setMinimalTitleBarMode(value);
-    return Error::success();
 }
 
 } // namespace nx::vms::client::desktop::jsapi::detail
