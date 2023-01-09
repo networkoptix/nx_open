@@ -886,7 +886,7 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.resources",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Resources(context, parent);
+            return new jsapi::Resources(parent);
         });
 
     registerApiObjectWithFactory("vms.log",
