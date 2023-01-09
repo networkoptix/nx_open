@@ -20,6 +20,12 @@ class UnifiedResourcePool: public QObject
 public:
     UnifiedResourcePool(QObject* parent = nullptr);
 
+    using ResourceFilter = std::function<bool (const QnResourcePtr& resource)>;
+    QnResourceList resources(ResourceFilter filter = {}) const;
+
+    /** Find first matching resource with given id. */
+    QnResourcePtr resource(const QnUuid& id) const;
+
 signals:
     /**
      * Emitted whenever any new Resource is added to any of the Resource Pools.

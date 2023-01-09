@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
 #include "resources_structures.h"
@@ -20,9 +19,7 @@ class ResourcesApiBackend: public QObject
     using base_type = QObject;
 
 public:
-    ResourcesApiBackend(
-        QnWorkbenchContext* context,
-        QObject* parent = nullptr);
+    ResourcesApiBackend(QObject* parent = nullptr);
 
     virtual ~ResourcesApiBackend() override;
 
@@ -35,10 +32,6 @@ public:
 signals:
     void added(const Resource& resource);
     void removed(const QnUuid& resourceId);
-
-private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop::jsapi::detail

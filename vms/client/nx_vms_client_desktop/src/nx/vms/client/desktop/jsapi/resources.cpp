@@ -9,12 +9,10 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-Resources::Resources(
-    QnWorkbenchContext* context,
-    QObject* parent)
+Resources::Resources(QObject* parent)
     :
     base_type(parent),
-    d(new detail::ResourcesApiBackend(context, this))
+    d(new detail::ResourcesApiBackend(this))
 {
     connect(d.data(), &detail::ResourcesApiBackend::added, this,
         [this](const detail::Resource& resource)
