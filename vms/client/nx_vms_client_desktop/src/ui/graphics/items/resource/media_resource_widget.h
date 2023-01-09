@@ -395,6 +395,7 @@ private:
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateAnalyticsVisibility(bool animate = false);
+    Q_SLOT void handleSyncStateChanged(bool enabled);
 
     void updateCompositeOverlayMode();
 

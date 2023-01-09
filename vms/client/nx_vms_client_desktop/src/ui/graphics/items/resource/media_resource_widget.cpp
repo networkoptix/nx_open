@@ -7,11 +7,11 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
-#include <QtGui/QPainter>
 #include <QtGui/QAction>
+#include <QtGui/QPainter>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <qt_graphics_items/graphics_stacked_widget.h>
 
@@ -35,10 +35,10 @@
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -70,6 +70,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
@@ -83,6 +84,7 @@
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/camera_hotspots_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figures_watcher.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/roi_figures_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -132,7 +134,6 @@
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
 #include <utils/media/sse_helper.h>
-#include <nx/vms/client/desktop/ui/graphics/items/overlays/camera_hotspots_overlay_widget.h>
 
 using namespace std::chrono;
 
@@ -373,6 +374,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(
                 }
             });
     }
+
+    connect(action(action::ToggleSyncAction), &QAction::triggered, this,
+        &QnMediaResourceWidget::handleSyncStateChanged);
 
     updateDisplay();
     updateDewarpingParams();
@@ -1262,7 +1266,8 @@ bool QnMediaResourceWidget::capabilityButtonsAreVisible() const
             | Qn::Permission::WritePtzPermission;
 
     return !d->isPreviewSearchLayout
-        && !qnRuntime->isVideoWallMode() //< Video wall has userInput permission but no actual user.
+        // Video wall has userInput permission but no actual user.
+        && !qnRuntime->isVideoWallMode() 
         && d->camera
         && (accessController()->permissions(d->camera) & kInputPermissions) != 0;
 }
@@ -1602,22 +1607,22 @@ void QnMediaResourceWidget::at_videoLayoutChanged()
 
 void QnMediaResourceWidget::updateIconButton()
 {
-    const auto buttonsBar = titleBar()->leftButtonsBar();
-
     if (isZoomWindow())
     {
-        const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
-        iconButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-        iconButton->setToolTip(tr("Zoom Window"));
+        const auto zoomIconButton =
+            m_hudOverlay->title()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
+        zoomIconButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        zoomIconButton->setToolTip(tr("Zoom Window"));
         return;
     }
 
+    const auto iconButton = m_hudOverlay->bottom()->positionAndRecordingStatus();
     if (!d->camera || d->camera->hasFlags(Qn::virtual_camera))
         return;
 
     const auto icon = m_recordingStatusHelper->icon();
-    const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
-    iconButton->setIcon(icon);
+    iconButton->setIcon(icon.pixmap(QSize(12,12)));
+    iconButton->setVisible(true);
     iconButton->setToolTip(m_recordingStatusHelper->tooltip());
 }
 
@@ -2292,7 +2297,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
         ? tr("LIVE")
         : extractTime(getDisplayTimeUsec()));
 
-    static const int kPositionTextPixelSize = 14;
+    static const int kPositionTextPixelSize = 10;
     return html::styledParagraph(
         timeString,
         kPositionTextPixelSize,
@@ -2389,6 +2394,13 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->camera && (!d->camera->hasFlags(Qn::virtual_camera)))
         result |= Qn::RecordingStatusIconButton;
 
+    if (d->isPlayingLive())
+        result |= Qn::RecordingStatusIconButton;
+
+    const auto reader = d->display()->archiveReader();
+    if (!reader || reader->isMediaPaused())
+        result |= Qn::PauseButton;
+
     return result;
 }
 
@@ -2481,9 +2493,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {
-        if (!qnRuntime->isVideoWallMode())
-            return Qn::PausedOverlay;
-
         return Qn::EmptyOverlay;
     }
 
@@ -3433,4 +3442,9 @@ void QnMediaResourceWidget::at_triggerFieldsChanged(
             static_cast<SoftwareTriggerButton*>(m_triggersContainer->item(index)),
             info);
     }
+}
+
+void QnMediaResourceWidget::handleSyncStateChanged(bool enabled)
+{
+    updateHud(enabled);
 }

@@ -13,6 +13,7 @@ class QGraphicsWidget;
 class QnViewportBoundWidget;
 class QnResourceTitleItem;
 class QnHudOverlayWidget;
+namespace nx::vms::client::desktop { class ResourceBottomItem; }
 
 class QnHudOverlayWidgetPrivate: public QObject
 {
@@ -27,9 +28,10 @@ public:
 
     QnViewportBoundWidget* const titleHolder;
     QnResourceTitleItem* const title;
+    QnViewportBoundWidget* const bottomHolder;
+    nx::vms::client::desktop::ResourceBottomItem* const bottom;
     QnViewportBoundWidget* const content;
     QnHtmlTextItem* const details;
-    QnHtmlTextItem* const position;
     QGraphicsWidget* const left;
     QGraphicsWidget* const right;
     QnActionIndicatorItem* const actionIndicator;

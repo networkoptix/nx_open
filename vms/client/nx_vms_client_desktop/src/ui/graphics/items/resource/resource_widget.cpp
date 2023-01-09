@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -34,6 +35,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
@@ -56,6 +58,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -284,8 +287,8 @@ void QnResourceWidget::setupHud()
     m_hudOverlay->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
-    setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
-    setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);
+    setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate*/ false);
+    setOverlayWidgetVisible(m_hudOverlay->bottom(), true, /*animate*/ false);
 }
 
 void QnResourceWidget::setupSelectionOverlay()
@@ -349,6 +352,14 @@ void QnResourceWidget::createButtons()
     auto leftButtonsBar = titleBar()->leftButtonsBar();
     leftButtonsBar->setUniformButtonSize(kTitleButtonSize);
 
+    auto iconButton = new QnImageButtonWidget();
+    iconButton->setParent(this);
+    iconButton->setPreferredSize(kTitleButtonSize);
+    iconButton->setVisible(false);
+    iconButton->setAcceptedMouseButtons(Qt::NoButton);
+    iconButton->setObjectName("IconButton");
+    leftButtonsBar->addButton(Qn::RecordingStatusIconButton, iconButton);
+
     auto closeButton = createStatisticAwareButton("res_widget_close");
     closeButton->setIcon(loadSvgIcon("item/close.svg"));
     closeButton->setToolTip(tooltipText(tr("Close"), QKeySequence{"Del"}));
@@ -384,14 +395,6 @@ void QnResourceWidget::createButtons()
         this,
         &QnResourceWidget::at_buttonBar_checkedButtonsChanged);
 
-    auto iconButton = new QnImageButtonWidget();
-    iconButton->setParent(this);
-    iconButton->setPreferredSize(kTitleButtonSize);
-    iconButton->setVisible(false);
-    iconButton->setAcceptedMouseButtons(Qt::NoButton);
-    iconButton->setObjectName("IconButton");
-    titleBar()->leftButtonsBar()->addButton(Qn::RecordingStatusIconButton, iconButton);
-
     auto fullscreenButton = createStatisticAwareButton("web_widget_fullscreen");
     fullscreenButton->setObjectName("FullscreenButton");
     connect(
@@ -400,11 +403,10 @@ void QnResourceWidget::createButtons()
         this,
         [this]()
         {
-          // Toggles fullscreen item mode.
-          const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
-          workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
-        }
-    );
+            // Toggles fullscreen item mode.
+            const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
+            workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
+        });
     rightButtonsBar->addButton(Qn::FullscreenButton, fullscreenButton);
     updateFullscreenButton();
 }
@@ -647,12 +649,12 @@ QString QnResourceWidget::calculatePositionText() const
 
 void QnResourceWidget::updatePositionText()
 {
-    if (!isOverlayWidgetVisible(m_hudOverlay->position()))
+    if (!isOverlayWidgetVisible(m_hudOverlay->bottom()))
         return;
 
     const QString text = calculatePositionText();
-    m_hudOverlay->position()->setHtml(text);
-    m_hudOverlay->position()->setVisible(!text.isEmpty());
+    m_hudOverlay->bottom()->positionAndRecordingStatus()->setHtml(text);
+    m_hudOverlay->bottom()->setVisible(!text.isEmpty());
 }
 
 QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
@@ -965,7 +967,8 @@ int QnResourceWidget::checkedButtons() const
 int QnResourceWidget::visibleButtons() const
 {
     return (titleBar()->rightButtonsBar()->visibleButtons()
-            | titleBar()->leftButtonsBar()->visibleButtons());
+        | titleBar()->leftButtonsBar()->visibleButtons()
+        | m_hudOverlay->bottom()->visibleButtons());
 }
 
 int QnResourceWidget::calculateButtonsVisibility() const
@@ -1004,6 +1007,7 @@ void QnResourceWidget::updateButtonsVisibility()
 
     titleBar()->rightButtonsBar()->setVisibleButtons(visibleButtons);
     titleBar()->leftButtonsBar()->setVisibleButtons(visibleButtons);
+    m_hudOverlay->bottom()->setVisibleButtons(visibleButtons);
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &) const
@@ -1172,26 +1176,30 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
         && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
-    const bool showPosition = (overlaysCanBeVisible && (detailsVisible || m_mouseInWidget))
-        || forceShowPosition();
-    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
-        (m_mouseInWidget || qnRuntime->showFullInfo() || qnSettings->showFullInfo());
+    const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget)
+        || forceShowPosition()
+        || (!workbench()->windowContext()->streamSynchronizer()->isRunning()
+            && (selectionState() == SelectionState::notSelected));
+    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible
+        && (m_mouseInWidget || qnRuntime->showFullInfo() || qnSettings->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
-    const bool updatePositionTextRequired = showPosition
-        && !isOverlayWidgetVisible(m_hudOverlay->position());
-    setOverlayWidgetVisible(m_hudOverlay->position(), showPosition, animate);
+    const bool updatePositionTextRequired =
+        showPosition && !isOverlayWidgetVisible(m_hudOverlay->bottom());
+    setOverlayWidgetVisible(m_hudOverlay->bottom(), showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
 
-    const bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_hudOverlay->details()));
+    const bool updateDetailsTextRequired =
+        (showDetailedInfo && !isOverlayWidgetVisible(m_hudOverlay->details()));
     setOverlayWidgetVisible(m_hudOverlay->details(), showDetailedInfo, animate);
     if (updateDetailsTextRequired)
         updateDetailsText();
 
     setOverlayWidgetVisible(titleBar(), showButtonsOverlay, animate);
-    titleBar()->setSimpleMode(showOnlyCameraName, animate);
+    if (m_hudOverlay->scene())
+        titleBar()->setSimpleMode(showOnlyCameraName, animate);
 }
 
 bool QnResourceWidget::isHovered() const
@@ -1283,6 +1291,7 @@ void QnResourceWidget::updateSelectedState()
         return;
 
     m_selectionState = selectionState;
+    updateHud(display()->animationAllowed());
     emit selectionStateChanged(m_selectionState, {});
 }
 

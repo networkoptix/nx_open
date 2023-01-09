@@ -2,22 +2,24 @@
 
 #include "hud_overlay_widget_p.h"
 
-#include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsWidget>
 
-#include <ui/graphics/items/generic/viewport_bound_widget.h>
-#include <ui/graphics/items/overlays/resource_title_item.h>
-#include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
 
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     base_type(),
     q_ptr(main),
     titleHolder(new QnViewportBoundWidget(main)),
     title(new QnResourceTitleItem(titleHolder)),
+    bottomHolder(new QnViewportBoundWidget(main)),
+    bottom(new nx::vms::client::desktop::ResourceBottomItem(bottomHolder)),
     content(new QnViewportBoundWidget(main)),
     details(new QnHtmlTextItem()),
-    position(new QnHtmlTextItem()),
     left(new QGraphicsWidget(content)),
     right(new QGraphicsWidget(content)),
     actionIndicator(new QnActionIndicatorItem(content))
@@ -34,8 +36,8 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     right->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
     right->setAcceptedMouseButtons(Qt::NoButton);
     rightLayout->addItem(right);
-    rightLayout->addItem(position);
-    rightLayout->setAlignment(position, Qt::AlignRight | Qt::AlignBottom);
+    rightLayout->addItem(bottomHolder);
+    rightLayout->setAlignment(bottomHolder, Qt::AlignRight | Qt::AlignBottom);
 
     auto contentLayout = new QGraphicsLinearLayout(Qt::Horizontal, content);
     contentLayout->addItem(leftLayout);
@@ -43,10 +45,15 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
 
     content->setAcceptedMouseButtons(Qt::NoButton);
     titleHolder->setAcceptedMouseButtons(Qt::NoButton);
+    bottomHolder->setAcceptedMouseButtons(Qt::NoButton);
 
     auto titleLayout = new QGraphicsLinearLayout(Qt::Vertical, titleHolder);
     titleLayout->addItem(title);
     titleLayout->addStretch();
+
+    auto bottomLayout = new QGraphicsLinearLayout(Qt::Vertical, bottomHolder);
+    bottomLayout->addItem(bottom);
+    bottomLayout->setAlignment(bottom, Qt::AlignRight | Qt::AlignBottom);
 
     connect(main, &QGraphicsWidget::geometryChanged,
         this, &QnHudOverlayWidgetPrivate::updateLayout);
@@ -68,7 +75,6 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     options.autosize = true;
 
     details->setOptions(options);
-    position->setOptions(options);
 }
 
 void QnHudOverlayWidgetPrivate::updateLayout()
