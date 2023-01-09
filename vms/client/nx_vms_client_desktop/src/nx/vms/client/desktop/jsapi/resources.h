@@ -22,9 +22,7 @@ class Resources: public QObject
     using base_type = QObject;
 
 public:
-    Resources(
-        QnWorkbenchContext* context,
-        QObject* parent = nullptr);
+    Resources(QObject* parent = nullptr);
 
     virtual ~Resources() override;
 

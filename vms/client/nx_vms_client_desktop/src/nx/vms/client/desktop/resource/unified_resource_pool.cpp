@@ -43,4 +43,22 @@ UnifiedResourcePool::UnifiedResourcePool(QObject* parent):
         connectToContext(context);
 }
 
+QnResourceList UnifiedResourcePool::resources(ResourceFilter filter) const
+{
+    QnResourceList result;
+    for (const auto& systemContext: appContext()->systemContexts())
+        result.append(systemContext->resourcePool()->getResources(filter));
+    return result;
+}
+
+QnResourcePtr UnifiedResourcePool::resource(const QnUuid& id) const
+{
+    for (const auto& systemContext: appContext()->systemContexts())
+    {
+        if (const auto resource = systemContext->resourcePool()->getResourceById(id))
+            return resource;
+    }
+    return {};
+}
+
 } // namespace nx::vms::client::desktop
