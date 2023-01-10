@@ -7,6 +7,7 @@
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/event/action_parameters.h>
 #include <transaction/transaction_descriptor.h>
@@ -67,6 +68,16 @@ Result fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
 
     url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
     paramData->url = url.toString();
+    return Result();
+}
+
+Result fixRequestDataIfNeeded(nx::vms::api::LayoutData* paramData)
+{
+    for (auto& item: paramData->items)
+    {
+        if (item.id.isNull())
+            item.id = QnUuid::createUuid();
+    }
     return Result();
 }
 
@@ -144,6 +155,12 @@ QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
     }
 
     return originalTran;
+}
+
+QnTransaction<nx::vms::api::LayoutData> fixTransactionInputFromApi(
+    const QnTransaction<nx::vms::api::LayoutData>& originalTran, Result* result)
+{
+    return doFix(originalTran, result);
 }
 
 } // namespace ec2
