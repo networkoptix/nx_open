@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP sunucusuna erişilemiyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Oturum anahtarı geçersiz veya süresi dolmuş.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
     </message>
   </context>
   <context>
@@ -2193,7 +2193,7 @@
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Eklenti: %1</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -2209,11 +2209,11 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>Veritabanı %1 üzerinde yedeklendi</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Sunucu Sertifikası Hatası</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>

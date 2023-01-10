@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Mevcut güncellemeler hakkında bilgi ver</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kameraları seçin...</translation>
     </message>
     <message>
       <source>none</source>
@@ -583,7 +583,7 @@
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Bu model desteklenmiyor</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -895,7 +895,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Alt tip</translation>
     </message>
   </context>
   <context>
@@ -1169,7 +1169,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Sunucuya ulaşılamıyor</translation>
     </message>
     <message>
       <source>No access</source>
