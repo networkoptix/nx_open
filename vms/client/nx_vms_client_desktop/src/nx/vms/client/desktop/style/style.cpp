@@ -4187,7 +4187,7 @@ void Style::polish(QWidget* widget)
     if (qobject_cast<QMenu*>(widget))
     {
         widget->setAttribute(Qt::WA_TranslucentBackground);
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
 #endif
         popupToCustomizeShadow = widget;
