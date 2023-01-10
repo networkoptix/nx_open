@@ -242,21 +242,14 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
     auto left = leftIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
     auto right = rightIndex.data(ServerUpdatesModel::UpdateItemRole).value<UpdateItemPtr>();
 
+    if (!left || !right)
+        return left != nullptr;
+
     if (left->component != right->component)
         return left->component == UpdateItem::Component::client;
 
     if (left->incompatible != right->incompatible)
         return !left->incompatible;
-
-    if (!left || !right)
-        return left < right;
-
-    if (left->offline != right->offline)
-    {
-        if (!left->offline)
-            return true;
-        return left->state != nx::vms::common::update::Status::Code::offline;
-    }
 
     QString lname = leftIndex.data(Qt::DisplayRole).toString();
     QString rname = rightIndex.data(Qt::DisplayRole).toString();
