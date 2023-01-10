@@ -15,6 +15,6 @@ if(withDistributions)
     endif()
 endif()
 
-if(withTests AND withUnitTestsArchive)
+if(withUnitTestsArchive)
     add_subdirectory(unit_tests)
 endif()
