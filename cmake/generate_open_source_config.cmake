@@ -1,5 +1,11 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include(utils)
+
+set(UPDATE_SERVER_URL "https://updates.networkoptix.com")
+set(SERVER_PLATFORMS windows_x64 linux_x64 linux_arm32 linux_arm64)
+set(SERVER_REFS_FILE_NAME "${PROJECT_BINARY_DIR}/compatible_servers.txt")
+
 nx_configure_file(
     "${open_source_root}/build_info.txt"
     ${CMAKE_CURRENT_BINARY_DIR}/distrib)
@@ -9,3 +15,31 @@ nx_configure_file(
 nx_configure_file(
     "${open_source_root}/nx_log_viewer.html"
     ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+
+function(nx_generate_compatible_servers_txt)
+    if(buildNumber STREQUAL "0")
+        file(WRITE "${SERVER_REFS_FILE_NAME}" "# No compatible Server version was detected.")
+        return()
+    endif()
+
+    set(compatible_server_urls "")
+    foreach(platform ${SERVER_PLATFORMS})
+        set(server_distribution_file_name
+            "metavms-server_update-${releaseVersion.full}-${platform}.zip")
+        list(APPEND compatible_server_urls
+            "${UPDATE_SERVER_URL}/metavms/${buildNumber}/${server_distribution_file_name}")
+    endforeach()
+
+    list(JOIN compatible_server_urls "\n" compatible_server_urls_string)
+    file(WRITE "${SERVER_REFS_FILE_NAME}" "${compatible_server_urls_string}\n")
+
+    if(NOT customization STREQUAL "metavms")
+        file(APPEND "${SERVER_REFS_FILE_NAME}"
+            "\n# Check the link below for the compatible Server version specific for your "
+            "customization.\n# Search for the version ${releaseVersion.full}.\n"
+        )
+        file(APPEND "${SERVER_REFS_FILE_NAME}" "${UPDATE_SERVER_URL}/${customization}\n")
+    endif()
+
+    nx_store_known_file("${SERVER_REFS_FILE_NAME}")
+endfunction()
