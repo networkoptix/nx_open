@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/uuid.h>
@@ -65,4 +64,3 @@ public:
     std::string toString() const;
 };
 
-Q_DECLARE_METATYPE(QnVideoWallControlMessage)

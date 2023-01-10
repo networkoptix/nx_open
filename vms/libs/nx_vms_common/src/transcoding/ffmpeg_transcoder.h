@@ -5,7 +5,6 @@
 extern "C"
 {
 #include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
 }
 
 #include <nx/utils/cryptographic_hash.h>
@@ -19,8 +18,7 @@ class QnLicensePool;
 
 class NX_VMS_COMMON_API QnFfmpegTranscoder: public QnTranscoder
 {
-    Q_OBJECT;
-
+    Q_OBJECT
 public:
     static const int MTU_SIZE = 1412;
 

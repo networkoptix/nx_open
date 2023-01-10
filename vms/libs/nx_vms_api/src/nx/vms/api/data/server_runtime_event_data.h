@@ -89,4 +89,3 @@ QN_FUSION_DECLARE_FUNCTIONS(DeviceAdvancedSettingsManifestChangedData, (json), N
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::ServerRuntimeEventData);

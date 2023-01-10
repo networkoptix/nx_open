@@ -5,16 +5,13 @@
 #include <deque>
 #include <set>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/lockable.h>
-#include <utils/camera/camera_diagnostics.h>
 #include <utils/common/aspect_ratio.h>
 
-#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/utils/url.h>
@@ -24,6 +21,7 @@
 #include <nx/vms/api/data/device_profile.h>
 
 class CameraMediaStreams;
+class CameraMediaStreamInfo;
 class CameraBitrates;
 class CameraBitrateInfo;
 
@@ -279,6 +277,3 @@ constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);
 constexpr QSize SECONDARY_STREAM_MAX_RESOLUTION =
     QnVirtualCameraResource::kMaximumSecondaryStreamResolution;
 constexpr QSize UNLIMITED_RESOLUTION(INT_MAX, INT_MAX);
-
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
-Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

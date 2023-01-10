@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <common/common_globals.h>
@@ -19,4 +17,4 @@ struct QnBackupStatusData
 };
 #define QnBackupStatusData_Fields (state)(result)(progress)(backupTimeMs)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBackupStatusData, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnBackupStatusData, (json), NX_VMS_COMMON_API)

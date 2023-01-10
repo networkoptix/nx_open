@@ -540,5 +540,3 @@ private:
 
     QAction* const m_toggleImageEnhancementAction;
 };
-
-Q_DECLARE_METATYPE(QnMediaResourceWidget *)

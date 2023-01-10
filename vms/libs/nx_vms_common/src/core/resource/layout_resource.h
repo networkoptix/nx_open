@@ -148,5 +148,3 @@ protected:
     bool m_locked = false;
 };
 
-Q_DECLARE_METATYPE(QnLayoutResourcePtr);
-Q_DECLARE_METATYPE(QnLayoutResourceList);

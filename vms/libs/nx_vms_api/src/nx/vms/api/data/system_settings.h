@@ -25,4 +25,3 @@ NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(cloudSystemID)(defau
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::SystemSettings)

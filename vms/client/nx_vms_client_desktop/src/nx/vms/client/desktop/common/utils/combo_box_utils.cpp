@@ -84,7 +84,7 @@ void insertHiddenItem(
 
 QString multipleValuesText()
 {
-    return lit("<%1>").arg(ComboBoxUtils::tr("multiple values"));
+    return QString("<%1>").arg(ComboBoxUtils::tr("multiple values"));
 }
 
 void insertMultipleValuesItem(QComboBox* combo, int index)

@@ -28,4 +28,3 @@ NX_VMS_API_DECLARE_STRUCT(EmailSettingsData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::EmailSettingsData)

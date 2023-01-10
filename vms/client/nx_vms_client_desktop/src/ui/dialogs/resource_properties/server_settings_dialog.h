@@ -50,5 +50,3 @@ private:
     nx::utils::ImplPtr<Ui::ServerSettingsDialog> ui;
     nx::utils::ImplPtr<Private> d;
 };
-
-Q_DECLARE_METATYPE(QnServerSettingsDialog::DialogPage)

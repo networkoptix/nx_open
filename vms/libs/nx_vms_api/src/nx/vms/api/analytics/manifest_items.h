@@ -250,17 +250,17 @@ QN_FUSION_DECLARE_FUNCTIONS(TypeSupportInfo, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlag, (metatype)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlag, (lexical),
     NX_VMS_API)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlags, (metatype)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EventTypeFlags, (lexical),
     NX_VMS_API)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::ObjectTypeFlag, (metatype)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::ObjectTypeFlag, (lexical),
     NX_VMS_API)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::ObjectTypeFlags, (metatype)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::ObjectTypeFlags, (lexical),
     NX_VMS_API)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::AttributeType, (metatype)(lexical),
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::AttributeType, (lexical),
     NX_VMS_API)

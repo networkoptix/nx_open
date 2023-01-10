@@ -4,9 +4,6 @@
 
 #include <atomic>
 
-#include <QtCore/QMetaType>
-#include <QtCore/QSet>
-
 #include <common/common_globals.h>
 #include <utils/common/from_this_to_shared.h>
 
@@ -449,5 +446,3 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(const Resource* re
     return toSharedPointer(resource);
 }
 
-Q_DECLARE_METATYPE(QnResourcePtr);
-Q_DECLARE_METATYPE(QnResourceList);

@@ -6,6 +6,7 @@
 
 #include <common/common_module.h>
 #include <core/resource_access/user_access_data.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/build_info.h>

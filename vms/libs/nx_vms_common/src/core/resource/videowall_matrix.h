@@ -5,7 +5,6 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <nx/utils/uuid.h>
 
 class QnVideoWallMatrix
@@ -24,13 +23,9 @@ public:
     }
 };
 
-Q_DECLARE_METATYPE(QnVideoWallMatrix)
-Q_DECLARE_TYPEINFO(QnVideoWallMatrix, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallMatrix> QnVideoWallMatrixList;
 typedef QHash<QnUuid, QnVideoWallMatrix> QnVideoWallMatrixMap;
 
-Q_DECLARE_METATYPE(QnVideoWallMatrixList)
-Q_DECLARE_METATYPE(QnVideoWallMatrixMap)
 
 #endif // VIDEO_WALL_MATRIX_H

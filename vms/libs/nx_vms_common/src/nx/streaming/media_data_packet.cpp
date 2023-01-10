@@ -12,7 +12,7 @@
 #include <nx/streaming/config.h>
 
 #include <motion/motion_detection.h>
-#include <utils/media/sse_helper.h>
+
 
 #if defined(Q_OS_MACOS) && defined(__amd64)
     #include <smmintrin.h>

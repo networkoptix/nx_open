@@ -4,7 +4,6 @@
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
-#include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
 
@@ -30,8 +29,3 @@ class NX_VMS_COMMON_API QnCommonMetaTypes
 public:
     static void initialize();
 };
-
-Q_DECLARE_METATYPE(QHostAddress);
-Q_DECLARE_METATYPE(QAuthenticator);
-Q_DECLARE_METATYPE(Qt::ConnectionType);
-Q_DECLARE_METATYPE(Qt::Orientations);

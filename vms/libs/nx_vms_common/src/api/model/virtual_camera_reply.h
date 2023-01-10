@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -13,5 +11,5 @@ struct QnVirtualCameraReply
 };
 #define QnVirtualCameraReply_Fields (id)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraReply, (json)(ubjson), NX_VMS_COMMON_API)
 

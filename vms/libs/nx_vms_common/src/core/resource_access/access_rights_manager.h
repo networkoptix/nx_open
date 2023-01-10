@@ -14,7 +14,6 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API AccessRightsManager: public AbstractAccessRightsManager
 {
-    Q_OBJECT
     using base_type = AbstractAccessRightsManager;
 
 public:

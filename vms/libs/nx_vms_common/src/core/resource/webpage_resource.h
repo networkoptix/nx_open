@@ -29,8 +29,6 @@ constexpr auto nxReflectVisitAllEnumItems(WebPageSubtype*, Visitor&& visitor)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::WebPageSubtype)
-
 class NX_VMS_COMMON_API QnWebPageResource: public QnResource
 {
     Q_OBJECT
@@ -75,5 +73,3 @@ private:
     nx::vms::api::ResourceStatus m_status = nx::vms::api::ResourceStatus::undefined;
 };
 
-Q_DECLARE_METATYPE(QnWebPageResourcePtr)
-Q_DECLARE_METATYPE(QnWebPageResourceList)

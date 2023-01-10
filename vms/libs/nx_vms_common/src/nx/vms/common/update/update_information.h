@@ -74,5 +74,3 @@ NX_VMS_COMMON_API InformationError fetchErrorToInformationError(
     const nx::vms::update::FetchError error);
 
 } // namespace nx::vms::common::update
-
-Q_DECLARE_METATYPE(nx::vms::common::update::Information)

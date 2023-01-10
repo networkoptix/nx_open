@@ -4,7 +4,6 @@
 #define QN_LATIN1_ARRAY_H
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/to_string.h>
@@ -28,6 +27,5 @@ template<> struct IsQByteArrayAlike<QnLatin1Array, std::void_t<>>: public std::f
 
 } // namespace nx::reflect::detail
 
-Q_DECLARE_METATYPE(QnLatin1Array)
 
 #endif // QN_LATIN1_ARRAY_H

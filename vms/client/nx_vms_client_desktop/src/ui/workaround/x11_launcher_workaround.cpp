@@ -53,14 +53,14 @@ bool QnX11LauncherWorkaround::isUnity3DSession() {
 
     bool hasUnityPanelService = false;
 
-    QDir procDir(lit("/proc"));
+    QDir procDir("/proc");
     QStringList entries = procDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach (const QString &procEntry, entries) {
-        QFileInfo info(lit("/proc/") + procEntry + lit("/exe"));
+        QFileInfo info(QString("/proc/") + procEntry + "/exe");
         QString realPath = info.symLinkTarget();
-        if (realPath.endsWith(lit("unity-panel-service")))
+        if (realPath.endsWith("unity-panel-service"))
             hasUnityPanelService = true;
-        if (realPath.endsWith(lit("unity-2d-panel")))
+        if (realPath.endsWith("unity-2d-panel"))
             return false;
     }
     return hasUnityPanelService;

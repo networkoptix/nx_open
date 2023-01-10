@@ -17,8 +17,6 @@ namespace nx::vms::utils {
  */
 class TranslationOverlayItem: public QTranslator
 {
-    Q_OBJECT
-
 public:
     TranslationOverlayItem(QObject* parent = nullptr);
     virtual ~TranslationOverlayItem();

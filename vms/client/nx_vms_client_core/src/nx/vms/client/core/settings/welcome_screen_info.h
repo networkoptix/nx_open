@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QMetaType>
 #include <QtCore/QObject>
 
 namespace nx::vms::client::core::welcome_screen {

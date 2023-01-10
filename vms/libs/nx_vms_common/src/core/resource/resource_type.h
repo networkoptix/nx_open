@@ -60,8 +60,6 @@ private:
     mutable bool m_isCameraSet = false;
 };
 
-Q_DECLARE_METATYPE(QnResourceTypeList)
-
 class NX_VMS_COMMON_API QnResourceTypePool
 {
 public:

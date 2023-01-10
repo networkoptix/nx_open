@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMetaType>
 
 #include "data_macros.h"
 
@@ -28,5 +27,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(KeyValueData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::KeyValueData)
-Q_DECLARE_METATYPE(nx::vms::api::KeyValueDataList)

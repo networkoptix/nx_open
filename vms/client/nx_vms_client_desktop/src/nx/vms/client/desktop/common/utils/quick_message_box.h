@@ -29,5 +29,3 @@ public:
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(QDialogButtonBox::StandardButton)

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include "data_macros.h"
 
 namespace nx {
@@ -21,5 +19,3 @@ NX_VMS_API_DECLARE_STRUCT(VideoWallLicenseOverflowData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::api::VideoWallLicenseOverflowData)

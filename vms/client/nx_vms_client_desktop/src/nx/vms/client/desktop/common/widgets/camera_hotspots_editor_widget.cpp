@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/math/math.h>
 
 namespace {
 

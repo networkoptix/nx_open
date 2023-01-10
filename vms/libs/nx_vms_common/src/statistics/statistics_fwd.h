@@ -19,5 +19,3 @@ typedef QHash<QString, QString> QnStatisticValuesHash;
 
 typedef QList<QnStatisticValuesHash> QnMetricHashesList;
 typedef QSet<QString> QnStringsSet;
-
-Q_DECLARE_METATYPE(QnMetricHashesList)

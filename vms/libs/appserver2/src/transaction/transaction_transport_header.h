@@ -53,6 +53,4 @@ namespace ec2 {
 
 } // namespace ec2
 
-Q_DECLARE_METATYPE(ec2::QnTransactionTransportHeader);
-
 #endif // QN_TRANSACTION_TRANSPORT_HEADER_H

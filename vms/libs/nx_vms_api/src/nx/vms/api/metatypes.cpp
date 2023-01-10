@@ -5,7 +5,6 @@
 #include <atomic>
 
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <nx/fusion/serialization/json_functions.h>
 

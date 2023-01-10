@@ -80,4 +80,3 @@ QN_FUSION_DECLARE_FUNCTIONS(
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::Timestamp)

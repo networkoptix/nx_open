@@ -12,8 +12,6 @@ class NX_VMS_COMMON_API QnAbstractDataConsumer
     public QnLongRunnable,
     public QnAbstractMediaDataReceptor
 {
-    Q_OBJECT
-
 public:
     QnAbstractDataConsumer(int maxQueueSize);
     virtual ~QnAbstractDataConsumer(){ stop(); }

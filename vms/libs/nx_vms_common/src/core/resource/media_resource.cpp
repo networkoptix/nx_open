@@ -12,6 +12,7 @@
 #include "resource_media_layout.h"
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource/resource_media_layout.h>
 
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/streaming/abstract_stream_data_provider.h>

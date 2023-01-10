@@ -7,7 +7,11 @@
 #ifdef __cplusplus
 
 /* Useful utils */
+#include <nx/utils/uuid.h>
 #include <common/common_globals.h>
+#include <nx/utils/string.h>
+#include <nx/reflect/enum_instrument.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 /* STL headers. */
 #include <algorithm>

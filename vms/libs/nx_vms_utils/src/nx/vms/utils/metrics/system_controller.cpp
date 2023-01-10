@@ -2,8 +2,8 @@
 
 #include "system_controller.h"
 
-#include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::utils::metrics {
 

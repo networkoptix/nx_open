@@ -15,6 +15,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/text/time_strings.h>
 #include <nx/vms/text/archive_duration.h>
+#include <utils/math/math.h>
 
 namespace {
 

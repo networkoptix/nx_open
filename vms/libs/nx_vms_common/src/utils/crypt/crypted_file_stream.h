@@ -21,7 +21,6 @@ namespace nx::utils {
 class NX_VMS_COMMON_API CryptedFileStream: public QIODevice
 {
     Q_OBJECT
-
     using Key = crypto_functions::Key;
 
 public:

@@ -5,7 +5,7 @@
 
 namespace
 {
-    const auto kMetricPrefix = lit("clck_cnt");
+    const QString kMetricPrefix("clck_cnt");
 }
 
 QnControlsStatisticsModule::QnControlsStatisticsModule(QObject* parent) :
@@ -22,7 +22,7 @@ QnStatisticValuesHash QnControlsStatisticsModule::values() const
     for (auto it = m_clicksCount.cbegin(); it != m_clicksCount.cend(); ++it)
     {
         const auto alias = it.key();
-        const auto fullAlias = lit("%1_%2").arg(kMetricPrefix, alias);
+        const QString fullAlias = QString("%1_%2").arg(kMetricPrefix, alias);
         const auto value = QString::number(it.value());
         result.insert(fullAlias, value);
     }

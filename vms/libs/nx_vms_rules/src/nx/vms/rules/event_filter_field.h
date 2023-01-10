@@ -14,8 +14,6 @@ namespace nx::vms::rules {
  */
 class NX_VMS_RULES_API EventFilterField: public Field
 {
-    Q_OBJECT
-
 public:
     EventFilterField();
 

@@ -37,5 +37,3 @@ NX_VMS_API bool deserialize(
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::CameraDataEx)
-Q_DECLARE_METATYPE(nx::vms::api::CameraDataExList)

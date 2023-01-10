@@ -29,7 +29,7 @@
 namespace nx {
 namespace p2p {
 
-const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
+const QString MessageBus::kCloudPathPrefix("/cdb");
 
 using namespace ec2;
 using namespace vms::api;
@@ -153,13 +153,13 @@ void MessageBus::printTran(
     QString directionName;
     if (direction == Connection::Direction::outgoing)
     {
-        msgName = lit("Send");
-        directionName = lit("--->");
+        msgName = "Send";
+        directionName = "--->";
     }
     else
     {
-        msgName = lit("Got");
-        directionName = lit("<---");
+        msgName = "Got";
+        directionName = "<---";
     }
 
     NX_VERBOSE(this, "%1 tran:\t %2 %3 %4. Command: %5. Seq: %6. timestamp: %7. Created by: %8(dbId=%9).",

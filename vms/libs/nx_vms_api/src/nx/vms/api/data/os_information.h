@@ -47,5 +47,3 @@ QN_FUSION_DECLARE_FUNCTIONS(OsInformation,
 } // namespace api
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::api::OsInformation)

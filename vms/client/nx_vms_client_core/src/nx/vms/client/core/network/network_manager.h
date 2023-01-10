@@ -138,5 +138,3 @@ private:
 
 } // namespace nx::vms::client::core
 
-Q_DECLARE_METATYPE(nx::vms::client::core::NetworkManager::Response);
-Q_DECLARE_METATYPE(std::shared_ptr<nx::network::http::AsyncClient>);

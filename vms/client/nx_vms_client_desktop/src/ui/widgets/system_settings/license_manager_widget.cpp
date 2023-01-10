@@ -494,7 +494,7 @@ void QnLicenseManagerWidget::updateFromServer(
     NX_VERBOSE(this, licenseRequestLogString(messageBody, licenseKey));
     QNetworkReply* reply = m_httpClient->post(request, messageBody);
 
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
+    connect(reply, &QNetworkReply::errorOccurred, this, &QnLicenseManagerWidget::at_downloadError);
     connect(reply, &QNetworkReply::finished, this,
         [this, licenseKey, infoMode, url, reply]
         {

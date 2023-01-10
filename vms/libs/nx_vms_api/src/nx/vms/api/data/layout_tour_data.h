@@ -58,8 +58,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutTourData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::LayoutTourItemData)
-Q_DECLARE_METATYPE(nx::vms::api::LayoutTourItemDataList)
-Q_DECLARE_METATYPE(nx::vms::api::LayoutTourData)
-Q_DECLARE_METATYPE(nx::vms::api::LayoutTourDataList)
-Q_DECLARE_METATYPE(nx::vms::api::LayoutTourSettings)

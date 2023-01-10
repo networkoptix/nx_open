@@ -5,7 +5,6 @@
 
 #include <QtCore/QSharedPointer>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMetaType>
 
 #include <api/model/statistics_reply.h>
 
@@ -145,7 +144,5 @@ private:
     int m_hddCount;
     int m_networkCount;
 };
-
-Q_DECLARE_METATYPE(QnServerResourceWidget *)
 
 #endif // QN_SERVER_RESOURCE_WIDGET_H

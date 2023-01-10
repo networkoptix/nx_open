@@ -12,7 +12,6 @@
 
 extern "C" {
 #include <libavformat/avio.h>
-#include <libavformat/avformat.h>
 }
 
 namespace nx {

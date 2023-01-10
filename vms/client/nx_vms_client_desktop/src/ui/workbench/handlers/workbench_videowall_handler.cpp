@@ -2,8 +2,7 @@
 
 #include "workbench_videowall_handler.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/algorithm/cxx11/copy_if.hpp>
+#include <algorithm>
 
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
@@ -699,13 +698,15 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     if (!videowall)
         return false;
 
-    return boost::algorithm::any_of(videowall->items()->getItems().values(), offlineItemOnThisPc());
+    const auto& values = videowall->items()->getItems().values();
+    return std::any_of(values.begin(), values.end(), offlineItemOnThisPc());
 }
 
 void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
     QList<QnVideoWallItem> items;
-    boost::algorithm::copy_if(videoWall->items()->getItems().values(), std::back_inserter(items),
+    const auto& values = videoWall->items()->getItems().values();
+    std::copy_if(values.begin(), values.end(), std::back_inserter(items),
         offlineItemOnThisPc());
 
     NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
@@ -2065,12 +2066,13 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     };
     Action dropAction = Action::NoAction;
 
-    bool hasDesktopCamera = boost::algorithm::any_of(targetResources,
+    bool hasDesktopCamera = std::any_of(targetResources.begin(), targetResources.end(),
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::desktop_camera); });
 
     if (currentLayout)
     {
-        hasDesktopCamera |= boost::algorithm::any_of(currentLayout->getItems().values(),
+        const auto& values = currentLayout->getItems().values();
+        hasDesktopCamera |= std::any_of(values.begin(), values.end(),
             [this](const QnLayoutItemData &item)
         {
             QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);

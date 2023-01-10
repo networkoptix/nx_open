@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/synctime.h>
 
+#include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 

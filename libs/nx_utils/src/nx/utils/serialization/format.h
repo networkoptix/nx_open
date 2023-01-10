@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
+#include <string_view>
+
+#include <QtCore/QByteArray>
 
 #include <nx/reflect/enum_instrument.h>
 
@@ -45,5 +47,3 @@ NX_UTILS_API SerializationFormat serializationFormatFromHttpContentType(
     const QByteArray& httpContentType);
 
 } // namespace Qn
-
-Q_DECLARE_METATYPE(Qn::SerializationFormat)

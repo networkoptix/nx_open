@@ -6,7 +6,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMetaType>
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
@@ -181,9 +180,6 @@ private:
     // Is full license valid (signature2 is used)
     bool m_isValid2 = false;
 };
-
-Q_DECLARE_METATYPE(QnLicensePtr)
-Q_DECLARE_METATYPE(QnLicenseList)
 
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).

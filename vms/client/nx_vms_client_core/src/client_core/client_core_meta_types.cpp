@@ -18,6 +18,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
+#include <nx/vms/api/types/resource_metatypes.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
@@ -37,7 +38,7 @@
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
 #include <nx/vms/client/core/network/oauth_client.h>
-#include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/network/server_certificate_validation_level_metatype.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>

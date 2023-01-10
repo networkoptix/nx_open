@@ -7,7 +7,6 @@
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
-#include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
 #include <QtGui/QVector3D>

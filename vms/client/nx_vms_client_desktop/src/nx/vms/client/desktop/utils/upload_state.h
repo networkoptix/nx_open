@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
@@ -64,5 +63,3 @@ struct UploadState
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::UploadState)

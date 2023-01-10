@@ -314,5 +314,3 @@ bool AbstractSearchListModel::truncateDataToMaximumCount(
 }
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::AbstractSearchListModel::FetchResult)

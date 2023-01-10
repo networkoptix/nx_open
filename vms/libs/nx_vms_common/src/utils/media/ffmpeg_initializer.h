@@ -8,7 +8,6 @@
 class NX_VMS_COMMON_API QnFfmpegInitializer: public QObject
 {
     Q_OBJECT
-
 public:
     QnFfmpegInitializer(QObject* parent = nullptr);
     ~QnFfmpegInitializer();

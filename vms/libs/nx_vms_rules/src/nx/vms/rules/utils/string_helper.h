@@ -18,7 +18,6 @@ class NX_VMS_RULES_API StringHelper:
     public common::SystemContextAware
 {
     Q_OBJECT
-
 public:
     StringHelper(common::SystemContext* context);
 

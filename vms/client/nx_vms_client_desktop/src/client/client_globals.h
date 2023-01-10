@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QFlags>
-#include <QtCore/QMetaType>
 
 #include <common/common_meta_types.h>
 #include <nx/reflect/enum_instrument.h>
@@ -498,12 +497,3 @@ namespace Qn
 
 
 } // namespace Qn
-
-Q_DECLARE_METATYPE(Qn::ItemDataRole)
-Q_DECLARE_METATYPE(Qn::ItemRole)
-Q_DECLARE_METATYPE(Qn::TimeMode)
-Q_DECLARE_METATYPE(Qn::ThumbnailStatus)
-Q_DECLARE_METATYPE(Qn::ImageBehavior)
-Q_DECLARE_METATYPE(Qn::PaneState)
-Q_DECLARE_METATYPE(Qn::WorkbenchPane)
-Q_DECLARE_METATYPE(Qn::LightModeFlags)

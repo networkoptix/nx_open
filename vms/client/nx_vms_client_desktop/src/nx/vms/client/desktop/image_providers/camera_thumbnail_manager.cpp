@@ -6,7 +6,9 @@
 
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/server_rest_connection.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_media_layout.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>

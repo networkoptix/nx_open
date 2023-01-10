@@ -44,7 +44,7 @@ MacAddress::MacAddress(const QStringView& mac)
     {
         QChar delimiter;
 
-        static const std::list<int> kDelimiterIndices{2,5,8,11,14};
+        static const QList<int> kDelimiterIndices{2,5,8,11,14};
 
         // Check variant with delimiters. Only '-' or ':' are allowed.
         for (const QChar& c: kAllowedDelimiters)

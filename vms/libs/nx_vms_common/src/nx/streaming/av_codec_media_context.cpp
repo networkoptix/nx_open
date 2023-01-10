@@ -24,7 +24,7 @@ AVCodecID convertCodecIdFromFfmpeg3_1(AVCodecID id)
 }
 
 template<typename T>
-bool deserialize(CodecParameters& codecParameters, const char* data, int size)
+bool deserializeCodecParameters(CodecParameters& codecParameters, const char* data, int size)
 {
     if (size < 4 || data[0] != '[' || data[1] != 'l') //< Ubjson starts with CodecID ('l').
         return false;
@@ -114,7 +114,7 @@ bool CodecParameters::deserialize(const char* data, int size, int version)
     if (m_version == 0)
     {
         // TODO #lbusygin: get rid of this version when the mobile client stops supporting servers < 5.0
-        if (!::deserialize<QnMediaContextSerializableData_4_2>(*this, data, size))
+        if (!::deserializeCodecParameters<QnMediaContextSerializableData_4_2>(*this, data, size))
         {
             NX_WARNING(this, "Failed to deserialize codec parameters data(version 4.2)");
             return false;
@@ -123,7 +123,7 @@ bool CodecParameters::deserialize(const char* data, int size, int version)
     }
     else if (m_version == 1)
     {
-        if (!::deserialize<QnMediaContextSerializableData_4_2>(*this, data, size))
+        if (!::deserializeCodecParameters<QnMediaContextSerializableData_4_2>(*this, data, size))
         {
             NX_WARNING(this, "Failed to deserialize codec parameters data");
             return false;
@@ -133,7 +133,7 @@ bool CodecParameters::deserialize(const char* data, int size, int version)
     {
         if (m_version > 2)
             NX_DEBUG(this, "Try to deserialize data from the future version");
-        if (!::deserialize<QnMediaContextSerializableData>(*this, data, size))
+        if (!::deserializeCodecParameters<QnMediaContextSerializableData>(*this, data, size))
         {
             NX_WARNING(this, "Failed to deserialize codec parameters data");
             return false;

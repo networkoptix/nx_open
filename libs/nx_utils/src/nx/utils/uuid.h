@@ -5,8 +5,8 @@
 #include <string>
 #include <string_view>
 
+#include <QtCore/QObject>
 #include <QtCore/QByteArray>
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 
@@ -111,8 +111,6 @@ struct hash<QnUuid>
 };
 
 } // namespace std
-
-Q_DECLARE_METATYPE(QnUuid);
 
 namespace nx::utils {
 

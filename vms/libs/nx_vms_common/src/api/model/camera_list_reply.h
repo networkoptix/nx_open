@@ -17,4 +17,3 @@ public:
 #define QnCameraListReply_Fields (physicalIdList)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraListReply, (json)(ubjson), NX_VMS_COMMON_API)
-Q_DECLARE_METATYPE(QnCameraListReply)

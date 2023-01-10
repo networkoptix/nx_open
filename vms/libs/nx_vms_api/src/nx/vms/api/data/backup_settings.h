@@ -37,5 +37,3 @@ NX_REFLECTION_INSTRUMENT(BackupSettings, BackupSettings_Fields)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::BackupSettings)
-Q_DECLARE_METATYPE(nx::vms::api::BackupSettingsList)

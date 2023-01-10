@@ -102,5 +102,3 @@ NX_REFLECTION_INSTRUMENT(VirtualCameraState,
     (status)(error)(cameraId)(lockUserId)(queue)(currentIndex)(consumeProgress))
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::VirtualCameraState)

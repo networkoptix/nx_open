@@ -47,6 +47,3 @@ QN_FUSION_DECLARE_FUNCTIONS(Override, (json))
 
 } // namespace ptz
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::ptz::OverridePart);
-Q_DECLARE_METATYPE(nx::vms::common::ptz::Override);

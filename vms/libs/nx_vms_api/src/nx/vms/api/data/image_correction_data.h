@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/compare.h>
 
 #include "data_macros.h"
@@ -44,8 +42,6 @@ NX_VMS_API_DECLARE_STRUCT_EX(ImageCorrectionData, (ubjson)(json)(xml)(csv_record
 NX_REFLECTION_INSTRUMENT(ImageCorrectionData, ImageCorrectionData_Fields)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::ImageCorrectionData)
 
 // Compatibility-layer functions to maintain old way of (de)serializing in the server sql database.
 void NX_VMS_API serialize_field(const nx::vms::api::ImageCorrectionData& data, QVariant* target);

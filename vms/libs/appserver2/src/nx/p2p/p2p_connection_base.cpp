@@ -184,10 +184,8 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
     NX_DEBUG(
         this,
-        lit("Connection to peer %1 canceled from state %2. Reason: %3")
-        .arg(m_remotePeer.id.toString())
-        .arg(toString(state()))
-        .arg(reason));
+        "Connection to peer %1 canceled from state %2. Reason: %3",
+        m_remotePeer.id.toString(), toString(state()), reason);
     m_lastErrorMessage = reason;
     setState(newState);
 }
@@ -213,7 +211,7 @@ void ConnectionBase::onHttpClientDone()
 
     const int statusCode = m_httpClient->response()->statusLine.statusCode;
 
-    NX_VERBOSE(this, lit("%1. statusCode = %2").arg(Q_FUNC_INFO).arg(statusCode));
+    NX_VERBOSE(this, "%1. statusCode = %2", Q_FUNC_INFO, statusCode);
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
     {

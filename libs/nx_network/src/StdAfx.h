@@ -11,3 +11,6 @@
 #else
 #    include <arpa/inet.h>
 #endif
+
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/http_types.h>

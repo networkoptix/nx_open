@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
 
@@ -481,8 +480,3 @@ private:
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
-Q_DECLARE_METATYPE(QnResourceWidget::Options)
-Q_DECLARE_METATYPE(QnResourceWidget *)
-Q_DECLARE_METATYPE(QnResourceWidgetList);

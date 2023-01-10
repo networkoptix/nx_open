@@ -6,7 +6,6 @@
 
 class NX_VMS_COMMON_API QnThumbnailsArchiveDelegate: public QnAbstractArchiveDelegate
 {
-    Q_OBJECT;
 public:
     QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr baseDelegate);
 

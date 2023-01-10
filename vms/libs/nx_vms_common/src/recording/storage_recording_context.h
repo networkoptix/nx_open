@@ -11,11 +11,6 @@
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/streaming/video_data_packet.h>
 
-extern "C"
-{
-#include <libavformat/avformat.h>
-}
-
 #include <QtCore/QString>
 
 namespace nx {

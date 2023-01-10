@@ -6,7 +6,6 @@
 #include <nx/utils/log/assert.h>
 
 #include <typeinfo>
-#include <QtCore/QMetaType>
 
 class QPoint;
 class QPointF;

@@ -23,5 +23,3 @@ QN_FUSION_DECLARE_FUNCTIONS(Watermark, (json), NX_VMS_COMMON_API)
 
 } // namespace core
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::core::Watermark)

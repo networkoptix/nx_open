@@ -216,6 +216,3 @@ private:
     nx::core::resource::edge::EdgeServerStateTracker* edgeServerStateTracker();
     QScopedPointer<nx::core::resource::edge::EdgeServerStateTracker> m_edgeServerStateTracker;
 };
-
-Q_DECLARE_METATYPE(QnMediaServerResourcePtr)
-Q_DECLARE_METATYPE(QnMediaServerResourceList)

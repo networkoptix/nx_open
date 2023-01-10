@@ -3,8 +3,6 @@
 #ifndef QN_PTZ_MAPPER_H
 #define QN_PTZ_MAPPER_H
 
-#include <QtCore/QMetaType>
-
 #include <utils/math/space_mapper.h>
 
 #include <nx/vms/common/ptz/vector.h>
@@ -49,7 +47,5 @@ private:
     QnSpaceMapperPtr<Vector> m_outputMapper;
     QnPtzLimits m_logicalLimits;
 };
-
-Q_DECLARE_METATYPE(QnPtzMapperPtr)
 
 #endif // QN_PTZ_MAPPER_H

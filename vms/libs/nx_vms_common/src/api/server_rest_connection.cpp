@@ -2,6 +2,8 @@
 
 #include "server_rest_connection.h"
 
+#include <QtNetwork/QAuthenticator>
+
 #include <atomic>
 
 #include <api/helpers/chunks_request_data.h>

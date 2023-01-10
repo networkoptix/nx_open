@@ -2,8 +2,7 @@
 
 #include "user_roles_settings_model.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
+#include <algorithm>
 
 #include <QtGui/QBrush>
 
@@ -148,8 +147,7 @@ bool QnUserRolesSettingsModel::isUserRoleValid(const UserRoleData& userRole) con
     if (m_predefinedNames.contains(name))
         return false;
 
-    using boost::algorithm::any_of;
-    return !any_of(m_userRoles,
+    return !std::any_of(m_userRoles.begin(), m_userRoles.end(),
         [&](const UserRoleData& other)
         {
             return other.id != userRole.id
@@ -159,8 +157,7 @@ bool QnUserRolesSettingsModel::isUserRoleValid(const UserRoleData& userRole) con
 
 bool QnUserRolesSettingsModel::isValid() const
 {
-    using boost::algorithm::all_of;
-    return all_of(m_userRoles,
+    return std::all_of(m_userRoles.begin(), m_userRoles.end(),
         [this](const UserRoleData& role) { return isUserRoleValid(role); });
 }
 

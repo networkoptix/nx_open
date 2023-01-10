@@ -702,7 +702,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
             request.timestampUs = localParameters.utcTimestampMsec == latestScreenshotTime
                 ? nx::api::ImageRequest::kLatestThumbnail
-                : microseconds(localParameters.utcTimestampMsec * 1000);
+                : std::chrono::microseconds(localParameters.utcTimestampMsec * 1000);
 
             imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);
         }

@@ -75,4 +75,4 @@ void PrintTo(const EncodedString& value, ::std::ostream* os);
 
 } // namespace nx::vms::client::core
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::client::core::EncodedString, (metatype)(lexical)(json))
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::client::core::EncodedString, (lexical)(json))

@@ -29,5 +29,3 @@ struct NX_VMS_COMMON_API PersistentUpdateStorage
 QN_FUSION_DECLARE_FUNCTIONS(PersistentUpdateStorage, (ubjson)(json), NX_VMS_COMMON_API)
 
 } // namespace nx::vms::common::update
-
-Q_DECLARE_METATYPE(nx::vms::common::update::PersistentUpdateStorage);

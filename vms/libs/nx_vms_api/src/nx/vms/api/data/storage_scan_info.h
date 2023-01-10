@@ -39,4 +39,3 @@ using StorageScanInfoFullMap = Map<QnUuid, StorageScanInfoFull>;
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::StorageScanInfo)

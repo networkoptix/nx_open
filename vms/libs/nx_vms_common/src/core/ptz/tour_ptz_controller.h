@@ -16,7 +16,6 @@ using QnPtzTourHash = QHash<QString, QnPtzTour>;
 
 class NX_VMS_COMMON_API QnTourPtzController: public QnProxyPtzController
 {
-    Q_OBJECT
     using base_type = QnProxyPtzController;
 
 public:

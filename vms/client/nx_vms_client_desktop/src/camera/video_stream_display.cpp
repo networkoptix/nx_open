@@ -6,7 +6,8 @@
 #include <chrono>
 
 extern "C" {
-#include <libavutil/imgutils.h>
+    #include <libavutil/imgutils.h>
+    #include <libswscale/swscale.h>
 } // extern "C"
 
 #include <client/client_module.h>

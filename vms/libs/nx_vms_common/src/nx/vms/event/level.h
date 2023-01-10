@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 #include "event_fwd.h"
@@ -27,5 +25,3 @@ NX_VMS_COMMON_API Level levelOf(const AbstractActionPtr& action);
 NX_VMS_COMMON_API Level levelOf(const EventParameters& params);
 
 } // namespace nx::vms::event
-
-Q_DECLARE_METATYPE(nx::vms::event::Level);

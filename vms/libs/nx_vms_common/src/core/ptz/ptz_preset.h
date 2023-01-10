@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
-#include <QtGui/QVector3D>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
@@ -27,7 +24,6 @@ NX_REFLECTION_ENUM_CLASS(PresetType,
 
 } // namespace nx::core::ptz
 
-Q_DECLARE_METATYPE(nx::core::ptz::PresetType)
 
 struct NX_VMS_COMMON_API QnPtzPreset
 {
@@ -49,8 +45,6 @@ public:
 #define QnPtzPreset_Fields (id)(name)
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzPreset, (json), NX_VMS_COMMON_API);
 
-Q_DECLARE_METATYPE(QnPtzPreset)
-Q_DECLARE_METATYPE(QnPtzPresetList)
 
 struct QnPtzPresetData
 {
@@ -90,4 +84,3 @@ using QnPtzPresetRecordHash = QHash<QString, QnPtzPresetRecord>;
 
 using QnPtzPresetMapping = QMap<QString, QnPtzPreset>;
 
-Q_DECLARE_METATYPE(QnPtzPresetRecordHash);

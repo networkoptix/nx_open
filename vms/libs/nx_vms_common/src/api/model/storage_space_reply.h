@@ -5,7 +5,6 @@
 
 #include <QtCore/QString>
 #include <QtCore/QVariant>
-#include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -19,6 +18,6 @@ struct QnStorageSpaceReply
 
 #define QnStorageSpaceReply_Fields (storages)(storageProtocols)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnStorageSpaceReply, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageSpaceReply, (json), NX_VMS_COMMON_API)
 
 #endif // QN_STORAGE_SPACE_DATA_H

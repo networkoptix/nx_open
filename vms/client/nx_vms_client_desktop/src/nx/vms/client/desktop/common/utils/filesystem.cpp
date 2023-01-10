@@ -19,15 +19,15 @@ QString FileSystemStrings::suffix(FileExtension ext)
     switch (ext)
     {
         case FileExtension::avi:
-            return lit("avi");
+            return "avi";
         case FileExtension::mkv:
-            return lit("mkv");
+            return "mkv";
         case FileExtension::mp4:
-            return lit("mp4");
+            return "mp4";
         case FileExtension::nov:
-            return lit("nov");
+            return "nov";
         case FileExtension::exe:
-            return lit("exe");
+            return "exe";
         default:
             NX_ASSERT(false, "Should never get here");
             return QString();
@@ -36,16 +36,16 @@ QString FileSystemStrings::suffix(FileExtension ext)
 
 FileExtension FileSystemStrings::extension(const QString& suffix, FileExtension defaultValue)
 {
-    if (suffix == lit("exe"))
+    if (suffix == "exe")
         return FileExtension::exe;
 
-    if (suffix == lit("avi"))
+    if (suffix == "avi")
         return FileExtension::avi;
 
-    if (suffix == lit("mp4"))
+    if (suffix == "mp4")
         return FileExtension::mp4;
 
-    if (suffix == lit("nov"))
+    if (suffix == "nov")
         return FileExtension::nov;
 
     return defaultValue;
@@ -74,7 +74,7 @@ QString FileSystemStrings::description(FileExtension extension)
 
 QString FileSystemStrings::filterDescription(FileExtension ext)
 {
-    const QString formatTemplate(lit("%1 (*.%2)"));
+    const QString formatTemplate("%1 (*.%2)");
     return formatTemplate.arg(description(ext)).arg(suffix(ext));
 }
 
@@ -134,7 +134,7 @@ QVariant FileExtensionModel::data(const QModelIndex& index, int role) const
         case Qt::AccessibleDescriptionRole:
             return FileSystemStrings::filterDescription(extension);
         case Qn::ShortTextRole:
-            return lit(".%1").arg(FileSystemStrings::suffix(extension));
+            return QString(".%1").arg(FileSystemStrings::suffix(extension));
         case ExtensionRole:
             return QVariant::fromValue(extension);
         default:

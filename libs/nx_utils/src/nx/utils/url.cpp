@@ -4,6 +4,7 @@
 
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QDataStream>
+#include <QtCore/QJsonValue>
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log.h>
@@ -536,6 +537,17 @@ QString toString(const nx::utils::Url& value)
 }
 
 } // namespace nx::utils
+
+void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target)
+{
+    *target = QJsonValue(url.toString());
+}
+
+bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target)
+{
+    *target = nx::utils::Url(value.toString());
+    return true;
+}
 
 QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url)
 {

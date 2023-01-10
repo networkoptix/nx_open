@@ -18,8 +18,6 @@ namespace event {
 */
 class NX_VMS_COMMON_API Rule: public QObject
 {
-    Q_OBJECT
-
 public:
     Rule();
     virtual ~Rule() override;
@@ -120,6 +118,3 @@ private:
 } // namespace event
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::event::RulePtr)
-Q_DECLARE_METATYPE(nx::vms::event::RuleList)

@@ -49,5 +49,3 @@ QN_FUSION_DECLARE_FUNCTIONS(EncodedCredentials, (json))
 void PrintTo(const EncodedCredentials& value, ::std::ostream* os);
 
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::EncodedCredentials)

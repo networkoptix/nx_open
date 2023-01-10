@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMetaType>
 
 namespace nx::vms::client::core {
 
@@ -19,5 +18,3 @@ public:
 };
 
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::DateRange)

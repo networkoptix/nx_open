@@ -4,16 +4,16 @@
 
 #include <thread>
 
-#define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
-#include <nx/kit/debug.h>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QSize>
 
+#define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
+
+#include <nx/kit/debug.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
-
-#include <QtCore/QSize>
 
 namespace nx {
 namespace utils {

@@ -313,8 +313,6 @@ NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
 
 } // namespace nx::network
 
-Q_DECLARE_METATYPE(nx::network::HostAddress)
-Q_DECLARE_METATYPE(nx::network::SocketAddress)
 
 namespace std {
 

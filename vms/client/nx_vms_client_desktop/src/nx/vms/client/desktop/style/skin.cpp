@@ -48,7 +48,7 @@ void Skin::init(const QStringList& paths)
 {
     if (paths.isEmpty())
     {
-        init(QStringList() << lit(":/skin"));
+        init(QStringList() << ":/skin");
         return;
     }
 

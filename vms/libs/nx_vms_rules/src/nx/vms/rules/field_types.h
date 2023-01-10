@@ -23,5 +23,3 @@ struct UuidSelection
 };
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::UuidSelection)

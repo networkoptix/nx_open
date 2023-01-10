@@ -25,9 +25,9 @@ public:
         "path + '/' + names[i] + extension".
     */
     void setIcons(const QString& path, const QStringList& names,
-        const QString& extension = lit(".png"));
+        const QString& extension = ".png");
     void setPixmaps(const QString& path, const QStringList& names,
-        const QString& extension = lit(".png"));
+        const QString& extension = ".png");
 
     void setIcons(const QVector<QPair<QString, QIcon>>& icons);
     void setPixmaps(const QVector<QPair<QString, QPixmap>>& pixmaps);

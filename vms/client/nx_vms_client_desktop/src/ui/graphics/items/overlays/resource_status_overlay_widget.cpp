@@ -63,7 +63,7 @@ void setupButton(QPushButton& button)
 {
     button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    static const auto kButtonName = lit("itemStateActionButton");
+    static const auto kButtonName = "itemStateActionButton";
     button.setObjectName(kButtonName);
 
     static const auto kStyleSheetTemplateRaw = R"(
@@ -111,7 +111,7 @@ void setupCustomButton(QPushButton& button)
 {
     button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    static const auto kButtonName = lit("itemStateExtraActionButton");
+    static const auto kButtonName = "itemStateExtraActionButton";
     button.setObjectName(kButtonName);
 
     static const auto kStyleSheetTemplateRaw = R"(
@@ -368,7 +368,7 @@ void QnStatusOverlayWidget::setupCentralControls()
     setupLabel(m_description, getDescriptionStyle(m_errorStyle));
     m_description->setVisible(false);
 
-    m_centralContainer->setObjectName(lit("centralContainer"));
+    m_centralContainer->setObjectName("centralContainer");
     m_centralContainer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setPaletteColor(m_centralContainer, QPalette::Window, Qt::transparent);
 
@@ -405,7 +405,7 @@ void QnStatusOverlayWidget::setupExtrasControls()
      * graphics proxy doesn't handle size hint changes at all. */
 
     m_extrasContainer->setAttribute(Qt::WA_TranslucentBackground);
-    m_extrasContainer->setObjectName(lit("extrasContainer"));
+    m_extrasContainer->setObjectName("extrasContainer");
 
     const auto layout = new QVBoxLayout(m_extrasContainer);
     layout->setContentsMargins(QMargins());

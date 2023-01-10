@@ -12,8 +12,6 @@ namespace nx::utils::property_storage {
 
 class NX_VMS_COMMON_API Storage: public QObject
 {
-    Q_OBJECT
-
 public:
     using BaseProperty = nx::utils::property_storage::BaseProperty;
 

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
@@ -30,7 +29,7 @@ struct QnStatisticsDataItem
 
 #define QnStatisticsDataItem_Fields (description)(value)(deviceType)(deviceFlags)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsDataItem, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsDataItem, (json))
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataItemList;
 
@@ -53,8 +52,6 @@ struct QnStatisticsData
 
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
 
-Q_DECLARE_METATYPE(QnStatisticsData)
-
 #define QnStatisticsReply_Fields (statistics)(updatePeriod)(uptimeMs)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsReply, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsReply, (json), NX_VMS_COMMON_API)

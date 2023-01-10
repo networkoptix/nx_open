@@ -354,5 +354,3 @@ QString videoQualityToString(int videoQuality);
 
 } // namespace media
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::media::PlayerStatistics)

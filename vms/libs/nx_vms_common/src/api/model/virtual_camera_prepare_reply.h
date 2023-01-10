@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 struct QnVirtualCameraPrepareReplyElement
@@ -20,5 +18,5 @@ struct QnVirtualCameraPrepareReply
 };
 #define QnVirtualCameraPrepareReply_Fields (elements)(storageCleanupNeeded)(storageFull)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareReplyElement, (json)(ubjson)(metatype))
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareReplyElement, (json)(ubjson))
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareReply, (json)(ubjson), NX_VMS_COMMON_API)

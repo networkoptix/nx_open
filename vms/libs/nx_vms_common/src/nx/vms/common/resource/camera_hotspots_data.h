@@ -4,10 +4,9 @@
 
 #include <vector>
 
-#include <QtCore/QMetaType>
+#include <QtCore/QPointF>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::common {
@@ -66,6 +65,3 @@ NX_REFLECTION_INSTRUMENT(CameraHotspotData, (cameraId)(pos)(direction)(name)(acc
 using CameraHotspotDataList = std::vector<CameraHotspotData>;
 
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::CameraHotspotData)
-Q_DECLARE_METATYPE(nx::vms::common::CameraHotspotDataList)

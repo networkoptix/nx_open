@@ -89,7 +89,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
         auto button = new SelectableButton(ui->motionSensitivityGroupBox);
-        button->setText(lit("%1").arg(i));
+        button->setText(QString("%1").arg(i));
         button->setFixedSize(kSensitivityButtonSize);
         button->setCustomPaintFunction(sensitivityButtonPaintFunction);
         ui->motionSensitivityGroupBox->layout()->addWidget(button);
@@ -149,7 +149,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     m_motionWidget->rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
-    m_motionWidget->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
+    m_motionWidget->setSource(QString("Nx/Motion/MotionSettingsItem.qml"));
     m_motionWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     ui->motionContainerWidget->layout()->addWidget(m_motionWidget);
 

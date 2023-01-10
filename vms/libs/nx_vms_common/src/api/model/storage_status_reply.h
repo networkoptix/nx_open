@@ -4,8 +4,6 @@
 
 #include <api/model/api_model_fwd.h>
 
-#include <QtCore/QMetaType>
-
 #include <core/resource/resource_fwd.h>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -23,7 +21,7 @@ struct NX_VMS_COMMON_API QnStorageStatusReply
     QnStorageStatusReply();
 };
 #define QnStorageStatusReply_Fields (pluginExists)(storage)(status)
-QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(ubjson), NX_VMS_COMMON_API)
 
 NX_VMS_COMMON_API nx::vms::api::StorageSpaceData fromResourceToApi(
     const QnStorageResourcePtr& storage, bool fastCreate);

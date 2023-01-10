@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <utils/camera/camera_diagnostics.h>
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -25,4 +23,4 @@ struct NX_VMS_COMMON_API QnCameraDiagnosticsReply
     }
 };
 #define QnCameraDiagnosticsReply_Fields (performedStep)(errorCode)(errorParams)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraDiagnosticsReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraDiagnosticsReply, (json)(ubjson), NX_VMS_COMMON_API)

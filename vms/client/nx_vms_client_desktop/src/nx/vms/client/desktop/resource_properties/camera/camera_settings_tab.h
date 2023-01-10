@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::client::desktop {
@@ -22,5 +20,3 @@ NX_REFLECTION_ENUM_CLASS(CameraSettingsTab,
 );
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::CameraSettingsTab)

@@ -4,7 +4,6 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/instrument.h>
 
@@ -64,6 +63,3 @@ struct NX_VMS_COMMON_API QnPtzTour
 };
 #define QnPtzTour_Fields (id)(name)(spots)
 
-Q_DECLARE_METATYPE(QnPtzTourSpot)
-Q_DECLARE_METATYPE(QnPtzTour)
-Q_DECLARE_METATYPE(QnPtzTourList)

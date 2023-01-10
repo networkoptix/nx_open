@@ -5,7 +5,6 @@
 #include <map>
 #include <set>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
@@ -34,5 +33,3 @@ struct AuthAllowedUrls
 NX_REFLECTION_INSTRUMENT(AuthAllowedUrls, (items))
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::AuthAllowedUrls)

@@ -13,8 +13,6 @@ class Ec2Router:
     public Router,
     public nx::vms::common::SystemContextAware
 {
-    Q_OBJECT
-
 public:
     Ec2Router(nx::vms::common::SystemContext* context);
     virtual ~Ec2Router();

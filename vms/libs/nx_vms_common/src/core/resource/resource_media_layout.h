@@ -11,6 +11,8 @@
 
 #include <core/resource/audio_layout.h>
 
+#include "resource_media_layout_fwd.h"
+
 class QnResourceLayout {
 public:
     QnResourceLayout() {}
@@ -47,9 +49,6 @@ public:
     virtual QString toString() const { return QString(); }
 };
 
-using QnResourceVideoLayoutPtr = std::shared_ptr<QnResourceVideoLayout>;
-using QnConstResourceVideoLayoutPtr = std::shared_ptr<const QnResourceVideoLayout>;
-
 /**
  * Default video layout for any camera with only one sensor.
  */
@@ -74,10 +73,6 @@ public:
         return QVector<int>() << 0;
     }
 };
-
-class QnCustomResourceVideoLayout;
-using QnCustomResourceVideoLayoutPtr = std::shared_ptr<QnCustomResourceVideoLayout>;
-using QnConstCustomResourceVideoLayoutPtr = std::shared_ptr<const QnCustomResourceVideoLayout>;
 
 class NX_VMS_COMMON_API QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:

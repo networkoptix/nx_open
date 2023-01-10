@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::api {
@@ -27,5 +25,3 @@ constexpr auto nxReflectVisitAllEnumItems(ConnectionType*, Visitor&& visitor)
 }
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::ConnectionType)

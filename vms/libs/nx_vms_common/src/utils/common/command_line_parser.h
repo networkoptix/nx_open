@@ -8,7 +8,6 @@
 #include <QtCore/QVariant>
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
 // TODO: #sivanov Rework with QCommandLineParser.
@@ -16,7 +15,6 @@
 class QTextStream;
 
 struct QnCommandLineDefaultImpliedValue {};
-Q_DECLARE_METATYPE(QnCommandLineDefaultImpliedValue);
 
 namespace command_line_parser_detail {
     inline QVariant defaultImpliedValue() {

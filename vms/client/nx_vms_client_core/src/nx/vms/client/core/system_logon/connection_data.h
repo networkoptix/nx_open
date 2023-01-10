@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/instrument.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
@@ -30,5 +28,3 @@ struct ConnectionData
 NX_REFLECTION_INSTRUMENT(ConnectionData, (url)(systemId));
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::core::ConnectionData)

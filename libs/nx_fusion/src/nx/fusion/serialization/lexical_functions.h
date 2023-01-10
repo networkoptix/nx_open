@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <QtCore/QBitArray>
+#include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
 #include <QtGui/QColor>
 

@@ -1497,7 +1497,3 @@ struct hash<nx::BasicBuffer<CharType>>
 };
 
 } // namespace std
-
-#ifdef Q_DECLARE_METATYPE
-    Q_DECLARE_METATYPE(nx::Buffer);
-#endif

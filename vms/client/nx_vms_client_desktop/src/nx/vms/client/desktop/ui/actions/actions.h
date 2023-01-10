@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <string>
 #include <string_view>
-
-#include <QtCore/QMetaType>
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 
@@ -1489,5 +1489,3 @@ std::string toString(IDType id);
 bool fromString(const std::string_view& str, IDType* id);
 
 } // namespace nx::vms::client::desktop::ui::action
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ui::action::IDType)

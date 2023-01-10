@@ -2,9 +2,9 @@
 
 #include "workbench_ui.h"
 
+#include <algorithm>
 #include <cmath> /* For std::floor. */
 
-#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtCore/QMargins>
 #include <QtGui/QAction>
@@ -660,8 +660,6 @@ void WorkbenchUi::setFlags(Flags flags)
 
 void WorkbenchUi::updateViewportMargins(bool animate)
 {
-    using boost::algorithm::any_of;
-
     auto panelEffectiveGeometry = [](AbstractWorkbenchPanel* panel)
         {
             if (panel && panel->isVisible() && panel->isPinned())
@@ -674,7 +672,9 @@ void WorkbenchUi::updateViewportMargins(bool animate)
         ? !layout->flags().testFlag(QnLayoutFlag::NoTimeline)
         : true);
 
-    const bool timelineCanBeVisible = m_timeline && allowedByLayout && any_of(display()->widgets(),
+    const auto& widgets = display()->widgets();
+    const bool timelineCanBeVisible = m_timeline && allowedByLayout && std::any_of(
+        widgets.begin(), widgets.end(),
         [this](QnResourceWidget* widget)
         {
             return calculateTimelineVisible(widget);

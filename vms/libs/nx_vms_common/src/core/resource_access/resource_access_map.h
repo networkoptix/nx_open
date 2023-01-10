@@ -20,4 +20,3 @@ NX_VMS_COMMON_API ResourceAccessMap& operator+=(
 
 } // namespace nx::core::access
 
-Q_DECLARE_METATYPE(nx::core::access::ResourceAccessMap)

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QRectF>
 #include <QtCore/QSize>
 
@@ -43,5 +42,3 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
 };
 
 } // namespace nx::api
-
-Q_DECLARE_METATYPE(nx::api::ImageRequest::StreamSelectionMode)

@@ -48,8 +48,6 @@ class SystemSettings;
  */
 class NX_VMS_COMMON_API SystemContext: public QObject
 {
-    Q_OBJECT
-
 public:
     /** Various types of system contexts. Some of them require shortened initialization. */
     enum class Mode

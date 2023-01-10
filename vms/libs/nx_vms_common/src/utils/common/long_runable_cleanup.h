@@ -21,8 +21,6 @@ class NX_VMS_COMMON_API QnLongRunableCleanup:
     public QObject,
     public Singleton<QnLongRunableCleanup>
 {
-    Q_OBJECT
-
 public:
     QnLongRunableCleanup();
     virtual ~QnLongRunableCleanup();

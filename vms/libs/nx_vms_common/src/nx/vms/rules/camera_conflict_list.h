@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QHash>
-#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
 #include <nx/fusion/fusion/fusion_fwd.h>
@@ -26,5 +25,3 @@ struct NX_VMS_COMMON_API CameraConflictList
 QN_FUSION_DECLARE_FUNCTIONS(CameraConflictList, (json), NX_VMS_COMMON_API);
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::CameraConflictList);

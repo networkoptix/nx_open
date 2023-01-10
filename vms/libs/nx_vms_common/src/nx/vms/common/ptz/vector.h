@@ -108,8 +108,6 @@ QN_FUSION_DECLARE_FUNCTIONS(Vector, (json), NX_VMS_COMMON_API)
 } // namespace ptz
 } // namespace nx::vms::common
 
-Q_DECLARE_METATYPE(nx::vms::common::ptz::Vector);
-
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const nx::vms::common::ptz::Vector& ptzVector);
 
 inline bool qFuzzyEquals(

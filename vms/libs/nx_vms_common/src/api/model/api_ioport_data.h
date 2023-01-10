@@ -56,7 +56,6 @@ typedef std::vector<QnIOPortData> QnIOPortDataList;
 
 NX_REFLECTION_INSTRUMENT(QnIOPortData, QnIOPortData_Fields)
 
-Q_DECLARE_METATYPE(QnIOPortData)
 
 struct NX_VMS_COMMON_API QnCameraPortsData
 {
@@ -90,8 +89,6 @@ inline QString toString(const QnIOStateData& ioStateData)
 
 typedef std::vector<QnIOStateData> QnIOStateDataList;
 #define QnIOStateData_Fields (id)(isActive)(timestamp)
-
-Q_DECLARE_METATYPE(QnIOStateData)
 
 struct NX_VMS_COMMON_API QnCameraIOStateData
 {

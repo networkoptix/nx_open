@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/enum_instrument.h>
 
@@ -16,5 +15,3 @@ NX_REFLECTION_ENUM_CLASS(State,
 )
 
 } // namespace nx::vms::api::rules
-
-Q_DECLARE_METATYPE(nx::vms::api::rules::State)

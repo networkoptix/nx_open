@@ -33,6 +33,3 @@ private:
 private:
     std::vector<AudioTrack> m_audioTracks;
 };
-
-using AudioLayoutPtr = std::shared_ptr<AudioLayout>;
-using AudioLayoutConstPtr = std::shared_ptr<const AudioLayout>;

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::rules {
@@ -21,5 +19,3 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     custom)
 
 } // namespace nx::vms::api::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::Icon)

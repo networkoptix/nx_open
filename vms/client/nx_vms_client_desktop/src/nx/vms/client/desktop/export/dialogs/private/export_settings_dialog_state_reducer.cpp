@@ -32,9 +32,9 @@ static const qint64 kDefaultLengthMs = 5 * 60 * 1000;
 /* Magic knowledge. We know that the result will be generated with 30 fps. --rvasilenko */
 static const int kResultFps = 30;
 
-static const auto kImageCacheDirName = lit("export_image_overlays");
-static const auto kCachedMediaOverlayImageName = lit("export_media_image_overlay.png");
-static const auto kCachedBookmarkOverlayImageName = lit("export_bookmark_image_overlay.png");
+static const auto kImageCacheDirName = "export_image_overlays";
+static const auto kCachedMediaOverlayImageName = "export_media_image_overlay.png";
+static const auto kCachedBookmarkOverlayImageName = "export_bookmark_image_overlay.png";
 
 struct Position
 {
@@ -134,7 +134,7 @@ void ExportSettingsDialogState::updateBookmarkText()
         ? common::html::toHtml(bookmarkDescription)
         : QString();
 
-    static const auto kBookmarkTemplate = lit("<p><font size=5>%1</font></p>%2");
+    static const QString kBookmarkTemplate("<p><font size=5>%1</font></p>%2");
     const auto text = kBookmarkTemplate.arg(bookmarkName.toHtmlEscaped()).arg(description);
     exportMediaPersistentSettings.bookmarkOverlay.text = text;
 }

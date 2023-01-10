@@ -13,7 +13,6 @@ class QnAviAudioLayout;
 
 class QnNovArchiveDelegate: public QnAviArchiveDelegate
 {
-    Q_OBJECT;
 public:
     QnNovArchiveDelegate();
 

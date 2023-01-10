@@ -29,5 +29,3 @@ struct QnPtzObject
 };
 #define QnPtzObject_Fields (type)(id)
 
-Q_DECLARE_METATYPE(Qn::PtzObjectType)
-Q_DECLARE_METATYPE(QnPtzObject)

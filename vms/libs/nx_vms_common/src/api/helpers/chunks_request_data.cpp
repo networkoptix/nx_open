@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <motion/motion_detection.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>

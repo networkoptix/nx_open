@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QHash>
-#include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/id.h>
@@ -24,8 +23,8 @@ struct QnCloudHostCheckReply
 #define QnCloudHostCheckReply_Fields (cloudHost)(failedServers)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnUpdateFreeSpaceReply,
-    (ubjson)(xml)(json)(csv_record)(metatype),
+    (ubjson)(xml)(json)(csv_record),
     NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCloudHostCheckReply,
-    (ubjson)(xml)(json)(csv_record)(metatype),
+    (ubjson)(xml)(json)(csv_record),
     NX_VMS_COMMON_API)

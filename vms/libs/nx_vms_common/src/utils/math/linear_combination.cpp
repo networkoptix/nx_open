@@ -8,7 +8,6 @@
 #include <QtCore/QSizeF>
 #include <QtCore/QRectF>
 #include <QtCore/QVariant>
-#include <QtCore/QMetaType>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>

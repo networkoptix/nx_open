@@ -30,7 +30,6 @@ struct NX_VMS_COMMON_API QnCloudSystem
 
 #define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight) \
     (lastLoginTimeUtcMs)(authKey)(online)(system2faEnabled)(version)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (metatype)(json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json), NX_VMS_COMMON_API)
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
-Q_DECLARE_METATYPE(QnCloudSystemList);

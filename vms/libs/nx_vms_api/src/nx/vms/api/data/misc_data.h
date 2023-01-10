@@ -21,5 +21,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(MiscData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::MiscData)
-Q_DECLARE_METATYPE(nx::vms::api::MiscDataList)

@@ -4,15 +4,10 @@
 
 #include <ostream>
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
 namespace nx::vms::api {
-
-Q_NAMESPACE_EXPORT(NX_VMS_API)
-Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
 enum class ResourceStatus
 {
@@ -49,7 +44,6 @@ enum class ResourceStatus
      */
     mismatchedCertificate = 6,
 };
-Q_ENUM_NS(ResourceStatus)
 
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(ResourceStatus*, Visitor&& visitor)
@@ -64,11 +58,6 @@ constexpr auto nxReflectVisitAllEnumItems(ResourceStatus*, Visitor&& visitor)
         Item{ResourceStatus::incompatible, "Incompatible"},
         Item{ResourceStatus::mismatchedCertificate, "mismatchedCertificate"}
     );
-}
-
-inline size_t qHash(ResourceStatus value, size_t seed = 0)
-{
-    return QT_PREPEND_NAMESPACE(qHash)((int) value, seed);
 }
 
 NX_REFLECTION_ENUM(CameraStatusFlag,
@@ -338,20 +327,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(StreamDataFilters)
 NX_REFLECTION_ENUM_CLASS(MetadataStorageChangePolicy,
     keep,
     remove,
-    move
-)
+    move)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::FailoverPriority)
-Q_DECLARE_METATYPE(nx::vms::api::CameraBackupQuality)
-Q_DECLARE_METATYPE(nx::vms::api::CameraStatusFlag)
-Q_DECLARE_METATYPE(nx::vms::api::CameraStatusFlags)
-Q_DECLARE_METATYPE(nx::vms::api::MetadataStorageChangePolicy)
-Q_DECLARE_METATYPE(nx::vms::api::RecordingMetadataType)
-Q_DECLARE_METATYPE(nx::vms::api::RecordingMetadataTypes)
-Q_DECLARE_METATYPE(nx::vms::api::ResourceStatus)
-Q_DECLARE_METATYPE(nx::vms::api::ServerFlag)
-Q_DECLARE_METATYPE(nx::vms::api::ServerFlags)
-Q_DECLARE_METATYPE(nx::vms::api::StreamDataFilter)
-Q_DECLARE_METATYPE(nx::vms::api::StreamDataFilters)

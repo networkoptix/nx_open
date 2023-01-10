@@ -272,5 +272,3 @@ namespace Mustache
     QString renderTemplate(const QString& templateString, const QVariantHash& args);
 
 };
-
-Q_DECLARE_METATYPE(Mustache::QtVariantContext::fn_t)

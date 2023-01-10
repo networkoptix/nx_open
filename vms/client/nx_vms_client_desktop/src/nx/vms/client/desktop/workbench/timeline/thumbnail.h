@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <QtCore/QtGlobal>
-#include <QtCore/QMetaType>
 #include <QtGui/QImage>
 
 namespace nx::vms::client::desktop::workbench::timeline {
@@ -98,5 +97,3 @@ private:
 using ThumbnailPtr = std::shared_ptr<const Thumbnail>;
 
 } // namespace nx::vms::client::desktop::workbench::timeline
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::workbench::timeline::ThumbnailPtr)

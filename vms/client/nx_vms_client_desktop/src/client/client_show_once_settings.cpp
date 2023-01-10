@@ -4,7 +4,7 @@
 
 namespace {
 
-static const QString kClientShowOnceId(lit("show_once"));
+static const QString kClientShowOnceId("show_once");
 
 } // namespace
 

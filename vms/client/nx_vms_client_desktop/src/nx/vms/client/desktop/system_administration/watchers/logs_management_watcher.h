@@ -155,5 +155,3 @@ private:
 using LogsManagementUnitPtr = LogsManagementWatcher::UnitPtr;
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::LogsManagementWatcher::State);

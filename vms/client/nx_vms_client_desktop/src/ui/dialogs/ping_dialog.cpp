@@ -49,19 +49,19 @@ void QnPingDialog::at_pingUtility_pingResponse(const QnPingUtility::PingResponse
 QString QnPingDialog::responseToString(const QnPingUtility::PingResponse &response) const {
     switch (response.type) {
     case QnPingUtility::UnknownError:
-        return QString(lit("Unknown error for icmp_seq %1")).arg(response.seq);
+        return QString(QString("Unknown error for icmp_seq %1")).arg(response.seq);
     case QnPingUtility::Timeout:
-        return QString(lit("Request timeout for icmp_seq %1")).arg(response.seq);
+        return QString(QString("Request timeout for icmp_seq %1")).arg(response.seq);
 #ifdef Q_OS_MACX
     case ICMP_ECHOREPLY:
-        return QString(lit("%1 bytes from %2: icmp_seq=%3 ttl=%4 time=%5 ms")).
+        return QString(QString("%1 bytes from %2: icmp_seq=%3 ttl=%4 time=%5 ms")).
                 arg(response.bytes).
                 arg(response.hostAddress).
                 arg(response.seq).
                 arg(response.ttl).
                 arg(response.time, 0, 'f', 3);
     case ICMP_UNREACH:
-        return QString(lit("Destination host unreacheable"));
+        return QString(QString("Destination host unreacheable"));
 #endif
     default:
         break;

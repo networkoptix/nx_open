@@ -47,7 +47,7 @@ bool parseHttpRequestParams(
     QString* value)
 {
     NX_ASSERT(command == "getHelp");
-    return deserialize(params, lit("group"), value);
+    return deserialize(params, "group", value);
 }
 
 bool parseHttpRequestParams(
@@ -57,12 +57,12 @@ bool parseHttpRequestParams(
     nx::vms::api::StoredFilePath* value)
 {
     NX_ASSERT(command != "getHelp");
-    return deserialize(params, lit("folder"), &(value->path)); //< nx::vms::api::StoredFilePath
+    return deserialize(params, "folder", &(value->path)); //< nx::vms::api::StoredFilePath
 }
 
 void toUrlParams(const nx::vms::api::StoredFilePath& name, QUrlQuery* query)
 {
-    serialize(name.path, lit("folder"), query);
+    serialize(name.path, "folder", query);
 }
 
 bool parseHttpRequestParams(
@@ -72,14 +72,14 @@ bool parseHttpRequestParams(
     QByteArray* value)
 {
     QString tmp;
-    bool result = deserialize(params, lit("id"), &tmp);
+    bool result = deserialize(params, "id", &tmp);
     *value = tmp.toUtf8();
     return result;
 }
 
 void toUrlParams(const QByteArray& id, QUrlQuery* query)
 {
-    serialize(QString::fromLatin1(id), lit("id"), query);
+    serialize(QString::fromLatin1(id), "id", query);
 }
 
 bool parseHttpRequestParams(
@@ -90,14 +90,14 @@ bool parseHttpRequestParams(
 {
     // Semantics of the returned value is quite strange. We must parse both params anyway.
     parseHttpRequestParams(commonModule, command, params, &query->id);
-    deserialize(params, lit("showDesktopCameras"), &query->showDesktopCameras);
+    deserialize(params, "showDesktopCameras", &query->showDesktopCameras);
     return true;
 }
 
 void toUrlParams(const QnCameraDataExQuery& filter, QUrlQuery* query)
 {
-    serialize(filter.id, lit("id"), query);
-    serialize(filter.showDesktopCameras, lit("showDesktopCameras"), query);
+    serialize(filter.id, "id", query);
+    serialize(filter.showDesktopCameras, "showDesktopCameras", query);
 }
 
 bool parseHttpRequestParams(
@@ -106,7 +106,7 @@ bool parseHttpRequestParams(
     const nx::network::rest::Params& params,
     QnUuid* id)
 {
-    return deserialize(params, lit("id"), id);
+    return deserialize(params, "id", id);
 }
 
 bool parseHttpRequestParams(
@@ -116,7 +116,7 @@ bool parseHttpRequestParams(
     QnCameraUuid* id)
 {
     QString stringValue;
-    const bool result = deserialize(params, lit("id"), &stringValue);
+    const bool result = deserialize(params, "id", &stringValue);
     if (result)
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
@@ -135,7 +135,7 @@ bool parseHttpRequestParams(
     QnLayoutUuid* id)
 {
     QString stringValue;
-    const bool result = deserialize(params, lit("id"), &stringValue);
+    const bool result = deserialize(params, "id", &stringValue);
     if (result)
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
@@ -149,7 +149,7 @@ bool parseHttpRequestParams(
 
 void toUrlParams(const QnUuid& id, QUrlQuery* query)
 {
-    serialize(id, lit("id"), query);
+    serialize(id, "id", query);
 }
 
 bool parseHttpRequestParams(
@@ -160,12 +160,12 @@ bool parseHttpRequestParams(
 {
     // TODO: Consider renaming this parameter to parentId. Note that this is a breaking change that
     // affects all API functions which are registered with ParentId input data.
-    return deserialize(params, lit("id"), id);
+    return deserialize(params, "id", id);
 }
 
 void toUrlParams(const nx::vms::api::StorageParentId& id, QUrlQuery* query)
 {
-    serialize(id, lit("id"), query);
+    serialize(id, "id", query);
 }
 
 bool parseHttpRequestParams(
@@ -173,12 +173,12 @@ bool parseHttpRequestParams(
     const nx::network::rest::Params& params,
     Qn::SerializationFormat* format)
 {
-    return deserialize(params, lit("format"), format);
+    return deserialize(params, "format", format);
 }
 
 void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery* query)
 {
-    serialize(format, lit("format"), query);
+    serialize(format, "format", query);
 }
 
 bool parseHttpRequestParams(

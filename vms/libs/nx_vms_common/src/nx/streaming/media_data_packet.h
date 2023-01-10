@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <memory>
+#include <vector>
 
 #include <QtCore/QVector>
 #include <QtCore/QRect>
@@ -21,12 +22,12 @@
 #include <nx/vms/common/globals/media_stream_event.h>
 
 #include "media_data_packet_fwd.h"
-#include <nx/vms/api/types/resource_types.h>
 
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
 
 class QIODevice;
+class QRegion;
 struct AVCodecContext;
 
 enum MediaQuality
@@ -79,10 +80,6 @@ using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
 
 using QnMetaDataLightVector = std::vector<QnMetaDataV1Light, QnAlignedAllocator<QnMetaDataV1Light>>;
-
-Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
-Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
-Q_DECLARE_METATYPE(QnAbstractCompressedMetadataPtr);
 
 struct NX_VMS_COMMON_API QnAbstractMediaData: public QnAbstractDataPacket
 {

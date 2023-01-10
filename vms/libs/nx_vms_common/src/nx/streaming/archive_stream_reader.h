@@ -38,7 +38,6 @@ class FrameTypeExtractor;
  */
 class NX_VMS_COMMON_API QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
-    Q_OBJECT
     using base_type = QnAbstractArchiveStreamReader;
 
 public:
@@ -213,7 +212,6 @@ private:
     virtual bool needKeyData(int channel) const override;
     void emitJumpOccured(qint64 mksec, int sequence);
 
-private slots:
 private:
     unsigned m_selectedAudioChannel;
     bool m_eof;

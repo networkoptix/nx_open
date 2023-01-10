@@ -207,6 +207,3 @@ private:
     QString m_fullName;
     nx::vms::api::UserExternalId m_externalId;
 };
-
-Q_DECLARE_METATYPE(QnUserResourcePtr)
-Q_DECLARE_METATYPE(QnUserResourceList)

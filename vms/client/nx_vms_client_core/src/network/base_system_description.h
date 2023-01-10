@@ -21,7 +21,6 @@ enum class QnServerField
     Version = 1 << 4,
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
-Q_DECLARE_METATYPE(QnServerFields)
 
 enum class QnSystemCompatibility
 {

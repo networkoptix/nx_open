@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -45,6 +44,3 @@ private:
     QnVideoWallResourcePtr m_videowall;
     QnUuid m_uuid;
 };
-
-Q_DECLARE_METATYPE(QnVideoWallItemIndex)
-Q_DECLARE_METATYPE(QnVideoWallItemIndexList)

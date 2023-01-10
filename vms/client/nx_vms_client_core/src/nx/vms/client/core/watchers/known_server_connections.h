@@ -43,5 +43,3 @@ NX_REFLECTION_INSTRUMENT(KnownServerConnections::Connection, (serverId)(url));
 
 } // namespace watchers
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::watchers::KnownServerConnections::Connection)

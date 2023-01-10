@@ -93,7 +93,7 @@ signals:
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
-    void businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void businessActionReceived(const QSharedPointer<nx::vms::event::AbstractAction>& action);
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);

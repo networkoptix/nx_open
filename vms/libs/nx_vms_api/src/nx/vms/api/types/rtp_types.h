@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::api {
@@ -29,5 +27,3 @@ constexpr auto nxReflectVisitAllEnumItems(RtpTransportType*, Visitor&& visitor)
 }
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::RtpTransportType)

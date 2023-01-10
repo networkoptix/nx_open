@@ -29,5 +29,3 @@ struct NX_VMS_COMMON_API ClientUpdateSettings
 QN_FUSION_DECLARE_FUNCTIONS(ClientUpdateSettings, (json), NX_VMS_COMMON_API)
 
 } // namespace nx::vms::common::update
-
-Q_DECLARE_METATYPE(nx::vms::common::api::ClientUpdateSettings)

@@ -94,6 +94,3 @@ public:
 };
 
 } // namespace nx::analytics::taxonomy
-
-Q_DECLARE_METATYPE(std::vector<nx::analytics::taxonomy::AbstractAttribute*>)
-Q_DECLARE_METATYPE(std::vector<nx::analytics::taxonomy::AbstractScope*>)

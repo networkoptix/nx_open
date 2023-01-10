@@ -15,8 +15,6 @@ class NX_UTILS_API QnLongRunnable:
 {
     using base_type = nx::utils::Thread;
 
-    Q_OBJECT
-
 public:
 
     QnLongRunnable(const char* threadName = nullptr);
@@ -36,8 +34,6 @@ class NX_UTILS_API QnLongRunnablePool:
     public QObject,
     public Singleton<QnLongRunnablePool>
 {
-    Q_OBJECT
-
 public:
     QnLongRunnablePool(QObject *parent = NULL);
     virtual ~QnLongRunnablePool();

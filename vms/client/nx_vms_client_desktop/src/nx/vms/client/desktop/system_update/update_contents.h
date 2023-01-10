@@ -140,6 +140,3 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::UpdateContents);
-Q_DECLARE_METATYPE(nx::vms::client::desktop::UpdateDeliveryInfo);

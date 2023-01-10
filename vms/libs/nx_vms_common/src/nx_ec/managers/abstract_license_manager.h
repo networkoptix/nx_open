@@ -17,8 +17,8 @@ class NX_VMS_COMMON_API AbstractLicenseNotificationManager: public QObject
     Q_OBJECT
 
 signals:
-    void licenseChanged(QnLicensePtr license);
-    void licenseRemoved(QnLicensePtr license);
+    void licenseChanged(QSharedPointer<QnLicense> license);
+    void licenseRemoved(QSharedPointer<QnLicense> license);
 };
 
 /*!

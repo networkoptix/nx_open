@@ -6,8 +6,6 @@
 #include <tuple>
 #include <type_traits>
 
-#include <QtCore/QJsonValue>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/device_type.h>
@@ -15,8 +13,6 @@
 #include "camera_attributes_data.h"
 #include "camera_data.h"
 #include "credentials.h"
-#include "resource_data.h"
-#include "type_traits.h"
 
 namespace nx::vms::api {
 

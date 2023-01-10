@@ -64,9 +64,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraHistoryData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::ServerFootageData)
-Q_DECLARE_METATYPE(nx::vms::api::ServerFootageDataList)
-Q_DECLARE_METATYPE(nx::vms::api::CameraHistoryItemData)
-Q_DECLARE_METATYPE(nx::vms::api::CameraHistoryItemDataList)
-Q_DECLARE_METATYPE(nx::vms::api::CameraHistoryData)
-Q_DECLARE_METATYPE(nx::vms::api::CameraHistoryDataList)

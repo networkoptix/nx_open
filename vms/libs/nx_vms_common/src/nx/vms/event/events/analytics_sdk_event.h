@@ -61,5 +61,3 @@ private:
 } // namespace event
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::event::AnalyticsSdkEventPtr);

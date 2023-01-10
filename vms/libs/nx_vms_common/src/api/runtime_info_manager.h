@@ -35,14 +35,10 @@ struct QnPeerRuntimeInfo
 };
 
 
-Q_DECLARE_METATYPE(QnPeerRuntimeInfo)
 Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
 
 typedef QList<QnPeerRuntimeInfo> QnPeerRuntimeInfoList;
 typedef QHash<QnUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
-
-Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
-Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 
 class NX_VMS_COMMON_API QnRuntimeInfoManager:

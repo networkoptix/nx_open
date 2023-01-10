@@ -6,7 +6,6 @@
 
 class NX_VMS_COMMON_API QnBasicPtzController: public QnAbstractPtzController
 {
-    Q_OBJECT
     using base_type = QnAbstractPtzController;
 
 public:

@@ -15,8 +15,6 @@ class Plugin;
 /** Helper class for engine storage and initialization. */
 class NX_VMS_RULES_API EngineHolder: public QObject
 {
-    Q_OBJECT
-
 public:
     EngineHolder(nx::vms::common::SystemContext* context, std::unique_ptr<Plugin> plugin);
     ~EngineHolder();

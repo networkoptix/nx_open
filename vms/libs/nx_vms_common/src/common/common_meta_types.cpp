@@ -4,8 +4,6 @@
 
 #include <atomic>
 
-#include <QtCore/QMetaType>
-
 #include <api/model/api_ioport_data.h>
 #include <api/model/audit/audit_record.h>
 #include <api/model/backup_status_reply.h>
@@ -290,4 +288,5 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<nx::String>();
+    
 }

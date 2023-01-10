@@ -28,7 +28,7 @@ struct QnPaneSettings
 };
 
 #define QnPaneSettings_Fields (state)(span)
-QN_FUSION_DECLARE_FUNCTIONS(QnPaneSettings, (json)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnPaneSettings, (json));
 NX_REFLECTION_INSTRUMENT(QnPaneSettings, QnPaneSettings_Fields)
 
 /**

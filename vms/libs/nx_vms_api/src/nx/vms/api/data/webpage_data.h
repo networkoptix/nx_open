@@ -27,5 +27,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(WebPageData)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::WebPageData)
-Q_DECLARE_METATYPE(nx::vms::api::WebPageDataList)

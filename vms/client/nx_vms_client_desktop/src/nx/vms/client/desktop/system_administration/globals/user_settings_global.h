@@ -63,6 +63,3 @@ public:
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::PasswordStrengthData)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::UserSettingsGlobal::UserType)

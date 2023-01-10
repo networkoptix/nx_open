@@ -337,67 +337,67 @@ QString toLongestShortString(const QnTimeStep& step)
         {
             QString result = step.format;
 
-            if (result.contains(lit("yyyy")))
-                result.replace(lit("yyyy"), lit("2000"));
-            else if (result.contains(lit("yy")))
-                result.replace(lit("yy"), lit("2000"));
+            if (result.contains("yyyy"))
+                result.replace("yyyy", "2000");
+            else if (result.contains("yy"))
+                result.replace("yy", "2000");
 
-            if (result.contains(lit("hh")))
-                result.replace(lit("hh"), lit("23"));
-            else if (result.contains(lit("h")))
-                result.replace(lit("h"), lit("23"));
+            if (result.contains("hh"))
+                result.replace("hh", "23");
+            else if (result.contains("h"))
+                result.replace("h", "23");
 
-            if (result.contains(lit("HH")))
-                result.replace(lit("HH"), lit("23"));
-            else if (result.contains(lit("H")))
-                result.replace(lit("H"), lit("23"));
+            if (result.contains("HH"))
+                result.replace("HH", "23");
+            else if (result.contains("H"))
+                result.replace("H", "23");
 
-            if (result.contains(lit("mm")))
-                result.replace(lit("mm"), lit("59"));
-            else if (result.contains(lit("m")))
-                result.replace(lit("m"), lit("59"));
+            if (result.contains("mm"))
+                result.replace("mm", "59");
+            else if (result.contains("m"))
+                result.replace("m", "59");
 
-            if (result.contains(lit("ss")))
-                result.replace(lit("ss"), lit("59"));
-            else if (result.contains(lit("s")))
-                result.replace(lit("s"), lit("59"));
+            if (result.contains("ss"))
+                result.replace("ss", "59");
+            else if (result.contains("s"))
+                result.replace("s", "59");
 
-            if (result.contains(lit("zzz")))
-                result.replace(lit("zzz"), lit("999"));
-            else if (result.contains(lit("z")))
-                result.replace(lit("z"), lit("999"));
+            if (result.contains("zzz"))
+                result.replace("zzz", "999");
+            else if (result.contains("z"))
+                result.replace("z", "999");
 
-            if (result.contains(lit("ap")))
-                result.replace(lit("ap"), longestAmPm());
-            else if (result.contains(lit("a")))
-                result.replace(lit("a"), longestAmPm());
+            if (result.contains("ap"))
+                result.replace("ap", longestAmPm());
+            else if (result.contains("a"))
+                result.replace("a", longestAmPm());
 
-            if (result.contains(lit("AP")))
-                result.replace(lit("AP"), longestAmPm());
-            else if (result.contains(lit("A")))
-                result.replace(lit("A"), longestAmPm());
+            if (result.contains("AP"))
+                result.replace("AP", longestAmPm());
+            else if (result.contains("A"))
+                result.replace("A", longestAmPm());
 
-            if (result.contains(lit("MMMM")))
-                result.replace(lit("MMMM"), longestName(1, 12,
+            if (result.contains("MMMM"))
+                result.replace("MMMM", longestName(1, 12,
                     [](int i){ return QLocale().monthName(i, QLocale::LongFormat); }));
-            else if (result.contains(lit("MMM")))
-                result.replace(lit("MMM"), longestName(1, 12,
+            else if (result.contains("MMM"))
+                result.replace("MMM", longestName(1, 12,
                     [](int i){ return QLocale().monthName(i, QLocale::ShortFormat); }));
-            else if (result.contains(lit("MM")))
-                result.replace(lit("MM"), lit("12"));
-            else if (result.contains(lit("M")))
-                result.replace(lit("M"), lit("12"));
+            else if (result.contains("MM"))
+                result.replace("MM", "12");
+            else if (result.contains("M"))
+                result.replace("M", "12");
 
-            if (result.contains(lit("dddd")))
-                result.replace(lit("dddd"), longestName(1, 7,
+            if (result.contains("dddd"))
+                result.replace("dddd", longestName(1, 7,
                     [](int i){ return QLocale().dayName(i, QLocale::LongFormat); }));
-            else if (result.contains(lit("ddd")))
-                result.replace(lit("ddd"), longestName(1, 7,
+            else if (result.contains("ddd"))
+                result.replace("ddd", longestName(1, 7,
                     [](int i){ return QLocale().dayName(i, QLocale::ShortFormat); }));
-            else if (result.contains(lit("dd")))
-                result.replace(lit("dd"), lit("29"));
-            else if (result.contains(lit("d")))
-                result.replace(lit("d"), lit("29"));
+            else if (result.contains("dd"))
+                result.replace("dd", "29");
+            else if (result.contains("d"))
+                result.replace("d", "29");
 
             return result;
         }

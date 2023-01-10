@@ -32,5 +32,3 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(DataFields)
 
 } // namespace ptz
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::ptz::DataFields)

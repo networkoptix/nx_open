@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/email/email_fwd.h>
 
@@ -17,4 +16,4 @@ struct NX_VMS_COMMON_API QnTestEmailSettingsReply
 
 #define QnTestEmailSettingsReply_Fields (errorCode)(smtpReplyCode)(errorString)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(ubjson), NX_VMS_COMMON_API)

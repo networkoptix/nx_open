@@ -115,7 +115,6 @@ class QnFfmpegVideoTranscoder;
 class NX_VMS_COMMON_API QnTranscoder: public QObject
 {
     Q_OBJECT
-
 public:
     QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics);
     virtual ~QnTranscoder();

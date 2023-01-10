@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMetaType>
 
 #include "data_macros.h"
 
@@ -25,5 +24,3 @@ NX_REFLECTION_INSTRUMENT(DatabaseDumpData, DatabaseDumpData_Fields)
 } // namespace api
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::api::DatabaseDumpData);

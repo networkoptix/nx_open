@@ -78,4 +78,3 @@ NX_VMS_API_DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::FullInfoData)

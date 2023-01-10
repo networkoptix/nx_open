@@ -222,7 +222,7 @@ void ScheduleSettingsWidget::setupUi()
 
             ui->qualityComboBox->addItem(text, static_cast<int>(streamQuality));
             combo_box_utils::addHiddenItem(ui->qualityComboBox,
-                text + lit(" *"), kCustomQualityOffset + static_cast<int>(streamQuality));
+                text + " *", kCustomQualityOffset + static_cast<int>(streamQuality));
         };
 
     addQualityItem(StreamQuality::low);
@@ -234,7 +234,7 @@ void ScheduleSettingsWidget::setupUi()
         "and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
 
     ui->bitrateSpinBox->setDecimals(common::CameraBitrateCalculator::kBitrateKbpsPrecisionDecimals);
-    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
+    ui->bitrateSpinBox->setSuffix(QString(" ") + tr("Mbit/s"));
 
     ui->bitrateSlider->setProperty(
         style::Properties::kSliderFeatures,
@@ -370,8 +370,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
             : tr("More Settings");
 
         const auto buttonIcon = qnSkin->icon(recording.customBitrateVisible
-            ? lit("text_buttons/collapse.png")
-            : lit("text_buttons/expand.png"));
+            ? "text_buttons/collapse.png"
+            : "text_buttons/expand.png");
 
         ui->advancedSettingsButton->setText(buttonText);
         ui->advancedSettingsButton->setIcon(buttonIcon);

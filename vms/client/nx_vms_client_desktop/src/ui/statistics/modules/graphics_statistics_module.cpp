@@ -100,20 +100,20 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
             return result.join(',');
         });
 
-    m_metrics->addMetric(lit("avg_tabs_cnt"), avgTabsCount);
-    m_metrics->addMetric(lit("psearch_duration_ms"), psearchDuration);
-    m_metrics->addMetric(lit("camera_fullscreen_duration_ms"), cameraFullscreenMetric);
-    m_metrics->addMetric(lit("msearch_duration_ms"), msearchDuration);
-    m_metrics->addMetric(lit("version"), versionMetric);
-    m_metrics->addMetric(lit("arch"), archMetric);
-    m_metrics->addMetric(lit("platform"), platformMetric);
-    m_metrics->addMetric(lit("platform_modification"), platformModificationMetric);
-    m_metrics->addMetric(lit("revision"), revisionMetric);
-    m_metrics->addMetric(lit("customization"), customizationMetric);
-    m_metrics->addMetric(lit("gl_version"), glVersionMetric);
-    m_metrics->addMetric(lit("gl_renderer"), glRendererMetric);
-    m_metrics->addMetric(lit("gl_vendor"), glVendorMetric);
-    m_metrics->addMetric(lit("resolution"), resolutionMetric);
+    m_metrics->addMetric("avg_tabs_cnt", avgTabsCount);
+    m_metrics->addMetric("psearch_duration_ms", psearchDuration);
+    m_metrics->addMetric("camera_fullscreen_duration_ms", cameraFullscreenMetric);
+    m_metrics->addMetric("msearch_duration_ms", msearchDuration);
+    m_metrics->addMetric("version", versionMetric);
+    m_metrics->addMetric("arch", archMetric);
+    m_metrics->addMetric("platform", platformMetric);
+    m_metrics->addMetric("platform_modification", platformModificationMetric);
+    m_metrics->addMetric("revision", revisionMetric);
+    m_metrics->addMetric("customization", customizationMetric);
+    m_metrics->addMetric("gl_version", glVersionMetric);
+    m_metrics->addMetric("gl_renderer", glRendererMetric);
+    m_metrics->addMetric("gl_vendor", glVendorMetric);
+    m_metrics->addMetric("resolution", resolutionMetric);
 }
 
 QnGraphicsStatisticsModule::~QnGraphicsStatisticsModule()

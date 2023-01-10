@@ -2,10 +2,6 @@
 
 #include "camera_advanced_param.h"
 
-#include <boost/range.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/find_if.hpp>
-
 #include <core/resource/resource.h>
 #include <core/resource/resource_property_key.h>
 #include <nx/fusion/model_functions.h>

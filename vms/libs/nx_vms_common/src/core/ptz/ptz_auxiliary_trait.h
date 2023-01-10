@@ -31,5 +31,3 @@ private:
     QString m_name;
 };
 
-Q_DECLARE_METATYPE(QnPtzAuxiliaryTrait)
-Q_DECLARE_METATYPE(QnPtzAuxiliaryTraitList)

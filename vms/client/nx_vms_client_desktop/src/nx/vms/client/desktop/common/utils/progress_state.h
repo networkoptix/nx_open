@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 #include <optional>
 #include <variant>
-
-#include <QtCore/QMetaType>
 
 namespace nx::vms::client::desktop {
 
@@ -36,5 +36,3 @@ private:
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ProgressState)

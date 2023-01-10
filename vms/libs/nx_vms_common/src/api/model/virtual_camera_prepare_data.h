@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <recording/time_period.h>
 
@@ -20,5 +18,5 @@ struct QnVirtualCameraPrepareData
 };
 #define QnVirtualCameraPrepareData_Fields (elements)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareDataElement, (json)(ubjson)(metatype))
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareData, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareDataElement, (json)(ubjson))
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraPrepareData, (json)(ubjson), NX_VMS_COMMON_API)

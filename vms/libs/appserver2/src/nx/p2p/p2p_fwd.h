@@ -5,7 +5,6 @@
 #include <set>
 
 #include <QtCore/QMap>
-#include <QtCore/QMetaType>
 
 #include <nx/vms/api/data/peer_data.h>
 
@@ -89,5 +88,3 @@ static const qint32 kMaxOnlineDistance = 16384;
 extern const char* const kP2pProtoName;
 
 } // namespace nx::p2p
-
-Q_DECLARE_METATYPE(nx::p2p::MessageType)

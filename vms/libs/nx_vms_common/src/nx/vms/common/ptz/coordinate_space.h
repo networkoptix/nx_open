@@ -30,5 +30,3 @@ constexpr auto nxReflectVisitAllEnumItems(CoordinateSpace*, Visitor&& visitor)
 
 } // namespace ptz
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::ptz::CoordinateSpace)

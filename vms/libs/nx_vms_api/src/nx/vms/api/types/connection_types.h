@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
@@ -60,5 +58,3 @@ Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::PeerType)

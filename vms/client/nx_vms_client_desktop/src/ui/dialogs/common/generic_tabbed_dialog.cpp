@@ -2,18 +2,14 @@
 
 #include "generic_tabbed_dialog.h"
 
+#include <algorithm>
+
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QPushButton>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <nx/utils/log/assert.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-
-using boost::algorithm::any_of;
-using boost::algorithm::all_of;
 
 namespace
 {
@@ -287,7 +283,7 @@ bool QnGenericTabbedDialog::canApplyChanges() const
     if (isReadOnly())
         return false;
 
-    return all_of(m_pages, [](const Page &page)
+    return std::all_of(m_pages.begin(), m_pages.end(), [](const Page &page)
     {
         return !page.enabled || !page.visible || page.widget->canApplyChanges();
     });
@@ -298,7 +294,7 @@ bool QnGenericTabbedDialog::canDiscardChanges() const
     if (isReadOnly())
         return true;
 
-    return all_of(m_pages, [](const Page &page)
+    return std::all_of(m_pages.begin(), m_pages.end(), [](const Page &page)
     {
         return !page.enabled || !page.visible || page.widget->canDiscardChanges();
     });
@@ -309,7 +305,7 @@ bool QnGenericTabbedDialog::hasChanges() const
     if (isReadOnly())
         return false;
 
-    return any_of(m_pages, [](const Page &page)
+    return std::any_of(m_pages.begin(), m_pages.end(), [](const Page &page)
     {
         return page.enabled && page.visible && page.widget->hasChanges();
     });

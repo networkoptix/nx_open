@@ -638,29 +638,3 @@ namespace Qn {
 
 using nx::vms::api::GlobalPermission;
 using nx::vms::api::GlobalPermissions;
-
-Q_DECLARE_METATYPE(Qn::ResourceFlags)
-Q_DECLARE_METATYPE(Qn::UserRole)
-
-Q_DECLARE_METATYPE(Qn::TimePeriodContent)
-Q_DECLARE_METATYPE(Qn::StatisticsDeviceType)
-Q_DECLARE_METATYPE(Qn::StorageInitResult)
-Q_DECLARE_METATYPE(Qn::PanicMode)
-Q_DECLARE_METATYPE(Qn::RecordingState)
-Q_DECLARE_METATYPE(Qn::StatusChangeReason)
-Q_DECLARE_METATYPE(Qn::ConnectionRole)
-Q_DECLARE_METATYPE(Qn::BackupState)
-Q_DECLARE_METATYPE(Qn::RebuildAction)
-Q_DECLARE_METATYPE(Qn::BackupAction)
-Q_DECLARE_METATYPE(Qn::IOPortType)
-Q_DECLARE_METATYPE(Qn::IODefaultState)
-Q_DECLARE_METATYPE(Qn::AuditRecordType)
-Q_DECLARE_METATYPE(Qn::LicenseType)
-
-Q_DECLARE_METATYPE(Qn::IOPortTypes)
-Q_DECLARE_METATYPE(Qn::Permission)
-Q_DECLARE_METATYPE(Qn::Permissions)
-
-Q_DECLARE_METATYPE(Qn::ResourceInfoLevel)
-
-Q_DECLARE_METATYPE(Qn::FisheyeCameraProjection)

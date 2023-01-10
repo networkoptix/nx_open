@@ -48,4 +48,3 @@ struct hash<QnResourceAccessSubject>
 
 } // namepsace std
 
-Q_DECLARE_METATYPE(QnResourceAccessSubject)

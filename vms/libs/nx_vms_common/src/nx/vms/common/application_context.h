@@ -24,8 +24,6 @@ namespace nx::vms::common {
  */
 class NX_VMS_COMMON_API ApplicationContext: public QObject
 {
-    Q_OBJECT
-
 protected:
     using PeerType = nx::vms::api::PeerType;
 

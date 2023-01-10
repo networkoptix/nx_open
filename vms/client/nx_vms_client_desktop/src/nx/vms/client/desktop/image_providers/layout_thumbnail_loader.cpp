@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+#include <utils/math/math.h>
 
 using nx::vms::client::core::Geometry;
 

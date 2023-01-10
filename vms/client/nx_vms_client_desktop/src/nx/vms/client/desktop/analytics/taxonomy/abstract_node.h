@@ -71,6 +71,3 @@ public:
 };
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy
-
-Q_DECLARE_METATYPE(std::vector<nx::vms::client::desktop::analytics::taxonomy::AbstractNode*>)
-Q_DECLARE_METATYPE(std::vector<nx::vms::client::desktop::analytics::taxonomy::AbstractAttribute*>)

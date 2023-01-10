@@ -71,5 +71,3 @@ public:
     QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
     QSet<QGraphicsWidget *> pendingLayoutWidgets;
 };
-
-Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);

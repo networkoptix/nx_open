@@ -4,7 +4,6 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <QtCore/QRect>
 #include <QtCore/QVariant>
 #include <QtGui/QColor>
@@ -36,11 +35,8 @@ struct NX_VMS_COMMON_API QnLayoutItemData
     bool operator==(const QnLayoutItemData& other) const;
 };
 
-Q_DECLARE_METATYPE(QnLayoutItemData);
 Q_DECLARE_TYPEINFO(QnLayoutItemData, Q_MOVABLE_TYPE);
 
 typedef QList<QnLayoutItemData> QnLayoutItemDataList;
 typedef QHash<QnUuid, QnLayoutItemData> QnLayoutItemDataMap;
 
-Q_DECLARE_METATYPE(QnLayoutItemDataList);
-Q_DECLARE_METATYPE(QnLayoutItemDataMap);

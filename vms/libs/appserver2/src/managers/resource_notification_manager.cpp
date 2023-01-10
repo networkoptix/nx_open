@@ -19,9 +19,9 @@ void QnResourceNotificationManager::triggerNotification(
     const QnTransaction<vms::api::ResourceStatusData>& tran,
     NotificationSource source)
 {
-    NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2")
-        .arg(QString::fromLatin1(Q_FUNC_INFO))
-        .arg(tran.params.id.toString()));
+    NX_VERBOSE(this, "%1 Emit statusChanged signal for resource %2",
+        QString::fromLatin1(Q_FUNC_INFO),
+        tran.params.id.toString());
     emit statusChanged(QnUuid(tran.params.id), tran.params.status, source);
 }
 

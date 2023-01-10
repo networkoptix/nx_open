@@ -14,7 +14,6 @@ namespace QnMulticast
     */
     class NX_VMS_COMMON_API HTTPClient: public QObject
     {
-        Q_OBJECT
     public:
 
         static const int NO_TIMEOUT = -1;

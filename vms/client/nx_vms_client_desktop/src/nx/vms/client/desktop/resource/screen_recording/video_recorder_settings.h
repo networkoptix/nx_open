@@ -35,10 +35,6 @@ enum Resolution
 
 } // namespace Qn
 
-Q_DECLARE_METATYPE(Qn::CaptureMode)
-Q_DECLARE_METATYPE(Qn::DecoderQuality)
-Q_DECLARE_METATYPE(Qn::Resolution)
-
 namespace nx::vms::client::desktop {
 
 class VideoRecorderSettings: public core::AudioRecorderSettings

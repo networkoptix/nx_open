@@ -22,7 +22,7 @@ bool UnityLauncherWorkaround::startDetached(
 
     const QFileInfo info(program);
     QProcess process;
-    process.setProgram(lit("./") + info.fileName());
+    process.setProgram(QString("./") + info.fileName());
     process.setArguments(arguments);
     process.setWorkingDirectory(info.absolutePath());
     if (detachOutput)

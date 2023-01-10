@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
@@ -59,7 +57,3 @@ constexpr auto nxReflectVisitAllEnumItems(StreamIndex*, Visitor&& visitor)
 StreamIndex NX_VMS_API oppositeStreamIndex(StreamIndex streamIndex);
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::MotionType)
-Q_DECLARE_METATYPE(nx::vms::api::MotionTypes)
-Q_DECLARE_METATYPE(nx::vms::api::StreamIndex)

@@ -5,7 +5,6 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QMetaType>
 
 #include <nx/vms/api/types/smtp_types.h>
 

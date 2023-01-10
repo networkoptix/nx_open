@@ -155,6 +155,3 @@ protected:
 };
 
 } // namespace nx::vms::event
-
-Q_DECLARE_METATYPE(nx::vms::event::AbstractActionPtr)
-Q_DECLARE_METATYPE(nx::vms::event::AbstractActionList)

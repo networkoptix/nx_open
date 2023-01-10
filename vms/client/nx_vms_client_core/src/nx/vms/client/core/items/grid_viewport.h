@@ -154,5 +154,4 @@ private:
 
 } // namespace nx::vms::client::core
 
-Q_DECLARE_METATYPE(nx::vms::client::core::GridViewportParameters)
 QML_DECLARE_TYPEINFO(nx::vms::client::core::GridViewport, QML_HAS_ATTACHED_PROPERTIES)

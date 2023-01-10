@@ -18,10 +18,10 @@
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 
-static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
-static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
-static const QString LAST_CRASH = lit("statisticsReportLastCrash");
-static const QString SENT_PREFIX = lit("sent_");
+static const QString DATE_FORMAT("yyyy-MM-dd_hh-mm-ss");
+static const QString SERVER_API_COMMAND("crashserver/api/report");
+static const QString LAST_CRASH("statisticsReportLastCrash");
+static const QString SENT_PREFIX("sent_");
 
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
 static const uint SENDING_MIN_SIZE = 1 * 1024; /* less then 1kb is not informative */
@@ -43,8 +43,8 @@ static QFileInfoList readCrashes([[maybe_unused]] const QString& prefix = QStrin
         return QFileInfoList(); // do nothing. not implemented
     #endif
 
-    NX_DEBUG(typeid(ec2::CrashReporter), lit("readCrashes: scan %1 for files %2")
-           .arg(crashDir.absolutePath()).arg(crashFilter));
+    NX_DEBUG(typeid(ec2::CrashReporter), "readCrashes: scan %1 for files %2",
+           crashDir.absolutePath(), crashFilter);
 
     auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
     // Qt has a crossplatform bug in build in sort by QDir::Time
@@ -110,7 +110,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
     // remove old crashes
     {
-        auto allCrashes = readCrashes(lit("*"));
+        auto allCrashes = readCrashes("*");
         for (uint i = 0; i < KEEP_LAST_CRASHES && !allCrashes.isEmpty(); ++i)
             allCrashes.pop_front();
 
@@ -124,7 +124,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (!globalSettings->isStatisticsAllowed()
         || globalSettings->isNewSystem())
     {
-        NX_DEBUG(this, lit("Automatic report system is disabled"));
+        NX_DEBUG(this, "Automatic report system is disabled");
         return false;
     }
 
@@ -135,8 +135,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
-        NX_DEBUG(this, lit("Previous crash was reported %1, exit")
-                .arg(lastTime.toString(Qt::ISODate)));
+        NX_DEBUG(this, "Previous crash was reported %1, exit", lastTime.toString(Qt::ISODate));
         return false;
     }
 
@@ -145,7 +144,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         ? nx::vms::statistics::kDefaultStatisticsServer
         : configApi;
 
-    const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
+    const nx::utils::Url url = QString("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
 
     auto crashes = readCrashes();
     while (!crashes.isEmpty())
@@ -155,8 +154,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         if (crash.size() < SENDING_MIN_SIZE)
         {
             QFile::remove(crash.absoluteFilePath());
-            NX_VERBOSE(this, lit("Remove not informative crash: %1")
-                .arg(crash.absolutePath()));
+            NX_VERBOSE(this, "Remove not informative crash: %1", crash.absolutePath());
         }
         else
         if (crash.size() < SENDING_MAX_SIZE)
@@ -175,11 +173,11 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
-        NX_ERROR(this, lit("Previous report is in progress, exit"));
+        NX_ERROR(this, "Previous report is in progress, exit");
         return;
     }
 
-    NX_DEBUG(this, lit("Start new async scan for reports"));
+    NX_DEBUG(this, "Start new async scan for reports");
     m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
@@ -209,8 +207,7 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     auto content = file.readAll();
     if (content.size() == 0)
     {
-        NX_WARNING(this, lit("Error: %1 is not readable or empty: %2")
-                .arg(filePath).arg(file.errorString()));
+        NX_WARNING(this, "Error: %1 is not readable or empty: %2", filePath, file.errorString());
         return false;
     }
 
@@ -227,11 +224,11 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_activeHttpClient)
     {
-        NX_WARNING(this, lit("Another report already is in progress!"));
+        NX_WARNING(this, "Another report already is in progress!");
         return false;
     }
 
-    NX_INFO(this, lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()));
+    NX_INFO(this, "Send %1 to %2", filePath, serverApi.toString());
 
     httpClient->doPost(serverApi, "application/octet-stream", std::move(content));
     m_activeHttpClient = std::move(httpClient);
@@ -251,14 +248,14 @@ void ReportData::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (!httpClient->hasRequestSucceeded())
     {
-        NX_WARNING(this, lit("Sending %1 to %2 has failed")
-                .arg(m_crashFile.absoluteFilePath())
-                .arg(httpClient->url().toString()));
+        NX_WARNING(this, "Sending %1 to %2 has failed",
+                m_crashFile.absoluteFilePath(),
+                httpClient->url().toString());
     }
     else
     {
-        NX_DEBUG(this, lit("Report %1 has been sent successfully")
-                .arg(m_crashFile.absoluteFilePath()));
+        NX_DEBUG(this, "Report %1 has been sent successfully",
+                m_crashFile.absoluteFilePath());
 
         const auto now = qnSyncTime->currentDateTime().toUTC();
         m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));
@@ -288,7 +285,7 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = nx::vms::api::OsInformation::fromBuildInfo().toString();
     const auto systemRuntime = nx::vms::api::OsInformation::currentSystemRuntime();
-    const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
+    const auto system = QString( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
             .replace( QChar( ' ' ), QChar( '-' ) );
 
     const auto timestamp = m_crashFile.birthTime().toUTC().toString("yyyy-MM-dd_hh-mm-ss");

@@ -6,6 +6,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QRegularExpression>
 
 #include <nx/branding.h>
 #include <nx/network/http/http_client.h>

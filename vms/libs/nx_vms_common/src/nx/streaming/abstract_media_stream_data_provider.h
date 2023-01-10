@@ -10,14 +10,9 @@
 #include <nx/utils/value_cache.h>
 #include <utils/camera/camera_diagnostics.h>
 
-class QnResourceVideoLayout;
-class QnResourceAudioLayout;
-
 class NX_VMS_COMMON_API QnAbstractMediaStreamDataProvider:
     public QnAbstractStreamDataProvider
 {
-    Q_OBJECT
-
 public:
     static void setMediaStatisticsWindowSize(std::chrono::microseconds value);
     static void setMediaStatisticsMaxDurationInFrames(int value);

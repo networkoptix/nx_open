@@ -87,5 +87,3 @@ private:
     QScopedPointer<QnThreadsafeItemStorage<QnVideoWallMatrix> > m_matrices;
 };
 
-Q_DECLARE_METATYPE(QnVideoWallResourcePtr)
-Q_DECLARE_METATYPE(QnVideoWallResourceList)

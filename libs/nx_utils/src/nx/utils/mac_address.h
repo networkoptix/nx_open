@@ -6,7 +6,6 @@
 #include <string_view>
 
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 #include <QtCore/QHash>
 
 namespace nx::utils {
@@ -47,5 +46,3 @@ inline size_t qHash(const MacAddress& value, size_t seed = 0)
 }
 
 } // namespace nx::utils
-
-Q_DECLARE_METATYPE(nx::utils::MacAddress)

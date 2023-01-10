@@ -4,8 +4,6 @@
 
 #include <memory>
 
-#include <QtCore/QMetaType>
-
 namespace ec2 {
 
 enum class ErrorCode;
@@ -112,5 +110,3 @@ using AbstractECConnectionPtr = std::shared_ptr<AbstractECConnection>;
 class AbstractECConnectionFactory;
 
 } // namespace ec2
-
-Q_DECLARE_METATYPE(ec2::AbstractECConnectionPtr);

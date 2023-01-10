@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::core::transcoding {
@@ -30,5 +28,3 @@ constexpr auto nxReflectVisitAllEnumItems(TimestampFormat*, Visitor&& visitor)
 }
 
 } // namespace nx::core::transcoding
-
-Q_DECLARE_METATYPE(nx::core::transcoding::TimestampFormat)

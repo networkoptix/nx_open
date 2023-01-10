@@ -163,7 +163,7 @@ void QnIoModuleFormOverlayContentsPrivate::InputPortItem::paint(QPainter* painte
     paintId(painter, idRect, false);
 
     auto margin = nx::style::Metrics::kStandardPadding + effectiveIdWidth();
-    auto icon = qnSkin->icon(lit("io/indicator_off.png"), lit("io/indicator_on.png"));
+    auto icon = qnSkin->icon("io/indicator_off.png", "io/indicator_on.png");
     auto iconRect = QRectF(idRect.left() + margin, idRect.top(), kIndicatorWidth, idRect.height());
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     icon.paint(painter, iconRect.toRect(), Qt::AlignCenter, QIcon::Normal, iconState);
@@ -256,7 +256,7 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
     // TODO: #vkutin #apats Icon for disabled state is required
-    auto icon = qnSkin->icon(lit("io/button_indicator_off.png"), lit("io/button_indicator_on.png"));
+    auto icon = qnSkin->icon("io/button_indicator_off.png", "io/button_indicator_on.png");
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;
     iconRect.setLeft(iconRect.right() - kIndicatorWidth);

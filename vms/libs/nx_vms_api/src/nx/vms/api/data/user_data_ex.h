@@ -21,4 +21,3 @@ NX_VMS_API_DECLARE_STRUCT(UserDataEx)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::UserDataEx)

@@ -5,16 +5,19 @@
 #include <chrono>
 #include <limits>
 
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QUrlQuery>
 
 #include <camera/fps_calculator.h>
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_media_layout.h>
 #include <nx/analytics/utils.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json/serializer.h>

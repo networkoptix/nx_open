@@ -17,7 +17,6 @@ class SubjectHierarchy;
  */
 class NX_VMS_COMMON_API InheritedResourceAccessResolver: public AbstractResourceAccessResolver
 {
-    Q_OBJECT
     using base_type = AbstractResourceAccessResolver;
 
 public:

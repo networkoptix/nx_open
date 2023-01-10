@@ -22,5 +22,3 @@ NX_REFLECTION_INSTRUMENT(CloudSystemData, CloudSystemData_Fields)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::CloudSystemData)
-Q_DECLARE_METATYPE(nx::vms::api::CloudSystemDataList)

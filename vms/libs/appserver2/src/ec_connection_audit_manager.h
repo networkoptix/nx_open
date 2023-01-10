@@ -14,7 +14,6 @@ class AbstractECConnection;
 
 class ECConnectionAuditManager: public QObject, public QnCommonModuleAware
 {
-    Q_OBJECT
 public:
     ECConnectionAuditManager(AbstractECConnection* ecConnection, QnCommonModule* commonModule);
     virtual ~ECConnectionAuditManager() override;

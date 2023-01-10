@@ -28,7 +28,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
+#include <nx/utils/math/fuzzy.h>
 #include <utils/common/long_runable_cleanup.h>
+#include <utils/math/math.h>
 
 #include "audio_output.h"
 #include "frame_metadata.h"
