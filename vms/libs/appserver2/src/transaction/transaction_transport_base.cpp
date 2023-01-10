@@ -652,7 +652,7 @@ void QnTransactionTransportBase::doOutgoingConnect(
         toString(getState()));
 
     nx::utils::Url url = remoteAddr();
-    url.setPath(url.path() + lit("/") + toString(getState()));
+    url.setPath(url.path() + "/" + toString(getState()));
     m_httpClient->setAuthType(url.scheme() == nx::network::http::kSecureUrlSchemeName
         ? nx::network::http::AuthType::authBasicAndDigest
         : nx::network::http::AuthType::authDigest);
@@ -674,7 +674,7 @@ void QnTransactionTransportBase::repeatDoGet()
         Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()));
 
     nx::utils::Url url = remoteAddr();
-    url.setPath(url.path() + lit("/") + toString(getState()));
+    url.setPath(url.path() + "/" + toString(getState()));
     m_httpClient->doGet(url);
 }
 
@@ -1180,7 +1180,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                 if (m_remotePeer.peerType == api::PeerType::cloudServer)
                     m_postTranBaseUrl.setPath(QString(nx::cloud::db::api::kPushEc2TransactionPath));
                 else
-                    m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+                    m_postTranBaseUrl.setPath("/ec2/forward_events");
                 m_postTranBaseUrl.setQuery(QString());
             }
         }

@@ -39,7 +39,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceTypeData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeData)
-Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeDataList)
-Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeData)
-Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeDataList)

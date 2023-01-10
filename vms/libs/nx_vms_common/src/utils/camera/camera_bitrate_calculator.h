@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/camera_media_stream_info.h>
 
 #include <common/common_globals.h>
 

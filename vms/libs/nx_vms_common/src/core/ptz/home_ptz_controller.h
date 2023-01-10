@@ -14,7 +14,6 @@ class QnHomePtzExecutor;
 
 class NX_VMS_COMMON_API QnHomePtzController: public QnProxyPtzController
 {
-    Q_OBJECT
     using base_type = QnProxyPtzController;
 
 public:

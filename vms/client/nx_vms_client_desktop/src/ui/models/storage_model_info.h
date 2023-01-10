@@ -26,5 +26,3 @@ struct QnStorageModelInfo
 };
 
 typedef QList<QnStorageModelInfo> QnStorageModelInfoList;
-
-Q_DECLARE_METATYPE(QnStorageModelInfo)

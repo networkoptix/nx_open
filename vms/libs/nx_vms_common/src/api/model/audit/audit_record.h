@@ -42,8 +42,4 @@ NX_REFLECTION_INSTRUMENT(QnAuditRecord, QnAuditRecord_Fields)
 using QnAuditRecordList = QVector<QnAuditRecord>;
 using QnAuditRecordRefList = QVector<QnAuditRecord*>;
 
-Q_DECLARE_METATYPE(QnAuditRecord)
-Q_DECLARE_METATYPE(QnAuditRecord*)
-Q_DECLARE_METATYPE(QnAuditRecordList)
-
 #endif // _QN_AUDIT_RECORD_H__

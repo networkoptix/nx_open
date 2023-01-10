@@ -296,17 +296,16 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParamsPostBody
 };
 #define QnCameraAdvancedParamsPostBody_Fields (cameraId)(paramValues)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamValue, (json)(metatype), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter, (json)(metatype), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamGroup, (json)(metatype), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParams, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamValue, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamGroup, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParams, (json), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency,
-    (json)(metatype),
+    (json),
     NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition,
-    (json)(metatype),
+    (json),
     NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterOverload, (json)(metatype), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamsPostBody, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterOverload, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamsPostBody, (json), NX_VMS_COMMON_API)
 
-Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)

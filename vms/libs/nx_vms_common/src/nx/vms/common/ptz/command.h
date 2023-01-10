@@ -101,5 +101,3 @@ constexpr auto nxReflectVisitAllEnumItems(Command*, Visitor&& visitor)
 
 } // namespace ptz
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::ptz::Command)

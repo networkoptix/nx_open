@@ -30,7 +30,6 @@ class QnCustomResourceVideoLayout;
  */
 class NX_VMS_COMMON_API QnAviArchiveDelegate: public QnAbstractArchiveDelegate
 {
-    Q_OBJECT
 
     using base_type = QnAbstractArchiveDelegate;
     friend class QnAviAudioLayout;

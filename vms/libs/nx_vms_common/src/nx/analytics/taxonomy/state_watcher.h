@@ -12,7 +12,6 @@ class DescriptorContainer;
 
 class StateWatcher: public AbstractStateWatcher
 {
-    Q_OBJECT
 public:
     StateWatcher(
         DescriptorContainer* taxonomyDescriptorContainer,

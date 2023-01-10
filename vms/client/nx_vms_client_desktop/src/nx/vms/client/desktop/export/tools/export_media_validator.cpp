@@ -4,6 +4,7 @@
 
 #include <camera/camera_data_manager.h>
 #include <client_core/client_core_module.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>

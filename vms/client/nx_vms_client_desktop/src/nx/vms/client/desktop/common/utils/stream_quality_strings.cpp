@@ -61,7 +61,7 @@ public:
                 //: Short for 'Preset'
                 return tr("Ps");
             case StreamQuality::undefined:
-                return lit("-");
+                return "-";
 
             default:
                 return QString();

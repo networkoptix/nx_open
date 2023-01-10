@@ -8,6 +8,3 @@
 
 using ServerSearchAddressesHash = QHash<QnUuid, QSet<QString>>;
 using SystemSearchAddressesHash = QHash<QnUuid, ServerSearchAddressesHash>;
-
-Q_DECLARE_METATYPE(ServerSearchAddressesHash)
-Q_DECLARE_METATYPE(SystemSearchAddressesHash)

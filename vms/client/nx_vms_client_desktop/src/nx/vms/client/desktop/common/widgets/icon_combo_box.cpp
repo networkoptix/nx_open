@@ -65,14 +65,14 @@ void IconComboBox::setIcons(const QString& path,
 {
     const QString ext = extension.startsWith('.')
         ? extension
-        : lit(".") + extension;
+        : QString(".") + extension;
 
     QVector<QPair<QString, QIcon>> icons;
     icons.reserve(names.size());
 
     for (const auto& name: names)
     {
-        const auto fullName = path + lit("/") + name + ext;
+        const auto fullName = path + QChar('/') + name + ext;
         const auto icon = qnSkin->icon(fullName);
         if (!icon.isNull())
             icons.push_back({ name, icon });
@@ -86,14 +86,14 @@ void IconComboBox::setPixmaps(const QString& path,
 {
     const QString ext = extension.startsWith('.')
         ? extension
-        : lit(".") + extension;
+        : QString(".") + extension;
 
     QVector<QPair<QString, QPixmap>> pixmaps;
     pixmaps.reserve(names.size());
 
     for (const auto& name : names)
     {
-        const auto fullName = path + lit("/") + name + ext;
+        const auto fullName = path + QChar('/') + name + ext;
         const auto pixmap = qnSkin->pixmap(fullName);
         if (!pixmap.isNull())
             pixmaps.push_back({ name, pixmap });

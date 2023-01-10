@@ -48,5 +48,3 @@ NX_REFLECTION_INSTRUMENT(IdData, IdData_Fields)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::IdData)
-Q_DECLARE_METATYPE(nx::vms::api::IdDataList)

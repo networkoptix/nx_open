@@ -38,5 +38,3 @@ void deserialize_field(const QVariant& from, UserExternalId* to);
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::UserExternalId)
-Q_DECLARE_METATYPE(nx::vms::api::UserExternalIdList)

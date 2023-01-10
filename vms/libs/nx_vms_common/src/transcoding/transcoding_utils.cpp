@@ -10,6 +10,7 @@
 #include <utils/media/h263_utils.h>
 #include <utils/math/math.h>
 
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/streaming/abstract_stream_data_provider.h>

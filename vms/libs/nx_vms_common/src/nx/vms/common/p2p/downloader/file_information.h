@@ -140,5 +140,3 @@ QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json), NX_VMS_COMMON_API)
 } // namespace common
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::common::p2p::downloader::FileInformation)

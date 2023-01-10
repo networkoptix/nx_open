@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <nx/utils/uuid.h>
@@ -91,8 +90,8 @@ struct NX_VMS_COMMON_API QnManualCameraSearchReply
 #define QnManualCameraSearchReply_Fields (status)(processUuid)(cameras)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnManualResourceSearchEntry,
-    (json)(ubjson)(xml)(csv_record)(metatype),
+    (json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnManualCameraSearchReply,
-    (json)(ubjson)(xml)(csv_record)(metatype),
+    (json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)

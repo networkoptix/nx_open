@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <nx/utils/uuid.h>
 
@@ -39,6 +38,3 @@ private:
 using LayoutItemIndexList = QList<LayoutItemIndex>;
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::LayoutItemIndex);
-Q_DECLARE_METATYPE(nx::vms::client::desktop::LayoutItemIndexList);

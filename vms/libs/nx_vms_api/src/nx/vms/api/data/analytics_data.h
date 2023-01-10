@@ -276,10 +276,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfo)
 using ExtendedPluginInfoByServer = std::map<QnUuid, PluginInfoExList>;
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::AnalyticsPluginData)
-Q_DECLARE_METATYPE(nx::vms::api::AnalyticsEngineData)
-Q_DECLARE_METATYPE(nx::vms::api::PluginInfo)
-Q_DECLARE_METATYPE(nx::vms::api::PluginInfoList)
-Q_DECLARE_METATYPE(nx::vms::api::PluginResourceBindingInfo)
-Q_DECLARE_METATYPE(nx::vms::api::PluginInfoEx)

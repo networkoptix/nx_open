@@ -60,7 +60,7 @@ void VirtualCameraUploadWidget::loadState(const CameraSettingsDialogState& state
             ui->messageLabel->setText(state.virtualCameraUploaderName.isEmpty()
                 ? tr("Another user is currently uploading footage to this camera.")
                 : tr("User %1 is currently uploading footage to this camera.")
-                    .arg(lit("<b>%1</b>").arg(state.virtualCameraUploaderName)));
+                    .arg(QString("<b>%1</b>").arg(state.virtualCameraUploaderName)));
 
             ui->stackedWidget->setCurrentWidget(ui->messagePage);
             break;
@@ -76,7 +76,7 @@ void VirtualCameraUploadWidget::loadState(const CameraSettingsDialogState& state
                     return QFileInfo(state.currentFile().path).fileName();
                 };
 
-            const auto queueMessage = lit(" %1\t%p%").arg((virtualCameraState.queue.size() > 1
+            const auto queueMessage = QString(" %1\t%p%").arg((virtualCameraState.queue.size() > 1
                 ? tr("(%1 of %2)", "Uploaded and total number of files will be substituted")
                     .arg(virtualCameraState.currentIndex + 1)
                     .arg(virtualCameraState.queue.size())

@@ -157,6 +157,3 @@ private:
 } // namespace event
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::event::AbstractEventPtr)
-Q_DECLARE_METATYPE(nx::vms::event::EventParameters)

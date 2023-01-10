@@ -29,7 +29,7 @@ public:
         m_checkStateChanged(checkStateChanged)
     {
         m_data[Qt::CheckStateRole] = QVariant::fromValue<int>(Qt::Unchecked);
-        m_data[Qt::DisplayRole] = lit("<All Items>"); //< Just a default.
+        m_data[Qt::DisplayRole] = "<All Items>"; //< Just a default.
     }
 
     virtual QModelIndex index(int row, int column,

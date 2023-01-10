@@ -146,7 +146,3 @@ using LicenseSummaryValues = Map<QString /*type*/, LicenseSummaryData /*summary*
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::LicenseData)
-Q_DECLARE_METATYPE(nx::vms::api::LicenseDataList)
-Q_DECLARE_METATYPE(nx::vms::api::DetailedLicenseData)
-Q_DECLARE_METATYPE(nx::vms::api::DetailedLicenseDataList)

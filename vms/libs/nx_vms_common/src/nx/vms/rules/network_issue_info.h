@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 
 #include <nx/fusion/fusion/fusion_fwd.h>
@@ -31,5 +30,3 @@ struct NX_VMS_COMMON_API NetworkIssueInfo
 QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueInfo, (json), NX_VMS_COMMON_API);
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::NetworkIssueInfo);

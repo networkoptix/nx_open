@@ -7,7 +7,6 @@
 
 class NX_VMS_COMMON_API QnViewportPtzController: public QnProxyPtzController
 {
-    Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:

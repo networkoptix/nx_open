@@ -2,7 +2,6 @@
 
 #include "abstract_animator.h"
 
-#include <QtCore/QMetaType>
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/assert.h>

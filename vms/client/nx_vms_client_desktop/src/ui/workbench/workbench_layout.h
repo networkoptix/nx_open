@@ -38,7 +38,6 @@ enum class QnLayoutFlag
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
-Q_DECLARE_METATYPE(QnLayoutFlags)
 
 /**
  * Layout of a workbench.
@@ -423,6 +422,3 @@ private:
 };
 
 using QnWorkbenchLayoutList = QList<QnWorkbenchLayout*>;
-
-Q_DECLARE_METATYPE(QnWorkbenchLayout*);
-Q_DECLARE_METATYPE(QnWorkbenchLayoutList);

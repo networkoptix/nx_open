@@ -169,6 +169,3 @@ NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::LdapSettings)
-Q_DECLARE_METATYPE(nx::vms::api::LdapUser)
-Q_DECLARE_METATYPE(nx::vms::api::LdapUserList)

@@ -84,7 +84,6 @@ QnReadOnlyEventEater *QnReadOnlyEventEater::instance(QWidget *widget) {
 }
 
 Q_DECLARE_OPAQUE_POINTER(QnReadOnlyEventEater *)
-Q_DECLARE_METATYPE(QnReadOnlyEventEater *);
 
 
 // -------------------------------------------------------------------------- //

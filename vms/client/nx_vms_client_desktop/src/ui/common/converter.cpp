@@ -3,7 +3,6 @@
 #include "converter.h"
 
 #include <QtCore/QVariant>
-#include <QtCore/QMetaType>
 
 #include <nx/utils/log/log.h>
 
@@ -33,4 +32,3 @@ QVariant AbstractConverter::convertTargetToSource(const QVariant &target) const 
 
     return doConvertTargetToSource(target);
 }
-

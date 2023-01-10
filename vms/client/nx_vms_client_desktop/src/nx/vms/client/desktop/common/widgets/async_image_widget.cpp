@@ -26,7 +26,7 @@
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-
+#include <utils/math/math.h>
 
 namespace nx::vms::client::desktop {
 

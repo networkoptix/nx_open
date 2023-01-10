@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
@@ -277,8 +276,3 @@ inline AccessRights globalPermissionsToAccessRights(GlobalPermissions permission
 }
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::AccessRight)
-Q_DECLARE_METATYPE(nx::vms::api::AccessRights)
-Q_DECLARE_METATYPE(nx::vms::api::GlobalPermission)
-Q_DECLARE_METATYPE(nx::vms::api::GlobalPermissions)

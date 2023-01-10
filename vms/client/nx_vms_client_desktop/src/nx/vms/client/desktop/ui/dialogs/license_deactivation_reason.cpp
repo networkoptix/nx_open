@@ -159,7 +159,7 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
         [this, nameField, emailField, reasonComboBox, reasonField]()
         {
             const auto reasonText = isLastSelectedOption(reasonComboBox)
-                ? reasonField->text().split(lit("\n"))
+                ? reasonField->text().split("\n")
                 : QStringList(reasonComboBox->text());
 
             const auto systemName = systemSettings()->systemName();

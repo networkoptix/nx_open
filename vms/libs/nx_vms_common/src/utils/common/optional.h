@@ -25,4 +25,4 @@ private:
     std::optional<bool> m_value;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(QnOptionalBool, (metatype)(lexical));
+QN_FUSION_DECLARE_FUNCTIONS(QnOptionalBool, (lexical));

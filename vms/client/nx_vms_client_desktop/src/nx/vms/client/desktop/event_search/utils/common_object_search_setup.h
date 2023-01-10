@@ -87,5 +87,3 @@ private:
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(QnVirtualCameraResourceSet)

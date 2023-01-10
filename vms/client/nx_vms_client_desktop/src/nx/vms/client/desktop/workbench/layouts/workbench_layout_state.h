@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/instrument.h>
 #include <nx/utils/datetime.h>
 
@@ -24,5 +22,3 @@ struct StreamSynchronizationState
 NX_REFLECTION_INSTRUMENT(StreamSynchronizationState, StreamSynchronizationState_Fields)
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::StreamSynchronizationState)

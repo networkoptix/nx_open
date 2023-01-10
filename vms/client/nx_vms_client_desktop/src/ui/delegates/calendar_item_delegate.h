@@ -3,7 +3,6 @@
 #ifndef QN_CALENDAR_ITEM_DELEGATE_H
 #define QN_CALENDAR_ITEM_DELEGATE_H
 
-#include <QtCore/QMetaType>
 #include <QtWidgets/QStyledItemDelegate>
 
 struct QnTimePeriod;

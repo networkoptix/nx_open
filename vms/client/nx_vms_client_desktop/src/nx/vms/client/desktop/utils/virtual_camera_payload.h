@@ -65,5 +65,3 @@ struct VirtualCameraUpload
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::VirtualCameraUpload)

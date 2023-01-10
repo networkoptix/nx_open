@@ -17,7 +17,6 @@ signals:
 
 class QnThreadedPtzController: public QnProxyPtzController
 {
-    Q_OBJECT
     using base_type = QnProxyPtzController;
 
 public:

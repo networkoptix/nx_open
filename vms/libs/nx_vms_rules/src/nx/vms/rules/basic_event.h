@@ -100,5 +100,3 @@ private:
 };
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::EventPtr)

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 class QnIndents
 {
 public:
@@ -45,5 +43,3 @@ private:
     int m_left = 0;
     int m_right = 0;
 };
-
-Q_DECLARE_METATYPE(QnIndents);

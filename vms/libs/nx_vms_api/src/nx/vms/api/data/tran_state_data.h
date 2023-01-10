@@ -52,7 +52,3 @@ NX_VMS_API_DECLARE_STRUCT(SyncRequestData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::TranState)
-Q_DECLARE_METATYPE(nx::vms::api::TranStateResponse)
-Q_DECLARE_METATYPE(nx::vms::api::TranSyncDoneData)
-Q_DECLARE_METATYPE(nx::vms::api::SyncRequestData)

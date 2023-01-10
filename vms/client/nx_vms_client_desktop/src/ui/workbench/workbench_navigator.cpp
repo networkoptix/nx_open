@@ -63,6 +63,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_user_inactivity_watcher.h"

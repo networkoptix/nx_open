@@ -7,8 +7,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/motion_window.h>
 #include <core/resource/resource_data.h>
+#include <core/resource/resource_media_layout.h>
 #include <core/resource/user_resource.h>
+#include <core/ptz/ptz_preset.h>
 #include <licensing/license.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/string_conversion.h>
@@ -16,8 +19,10 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/common/globals/media_stream_event.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/synctime.h>

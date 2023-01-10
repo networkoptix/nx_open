@@ -211,8 +211,3 @@ NX_VMS_API bool deserialize(
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::ScheduleTaskData)
-Q_DECLARE_METATYPE(nx::vms::api::BackupContentType)
-Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesData)
-Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesDataList)
-

@@ -41,13 +41,13 @@ AbstractCameraAdvancedParamWidget::AbstractCameraAdvancedParamWidget(const QnCam
 
 QStringList AbstractCameraAdvancedParamWidget::range() const
 {
-    NX_ASSERT(false, lit("range allowed to be called only for Enumeration widget."));
+    NX_ASSERT(false, "range allowed to be called only for Enumeration widget.");
     return QStringList();
 }
 
 void AbstractCameraAdvancedParamWidget::setRange(const QString& /*range*/)
 {
-    NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
+    NX_ASSERT(false, "setRange allowed to be called only for Enumeration widget.");
 }
 
 class QnBoolCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
@@ -68,12 +68,12 @@ public:
 
     virtual QString value() const override
     {
-        return m_checkBox->isChecked() ? lit("true") : lit("false");
+        return m_checkBox->isChecked() ? "true" : "false";
     }
 
     virtual void setValue(const QString& newValue) override
     {
-        m_checkBox->setChecked(newValue == lit("true") || newValue == lit("1"));
+        m_checkBox->setChecked(newValue == "true" || newValue == "1");
     }
 
 private:
@@ -113,7 +113,7 @@ public:
             m_spinBox->setButtonSymbols(QSpinBox::NoButtons);
 
         if (!parameter.unit.isEmpty())
-            m_spinBox->setSuffix(lit(" %1").arg(parameter.unit));
+            m_spinBox->setSuffix(QString(" %1").arg(parameter.unit));
 
         m_layout->addWidget(m_spinBox);
         m_layout->addStretch(0);
@@ -401,10 +401,10 @@ public:
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_ptrWidget(new LensPtzControl(this))
     {
-        const QString kIconCw(lit("text_buttons/rotate_cw.png"));
-        const QString kIconCwHovered(lit("text_buttons/rotate_cw_hovered.png"));
-        const QString kIconCcw(lit("text_buttons/rotate_ccw.png"));
-        const QString kIconCcwHovered(lit("text_buttons/rotate_ccw_hovered.png"));
+        const QString kIconCw("text_buttons/rotate_cw.png");
+        const QString kIconCwHovered("text_buttons/rotate_cw_hovered.png");
+        const QString kIconCcw("text_buttons/rotate_ccw.png");
+        const QString kIconCcwHovered("text_buttons/rotate_ccw_hovered.png");
 
         // Central widget is here.
         const auto ptzrContainer = new QVBoxLayout();
@@ -462,7 +462,7 @@ public:
     virtual QString value() const override
     {
         auto val = m_ptrWidget->value();
-        return lit("%1,%2,%3").arg(val.horizontal).arg(val.vertical).arg(val.rotation);
+        return QString("%1,%2,%3").arg(val.horizontal).arg(val.vertical).arg(val.rotation);
     }
 
     virtual void setRange(const QString& range) override

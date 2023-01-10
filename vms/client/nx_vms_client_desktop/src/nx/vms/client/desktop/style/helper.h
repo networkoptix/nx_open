@@ -4,9 +4,10 @@
 
 #include <QtCore/QFlags>
 #include <QtCore/QMargins>
-#include <QtCore/QMetaType>
 #include <QtCore/QRectF>
 #include <QtCore/QSize>
+#include <QtGui/QColor>
+#include <QtGui/QPalette>
 
 class QWidget;
 
@@ -266,5 +267,3 @@ enum class TabShape
 TabShape tabShape(const QWidget* widget);
 
 } // namespace nx::style
-
-Q_DECLARE_METATYPE(nx::style::TabShape)

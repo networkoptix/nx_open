@@ -91,5 +91,3 @@ private:
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::node_view::details::ViewNodeData)

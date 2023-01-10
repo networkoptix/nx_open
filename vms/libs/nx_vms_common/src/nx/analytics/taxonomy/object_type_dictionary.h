@@ -16,7 +16,6 @@ class NX_VMS_COMMON_API ObjectTypeDictionary:
     public nx::analytics::db::AbstractObjectTypeDictionary
 {
     Q_OBJECT
-
 public:
     explicit ObjectTypeDictionary(AbstractStateWatcher* taxonomyWatcher, QObject* parent = nullptr);
     virtual std::optional<QString> idToName(const QString& id) const override;

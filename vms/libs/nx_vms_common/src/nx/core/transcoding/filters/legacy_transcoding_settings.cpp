@@ -3,6 +3,7 @@
 #include "legacy_transcoding_settings.h"
 
 #include <core/resource/media_resource.h>
+#include <core/resource/resource_media_layout.h>
 
 namespace nx {
 namespace core {

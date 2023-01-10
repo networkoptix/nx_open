@@ -3,6 +3,7 @@
 #include "layout_data_helper.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_media_layout.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>

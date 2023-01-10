@@ -73,5 +73,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraData)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::CameraData)
-Q_DECLARE_METATYPE(nx::vms::api::CameraDataList)

@@ -3,8 +3,6 @@
 #include "helper.h"
 
 #include <QtCore/QVariant>
-#include <QtGui/QColor>
-#include <QtGui/QPalette>
 #include <QtGui/private/qfont_p.h>
 #include <QtWidgets/QWidget>
 

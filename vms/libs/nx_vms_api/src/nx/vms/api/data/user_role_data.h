@@ -64,5 +64,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::UserRoleData)
-Q_DECLARE_METATYPE(nx::vms::api::UserRoleDataList)

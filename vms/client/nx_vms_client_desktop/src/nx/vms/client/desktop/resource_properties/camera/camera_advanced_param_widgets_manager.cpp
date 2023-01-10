@@ -2,15 +2,13 @@
 
 #include "camera_advanced_param_widgets_manager.h"
 
+#include <algorithm>
 #include <set>
 
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
-
-#include <boost/range.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <nx/vms/client/desktop/style/helper.h>
 
@@ -221,13 +219,13 @@ void CameraAdvancedParamWidgetsManager::updateParametersVisibility(ParameterVisi
 bool CameraAdvancedParamWidgetsManager::hasValidValues(
     const QnCameraAdvancedParamGroup& group) const
 {
-    bool hasValidParameter = boost::algorithm::any_of(
-        group.params,
+    bool hasValidParameter = std::any_of(
+        group.params.begin(), group.params.end(),
         [](const QnCameraAdvancedParameter &param) { return param.isValid(); });
     if (hasValidParameter)
         return true;
-    return boost::algorithm::any_of(
-        group.groups,
+    return std::any_of(
+        group.groups.begin(), group.groups.end(),
         [this](const QnCameraAdvancedParamGroup &group) { return hasValidValues(group); });
 }
 

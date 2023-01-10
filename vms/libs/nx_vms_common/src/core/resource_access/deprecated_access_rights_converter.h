@@ -27,7 +27,6 @@ class NX_VMS_COMMON_API DeprecatedAccessRightsConverter:
     public QObject,
     public QnUpdatable
 {
-    Q_OBJECT
     using base_type = QObject;
 
 public:

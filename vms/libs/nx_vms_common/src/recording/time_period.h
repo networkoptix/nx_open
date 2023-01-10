@@ -5,9 +5,8 @@
 #include <chrono>
 #include <limits>
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization/compressed_time_fwd.h>
 #include <nx/reflect/instrument.h>
 
 struct NX_VMS_COMMON_API QnTimePeriod
@@ -201,7 +200,7 @@ NX_VMS_COMMON_API std::string toString(const QnTimePeriod& period);
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod,
-    (json)(metatype)(datastream)(ubjson)(xml)(csv_record),
+    (json)(datastream)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)
 
 NX_REFLECTION_INSTRUMENT(QnTimePeriod, (startTimeMs)(durationMs))

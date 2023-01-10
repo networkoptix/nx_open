@@ -137,5 +137,3 @@ private:
 };
 
 } // namespace nx::vms::discovery
-
-Q_DECLARE_METATYPE(nx::vms::discovery::ModuleEndpoint);

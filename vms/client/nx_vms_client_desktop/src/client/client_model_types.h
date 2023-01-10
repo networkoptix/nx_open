@@ -5,7 +5,6 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QWeakPointer>
@@ -31,7 +30,6 @@ struct QnThumbnailsSearchState {
     QnTimePeriod period;
     qint64 step;
 };
-Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchState
@@ -78,7 +76,7 @@ public:
 
 using QnWorkbenchStateList = QList<QnWorkbenchState>;
 
-QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState::UnsavedLayout, (json))
 
 // -------------------------------------------------------------------------- //
@@ -95,8 +93,7 @@ struct QnLicenseWarningState {
  */
 typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
-Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
-QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
 
 // -------------------------------------------------------------------------- //
 // QnBackgroundImage
@@ -120,5 +117,5 @@ struct QnBackgroundImage
 };
 #define QnBackgroundImage_Fields (enabled)(name)(originalName)(mode)(opacity)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json));
 NX_REFLECTION_INSTRUMENT(QnBackgroundImage, QnBackgroundImage_Fields)

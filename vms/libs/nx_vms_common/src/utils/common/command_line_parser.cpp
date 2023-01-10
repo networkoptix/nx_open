@@ -4,7 +4,6 @@
 
 #include <cassert>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
 #include <nx/utils/log/assert.h>

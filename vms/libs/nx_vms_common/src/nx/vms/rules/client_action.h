@@ -17,5 +17,3 @@ NX_REFLECTION_ENUM_CLASS(ClientAction,
     browseUrl);
 
 } // namespace nx::vms::api::rules
-
-Q_DECLARE_METATYPE(nx::vms::rules::ClientAction)

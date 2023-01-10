@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QHash>
 #include <QtCore/QHashFunctions>
+#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
 
@@ -182,5 +182,3 @@ void registerQmlType();
 
 } // namespace ResourceTree
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ResourceTree::ShortcutHint)

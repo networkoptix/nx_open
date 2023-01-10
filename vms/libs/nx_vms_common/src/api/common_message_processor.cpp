@@ -835,7 +835,7 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
     m_context->eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_broadcastBusinessAction(const vms::event::AbstractActionPtr& action)
+void QnCommonMessageProcessor::on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action)
 {
     emit businessActionReceived(action);
 }

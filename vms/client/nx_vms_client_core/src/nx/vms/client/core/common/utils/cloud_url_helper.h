@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QUrl>
 
 #include <nx/vms/utils/system_uri.h>
 #include <nx/utils/url.h>

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QUrl>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
@@ -34,6 +32,3 @@ QN_FUSION_DECLARE_FUNCTIONS(LocalConnectionData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(WeightData, (json))
 
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::LocalConnectionData)
-Q_DECLARE_METATYPE(nx::vms::client::core::WeightData)

@@ -5,8 +5,6 @@
 #include <iostream>
 
 #include <QtCore/QUrl>
-#include <QtCore/QJsonValue>
-#include <QtCore/QMetaType>
 
 namespace nx::utils {
 
@@ -241,20 +239,12 @@ NX_UTILS_API QString toString(const nx::utils::Url& value);
 
 } // namespace nx::utils
 
-Q_DECLARE_METATYPE(nx::utils::Url)
 
 class QnJsonContext;
+class QJsonValue;
 
-inline void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target)
-{
-    *target = QJsonValue(url.toString());
-}
-
-inline bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target)
-{
-    *target = nx::utils::Url(value.toString());
-    return true;
-}
+NX_UTILS_API void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target);
+NX_UTILS_API bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target);
 
 NX_UTILS_API QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url);
 NX_UTILS_API QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url);

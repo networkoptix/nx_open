@@ -135,5 +135,3 @@ NX_VMS_API void setType(UserData* user, UserType type);
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::UserData)
-Q_DECLARE_METATYPE(nx::vms::api::UserDataList)

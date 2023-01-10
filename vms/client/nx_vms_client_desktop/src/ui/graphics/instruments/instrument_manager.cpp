@@ -22,8 +22,6 @@ namespace {
     const char *viewportWatcherName = "_qn_viewportWatcher";
 }
 
-Q_DECLARE_METATYPE(InstrumentManager *);
-
 InstrumentManagerPrivate::InstrumentManagerPrivate():
     q_ptr(nullptr),
     scene(nullptr),

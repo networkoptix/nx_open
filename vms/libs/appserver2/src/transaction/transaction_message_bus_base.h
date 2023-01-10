@@ -13,7 +13,6 @@ namespace ec2
 {
     class TransactionMessageBusBase: public AbstractTransactionMessageBus
     {
-        Q_OBJECT
     public:
         TransactionMessageBusBase(
             nx::vms::api::PeerType peerType,

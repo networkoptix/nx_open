@@ -2,11 +2,6 @@
 
 #pragma once
 
-extern "C"
-{
-#include <libavformat/avformat.h>
-};
-
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/abstract_archive_delegate.h>
@@ -17,8 +12,6 @@ extern "C"
 
 class NX_VMS_COMMON_API QnThumbnailsStreamReader: public QnAbstractMediaStreamDataProvider
 {
-    Q_OBJECT;
-
 public:
     QnThumbnailsStreamReader(
         const QnResourcePtr& resource,

@@ -25,7 +25,7 @@ using namespace nx::vms::common;
 
 namespace nx::vms::time {
 
-const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
+const QString TimeSyncManager::kTimeSyncUrlPath("/api/synchronizedTime");
 
 TimeSyncManager::TimeSyncManager(
     SystemContext* systemContext)

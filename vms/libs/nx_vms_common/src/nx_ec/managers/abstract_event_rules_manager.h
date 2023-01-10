@@ -21,7 +21,7 @@ signals:
     void addedOrUpdated(const nx::vms::api::EventRuleData& rule, ec2::NotificationSource source);
     void removed(const QnUuid& id);
     void businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
-    void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
+    void gotBroadcastAction(const QSharedPointer<nx::vms::event::AbstractAction>& action);
 };
 
 /*!

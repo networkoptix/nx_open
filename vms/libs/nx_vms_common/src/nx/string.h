@@ -133,5 +133,3 @@ NX_VMS_COMMON_API void serialize(QnJsonContext* ctx, const nx::String& value, QJ
 NX_VMS_COMMON_API bool deserialize(QnJsonContext* ctx, const QJsonValue& value, nx::String* target);
 
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::String);

@@ -2,7 +2,7 @@
 
 #include "videowall_messages.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
@@ -57,7 +57,7 @@ bool Videowall::checkLocalFiles(QWidget* parent,
     if (itemBelongsToThisPc)
         return true;
 
-    bool hasLocalFiles = boost::algorithm::any_of(resources,
+    bool hasLocalFiles = std::any_of(resources.begin(), resources.end(),
         [](const QnResourcePtr& resource)
         {
             return resource->hasFlags(Qn::local_media);

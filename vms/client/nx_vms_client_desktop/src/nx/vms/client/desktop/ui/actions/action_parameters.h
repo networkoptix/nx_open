@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QVariant>
-#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -183,5 +182,3 @@ private:
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ui::action::Parameters)

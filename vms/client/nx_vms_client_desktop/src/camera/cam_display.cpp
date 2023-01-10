@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/math/math.h>
 
 #include "audio_stream_display.h"
 #include "video_stream_display.h"

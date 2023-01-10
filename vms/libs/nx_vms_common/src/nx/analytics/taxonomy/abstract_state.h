@@ -66,6 +66,3 @@ public:
 };
 
 } // namespace nx::analytics::taxonomy
-
-Q_DECLARE_METATYPE(std::vector<nx::analytics::taxonomy::AbstractObjectType*>)
-Q_DECLARE_METATYPE(std::vector<nx::analytics::taxonomy::AbstractEngine*>)

@@ -70,7 +70,3 @@ NX_VMS_API_DECLARE_STRUCT(ResetEventRulesData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::EventRuleData)
-Q_DECLARE_METATYPE(nx::vms::api::EventRuleDataList)
-Q_DECLARE_METATYPE(nx::vms::api::EventActionData)
-Q_DECLARE_METATYPE(nx::vms::api::EventActionDataList)

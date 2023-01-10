@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QString>
 
 typedef QSet<QString> QnStringSet;
 namespace nx::vms::client::core {

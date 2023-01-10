@@ -18,10 +18,7 @@
 #include "../video_recorder_settings.h"
 
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
+struct SwsContext;
 }
 
 namespace nx::vms::client::desktop {
@@ -38,8 +35,6 @@ struct CaptureInfo
 };
 
 typedef QSharedPointer<CaptureInfo> CaptureInfoPtr;
-
-Q_DECLARE_METATYPE(CaptureInfoPtr)
 
 class ScreenGrabber: public QObject
 {

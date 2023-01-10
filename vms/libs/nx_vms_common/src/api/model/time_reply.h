@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 #include <nx/utils/uuid.h>
@@ -40,8 +38,8 @@ struct ApiDateTimeData
 };
 #define ApiDateTimeData_Fields (timeSinceEpochMs)(timeZoneId)(timeZoneOffsetMs)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(ubjson)(xml)(csv_record)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(ubjson)(xml)(csv_record), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(ApiDateTimeData,
-    (json)(ubjson)(xml)(csv_record)(metatype),
+    (json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(SyncTimeData, (json)(ubjson)(xml)(csv_record)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(SyncTimeData, (json)(ubjson)(xml)(csv_record), NX_VMS_COMMON_API)

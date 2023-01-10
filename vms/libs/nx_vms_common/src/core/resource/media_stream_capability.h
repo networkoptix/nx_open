@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <QtCore/QMap>
 
 #include <common/common_globals.h>
@@ -51,5 +49,3 @@ using CameraTraits = std::map<CameraTraitNameString, CameraTraitAttributes>;
 
 } // media
 } // nx
-
-Q_DECLARE_METATYPE(nx::media::CameraTraits)

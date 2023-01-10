@@ -214,5 +214,3 @@ private:
 };
 
 } // namespace nx::network::http
-
-Q_DECLARE_METATYPE(nx::network::http::ClientPool::ContextPtr);

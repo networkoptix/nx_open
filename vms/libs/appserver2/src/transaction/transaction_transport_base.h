@@ -376,5 +376,3 @@ private slots:
 };
 
 }
-
-Q_DECLARE_METATYPE(ec2::QnTransactionTransportBase::State);

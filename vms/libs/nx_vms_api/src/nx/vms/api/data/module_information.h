@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QSet>
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #include "data_macros.h"
@@ -173,13 +173,13 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation
     nx::utils::OsInfo osInfo;
 
     /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
-    milliseconds osTimeMs = 0ms;
+    std::chrono::milliseconds osTimeMs{0};
 
     /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     /**%apidoc Time zone offset, in milliseconds. */
-    milliseconds timeZoneOffsetMs = 0ms;
+    std::chrono::milliseconds timeZoneOffsetMs{0};
 
     /**%apidoc Identification of the time zone in the text form. */
     QString timeZoneId;
@@ -199,10 +199,6 @@ NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::ModuleInformation)
-Q_DECLARE_METATYPE(nx::vms::api::ModuleInformationWithAddresses)
-Q_DECLARE_METATYPE(nx::vms::api::ServerInformation)
 
 namespace nx::utils {
 

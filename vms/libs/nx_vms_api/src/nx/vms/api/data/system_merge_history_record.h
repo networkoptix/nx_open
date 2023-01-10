@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QtGlobal>
 
@@ -50,5 +49,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(SystemMergeHistoryRecord)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::SystemMergeHistoryRecord)
-Q_DECLARE_METATYPE(nx::vms::api::SystemMergeHistoryRecordList)

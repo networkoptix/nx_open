@@ -5,15 +5,12 @@
 #include <nx/media/ffmpeg/audio_encoder.h>
 #include <nx/streaming/av_codec_media_context.h>
 
-extern "C"
-{
-#include <speex/speex_preprocess.h>
-#include <libavcodec/avcodec.h>
-}
-
 #include "../desktop_data_provider_base.h"
 
 class QAudioDevice;
+
+struct SpeexPreprocessState_;
+typedef struct SpeexPreprocessState_ SpeexPreprocessState;
 
 namespace nx::vms::client::core {
 

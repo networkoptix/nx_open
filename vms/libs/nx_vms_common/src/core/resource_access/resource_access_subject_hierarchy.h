@@ -17,7 +17,6 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API ResourceAccessSubjectHierarchy: public SubjectHierarchy
 {
-    Q_OBJECT
     using base_type = SubjectHierarchy;
 
 public:

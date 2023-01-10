@@ -2,7 +2,6 @@
 
 #include "caching_camera_data_loader.h"
 
-#include <QtCore/QMetaType>
 #include <QtCore/QTimer>
 
 #include <core/resource/avi/avi_resource.h>

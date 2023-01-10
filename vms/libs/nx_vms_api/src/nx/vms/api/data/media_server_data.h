@@ -261,11 +261,3 @@ QN_FUSION_DECLARE_FUNCTIONS(StorageFilter, (csv_record)(json)(ubjson)(xml), NX_V
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::StorageData)
-Q_DECLARE_METATYPE(nx::vms::api::StorageDataList)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerData)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataList)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataEx)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataExList)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerUserAttributesData)
-Q_DECLARE_METATYPE(nx::vms::api::MediaServerUserAttributesDataList)

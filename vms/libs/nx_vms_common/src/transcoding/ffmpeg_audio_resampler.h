@@ -5,10 +5,6 @@
 #include <stdint.h>
 #include <queue>
 
-extern "C" {
-#include <libavformat/avformat.h>
-}
-
 #include "ffmpeg_audio_buffer.h"
 
 struct SwrContext;

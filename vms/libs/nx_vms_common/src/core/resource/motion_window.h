@@ -3,7 +3,6 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
-#include <QtCore/QMetaType>
 #include <QtCore/QMultiMap>
 #include <nx/utils/thread/mutex.h>
 #include <QtGui/QRegion>
@@ -109,7 +108,6 @@ private:
     mutable bool m_dirty = false;
 };
 
-Q_DECLARE_METATYPE(QnMotionRegion);
 
 void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString);
 QString serializeMotionRegion(const QnMotionRegion& region);

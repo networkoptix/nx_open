@@ -50,6 +50,3 @@ private:
     QString m_password;
     bool m_isReadOnly = false;
 };
-
-Q_DECLARE_METATYPE(QnFileLayoutResourcePtr);
-Q_DECLARE_METATYPE(QnFileLayoutResourceList);

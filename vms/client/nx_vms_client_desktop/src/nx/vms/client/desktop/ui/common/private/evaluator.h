@@ -4,7 +4,6 @@
 #define QN_EVALUATOR_H
 
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 #include <QtCore/QCoreApplication>
@@ -257,8 +256,6 @@ namespace Qee {
     };
 
 } // namespace Qee
-
-Q_DECLARE_METATYPE(Qee::Function)
 
 #endif // QN_EVALUATOR_H
 

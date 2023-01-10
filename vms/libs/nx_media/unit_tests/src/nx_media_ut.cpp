@@ -6,9 +6,9 @@
 
 #include <nx/core/access/access_types.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>

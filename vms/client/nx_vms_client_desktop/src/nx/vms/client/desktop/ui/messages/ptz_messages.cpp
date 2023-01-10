@@ -8,7 +8,7 @@
 namespace {
 
 /* Delete ptz preset which is used in the tour. */
-static const QString kPtzPresetShowOnceKey(lit("PtzPresetInUse"));
+static const QString kPtzPresetShowOnceKey("PtzPresetInUse");
 
 } //namespace
 

@@ -8,7 +8,7 @@
 
 extern "C"
 {
-    #include <libswscale/swscale.h>
+    struct SwsContext;
 }
 
 #include <set>
@@ -118,7 +118,7 @@ private:
     QnFrameScaler::DownscaleFactor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
-    SwsContext *m_scaleContext;
+    SwsContext* m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;
     bool m_mtDecoding = false;

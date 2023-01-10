@@ -46,4 +46,3 @@ signals:
 
 } // namespace nx::utils
 
-Q_DECLARE_METATYPE(nx::utils::async_handler_executor_detail::ExecuteArg)

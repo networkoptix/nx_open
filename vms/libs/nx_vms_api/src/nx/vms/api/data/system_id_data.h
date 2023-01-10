@@ -27,4 +27,3 @@ NX_VMS_API_DECLARE_STRUCT(SystemIdData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::SystemIdData)

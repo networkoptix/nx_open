@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QSize>
-#include <QtCore/QMetaType>
 
 class NX_VMS_COMMON_API QnAspectRatio
 {
@@ -39,5 +38,3 @@ private:
     int m_width = 0;
     int m_height = 0;
 };
-
-Q_DECLARE_METATYPE(QnAspectRatio)

@@ -19,5 +19,3 @@ struct ExportLayoutPersistentSettings
 NX_REFLECTION_INSTRUMENT(ExportLayoutPersistentSettings, ExportLayoutPersistentSettings_Fields)
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportLayoutPersistentSettings)

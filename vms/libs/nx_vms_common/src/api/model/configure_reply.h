@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 struct QnConfigureReply
@@ -14,4 +12,4 @@ struct QnConfigureReply
     bool restartNeeded;
 };
 #define QnConfigureReply_Fields (restartNeeded)
-QN_FUSION_DECLARE_FUNCTIONS(QnConfigureReply, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnConfigureReply, (json), NX_VMS_COMMON_API)

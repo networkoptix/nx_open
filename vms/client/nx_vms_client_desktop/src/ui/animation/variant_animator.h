@@ -7,7 +7,6 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVariant>
 #include <QtCore/QEasingCurve>
-#include <QtCore/QMetaType>
 
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <ui/common/converter.h>
@@ -210,7 +209,5 @@ private:
     MagnitudeCalculator *m_magnitudeCalculator;
     LinearCombinator *m_linearCombinator;
 };
-
-Q_DECLARE_METATYPE(VariantAnimator *);
 
 #endif // QN_ANIMATOR_H

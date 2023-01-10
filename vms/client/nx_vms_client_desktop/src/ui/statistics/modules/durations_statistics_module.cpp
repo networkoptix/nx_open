@@ -13,9 +13,9 @@ QnDurationStatisticsModule::QnDurationStatisticsModule(QObject *parent)
     : base_type(parent)
     , m_metrics(new QnMetricsContainer())
 {
-    m_metrics->addMetric<SessionUptimeMetric>(lit("session_ms"));
-    m_metrics->addMetric<AppActiveTimeMetric>(lit("active_ms"));
-    m_metrics->addMetric<UdtInternetTrafficMetric>(lit("udtInternetTraffic_bytes"));
+    m_metrics->addMetric<SessionUptimeMetric>("session_ms");
+    m_metrics->addMetric<AppActiveTimeMetric>("active_ms");
+    m_metrics->addMetric<UdtInternetTrafficMetric>("udtInternetTraffic_bytes");
 }
 
 QnDurationStatisticsModule::~QnDurationStatisticsModule()

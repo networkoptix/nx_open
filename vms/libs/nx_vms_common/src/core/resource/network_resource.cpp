@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <QCryptographicHash>
+#include <QtNetwork/QAuthenticator>
 
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/http/http_types.h>

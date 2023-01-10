@@ -24,5 +24,3 @@ NX_VMS_API_DECLARE_STRUCT(HardwareIdMapping)
 using HardwareIdMappingList = std::vector<HardwareIdMapping>;
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::HardwareIdMapping)

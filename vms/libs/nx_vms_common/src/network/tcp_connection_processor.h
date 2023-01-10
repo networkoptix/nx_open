@@ -25,7 +25,6 @@ class NX_VMS_COMMON_API QnTCPConnectionProcessor:
     public QnLongRunnable,
     public /*mixin*/ QnCommonModuleAware
 {
-    Q_OBJECT
     using base_type = QnLongRunnable;
 
 public:

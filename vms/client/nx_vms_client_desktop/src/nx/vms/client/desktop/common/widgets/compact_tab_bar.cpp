@@ -313,7 +313,7 @@ QIcon CompactTabBar::Private::tabIcon(int index) const
     {
         // Use placeholder icon.
         static const QnIcon::Suffixes suffixes({{QIcon::Selected, QString()}});
-        result = qnSkin->icon(lit("events/alert_red.png"), QString(), &suffixes);
+        result = qnSkin->icon("events/alert_red.png", QString(), &suffixes);
     }
 
     return result;

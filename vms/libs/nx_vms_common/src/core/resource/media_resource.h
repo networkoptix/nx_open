@@ -2,20 +2,17 @@
 
 #pragma once
 
-#include <QtCore/QMap>
 #include <QtCore/QSize>
 
 #include <core/ptz/ptz_constants.h>
 #include <core/resource/resource.h>
-#include <core/resource/resource_media_layout.h>
+#include <core/resource/resource_media_layout_fwd.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/common/ptz/type.h>
 #include <utils/common/aspect_ratio.h>
 
 class QnAbstractStreamDataProvider;
-class QnResourceVideoLayout;
-class QnResourceAudioLayout;
 
 /**
  * Represents a camera or a local video file.

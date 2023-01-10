@@ -26,5 +26,3 @@ private:
 };
 
 } // namespace nx::vms::event
-
-Q_DECLARE_METATYPE(nx::vms::event::ServerCertificateErrorPtr);

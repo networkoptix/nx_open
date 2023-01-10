@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QSize>
 
 #include <common/common_globals.h>

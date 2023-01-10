@@ -25,7 +25,7 @@ QnStorageRebuildWidget::~QnStorageRebuildWidget()
 
 void QnStorageRebuildWidget::loadData(const nx::vms::api::StorageScanInfo& data, bool isBackup)
 {
-    QString placeholder = lit(" \t%p%");
+    QString placeholder(" \t%p%");
     if (data.progress >= 0)
     {
         ui->progressBar->setValue(data.totalProgress * 100 + 0.5);

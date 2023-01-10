@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::core::resource {
@@ -16,5 +14,3 @@ NX_REFLECTION_ENUM_CLASS(UsingOnvifMedia2Type,
 )
 
 } // namespace nx::core::resource
-
-Q_DECLARE_METATYPE(nx::core::resource::UsingOnvifMedia2Type)

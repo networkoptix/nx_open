@@ -122,7 +122,3 @@ NX_VMS_API_DECLARE_STRUCT(PeerDataEx)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::PersistentIdData)
-Q_DECLARE_METATYPE(nx::vms::api::PeerData)
-Q_DECLARE_METATYPE(nx::vms::api::PeerDataEx)
-

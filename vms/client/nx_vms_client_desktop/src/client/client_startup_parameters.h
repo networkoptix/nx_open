@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QRect>
 
 #include <nx/utils/url.h>
@@ -94,5 +93,3 @@ struct QnStartupParameters
     QString qmlRoot;
     QStringList qmlImportPaths;
 };
-
-Q_DECLARE_METATYPE(QnStartupParameters)

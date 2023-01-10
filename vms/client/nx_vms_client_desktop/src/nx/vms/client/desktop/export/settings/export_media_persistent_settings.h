@@ -214,12 +214,3 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 NX_REFLECTION_INSTRUMENT(ExportMediaPersistentSettings, ExportMediaPersistentSettings_Fields)
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportTimestampOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportImageOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportTextOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportBookmarkOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportInfoOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportRapidReviewPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportMediaPersistentSettings)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportOverlayType)

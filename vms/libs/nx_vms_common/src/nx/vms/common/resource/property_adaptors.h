@@ -11,7 +11,6 @@ namespace nx::vms::common {
 class NX_VMS_COMMON_API BusinessEventFilterResourcePropertyAdaptor:
     public QnLexicalResourcePropertyAdaptor<quint64>
 {
-    Q_OBJECT
     typedef QnLexicalResourcePropertyAdaptor<quint64> base_type;
 
 public:

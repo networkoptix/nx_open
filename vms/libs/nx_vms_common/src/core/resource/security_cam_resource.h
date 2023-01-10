@@ -2,32 +2,32 @@
 
 #pragma once
 
-#include <map>
-#include <mutex>
-
 #include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/misc/schedule_task.h>
-#include <core/ptz/ptz_preset.h>
-#include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_stream_capability.h>
-#include <core/resource/motion_window.h>
 #include <core/resource/network_resource.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/device_model.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
+#include <nx/vms/common/resource/remote_archive_types.h>
+#include <recording/time_period_list.h>
 
-#include "resource_data.h"
 
 class QnAbstractArchiveDelegate;
+class QnResourceData;
+class QnMotionRegion;
 
 namespace nx::vms::rules { struct NetworkIssueInfo; }
+namespace nx::core::resource { class AbstractRemoteArchiveManager; }
+namespace nx::vms::common { enum class MediaStreamEvent; }
+namespace nx::core::ptz { enum class PresetType; }
+
 
 class NX_VMS_COMMON_API QnSecurityCamResource:
     public QnNetworkResource,
@@ -660,6 +660,3 @@ private:
 protected slots:
     virtual void resetCachedValues();
 };
-
-Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
-Q_DECLARE_METATYPE(QnSecurityCamResourceList)

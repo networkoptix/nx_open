@@ -23,4 +23,3 @@ NX_VMS_API_DECLARE_STRUCT(PeerSyncTimeData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::PeerSyncTimeData)

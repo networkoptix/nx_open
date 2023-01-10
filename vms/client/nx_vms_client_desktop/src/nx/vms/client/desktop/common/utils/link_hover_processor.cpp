@@ -156,7 +156,7 @@ void LinkHoverProcessor::updateColors(UpdateTime when)
     const bool hovered = !m_hoveredLink.isEmpty();
     const int linkPos = hovered ? m_originalText.indexOf(m_hoveredLink) : -1;
     const int hoveredHrefPos = hovered
-        ? m_originalText.lastIndexOf(lit("href"), linkPos, Qt::CaseInsensitive)
+        ? m_originalText.lastIndexOf("href", linkPos, Qt::CaseInsensitive)
         : -1;
 
     /* Insert color attribute before each href attribute: */
@@ -164,14 +164,14 @@ void LinkHoverProcessor::updateColors(UpdateTime when)
     for (int pos = -1;;)
     {
         /* Find href attribute position: */
-        pos = alteredText.lastIndexOf(lit("href"), pos, Qt::CaseInsensitive);
+        pos = alteredText.lastIndexOf("href", pos, Qt::CaseInsensitive);
         if (pos == -1)
             break;
 
         // TODO: #vkutin Implement a better parsing for this to work if "style" attribute already
         // exists.
         const QColor color = style::linkColor(m_label->palette(), pos == hoveredHrefPos);
-        alteredText.insert(pos, lit("style='color: %1' ").arg(color.name(QColor::HexRgb)));
+        alteredText.insert(pos, QString("style='color: %1' ").arg(color.name(QColor::HexRgb)));
     }
 
     /* Apply altered label text: */

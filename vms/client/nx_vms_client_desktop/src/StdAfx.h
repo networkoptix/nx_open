@@ -15,8 +15,6 @@ extern "C" {
 #endif
 #   include <libavcodec/avcodec.h>
 #   include <libavformat/avformat.h>
-#   include <libswscale/swscale.h>
-#   include <libavutil/avstring.h>
 #ifdef __cplusplus
 }
 #endif
@@ -34,6 +32,7 @@ extern "C" {
 #include <QtCore/QStringList>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtQml/QtQml>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -42,3 +41,4 @@ extern "C" {
 #endif
 
 #include <nx/utils/literal.h>
+#include <nx/fusion/model_functions.h>

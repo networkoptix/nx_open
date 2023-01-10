@@ -9,6 +9,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_media_layout.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>

@@ -49,5 +49,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(AesKeyData)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::StorageEncryptionData)
-Q_DECLARE_METATYPE(nx::vms::api::AesKeyData)

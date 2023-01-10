@@ -76,7 +76,7 @@ void QnTableExportHelper::exportToFile(
     QFile file(fileName);
     if (file.open(QFile::WriteOnly | QFile::Truncate))
     {
-        if (fileName.endsWith(lit(".html")) || fileName.endsWith(lit(".htm")))
+        if (fileName.endsWith(".html") || fileName.endsWith(".htm"))
             file.write(htmlData.toUtf8());
         else
             file.write(textData.toUtf8());
@@ -144,7 +144,7 @@ void QnTableExportHelper::getGridData(const QAbstractItemModel* tableModel,
                 if (sortedIndexes[i].row() != prevRow)
                 {
                     prevRow = sortedIndexes[i].row();
-                    textResult.append(lit("\n"));
+                    textResult.append("\n");
                     rowTag.reset();   /*< close tag before opening new. */
                     rowTag.reset(new html::Tag("tr", htmlResult));
                 }
@@ -166,7 +166,7 @@ void QnTableExportHelper::getGridData(const QAbstractItemModel* tableModel,
             }
         }
 
-        textResult.append(lit("\n"));
+        textResult.append("\n");
     }
 
     textData = textResult;

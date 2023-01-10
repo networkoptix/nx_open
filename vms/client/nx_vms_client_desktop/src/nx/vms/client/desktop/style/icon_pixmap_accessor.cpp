@@ -19,7 +19,7 @@ Target *qiconengine_cast(const QString &key, QIconEngine *source) {
 
 QnIconPixmapAccessor::QnIconPixmapAccessor(const QIcon *icon):
     m_icon(icon),
-    m_engine(qiconengine_cast<QPixmapIconEngine>(lit("QPixmapIconEngine"), const_cast<QIcon *>(icon)->data_ptr()->engine))
+    m_engine(qiconengine_cast<QPixmapIconEngine>("QPixmapIconEngine", const_cast<QIcon *>(icon)->data_ptr()->engine))
 {}
 
 int QnIconPixmapAccessor::size() const {

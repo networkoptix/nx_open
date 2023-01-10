@@ -5,7 +5,6 @@
 
 #include <QtCore/QVariant>
 #include <QtCore/QHash>
-#include <QtCore/QMetaType>
 #include <QtCore/QJsonValue>
 
 class QnJsonContext;
@@ -62,8 +61,6 @@ private:
     QHash<QString, Data> m_dataByKey;
 #endif
 };
-
-Q_DECLARE_METATYPE(QnResourceData)
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target);
 

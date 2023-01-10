@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -37,5 +35,3 @@ NX_REFLECTION_INSTRUMENT(RecordScheduleCellData,
     (fps)(streamQuality)(recordingType)(metadataTypes)(bitrateMbitPerSec))
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::RecordScheduleCellData)

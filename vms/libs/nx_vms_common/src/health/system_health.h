@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/vms/event/event_fwd.h>
 
 // TODO: #sivanov refactor settings storage - move to User Settings tab on server.
@@ -82,5 +80,3 @@ NX_VMS_COMMON_API QSet<MessageType> unpackVisibleInSettings(quint64 packed);
 NX_VMS_COMMON_API quint64 packVisibleInSettings(quint64 base, QSet<MessageType> messageTypes);
 
 } // namespace QnSystemHealth
-
-Q_DECLARE_METATYPE(QnSystemHealth::MessageType)

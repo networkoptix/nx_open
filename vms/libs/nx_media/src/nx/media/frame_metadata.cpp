@@ -3,6 +3,7 @@
 #include "frame_metadata.h"
 
 #include <nx/reflect/json.h>
+#include <nx/utils/serialization/flags.h>
 
 namespace nx {
 namespace media {

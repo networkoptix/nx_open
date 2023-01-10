@@ -493,7 +493,7 @@ bool StylePrivate::polishInputDialog(QInputDialog* inputDialog) const
     inputDialog->sizeHint(); // to ensure lazy layout is set up
     QLayout* oldLayout = inputDialog->layout();
 
-    static const QString kTopmostLayoutName = lit("_qn_inputDialogLayout");
+    static const QString kTopmostLayoutName = "_qn_inputDialogLayout";
     if (oldLayout->objectName() == kTopmostLayoutName)
         return false;
 

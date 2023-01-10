@@ -12,11 +12,6 @@
 
 namespace nx { namespace metrics { struct Storage; } }
 
-extern "C"
-{
-    #include <libswscale/swscale.h>
-}
-
 #include <nx/core/transcoding/filters/filter_chain.h>
 
 #include "utils/media/frame_info.h"

@@ -3,7 +3,9 @@
 #include "media_resource_helper.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_media_layout.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>

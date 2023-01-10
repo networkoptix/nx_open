@@ -24,5 +24,3 @@ NX_REFLECTION_INSTRUMENT(WatermarkSettings, WatermarkSettings_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(WatermarkSettings, (json), NX_VMS_API)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::WatermarkSettings)

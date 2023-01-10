@@ -112,4 +112,3 @@ SharedGuardPtr join(Container<SharedGuardPtr> container)
 
 } // namespace nx::utils
 
-Q_DECLARE_METATYPE(nx::utils::SharedGuardPtr)

@@ -3,7 +3,7 @@
 #include "storage_url_dialog.h"
 #include "ui_storage_url_dialog.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <QtCore/QCryptographicHash>
 
@@ -305,13 +305,13 @@ bool QnStorageUrlDialog::storageAlreadyUsed(const QString& path) const
     QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
     servers.removeOne(m_server);
 
-    bool usedOnOtherServers = boost::algorithm::any_of(servers,
+    bool usedOnOtherServers = std::any_of(servers.begin(), servers.end(),
         [path](const QnMediaServerResourcePtr& server)
         {
             return !server->getStorageByUrl(path).isNull();
         });
 
-    bool usedOnCurrentServer = boost::algorithm::any_of(m_currentServerStorages,
+    bool usedOnCurrentServer = std::any_of(m_currentServerStorages.begin(), m_currentServerStorages.end(),
         [path](const QnStorageModelInfo& info)
         {
             return info.url == path;

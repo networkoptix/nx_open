@@ -20,5 +20,5 @@ struct NX_VMS_COMMON_API QnStatisticsSettings
 
 #define QnStatisticsSettings_Fields (limit)(storeDays)(minSendPeriodSecs)(filters)(statisticsServerUrl)
 QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsSettings,
-    (json)(ubjson)(xml)(csv_record)(metatype),
+    (json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)

@@ -15,6 +15,6 @@ struct SystemVisibilityScopeInfo
 };
 #define SystemVisibilityScopeInfo_Fields (name)(visibilityScope)
 
-QN_FUSION_DECLARE_FUNCTIONS(SystemVisibilityScopeInfo, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(SystemVisibilityScopeInfo, (json))
 
 typedef QHash<QnUuid, SystemVisibilityScopeInfo> SystemVisibilityScopeInfoHash;

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
@@ -49,7 +48,7 @@ struct NX_VMS_COMMON_API SmtpOperationResult
 
 #define SmtpOperationResult_Fields (error)(lastCode)
 
-QN_FUSION_DECLARE_FUNCTIONS(SmtpOperationResult, (metatype)(lexical)(json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(SmtpOperationResult, (lexical)(json), NX_VMS_COMMON_API)
 
 // TODO: #sivanov Move other methods to this namespace, then move module to nx/email (?) lib.
 namespace nx {
@@ -157,5 +156,5 @@ private:
     QString m_fullName;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(QnEmailSmtpServerPreset, (metatype)(lexical)(json), NX_VMS_COMMON_API)
-QN_FUSION_DECLARE_FUNCTIONS(QnEmailSettings, (metatype)(lexical)(json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnEmailSmtpServerPreset, (lexical)(json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnEmailSettings, (lexical)(json), NX_VMS_COMMON_API)

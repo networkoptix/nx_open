@@ -34,11 +34,3 @@ struct Model
 
 } // namespace videowall
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::videowall::ScreenGeometry)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::videowall::Screens)
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::videowall::Item)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::videowall::Items)
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::videowall::Model)

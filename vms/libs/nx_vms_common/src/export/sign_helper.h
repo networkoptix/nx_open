@@ -2,10 +2,6 @@
 
 #pragma once
 
-extern "C" {
-#include <libavformat/avformat.h>
-} // extern "C"
-
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
@@ -22,8 +18,7 @@ class SPSUnit;
 class PPSUnit;
 class QnLicensePool;
 
-class NX_VMS_COMMON_API QnSignHelper:
-    public QObject
+class NX_VMS_COMMON_API QnSignHelper: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

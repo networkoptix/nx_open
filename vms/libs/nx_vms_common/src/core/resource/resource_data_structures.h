@@ -18,7 +18,6 @@ typedef std::vector<QnHttpConfigureRequest> QnHttpConfigureRequestList;
 
 #define QnHttpConfigureRequest_Fields (templateString)(method)(isAllowedToFail)(body)
 QN_FUSION_DECLARE_FUNCTIONS(QnHttpConfigureRequest, (json)(ubjson)(xml)(csv_record))
-Q_DECLARE_METATYPE(QnHttpConfigureRequest)
 
 typedef std::vector<quint64> QnBitrateList;
 
@@ -35,7 +34,6 @@ struct TwoWayAudioParams
     bool useBasicAuth = false;
     int frameSize = 0;
 };
-Q_DECLARE_METATYPE(TwoWayAudioParams);
 #define TwoWayAudioParams_Fields (engine)(codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)(useBasicAuth)(frameSize)
 
 struct QnBounds
@@ -51,6 +49,5 @@ struct QnBounds
 #define QnBounds_Fields (min)(max)
 QN_FUSION_DECLARE_FUNCTIONS(QnBounds, (json)(ubjson)(xml)(csv_record))
 QN_FUSION_DECLARE_FUNCTIONS(TwoWayAudioParams, (json)(ubjson)(xml)(csv_record))
-Q_DECLARE_METATYPE(QnBounds)
 
 typedef std::vector<QnBounds> QnBoundsList;

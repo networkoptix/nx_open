@@ -5,13 +5,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QThread>
-#include <QtCore/QMetaType>
 
 class QProcess;
 
 class NX_VMS_COMMON_API QnPlatformProcess: public QObject
 {
-    Q_OBJECT;
 public:
     enum Priority {
         IdlePriority = QThread::IdlePriority,
@@ -44,8 +42,6 @@ public:
      */
     virtual void setPriority(Priority priority) = 0;
 };
-
-Q_DECLARE_METATYPE(QnPlatformProcess *)
 
 #endif // QN_PLATFORM_PROCESS_H
 

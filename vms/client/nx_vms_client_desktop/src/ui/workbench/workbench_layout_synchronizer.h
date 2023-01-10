@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
@@ -84,5 +83,3 @@ private:
      * item are synchronized there-and-back many times until finally converging. */
     QSet<QnUuid> m_pendingItems;
 };
-
-Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);

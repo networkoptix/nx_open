@@ -7,6 +7,11 @@
 #include <QtMultimedia/QAudioSource>
 #include <QtMultimedia/QAudioDevice>
 
+extern "C" {
+#include <speex/speex_preprocess.h>
+#include <libavcodec/avcodec.h>
+}
+
 #include <speex/speex_preprocess.h>
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>

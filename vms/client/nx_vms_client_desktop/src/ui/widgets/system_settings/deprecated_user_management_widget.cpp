@@ -3,7 +3,8 @@
 #include "deprecated_user_management_widget.h"
 #include "ui_deprecated_user_management_widget.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
+
 
 #include <QtCore/QMap>
 #include <QtCore/QSortFilterProxyModel>
@@ -330,8 +331,8 @@ bool QnDeprecatedUserManagementWidget::hasChanges() const
     if (!isEnabled())
         return false;
 
-    using boost::algorithm::any_of;
-    return any_of(resourcePool()->getResources<QnUserResource>(),
+    const auto& resources = resourcePool()->getResources<QnUserResource>();
+    return std::any_of(resources.begin(), resources.end(),
         [this, users = d->usersModel->users()](const QnUserResourcePtr& user)
         {
             return !users.contains(user)
@@ -488,8 +489,9 @@ void QnDeprecatedUserManagementWidget::Private::updateLdapState()
 
 void QnDeprecatedUserManagementWidget::Private::modelUpdated()
 {
+    const auto& users = visibleUsers();
     ui->usersTable->setColumnHidden(QnDeprecatedUserListModel::UserTypeColumn,
-        !boost::algorithm::any_of(visibleUsers(),
+        !std::any_of(users.begin(), users.end(),
             [](const QnUserResourcePtr& user) { return !user->isLocal(); }));
 
     const bool isEmptyModel = !sortModel->rowCount();
@@ -515,8 +517,6 @@ void QnDeprecatedUserManagementWidget::Private::updateSelection()
 
     header->setCheckState(selectionState);
 
-    using boost::algorithm::any_of;
-
     const auto canModifyUser =
         [this](const QnUserResourcePtr& user)
         {
@@ -524,25 +524,25 @@ void QnDeprecatedUserManagementWidget::Private::updateSelection()
             return q->accessController()->hasPermissions(user, requiredPermissions);
         };
 
-    ui->enableSelectedButton->setEnabled(any_of(users,
+    ui->enableSelectedButton->setEnabled(std::any_of(users.begin(), users.end(),
         [this, canModifyUser](const QnUserResourcePtr& user)
         {
             return canModifyUser(user) && !usersModel->isUserEnabled(user);
         }));
 
-    ui->disableSelectedButton->setEnabled(any_of(users,
+    ui->disableSelectedButton->setEnabled(std::any_of(users.begin(), users.end(),
         [this, canModifyUser](const QnUserResourcePtr& user)
         {
             return canModifyUser(user) && usersModel->isUserEnabled(user);
         }));
 
-    ui->deleteSelectedButton->setEnabled(any_of(users,
+    ui->deleteSelectedButton->setEnabled(std::any_of(users.begin(), users.end(),
         [this](const QnUserResourcePtr& user)
         {
             return q->accessController()->hasPermissions(user, Qn::RemovePermission);
         }));
 
-    ui->forceSecureAuthButton->setEnabled(any_of(users,
+    ui->forceSecureAuthButton->setEnabled(std::any_of(users.begin(), users.end(),
         [this](const QnUserResourcePtr& user)
         {
             return canDisableDigest(user) && usersModel->isDigestEnabled(user);

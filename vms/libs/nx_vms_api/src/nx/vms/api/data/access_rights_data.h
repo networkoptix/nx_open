@@ -27,6 +27,3 @@ struct NX_VMS_API AccessRightsData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AccessRightsData)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::AccessRightsData)
-Q_DECLARE_METATYPE(nx::vms::api::AccessRightsDataList)

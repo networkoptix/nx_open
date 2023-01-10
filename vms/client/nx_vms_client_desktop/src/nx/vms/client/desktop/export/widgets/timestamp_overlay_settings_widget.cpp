@@ -54,7 +54,7 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
             emit formatChanged(format);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon(lit("text_buttons/trash.png")));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/trash.png"));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &TimestampOverlaySettingsWidget::deleteClicked);

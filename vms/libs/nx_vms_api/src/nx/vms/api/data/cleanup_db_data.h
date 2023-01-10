@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 
 #include "data_macros.h"
@@ -28,4 +27,3 @@ NX_VMS_API_DECLARE_STRUCT(CleanupDatabaseData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::CleanupDatabaseData)

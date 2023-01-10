@@ -8,7 +8,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <export/sign_helper.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/archive_stream_reader.h>

@@ -1870,5 +1870,3 @@ NX_REFLECTION_INSTRUMENT(ApiTransactionData, ApiTransactionData_Fields)
 int generateRequestID();
 
 } // namespace ec2
-
-Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

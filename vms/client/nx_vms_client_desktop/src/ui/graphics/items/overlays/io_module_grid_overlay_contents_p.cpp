@@ -136,7 +136,7 @@ void QnIoModuleGridOverlayContentsPrivate::InputPortItem::paint(QPainter* painte
     paintId(painter, idRect, false);
 
     auto margin = nx::style::Metrics::kStandardPadding + effectiveIdWidth();
-    auto icon = qnSkin->icon(lit("io/indicator_off.png"), lit("io/indicator_on.png"));
+    auto icon = qnSkin->icon("io/indicator_off.png", "io/indicator_on.png");
     auto iconRect = QRectF(idRect.left() + margin, idRect.top(), kIndicatorWidth, idRect.height());
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     icon.paint(painter, iconRect.toRect(), Qt::AlignCenter, QIcon::Normal, iconState);

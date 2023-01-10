@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+
 #include <QtMultimedia/QVideoFrame>
 
+#include <nx/reflect/instrument.h>
 #include <nx/streaming/video_data_packet.h>
 
 #include "media_fwd.h"
@@ -46,5 +47,3 @@ NX_REFLECTION_INSTRUMENT(FrameMetadata, FrameMetadata_Fields)
 
 } // namespace media
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::media::FrameMetadata);

@@ -37,6 +37,3 @@ public:
 };
 
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::AnalyticsPluginResourcePtr)
-Q_DECLARE_METATYPE(nx::vms::common::AnalyticsPluginResourceList)

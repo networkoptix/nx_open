@@ -4,8 +4,6 @@
 
 #include <optional>
 
-#include <QtCore/QMetaType>
-
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/reflect/enum_instrument.h>
 
@@ -63,6 +61,3 @@ struct CloudSystemConnectData
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::LogonData)
-Q_DECLARE_METATYPE(nx::vms::client::desktop::CloudSystemConnectData)

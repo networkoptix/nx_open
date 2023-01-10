@@ -5,6 +5,8 @@
 #include <map>
 #include <optional>
 
+#include <QtCore/QRegularExpression>
+
 #include <udt/udt.h>
 
 #include <nx/utils/debug.h>

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
+#include <QtCore/QtGlobal>
 
 #include <nx/reflect/enum_instrument.h>
 
@@ -38,6 +38,3 @@ private:
 };
 
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::Rotation)
-Q_DECLARE_METATYPE(nx::vms::client::core::StandardRotation)

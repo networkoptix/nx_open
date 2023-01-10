@@ -24,6 +24,3 @@ using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutRe
 using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::CrossSystemLayoutResourcePtr);
-Q_DECLARE_METATYPE(nx::vms::client::desktop::CrossSystemLayoutResourceList);

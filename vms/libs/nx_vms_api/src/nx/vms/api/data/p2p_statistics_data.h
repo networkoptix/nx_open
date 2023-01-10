@@ -23,4 +23,3 @@ NX_VMS_API_DECLARE_STRUCT(P2pStatisticsData)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::P2pStatisticsData)

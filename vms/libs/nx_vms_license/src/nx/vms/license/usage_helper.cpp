@@ -8,11 +8,7 @@
 
 #include <QtCore/QJsonObject>
 
-#include <boost/range/algorithm/sort.hpp>
-#include <boost/range/algorithm/fill.hpp>
-#include <boost/range/adaptor/reversed.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <api/runtime_info_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -200,8 +196,8 @@ UsageHelper::Cache::Cache()
 
 void UsageHelper::Cache::reset()
 {
-    boost::fill(proposed, 0);
-    boost::fill(total, 0);
+    std::fill(proposed.begin(), proposed.end(), 0);
+    std::fill(total.begin(), total.end(), 0);
     for (auto& value: used)
         value.clear();
     for (auto& value: overflow)
@@ -353,7 +349,8 @@ void UsageHelper::updateCache() const
 
 bool UsageHelper::isValid() const
 {
-    return boost::algorithm::all_of(licenseTypes(), [this](Qn::LicenseType lt) { return isValid(lt); });
+    const auto& types = licenseTypes();
+    return std::all_of(types.begin(), types.end(), [this](Qn::LicenseType lt) { return isValid(lt); });
 }
 
 bool UsageHelper::isValid(Qn::LicenseType licenseType) const

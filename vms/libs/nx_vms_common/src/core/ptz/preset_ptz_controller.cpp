@@ -3,7 +3,6 @@
 #include "preset_ptz_controller.h"
 #include "ptz_preset.h"
 
-#include <nx/fusion/model_functions.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 

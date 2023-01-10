@@ -54,5 +54,3 @@ private:
 QN_FUSION_DECLARE_FUNCTIONS(PoeOverBudgetEvent::Parameters, (json), NX_VMS_COMMON_API)
 
 } // namespace nx::vms::event
-
-Q_DECLARE_METATYPE(nx::vms::event::PoeOverBudgetEventPtr);

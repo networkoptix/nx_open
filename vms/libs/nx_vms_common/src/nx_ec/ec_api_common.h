@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 
 namespace ec2 {
 
@@ -64,6 +63,3 @@ template <typename... Args>
 using Handler = std::function<void(int reqId, Result, const Args&...)>;
 
 } // namespace ec2
-
-Q_DECLARE_METATYPE(ec2::ErrorCode);
-Q_DECLARE_METATYPE(ec2::NotificationSource)

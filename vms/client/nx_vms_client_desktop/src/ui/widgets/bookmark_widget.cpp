@@ -137,9 +137,9 @@ bool QnBookmarkWidget::isValid() const
 }
 
 void QnBookmarkWidget::updateTagsList() {
-    QString html = lit("<html><body><center>%1</center></body></html>");
-    QString unusedTag = lit("<a style=\"text-decoration:none;\" href=\"%1\">%1</a><span style=\"text-decoration:none;\"> </span>");
-    QString usedTag = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font></a><span style=\"text-decoration:none;\"> </span>");
+    QString html("<html><body><center>%1</center></body></html>");
+    QString unusedTag("<a style=\"text-decoration:none;\" href=\"%1\">%1</a><span style=\"text-decoration:none;\"> </span>");
+    QString usedTag("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font></a><span style=\"text-decoration:none;\"> </span>");
 
     QStringList tags;
     for (const auto& tag : m_allTags)
@@ -155,7 +155,7 @@ void QnBookmarkWidget::updateTagsList() {
         (Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
 
     ui->tagsListLabel->setTextInteractionFlags(flags);
-    ui->tagsListLabel->setText(html.arg(tags.join(lit(", "))));
+    ui->tagsListLabel->setText(html.arg(tags.join(", ")));
 
     update();
 }

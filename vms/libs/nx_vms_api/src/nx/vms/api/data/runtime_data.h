@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QtGlobal>
-#include <QtCore/QMetaType>
 #include <QtCore/QSet>
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -84,4 +83,3 @@ NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::RuntimeData)

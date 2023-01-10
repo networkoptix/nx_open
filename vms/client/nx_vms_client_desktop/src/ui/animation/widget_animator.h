@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QMetaType>
 #include <QtCore/QEasingCurve>
 
 #include "animator_group.h"
@@ -97,5 +96,3 @@ private:
     /** Widget rotation animation. */
     VariantAnimator* m_rotationAnimator;
 };
-
-Q_DECLARE_METATYPE(WidgetAnimator*);

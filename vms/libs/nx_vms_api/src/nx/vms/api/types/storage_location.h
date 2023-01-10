@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::api {
@@ -15,5 +13,3 @@ NX_REFLECTION_ENUM_CLASS(StorageLocation,
 )
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::StorageLocation)

@@ -6,7 +6,6 @@
 #include <QtCore/QPair>
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
-#include <QtCore/QMetaType>
 #include <QtCore/QUrlQuery>
 
 #include <nx/network/http/http_types.h>
@@ -85,5 +84,3 @@ struct NX_VMS_COMMON_API Content
 };
 
 } // namespace nx::network::rest
-
-Q_DECLARE_METATYPE(nx::network::rest::Params);

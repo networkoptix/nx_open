@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QCollator>
@@ -96,5 +95,3 @@ private:
     QList<QPersistentModelIndex> m_parentIndicesToUpdate;
     const QScopedPointer<nx::utils::PendingOperation> m_updateParentsOp;
 };
-
-Q_DECLARE_METATYPE(QnResourceSearchProxyModel*)

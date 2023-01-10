@@ -10,7 +10,6 @@
 
 class NX_VMS_COMMON_API QnStoragePluginFactory: public QObject
 {
-    Q_OBJECT
 public:
     typedef std::function<QnStorageResource *(const QString&)> StorageFactory;
 

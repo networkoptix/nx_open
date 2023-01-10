@@ -4,12 +4,14 @@
 
 #include <QtCore/QSize>
 
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
+#include <utils/math/math.h>
 #include <utils/media/av_codec_helper.h>
 
 #include "media_player.h" //< For enum VideoQuality.

@@ -12,8 +12,6 @@ namespace ec2 {
     class TransactionMessageBusAdapter:
         public AbstractTransactionMessageBus
     {
-        Q_OBJECT
-
     public:
         TransactionMessageBusAdapter(
             QnCommonModule* commonModule,

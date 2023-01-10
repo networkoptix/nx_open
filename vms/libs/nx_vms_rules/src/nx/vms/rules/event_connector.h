@@ -4,7 +4,6 @@
 
 #include <vector>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QObject>
 
 #include "basic_event.h"
@@ -28,5 +27,3 @@ signals:
 };
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(std::vector<nx::vms::rules::EventPtr>)

@@ -25,8 +25,6 @@ struct TranslationInfo
 
 } // namespace nx::vms::client::desktop
 
-Q_DECLARE_METATYPE(nx::vms::client::desktop::TranslationInfo)
-
 class QnTranslationListModel: public QAbstractListModel
 {
     Q_OBJECT

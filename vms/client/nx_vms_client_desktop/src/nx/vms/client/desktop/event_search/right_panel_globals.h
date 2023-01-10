@@ -119,5 +119,3 @@ inline uint qHash(RightPanel::SystemSelection source)
 
 } // namespace RightPanel
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::RightPanel::EventCategory)

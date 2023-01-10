@@ -32,6 +32,3 @@ struct Message
 };
 
 } // namespace nx::email
-
-Q_DECLARE_METATYPE(nx::email::Attachment)
-Q_DECLARE_METATYPE(nx::email::Message)

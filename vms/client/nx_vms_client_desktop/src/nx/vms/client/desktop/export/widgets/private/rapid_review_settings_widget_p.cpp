@@ -264,7 +264,7 @@ qreal RapidReviewSettingsWidgetPrivate::sliderExpCoeff() const
      */
 
     qreal speedUp = m_maxSpeed / kMinimalSpeed;
-    return log(speedUp) / kSliderSteps;
+    return ::log(speedUp) / kSliderSteps;
 }
 
 qreal RapidReviewSettingsWidgetPrivate::toSliderScale(qreal absoluteSpeedValue) const
@@ -278,7 +278,7 @@ qreal RapidReviewSettingsWidgetPrivate::toSliderScale(qreal absoluteSpeedValue) 
     const qreal k = sliderExpCoeff();
 
     const qreal targetSpeedUp = 1.0 * absoluteSpeedValue / kMinimalSpeed;
-    const qreal sliderValue = log(targetSpeedUp) / k;
+    const qreal sliderValue = ::log(targetSpeedUp) / k;
     return sliderValue;
 }
 

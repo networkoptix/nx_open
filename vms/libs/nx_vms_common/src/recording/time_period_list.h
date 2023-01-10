@@ -278,11 +278,8 @@ struct NX_VMS_COMMON_API MultiServerPeriodData
 typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData,
-    (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time),
+    (json)(ubjson)(xml)(csv_record)(compressed_time),
     NX_VMS_COMMON_API);
-
-Q_DECLARE_METATYPE(QnTimePeriodList);
-Q_DECLARE_METATYPE(MultiServerPeriodDataList);
 
 
 #endif // QN_TIME_PERIOD_LIST_H

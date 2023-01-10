@@ -60,5 +60,3 @@ struct ErrorEx: public Error
 };
 
 } // namespace nx::recording
-
-Q_DECLARE_METATYPE(std::optional<nx::recording::Error>)

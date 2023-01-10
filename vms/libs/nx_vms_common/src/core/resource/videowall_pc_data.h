@@ -5,7 +5,6 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <nx/utils/uuid.h>
 #include <QtCore/QRect>
 
@@ -49,16 +48,12 @@ public:
     }
 };
 
-Q_DECLARE_METATYPE(QnVideoWallPcData::PcScreen)
 Q_DECLARE_TYPEINFO(QnVideoWallPcData::PcScreen, Q_MOVABLE_TYPE);
 
-Q_DECLARE_METATYPE(QnVideoWallPcData)
 Q_DECLARE_TYPEINFO(QnVideoWallPcData, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallPcData> QnVideoWallPcDataList;
 typedef QHash<QnUuid, QnVideoWallPcData> QnVideoWallPcDataMap;
 
-Q_DECLARE_METATYPE(QnVideoWallPcDataList)
-Q_DECLARE_METATYPE(QnVideoWallPcDataMap)
 
 #endif // VIDEO_WALL_PC_DATA_H

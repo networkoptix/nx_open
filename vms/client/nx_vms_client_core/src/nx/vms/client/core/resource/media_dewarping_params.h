@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/vms/api/data/dewarping_data.h>
 
 namespace nx::vms::client::core {
@@ -37,5 +35,3 @@ public:
 };
 
 } // namespace nx::vms::client::core
-
-Q_DECLARE_METATYPE(nx::vms::client::core::MediaDewarpingParams);

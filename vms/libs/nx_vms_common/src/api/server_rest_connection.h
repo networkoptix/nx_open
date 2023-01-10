@@ -114,7 +114,6 @@ class NX_VMS_COMMON_API ServerConnection:
     public QObject,
     public ServerConnectionBase
 {
-    Q_OBJECT
     using Timeouts = nx::network::http::AsyncClient::Timeouts;
     using AbstractCertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
 

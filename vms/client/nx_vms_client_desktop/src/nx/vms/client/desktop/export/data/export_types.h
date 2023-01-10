@@ -4,8 +4,6 @@
 
 #include <recording/stream_recorder_data.h>
 
-#include <QtCore/QMetaType>
-
 #include <optional>
 
 namespace nx::vms::client::desktop {
@@ -42,5 +40,3 @@ enum class ExportProcessError
 ExportProcessError convertError(const std::optional<nx::recording::Error>& value);
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportProcessStatus)

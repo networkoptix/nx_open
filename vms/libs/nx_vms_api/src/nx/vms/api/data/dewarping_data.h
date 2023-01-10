@@ -4,7 +4,6 @@
 
 #include <QtCore/QtMath>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/dewarping_types.h>
@@ -124,8 +123,6 @@ NX_REFLECTION_INSTRUMENT(ViewData, ViewData_Fields)
 } // namespace dewarping
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::dewarping::MediaData)
-Q_DECLARE_METATYPE(nx::vms::api::dewarping::ViewData)
 
 // Compatibility-layer functions to maintain old way of (de)serializing in the server sql database.
 void NX_VMS_API serialize_field(const nx::vms::api::dewarping::MediaData& data, QVariant* target);

@@ -758,7 +758,7 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
 
     if (event == QKeySequence::Copy)
     {
-        QString separator = lit("---------------------------\n");
+        QString separator = "---------------------------\n";
         QString textToCopy = separator;
         separator.prepend(QLatin1Char('\n'));
         textToCopy += windowTitle() + separator; // title
@@ -771,7 +771,7 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         QString buttonTexts;
         for (auto pb: ui->buttonBox->buttons())
         {
-            buttonTexts += pb->text() + lit("   ");
+            buttonTexts += pb->text() + "   ";
         }
         textToCopy += buttonTexts + separator;
         QApplication::clipboard()->setText(textToCopy);

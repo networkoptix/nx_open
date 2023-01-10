@@ -25,14 +25,14 @@ static inline bool fuzzyEquals(double p1, double p2)
 {
     constexpr double kPrecision = 1000000000000.0;
     return (fuzzyIsNull(p1) && fuzzyIsNull(p2)) ||
-        (std::fabs(p1 - p2) * kPrecision <= std::min(std::fabs(p1), std::fabs(p2)));
+        (std::fabs(p1 - p2) * kPrecision <= std::fmin(std::fabs(p1), std::fabs(p2)));
 }
 
 static inline bool fuzzyEquals(float p1, float p2)
 {
     constexpr float kPrecision = 100000.0f;
     return (fuzzyIsNull(p1) && fuzzyIsNull(p2)) ||
-        (std::fabs(p1 - p2) * kPrecision <= std::min(std::fabs(p1), std::fabs(p2)));
+        (std::fabs(p1 - p2) * kPrecision <= std::fmin(std::fabs(p1), std::fabs(p2)));
 }
 
 template<typename T>

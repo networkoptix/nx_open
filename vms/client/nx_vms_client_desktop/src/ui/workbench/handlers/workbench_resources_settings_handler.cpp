@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/misc/schedule_task.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>

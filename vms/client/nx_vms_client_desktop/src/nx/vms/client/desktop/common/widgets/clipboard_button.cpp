@@ -73,9 +73,9 @@ ClipboardButton::ClipboardButton(
     QWidget* parent)
     :
     base_type(
-        qnSkin->icon(lit("text_buttons/copy.png")),
+        qnSkin->icon("text_buttons/copy.png"),
         text,
-        qnSkin->icon(lit("text_buttons/ok.png")),
+        qnSkin->icon("text_buttons/ok.png"),
         confirmationText,
         parent)
 {

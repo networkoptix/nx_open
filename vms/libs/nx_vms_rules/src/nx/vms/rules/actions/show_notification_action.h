@@ -50,5 +50,3 @@ public:
 };
 
 } // namespace nx::vms::rules
-
-Q_DECLARE_METATYPE(QSharedPointer<nx::vms::rules::NotificationAction>)

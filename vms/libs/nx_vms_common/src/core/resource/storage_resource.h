@@ -104,6 +104,3 @@ private:
     bool m_isBackup = false;
     nx::vms::api::StorageStatuses m_status = nx::vms::api::StorageStatus::none;
 };
-
-Q_DECLARE_METATYPE(QnStorageResourcePtr);
-Q_DECLARE_METATYPE(QnStorageResourceList);

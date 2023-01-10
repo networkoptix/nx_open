@@ -99,8 +99,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         ${qt_styles_sources}
         ${qt_widgets_sources}
         ${qt_images_sources}
-    FORCE_INCLUDE
-        ${nx_utils_dir}/src/nx/utils/literal.h
     ADDITIONAL_RESOURCES
         "${customization_dir}/license.html"
         "${update_verification_keys}"

@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QJsonObject>
 
 #include <nx/utils/uuid.h>
@@ -58,5 +57,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(ServerTimeReply)
 
 } // namespace nx::vms::api
 
-Q_DECLARE_METATYPE(nx::vms::api::TimeReply)
-Q_DECLARE_METATYPE(nx::vms::api::ServerTimeReply)

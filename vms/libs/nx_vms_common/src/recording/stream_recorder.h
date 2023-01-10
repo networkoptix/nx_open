@@ -9,10 +9,6 @@
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
-extern "C" {
-#include <libavformat/avformat.h>
-}
-
 #include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>

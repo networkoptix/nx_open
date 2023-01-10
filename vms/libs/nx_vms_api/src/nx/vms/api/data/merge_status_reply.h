@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
 
@@ -22,5 +20,3 @@ struct NX_VMS_API MergeStatusReply
 NX_VMS_API_DECLARE_STRUCT(MergeStatusReply)
 
 } // namespace nx::vms::api
-
-Q_DECLARE_METATYPE(nx::vms::api::MergeStatusReply)

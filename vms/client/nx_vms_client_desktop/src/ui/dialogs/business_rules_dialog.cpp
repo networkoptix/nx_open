@@ -3,7 +3,7 @@
 #include "business_rules_dialog.h"
 #include "ui_business_rules_dialog.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <QtCore/QEvent>
 #include <QtCore/QSortFilterProxyModel>
@@ -52,8 +52,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-
-using boost::algorithm::any_of;
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -147,7 +145,8 @@ namespace {
                     return role.name.contains(m_filterText, Qt::CaseInsensitive);
                 };
 
-            bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
+            const auto& cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+            bool anyCameraPassFilter = std::any_of(cameras.begin(), cameras.end(), resourcePassText);
             vms::api::EventType eventType = idx.data(Qn::EventTypeRole).value<vms::api::EventType>();
             if (vms::event::requiresCameraResource(eventType)) {
                 auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
@@ -157,7 +156,7 @@ namespace {
                     return true;
 
                 // rule contains camera passing the filter
-                if (any_of(eventResources, passText))
+                if (std::any_of(eventResources.begin(), eventResources.end(), passText))
                     return true;
             }
 
@@ -165,7 +164,7 @@ namespace {
             if (vms::event::requiresCameraResource(actionType))
             {
                 auto actionResources = idx.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>();
-                if (any_of(actionResources, passText))
+                if (std::any_of(actionResources.begin(), actionResources.end(), passText))
                     return true;
             }
 

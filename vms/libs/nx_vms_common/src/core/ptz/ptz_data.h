@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
 #include <QtGui/QVector3D>
 
 #include <core/ptz/ptz_constants.h>
@@ -45,4 +44,3 @@ struct QnPtzData
 #define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
     (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
 
-Q_DECLARE_METATYPE(QnPtzData)

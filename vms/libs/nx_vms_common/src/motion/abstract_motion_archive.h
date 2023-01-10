@@ -26,5 +26,3 @@ public:
 
     virtual QnAbstractMotionArchiveConnectionPtr createMotionArchiveConnection() = 0;
 };
-
-using QnAbstractMotionConnectionFactoryPtr = QSharedPointer<QnAbstractMotionConnectionFactory>;

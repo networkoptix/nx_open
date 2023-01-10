@@ -46,7 +46,3 @@ NX_VMS_API_DECLARE_STRUCT(UpdateInstallData)
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadData)
-Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadResponseData)
-Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadResponseDataList)
-Q_DECLARE_METATYPE(nx::vms::api::UpdateInstallData)

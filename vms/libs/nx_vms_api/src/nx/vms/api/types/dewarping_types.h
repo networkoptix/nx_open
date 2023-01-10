@@ -4,8 +4,8 @@
 
 #include <ostream>
 
-#include <QtCore/QMetaType>
 #include <QtCore/QObject>
+#include <QtCore/QMetaType>
 
 #include <nx/reflect/enum_instrument.h>
 
@@ -56,6 +56,3 @@ NX_VMS_API std::ostream& operator<<(std::ostream& os, ViewProjection value);
 
 } // namespace nx::vms::api::dewarping
 
-Q_DECLARE_METATYPE(nx::vms::api::dewarping::FisheyeCameraMount)
-Q_DECLARE_METATYPE(nx::vms::api::dewarping::CameraProjection)
-Q_DECLARE_METATYPE(nx::vms::api::dewarping::ViewProjection)

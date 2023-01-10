@@ -15,7 +15,6 @@ typedef QHash<QString, QnPtzPresetRecord> QnPtzPresetRecordHash;
 
 class NX_VMS_COMMON_API QnPresetPtzController: public QnProxyPtzController
 {
-    Q_OBJECT
     typedef QnProxyPtzController base_type;
     typedef std::function<bool(QnPtzPresetRecordHash& records, QnPtzPreset)> PresetsActionFunc;
 

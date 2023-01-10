@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
@@ -29,5 +27,5 @@ struct QnVirtualCameraStatusReply
 };
 #define QnVirtualCameraStatusReply_Fields (success)(locked)(consuming)(userId)(token)(progress)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraStatusReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraStatusReply, (json)(ubjson), NX_VMS_COMMON_API)
 

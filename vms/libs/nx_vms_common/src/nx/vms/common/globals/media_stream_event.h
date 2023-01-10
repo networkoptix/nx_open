@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>
 
@@ -58,5 +59,3 @@ NX_VMS_COMMON_API QByteArray serialize(const MediaStreamEventPacket& value);
 NX_VMS_COMMON_API bool deserialize(const QByteArray& data, MediaStreamEventPacket* outValue);
 
 } // namespace nx::vms::common
-
-Q_DECLARE_METATYPE(nx::vms::common::MediaStreamEvent)

@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <QtCore/QMap>
-#include <QtCore/QMetaType>
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
@@ -48,5 +47,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json), NX_VMS_COMMON_API)
 
 typedef QVector<QnCamRecordingStatsData> QnRecordingStatsReply;
-Q_DECLARE_METATYPE(QnCamRecordingStatsData)
-Q_DECLARE_METATYPE(QnRecordingStatsReply)

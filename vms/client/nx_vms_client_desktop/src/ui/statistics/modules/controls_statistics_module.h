@@ -38,7 +38,7 @@ void QnControlsStatisticsModule::registerButton(const QString &alias
 {
     const QPointer<QnControlsStatisticsModule> guard(this);
     const auto &nonEmptyAlias = (alias.isEmpty()
-        ? lit("undefined_button") : alias);
+        ? "undefined_button" : alias);
     const auto handler = [this, guard, nonEmptyAlias]()
     {
         if (guard)
@@ -54,7 +54,7 @@ void QnControlsStatisticsModule::registerSlider(const QString &alias
 {
     const QPointer<QnControlsStatisticsModule> guard(this);
     const auto &nonEmptyAlias = (alias.isEmpty()
-        ? lit("undefined_slider") : alias);
+        ? "undefined_slider" : alias);
     const auto handler = [this, guard, nonEmptyAlias]()
     {
         if (guard)

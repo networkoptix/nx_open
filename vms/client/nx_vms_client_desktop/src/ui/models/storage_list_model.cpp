@@ -2,7 +2,7 @@
 
 #include "storage_list_model.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <QtGui/QPalette>
 
@@ -460,8 +460,6 @@ void QnStorageListModel::setReadOnly(bool readOnly)
 
 bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) const
 {
-    using boost::algorithm::any_of;
-
     if (m_readOnly)
         return false;
 
@@ -473,7 +471,7 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
         return status.state == nx::vms::api::RebuildState::full;
     };
 
-    if (any_of(m_rebuildStatus, isFullScan))
+    if (std::any_of(m_rebuildStatus.begin(), m_rebuildStatus.end(), isFullScan))
         return false;
 
     if (!data.isWritable)
@@ -505,7 +503,7 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
     };
 
     /* Check that at least one writable storage left in the main pool. */
-    return any_of(m_storages, isWritable);
+    return std::any_of(m_storages.begin(), m_storages.end(), isWritable);
 }
 
 bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const

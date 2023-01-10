@@ -226,7 +226,7 @@ void ECConnectionAuditManager::addAuditRecord(
                 {
                     eventType = Qn::AR_CameraRemove;
                     if (QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>())
-                        description = lit("%1 (%2)").arg(description).arg(
+                        description = QString("%1 (%2)").arg(description).arg(
                             camRes->getHostAddress());
                 }
                 else if (res.dynamicCast<QnMediaServerResource>())

@@ -15,7 +15,6 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API VideowallItemAccessResolver: public AbstractResourceAccessResolver
 {
-    Q_OBJECT
     using base_type = AbstractResourceAccessResolver;
 
 public:

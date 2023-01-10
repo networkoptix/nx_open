@@ -4,7 +4,6 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonObject>
-#include <QtCore/QMetaType>
 #include <QtGui/QCloseEvent> //< TODO: Move event posting to input utils.
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>

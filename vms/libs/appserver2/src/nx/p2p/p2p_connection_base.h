@@ -269,6 +269,3 @@ QString toString(ConnectionBase::State value);
 
 } // namespace p2p
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::p2p::P2pConnectionPtr)
-Q_DECLARE_METATYPE(nx::p2p::ConnectionBase::State)

@@ -76,5 +76,3 @@ struct NX_VMS_CLIENT_DESKTOP_API Filename
 };
 
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::FileExtension)

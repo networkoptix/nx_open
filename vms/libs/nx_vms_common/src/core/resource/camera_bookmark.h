@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
 #include <common/common_globals.h>
@@ -213,15 +212,12 @@ NX_VMS_COMMON_API QnCameraBookmarkList variantListToBookmarkList(const QVariantL
 
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
-Q_DECLARE_METATYPE(QnCameraBookmarkList)
-Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
-
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json), NX_VMS_COMMON_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,
-    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype),
+    (sql_record)(json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag,
-    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype),
+    (sql_record)(json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)

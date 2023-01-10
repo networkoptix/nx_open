@@ -148,15 +148,3 @@ NX_VMS_API_DECLARE_STRUCT(VideowallControlMessageData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-
-Q_DECLARE_METATYPE(nx::vms::api::VideowallData)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallDataList)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallItemData)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallItemDataList)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenData)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenDataList)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixData)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixDataList)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemData)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemDataList)
-Q_DECLARE_METATYPE(nx::vms::api::VideowallControlMessageData)

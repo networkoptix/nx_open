@@ -117,8 +117,8 @@ public:
         m_glWidget(glWidget)
     {
         const auto& info = StaticOpenGLInfo::instance().info();
-        if (info.vendor.contains(lit("Tungsten Graphics"))
-            && info.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
+        if (info.vendor.contains("Tungsten Graphics")
+            && info.renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
         {
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         }
@@ -126,7 +126,7 @@ public:
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (info.vendor.contains(lit("Intel"))
+        if (info.vendor.contains("Intel")
             && QRegularExpression(QRegularExpression::anchoredPattern(QLatin1String(".*Intel.+3000.*"))).match(info.renderer).hasMatch())
         {
             StaticOpenGLInfo::instance().overrideMaxTextureSize(4096);
@@ -135,7 +135,7 @@ public:
 
 
 #ifdef Q_OS_LINUX
-        QDir atiProcDir(lit("/proc/ati"));
+        QDir atiProcDir("/proc/ati");
         if(atiProcDir.exists()) /* Checking for fglrx driver. */
             m_features |= QnGlFunctions::NoOpenGLFullScreen;
 #endif

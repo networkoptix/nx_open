@@ -104,6 +104,4 @@ public:
     bool removeOne(QGraphicsItem *value);
 };
 
-Q_DECLARE_METATYPE(WeakGraphicsItemPointerList)
-
 #endif // QN_WEAK_GRAPHICS_ITEM_POINTER_H

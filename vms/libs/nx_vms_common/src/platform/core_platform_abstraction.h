@@ -8,7 +8,6 @@
 
 class NX_VMS_COMMON_API QnCorePlatformAbstraction: public QObject
 {
-    Q_OBJECT
 public:
     QnCorePlatformAbstraction(QObject *parent = nullptr);
     virtual ~QnCorePlatformAbstraction();

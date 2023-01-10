@@ -45,6 +45,4 @@ private:
     int m_timeout;
 };
 
-Q_DECLARE_METATYPE(QnPingUtility::PingResponse)
-
 #endif // PING_UTILITY_H

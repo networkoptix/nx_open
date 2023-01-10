@@ -4,7 +4,6 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QMetaType>
 
 #include <nx/utils/uuid.h>
 
@@ -64,11 +63,5 @@ public:
 
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
 
-Q_DECLARE_METATYPE(QnVideoWallItem)
-Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
-
 typedef QList<QnVideoWallItem> QnVideoWallItemList;
 typedef QHash<QnUuid, QnVideoWallItem> QnVideoWallItemMap;
-
-Q_DECLARE_METATYPE(QnVideoWallItemList)
-Q_DECLARE_METATYPE(QnVideoWallItemMap)
