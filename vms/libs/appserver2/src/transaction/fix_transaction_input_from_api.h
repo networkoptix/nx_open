@@ -11,6 +11,7 @@ struct StorageData;
 struct ResourceParamData;
 struct ResourceParamWithRefData;
 struct EventRuleData;
+struct LayoutData;
 
 } // namespace nx::vms::api
 
@@ -37,5 +38,8 @@ QnTransaction<nx::vms::api::ResourceParamWithRefData> fixTransactionInputFromApi
 
 QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
     const QnTransaction<nx::vms::api::EventRuleData>& originalTran, Result* result);
+
+QnTransaction<nx::vms::api::LayoutData> fixTransactionInputFromApi(
+    const QnTransaction<nx::vms::api::LayoutData>& originalTran, Result* result);
 
 } // namespace ec2
