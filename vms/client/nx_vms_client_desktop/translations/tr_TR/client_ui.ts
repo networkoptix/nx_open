@@ -604,11 +604,11 @@
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Sistem ön ayarlarını kullan</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>PTZ Hızı</translation>
     </message>
     <message>
       <source>RTP Transport</source>
@@ -620,11 +620,11 @@
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Zaman Ayarları</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Kamera zaman ayarlarını koru</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <translation>Cihazdan Dışa Aktar</translation>
     </message>
   </context>
   <context>
@@ -1131,7 +1131,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Önceliği belirle:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Yük Devretme Yok</translation>
     </message>
   </context>
   <context>
@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Gelişmiş ayarlar</translation>
     </message>
   </context>
   <context>
@@ -2402,7 +2402,7 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Veri koruması</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Kullanıcı Aktivitesi</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
@@ -2446,7 +2446,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Kullanıcıları Yönet</translation>
     </message>
   </context>
   <context>
@@ -2464,7 +2464,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Sunucu sertifikası</translation>
     </message>
     <message>
       <source>General</source>
@@ -2488,7 +2488,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Parmak izleri</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2538,7 +2538,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Yerleşik ve USB web kameralarını otomatik olarak algıla</translation>
     </message>
   </context>
   <context>
@@ -2910,11 +2910,11 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Bu kullanıcı özet kimlik doğrulamasını kullanabilir.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
   </context>
   <context>
@@ -3008,7 +3008,7 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>İstemci API kullanılmasına izin ver</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>

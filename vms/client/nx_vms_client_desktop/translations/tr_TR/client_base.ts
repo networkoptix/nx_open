@@ -1745,11 +1745,11 @@
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Diğer tüm istemci pencereleri kapatılacaktır.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Güvenlik ayarları değiştirildi</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2064,7 +2064,7 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM Saldırısı</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
@@ -5888,7 +5888,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Bu kullanıcı için özet kimlik doğrulamasına izin ver</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -6042,7 +6042,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Bu web sayfası açılsın mı?</translation>
     </message>
     <message>
       <source>Web page</source>
@@ -6050,11 +6050,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Yine de bağlan</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Web sayfası ayarları...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6963,7 +6963,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Cihazları seçin...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
@@ -7340,7 +7340,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Isıtıcı</translation>
     </message>
     <message>
       <source>Wiper</source>
@@ -7406,11 +7406,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>Otomatik seçim</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Destekleniyorsa kullan</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7564,23 +7564,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Cihazları Seç</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Kameraları Seç</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Cihaz Seç</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Kamera Seç</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Kullanılabilir kamera yok</translation>
     </message>
   </context>
   <context>
@@ -7688,7 +7688,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Yalnızca Hareket ve Nesneler</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7696,11 +7696,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Hareket ve Nesne + Düşük Çözünürlük</translation>
     </message>
   </context>
   <context>
@@ -7735,7 +7735,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Ses devre dışı bırakılacak</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
@@ -7743,7 +7743,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2 yönlü ses devre dışı bırakılacak</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
@@ -7785,11 +7785,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Geçersiz akış adresi</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Akış protokolü uyuşmazlığı</translation>
     </message>
   </context>
   <context>
@@ -7844,11 +7844,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Güncelleme dosyası indirilemiyor</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Güncelleme dosyasını indirmek için yeterli alan yok</translation>
     </message>
   </context>
   <context>
@@ -7887,7 +7887,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>%1 giriş yap</translation>
     </message>
   </context>
   <context>
@@ -7910,11 +7910,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Yeniden kimlik doğrulama gerekli</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Oturumunuza devam etmek için parolayı girin</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -7930,7 +7930,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Yerel Sistem sahibi yok veya devre dışı.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
@@ -7992,7 +7992,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Sunucuyu Sistemle Birleştir</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
@@ -9225,11 +9225,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Özel bir istemci kullanıyorsunuz. Güncelleme talimatlarını almak için lütfen %1 ile iletişime geçin.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>İstemci güncellemesini indirmek için bilgisayarınızda yeterli alan yok. Lütfen sabit sürücünüzde biraz yer açın ve tekrar deneyin.</translation>
     </message>
   </context>
   <context>
@@ -9262,7 +9262,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Bildirim Ayarları</translation>
     </message>
   </context>
   <context>
@@ -9532,15 +9532,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Proxy Web Sayfası Ekle</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Web Sayfası Ekle</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Proxy Web Sayfasını Düzenle</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9623,35 +9623,35 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Hareket ve nesneleri kaydetme</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Yalnızca nesneleri kaydetme</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Hareket ve nesneleri düşük kalite kaydetme</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Nesneleri düşük kalite kaydetme</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Hareket, Nesne</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Hareket, Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
   </context>
   <context>
@@ -9712,7 +9712,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analitik</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9720,7 +9720,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Giriş Sinyali</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9728,11 +9728,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Akış Sorunu</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Cihaz Bağlantısını Kes</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9797,23 +9797,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Hareket, Nesne</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Hareket ve Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9822,20 +9820,19 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Hareket + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Bu kamera için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Seçilen kameralardan bazıları için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9855,11 +9852,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Bu kamera için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Seçilen kameralardan bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
@@ -9875,7 +9872,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>Bu G/Ç modülü için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
@@ -9891,7 +9888,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>Bu G/Ç modülü için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
@@ -9933,7 +9930,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Arşiv şifreleme parolası</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
@@ -10115,7 +10112,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Uygun sunucu yok</translation>
     </message>
   </context>
   <context>
@@ -10186,7 +10183,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>bilinmeyen durum</translation>
     </message>
   </context>
   <context>
@@ -10295,7 +10292,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya hareket kaydını etkinleştirin</translation>
     </message>
   </context>
   <context>
@@ -10321,7 +10318,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Kayıt programı %n kameralar için geçersiz</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
     </message>
@@ -10539,7 +10536,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Sürümü Seçin</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10547,7 +10544,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Geçersiz sürüm.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10617,7 +10614,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Bu yerleşimi gizlemek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
@@ -10742,7 +10739,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Tüm arşiv</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10758,15 +10755,15 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Yüksek çözünürlük</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Tüm akışlar</translation>
     </message>
   </context>
   <context>
@@ -10838,11 +10835,11 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Yeni Grup</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Yeni Grup %1</translation>
     </message>
   </context>
   <context>
@@ -10863,7 +10860,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Eylem Yok</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10875,50 +10872,50 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Otomatik odaklama</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>PTZ Konumuna Git</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Tam Ekran Moduna Geç</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Düzende Sonraki Kamera</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Düzende Önceki Kamera</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Düzeni Aç</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Düzenleyici</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Çoklu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Düzen Seçiniz...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Buton</translation>
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Seçilen Düzen</translation>
     </message>
   </context>
   <context>
@@ -10932,7 +10929,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>Belirtilen kimliğe sahip bir öğe bulunamıyor</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
@@ -11372,11 +11369,11 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Pencere yapılandırması kaydedildi</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Bu derleme yalnızca demo amaçlıdır.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
@@ -11390,7 +11387,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -11595,11 +11592,11 @@ to view more bookmarks</source>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>İstemciyi Yeniden Başlat</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Güncelleme Ayarları</translation>
     </message>
     <message>
       <source>Client update is installed</source>
@@ -11612,7 +11609,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Otomatik istemci güncellemeleri</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>

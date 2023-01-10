@@ -90,7 +90,7 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Geçersiz sertifika</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>İki aşamalı kimlik doğrulama gerekli.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
