@@ -23,7 +23,7 @@
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}-build-debug",
-      "cmakeCommandArgs": "-DwithTests=OFF -DwithDocumentation=OFF -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "cmakeCommandArgs": "-DwithTests=OFF -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [],
