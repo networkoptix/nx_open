@@ -256,7 +256,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(
             while (AVFrame* resampledFrame = m_resampler.nextFrame())
             {
                 error = avcodec_send_frame(m_encoderCtx, resampledFrame);
-                if (error)
+                if (error && error != AVERROR(EAGAIN))
                 {
                     m_lastErrMessage = tr("Could not send audio frame to encoder, Error code: %1.")
                         .arg(error);
