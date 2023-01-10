@@ -109,6 +109,8 @@ if(WINDOWS)
     nx_prepare_vs_settings()
 endif()
 
+nx_generate_compatible_servers_txt()
+
 nx_create_dev_qt_conf()
 
 nx_save_known_files()
