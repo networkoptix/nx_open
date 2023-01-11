@@ -20,6 +20,7 @@
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/events/server_failure_event.h>
 #include <nx/vms/rules/events/server_started_event.h>
+#include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/field.h>
 #include <utils/common/synctime.h>
 
@@ -53,27 +54,32 @@ class ActionBuilderTest:
     public TestPlugin
 {
 public:
-    ActionBuilderTest() : TestPlugin(engine.get())
+    ActionBuilderTest() : TestEngineHolder(context()->systemContext()), TestPlugin(engine.get())
     {
         registerEvent<ServerStartedEvent>();
         registerEvent<ServerFailureEvent>();
+        mockRule = std::make_unique<Rule>(QnUuid(), engine.get());
     }
 
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
     {
-        return QSharedPointer<ActionBuilder>::create(
+        auto builder = QSharedPointer<ActionBuilder>::create(
             QnUuid::createUuid(),
             utils::type<TestAction>(),
             []{ return new TestAction; });
+        builder->setRule(mockRule.get());
+        return builder;
     }
 
     QSharedPointer<TestActionBuilder> makeTestActionBuilder(
         const std::function<BasicAction*()>& actionConstructor) const
     {
-        return QSharedPointer<TestActionBuilder>::create(
+        auto builder = QSharedPointer<TestActionBuilder>::create(
             QnUuid::createUuid(),
             utils::type<TestActionWithTargetUsers>(),
             actionConstructor);
+        builder->setRule(mockRule.get());
+        return builder;
     }
 
     QSharedPointer<TestActionBuilder> makeBuilderWithTargetUserField(
@@ -124,6 +130,7 @@ public:
 
 private:
     QnSyncTime syncTime;
+    std::unique_ptr<Rule> mockRule;
 };
 
 TEST_F(ActionBuilderTest, builderWithoutTargetUserFieldProduceOnlyOneAction)

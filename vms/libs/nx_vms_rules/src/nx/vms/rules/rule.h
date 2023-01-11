@@ -15,6 +15,7 @@ namespace nx::vms::rules {
 
 class ActionBuilder;
 class EventFilter;
+class Engine;
 
 /**
  * VMS rule description.
@@ -24,10 +25,11 @@ class NX_VMS_RULES_API Rule: public QObject
     Q_OBJECT
 
 public:
-    explicit Rule(const QnUuid& id);
+    explicit Rule(const QnUuid& id, const Engine* engine);
     ~Rule();
 
     QnUuid id() const;
+    const Engine* engine() const;
 
     // Takes ownership.
     void addEventFilter(std::unique_ptr<EventFilter> filter);
@@ -69,6 +71,7 @@ private:
 
 private:
     QnUuid m_id;
+    const Engine* m_engine;
 
     // TODO: #spanasenko and-or logic
     std::vector<std::unique_ptr<EventFilter>> m_filters;

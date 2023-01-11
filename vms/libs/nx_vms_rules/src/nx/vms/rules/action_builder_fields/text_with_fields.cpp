@@ -5,6 +5,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 
 #include "../aggregated_event.h"
 #include "../basic_event.h"
@@ -80,8 +81,14 @@ QString eventDescription(const AggregatedEventPtr& eventAggregator, common::Syst
     if (const auto value = eventAggregator->property("description"); value.canConvert<QString>())
         return value.toString();
 
-    auto descriptor = Engine::instance()->eventDescriptor(eventType(eventAggregator));
-    return descriptor ? descriptor->description : QString();
+    const auto engine = context->vmsRulesEngine();
+    if (NX_ASSERT(engine))
+    {
+        if (auto descriptor = engine->eventDescriptor(eventType(eventAggregator)))
+            return descriptor->description;
+    }
+
+    return {};
 }
 
 QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)

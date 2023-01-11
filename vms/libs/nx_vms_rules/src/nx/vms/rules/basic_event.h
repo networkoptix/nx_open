@@ -74,7 +74,7 @@ public:
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
     virtual QVariantMap details(common::SystemContext* context) const;
 
-    QString name() const;
+    QString name(common::SystemContext* context) const;
 
 protected:
     BasicEvent() = default;
@@ -86,7 +86,7 @@ protected:
         return QStringList{strings...}.join(kEventNameSeparator);
     }
 
-    QString extendedCaption() const;
+    QString extendedCaption(common::SystemContext* context) const;
 
     /**
     * Returns event source to display in notification tile and tooltip.

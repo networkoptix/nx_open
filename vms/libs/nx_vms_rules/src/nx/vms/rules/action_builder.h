@@ -35,9 +35,8 @@ public:
     QnUuid id() const;
     QString actionType() const;
 
-    /** Returns a rule id the action builder belongs to. */
-    QnUuid ruleId() const;
-    void setRuleId(const QnUuid& ruleId);
+    const Rule* rule() const;
+    void setRule(const Rule* rule);
 
     /**
      * Get all configurable Builder properties in a form of flattened dictionary,
@@ -106,9 +105,9 @@ private:
     ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
 
     QnUuid m_id;
-    QnUuid m_ruleId;
     QString m_actionType;
     ActionConstructor m_constructor;
+    const Rule* m_rule = {};
     std::map<QString, std::unique_ptr<ActionBuilderField>> m_fields;
 
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();

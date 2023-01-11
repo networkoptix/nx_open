@@ -234,11 +234,6 @@ ServerTimeWatcher* SystemContext::serverTimeWatcher() const
     return d->serverTimeWatcher.get();
 }
 
-nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
-{
-    return d->vmsRulesEngineHolder->engine();
-}
-
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);

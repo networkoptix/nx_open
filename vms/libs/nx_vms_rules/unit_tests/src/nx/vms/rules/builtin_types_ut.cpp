@@ -27,7 +27,7 @@ class BuiltinTypesTest:
     public Plugin
 {
 public:
-    BuiltinTypesTest()
+    BuiltinTypesTest(): TestEngineHolder(context()->systemContext())
     {
         initialize(engine.get());
     }

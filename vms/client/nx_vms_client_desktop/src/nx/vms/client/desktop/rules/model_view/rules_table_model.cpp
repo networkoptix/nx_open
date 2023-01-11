@@ -421,7 +421,7 @@ QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, i
 QModelIndex RulesTableModel::addRule()
 {
     auto newRuleId = QnUuid::createUuid();
-    auto newRule = std::make_unique<Rule>(newRuleId);
+    auto newRule = std::make_unique<Rule>(newRuleId, engine);
 
     // TODO: Choose default type for the event and action.
     auto eventFilter = engine->buildEventFilter(nx::vms::rules::GenericEvent::manifest().id);

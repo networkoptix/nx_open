@@ -60,7 +60,7 @@ TEST_F(EngineTest, ruleAddedSuccessfully)
     // No rules at the moment the engine is just created.
     ASSERT_TRUE(engine->rules().empty());
 
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid());
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
     engine->addRule(engine->serialize(rule.get()));
 
     ASSERT_EQ(engine->rules().size(), 1);
@@ -69,7 +69,7 @@ TEST_F(EngineTest, ruleAddedSuccessfully)
 
 TEST_F(EngineTest, ruleClonedSuccessfully)
 {
-    auto rule = std::make_unique<Rule>(QnUuid::createUuid());
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
     engine->addRule(engine->serialize(rule.get()));
 
     auto clonedRule = engine->cloneRule(rule->id());

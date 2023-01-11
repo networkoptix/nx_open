@@ -23,15 +23,18 @@ ActionTypePickerWidget::ActionTypePickerWidget(QWidget* parent):
         {
             emit actionTypePicked(actionType());
         });
-
-    ui->actionTypeComboBox->clear();
-    for (const auto& actionType: vms::rules::Engine::instance()->actions())
-        ui->actionTypeComboBox->addItem(actionType.displayName, actionType.id);
 }
 
 // Non-inline destructor is required for member scoped pointers to forward declared classes.
 ActionTypePickerWidget::~ActionTypePickerWidget()
 {
+}
+
+void ActionTypePickerWidget::init(nx::vms::rules::Engine* engine)
+{
+    ui->actionTypeComboBox->clear();
+    for (const auto& actionType: engine->actions())
+        ui->actionTypeComboBox->addItem(actionType.displayName, actionType.id);
 }
 
 QString ActionTypePickerWidget::actionType() const

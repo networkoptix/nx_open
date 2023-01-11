@@ -56,7 +56,7 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
     const auto totalEventCount = totalCount();
     if (totalEventCount > 1)
     {
-        const auto eventName = initialEvent()->name();
+        const auto eventName = initialEvent()->name(context);
         eventDetails[utils::kExtendedCaptionDetailName] =
             tr("Multiple %1 events have occurred").arg(eventName);
     }

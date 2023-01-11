@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/router.h>
 
 namespace nx::vms::rules::test {
@@ -22,15 +23,15 @@ public:
     }
 };
 
-
 /** May be used for test fixture inheritance. */
 struct TestEngineHolder
 {
     std::unique_ptr<Engine> engine;
 
-    TestEngineHolder():
+    TestEngineHolder(nx::vms::common::SystemContext* context):
         engine(std::make_unique<Engine>(std::make_unique<TestRouter>()))
     {
+        context->setVmsRulesEngine(engine.get());
     }
 };
 

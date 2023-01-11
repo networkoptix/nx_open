@@ -122,8 +122,6 @@ public:
 
     ServerTimeWatcher* serverTimeWatcher() const;
 
-    nx::vms::rules::Engine* vmsRulesEngine() const;
-
 signals:
     void remoteIdChanged(const QnUuid& id);
 

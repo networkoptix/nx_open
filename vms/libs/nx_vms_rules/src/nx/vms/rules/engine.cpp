@@ -51,7 +51,8 @@ bool isDescriptorValid(const ItemDescriptor& descriptor)
 
 Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
     QObject(parent),
-    m_router(std::move(router))
+    m_router(std::move(router)),
+    m_eventCache(new EventCache())
 {
     const QString rulesVersion(ini().rulesEngine);
     m_enabled = (rulesVersion == "new" || rulesVersion == "both");
@@ -392,7 +393,7 @@ bool Engine::addRule(const api::Rule& serialized)
 
 std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 {
-    std::unique_ptr<Rule> rule(new Rule(serialized.id));
+    std::unique_ptr<Rule> rule(new Rule(serialized.id, this));
 
     for (const auto& filterInfo: serialized.eventList)
     {
@@ -819,9 +820,9 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
-EventCache& Engine::eventCache()
+EventCache* Engine::eventCache() const
 {
-    return m_eventCache;
+    return m_eventCache.get();
 }
 
 } // namespace nx::vms::rules

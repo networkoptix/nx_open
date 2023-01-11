@@ -242,6 +242,9 @@ public:
      */
     nx::vms::event::RuleManager* eventRuleManager() const;
 
+    nx::vms::rules::Engine* vmsRulesEngine() const;
+    void setVmsRulesEngine(nx::vms::rules::Engine* engine);
+
     nx::analytics::taxonomy::DescriptorContainer* analyticsDescriptorContainer() const;
 
     nx::analytics::taxonomy::AbstractStateWatcher* analyticsTaxonomyStateWatcher() const;

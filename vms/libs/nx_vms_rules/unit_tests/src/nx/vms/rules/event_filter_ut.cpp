@@ -10,6 +10,7 @@
 #include <nx/vms/rules/event_filter_fields/text_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
+#include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/field.h>
 
 #include "test_event.h"
@@ -41,11 +42,13 @@ protected:
     virtual void SetUp() override
     {
         engine = std::make_unique<Engine>(std::make_unique<TestRouter>());
+        mockRule = std::make_unique<Rule>(QnUuid(), engine.get());
 
         filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.generic");
         filter->addField("source", std::make_unique<KeywordsField>());
         filter->addField("caption", std::make_unique<KeywordsField>());
         filter->addField("description", std::make_unique<KeywordsField>());
+        filter->setRule(mockRule.get());
 
         auto fields = filter->fields();
         sourceField = dynamic_cast<KeywordsField*>(fields.value("source"));
@@ -70,6 +73,7 @@ protected:
     }
 
     std::unique_ptr <Engine> engine;
+    std::unique_ptr<Rule> mockRule;
     std::unique_ptr<EventFilter> filter;
 
     KeywordsField* sourceField{};
@@ -121,6 +125,7 @@ TEST_F(EventFilterTest, oneEventFieldMismatchToFilterFieldTest)
 TEST_F(EventFilterTest, handlesStartedProlongedEventProperly)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->setRule(mockRule.get());
     addStateField(State::started, filter.get());
 
     EventPtr event(new TestEvent{{}, State::started});
@@ -141,6 +146,7 @@ TEST_F(EventFilterTest, handlesStartedProlongedEventProperly)
 TEST_F(EventFilterTest, handlesStoppedProlongedEventProperly)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->setRule(mockRule.get());
     addStateField(State::stopped, filter.get());
 
     EventPtr event(new TestEvent{{}, State::stopped});
@@ -160,6 +166,7 @@ TEST_F(EventFilterTest, handlesStoppedProlongedEventProperly)
 TEST_F(EventFilterTest, filteredOutEventIsNotRunning)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->setRule(mockRule.get());
     addStateField(State::started, filter.get());
     addTextField("a", filter.get());
 
@@ -182,6 +189,7 @@ TEST_F(EventFilterTest, filteredOutEventIsNotRunning)
 TEST_F(EventFilterTest, cacheKey)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->setRule(mockRule.get());
     addTextField({}, filter.get());
 
     auto event = TestEventPtr::create();
@@ -207,6 +215,7 @@ TEST_F(EventFilterTest, cacheTimeout)
     using namespace std::chrono;
 
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->setRule(mockRule.get());
     addTextField({}, filter.get());
 
     auto event = TestEventPtr::create();
@@ -219,7 +228,7 @@ TEST_F(EventFilterTest, cacheTimeout)
 
     // Same cache events are matched after timeout.
     std::this_thread::sleep_for(5ms);
-    engine->eventCache().cleanupOldEventsFromCache(1ms, 1ms);
+    engine->eventCache()->cleanupOldEventsFromCache(1ms, 1ms);
     EXPECT_TRUE(filter->match(event));
     EXPECT_FALSE(filter->match(event));
 }

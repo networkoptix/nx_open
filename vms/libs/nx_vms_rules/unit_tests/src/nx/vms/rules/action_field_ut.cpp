@@ -56,6 +56,7 @@ struct FormatResult
 
 class ActionFieldTest:
     public common::test::ContextBasedTest,
+    public TestEngineHolder,
     public ::testing::WithParamInterface<FormatResult>
 {
 public:
@@ -67,10 +68,7 @@ public:
         {"floatField", 123.123},
     };
 
-    std::unique_ptr<Engine> engine;
-
-    ActionFieldTest():
-        engine(new Engine(std::make_unique<TestRouter>()))
+    ActionFieldTest(): TestEngineHolder(context()->systemContext())
     {
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
