@@ -100,7 +100,9 @@ NX_REFLECTION_INSTRUMENT(CloudSystemAuth, CloudSystemAuth_Fields)
 
 struct NX_VMS_API SetupSystemData
 {
-    /**%apidoc New system name. */
+    /**%apidoc New System name.
+     * %example System 1
+     */
     QString name;
 
     /**%apidoc System settings to set when System is configured. */

@@ -21,7 +21,15 @@ namespace nx::vms::api {
 struct NX_VMS_API ServerModel: ResourceWithParameters
 {
     QnUuid id;
+
+    /**%apidoc
+     * %example Server 1
+     */
     QString name;
+
+    /**%apidoc
+     * %example https://127.0.0.1:7001
+     */
     QString url;
 
     /**%apidoc[opt] */
@@ -61,6 +69,7 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
      * <br/>
      * For any day-hour position, a missing value means "unlimited bitrate", and a zero value means
      * "don't perform backup".
+     * %example [{"key": {"day": "monday", "hour": 0}, "value": 0}]
      */
     BackupBitrateBytesPerSecond backupBitrateBytesPerSecond;
 

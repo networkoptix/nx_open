@@ -21,6 +21,10 @@ namespace nx::vms::api {
 struct DeviceGroupSettings
 {
     QString id;
+
+    /**%apidoc
+     * %example Group 1
+     */
     QString name;
 };
 #define DeviceGroupSettings_Fields (id)(name)
@@ -30,10 +34,16 @@ struct NX_VMS_API DeviceModelGeneral
 {
     QnUuid id;
     QString physicalId;
+
+    /**%apidoc
+     * %example 192.168.0.1
+     */
     QString url;
     QnUuid typeId;
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt]
+     * %example Device 1
+     */
     QString name;
 
     /**%apidoc[opt] */

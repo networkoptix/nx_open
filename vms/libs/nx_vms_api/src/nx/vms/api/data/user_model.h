@@ -21,6 +21,10 @@ namespace nx::vms::api {
 struct NX_VMS_API UserModel
 {
     QnUuid id;
+
+    /**%apidoc
+     * %example admin
+     */
     QString name;
 
     /**%apidoc[opt] For cloud users this should be equal name. */

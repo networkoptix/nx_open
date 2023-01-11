@@ -23,6 +23,10 @@ struct NX_VMS_API StorageModel: ResourceWithParameters
 {
     QnUuid id;
     QnUuid serverId;
+
+    /**%apidoc
+     * %example Storage 1
+     */
     QString name;
     QString path;
 

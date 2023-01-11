@@ -93,7 +93,11 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixItemData)
 
 struct NX_VMS_API VideowallMatrixData: IdData
 {
+    /**%apidoc
+     * %example Video Wall matrix 1
+     */
     QString name;
+
     VideowallMatrixItemDataList items;
 
     bool operator==(const VideowallMatrixData& other) const = default;
@@ -106,6 +110,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixData)
  * %param[opt] parentId Id of a User who created this video wall.
  * %param[readonly] id Video wall unique id.
  * %param name Video wall name.
+ *     %example Video wall 1
  * %param[unused] url
  */
 struct NX_VMS_API VideowallData: ResourceData

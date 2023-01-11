@@ -38,7 +38,12 @@ NX_VMS_API_DECLARE_STRUCT(LayoutTourSettings)
 struct NX_VMS_API LayoutTourData: IdData
 {
     QnUuid parentId;
+
+    /**%apidoc
+     * %example Layout Tour 1
+     */
     QString name;
+
     LayoutTourItemDataList items;
     LayoutTourSettings settings;
 

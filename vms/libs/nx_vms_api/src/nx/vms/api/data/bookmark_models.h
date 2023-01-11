@@ -85,7 +85,9 @@ struct NX_VMS_API Bookmark
     /**%apidoc Device id. */
     QString deviceId;
 
-    /**%apidoc Caption of the Bookmark. */
+    /**%apidoc Caption of the Bookmark.
+     * %example Bookmark 1
+     */
     QString name;
 
     /**%apidoc[opt] Details of the Bookmark. */
@@ -94,7 +96,9 @@ struct NX_VMS_API Bookmark
     /**%apidoc[opt] Start time of the Bookmark (in milliseconds since epoch). */
     std::chrono::milliseconds startTimeMs{0};
 
-    /**%apidoc Length of the Bookmark (in milliseconds). */
+    /**%apidoc Length of the Bookmark (in milliseconds).
+     * %example 1000
+     */
     std::chrono::milliseconds durationMs{0};
 
     /**%apidoc[opt]:stringArray List of tags attached to the Bookmark. */
