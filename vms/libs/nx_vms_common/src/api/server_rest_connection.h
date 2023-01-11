@@ -475,8 +475,8 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getAuditLogRecords(
-        std::chrono::microseconds from,
-        std::chrono::microseconds to,
+        std::chrono::milliseconds from,
+        std::chrono::milliseconds to,
         UbJsonResultCallback callback,
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});

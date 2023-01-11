@@ -1110,8 +1110,8 @@ Handle ServerConnection::getStatistics(
 }
 
 Handle ServerConnection::getAuditLogRecords(
-    std::chrono::microseconds from,
-    std::chrono::microseconds to,
+    std::chrono::milliseconds from,
+    std::chrono::milliseconds to,
     UbJsonResultCallback callback,
     QThread* targetThread,
     std::optional<QnUuid> proxyToServer)
