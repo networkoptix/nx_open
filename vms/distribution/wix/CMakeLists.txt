@@ -1,9 +1,5 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-option(addQtPdb
-    "Whether add Qt PDB files to debug libs"
-    OFF)
-
 include(${open_source_root}/cmake/distribution/common.cmake)
 include(${open_source_root}/cmake/distribution/wix.cmake)
 include(${open_source_root}/cmake/wix_utils.cmake)
