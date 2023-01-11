@@ -5,6 +5,7 @@
 #include <client/client_globals.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -27,9 +28,10 @@ bool isCustomUser(const QnUserResourcePtr& user)
     if (!NX_ASSERT(user))
         return false;
 
-    const auto role = user->userRole();
-    return role == Qn::UserRole::customPermissions || role == Qn::UserRole::customUserRole;
-};
+    return user->getRawPermissions() != GlobalPermission::none
+        || !user->systemContext()->accessRightsManager()->ownResourceAccessMap(
+            user->getId()).isEmpty();
+}
 
 } // namespace
 
