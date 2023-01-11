@@ -2,6 +2,7 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+from conan.tools.files import save
 from conans import ConanFile, __version__ as conan_version
 from conans.model import Generator
 from conans.tools import Version
@@ -13,39 +14,37 @@ required_conan_version = ">=1.38.0"
 
 
 # Conan does not provide a generator which makes it possible to easily access package folders for
-# packages in both host and build contexts. This class is the replacement.
-class BaseConanPackagePathsGenerator(Generator):
-    @property
-    def filename(self):
-        return "conan_paths.cmake"
+# packages in both host and build contexts. This is the replacement.
+def generate_conan_package_paths(conanfile):
+    def toPosixPath(path):
+        return path.replace("\\", "/")
 
-    @property
-    def content(self):
-        def toPosixPath(path):
-            return path.replace("\\", "/")
+    packages = {reference.ref.name: toPosixPath(package.package_folder) \
+        for reference, package in chain(
+            conanfile.dependencies.build.items(),
+            conanfile.dependencies.host.items())}
 
-        packages = {reference.ref.name: toPosixPath(package.package_folder) \
-            for reference, package in chain(
-                self.conanfile.dependencies.build.items(),
-                self.conanfile.dependencies.host.items())}
+    content = "set(CONAN_DEPENDENCIES {})\n\n".format(" ".join(name for name in packages.keys()))
 
-        content = "set(CONAN_DEPENDENCIES {})\n\n".format(" ".join(name for name in packages.keys()))
+    for name, path in packages.items():
+        content += f"set(CONAN_{name.upper()}_ROOT \"{path}\")\n"
 
-        for name, path in packages.items():
-            content += f"set(CONAN_{name.upper()}_ROOT \"{path}\")\n"
-
-        return content
+    save(conanfile, "conan_paths.cmake", content)
 
 
-# Workaround to use the same generator name in the NxOpenConan subclass.
-class ConanPackagePathsGenerator(BaseConanPackagePathsGenerator):
-    pass
+def generate_conan_package_refs(conanfile):
+    refs = [package.pref.full_str() \
+        for _, package in chain(
+                conanfile.dependencies.build.items(),
+                conanfile.dependencies.host.items())]
+
+    save(conanfile, "conan_refs.txt", "\n".join(refs))
 
 
 class NxOpenConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
-    generators = "cmake_find_package", "virtualrunenv", "ConanPackagePathsGenerator"
+    generators = "cmake_find_package", "virtualrunenv"
 
     options = {
         "targetDevice": "ANY",
@@ -63,6 +62,10 @@ class NxOpenConan(ConanFile):
         "qt/5.15.2" "#86503340155e8896b26aa6ce2e1905fe",
         "roboto-fonts/1.0" "#d9dbbcbc40cbdeb6dfaa382399bccfd6",
     )
+
+    def generate(self):
+        generate_conan_package_paths(self)
+        generate_conan_package_refs(self)
 
     def build_requirements(self):
         if self.isLinux:
