@@ -45,11 +45,9 @@ QString replaceCharacters(
     return result;
 }
 
-qint64 parseDateTime(const QString& dateTimeStr)
+qint64 parseDateTimeUsec(const QString& dateTimeStr)
 {
-    constexpr qint64 kMSecPerSec = 1000;
     constexpr qint64 kUSecPerMSec = 1000;
-    constexpr qint64 kSecPerYear = 365 * 24 * 60 * 60;
 
     if (dateTimeStr.toLower().trimmed() == "now")
     {
@@ -62,16 +60,10 @@ qint64 parseDateTime(const QString& dateTimeStr)
     }
     else
     {
-        auto somethingSinceEpoch = dateTimeStr.toLongLong();
-        // Detecting seconds, milliseconds or microseconds.
-        if (somethingSinceEpoch <= 0)
-            return somethingSinceEpoch;
-        else if (somethingSinceEpoch < kSecPerYear * kMSecPerSec)
-            return somethingSinceEpoch * kMSecPerSec * kUSecPerMSec;   //< From seconds.
-        else if (somethingSinceEpoch < kSecPerYear * kMSecPerSec * kUSecPerMSec)
-            return somethingSinceEpoch * kUSecPerMSec; //< From milliseconds.
-        else
-            return somethingSinceEpoch; // It's a microseconds.
+        int64_t timestampMsec = dateTimeStr.toLongLong();
+        if (timestampMsec == DATETIME_NOW)
+            return DATETIME_NOW;
+        return timestampMsec * kUSecPerMSec;
     }
 }
 
@@ -79,7 +71,7 @@ qint64 parseDateTimeMsec(const QString& dateTimeStr)
 {
     static const qint64 kUsecPerMs = 1000;
 
-    qint64 usecSinceEpoch = parseDateTime(dateTimeStr);
+    qint64 usecSinceEpoch = parseDateTimeUsec(dateTimeStr);
     if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
         return usecSinceEpoch;  //special values are returned "as is"
 

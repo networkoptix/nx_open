@@ -58,15 +58,13 @@ bool isNullRegion(const QRegion& region)
 QnChunksRequestData QnChunksRequestData::fromParams(
     QnResourcePool* resourcePool, const nx::network::rest::Params& params)
 {
-    static const qint64 kUsPerMs = 1000;
-
     QnChunksRequestData request;
 
     if (params.contains(kStartTimeParam))
-        request.startTimeMs = nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs;
+        request.startTimeMs = nx::utils::parseDateTimeMsec(params.value(kStartTimeParam));
 
     if (params.contains(kEndTimeParam))
-        request.endTimeMs = nx::utils::parseDateTime(params.value(kEndTimeParam)) / kUsPerMs;
+        request.endTimeMs = nx::utils::parseDateTimeMsec(params.value(kEndTimeParam));
 
     if (params.contains(kDetailParam))
         request.detailLevel = std::chrono::milliseconds(params.value(kDetailParam).toLongLong());

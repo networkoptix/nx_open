@@ -19,12 +19,9 @@ TEST( parseDateTime, general )
     const QDateTime testDate = QDateTime::fromString( testDateStr, Qt::ISODate );
     const qint64 testTimestamp = testDate.toMSecsSinceEpoch();
     const qint64 testTimestampUSec = testTimestamp * USEC_PER_MS;
-    const qint64 testTimestampSec = testTimestamp / MSEC_PER_SEC;
 
-    ASSERT_EQ( nx::utils::parseDateTime( testDateStr ), testTimestampUSec );
-    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestamp) ), testTimestampUSec );
-    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampUSec) ), testTimestampUSec );
-    ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampSec) ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTimeUsec( testDateStr ), testTimestampUSec );
+    ASSERT_EQ( nx::utils::parseDateTimeUsec( QString::number(testTimestamp) ), testTimestampUSec );
 }
 
 TEST(removeMnemonics, general)

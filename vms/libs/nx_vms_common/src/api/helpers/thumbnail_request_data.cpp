@@ -55,7 +55,7 @@ void QnThumbnailRequestData::loadFromParams(
         if (timeValue.toLower() == kLatestTimeValue)
             request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
         else
-            request.timestampUs = std::chrono::microseconds(nx::utils::parseDateTime(timeValue));
+            request.timestampUs = std::chrono::microseconds(nx::utils::parseDateTimeUsec(timeValue));
 
         if (params.contains(kIgnoreExternalArchiveParam))
             request.ignoreExternalArchive = true;
