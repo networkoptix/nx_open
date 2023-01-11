@@ -23,10 +23,6 @@ EventTypePickerWidget::EventTypePickerWidget(QWidget* parent):
             emit eventTypePicked(eventType());
         });
 
-    ui->eventTypeComboBox->clear();
-    for (const auto& eventType: vms::rules::Engine::instance()->events())
-        ui->eventTypeComboBox->addItem(eventType.displayName, eventType.id);
-
     connect(ui->continuanceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
         [this]()
         {
@@ -50,6 +46,13 @@ EventTypePickerWidget::EventTypePickerWidget(QWidget* parent):
 // Non-inline destructor is required for member scoped pointers to forward declared classes.
 EventTypePickerWidget::~EventTypePickerWidget()
 {
+}
+
+void EventTypePickerWidget::init(const nx::vms::rules::Engine* engine)
+{
+    ui->eventTypeComboBox->clear();
+    for (const auto& eventType: engine->events())
+        ui->eventTypeComboBox->addItem(eventType.displayName, eventType.id);
 }
 
 QString EventTypePickerWidget::eventType() const

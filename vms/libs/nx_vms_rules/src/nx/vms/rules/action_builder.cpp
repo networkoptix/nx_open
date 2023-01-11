@@ -26,6 +26,7 @@
 #include "basic_action.h"
 #include "basic_event.h"
 #include "engine.h"
+#include "rule.h"
 #include "utils/action.h"
 #include "utils/field.h"
 #include "utils/type.h"
@@ -45,7 +46,11 @@ EventPtr permissionFilter(
     const QnUserResourcePtr& user,
     const nx::vms::common::SystemContext* context)
 {
-    const auto manifest = Engine::instance()->eventDescriptor(event->type());
+    const auto engine = context->vmsRulesEngine();
+    if (!NX_ASSERT(engine))
+        return {};
+
+    const auto manifest = engine->eventDescriptor(event->type());
     if (!NX_ASSERT(manifest))
         return {};
 
@@ -124,7 +129,7 @@ EventPtr permissionFilter(
 
     if (!filteredFields.empty())
     {
-        auto clone = Engine::instance()->cloneEvent(event);
+        auto clone = engine->cloneEvent(event);
         for (const auto& [key, value]: filteredFields)
             clone->setProperty(key, QVariant::fromValue(value));
 
@@ -177,14 +182,14 @@ QString ActionBuilder::actionType() const
     return m_actionType;
 }
 
-QnUuid ActionBuilder::ruleId() const
+const Rule* ActionBuilder::rule() const
 {
-    return m_ruleId;
+    return m_rule;
 }
 
-void ActionBuilder::setRuleId(const QnUuid& ruleId)
+void ActionBuilder::setRule(const Rule* rule)
 {
-    m_ruleId = ruleId;
+    m_rule = rule;
 }
 
 std::map<QString, QVariant> ActionBuilder::flatData() const
@@ -321,7 +326,13 @@ microseconds ActionBuilder::aggregationInterval() const
 
 bool ActionBuilder::isProlonged() const
 {
-    return nx::vms::rules::isProlonged(Engine::instance(), this);
+    if (NX_ASSERT(m_rule))
+    {
+        if (auto engine = m_rule->engine(); NX_ASSERT(engine))
+            return nx::vms::rules::isProlonged(engine, this);
+    }
+
+    return {};
 }
 
 void ActionBuilder::connectSignals()
@@ -465,7 +476,7 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
         return {};
     }
 
-    action->setRuleId(m_ruleId);
+    action->setRuleId(m_rule ? m_rule->id() : QnUuid());
 
     const auto propertyNames =
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);

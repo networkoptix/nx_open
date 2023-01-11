@@ -9,6 +9,8 @@
 
 namespace Ui { class EventTypePickerWidget; }
 
+namespace nx::vms::rules { class Engine; }
+
 namespace nx::vms::client::desktop::rules {
 
 class EventTypePickerWidget: public QWidget
@@ -18,6 +20,8 @@ class EventTypePickerWidget: public QWidget
 public:
     EventTypePickerWidget(QWidget* parent = nullptr);
     virtual ~EventTypePickerWidget() override;
+
+    void init(const nx::vms::rules::Engine* engine);
 
     QString eventType() const;
     void setEventType(const QString& eventType);

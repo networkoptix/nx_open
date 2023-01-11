@@ -39,9 +39,7 @@ namespace api = ::nx::vms::api::rules;
  * Works as factory for actual filters for the selected event type. //< TODO: IMPL!
  * Works as factory for actual action builders for the selected action type. //< TODO: IMPL!
  */
-class NX_VMS_RULES_API Engine:
-    public QObject,
-    public Singleton<Engine>
+class NX_VMS_RULES_API Engine: public QObject
 {
     Q_OBJECT
 
@@ -203,7 +201,7 @@ public:
     void processEvent(const EventPtr& event);
     void processAnalyticsEvents(const std::vector<EventPtr>& events);
 
-    EventCache& eventCache();
+    EventCache* eventCache() const;
 
 public: // Declare following methods public for testing purposes.
     std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
@@ -255,7 +253,7 @@ private:
     QMap<QString, ItemDescriptor> m_eventDescriptors;
     QMap<QString, ItemDescriptor> m_actionDescriptors;
 
-    EventCache m_eventCache;
+    std::unique_ptr<EventCache> m_eventCache;
 };
 
 } // namespace nx::vms::rules

@@ -75,6 +75,7 @@ struct SystemContext::Private
 
     QPointer<AbstractCertificateVerifier> certificateVerifier;
     QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
+    nx::vms::rules::Engine* vmsRulesEngine = {};
 };
 
 SystemContext::SystemContext(
@@ -332,6 +333,16 @@ QnLayoutTourManager* SystemContext::showreelManager() const
 nx::vms::event::RuleManager* SystemContext::eventRuleManager() const
 {
     return d->eventRuleManager.get();
+}
+
+nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
+{
+    return d->vmsRulesEngine;
+}
+
+void SystemContext::setVmsRulesEngine(nx::vms::rules::Engine* engine)
+{
+    d->vmsRulesEngine = engine;
 }
 
 taxonomy::DescriptorContainer* SystemContext::analyticsDescriptorContainer() const

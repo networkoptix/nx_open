@@ -5,6 +5,7 @@
 #include <QtCore/QMetaProperty>
 
 #include <nx/utils/metatypes.h>
+#include <nx/vms/common/system_context.h>
 
 #include "engine.h"
 #include "utils/event_details.h"
@@ -66,8 +67,8 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
     QVariantMap result;
 
     utils::insertIfNotEmpty(result, utils::kTypeDetailName, type());
-    utils::insertIfNotEmpty(result, utils::kNameDetailName, name());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
+    utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
 
     if (const auto source = sourceId(); !source.isNull())
     {
@@ -81,15 +82,21 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
     return result;
 }
 
-QString BasicEvent::name() const
+QString BasicEvent::name(common::SystemContext* context) const
 {
-    const auto descriptor = Engine::instance()->eventDescriptor(type());
-    return descriptor ? descriptor->displayName : tr("Unknown event");
+    const auto engine = context->vmsRulesEngine();
+    if (NX_ASSERT(engine))
+    {
+        if (const auto descriptor = engine->eventDescriptor(type()))
+            return descriptor->displayName;
+    }
+
+    return tr("Unknown event");
 }
 
-QString BasicEvent::extendedCaption() const
+QString BasicEvent::extendedCaption(common::SystemContext* context) const
 {
-    return tr("%1 event has occurred").arg(name());
+    return tr("%1 event has occurred").arg(name(context));
 }
 
 QnUuid BasicEvent::sourceId() const

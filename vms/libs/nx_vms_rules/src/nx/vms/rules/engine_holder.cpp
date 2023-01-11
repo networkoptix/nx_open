@@ -18,6 +18,7 @@ EngineHolder::EngineHolder(nx::vms::common::SystemContext* context, std::unique_
     m_builtinPlugin(std::move(plugin))
 {
     m_builtinPlugin->initialize(m_engine.get());
+    context->setVmsRulesEngine(m_engine.get());
 }
 
 EngineHolder::~EngineHolder()

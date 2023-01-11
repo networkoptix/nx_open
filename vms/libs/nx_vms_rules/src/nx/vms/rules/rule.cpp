@@ -10,7 +10,7 @@
 
 namespace nx::vms::rules {
 
-Rule::Rule(const QnUuid& id): m_id(id)
+Rule::Rule(const QnUuid& id, const Engine* engine): m_id(id), m_engine(engine)
 {
 }
 
@@ -23,6 +23,11 @@ QnUuid Rule::id() const
     return m_id;
 }
 
+const Engine* Rule::engine() const
+{
+    return m_engine;
+}
+
 void Rule::addEventFilter(std::unique_ptr<EventFilter> filter)
 {
     insertEventFilter(m_filters.size(), std::move(filter));
@@ -30,10 +35,6 @@ void Rule::addEventFilter(std::unique_ptr<EventFilter> filter)
 
 void Rule::addActionBuilder(std::unique_ptr<ActionBuilder> builder)
 {
-    if (!builder)
-        return;
-
-    builder->setRuleId(m_id);
     insertActionBuilder(m_builders.size(), std::move(builder));
 }
 
@@ -41,6 +42,7 @@ void Rule::insertEventFilter(int index, std::unique_ptr<EventFilter> filter)
 {
     // TODO: assert, connect signals
     NX_ASSERT(filter);
+    filter->setRule(this);
     m_filters.insert(m_filters.begin() + index, std::move(filter));
     updateState();
 }
@@ -49,6 +51,7 @@ void Rule::insertActionBuilder(int index, std::unique_ptr<ActionBuilder> builder
 {
     // TODO: assert, connect signals
     NX_ASSERT(builder);
+    builder->setRule(this);
     m_builders.insert(m_builders.begin() + index, std::move(builder));
     updateState();
 }
@@ -57,6 +60,7 @@ std::unique_ptr<EventFilter> Rule::takeEventFilter(int index)
 {
     // TODO: assert, disconnect
     auto result = std::move(m_filters.at(index));
+    result->setRule({});
     m_filters.erase(m_filters.begin() + index);
     updateState();
     return result;
@@ -66,6 +70,7 @@ std::unique_ptr<ActionBuilder> Rule::takeActionBuilder(int index)
 {
     // TODO: assert, disconnect
     auto result = std::move(m_builders.at(index));
+    result->setRule({});
     m_builders.erase(m_builders.begin() + index);
     updateState();
     return result;

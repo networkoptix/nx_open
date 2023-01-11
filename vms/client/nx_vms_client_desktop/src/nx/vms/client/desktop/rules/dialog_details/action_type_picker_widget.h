@@ -7,6 +7,8 @@
 
 namespace Ui { class ActionTypePickerWidget; }
 
+namespace nx::vms::rules { class Engine; }
+
 namespace nx::vms::client::desktop::rules {
 
 class ActionTypePickerWidget: public QWidget
@@ -16,6 +18,8 @@ class ActionTypePickerWidget: public QWidget
 public:
     ActionTypePickerWidget(QWidget* parent = nullptr);
     virtual ~ActionTypePickerWidget() override;
+
+    void init(nx::vms::rules::Engine* engine);
 
     QString actionType() const;
     void setActionType(const QString& actionType);

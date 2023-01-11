@@ -89,7 +89,7 @@ QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) co
         .arg(objectCaption)
         .arg(resourceName);
 
-    return BasicEvent::extendedCaption();
+    return BasicEvent::extendedCaption(context);
 }
 
 const ItemDescriptor& AnalyticsObjectEvent::manifest()

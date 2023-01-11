@@ -43,6 +43,9 @@ RulesDialog::RulesDialog(QWidget* parent):
     const auto midlightColor = QPalette().color(QPalette::Midlight);
     setPaletteColor(ui->searchLineEdit, QPalette::PlaceholderText, midlightColor);
 
+    ui->actionTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
+    ui->eventTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
+
     connect(rulesTableModel, &RulesTableModel::dataChanged, this, &RulesDialog::onModelDataChanged);
 
     connect(ui->newRuleButton, &QPushButton::clicked, this,

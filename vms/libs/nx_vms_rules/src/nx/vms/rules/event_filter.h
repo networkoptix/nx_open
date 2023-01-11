@@ -34,6 +34,9 @@ public:
     QnUuid id() const;
     QString eventType() const;
 
+    const Rule* rule() const;
+    void setRule(const Rule* rule);
+
     /**
      * Get all configurable Filter properties in a form of flattened dictionary,
      * where each key has name in a format "field_name/field_property_name".
@@ -86,6 +89,7 @@ private:
 private:
     QnUuid m_id;
     QString m_eventType;
+    const Rule* m_rule = {};
     std::map<QString, std::unique_ptr<EventFilterField>> m_fields;
     bool m_updateInProgress = false;
 };

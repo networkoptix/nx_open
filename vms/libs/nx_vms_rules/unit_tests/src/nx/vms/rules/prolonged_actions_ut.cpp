@@ -56,7 +56,7 @@ protected:
         engine->addEventConnector(&connector);
         engine->addActionExecutor(utils::type<TestProlongedAction>(), &executor);
 
-        auto rule = std::make_unique<Rule>(QnUuid::createUuid());
+        auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
         rule->setEnabled(true);
 
         auto filter = engine->buildEventFilter(utils::type<TestEvent>());
