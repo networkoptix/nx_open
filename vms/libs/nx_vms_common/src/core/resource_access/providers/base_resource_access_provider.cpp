@@ -27,14 +27,14 @@ BaseResourceAccessProvider::BaseResourceAccessProvider(
     if (mode == Mode::cached)
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-            &BaseResourceAccessProvider::handleResourceAdded);
+            &BaseResourceAccessProvider::handleResourceAdded, Qt::DirectConnection);
         connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-            &BaseResourceAccessProvider::handleResourceRemoved);
+            &BaseResourceAccessProvider::handleResourceRemoved, Qt::DirectConnection);
 
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            &BaseResourceAccessProvider::handleRoleAddedOrUpdated);
+            &BaseResourceAccessProvider::handleRoleAddedOrUpdated, Qt::DirectConnection);
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-            &BaseResourceAccessProvider::handleRoleRemoved);
+            &BaseResourceAccessProvider::handleRoleRemoved, Qt::DirectConnection);
     }
 }
 
@@ -241,11 +241,11 @@ void BaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resour
     {
         /* Disabled user should have no access to anything. */
         connect(user.get(), &QnUserResource::enabledChanged, this,
-            &BaseResourceAccessProvider::updateAccessBySubject);
+            &BaseResourceAccessProvider::updateAccessBySubject, Qt::DirectConnection);
 
         /* Changing of role means change of all user access rights. */
         connect(user.get(), &QnUserResource::userRolesChanged, this,
-            &BaseResourceAccessProvider::updateAccessBySubject);
+            &BaseResourceAccessProvider::updateAccessBySubject, Qt::DirectConnection);
 
         handleSubjectAdded(user);
     }

@@ -17,55 +17,79 @@ QnLayoutItemAggregator::~QnLayoutItemAggregator()
 
 bool QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (m_watchedLayouts.contains(layout))
         return false;
 
     m_watchedLayouts.insert(layout);
 
-    for (auto item: layout->getItems())
-        handleItemAdded(item);
+    std::vector<QnUuid> added;
+    for (const auto& item: layout->getItems())
+    {
+        if (!item.resource.id.isNull() && m_items.insert(item.resource.id))
+            added.push_back(item.resource.id);
+    }
 
     connect(layout.get(), &QnLayoutResource::itemAdded, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             handleItemAdded(item);
-        });
+        }, Qt::DirectConnection);
 
     connect(layout.get(), &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             handleItemRemoved(item);
-        });
+        }, Qt::DirectConnection);
+
+    lock.unlock();
+    for (auto id: added)
+        emit itemAdded(id);
 
     return true;
 }
 
 bool QnLayoutItemAggregator::removeWatchedLayout(const QnLayoutResourcePtr& layout)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (!m_watchedLayouts.contains(layout))
         return false;
 
     m_watchedLayouts.remove(layout);
 
     layout->disconnect(this);
-    for (auto item : layout->getItems())
-        handleItemRemoved(item);
+
+    std::vector<QnUuid> removed;
+    for (const auto& item: layout->getItems())
+    {
+        if (!item.resource.id.isNull() && m_items.remove(item.resource.id))
+            removed.push_back(item.resource.id);
+    }
+
+    lock.unlock();
+    for (auto id: removed)
+        emit itemRemoved(id);
 
     return true;
 }
 
 QSet<QnLayoutResourcePtr> QnLayoutItemAggregator::watchedLayouts() const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_watchedLayouts;
 }
 
 bool QnLayoutItemAggregator::hasLayout(const QnLayoutResourcePtr& layout) const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_watchedLayouts.contains(layout);
 }
 
 bool QnLayoutItemAggregator::hasItem(const QnUuid& id) const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_items.contains(id);
 }
 
@@ -75,8 +99,12 @@ void QnLayoutItemAggregator::handleItemAdded(const QnLayoutItemData& item)
     if (resourceId.isNull())
         return;
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_items.insert(resourceId))
+    {
+        lock.unlock();
         emit itemAdded(resourceId);
+    }
 }
 
 void QnLayoutItemAggregator::handleItemRemoved(const QnLayoutItemData& item)
@@ -85,6 +113,10 @@ void QnLayoutItemAggregator::handleItemRemoved(const QnLayoutItemData& item)
     if (resourceId.isNull())
         return;
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_items.remove(resourceId))
+    {
+        lock.unlock();
         emit itemRemoved(resourceId);
+    }
 }

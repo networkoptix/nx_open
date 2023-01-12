@@ -23,7 +23,8 @@ SharedResourceAccessProvider::SharedResourceAccessProvider(
         connect(m_context->sharedResourcesManager(),
             &QnSharedResourcesManager::sharedResourcesChanged,
             this,
-            &SharedResourceAccessProvider::handleSharedResourcesChanged);
+            &SharedResourceAccessProvider::handleSharedResourcesChanged,
+            Qt::DirectConnection);
     }
 }
 
@@ -78,7 +79,7 @@ void SharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         connect(layout.get(), &QnResource::parentIdChanged, this,
-            &SharedResourceAccessProvider::updateAccessToResource);
+            &SharedResourceAccessProvider::updateAccessToResource, Qt::DirectConnection);
     }
 }
 

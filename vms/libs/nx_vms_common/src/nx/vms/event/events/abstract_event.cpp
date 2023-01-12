@@ -62,10 +62,6 @@ static const QList<EventType> kDeprecatedEvents {
     EventType::backupFinishedEvent
 };
 
-static const QMap<EventType, GlobalPermission> kEventPermissions {
-    {EventType::cameraIpConflictEvent, GlobalPermission::editCameras},
-};
-
 }
 
 bool hasChild(EventType eventType)
@@ -351,16 +347,24 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
 
     const auto context = user->systemContext();
 
-    // TODO: Looks like we need serious redesign here!
-    if (const auto permission = kEventPermissions.value(params.eventType);
-        (permission != GlobalPermission::none) &&
-            !context->globalPermissionsManager()->hasGlobalPermission(user, permission))
+    if (params.eventType == EventType::cameraIpConflictEvent)
     {
-        NX_VERBOSE(
-            NX_SCOPE_TAG,
-            "User %1 has no global permission %2 for the event %3",
-            user, permission, params.eventType);
+        const auto permission = Qn::WritePermission;
+        for (const auto& ref: params.metadata.cameraRefs)
+        {
+            auto camera = camera_id_helper::findCameraByFlexibleId(context->resourcePool(), ref);
+            if (!camera)
+            {
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Unable to find event %1 resource ref %2", params.eventType, ref);
+                continue;
+            }
+            if (context->resourceAccessManager()->hasPermission(user, camera, permission))
+                return true;
+        }
 
+        NX_VERBOSE(NX_SCOPE_TAG,
+            "User %1 has no permission %2 for the event %3", user, permission, params.eventType);
         return false;
     }
 

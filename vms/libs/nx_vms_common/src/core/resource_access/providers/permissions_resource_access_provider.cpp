@@ -24,7 +24,8 @@ PermissionsResourceAccessProvider::PermissionsResourceAccessProvider(
         connect(m_context->globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             this,
-            &PermissionsResourceAccessProvider::updateAccessBySubject);
+            &PermissionsResourceAccessProvider::updateAccessBySubject,
+            Qt::DirectConnection);
     }
 }
 
@@ -70,14 +71,20 @@ void PermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))
     {
-        connect(resource.get(), &QnResource::parentIdChanged, this,
-            &PermissionsResourceAccessProvider::updateAccessToResource);
+        connect(resource.get(),
+            &QnResource::parentIdChanged,
+            this,
+            &PermissionsResourceAccessProvider::updateAccessToResource,
+            Qt::DirectConnection);
     }
 
     if (resource->hasFlags(Qn::desktop_camera))
     {
-        connect(resource.get(), &QnResource::nameChanged, this,
-            &PermissionsResourceAccessProvider::updateAccessToResource);
+        connect(resource.get(),
+            &QnResource::nameChanged,
+            this,
+            &PermissionsResourceAccessProvider::updateAccessToResource,
+            Qt::DirectConnection);
     }
 }
 

@@ -48,16 +48,16 @@ public:
             return;
 
         connect(resourcePool, &QnResourcePool::resourceAdded,
-            this, &Private::handleResourceAdded);
+            this, &Private::handleResourceAdded, Qt::DirectConnection);
 
         connect(resourcePool, &QnResourcePool::resourceRemoved,
-            this, &Private::handleResourceRemoved);
+            this, &Private::handleResourceRemoved, Qt::DirectConnection);
 
         connect(userGroupManager, &QnUserRolesManager::userRoleAddedOrUpdated,
-            this, &Private::handleGroupAddedOrUpdated);
+            this, &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
 
         connect(userGroupManager, &QnUserRolesManager::userRoleRemoved,
-            this, &Private::handleGroupRemoved);
+            this, &Private::handleGroupRemoved, Qt::DirectConnection);
 
         for (const auto& user: resourcePool->getResources<QnUserResource>())
             handleUserChanged(user);
@@ -78,7 +78,7 @@ public:
             return;
 
         connect(user.get(), &QnUserResource::permissionsChanged,
-            this, &Private::handleUserChanged);
+            this, &Private::handleUserChanged, Qt::DirectConnection);
     }
 
     void handleResourceRemoved(const QnResourcePtr& resource)

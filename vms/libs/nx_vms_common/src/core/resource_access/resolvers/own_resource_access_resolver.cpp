@@ -48,8 +48,11 @@ OwnResourceAccessResolver::~OwnResourceAccessResolver()
 
 ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
 {
-    if (!NX_ASSERT(d->accessRightsManager) || hasAdminAccessRights(subjectId))
+    if (!NX_ASSERT(d->accessRightsManager))
         return {};
+
+    if (hasAdminAccessRights(subjectId))
+        return {{AbstractAccessRightsManager::kAnyResourceId, nx::vms::api::kAdminAccessRights}};
 
     return d->accessRightsManager->ownResourceAccessMap(subjectId);
 }

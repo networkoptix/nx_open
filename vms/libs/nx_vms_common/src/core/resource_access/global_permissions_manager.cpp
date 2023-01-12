@@ -27,14 +27,14 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
     if (mode == Mode::cached)
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-            &QnGlobalPermissionsManager::handleResourceAdded);
+            &QnGlobalPermissionsManager::handleResourceAdded, Qt::DirectConnection);
         connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-            &QnGlobalPermissionsManager::handleResourceRemoved);
+            &QnGlobalPermissionsManager::handleResourceRemoved, Qt::DirectConnection);
 
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
+            &QnGlobalPermissionsManager::handleRoleAddedOrUpdated, Qt::DirectConnection);
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-            &QnGlobalPermissionsManager::handleRoleRemoved);
+            &QnGlobalPermissionsManager::handleRoleRemoved, Qt::DirectConnection);
     }
 }
 
@@ -221,11 +221,11 @@ void QnGlobalPermissionsManager::handleResourceAdded(const QnResourcePtr& resour
         updateGlobalPermissions(user);
 
         connect(user.get(), &QnUserResource::permissionsChanged, this,
-            &QnGlobalPermissionsManager::updateGlobalPermissions);
+            &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);
         connect(user.get(), &QnUserResource::userRolesChanged, this,
-            &QnGlobalPermissionsManager::updateGlobalPermissions);
+            &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);
         connect(user.get(), &QnUserResource::enabledChanged, this,
-            &QnGlobalPermissionsManager::updateGlobalPermissions);
+            &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);
     }
 }
 

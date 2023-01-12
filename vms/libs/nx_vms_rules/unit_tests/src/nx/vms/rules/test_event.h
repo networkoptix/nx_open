@@ -40,7 +40,7 @@ public:
             .displayName = "Test event",
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .permissions = {
-                .globalPermission = nx::vms::api::GlobalPermission::userInput,
+                .globalPermission = nx::vms::api::GlobalPermission::viewLogs,
                 .resourcePermissions = {
                     {"cameraId", Qn::ViewContentPermission},
                     {"deviceIds", Qn::ViewContentPermission},

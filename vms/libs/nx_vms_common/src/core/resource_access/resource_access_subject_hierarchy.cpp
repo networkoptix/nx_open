@@ -37,7 +37,8 @@ public:
                 q->addOrUpdate(user->getId(), {groupIds.cbegin(), groupIds.cend()});
             };
 
-        connect(user.get(), &QnUserResource::userRolesChanged, this, updateUser);
+        connect(
+            user.get(), &QnUserResource::userRolesChanged, this, updateUser, Qt::DirectConnection);
         updateUser(user);
     }
 
@@ -78,16 +79,16 @@ ResourceAccessSubjectHierarchy::ResourceAccessSubjectHierarchy(
         return;
 
     connect(resourcePool, &QnResourcePool::resourceAdded,
-        d.get(), &Private::handleResourceAdded);
+        d.get(), &Private::handleResourceAdded, Qt::DirectConnection);
 
     connect(resourcePool, &QnResourcePool::resourceRemoved,
-        d.get(), &Private::handleResourceRemoved);
+        d.get(), &Private::handleResourceRemoved, Qt::DirectConnection);
 
     connect(userGroupsManager, &QnUserRolesManager::userRoleAddedOrUpdated,
-        d.get(), &Private::handleGroupAddedOrUpdated);
+        d.get(), &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
 
     connect(userGroupsManager, &QnUserRolesManager::userRoleRemoved,
-        d.get(), &Private::handleGroupRemoved);
+        d.get(), &Private::handleGroupRemoved, Qt::DirectConnection);
 
     for (const auto& group: userGroupsManager->userRoles())
         d->handleGroupAddedOrUpdated(group);

@@ -5,11 +5,9 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
-#include <utils/common/counter_hash.h>
-
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
-
+#include <utils/common/counter_hash.h>
 
 /**
  * This class watches set of given layouts, combining all items on them.
@@ -48,6 +46,7 @@ private:
     void handleItemRemoved(const QnLayoutItemData& item);
 
 private:
+    mutable nx::Mutex m_mutex;
     QSet<QnLayoutResourcePtr> m_watchedLayouts;
     QnCounterHash<QnUuid> m_items;
 };

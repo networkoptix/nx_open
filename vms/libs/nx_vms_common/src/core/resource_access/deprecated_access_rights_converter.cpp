@@ -21,31 +21,7 @@
 
 namespace nx::core::access {
 
-namespace {
-
 using namespace nx::vms::api;
-
-AccessRights convertPermissions(GlobalPermissions globalPermissions)
-{
-    AccessRights result = AccessRight::view;
-    if (globalPermissions.testFlag(GlobalPermission::viewArchive))
-        result.setFlag(AccessRight::viewArchive);
-    if (globalPermissions.testFlag(GlobalPermission::exportArchive))
-        result.setFlag(AccessRight::exportArchive);
-    if (globalPermissions.testFlag(GlobalPermission::viewBookmarks))
-        result.setFlag(AccessRight::viewBookmarks);
-    if (globalPermissions.testFlag(GlobalPermission::manageBookmarks))
-        result.setFlag(AccessRight::manageBookmarks);
-    if (globalPermissions.testFlag(GlobalPermission::controlVideowall))
-        result.setFlag(AccessRight::controlVideowall);
-    if (globalPermissions.testFlag(GlobalPermission::userInput))
-        result.setFlag(AccessRight::userInput);
-    if (globalPermissions.testFlag(GlobalPermission::editCameras))
-        result.setFlag(AccessRight::edit);
-    return result;
-}
-
-} // namespace
 
 class DeprecatedAccessRightsConverter::Private: public QObject
 {
@@ -107,19 +83,19 @@ DeprecatedAccessRightsConverter::DeprecatedAccessRightsConverter(
         && d->accessRightsManager);
 
     connect(d->resourcePool, &QnResourcePool::resourceAdded,
-        d.get(), &Private::handleResourceAdded);
+        d.get(), &Private::handleResourceAdded, Qt::DirectConnection);
 
     connect(d->resourcePool, &QnResourcePool::resourceRemoved,
-        d.get(), &Private::handleResourceRemoved);
+        d.get(), &Private::handleResourceRemoved, Qt::DirectConnection);
 
     connect(d->userGroupsManager, &QnUserRolesManager::userRoleAddedOrUpdated,
-        d.get(), &Private::handleGroupAddedOrUpdated);
+        d.get(), &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
 
     connect(d->userGroupsManager, &QnUserRolesManager::userRoleRemoved,
-        d.get(), &Private::handleGroupRemoved);
+        d.get(), &Private::handleGroupRemoved, Qt::DirectConnection);
 
     connect(d->sharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged,
-        d.get(), &Private::handleSharedResourcesChanged);
+        d.get(), &Private::handleSharedResourcesChanged, Qt::DirectConnection);
 
     for (const auto& group: QnPredefinedUserRoles::list())
         d->handleGroupAddedOrUpdated(group);
@@ -165,7 +141,8 @@ void DeprecatedAccessRightsConverter::Private::handleResourceAdded(const QnResou
                 updateSubject(id);
         };
 
-    connect(user.get(), &QnUserResource::permissionsChanged, this, updateUserPermissions);
+    connect(user.get(), &QnUserResource::permissionsChanged,
+        this, updateUserPermissions, Qt::DirectConnection);
     updateUserPermissions(user);
 }
 
@@ -217,8 +194,8 @@ void DeprecatedAccessRightsConverter::Private::updateSubject(const QnUuid& subje
     if (!globalPermissions.contains(subjectId) || !accessRightsManager)
         return;
 
-    const auto subjectGlobalPermissions = globalPermissions.value(subjectId);
-    if (subjectGlobalPermissions.testFlag(GlobalPermission::admin))
+    const auto globalPermissions = this->globalPermissions.value(subjectId);
+    if (globalPermissions.testFlag(GlobalPermission::admin))
     {
         accessRightsManager->setOwnResourceAccessMap(subjectId,
             {{AccessRightsManager::kAnyResourceId, kAdminAccessRights}});
@@ -226,12 +203,9 @@ void DeprecatedAccessRightsConverter::Private::updateSubject(const QnUuid& subje
     }
 
     ResourceAccessMap accessMap;
-    const auto accessRights = convertPermissions(subjectGlobalPermissions);
-
-    if (subjectGlobalPermissions.testFlag(GlobalPermission::accessAllMedia))
-        accessMap[AccessRightsManager::kAnyResourceId] = accessRights;
-    else if (subjectGlobalPermissions.testFlag(GlobalPermission::controlVideowall))
-        accessMap[AccessRightsManager::kAnyResourceId] = AccessRight::controlVideowall;
+    const auto accessRights = globalPermissionsToAccessRights(globalPermissions).setFlag(
+        AccessRight::view, globalPermissions.testFlag(GlobalPermission::accessAllMedia));
+    accessMap[AccessRightsManager::kAnyResourceId] = accessRights;
 
     // For much simpler logic we don't separate access rights flags per resource type here.
     // Not applicable permissions will be filtered out by resource access resolvers.

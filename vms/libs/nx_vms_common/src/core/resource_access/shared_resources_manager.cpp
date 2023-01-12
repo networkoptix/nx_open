@@ -36,14 +36,14 @@ QnSharedResourcesManager::QnSharedResourcesManager(
     m_sharedResources()
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        &QnSharedResourcesManager::handleResourceAdded);
+        &QnSharedResourcesManager::handleResourceAdded, Qt::DirectConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnSharedResourcesManager::handleResourceRemoved);
+        &QnSharedResourcesManager::handleResourceRemoved, Qt::DirectConnection);
 
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        &QnSharedResourcesManager::handleRoleAddedOrUpdated);
+        &QnSharedResourcesManager::handleRoleAddedOrUpdated, Qt::DirectConnection);
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        &QnSharedResourcesManager::handleRoleRemoved);
+        &QnSharedResourcesManager::handleRoleRemoved, Qt::DirectConnection);
 }
 
 QnSharedResourcesManager::~QnSharedResourcesManager()
