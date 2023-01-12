@@ -117,7 +117,7 @@ FocusScope
         ensureVisible(indexes)
         selectionModel.clear()
 
-        const linearIndexes = indexes.map(linearizationListModel.mapFromSource)
+        const linearIndexes = indexes.map((source) => linearizationListModel.mapFromSource(source))
             .filter(index => index.valid)
 
         if (!linearIndexes.length)

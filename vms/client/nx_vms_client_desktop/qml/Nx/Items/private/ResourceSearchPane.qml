@@ -55,7 +55,7 @@ FocusScope
             menu: menuEnabled ? menuInstance : null
             placeholderText: qsTr("Search")
 
-            Keys.onPressed:
+            Keys.onPressed: (event) =>
             {
                 if (event.key !== Qt.Key_Enter && event.key !== Qt.Key_Return)
                     return
@@ -64,7 +64,7 @@ FocusScope
                 event.accepted = true
             }
 
-            Keys.onShortcutOverride:
+            Keys.onShortcutOverride: (event) =>
                 event.accepted = event.key === Qt.Key_Enter || event.key === Qt.Key_Return
 
             PlatformMenu
@@ -90,7 +90,7 @@ FocusScope
                 MenuAction { text: qsTr("Users"); data: ResourceTree.FilterType.users }
                 MenuAction { text: qsTr("Local Files"); data: ResourceTree.FilterType.localFiles }
 
-                onTriggered:
+                onTriggered: (action) =>
                 {
                     searchField.filterType = action.data
                     searchTag.text = action.text

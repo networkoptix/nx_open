@@ -83,6 +83,11 @@ QPersistentModelIndex NxGlobalsObject::toPersistent(const QModelIndex& index) co
     return QPersistentModelIndex(index);
 }
 
+Q_INVOKABLE QModelIndex NxGlobalsObject::fromPersistent(const QPersistentModelIndex& index) const
+{
+    return index;
+}
+
 Q_INVOKABLE bool NxGlobalsObject::hasChildren(const QModelIndex& index) const
 {
     return index.isValid() && index.model()->hasChildren(index);
