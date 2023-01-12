@@ -157,7 +157,7 @@ TEST_F(ActionBuilderTest, builderWithTargetFieldButWithoutUserProducedNoAction)
 
 TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user->getId()},
@@ -175,8 +175,8 @@ TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::userInput);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user1 = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user2 = addUser(nx::vms::api::GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -198,8 +198,8 @@ TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::userInput);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user1 = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user2 = addUser(nx::vms::api::GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {},
@@ -251,7 +251,7 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::userInput);
+    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
     const auto camera = addCamera();
 
     UuidSelection selection{
@@ -272,8 +272,8 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
     const auto camera = addCamera();
 
     const auto accessAllMediaUser = addUser(
-        {GlobalPermission::accessAllMedia, GlobalPermission::userInput});
-    const auto accessNoneUser = addUser(nx::vms::api::GlobalPermission::userInput);
+        {GlobalPermission::accessAllMedia, GlobalPermission::viewLogs});
+    const auto accessNoneUser = addUser(nx::vms::api::GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {accessAllMediaUser->getId(), accessNoneUser->getId()},
@@ -296,11 +296,11 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 
 TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 {
-    auto user1 = addUser(GlobalPermission::userInput);
+    auto user1 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
     sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
 
-    auto user2 = addUser(GlobalPermission::userInput);
+    auto user2 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
     sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
 
@@ -345,11 +345,11 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 
 TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 {
-    auto user1 = addUser(GlobalPermission::userInput);
+    auto user1 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
     sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
 
-    auto user2 = addUser(GlobalPermission::userInput);
+    auto user2 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
     sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
 
@@ -385,7 +385,7 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 
 TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 {
-    auto user1 = addUser(GlobalPermission::userInput);
+    auto user1 = addUser(GlobalPermission::viewLogs);
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithTargetUserField(selection);

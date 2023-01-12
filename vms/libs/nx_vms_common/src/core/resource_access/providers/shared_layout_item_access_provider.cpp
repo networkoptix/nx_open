@@ -26,7 +26,8 @@ SharedLayoutItemAccessProvider::SharedLayoutItemAccessProvider(
         connect(m_context->sharedResourcesManager(),
             &QnSharedResourcesManager::sharedResourcesChanged,
             this,
-            &SharedLayoutItemAccessProvider::handleSharedResourcesChanged);
+            &SharedLayoutItemAccessProvider::handleSharedResourcesChanged,
+            Qt::DirectConnection);
 
         for (const auto& predefinedRole: QnPredefinedUserRoles::list())
             ensureAggregatorForSubject(predefinedRole);
@@ -140,7 +141,7 @@ void SharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& re
             [this, layout]
             {
                 updateAccessToLayout(layout);
-            });
+            }, Qt::DirectConnection);
 
         updateAccessToLayout(layout);
     }
@@ -306,9 +307,9 @@ QnLayoutItemAggregatorPtr SharedLayoutItemAccessProvider::ensureAggregatorForSub
 
         QnLayoutItemAggregatorPtr aggregator(new QnLayoutItemAggregator());
         connect(aggregator.get(), &QnLayoutItemAggregator::itemAdded, this,
-            updateAccessToResourceBySubject);
+            updateAccessToResourceBySubject, Qt::DirectConnection);
         connect(aggregator.get(), &QnLayoutItemAggregator::itemRemoved, this,
-            updateAccessToResourceBySubject);
+            updateAccessToResourceBySubject, Qt::DirectConnection);
         m_aggregatorsBySubject.insert(id, aggregator);
         return aggregator;
     }

@@ -93,7 +93,7 @@ void ResourceAccessProvider::addBaseProvider(AbstractResourceAccessProvider* pro
     if (mode() == Mode::cached)
     {
         connect(provider, &AbstractResourceAccessProvider::accessChanged, this,
-            &ResourceAccessProvider::handleBaseProviderAccessChanged);
+            &ResourceAccessProvider::handleBaseProviderAccessChanged, Qt::DirectConnection);
     }
 }
 
@@ -106,7 +106,7 @@ void ResourceAccessProvider::insertBaseProvider(int index,
     if (mode() == Mode::cached)
     {
         connect(provider, &AbstractResourceAccessProvider::accessChanged, this,
-            &ResourceAccessProvider::handleBaseProviderAccessChanged);
+            &ResourceAccessProvider::handleBaseProviderAccessChanged, Qt::DirectConnection);
     }
 }
 

@@ -44,6 +44,7 @@ private:
     void updateAccessToLayout(const QnLayoutResourcePtr& layout);
     void handleItemAdded(const QnUuid& resourceId);
     void handleItemRemoved(const QnUuid& resourceId);
+    void handleOwnAccessRightsChanged(const QSet<QnUuid>& subjectIds);
     QnLayoutResourceList getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall) const;
 
     void handleVideowallItemAdded(const QnVideoWallResourcePtr& videowall,

@@ -36,7 +36,8 @@ IntercomLayoutAccessProvider::IntercomLayoutAccessProvider(
                 const auto intercomLayout = resourcePool()->getResourceById(
                     nx::vms::common::calculateIntercomLayoutId(resource));
                 updateAccessToResource(intercomLayout);
-            });
+            },
+            Qt::DirectConnection);
     }
 }
 

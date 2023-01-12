@@ -36,7 +36,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
             NX_ASSERT(user);
             if (user)
                 handleUserAdded(user);
-        });
+        }, Qt::DirectConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -49,12 +49,12 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
             NX_ASSERT(user);
             if (user)
                 handleUserRemoved(user);
-        });
+        }, Qt::DirectConnection);
 
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        &QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated);
+        &QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated, Qt::DirectConnection);
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        &QnResourceAccessSubjectsCache::handleRoleRemoved);
+        &QnResourceAccessSubjectsCache::handleRoleRemoved, Qt::DirectConnection);
 
     connect(m_context->globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this](const QnResourceAccessSubject& subject)
@@ -64,7 +64,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
 
             const auto role = m_context->userRolesManager()->userRole(subject.id());
             updateSubjectRoles(subject, role.parentRoleIds);
-        });
+        }, Qt::DirectConnection);
 
     for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
         handleUserAdded(user);
@@ -138,7 +138,7 @@ std::vector<QnUuid> QnResourceAccessSubjectsCache::subjectWithParents(
 void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& user)
 {
     connect(user.get(), &QnUserResource::userRolesChanged, this,
-        [this](const auto& u) { updateSubjectRoles(u, u->userRoleIds()); });
+        [this](const auto& u) { updateSubjectRoles(u, u->userRoleIds()); }, Qt::DirectConnection);
     QnResourceAccessSubject subject(user);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
