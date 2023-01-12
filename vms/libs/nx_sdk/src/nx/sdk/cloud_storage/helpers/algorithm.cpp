@@ -325,6 +325,16 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
     if (!filter.timePeriod.contains(motion.startTimestamp))
         return false;
 
+    const bool isEmptyFilter = std::all_of(
+        filter.regions.begin(), filter.regions.end(),
+        [](const auto& rect)
+        {
+            return rect.isEmpty();
+        });
+
+    if (isEmptyFilter)
+        return true;
+
     // Channel starts from 0 and is incremented by 1.
     if (motion.channel < filter.regions.size())
     {
@@ -333,11 +343,11 @@ bool motionMaches(const Motion& motion, const MotionFilter& filter)
             rect = Rect{0.f, 0.f, (double) kMotionGridWidth, (double) kMotionGridHeight};
 
         auto matcher = RegionMatcher(rect);
-        if (!matcher.match(fromBase64(motion.dataBase64)))
-            return false;
+        if (matcher.match(fromBase64(motion.dataBase64)))
+            return true;
     }
 
-    return true;
+    return false;
 }
 
 TimePeriodList sortAndLimitMotion(const MotionFilter& filter, TimePeriodList motion)
