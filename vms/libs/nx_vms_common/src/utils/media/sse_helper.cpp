@@ -52,7 +52,7 @@
 
 QString getCPUString()
 {
-    #if defined(NX_SSE2_SUPPORTED)
+    #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
 
         char CPUBrandString[0x40];
         int CPUInfo[4] = {-1};
