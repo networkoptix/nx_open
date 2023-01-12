@@ -8,7 +8,7 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/utils/singleton.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 namespace ec2
 {

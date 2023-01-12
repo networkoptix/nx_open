@@ -2,8 +2,6 @@
 
 #include "videowall_resource.h"
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <nx/vms/api/data/videowall_data.h>
 
 QnVideoWallResource::QnVideoWallResource():
@@ -138,7 +136,9 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
 
             emit r->itemRemoved(r, item);
 
-            const bool lastItemFromThisPc = boost::algorithm::all_of(r->items()->getItems(),
+            const auto& items = r->items()->getItems();
+            const bool lastItemFromThisPc = std::all_of(
+                items.begin(), items.end(),
                 [pcUuid = item.pcUuid](const QnVideoWallItem &item)
                 {
                     return item.pcUuid != pcUuid;

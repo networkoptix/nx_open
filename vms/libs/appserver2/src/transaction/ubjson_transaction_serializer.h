@@ -10,7 +10,7 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/utils/singleton.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/p2p/p2p_fwd.h>
 #include <nx/p2p/p2p_serialization.h>
 

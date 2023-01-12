@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
