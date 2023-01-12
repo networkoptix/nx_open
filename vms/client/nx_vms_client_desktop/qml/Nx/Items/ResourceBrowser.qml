@@ -34,13 +34,13 @@ Item
         menuEnabled: !resourceTree.localFilesMode
         isFilterRelevant: (type => resourceTree.isFilterRelevant(type))
 
-        onEnterPressed:
+        onEnterPressed: (modifiers) =>
         {
             if (resourceTree.model.isFiltering)
                 resourceTree.model.activateSearchResults(modifiers)
         }
 
-        Keys.onPressed:
+        Keys.onPressed: (event) =>
         {
             if (event.key === Qt.Key_Down)
             {
@@ -83,9 +83,9 @@ Item
             return NxGlobals.invalidModelIndex()
         }
 
-        Keys.onUpPressed:
+        Keys.onUpPressed: (event) =>
         {
-            if (currentIndex === topmostSelectableIndex())
+            if (NxGlobals.fromPersistent(currentIndex) == topmostSelectableIndex())
                 resourceSearchPane.focus = true
             else
                 event.accepted = false

@@ -43,7 +43,7 @@ Menu
         property bool shown: false
     }
 
-    onTriggered:
+    onTriggered: (action) =>
     {
         if (parentMenu && (parentMenu instanceof PlatformMenu))
             parentMenu.triggered(action)

@@ -32,6 +32,7 @@ public:
 
     Q_INVOKABLE QModelIndex invalidModelIndex() const;
     Q_INVOKABLE QPersistentModelIndex toPersistent(const QModelIndex& index) const;
+    Q_INVOKABLE QModelIndex fromPersistent(const QPersistentModelIndex& index) const;
 
     Q_INVOKABLE bool hasChildren(const QModelIndex& index) const;
     Q_INVOKABLE Qt::ItemFlags itemFlags(const QModelIndex& index) const;
