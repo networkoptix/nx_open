@@ -22,6 +22,10 @@
 
 #include "access_subject_editing_context.h"
 
+// We removed common metatype declaration but for some reason it's still required here for proper
+// `QVector<AccessRight>` registration.
+Q_DECLARE_METATYPE(nx::vms::api::AccessRight)
+
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;

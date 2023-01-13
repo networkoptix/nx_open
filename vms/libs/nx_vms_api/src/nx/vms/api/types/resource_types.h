@@ -4,10 +4,15 @@
 
 #include <ostream>
 
+#include <QtCore/QHashFunctions>
+#include <QtCore/Qt>
+
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
 namespace nx::vms::api {
+Q_NAMESPACE_EXPORT(NX_VMS_API)
+Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
 enum class ResourceStatus
 {
@@ -44,6 +49,7 @@ enum class ResourceStatus
      */
     mismatchedCertificate = 6,
 };
+Q_ENUM_NS(ResourceStatus)
 
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(ResourceStatus*, Visitor&& visitor)
@@ -247,7 +253,7 @@ enum ServerFlag
      * The System is just installed, it has the default admin password and is not connected to the
      * Cloud.
      * %deprecated Is returned by the API only for compatibility. A proper indicator of a new
-     *     System is the empty (null) localSystemId. 
+     *     System is the empty (null) localSystemId.
      */
     SF_NewSystem = 0x100,
 
@@ -328,5 +334,10 @@ NX_REFLECTION_ENUM_CLASS(MetadataStorageChangePolicy,
     keep,
     remove,
     move)
+
+inline size_t qHash(ResourceStatus value, size_t seed = 0)
+{
+    return QT_PREPEND_NAMESPACE(qHash)((int) value, seed);
+}
 
 } // namespace nx::vms::api

@@ -56,8 +56,8 @@ Rectangle
     onHeightChanged: grid.updateMaxVisibleRowCountFromScratch()
     onComplexVisibilityModeChanged: grid.updateMaxVisibleRowCountFromScratch()
 
-    Keys.onPressed: grid.shiftPressed = onlyShiftModifierPressed(event)
-    Keys.onReleased: grid.shiftPressed = onlyShiftModifierPressed(event)
+    Keys.onPressed: (event) => grid.shiftPressed = onlyShiftModifierPressed(event)
+    Keys.onReleased: (event) => grid.shiftPressed = onlyShiftModifierPressed(event)
 
     Shortcut
     {
