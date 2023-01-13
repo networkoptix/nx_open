@@ -9,8 +9,8 @@
 #include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/rule.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -81,6 +81,7 @@ SimplifiedRule::SimplifiedRule(Engine* engine, std::unique_ptr<vms::rules::Rule>
 
 SimplifiedRule::~SimplifiedRule()
 {
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 void SimplifiedRule::setRule(std::unique_ptr<vms::rules::Rule>&& rule)
@@ -291,6 +292,8 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
     connect(engine, &vms::rules::Engine::ruleAddedOrUpdated, this,
         [this](QnUuid ruleId, bool added)
         {
+            NX_VERBOSE(this, "Rule %1 is %2", ruleId, (added ? "added" : "updated"));
+
             // If the current user has an intention to remove a rule with such id, it's changes
             // should be ignored.
             if (removedRules.contains(ruleId))
@@ -300,6 +303,8 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
                 addedRules.erase(ruleId);
             else
                 modifiedRules.erase(ruleId);
+
+            emit stateChanged();
 
             if (auto simplifiedRule = rule(ruleId).lock())
             {
@@ -319,7 +324,11 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
     connect(engine, &vms::rules::Engine::ruleRemoved, this,
         [this](QnUuid ruleId)
         {
+            NX_VERBOSE(this, "Rule %1 is removed", ruleId);
+
             removedRules.erase(ruleId);
+
+            emit stateChanged();
 
             auto simplifiedRule = rule(ruleId).lock();
             if (!simplifiedRule)
@@ -337,12 +346,11 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
     connect(engine, &vms::rules::Engine::rulesReset, this,
         [this]
         {
+            NX_VERBOSE(this, "Rules were reset");
             rejectChanges();
-        });
-}
 
-RulesTableModel::~RulesTableModel()
-{
+            emit stateChanged();
+        });
 }
 
 int RulesTableModel::rowCount(const QModelIndex& /*parent*/) const
@@ -418,15 +426,13 @@ QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, i
     return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-QModelIndex RulesTableModel::addRule()
+QModelIndex RulesTableModel::addRule(const QString& eventId, const QString& actionId)
 {
     auto newRuleId = QnUuid::createUuid();
     auto newRule = std::make_unique<Rule>(newRuleId, engine);
 
-    // TODO: Choose default type for the event and action.
-    auto eventFilter = engine->buildEventFilter(nx::vms::rules::GenericEvent::manifest().id);
-    auto actionBuilder =
-        engine->buildActionBuilder(nx::vms::rules::NotificationAction::manifest().id);
+    auto eventFilter = engine->buildEventFilter(eventId);
+    auto actionBuilder = engine->buildActionBuilder(actionId);
 
     if (!eventFilter || !actionBuilder)
         return {};

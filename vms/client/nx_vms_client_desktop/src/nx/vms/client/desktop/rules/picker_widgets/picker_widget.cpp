@@ -21,6 +21,7 @@ PickerWidget::PickerWidget(SystemContext* context, QWidget* parent):
 
     m_label = new QnElidedLabel;
     m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    m_label->setElideMode(Qt::ElideRight);
     m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
     mainLayout->addWidget(m_label);
 

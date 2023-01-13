@@ -66,6 +66,7 @@ public:
             m_alertLabel = new QnElidedLabel;
             setWarningStyle(m_alertLabel);
             m_alertLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            m_alertLabel->setElideMode(Qt::ElideRight);
             alertLayout->addWidget(m_alertLabel);
 
             alertWidget->setLayout(alertLayout);

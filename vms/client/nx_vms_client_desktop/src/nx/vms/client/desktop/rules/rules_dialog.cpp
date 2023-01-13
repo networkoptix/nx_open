@@ -6,7 +6,6 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/rules/model_view/modification_mark_item_delegate.h>
@@ -15,6 +14,9 @@
 #include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/events/generic_event.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -48,13 +50,17 @@ RulesDialog::RulesDialog(QWidget* parent):
 
     connect(rulesTableModel, &RulesTableModel::dataChanged, this, &RulesDialog::onModelDataChanged);
 
+    connect(rulesTableModel, &RulesTableModel::stateChanged, this, &RulesDialog::updateControlButtons);
+
     connect(ui->newRuleButton, &QPushButton::clicked, this,
         [this]
         {
             resetFilter();
 
             // Add a rule and select it.
-            auto newRuleIndex = rulesTableModel->addRule();
+            auto newRuleIndex = rulesTableModel->addRule(
+                vms::rules::GenericEvent::manifest().id,
+                vms::rules::NotificationAction::manifest().id);
             auto selectionModel = ui->tableView->selectionModel();
             selectionModel->setCurrentIndex(rulesFilterModel->mapFromSource(newRuleIndex),
                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -93,7 +99,6 @@ RulesDialog::RulesDialog(QWidget* parent):
         [this]
         {
             applyChanges();
-            updateControlButtons();
         });
 
     connect(ui->resetDefaultRulesButton, &QPushButton::clicked, this, &RulesDialog::resetToDefaults);
@@ -105,9 +110,7 @@ RulesDialog::RulesDialog(QWidget* parent):
 }
 
 // Non-inline destructor is required for member scoped pointers to forward declared classes.
-RulesDialog::~RulesDialog()
-{
-}
+RulesDialog::~RulesDialog() = default;
 
 bool RulesDialog::tryClose(bool force)
 {
