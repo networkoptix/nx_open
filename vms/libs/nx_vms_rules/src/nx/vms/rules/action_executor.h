@@ -18,7 +18,7 @@ class Engine;
  */
 class NX_VMS_RULES_API ActionExecutor: public QObject
 {
-    Q_OBJECT
+    Q_OBJECT //< TODO: #amalov Is QObject really needed in interface?
 
 public:
     ActionExecutor(QObject* parent = nullptr):

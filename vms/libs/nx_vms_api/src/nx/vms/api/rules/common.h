@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::api::rules {

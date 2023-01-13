@@ -41,7 +41,7 @@ AnalyticsEvent::AnalyticsEvent(
 
 QString AnalyticsEvent::resourceKey() const
 {
-    return makeName(
+    return utils::makeName(
         AnalyticsEngineEvent::resourceKey(),
         m_eventTypeId,
         m_objectTrackId.toSimpleString(),

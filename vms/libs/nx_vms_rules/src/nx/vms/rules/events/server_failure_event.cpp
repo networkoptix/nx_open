@@ -4,6 +4,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -44,7 +45,7 @@ QString ServerFailureEvent::extendedCaption(common::SystemContext* context) cons
 
 QString ServerFailureEvent::uniqueName() const
 {
-    return makeName(
+    return utils::makeName(
         BasicEvent::uniqueName(),
         QString::number(static_cast<int>(reason())));
 }
@@ -70,7 +71,7 @@ QString ServerFailureEvent::reason(common::SystemContext* context) const
 const ItemDescriptor& ServerFailureEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.serverFailure",
+        .id = utils::type<ServerFailureEvent>(),
         .displayName = tr("Server Failure"),
         .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"

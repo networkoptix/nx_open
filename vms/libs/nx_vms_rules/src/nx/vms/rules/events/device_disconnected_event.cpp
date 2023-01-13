@@ -11,6 +11,7 @@
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -25,7 +26,7 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
 
 QString DeviceDisconnectedEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+    return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
 QString DeviceDisconnectedEvent::resourceKey() const
@@ -86,7 +87,7 @@ QString DeviceDisconnectedEvent::name(common::SystemContext* context) const
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.deviceDisconnected",
+        .id = utils::type<DeviceDisconnectedEvent>(),
         .displayName = tr("Device Disconnected"),
         .description = "",
         .fields = {

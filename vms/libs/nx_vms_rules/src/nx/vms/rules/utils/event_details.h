@@ -12,6 +12,8 @@
 
 namespace nx::vms::rules::utils {
 
+// TODO: #amalov Think of passing ResourceInfoLevel & AttrSerializePolicy to details() method.
+
 static constexpr auto kAnalyticsEventTypeDetailName = "analyticsEventType";
 static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
 static constexpr auto kCaptionDetailName = "caption";
@@ -19,9 +21,11 @@ static constexpr auto kClientActionDetailName = "clientAction";
 static constexpr auto kCountDetailName = "count";
 static constexpr auto kCustomIconDetailName = "customIcon";
 static constexpr auto kDescriptionDetailName = "description";
+// Keep in sync with StringsHelper::eventDetails().
 static constexpr auto kDetailingDetailName = "detailing";
 static constexpr auto kEmailTemplatePathDetailName = "emailTemplate";
 // Verbose event caption with resource name. Used as email subject.
+// Keep in sync with StringsHelper::eventAtResource().
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 // Separate 'Caption' line in notification tooltip.
 static constexpr auto kExtraCaptionDetailName = "extraCaption";

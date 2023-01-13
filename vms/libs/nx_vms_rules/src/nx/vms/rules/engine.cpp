@@ -470,6 +470,21 @@ EventPtr Engine::cloneEvent(const EventPtr& event) const
     return result;
 }
 
+ActionPtr Engine::cloneAction(const ActionPtr& action) const
+{
+    if (!NX_ASSERT(action))
+        return {};
+
+    auto result = ActionPtr(m_actionTypes[action->type()]());
+    for (const auto& propName:
+        nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::fullAccess))
+    {
+        result->setProperty(propName.constData(), action->property(propName.constData()));
+    }
+
+    return result;
+}
+
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
     if (serialized.eventType.isEmpty())

@@ -53,7 +53,7 @@ public:
 
     virtual QString uniqueName() const override
     {
-        return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+        return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
     }
 
     virtual QString resourceKey() const override
@@ -80,6 +80,7 @@ public:
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
         nx::vms::rules::utils::insertClientAction(result, nx::vms::rules::ClientAction::none);
         result[nx::vms::rules::utils::kUrlDetailName] = "http://localhost";
+        result[utils::kDetailingDetailName] = QStringList{"line 1", "line 2"};
 
         return result;
     }
@@ -113,7 +114,7 @@ public:
 
     QString uniqueName() const override
     {
-        return makeName(QString::number(timestamp().count()), BasicEvent::uniqueName());
+        return utils::makeName(QString::number(timestamp().count()), BasicEvent::uniqueName());
     }
 };
 
