@@ -25,8 +25,11 @@ class LayoutItemAccessResolver::Private: public QObject
     LayoutItemAccessResolver* const q;
 
 public:
-    explicit Private(LayoutItemAccessResolver* q, AbstractResourceAccessResolver* baseResolver,
-        QnResourcePool* resourcePool);
+    explicit Private(
+        LayoutItemAccessResolver* q,
+        AbstractResourceAccessResolver* baseResolver,
+        QnResourcePool* resourcePool, 
+        bool subjectEditingMode);
 
     ResourceAccessMap ensureAccessMap(const QnUuid& subjectId) const;
     bool isVideowallLayout(const QnLayoutResourcePtr& layout) const;
@@ -62,6 +65,7 @@ private:
 public:
     const QPointer<AbstractResourceAccessResolver> baseResolver;
     const QPointer<QnResourcePool> resourcePool;
+    const bool subjectEditingMode;
     const std::shared_ptr<VideowallLayoutWatcher> videowallWatcher;
     mutable QHash<QnUuid, ResourceAccessMap> cachedAccessMaps;
     mutable QHash<QnLayoutResourcePtr, QSet<QnUuid>> layoutSubjects;
@@ -77,10 +81,11 @@ public:
 LayoutItemAccessResolver::LayoutItemAccessResolver(
     AbstractResourceAccessResolver* baseResolver,
     QnResourcePool* resourcePool,
+    bool subjectEditingMode,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, baseResolver, resourcePool))
+    d(new Private(this, baseResolver, resourcePool, subjectEditingMode))
 {
 }
 
@@ -171,11 +176,13 @@ ResourceAccessDetails LayoutItemAccessResolver::accessDetails(
 LayoutItemAccessResolver::Private::Private(
     LayoutItemAccessResolver* q,
     AbstractResourceAccessResolver* baseResolver,
-    QnResourcePool* resourcePool)
+    QnResourcePool* resourcePool,
+    bool subjectEditingMode)
     :
     q(q),
     baseResolver(baseResolver),
     resourcePool(resourcePool),
+    subjectEditingMode(subjectEditingMode),
     videowallWatcher(VideowallLayoutWatcher::instance(resourcePool))
 {
     NX_CRITICAL(baseResolver && resourcePool && videowallWatcher);
@@ -286,6 +293,9 @@ bool LayoutItemAccessResolver::Private::isVideowallLayout(const QnLayoutResource
 
 bool LayoutItemAccessResolver::Private::isSharedLayout(const QnLayoutResourcePtr& layout) const
 {
+    if (subjectEditingMode)
+        return !isVideowallLayout(layout);
+
     return layout
         && layout->getParentId().isNull()
         && !videowallWatcher->isVideowallItem(layout->getId());

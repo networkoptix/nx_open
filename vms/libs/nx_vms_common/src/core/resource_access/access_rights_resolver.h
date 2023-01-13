@@ -30,11 +30,18 @@ class NX_VMS_COMMON_API AccessRightsResolver: public QObject
     using base_type = QObject;
 
 public:
+    enum class Mode
+    {
+        normal, //< Normal resolver operation.
+        editing //< Access subject editing operation.
+    };
+
     explicit AccessRightsResolver(
         QnResourcePool* resourcePool,
         AbstractAccessRightsManager* accessRightsManager,
         AbstractGlobalPermissionsWatcher* globalPermissionsWatcher,
         SubjectHierarchy* subjectHierarchy,
+        Mode mode = Mode::normal,
         QObject* parent = nullptr);
 
     virtual ~AccessRightsResolver() override;
