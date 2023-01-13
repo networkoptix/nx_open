@@ -74,7 +74,7 @@ public:
 
     float rawSuggestedBitrate = -1; //< Megabits per second
     float suggestedBitrate = -1; //< Megabits per second
-    float actualBitrate = -1; //< Megabits per second
+    float actualBitrate = -1; //< Megabits per second. Current bitrate value.
 
     bool bitratePerGop = false;
     float bitrateFactor = -1;
@@ -85,6 +85,7 @@ public:
     QString resolution;
     int numberOfChannels = -1;
     bool isConfigured = false;
+    float avarageBitrateMbps = -1; //< Average bitrate for a whole archive.
 
     CameraBitrateInfo(
         nx::vms::api::StreamIndex index = nx::vms::api::StreamIndex::undefined,
@@ -98,7 +99,7 @@ public:
 #define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
     (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
     (bitratePerGop)(bitrateFactor) \
-    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)(isConfigured)
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)(isConfigured)(avarageBitrateMbps)
 
 class NX_VMS_COMMON_API CameraBitrates
 {
