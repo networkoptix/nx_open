@@ -24,15 +24,25 @@ constexpr int kDefaultLdapSearchPageSize = 1000;
 
 struct NX_VMS_API LdapSettingsBase
 {
-    /**%apidoc:string */
+    /**%apidoc:string
+     * %example ldap://organization-server-address.com
+     */
     QUrl uri;
 
+    /**%apidoc
+     * %example cn=admin,dc=la
+     */
     QString adminDn;
-    QString adminPassword;
+
+    /**%apidoc
+     * %example password123
+     */
+    std::optional<QString> adminPassword;
 
     /**%apidoc[opt]
      * LDAP User login attribute.
      * %value "uid"
+     * %example uid
      */
     QString loginAttribute = kDefaultLdapLoginAttribute;
 
@@ -40,6 +50,7 @@ struct NX_VMS_API LdapSettingsBase
      * LDAP Group objectClass.
      * %value "groupOfNames"
      * %value "groupOfUniqueNames"
+     * %example groupOfNames
      */
     QString groupObjectClass = kDefaultLdapGroupObjectClass;
 
@@ -47,6 +58,7 @@ struct NX_VMS_API LdapSettingsBase
      * LDAP Group member attribute.
      * %value "member"
      * %value "uniqueMember"
+     * %example member
      */
     QString memberAttribute = kDefaultLdapMemberAttribute;
 
@@ -77,9 +89,14 @@ struct NX_VMS_API LdapSettingsBase
 
 struct NX_VMS_API LdapSettingSearchFilter
 {
-    /**%apidoc[opt] */
+    /**%apidoc[opt]
+     * %example Users
+     */
     QString name;
 
+    /**%apidoc
+     * %example ou=users,dc=la
+     */
     QString base;
 
     /**%apidoc[opt] */

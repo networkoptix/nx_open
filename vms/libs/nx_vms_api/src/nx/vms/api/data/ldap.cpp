@@ -12,7 +12,9 @@ const QString kDefaultLdapMemberAttribute = QStringLiteral("member");
 
 bool LdapSettingsBase::isValid(bool checkPassword) const
 {
-    return !uri.isEmpty() && !adminDn.isEmpty() && !(checkPassword && adminPassword.isEmpty());
+    return !uri.isEmpty()
+        && !adminDn.isEmpty()
+        && !(checkPassword && adminPassword.value_or("").isEmpty());
 }
 
 int LdapSettingsBase::defaultPort(bool useSsl)
