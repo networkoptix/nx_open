@@ -179,7 +179,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     q->ui->serverLineEdit->setText(url.toString());
     q->ui->adminDnLineEdit->setText(settings.adminDn.trimmed());
-    q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
+    q->ui->passwordLineEdit->setText(settings.adminPassword.value_or("******").trimmed());
 
     // TODO: Support multiple LDAP filters.
     if (settings.filters.empty())
