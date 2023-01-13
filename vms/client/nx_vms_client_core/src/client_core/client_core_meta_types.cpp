@@ -18,7 +18,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
-#include <nx/vms/api/types/resource_metatypes.h>
+#include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>

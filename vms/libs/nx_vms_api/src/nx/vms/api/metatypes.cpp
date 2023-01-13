@@ -73,6 +73,8 @@ void Metatypes::initialize()
 
     qRegisterMetaType<GlobalPermission>();
     qRegisterMetaType<GlobalPermissions>();
+    qRegisterMetaType<AccessRight>();
+    qRegisterMetaType<AccessRights>();
 
     qRegisterMetaType<AccessRightsData>();
     qRegisterMetaType<AccessRightsDataList>();
