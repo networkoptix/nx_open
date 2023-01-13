@@ -14,12 +14,12 @@
 namespace nx::vms::client::desktop::rules {
 
 /** Facade around Rule class. Simplifies access to the rule properties. */
-class SimplifiedRule: public QObject
+class NX_VMS_CLIENT_DESKTOP_API SimplifiedRule: public QObject
 {
     Q_OBJECT
 
 public:
-    ~SimplifiedRule();
+    virtual ~SimplifiedRule() override;
 
     QnUuid id() const;
 
@@ -72,7 +72,7 @@ private:
     void watchOn(QObject* object) const;
 };
 
-class RulesTableModel:
+class NX_VMS_CLIENT_DESKTOP_API RulesTableModel:
     public QAbstractTableModel,
     public nx::vms::client::core::RemoteConnectionAware
 {
@@ -96,8 +96,7 @@ public:
         FieldRole
     };
 
-    RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent);
-    ~RulesTableModel();
+    explicit RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent = nullptr);
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -113,7 +112,7 @@ public:
         int role = Qt::DisplayRole) const override;
 
     /** Add new rule and return its index. Returns invalid index if rule was not added. */
-    QModelIndex addRule();
+    QModelIndex addRule(const QString& eventId, const QString& actionId);
 
     /** Remove rule under the index. Returns true if removed, false otherwise. */
     bool removeRule(const QModelIndex& ruleIndex);
@@ -134,6 +133,9 @@ public:
     void applyChanges(std::function<void(const QString&)> errorHandler = {});
     void rejectChanges();
     void resetToDefaults(std::function<void(const QString&)> errorHandler = {});
+
+signals:
+    void stateChanged();
 
 private:
     std::vector<std::shared_ptr<SimplifiedRule>> simplifiedRules;
