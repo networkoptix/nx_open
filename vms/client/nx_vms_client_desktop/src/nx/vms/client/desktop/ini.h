@@ -85,6 +85,11 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, skipUpdateFilesVerification, "[Dev] Skip update files signature check.");
 
+    NX_INI_FLAG(false, saveCustomReleaseListUrlToSystemSettings,
+        "[Dev] When enabled, the Client will store its own customized release list URL to a "
+        "corresponding system setting, so any update check request going through the system "
+        "Servers will use that URL instead of the default one.");
+
     NX_INI_FLAG(true, modalServerSetupWizard,
         "[Dev] Whether to show Server's setup wizard dialog in a modal window (default).\n"
         "Developers can change to non-modal for debugging of web-based components.");

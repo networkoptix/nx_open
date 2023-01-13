@@ -10,7 +10,7 @@ struct NX_VMS_COMMON_API Ini: nx::kit::IniConfig
 {
     Ini();
 
-    NX_INI_STRING("", updateFeedUrl,
+    NX_INI_STRING("", releaseListUrl,
         "[Dev] Overrides update server URL. Leave empty to use the built-in value.\n"
         "Use substring `{customization}` to substitute current customization value, e.g.:\n"
         "`https://updates.vmsproxy.com/{customization}/releases.json`");

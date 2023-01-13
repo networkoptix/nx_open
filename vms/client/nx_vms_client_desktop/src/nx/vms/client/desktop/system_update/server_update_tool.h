@@ -133,8 +133,7 @@ public:
 
     Q_ENUM(OfflineUpdateState);
 
-    std::future<UpdateContents> checkForUpdate(
-        const QString& updateUrl, const common::update::UpdateInfoParams& infoParams);
+    std::future<UpdateContents> checkForUpdate(const common::update::UpdateInfoParams& infoParams);
 
     std::future<UpdateContents> checkUpdateFromFile(const QString& file);
     std::future<UpdateContents> checkMediaserverUpdateInfo();
