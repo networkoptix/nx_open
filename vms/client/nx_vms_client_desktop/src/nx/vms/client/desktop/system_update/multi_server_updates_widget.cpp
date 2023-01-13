@@ -371,7 +371,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 if (m_widgetState == WidgetUpdateState::initial && !m_updateCheck.valid())
                 {
                     m_updateCheck = m_serverUpdateTool->checkForUpdate(
-                        common::update::updateFeedUrl(),
                         update::LatestVmsVersionParams{appContext()->version()});
                 }
             }
@@ -504,7 +503,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {
-            QDesktopServices::openUrl(generateUpcombinerUrl());
+            QDesktopServices::openUrl(generateUpcombinerUrl().toQUrl());
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
@@ -781,7 +780,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
     ui->alertBlock->setVisible(!messages.isEmpty());
 }
 
-QUrl MultiServerUpdatesWidget::generateUpcombinerUrl() const
+nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
 {
     const common::update::PersistentUpdateStorage updateStorage =
         systemContext()->globalSettings()->targetPersistentUpdateStorage();
@@ -831,7 +830,7 @@ QUrl MultiServerUpdatesWidget::generateUpcombinerUrl() const
     query.addQueryItem("allClients", includeAllClientPackages ? "true" : "false");
     query.addQueryItem("components", getComponentQuery(osInfoList));
 
-    QUrl url(common::update::updateGeneratorUrl());
+    nx::utils::Url url(common::update::updateGeneratorUrl());
     url.setQuery(query);
 
     return url;
@@ -1001,7 +1000,6 @@ void MultiServerUpdatesWidget::recheckSpecificBuild()
 
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkForUpdate(
-        common::update::updateFeedUrl(),
         update::CertainVersionParams{m_pickedSpecificBuild, appContext()->version()});
     loadDataToUi();
 }
@@ -1043,7 +1041,6 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     {
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
-            common::update::updateFeedUrl(),
             update::LatestVmsVersionParams{appContext()->version()});
         m_updateReport.compareAndSet(m_updateReport->checking, isChecking());
         // We have changed 'isChecking' here.
@@ -1696,7 +1693,6 @@ void MultiServerUpdatesWidget::processInitialState()
     {
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
-            common::update::updateFeedUrl(),
             update::LatestVmsVersionParams{appContext()->version()});
     }
 
@@ -2730,7 +2726,8 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
     if (m_showDebugData)
     {
         QStringList debugState = {
-            nx::format("UpdateFeedUrl=<a href=\"%1\">%1</a>", common::update::updateFeedUrl()),
+            nx::format("ReleaseListUrl=<a href=\"%1\">%1</a>",
+                common::update::releaseListUrl(systemContext())),
             nx::format("UpdateGeneratorUrl=<a href=\"%1\">%1</a>",
                 common::update::updateGeneratorUrl()),
             nx::format("Widget=%1", toString(m_widgetState)),

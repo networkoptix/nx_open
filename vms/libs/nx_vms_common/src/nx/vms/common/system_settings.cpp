@@ -592,6 +592,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [](auto v) { return v >= -1 && v <= 32; }, this,
         [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)"); });
 
+    m_customReleaseListUrlAdaptor = new QnLexicalResourcePropertyAdaptor<utils::Url>(
+        "customReleaseListUrl", utils::Url(), this,
+        [] { return tr("Update releases.json file URL"); });
+
     m_targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "targetUpdateInformation", QByteArray(), this,
         [] { return tr("Target update information"); });
@@ -977,6 +981,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        m_customReleaseListUrlAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::customReleaseListUrlChanged,
+        Qt::QueuedConnection);
+
+    connect(
         m_targetUpdateInformationAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1082,6 +1093,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_edgeRecordingEnabledAdaptor
         << m_webSocketEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
+        << m_customReleaseListUrlAdaptor
         << m_targetUpdateInformationAdaptor
         << m_installedUpdateInformationAdaptor
         << m_maxVirtualCameraArchiveSynchronizationThreads
@@ -1794,6 +1806,16 @@ bool SystemSettings::isEdgeRecordingEnabled() const
 void SystemSettings::setEdgeRecordingEnabled(bool enabled)
 {
     m_edgeRecordingEnabledAdaptor->setValue(enabled);
+}
+
+nx::utils::Url SystemSettings::customReleaseListUrl() const
+{
+    return m_customReleaseListUrlAdaptor->value();
+}
+
+void SystemSettings::setCustomReleaseListUrl(const nx::utils::Url& url)
+{
+    m_customReleaseListUrlAdaptor->setValue(url);
 }
 
 QByteArray SystemSettings::targetUpdateInformation() const

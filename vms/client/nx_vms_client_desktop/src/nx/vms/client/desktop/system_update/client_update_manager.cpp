@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/system_settings.h>
@@ -232,7 +233,7 @@ void ClientUpdateManager::Private::checkForUpdate()
         {
             const UpdateContents updateContents =
                 system_update::getUpdateContents(connectedServerApi(),
-                    nx::vms::common::update::updateFeedUrl(),
+                    nx::vms::common::update::releaseListUrl(systemContext()),
                     update::LatestDesktopClientVersionParams{
                         nx::utils::SoftwareVersion(appContext()->version()),
                         nx::build_info::publicationType(),

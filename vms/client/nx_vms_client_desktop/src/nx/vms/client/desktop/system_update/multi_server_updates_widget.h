@@ -418,7 +418,7 @@ private:
     * Generates URL for Upcombiner, a WEB service, that combines several update packages into
     * a single ZIP archive.
     */
-    QUrl generateUpcombinerUrl() const;
+    nx::utils::Url generateUpcombinerUrl() const;
 
     nx::utils::SoftwareVersion getMinimumComponentVersion() const;
 

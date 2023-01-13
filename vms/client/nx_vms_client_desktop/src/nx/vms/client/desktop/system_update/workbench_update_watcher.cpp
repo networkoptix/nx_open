@@ -157,20 +157,18 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
         NX_VERBOSE(this, "atStartCheckUpdate() - there is already an active update check");
         return;
     }
-    const QString updateUrl = common::update::updateFeedUrl();
-    NX_ASSERT(!updateUrl.isEmpty());
-    NX_VERBOSE(this, "atStartCheckUpdate() from %1", updateUrl);
+
+    NX_VERBOSE(this, "atStartCheckUpdate()");
 
     const nx::utils::SoftwareVersion versionOverride(ini().autoUpdateCheckVersionOverride);
     if (versionOverride.isNull())
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
-            updateUrl, update::LatestVmsVersionParams{appContext()->version()});
+            update::LatestVmsVersionParams{appContext()->version()});
     }
     else
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
-            updateUrl,
             update::CertainVersionParams{versionOverride, appContext()->version()});
     }
 }

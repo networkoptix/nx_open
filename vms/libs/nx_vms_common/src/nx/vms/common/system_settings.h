@@ -387,6 +387,9 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
+    nx::utils::Url customReleaseListUrl() const;
+    void setCustomReleaseListUrl(const nx::utils::Url& url);
+
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
 
@@ -525,6 +528,7 @@ signals:
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
     void cloudConnectRelayingOverSslForcedChanged();
+    void customReleaseListUrlChanged();
     void targetUpdateInformationChanged();
     void installedUpdateInformationChanged();
     void downloaderPeersChanged();
@@ -662,6 +666,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxVirtualCameraArchiveSynchronizationThreads = nullptr;
 
+    QnResourcePropertyAdaptor<nx::utils::Url>* m_customReleaseListUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* m_targetPersistentUpdateStorageAdaptor = nullptr;

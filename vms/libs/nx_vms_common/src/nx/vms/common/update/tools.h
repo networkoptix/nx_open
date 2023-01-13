@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QString>
-
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
+
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::common::update {
 
-NX_VMS_COMMON_API QString updateFeedUrl();
-NX_VMS_COMMON_API QString updateGeneratorUrl();
+NX_VMS_COMMON_API nx::utils::Url releaseListUrl(SystemContext* context);
+NX_VMS_COMMON_API nx::utils::Url updateGeneratorUrl();
 NX_VMS_COMMON_API QString passwordForBuild(const QString& build);
 
 } // namespace nx::vms::common::update
