@@ -28,16 +28,17 @@ struct AccessRightsResolver::Private
         QnResourcePool* resourcePool,
         AbstractAccessRightsManager* accessRightsManager,
         AbstractGlobalPermissionsWatcher* globalPermissionsWatcher,
-        SubjectHierarchy* subjectHierarchy)
+        SubjectHierarchy* subjectHierarchy,
+        bool subjectEditingMode)
         :
-        ownResourceAccessResolver(
-            new OwnResourceAccessResolver(accessRightsManager, globalPermissionsWatcher)),
-        videowallItemAccessResolver(
-            new VideowallItemAccessResolver(ownResourceAccessResolver.get(), resourcePool)),
-        layoutItemAccessResolver(
-            new LayoutItemAccessResolver(videowallItemAccessResolver.get(), resourcePool)),
-        inheritedResourceAccessResolver(
-            new InheritedResourceAccessResolver(layoutItemAccessResolver.get(), subjectHierarchy))
+        ownResourceAccessResolver(new OwnResourceAccessResolver(
+            accessRightsManager, globalPermissionsWatcher)),
+        videowallItemAccessResolver(new VideowallItemAccessResolver(
+            ownResourceAccessResolver.get(), resourcePool)),
+        layoutItemAccessResolver(new LayoutItemAccessResolver(
+            videowallItemAccessResolver.get(), resourcePool, subjectEditingMode)),
+        inheritedResourceAccessResolver(new InheritedResourceAccessResolver(
+            layoutItemAccessResolver.get(), subjectHierarchy))
     {
     }
 };
@@ -47,10 +48,16 @@ AccessRightsResolver::AccessRightsResolver(
     AbstractAccessRightsManager* accessRightsManager,
     AbstractGlobalPermissionsWatcher* globalPermissionsWatcher,
     SubjectHierarchy* subjectHierarchy,
+    Mode mode,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(resourcePool, accessRightsManager, globalPermissionsWatcher, subjectHierarchy))
+    d(new Private(
+        resourcePool,
+        accessRightsManager,
+        globalPermissionsWatcher,
+        subjectHierarchy,
+        mode == Mode::editing))
 {
     using InternalNotifier = AbstractResourceAccessResolver::Notifier;
     const auto internalNotifier = d->inheritedResourceAccessResolver->notifier();

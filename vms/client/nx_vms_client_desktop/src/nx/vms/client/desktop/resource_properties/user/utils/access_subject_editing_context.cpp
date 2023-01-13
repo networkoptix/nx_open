@@ -63,7 +63,8 @@ public:
             systemContext->resourcePool(),
             accessRightsManager.get(),
             systemContext->globalPermissionsWatcher(),
-            currentHierarchy.get())),
+            currentHierarchy.get(),
+            AccessRightsResolver::Mode::editing)),
         notifier(accessRightsResolver->createNotifier())
     {
         connect(notifier.get(), &AccessRightsResolver::Notifier::resourceAccessChanged,

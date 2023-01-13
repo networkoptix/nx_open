@@ -22,6 +22,7 @@ public:
     explicit LayoutItemAccessResolver(
         AbstractResourceAccessResolver* baseResolver,
         QnResourcePool* resourcePool,
+        bool subjectEditingMode = false,
         QObject* parent = nullptr);
 
     virtual ~LayoutItemAccessResolver() override;
