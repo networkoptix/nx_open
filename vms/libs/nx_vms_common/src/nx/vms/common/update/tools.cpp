@@ -3,32 +3,32 @@
 #include "tools.h"
 
 #include <nx/branding.h>
-#include <nx/build_info.h>
 
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/nx_system_updates_ini.h>
 
 namespace nx::vms::common::update {
 
-namespace {
-
-const QString kUpdateGeneratorUrl = "https://updates.hdw.mx/upcombiner/upcombine";
-const QString kDefaultUpdateFeedUrl =
-    "https://updates.vmsproxy.com/{customization}/releases.json";
-
-} // namespace
-
-QString updateFeedUrl()
+nx::utils::Url releaseListUrl(SystemContext* context)
 {
-    QString value = ini().updateFeedUrl;
+    QString value = ini().releaseListUrl;
+
     if (value.isEmpty())
-        value = kDefaultUpdateFeedUrl;
+    {
+        if (context && !context->globalSettings()->customReleaseListUrl().isEmpty())
+            return context->globalSettings()->customReleaseListUrl();
+
+        value = "https://updates.vmsproxy.com/{customization}/releases.json";
+    }
+
     value.replace("{customization}", nx::branding::customization());
     return value;
 }
 
-QString updateGeneratorUrl()
+nx::utils::Url updateGeneratorUrl()
 {
-    return kUpdateGeneratorUrl;
+    return "https://updates.hdw.mx/upcombiner/upcombine";
 }
 
 QString passwordForBuild(const QString& build)

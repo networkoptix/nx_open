@@ -217,7 +217,7 @@ void ClientUpdateTool::verifyUpdateFile()
 }
 
 std::future<UpdateContents> ClientUpdateTool::requestInternetUpdateInfo(
-    const QString& updateUrl,
+    const nx::utils::Url& updateUrl,
     const nx::vms::update::PublicationInfoParams& params)
 {
     return std::async(

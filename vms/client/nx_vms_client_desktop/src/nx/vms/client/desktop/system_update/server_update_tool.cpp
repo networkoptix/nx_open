@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/update/nx_system_updates_ini.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -117,6 +118,13 @@ ServerUpdateTool::~ServerUpdateTool()
 void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
 {
     m_systemId = systemId;
+
+    if (ini().saveCustomReleaseListUrlToSystemSettings)
+    {
+        systemSettings()->setCustomReleaseListUrl(common::update::ini().releaseListUrl);
+        systemSettings()->synchronizeNow();
+    }
+
     loadInternalState();
     m_downloader->startDownloads();
 }
@@ -1575,7 +1583,6 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 }
 
 std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
-    const QString& updateUrl,
     const common::update::UpdateInfoParams& infoParams)
 {
     auto connection = connectedServerApi();
@@ -1589,7 +1596,9 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     }
 
     return std::async(
-        [updateUrl, connection, infoParams]() -> UpdateContents
+        [updateUrl = nx::vms::common::update::releaseListUrl(systemContext()),
+            connection,
+            infoParams]() -> UpdateContents
         {
             auto contents = system_update::getUpdateContents(
                 connection, updateUrl, infoParams);
