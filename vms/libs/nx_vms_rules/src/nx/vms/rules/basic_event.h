@@ -79,13 +79,6 @@ public:
 protected:
     BasicEvent() = default;
 
-    template<class... Strings>
-    QString makeName(const Strings&... strings) const
-    {
-        static constexpr auto kEventNameSeparator = '_';
-        return QStringList{strings...}.join(kEventNameSeparator);
-    }
-
     QString extendedCaption(common::SystemContext* context) const;
 
     /**
@@ -95,7 +88,7 @@ protected:
     QnUuid sourceId() const;
 
 private:
-    std::chrono::microseconds m_timestamp;
+    std::chrono::microseconds m_timestamp = std::chrono::microseconds::zero();
     State m_state = State::none;
 };
 

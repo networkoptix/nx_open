@@ -49,4 +49,9 @@ void BasicAction::setRuleId(const QnUuid& ruleId)
     m_ruleId = ruleId;
 }
 
+QString BasicAction::uniqueKey() const
+{
+    return type();
+}
+
 } // namespace nx::vms::rules

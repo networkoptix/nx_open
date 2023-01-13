@@ -6,6 +6,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -22,7 +23,7 @@ ServerConflictEvent::ServerConflictEvent(
 
 QString ServerConflictEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
+    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
 QString ServerConflictEvent::resourceKey() const
@@ -72,7 +73,7 @@ QString ServerConflictEvent::extendedCaption(common::SystemContext* context) con
 const ItemDescriptor& ServerConflictEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.serverConflict",
+        .id = utils::type<ServerConflictEvent>(),
         .displayName = tr("Server Conflict"),
         .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"

@@ -4,6 +4,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -47,8 +48,8 @@ QString StorageIssueEvent::extendedCaption(common::SystemContext* context) const
 QString StorageIssueEvent::uniqueName() const
 {
     return (m_reason == nx::vms::api::EventReason::backupFailedSourceFileError)
-        ? makeName(BasicEvent::uniqueName(), QString::number((int) m_reason))
-        : makeName(BasicEvent::uniqueName(), QString::number((int) m_reason), m_reasonText);
+        ? utils::makeName(BasicEvent::uniqueName(), QString::number((int) m_reason))
+        : utils::makeName(BasicEvent::uniqueName(), QString::number((int) m_reason), m_reasonText);
 }
 
 QString StorageIssueEvent::reason(common::SystemContext* context) const
@@ -102,7 +103,7 @@ QString StorageIssueEvent::reason(common::SystemContext* context) const
 const ItemDescriptor& StorageIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.storageIssue",
+        .id = utils::type<StorageIssueEvent>(),
         .displayName = tr("Storage Issue"),
         .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"

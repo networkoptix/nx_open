@@ -10,6 +10,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -21,7 +22,7 @@ CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, QnUui
 
 QString CameraEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+    return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
 QString CameraEvent::resourceKey() const

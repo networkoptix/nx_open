@@ -7,6 +7,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/time_field.h"
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -24,6 +25,9 @@ const ItemDescriptor& BookmarkAction::manifest()
             makeFieldDescriptor<TimeField>("recordBefore", tr("Pre-recording")),
             makeFieldDescriptor<TimeField>("recordAfter", tr("Post-recording")),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
+
+            utils::makeExtractDetailFieldDescriptor("name", utils::kExtendedCaptionDetailName),
+            utils::makeExtractDetailFieldDescriptor("description", utils::kDetailingDetailName),
         }
     };
     return kDescriptor;

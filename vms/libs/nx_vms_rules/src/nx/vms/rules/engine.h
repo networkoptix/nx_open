@@ -157,6 +157,7 @@ public:
     EventPtr buildEvent(const EventData& eventData) const;
 
     EventPtr cloneEvent(const EventPtr& event) const;
+    ActionPtr cloneAction(const ActionPtr& action) const;
 
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
     api::EventFilter serialize(const EventFilter* filter) const;

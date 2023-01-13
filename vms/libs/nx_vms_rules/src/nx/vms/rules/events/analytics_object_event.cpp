@@ -34,12 +34,12 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
 
 QString AnalyticsObjectEvent::uniqueName() const
 {
-    return makeName(AnalyticsEngineEvent::uniqueName(), m_objectTrackId.toSimpleString());
+    return utils::makeName(AnalyticsEngineEvent::uniqueName(), m_objectTrackId.toSimpleString());
 }
 
 QString AnalyticsObjectEvent::resourceKey() const
 {
-    return makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
+    return utils::makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
 }
 
 QString AnalyticsObjectEvent::aggregationKey() const

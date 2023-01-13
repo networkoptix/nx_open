@@ -11,6 +11,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -31,7 +32,7 @@ DeviceIpConflictEvent::DeviceIpConflictEvent(
 
 QString DeviceIpConflictEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
+    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
 QString DeviceIpConflictEvent::resourceKey() const
@@ -95,7 +96,7 @@ QString DeviceIpConflictEvent::name(common::SystemContext* context) const
 const ItemDescriptor& DeviceIpConflictEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.deviceIpConflict",
+        .id = utils::type<DeviceIpConflictEvent>(),
         .displayName = tr("Device IP Conflict"),
         .permissions = {.globalPermission = GlobalPermission::editCameras},
         .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"

@@ -3,6 +3,7 @@
 #include "analytics_engine_event.h"
 
 #include "../utils/event_details.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -41,7 +42,7 @@ void AnalyticsEngineEvent::setEngineId(QnUuid engineId)
 
 QString AnalyticsEngineEvent::uniqueName() const
 {
-    return makeName(DescribedEvent::uniqueName(), m_cameraId.toSimpleString());
+    return utils::makeName(DescribedEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
 QString AnalyticsEngineEvent::resourceKey() const

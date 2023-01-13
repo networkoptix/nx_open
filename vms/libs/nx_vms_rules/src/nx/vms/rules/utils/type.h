@@ -23,4 +23,12 @@ QString type()
     return type(&T::staticMetaObject);
 }
 
+template<class... Strings>
+QString makeName(const Strings&... strings)
+{
+    static constexpr auto kKeyNameSeparator = '_';
+
+    return QStringList{strings...}.join(kKeyNameSeparator);
+}
+
 } // namespace nx::vms::rules::utils

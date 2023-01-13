@@ -10,6 +10,7 @@
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -33,7 +34,7 @@ QString NetworkIssueEvent::resourceKey() const
 
 QString NetworkIssueEvent::uniqueName() const
 {
-    return makeName(
+    return utils::makeName(
         BasicEvent::uniqueName(),
         cameraId().toSimpleString(),
         QString::number(static_cast<int>(reason())));
@@ -136,7 +137,7 @@ QString NetworkIssueEvent::reason(common::SystemContext* context) const
 const ItemDescriptor& NetworkIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.networkIssue",
+        .id = utils::type<NetworkIssueEvent>(),
         .displayName = tr("Network Issue"),
         .permissions = {
             .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
