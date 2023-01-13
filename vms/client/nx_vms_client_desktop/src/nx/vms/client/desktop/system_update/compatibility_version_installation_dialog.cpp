@@ -323,7 +323,8 @@ void CompatibilityVersionInstallationDialog::startUpdate()
     connect(m_private->clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
-    const QString updateUrl = nx::vms::common::update::updateFeedUrl();
+    const nx::utils::Url updateUrl = nx::vms::common::update::releaseListUrl(
+        m_private->clientUpdateTool->systemContext());
 
     m_private->checkingUpdates = true;
 

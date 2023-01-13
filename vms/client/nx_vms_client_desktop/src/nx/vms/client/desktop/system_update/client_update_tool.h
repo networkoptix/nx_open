@@ -152,7 +152,7 @@ public:
      * client has no internet.
      */
     std::future<UpdateContents> requestInternetUpdateInfo(
-        const QString& updateUrl, const nx::vms::update::PublicationInfoParams& params);
+        const nx::utils::Url& updateUrl, const nx::vms::update::PublicationInfoParams& params);
 
     std::future<UpdateContents> requestUpdateInfoFromServer(
         const nx::vms::common::update::UpdateInfoParams& params);
