@@ -34,7 +34,7 @@ bool QnVideoWallItemIndex::isNull() const
 
 bool QnVideoWallItemIndex::isValid() const
 {
-    return !isNull() && m_videowall->items()->hasItem(m_uuid);
+    return !isNull() && m_videowall && m_videowall->items()->hasItem(m_uuid);
 }
 
 QnVideoWallItem QnVideoWallItemIndex::item() const

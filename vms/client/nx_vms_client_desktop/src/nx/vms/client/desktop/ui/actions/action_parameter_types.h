@@ -47,6 +47,9 @@ public:
     static QnResourceList resources(const LayoutItemIndexList& layoutItems);
     static QnResourceList resources(QnWorkbenchLayout* layout);
     static QnResourceList resources(const QnWorkbenchLayoutList& layouts);
+    static QnResourceList videowalls(const QVariant& items);
+    static QnResourceList videowalls(const QnVideoWallItemIndexList& items);
+    static QnResourceList videowalls(const QnVideoWallMatrixIndexList& matrices);
     static LayoutItemIndex layoutItem(QnResourceWidget* widget);
     static LayoutItemIndexList layoutItems(const QnResourceWidgetList& widgets);
     static LayoutItemIndexList layoutItems(QnResourceWidget* widget);

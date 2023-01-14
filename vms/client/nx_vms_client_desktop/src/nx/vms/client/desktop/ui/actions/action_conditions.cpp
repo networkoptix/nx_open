@@ -2364,15 +2364,12 @@ ConditionWrapper videowallIsRunning()
         {
             const auto videowall = resource.dynamicCast<QnVideoWallResource>();
             if (!videowall)
-                return InvisibleAction;
-
-            if (videowall->items()->getItems().isEmpty())
-                return InvisibleAction;
+                return false;
 
             if (videowall->onlineItems().isEmpty())
-                return DisabledAction;
+                return false;
 
-            return EnabledAction;
+            return true;
         }, MatchMode::any);
 }
 

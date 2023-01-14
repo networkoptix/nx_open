@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/flat_map.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
@@ -112,6 +113,21 @@ List makeList(const T& value)
     if (isValid(value))
         result.push_back(value);
     return result;
+}
+
+template<class List>
+QnResourceList getVideowalls(const List& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item: items)
+    {
+        if (auto videowall = item.videowall())
+            result.insert(std::move(videowall));
+    }
+
+    return QnResourceList(
+        std::make_move_iterator(result.begin()),
+        std::make_move_iterator(result.end()));
 }
 
 } // anonymous namespace
@@ -252,6 +268,31 @@ QnResourceList ParameterTypes::resources(const QnWorkbenchLayoutList& layouts)
     }
 
     return result;
+}
+
+QnResourceList ParameterTypes::videowalls(const QVariant& items)
+{
+    using namespace ParameterMetaType;
+
+    switch (qn_actionMetaTypeMap()->value(items.userType()))
+    {
+        case VideoWallItemIndexList:
+            return videowalls(items.value<QnVideoWallItemIndexList>());
+        case VideoWallMatrixIndexList:
+            return videowalls(items.value<QnVideoWallMatrixIndexList>());
+        default:
+            return resources(items).filtered<QnVideoWallResource>();
+    }
+}
+
+QnResourceList ParameterTypes::videowalls(const QnVideoWallItemIndexList& items)
+{
+    return getVideowalls(items);
+}
+
+QnResourceList ParameterTypes::videowalls(const QnVideoWallMatrixIndexList& matrices)
+{
+    return getVideowalls(matrices);
 }
 
 QnResourceList ParameterTypes::resources(const QVariant& items)

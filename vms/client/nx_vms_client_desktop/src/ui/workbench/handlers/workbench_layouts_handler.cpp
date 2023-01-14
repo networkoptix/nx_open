@@ -1099,7 +1099,7 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
 {
     auto layouts = menu()->currentParameters(sender()).resources().filtered<LayoutResource>();
 
-    LayoutResourceList personalLayouts;
+    LayoutResourceList personalAndVideowallLayouts;
     LayoutResourceList sharedLayouts;
     for (const auto& layout: layouts)
     {
@@ -1108,17 +1108,23 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
             continue;
 
         if (layout->isCrossSystem())
-            personalLayouts << layout;
+            personalAndVideowallLayouts << layout;
         else if (layout->isShared())
             sharedLayouts << layout;
         else
-            personalLayouts << layout;
+            personalAndVideowallLayouts << layout;
     }
+
+    const auto personalLayouts = personalAndVideowallLayouts.filtered(
+        [](const LayoutResourcePtr& layout)
+        {
+            return !layout->getParentResource().objectCast<QnVideoWallResource>();
+        });
 
     if (ui::messages::Resources::deleteLayouts(mainWindowWidget(), sharedLayouts, personalLayouts))
     {
         removeLayouts(sharedLayouts);
-        removeLayouts(personalLayouts);
+        removeLayouts(personalAndVideowallLayouts);
     }
 }
 

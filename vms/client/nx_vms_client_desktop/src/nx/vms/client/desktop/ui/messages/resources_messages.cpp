@@ -178,8 +178,11 @@ bool Resources::stopSharingLayouts(QWidget* parent,
 bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
     const QnResourceList& personalLayouts)
 {
-    if (sharedLayouts.empty() && qnClientShowOnce->testFlag(kDeleteLocalLayoutsShowOnceKey))
+    if (sharedLayouts.empty()
+        && (personalLayouts.empty() || qnClientShowOnce->testFlag(kDeleteLocalLayoutsShowOnceKey)))
+    {
         return true;
+    }
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);

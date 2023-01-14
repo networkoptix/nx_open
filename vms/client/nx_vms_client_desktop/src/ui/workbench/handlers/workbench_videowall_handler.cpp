@@ -50,6 +50,7 @@
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
@@ -2013,7 +2014,10 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QnUuid targetUuid = parameters.argument(Qn::VideoWallItemGuidRole).value<QnUuid>();
     QnVideoWallItemIndex targetIndex = resourcePool()->getVideoWallItemByUuid(targetUuid);
-    if (targetIndex.isNull())
+    if (!targetIndex.isValid())
+        return;
+
+    if (!ResourceAccessManager::hasPermissions(targetIndex.videowall(), Qn::ReadWriteSavePermission))
         return;
 
     /* Layout that is currently on the drop-target item. */
@@ -2112,6 +2116,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     if (!targetLayout)
     {
         targetLayout = constructLayout(targetResources);
+        targetLayout->setName(targetIndex.item().name);
         targetLayout->setParentId(videoWallId);
     }
 
@@ -3106,6 +3111,9 @@ void QnWorkbenchVideoWallHandler::saveVideowall(
     const QnVideoWallResourcePtr& videowall,
     bool saveLayout)
 {
+    if (!ResourceAccessManager::hasPermissions(videowall, Qn::ReadWriteSavePermission))
+        return;
+
     if (saveLayout && QnWorkbenchLayout::instance(videowall))
         saveVideowallAndReviewLayout(videowall);
     else
@@ -3503,6 +3511,9 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
     const QnVideoWallResourcePtr& videowall,
     LayoutResourcePtr reviewLayout)
 {
+    if (!ResourceAccessManager::hasPermissions(videowall, Qn::ReadWriteSavePermission))
+        return;
+
     if (!reviewLayout)
     {
         if (const auto workbenchLayout = QnWorkbenchLayout::instance(videowall))
