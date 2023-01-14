@@ -179,18 +179,14 @@ void initialize(Manager* manager, Action* root)
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Control Video Wall"))
-        .condition(
-            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
-            && ConditionWrapper(new StartVideoWallControlCondition())
-        );
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new StartVideoWallControlCondition()));
 
     factory(PushMyScreenToVideowallAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Push my screen"))
-        .condition(
-            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
-            && ConditionWrapper(new DesktopCameraCondition())
-        );
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new DesktopCameraCondition()));
 
     factory(QueueAppRestartAction)
         .flags(NoTarget);
@@ -498,14 +494,11 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Save Video Wall View"))
         .shortcut("Ctrl+S")
-        .condition(
-            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
-            && ConditionWrapper(new SaveVideowallReviewCondition(true))
-        );
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new SaveVideowallReviewCondition(true)));
 
     factory(DropOnVideoWallItemAction)
-        .flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget)
-        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions));
+        .flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget);
 
     factory()
         .flags(Main)
@@ -1054,6 +1047,7 @@ void initialize(Manager* manager, Action* root)
     factory(OpenVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Open Video Wall"))
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
         .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
 
     factory(OpenInFolderAction)
@@ -1064,49 +1058,41 @@ void initialize(Manager* manager, Action* root)
     factory(IdentifyVideoWallAction)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Identify"))
-        .condition(
-            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
-            && ConditionWrapper(new IdentifyVideoWallCondition()));
+        .condition(ConditionWrapper(new IdentifyVideoWallCondition()));
 
     factory(AttachToVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Attach to Video Wall..."))
-        .condition(
-            condition::hasFlags(Qn::videowall, MatchMode::any)
-        );
+        .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
 
     factory(StartVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Switch to Video Wall mode..."))
-        .condition(new StartVideowallCondition());
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new StartVideowallCondition()));
 
     factory(SaveVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Video Wall"))
         .shortcut("Ctrl+S")
-        .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
-        .condition(
-            ConditionWrapper(new SaveVideowallReviewCondition(false))
-        );
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new SaveVideowallReviewCondition(false)));
 
     factory(SaveVideowallMatrixAction)
         .flags(Tree | SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Save Current Matrix"))
-        .condition(
-            ConditionWrapper(new NonEmptyVideowallCondition())
-        );
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new NonEmptyVideowallCondition()));
 
     factory(LoadVideowallMatrixAction)
         .flags(Tree | SingleTarget | VideoWallMatrixTarget)
-        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
         .text(ContextMenu::tr("Load Matrix"));
 
     factory(DeleteVideowallMatrixAction)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
-        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
         .text(ContextMenu::tr("Delete"))
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true);
@@ -1117,16 +1103,15 @@ void initialize(Manager* manager, Action* root)
 
     factory(StopVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::Permission::VideoWallLayoutPermissions)
         .text(ContextMenu::tr("Stop Video Wall"))
+        .requiredTargetPermissions(Qn::ReadWriteSavePermission)
         .condition(condition::videowallIsRunning());
 
     factory(ClearVideoWallScreen)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
         .text(ContextMenu::tr("Clear Screen"))
-        .condition(
-            condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions)
-            && ConditionWrapper(new DetachFromVideoWallCondition()));
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
+        .condition(ConditionWrapper(new DetachFromVideoWallCondition()));
 
     factory(SelectCurrentServerAction)
         .flags(Tree | SingleTarget | ResourceTarget)
@@ -1139,7 +1124,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(VideoWallScreenSettingsAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | VideoWallItemTarget)
-        .condition(condition::hasPermissionsForResources(Qn::VideoWallLayoutPermissions))
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::ReadWriteSavePermission)
         .text(ContextMenu::tr("Screen Settings..."));
 
     factory(ForgetLayoutPasswordAction)
@@ -1445,7 +1430,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(RenameVideowallEntityAction)
         .flags(Tree | SingleTarget | VideoWallItemTarget | VideoWallMatrixTarget | IntentionallyAmbiguous)
-        .condition(condition::hasPermissionsForResources(Qn::Permission::WriteNamePermission))
+        .requiredTargetPermissions(Qn::VideoWallResourceRole, Qn::WriteNamePermission)
         .text(ContextMenu::tr("Rename"))
         .shortcut("F2");
 

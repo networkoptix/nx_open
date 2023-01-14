@@ -291,6 +291,10 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
             {
                 resources = ParameterTypes::resources(parameters.argument(key));
             }
+            else if (key == Qn::VideoWallResourceRole)
+            {
+                resources = ParameterTypes::videowalls(parameters.argument(-1));
+            }
             else if (key == Qn::CurrentLayoutResourceRole)
             {
                 if (LayoutResourcePtr layout = context()->workbench()->currentLayoutResource())
