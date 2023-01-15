@@ -371,7 +371,6 @@ namespace Qn
     enum ResourceStatusOverlay
     {
         EmptyOverlay,
-        PausedOverlay,
         LoadingOverlay,
         NoDataOverlay,
         NoVideoDataOverlay,

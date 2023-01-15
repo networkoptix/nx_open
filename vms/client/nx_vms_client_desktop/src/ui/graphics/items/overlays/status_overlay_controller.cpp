@@ -29,7 +29,6 @@ bool isErrorOverlayCheck(Qn::ResourceStatusOverlay overlay)
     switch (overlay)
     {
         case Qn::EmptyOverlay:
-        case Qn::PausedOverlay:
         case Qn::LoadingOverlay:
         case Qn::NoDataOverlay:
         case Qn::NoVideoDataOverlay:
@@ -176,7 +175,6 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() 
     {
         case Qn::LoadingOverlay:
             return QnStatusOverlayWidget::Control::kPreloader;
-        case Qn::PausedOverlay:
         case Qn::NoVideoDataOverlay:
             return QnStatusOverlayWidget::Control::kImageOverlay;
         case Qn::NoDataOverlay:
@@ -316,7 +314,6 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
         { Qn::ServerUnauthorizedOverlay, "item_placeholders/no_access.png" },
         { Qn::IoModuleDisabledOverlay, "item_placeholders/disabled.png" },
         { Qn::NoVideoDataOverlay, "item_placeholders/sound.png" },
-        { Qn::PausedOverlay, "item_placeholders/pause.png" },
         { Qn::PasswordRequiredOverlay, "item_placeholders/alert.png" },
         { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
         { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },

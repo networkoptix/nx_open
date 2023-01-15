@@ -4,11 +4,13 @@
 
 #include "abstract_workbench_panel.h"
 
+class ActivityListenerInstrument;
 class QnNavigationItem;
 class QnResizerWidget;
 class QGraphicsWidget;
 class HoverFocusProcessor;
 class VariantAnimator;
+class QnBlinkingImageButtonWidget;
 class QnImageButtonWidget;
 class AnimatorGroup;
 class QTimer;
@@ -73,9 +75,11 @@ public:
 
 private:
     void setShowButtonUsed(bool used);
+    void setShowButtonVisible(bool visible);
     void updateResizerGeometry();
     void updateControlsGeometry();
     void updateTooltipVisibility();
+    void updateShowButtonVisibility();
 
     qreal minimumHeight() const;
 
@@ -103,7 +107,7 @@ private:
     QPointer<CalendarWorkbenchPanel> m_calendar;
 
     QnImageButtonWidget* m_pinButton;
-    QnImageButtonWidget* m_showButton;
+    QnBlinkingImageButtonWidget* m_showButton;
 
     QnResizerWidget* m_resizerWidget;
 
@@ -126,6 +130,8 @@ private:
 
     /** Animator for y position. */
     VariantAnimator* m_yAnimator;
+
+    ActivityListenerInstrument* m_widgetActivityInstrument;
 };
 
 } //namespace nx::vms::client::desktop

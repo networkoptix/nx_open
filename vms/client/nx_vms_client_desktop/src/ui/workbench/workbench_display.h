@@ -24,7 +24,6 @@ class QGraphicsView;
 class InstrumentManager;
 class BoundingInstrument;
 class TransformListenerInstrument;
-class ActivityListenerInstrument;
 class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayTuneInstrument;
@@ -392,9 +391,6 @@ protected slots:
     void at_item_dataChanged(Qn::ItemDataRole role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
-    void at_widgetActivityInstrument_activityStopped();
-    void at_widgetActivityInstrument_activityStarted();
-
     void at_widget_aspectRatioChanged();
 
     void at_view_destroyed();
@@ -464,9 +460,6 @@ private:
 
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
-
-    /** Activity listener instrument for resource widgets. */
-    ActivityListenerInstrument *m_widgetActivityInstrument;
 
     /** Focus listener instrument. */
     FocusListenerInstrument *m_focusListenerInstrument;

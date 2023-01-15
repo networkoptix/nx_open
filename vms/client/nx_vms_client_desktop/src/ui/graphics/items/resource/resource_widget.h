@@ -61,43 +61,40 @@ class QnResourceWidget:
 public:
     enum Option
     {
-        /** Whether the paused overlay icon should be displayed. */
-        DisplayActivity = 1 << 0,
-
         /** Whether selected / not selected state should be displayed. */
-        DisplaySelection = 1 << 1,
+        DisplaySelection = 1 << 0,
 
         // TODO: #sivanov This flag also handles smart search, separate.
         /** Whether motion is to be displayed. */
-        DisplayMotion = 1 << 2,
+        DisplayMotion = 1 << 1,
 
         /** Whether info panel is to be displayed. */
-        DisplayInfo = 1 << 3,
+        DisplayInfo = 1 << 2,
 
         /** Whether detected analytics objects are displayed. */
-        DisplayAnalyticsObjects = 1 << 4,
+        DisplayAnalyticsObjects = 1 << 3,
 
         /** Whether regions of interest (ROI) are displayed. */
-        DisplayRoi = 1 << 5,
+        DisplayRoi = 1 << 4,
 
         /** Whether the video is to be dewarped. */
-        DisplayDewarped = 1 << 6,
+        DisplayDewarped = 1 << 5,
 
         /** Whether PTZ state can be controlled. */
-        ControlPtz = 1 << 7,
+        ControlPtz = 1 << 6,
 
         /** Whether zoom windows can be created by dragging the mouse. */
-        ControlZoomWindow = 1 << 8,
+        ControlZoomWindow = 1 << 7,
 
-        WindowRotationForbidden = 1 << 9,
-        WindowResizingForbidden = 1 << 10,
+        WindowRotationForbidden = 1 << 8,
+        WindowResizingForbidden = 1 << 9,
 
-        FullScreenMode = 1 << 11,
-        ActivityPresence = 1 << 12,
+        FullScreenMode = 1 << 10,
+        ActivityPresence = 1 << 11,
 
-        AlwaysShowName = 1 << 13,
-        InfoOverlaysForbidden = 1 << 14,
-        AllowFocus = 1 << 15
+        AlwaysShowName = 1 << 12,
+        InfoOverlaysForbidden = 1 << 13,
+        AllowFocus = 1 << 14
     };
 
     Q_DECLARE_FLAGS(Options, Option)

@@ -147,7 +147,8 @@
                 "background_pressed": "#1d5177",
                 "text_pressed": "#d8e2e9"
             }
-        }
+        },
+        "showButton": "#c2a026.setAlpha(199)"
     },
 
     "calendar": {
