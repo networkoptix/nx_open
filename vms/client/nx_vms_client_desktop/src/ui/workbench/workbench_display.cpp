@@ -51,7 +51,6 @@
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/common/notification_levels.h>
-#include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
@@ -71,7 +70,7 @@
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/view/graphics_view.h>
-#include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
+#include <ui/workbench/handlers/workbench_action_handler.h> //< TODO: #sivanov Remove this include.
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <utils/common/aspect_ratio.h>
 #include <utils/common/checked_cast.h>
@@ -89,7 +88,6 @@
 #include "workbench_layout.h"
 #include "workbench_utility.h"
 
-using namespace std::chrono;
 using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace ui;
@@ -158,9 +156,6 @@ const int splashTotalLengthMs = 1000;
 
 /** Viewport lower size boundary, in scene coordinates. */
 static const QSizeF kViewportLowerSizeBound(500.0, 500.0);
-
-/** Delay in msecs of appearance a Pause overlay after user inactivity */
-static constexpr milliseconds kActivityTimeout = 60s;
 
 enum
 {
@@ -237,7 +232,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_afterPaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_widgetActivityInstrument = new ActivityListenerInstrument(true, kActivityTimeout.count(), this);
     m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayTuneInstrument = new SelectionOverlayTuneInstrument(this);
@@ -252,7 +246,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_focusListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
-    m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayTuneInstrument);
     m_instrumentManager->installInstrument(
         m_frameTimePointsInstrument,
@@ -274,9 +267,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
              */
             executeLater([this]() { fitInView(false); }, this);
         });
-
-    connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));
-    connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
 
     /* We should disable all one-key shortcuts while web view is in the focus. */
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
@@ -2432,18 +2422,6 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value)
             NX_ASSERT(false, "Invalid item flag '%1'.", static_cast<int>(flag));
             break;
     }
-}
-
-void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped()
-{
-    foreach(QnResourceWidget *widget, m_widgets)
-        widget->setOption(QnResourceWidget::DisplayActivity, true);
-}
-
-void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted()
-{
-    foreach(QnResourceWidget *widget, m_widgets)
-        widget->setOption(QnResourceWidget::DisplayActivity, false);
 }
 
 void QnWorkbenchDisplay::at_widget_aspectRatioChanged()

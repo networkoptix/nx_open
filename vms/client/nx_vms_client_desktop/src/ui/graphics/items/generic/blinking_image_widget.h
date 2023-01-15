@@ -18,6 +18,8 @@ class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationT
 public:
     QnBlinkingImageButtonWidget(QGraphicsItem* parent = nullptr);
 
+    void setParticleVisible(bool visible);
+
 public slots:
     void setNotificationCount(int count);
     void setColor(const QColor& color);

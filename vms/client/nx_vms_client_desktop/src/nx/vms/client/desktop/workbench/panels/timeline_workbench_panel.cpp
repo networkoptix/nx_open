@@ -2,45 +2,50 @@
 
 #include "timeline_workbench_panel.h"
 
-#include <QtCore/QTimer>
 #include <QtCore/QScopedValueRollback>
-
+#include <QtCore/QTimer>
 #include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
+#include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/navigation_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
-#include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/resizer_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_ui_globals.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <utils/math/math.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
+#include <utils/math/math.h>
 
 #include "../workbench_animations.h"
 #include "buttons.h"
 #include "calendar_workbench_panel.h"
 
 using nx::vms::client::desktop::workbench::timeline::ThumbnailLoadingManager;
+using namespace std::chrono;
 
 namespace {
 
@@ -53,6 +58,11 @@ static const int kResizerHeight = 8;
 
 static const int kShowWidgetHeight = 50;
 static const int kShowWidgetHiddenHeight = 12;
+
+/**
+ * Show paused timeline notification in fullscreen mode after this inactivity period.
+ */
+static constexpr milliseconds kActivityTimeout = 60s;
 
 } // namespace
 
@@ -78,7 +88,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_controlWidget(new workbench::timeline::ControlWidget(context(), display()->view())),
     m_pinButton(newPinTimelineButton(parentWidget, context(),
         ui::action::PinTimelineAction)),
-    m_showButton(newShowHideButton(parentWidget, context(),
+    m_showButton(newBlinkingShowHideButton(parentWidget, context(),
         ui::action::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
@@ -296,6 +306,31 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     connect(action(ui::action::ResourcesModeAction), &QAction::toggled,
         this, &TimelineWorkbenchPanel::updateTooltipVisibility);
 
+    m_showButton->setColor(colorTheme()->color("timeline.showButton"));
+    m_widgetActivityInstrument = new ActivityListenerInstrument(true, kActivityTimeout.count(), this);
+    display()->instrumentManager()->installInstrument(m_widgetActivityInstrument);
+
+    connect(m_widgetActivityInstrument,
+        &ActivityListenerInstrument::activityStopped,
+        this,
+        &TimelineWorkbenchPanel::updateShowButtonVisibility);
+
+    connect(m_widgetActivityInstrument,
+        &ActivityListenerInstrument::activityResumed,
+        this,
+        &TimelineWorkbenchPanel::updateShowButtonVisibility);
+
+    connect(navigator(),
+        &QnWorkbenchNavigator::playingChanged,
+        this,
+        &TimelineWorkbenchPanel::updateShowButtonVisibility);
+
+    connect(navigator(),
+        &QnWorkbenchNavigator::liveChanged,
+        this,
+        &TimelineWorkbenchPanel::updateShowButtonVisibility);
+
+    updateShowButtonVisibility();
     updateGeometry();
 }
 
@@ -718,6 +753,27 @@ void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target
     newEvent.setPos(item->timeSlider()->mapFromItem(m_resizerWidget, oldEvent->pos()));
     newEvent.setScenePos(oldEvent->scenePos());
     display()->scene()->sendEvent(item->timeSlider(), &newEvent);
+}
+
+void TimelineWorkbenchPanel::setShowButtonVisible(bool visible)
+{
+    if (m_showButton->isVisible() == visible)
+        return;
+
+    m_showButton->setVisible(visible);
+    m_showButton->setOpacity(visible ? 1 : 0);
+    
+    m_showButton->setParticleVisible(visible);
+}
+
+void TimelineWorkbenchPanel::updateShowButtonVisibility()
+{
+    auto activeWidget = dynamic_cast<QnMediaResourceWidget*>(display()->activeWidget());
+    const bool visible = activeWidget
+        && activeWidget->options().testFlag(QnResourceWidget::Option::FullScreenMode)
+        && !activeWidget->isPlayingLive()
+        && !m_widgetActivityInstrument->isActive();
+    setShowButtonVisible(visible);
 }
 
 } //namespace nx::vms::client::desktop

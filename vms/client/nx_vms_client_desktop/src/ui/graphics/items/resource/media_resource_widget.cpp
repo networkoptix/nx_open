@@ -2491,11 +2491,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::NoVideoDataOverlay;
     }
 
-    if (options().testFlag(DisplayActivity) && d->display()->isPaused())
-    {
-        return Qn::EmptyOverlay;
-    }
-
     if (d->display()->camDisplay()->isLongWaiting())
     {
         auto loader = systemContext()->cameraDataManager()->loader(d->mediaResource,
