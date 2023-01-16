@@ -15,13 +15,12 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQml/QtQml>
 
-#include <utils/common/event_processors.h>
-#include <utils/common/delayed.h>
-
+#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
-
-#include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -46,8 +45,9 @@ struct EmbeddedPopup::Private
     bool visibleToParent = true;
     bool visible = false;
 
-    std::unique_ptr<QQuickWidget> quickWidget{
-        new QQuickWidget(qnClientCoreModule->mainQmlEngine(), nullptr)};
+    std::unique_ptr<QQuickWidget> quickWidget{ini().debugDisableQmlTooltips
+        ? (QQuickWidget*) nullptr
+        : new QQuickWidget(qnClientCoreModule->mainQmlEngine(), nullptr)};
 
     std::unique_ptr<QObject> viewportEventHandler;
 
@@ -74,6 +74,9 @@ EmbeddedPopup::EmbeddedPopup(QObject* parent):
     QObject(parent),
     d(new Private{this})
 {
+    if (!d->quickWidget)
+        return;
+
     d->quickWidget->setClearColor(Qt::transparent);
     d->quickWidget->setAttribute(Qt::WA_TranslucentBackground);
     d->quickWidget->setAttribute(Qt::WA_ShowWithoutActivating);
@@ -122,7 +125,10 @@ void EmbeddedPopup::setContentItem(QQuickItem* value)
         d->contentItem->setParentItem(nullptr);
 
     d->contentItem = value;
-    d->contentItem->setParentItem(d->quickWidget->quickWindow()->contentItem());
+
+    if (d->quickWidget)
+        d->contentItem->setParentItem(d->quickWidget->quickWindow()->contentItem());
+
     emit contentItemChanged();
 }
 
@@ -465,7 +471,7 @@ void EmbeddedPopup::Private::updateGeometry()
     executeLater(
         [this, windowGeometry]
         {
-            if (!quickWidget->parentWidget())
+            if (!quickWidget || !quickWidget->parentWidget())
                 return;
             const auto offset = quickWidget->parentWidget()->mapToGlobal({0, 0});
             quickWidget->setGeometry(windowGeometry.toAlignedRect().translated(-offset));
@@ -509,17 +515,20 @@ void EmbeddedPopup::Private::updateVisibility()
 
     // Showing must be delayed because it causes contentItem polishing and size recalculation
     // and can lead to unexpected binding loops.
-    if (visible)
-        executeLater([this]() { quickWidget->setVisible(visible); }, quickWidget.get());
-    else
-        quickWidget->setVisible(visible);
+    if (quickWidget)
+    {
+        if (visible)
+            executeLater([this]() { quickWidget->setVisible(visible); }, quickWidget.get());
+        else
+            quickWidget->setVisible(visible);
+    }
 
     emit q->visibleChanged();
 }
 
 void EmbeddedPopup::Private::updateTransientParent()
 {
-    if (!viewport)
+    if (!viewport || !quickWidget)
         return;
 
     auto newWindow = viewport->window();

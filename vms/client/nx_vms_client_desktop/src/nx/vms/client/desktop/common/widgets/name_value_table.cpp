@@ -18,11 +18,11 @@
 #include <QtQuick/QQuickWindow>
 
 #include <client_core/client_core_module.h>
-
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
 namespace nx::vms::client::desktop {
@@ -218,7 +218,9 @@ private:
 struct NameValueTable::Private
 {
     NameValueTable* const q;
-    const QPointer<SharedOffscreenRenderer> renderer = SharedOffscreenRenderer::instance();
+    const QPointer<SharedOffscreenRenderer> renderer = ini().debugDisableAttributeTables
+        ? (SharedOffscreenRenderer*) nullptr
+        : SharedOffscreenRenderer::instance();
 
     GroupedValues content;
     QSize size;
