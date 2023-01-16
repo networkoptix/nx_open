@@ -142,17 +142,17 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
     return result.join(common::html::kLineBreak);
 }
 
+const QMap<QString, FormatFunction> kFormatFunctions = {
+    { "@CreateGuid", &createGuid },
+    { "@EventType", &eventType },
+    { "@EventName", &eventName },
+    { "@EventCaption", &eventCaption },
+    { "@EventDescription", &eventDescription },
+    { "@EventTooltip", &eventTooltip }
+};
+
 FormatFunction formatFunction(const QString& name)
 {
-    static const QMap<QString, FormatFunction> kFormatFunctions = {
-        { "@CreateGuid", &createGuid },
-        { "@EventType", &eventType },
-        { "@EventName", &eventName },
-        { "@EventCaption", &eventCaption },
-        { "@EventDescription", &eventDescription },
-        { "@EventTooltip", &eventTooltip }
-    };
-
     return kFormatFunctions.value(name);
 }
 
@@ -261,6 +261,13 @@ void TextWithFields::setText(const QString& text)
     }
 
     emit textChanged();
+}
+
+const QStringList& TextWithFields::availableFunctions()
+{
+    static const QStringList availableFunctionsList =
+        kFormatFunctions.keys().replaceInStrings(QRegularExpression{"^(.*)"}, "{\\1}");
+    return availableFunctionsList;
 }
 
 } // namespace nx::vms::rules

@@ -7,6 +7,7 @@
 
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 
+#include "../utils/completer.h"
 #include "picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -31,6 +32,8 @@ public:
         m_textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         contentLayout->addWidget(m_textEdit);
 
+        m_completer = new Completer{wordsToComplete(), m_textEdit, this};
+
         m_contentWidget->setLayout(contentLayout);
     }
 
@@ -38,6 +41,7 @@ private:
     PICKER_WIDGET_COMMON_USINGS
 
     QTextEdit* m_textEdit;
+    Completer* m_completer{};
 
     virtual void onDescriptorSet() override
     {
@@ -66,6 +70,11 @@ private:
 
     QString text();
     void setText(const QString& text);
+
+    QStringList wordsToComplete() const
+    {
+        return {};
+    }
 };
 
 using TextWithFieldsPicker = MultilineTextPickerWidget<vms::rules::TextWithFields>;
@@ -80,6 +89,12 @@ template<>
 void TextWithFieldsPicker::setText(const QString& text)
 {
     m_field->setText(text);
+}
+
+template<>
+QStringList TextWithFieldsPicker::wordsToComplete() const
+{
+    return vms::rules::TextWithFields::availableFunctions();
 }
 
 } // namespace nx::vms::client::desktop::rules
