@@ -50,6 +50,7 @@ void Initializer::registerActions() const
     registerAction<DeviceRecordingAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
+    registerAction<PanicRecordingAction>();
     registerAction<SendEmailAction>();
     registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();
