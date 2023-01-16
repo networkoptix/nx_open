@@ -35,13 +35,24 @@ NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields);
 
 struct NX_VMS_API DeviceModelGeneral
 {
+    /**%apidoc Depends on `physicalId`. Calculated automatically by default. */
     QnUuid id;
+
+    /**%apidoc
+     * Depends on the Device hardware and firmware. Unique per device.
+     * %example 92-61-00-00-00-9F
+     */
     QString physicalId;
 
     /**%apidoc
      * %example 192.168.0.1
      */
     QString url;
+
+    /**%apidoc
+     * Device Driver id, can be obtained from `GET /rest/v{1-}/devices/\*\/types`.
+     * %example 1b7181ce-0227-d3f7-9443-c86aab922d96
+     */
     QnUuid typeId;
 
     /**%apidoc[opt]
@@ -52,7 +63,9 @@ struct NX_VMS_API DeviceModelGeneral
     /**%apidoc[opt] */
     QString mac;
 
-    /**%apidoc[opt] Parent Server, current Server by default. */
+    /**%apidoc[opt]
+     * Parent Server, can be obtained from `GET /rest/v{1-}/servers`, current Server by default.
+     */
     QnUuid serverId;
 
     /**%apidoc[opt] */
@@ -123,13 +136,13 @@ struct DeviceScheduleSettings
     std::vector<ScheduleTaskData> tasks;
 
     /**%apidoc Minimum number of days to keep the archive for.
-     * %deprecated This fields is deprecated and used for backward compatibility only. Use 
+     * %deprecated This fields is deprecated and used for backward compatibility only. Use
      *     'minArchivePeriodS' instead.
      */
     std::optional<int> minArchiveDays;
 
     /**%apidoc[opt] Maximum number of days to keep the archive for.
-     * %deprecated This fields is deprecated and used for backward compatibility only. Use 
+     * %deprecated This fields is deprecated and used for backward compatibility only. Use
      *     'maxArchivePeriodS' instead.
      */
     std::optional<int> maxArchiveDays;
@@ -317,5 +330,16 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     (deviceType)(capabilities)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModel, DeviceModel_Fields);
+
+struct NX_VMS_API DeviceTypeModel
+{
+    QnUuid id;
+    std::optional<QnUuid> parentId;
+    QString name;
+    QString manufacturer;
+};
+#define DeviceTypeModel_Fields (id)(parentId)(name)(manufacturer)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceTypeModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceTypeModel, DeviceTypeModel_Fields);
 
 } // namespace nx::vms::api
