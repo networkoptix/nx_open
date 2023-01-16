@@ -3,10 +3,6 @@
 #include "vms_gateway_embeddable.h"
 #include "vms_gateway_process.h"
 
-template<>
-nx::cloud::gateway::VmsGatewayEmbeddable*
-    Singleton<nx::cloud::gateway::VmsGatewayEmbeddable>::s_instance = nullptr;
-
 namespace nx {
 namespace cloud {
 namespace gateway {

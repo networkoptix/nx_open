@@ -16,7 +16,7 @@ struct LocalConnectionData
 };
 #define LocalConnectionData_Fields (systemName)(urls)
 
-struct WeightData
+struct NX_VMS_CLIENT_CORE_API WeightData
 {
     QnUuid localId;
     qreal weight;

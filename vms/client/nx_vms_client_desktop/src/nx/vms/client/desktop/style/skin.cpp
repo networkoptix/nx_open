@@ -15,16 +15,15 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 #include "icon_loader.h"
 #include "old_style.h"
 #include "style.h"
 
-template<>
-nx::vms::client::desktop::Skin* Singleton<nx::vms::client::desktop::Skin>::s_instance = nullptr;
-
 namespace nx::vms::client::desktop {
+
+static Skin* s_instance = nullptr;
 
 namespace {
 
@@ -39,9 +38,27 @@ void correctPixelRatio(QPixmap& pixmap)
 
 } // namespace
 
-Skin::Skin(const QStringList& paths, QObject* parent): QObject(parent)
+Skin::Skin(const QStringList& paths, QObject* parent):
+    QObject(parent)
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     init(paths);
+}
+
+
+Skin::~Skin()
+{
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+Skin* Skin::instance()
+{
+    return s_instance;
 }
 
 void Skin::init(const QStringList& paths)
@@ -68,10 +85,6 @@ void Skin::init(const QStringList& paths)
         * dpr * dpr); // dpi-dcaled
     if (QPixmapCache::cacheLimit() < cacheLimit)
         QPixmapCache::setCacheLimit(cacheLimit);
-}
-
-Skin::~Skin()
-{
 }
 
 const QStringList& Skin::paths() const

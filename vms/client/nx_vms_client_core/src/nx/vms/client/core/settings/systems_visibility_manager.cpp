@@ -2,11 +2,8 @@
 
 #include "systems_visibility_manager.h"
 
-#include <nx/utils/log/assert.h>
 #include <client_core/client_core_settings.h>
-
-template<> nx::vms::client::core::SystemsVisibilityManager*
-    Singleton<nx::vms::client::core::SystemsVisibilityManager>::s_instance = nullptr;
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -16,12 +13,30 @@ const QnUuid cloudTileId = QnUuid::fromString("cloudWelcomeScreenTile");
 
 namespace nx::vms::client::core {
 
+static SystemsVisibilityManager* s_instance = nullptr;
+
 SystemsVisibilityManager::SystemsVisibilityManager(QObject* parent):
     base_type(parent)
 {
     NX_CRITICAL(qnClientCoreSettings, "Client core settings is not initialized yet");
 
     m_visibilityScopes = qnClientCoreSettings->tileScopeInfo();
+
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+}
+
+SystemsVisibilityManager::~SystemsVisibilityManager()
+{
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+SystemsVisibilityManager* SystemsVisibilityManager::instance()
+{
+    return s_instance;
 }
 
 void SystemsVisibilityManager::removeSystemData(const QnUuid& localId)

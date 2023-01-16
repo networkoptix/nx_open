@@ -150,4 +150,9 @@ QnStoragePluginFactory* ApplicationContext::storagePluginFactory() const
     return d->storagePluginFactory.get();
 }
 
+QnLongRunableCleanup* ApplicationContext::longRunableCleanup() const
+{
+    return d->longRunableCleanup.get();
+}
+
 } // namespace nx::vms::common

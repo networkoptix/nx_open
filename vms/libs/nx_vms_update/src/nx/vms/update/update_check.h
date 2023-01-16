@@ -18,7 +18,7 @@
 
 namespace nx::vms::update {
 
-enum class NX_VMS_UPDATE_API FetchError
+enum class FetchError
 {
     networkError,
     httpError,

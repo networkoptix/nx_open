@@ -10,8 +10,6 @@
 using nx::vms::client::core::WeightData;
 using nx::vms::common::ServerCompatibilityValidator;
 
-template<> QnForgottenSystemsManager* Singleton<QnForgottenSystemsManager>::s_instance = nullptr;
-
 QnForgottenSystemsManager::QnForgottenSystemsManager():
     base_type(),
     m_systems()

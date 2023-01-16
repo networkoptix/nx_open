@@ -7,8 +7,6 @@
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 
-#include <nx/utils/singleton.h>
-
 #include "icon.h"
 #include "svg_icon_colorer.h"
 
@@ -20,13 +18,15 @@ namespace nx::vms::client::desktop {
 class IconLoader;
 class GenericPalette;
 
-class NX_VMS_CLIENT_DESKTOP_API Skin: public QObject, public Singleton<Skin>
+class NX_VMS_CLIENT_DESKTOP_API Skin: public QObject
 {
     Q_OBJECT
 
 public:
     Skin(const QStringList& paths, QObject* parent = nullptr);
-    virtual ~Skin();
+    virtual ~Skin() override;
+
+    static Skin* instance();
 
     const QStringList& paths() const;
 

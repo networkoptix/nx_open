@@ -5,7 +5,6 @@
 #include <client_core/client_core_meta_types.h>
 #include <client_core/local_connection_data.h>
 #include <network/cloud_system_data.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/settings/search_addresses_info.h>
 #include <nx/vms/client/core/settings/system_visibility_scope_info.h>
@@ -15,9 +14,7 @@
 
 class QSettings;
 
-class NX_VMS_CLIENT_CORE_API QnClientCoreSettings :
-    public QnPropertyStorage,
-    public Singleton<QnClientCoreSettings>
+class NX_VMS_CLIENT_CORE_API QnClientCoreSettings: public QnPropertyStorage
 {
     Q_OBJECT
     using base_type = QnPropertyStorage;
@@ -48,8 +45,9 @@ public:
 
 public:
     QnClientCoreSettings(QObject* parent = nullptr);
-
     virtual ~QnClientCoreSettings();
+
+    static QnClientCoreSettings* instance();
 
     virtual void writeValueToSettings(
             QSettings* settings,

@@ -13,7 +13,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
 #include "event_cache.h"

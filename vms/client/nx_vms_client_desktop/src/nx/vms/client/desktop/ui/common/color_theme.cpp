@@ -17,11 +17,9 @@
 
 #include "color_theme_reader.h"
 
-template<>
-nx::vms::client::desktop::ColorTheme* Singleton<nx::vms::client::desktop::ColorTheme>::s_instance =
-    nullptr;
-
 namespace nx::vms::client::desktop {
+
+static ColorTheme* s_instance = nullptr;
 
 struct ColorTheme::Private
 {
@@ -95,6 +93,11 @@ ColorTheme::ColorTheme(QObject* parent):
     QObject(parent),
     d(new Private())
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     d->loadColors();
 }
 
@@ -106,11 +109,23 @@ ColorTheme::ColorTheme(
     QObject(parent),
     d(new Private())
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     d->loadColors(mainColorsFile, skinColorsFile);
 }
 
 ColorTheme::~ColorTheme()
 {
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+ColorTheme* ColorTheme::instance()
+{
+    return s_instance;
 }
 
 QVariantMap ColorTheme::colors() const

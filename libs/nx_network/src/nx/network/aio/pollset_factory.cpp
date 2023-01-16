@@ -8,17 +8,25 @@
 #include "pollset_wrapper.h"
 #include "unified_pollset.h"
 
-template<>
-nx::network::aio::PollSetFactory* Singleton<nx::network::aio::PollSetFactory>::s_instance =
-    nullptr;
-
 namespace nx {
 namespace network {
 namespace aio {
 
+PollSetFactory* s_instance = nullptr;
+
 PollSetFactory::PollSetFactory():
     m_udtEnabled(true)
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+}
+
+PollSetFactory::~PollSetFactory()
+{
+    if (s_instance == this)
+        s_instance = nullptr;
 }
 
 std::unique_ptr<AbstractPollSet> PollSetFactory::create()
@@ -37,6 +45,11 @@ void PollSetFactory::enableUdt()
 void PollSetFactory::disableUdt()
 {
     m_udtEnabled = false;
+}
+
+PollSetFactory* PollSetFactory::instance()
+{
+    return s_instance;
 }
 
 } // namespace aio

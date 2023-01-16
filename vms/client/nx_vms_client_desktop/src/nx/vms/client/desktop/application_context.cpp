@@ -16,7 +16,7 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
-#include <client/system_weights_manager.h>
+#include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/local_resource_status_watcher.h>
 #include <core/resource/resource.h>
@@ -27,6 +27,7 @@
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
@@ -552,13 +553,14 @@ struct ApplicationContext::Private
     std::unique_ptr<RadassController> radassController;
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
-    std::unique_ptr<QnSystemsWeightsManager> systemsWeightsManager;
+    std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
     std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
     std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
+    std::unique_ptr<nx::cloud::gateway::VmsGatewayEmbeddable> cloudGateway;
 };
 
 ApplicationContext::ApplicationContext(
@@ -628,8 +630,9 @@ ApplicationContext::ApplicationContext(
             d->radassController = std::make_unique<RadassController>();
             d->resourceFactory = std::make_unique<ResourceFactory>();
             d->uploadManager = std::make_unique<UploadManager>();
-            d->systemsWeightsManager = std::make_unique<QnSystemsWeightsManager>();
+            d->forgottenSystemsManager = std::make_unique<QnForgottenSystemsManager>();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
+            d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             break;
         }
     }
@@ -837,5 +840,16 @@ ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const
 {
     return d->resourcesChangesManager.get();
 }
+
+QnForgottenSystemsManager* ApplicationContext::forgottenSystemsManager() const
+{
+    return d->forgottenSystemsManager.get();
+}
+
+nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() const
+{
+    return d->cloudGateway.get();
+}
+
 
 } // namespace nx::vms::client::desktop

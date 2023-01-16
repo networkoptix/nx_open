@@ -6,8 +6,6 @@
 #include <QtCore/QHash>
 #include <QtQuick/QQuickImageProvider>
 
-#include <nx/utils/singleton.h>
-
 namespace nx::vms::client::core {
 
 class AbstractImageSource;
@@ -15,9 +13,7 @@ class AbstractImageSource;
 /**
  * Generic QML image provider with two-level underlying hierarchy: image sources and images.
  */
-class NX_VMS_CLIENT_CORE_API ThumbnailImageProvider:
-    public QQuickImageProvider,
-    public Singleton<ThumbnailImageProvider>
+class NX_VMS_CLIENT_CORE_API ThumbnailImageProvider: public QQuickImageProvider
 {
     Q_OBJECT
 
@@ -26,7 +22,9 @@ public:
 
 public:
     ThumbnailImageProvider();
-    virtual ~ThumbnailImageProvider() override = default;
+    virtual ~ThumbnailImageProvider() override;
+
+    static ThumbnailImageProvider* instance();
 
     virtual QImage requestImage(
         const QString& id, QSize* size, const QSize& requestedSize) override;

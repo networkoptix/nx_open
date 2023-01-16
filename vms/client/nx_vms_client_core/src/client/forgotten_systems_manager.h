@@ -7,13 +7,9 @@
 #include <QtCore/QSet>
 
 #include <client_core/client_core_meta_types.h>
-
 #include <nx/utils/uuid.h>
-#include <nx/utils/singleton.h>
 
-class NX_VMS_CLIENT_CORE_API QnForgottenSystemsManager:
-    public QObject,
-    public Singleton<QnForgottenSystemsManager>
+class NX_VMS_CLIENT_CORE_API QnForgottenSystemsManager: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -40,5 +36,3 @@ private:
 private:
     QnStringSet m_systems;
 };
-
-#define qnForgottenSystemsManager QnForgottenSystemsManager::instance()

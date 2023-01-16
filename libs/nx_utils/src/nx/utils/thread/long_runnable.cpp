@@ -7,6 +7,8 @@
 //-------------------------------------------------------------------------------------------------
 // QnLongRunnablePoolPrivate.
 
+static QnLongRunnablePool* s_poolInstance = nullptr;
+
 class QnLongRunnablePoolPrivate
 {
 public:
@@ -114,9 +116,9 @@ QnLongRunnable::QnLongRunnable(const char* threadName)
     if (threadName)
         setObjectName(threadName);
 
-    if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
+    if (s_poolInstance)
     {
-        m_pool = pool->d;
+        m_pool = s_poolInstance->d;
         m_pool->createdNotify(this);
     }
     else
@@ -151,18 +153,22 @@ void QnLongRunnable::at_finished()
 //-------------------------------------------------------------------------------------------------
 // QnLongRunnablePool.
 
-template<> QnLongRunnablePool* Singleton<QnLongRunnablePool>::s_instance = nullptr;
-
 QnLongRunnablePool::QnLongRunnablePool(QObject *parent):
     QObject(parent),
     d(new QnLongRunnablePoolPrivate())
 {
+    if (s_poolInstance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_poolInstance = this;
 }
 
 QnLongRunnablePool::~QnLongRunnablePool()
 {
     stopAll();
     d->verifyCreated();
+    if (s_poolInstance == this)
+        s_poolInstance = nullptr;
 }
 
 void QnLongRunnablePool::stopAll()
@@ -173,4 +179,9 @@ void QnLongRunnablePool::stopAll()
 void QnLongRunnablePool::waitAll()
 {
     d->waitAll();
+}
+
+QnLongRunnablePool* QnLongRunnablePool::instance()
+{
+    return s_poolInstance;
 }

@@ -15,6 +15,7 @@ class DebugActionsHandler: public QObject, public QnWorkbenchContextAware
 
 public:
     explicit DebugActionsHandler(QObject* parent = nullptr);
+    virtual ~DebugActionsHandler() override;
 
 private:
     void registerDebugCounterActions();

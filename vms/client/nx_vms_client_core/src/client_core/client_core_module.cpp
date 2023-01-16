@@ -10,7 +10,7 @@
 #include <core/dataprovider/data_provider_factory.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/app_info.h>
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
@@ -26,7 +26,7 @@
 
 using namespace nx::vms::client::core;
 
-template<> QnClientCoreModule* Singleton<QnClientCoreModule>::s_instance = nullptr;
+static QnClientCoreModule* s_instance = nullptr;
 
 struct QnClientCoreModule::Private
 {
@@ -45,6 +45,11 @@ QnClientCoreModule::QnClientCoreModule(
     base_type(),
     d(new Private())
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
     d->commonModule->store(new nx::vms::client::core::LocalNetworkInterfacesManager());
@@ -63,6 +68,13 @@ QnClientCoreModule::QnClientCoreModule(
 
 QnClientCoreModule::~QnClientCoreModule()
 {
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+QnClientCoreModule* QnClientCoreModule::instance()
+{
+    return s_instance;
 }
 
 void QnClientCoreModule::initializeNetworking(

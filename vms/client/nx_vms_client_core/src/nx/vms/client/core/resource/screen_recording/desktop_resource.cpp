@@ -3,6 +3,7 @@
 #include "desktop_resource.h"
 
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/long_runable_cleanup.h>
@@ -66,8 +67,7 @@ void DesktopResource::disconnectFromServer()
     if (!m_connection)
         return;
 
-    if (auto cleanup = QnLongRunableCleanup::instance())
-        cleanup->cleanupAsync(std::move(m_connection));
+    common::appContext()->longRunableCleanup()->cleanupAsync(std::move(m_connection));
 }
 
 AudioLayoutConstPtr DesktopResource::getAudioLayout(

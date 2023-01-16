@@ -7,11 +7,9 @@
 #include <string>
 
 #include <nx/kit/ini_config.h>
-
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/debug/allocation_analyzer.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/singleton.h>
 
 #include "debug/object_counters.h"
 #include "socket_common.h"
@@ -161,8 +159,7 @@ private:
 /**
  * Invokes SocketGlobals::init() when constructed and SocketGlobals::deinit() just before destruction.
  */
-class NX_NETWORK_API SocketGlobalsHolder:
-    public Singleton<SocketGlobalsHolder>
+class NX_NETWORK_API SocketGlobalsHolder
 {
 public:
     /**
@@ -170,10 +167,13 @@ public:
      */
     SocketGlobalsHolder(int initializationFlags = 0);
     SocketGlobalsHolder(const utils::ArgumentParser& arguments, int initializationFlags = 0);
+    ~SocketGlobalsHolder();
 
     void initialize(bool initializePeerId = true);
     void uninitialize();
     void reinitialize(bool initializePeerId = true);
+
+    static SocketGlobalsHolder* instance();
 
 private:
     const nx::utils::ArgumentParser m_args;
@@ -183,10 +183,3 @@ private:
 
 } // namespace network
 } // namespace nx
-
-// Workaround for the bug in the clang that doesn't look up for the instantiation of s_instance in
-// the same library (prevent -Wundefined-var-template).
-#if defined(__clang__)
-    template<>
-    nx::network::SocketGlobalsHolder* Singleton<nx::network::SocketGlobalsHolder>::s_instance;
-#endif

@@ -26,6 +26,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/utils/math/fuzzy.h>
@@ -1165,8 +1166,8 @@ void Player::stop()
     d->dataConsumer.reset();
     if (d->archiveReader)
     {
-        if (QnLongRunableCleanup::instance())
-            QnLongRunableCleanup::instance()->cleanupAsync(std::move(d->archiveReader));
+        if (auto context = nx::vms::common::appContext(); NX_ASSERT(context))
+            context->longRunableCleanup()->cleanupAsync(std::move(d->archiveReader));
         else
             d->archiveReader.reset();
     }

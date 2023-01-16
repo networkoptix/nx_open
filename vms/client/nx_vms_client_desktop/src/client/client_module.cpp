@@ -20,7 +20,6 @@
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
@@ -32,7 +31,6 @@
 #include <decoders/video/abstract_video_decoder.h>
 #include <finders/systems_finder.h>
 #include <nx/build_info.h>
-#include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -126,7 +124,7 @@ QPalette makeApplicationPalette()
 
 } // namespace
 
-template<> QnClientModule* Singleton<QnClientModule>::s_instance = nullptr;
+static QnClientModule* s_instance = nullptr;
 
 struct QnClientModule::Private
 {
@@ -152,6 +150,11 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     QObject(parent),
     d(new Private{.startupParameters = startupParameters})
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     // Shortened initialization if run in self-update mode.
     if (d->startupParameters.selfUpdateMode)
         return;
@@ -160,7 +163,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
 
     commonModule->store(new QnQtbugWorkaround());
 
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
     commonModule->store(new LocalProxyServer());
 
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
@@ -202,6 +204,14 @@ QnClientModule::~QnClientModule()
 
     // Restoring default message handler.
     nx::utils::disableQtMessageAsserts();
+
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+QnClientModule* QnClientModule::instance()
+{
+    return s_instance;
 }
 
 void QnClientModule::initDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
@@ -244,11 +254,9 @@ void QnClientModule::initSurfaceFormat()
 
 void QnClientModule::initNetwork()
 {
-    auto commonModule = clientCoreModule()->commonModule();
-
     appContext()->moduleDiscoveryManager()->start(systemContext()->resourcePool());
 
-    commonModule->store(new QnForgottenSystemsManager());
+    auto commonModule = clientCoreModule()->commonModule();
     commonModule->store(new nx::vms::client::core::SystemsVisibilityManager());
 }
 

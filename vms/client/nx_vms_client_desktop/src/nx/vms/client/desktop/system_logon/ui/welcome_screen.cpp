@@ -13,7 +13,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/forgotten_systems_manager.h>
-#include <client/system_weights_manager.h>
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
@@ -466,7 +465,9 @@ static SystemsVisibilitySortFilterModel* createVisibilityModel(QObject* parent)
 
     auto visibilityModel = new SystemsVisibilitySortFilterModel(parent);
 
-    NX_CRITICAL(qnForgottenSystemsManager,
+    auto forgottenSystemsManager = appContext()->forgottenSystemsManager();
+
+    NX_CRITICAL(forgottenSystemsManager,
         "Client forgotten systems manager is not initialized yet");
     NX_CRITICAL(qnClientCoreSettings,
         "Client core settings is not initialized yet");
@@ -485,16 +486,16 @@ static SystemsVisibilitySortFilterModel* createVisibilityModel(QObject* parent)
     );
 
     visibilityModel->setForgottenCheckCallback(
-        [](const QString& systemId)
+        [forgottenSystemsManager](const QString& systemId)
         {
-            return qnForgottenSystemsManager->isForgotten(systemId);
+            return forgottenSystemsManager->isForgotten(systemId);
         }
     );
 
-    QObject::connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
+    QObject::connect(forgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
         visibilityModel, &SystemsVisibilitySortFilterModel::forgottenSystemAdded);
 
-    QObject::connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
+    QObject::connect(forgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
         visibilityModel, &SystemsVisibilitySortFilterModel::forgottenSystemRemoved);
 
     visibilityModel->setSourceModel(
@@ -763,8 +764,9 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
     if (localSystemUuid.isNull())
         return;
 
-    qnForgottenSystemsManager->forgetSystem(systemId);
-    qnForgottenSystemsManager->forgetSystem(localSystemId);
+    auto forgottenSystemsManager = appContext()->forgottenSystemsManager();
+    forgottenSystemsManager->forgetSystem(systemId);
+    forgottenSystemsManager->forgetSystem(localSystemId);
 
     CredentialsManager::removeCredentials(localSystemUuid);
     qnClientCoreSettings->removeRecentConnection(localSystemUuid);

@@ -6,8 +6,6 @@
 #include <QtCore/QVariantMap>
 #include <QtGui/QColor>
 
-#include <nx/utils/singleton.h>
-
 #include "color_substitutions.h"
 
 namespace nx::vms::client::desktop {
@@ -16,7 +14,7 @@ namespace nx::vms::client::desktop {
  * QPalette analogue.
  * Read basic and skin colors and provide access to them.
  */
-class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject, public Singleton<ColorTheme>
+class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject
 {
     Q_OBJECT
 
@@ -29,6 +27,8 @@ public:
         const QString& skinColorsFile,
         QObject* parent = nullptr);
     virtual ~ColorTheme() override;
+
+    static ColorTheme* instance();
 
     QVariantMap colors() const;
 

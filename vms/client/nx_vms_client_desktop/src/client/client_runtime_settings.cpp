@@ -2,10 +2,12 @@
 
 #include "client_runtime_settings.h"
 
+#include <nx/utils/log/log.h>
+
 #include "client_settings.h"
 #include "client_startup_parameters.h"
 
-template<> QnClientRuntimeSettings* Singleton<QnClientRuntimeSettings>::s_instance = nullptr;
+static QnClientRuntimeSettings* s_instance = nullptr;
 
 QnClientRuntimeSettings::QnClientRuntimeSettings(
     const QnStartupParameters& startupParameters,
@@ -13,6 +15,11 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
     :
     base_type(parent)
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     init();
     setThreadSafe(true);
 
@@ -48,6 +55,13 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
 
 QnClientRuntimeSettings::~QnClientRuntimeSettings()
 {
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+QnClientRuntimeSettings* QnClientRuntimeSettings::instance()
+{
+    return s_instance;
 }
 
 bool QnClientRuntimeSettings::isDesktopMode() const

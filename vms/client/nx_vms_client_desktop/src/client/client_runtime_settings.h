@@ -4,15 +4,11 @@
 
 #include <utils/common/property_storage.h>
 
-#include <nx/utils/singleton.h>
-
 #include "client_globals.h"
 
 struct QnStartupParameters;
 
-class NX_VMS_CLIENT_DESKTOP_API QnClientRuntimeSettings:
-    public QnPropertyStorage,
-    public Singleton<QnClientRuntimeSettings>
+class NX_VMS_CLIENT_DESKTOP_API QnClientRuntimeSettings: public QnPropertyStorage
 {
     Q_OBJECT
 
@@ -65,7 +61,9 @@ public:
     explicit QnClientRuntimeSettings(
         const QnStartupParameters& startupParameters,
         QObject* parent = nullptr);
-    ~QnClientRuntimeSettings();
+    virtual ~QnClientRuntimeSettings() override;
+
+    static QnClientRuntimeSettings* instance();
 
     bool isDesktopMode() const;
 

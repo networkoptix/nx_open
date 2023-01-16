@@ -47,7 +47,7 @@ QString deviceName(IMMDeviceEnumerator* deviceEnumerator, LPCWSTR deviceId)
 
 namespace nx::vms::client::desktop {
 
-class AudioDeviceChangeNotifier::DeviceChangeListener: public IMMNotificationClient
+class AudioDeviceChangeNotifier::DeviceChangeListener final: public IMMNotificationClient
 {
 public:
     using DeviceChangeHandler = std::function<void(LPCWSTR deviceId)>;

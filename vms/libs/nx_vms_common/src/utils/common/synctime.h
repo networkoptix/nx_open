@@ -8,7 +8,6 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/impl_ptr.h>
 
 namespace ec2 {
@@ -28,15 +27,15 @@ using AbstractTimeSyncManagerPtr = std::shared_ptr<AbstractTimeSyncManager>;
 /**
  * Time provider that is synchronized with Server.
  */
-class NX_VMS_COMMON_API QnSyncTime final:
-    public QObject,
-    public Singleton<QnSyncTime>
+class NX_VMS_COMMON_API QnSyncTime final: public QObject
 {
     Q_OBJECT;
 
 public:
     QnSyncTime(QObject *parent = NULL);
     ~QnSyncTime();
+
+    static QnSyncTime* instance();
 
     void setTimeSyncManager(nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager);
     void setTimeNotificationManager(ec2::AbstractTimeNotificationManagerPtr timeNotificationManager);

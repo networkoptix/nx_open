@@ -2,21 +2,26 @@
 
 #pragma once
 
-#include "abstract_event_list_model.h"
-
 #include <chrono>
 
 #include <QtGui/QPixmap>
 
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/common/notification_levels.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <ui/common/notification_levels.h>
+
+#if defined(NX_CLANG_CL)
+    // MOC generates very long include path for relative includes, and it cannot be processed by
+    // clang-cl.exe. Workaround the issue by using an absolute include path.
+    #include <nx/vms/client/desktop/event_search/models/abstract_event_list_model.h>
+#else
+    #include "abstract_event_list_model.h"
+#endif
 
 namespace nx::vms::client::desktop {
 
