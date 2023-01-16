@@ -139,7 +139,9 @@ public:
 class NX_UTILS_API Settings
 {
 public:
-    Settings() = default;
+    Settings();
+    virtual ~Settings();
+
     void attach(std::shared_ptr<AbstractQSettings>& settings);
     void sync();
 

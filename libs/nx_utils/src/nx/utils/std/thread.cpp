@@ -2,13 +2,14 @@
 
 #include "thread.h"
 
-#include <nx/utils/thread/thread_util.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-
-template<> nx::utils::DetachedThreads* Singleton<nx::utils::DetachedThreads>::s_instance = nullptr;
+#include <nx/utils/thread/thread_util.h>
 
 namespace nx {
 namespace utils {
+
+static DetachedThreads* s_detachedThreads = nullptr;
 
 namespace {
 
@@ -34,6 +35,8 @@ DetachedThreads::DetachedThreads():
             }
         })
 {
+    if (NX_ASSERT(!s_detachedThreads))
+        s_detachedThreads = this;
 }
 
 DetachedThreads::~DetachedThreads()
@@ -41,6 +44,9 @@ DetachedThreads::~DetachedThreads()
     m_stopPromise.set_value();
     m_collector.join();
     m_garbage.clear(); //< Will end up with QT warnings and running threads termination.
+
+    if (NX_ASSERT(s_detachedThreads == this))
+        s_detachedThreads = nullptr;
 }
 
 void DetachedThreads::addThread(std::unique_ptr<detail::thread> thread)
@@ -158,7 +164,8 @@ void thread::detach() noexcept(false)
     if (!joinable())
         throw std::system_error(std::make_error_code(std::errc::invalid_argument));
 
-    DetachedThreads::instance()->addThread(std::move(m_actualThread));
+    if (NX_ASSERT(s_detachedThreads))
+        s_detachedThreads->addThread(std::move(m_actualThread));
 }
 
 void thread::swap(thread& other) noexcept

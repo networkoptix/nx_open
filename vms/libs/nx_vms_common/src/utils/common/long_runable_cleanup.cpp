@@ -7,8 +7,6 @@
 
 #include <utils/common/event_loop.h>
 
-template<> QnLongRunableCleanup* Singleton<QnLongRunableCleanup>::s_instance = nullptr;
-
 QnLongRunableCleanup::QnLongRunableCleanup()
 {
 }

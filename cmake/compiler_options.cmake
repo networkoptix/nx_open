@@ -1,8 +1,12 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+# -------------------------------------------------------------------------------------------------
+# CMake setup.
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(CMAKE_OBJCXX_STANDARD ${CMAKE_CXX_STANDARD})
 set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
@@ -12,11 +16,105 @@ set(CMAKE_CUDA_STANDARD 11)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_ARCHITECTURES 50)
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+set(CMAKE_SKIP_BUILD_RPATH ON)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+if(developerBuild)
+    # Build all executables on Windows as console apps to simplify debug in developer mode.
+    set(CMAKE_WIN32_EXECUTABLE OFF)
+else()
+    set(CMAKE_WIN32_EXECUTABLE ON)
+endif()
+
+# -------------------------------------------------------------------------------------------------
+# Compiler detection.
+# Currently we support 4 different compilers: MSVC, GNU GCC, Clang (*nix), Clang-Cl (win). Each of
+# them has own set of flags and options. Here we define easy-to-use variables for each compiler.
+#
+# MSVC variable is ON for both MSVC compiler and Clang-Cl.
+# compilerClang is ON for both native Clang and Clang-Cl.
+set(compilerMsvc OFF)
+set(compilerNativeClang OFF)
+set(compilerClangCl OFF)
+set(compilerClang OFF)
+set(compilerGcc OFF)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(compilerMsvc ON)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND MSVC)
+    set(compilerClang ON)
+    set(compilerClangCl ON)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(compilerClang ON)
+    set(compilerNativeClang ON)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(compilerGcc ON)
+else()
+    message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+# -------------------------------------------------------------------------------------------------
+# Defines.
+
+add_definitions(
+    -D__STDC_CONSTANT_MACROS
+    -DENABLE_SSL #< TODO: #sivanov Remove this one.
+    -DBOOST_BIND_NO_PLACEHOLDERS
+    -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+    -DQT_NO_EXCEPTIONS
+)
+
+# These definitions are specific for Windows headers.
+if(WINDOWS)
+    add_definitions(
+        -D_CRT_RAND_S
+        -D_WINSOCKAPI_=
+        -DNOMINMAX=
+        -DUNICODE
+        -DWIN32_LEAN_AND_MEAN
+    )
+endif()
+
+if(compilerClangCl)
+    # Add definition to workaround some specific issues in codebase, e.g. too long include paths in
+    # moc-generated files. Eventually these issues are to be resolved, so define will help us to
+    # find all such workarounds quickly.
+    add_definitions(-DNX_CLANG_CL)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
+    add_definitions(-D_DEBUG)
+endif()
+
+if(MSVC)
+    set(API_IMPORT_MACRO "__declspec(dllimport)")
+    set(API_EXPORT_MACRO "__declspec(dllexport)")
+else()
+    set(API_IMPORT_MACRO [[__attribute__((visibility("default")))]])
+    set(API_EXPORT_MACRO [[__attribute__((visibility("default")))]])
+endif()
+
+# On GCC/Clang, when a class template in a shared library has a static member variable, such
+# variable may produce duplicates (e.g. one in the library which "owns" the template, and one in a
+# library that uses it) in case the default symbol visibility is set to "hidden". To avoid the
+# issue, the following macro should be used when defining such static members, which raises the
+# symbol visibility from "hidden" to "default".
+#
+# It is unnecessary for windows because the MSVC compiler correctly exports static members of
+# a template if this template instance is exported.
+#
+# This macro doesn't prevent duplicates when the same class template instantiated in a different
+# shared libraries.
+if(NOT compilerMsvc)
+    add_definitions([[-DNX_FORCE_EXPORT=__attribute__((visibility("default")))]])
+else()
+    add_definitions(-DNX_FORCE_EXPORT=)
+endif()
+
+# -------------------------------------------------------------------------------------------------
+# User-defined options.
 
 if(LINUX AND NOT ANDROID)
     option(useLdGold "Use ld.gold to link binaries" OFF)
@@ -24,43 +122,41 @@ if(LINUX AND NOT ANDROID)
         "Add more debug info when building Release version; effective only when -DuseClang=ON" OFF)
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
-    # TODO: Use CMake defaults in the next release version (remove the following two lines).
-    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_qml_debug ON)
+else()
+    set(_qml_debug OFF)
+endif()
+option(qml_debug "Enable QML debugger" ${_qml_debug})
+unset(_qml_debug)
+if(qml_debug)
+    add_definitions(-DQT_QML_DEBUG)
+endif()
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        add_compile_options(-fno-devirtualize)
+if(compilerClang)
+    option(compileTimeTracing "Enable compile time tracing (-ftime-trace)" OFF)
+    if(compileTimeTracing)
+        add_compile_options(-ftime-trace)
     endif()
 endif()
 
-if(developerBuild)
-    set(CMAKE_WIN32_EXECUTABLE OFF) #< On Windows, build executables as console apps.
-else()
-    set(CMAKE_WIN32_EXECUTABLE ON) #< On Windows, build executables as GUI (non-console) apps.
+option(colorOutput "Always produce ANSI-colored output (GNU/Clang only)." OFF)
+if(${colorOutput})
+    if(compilerGcc)
+       add_compile_options(-fdiagnostics-color=always)
+    elseif(compilerClang)
+       add_compile_options(-fcolor-diagnostics)
+    endif()
 endif()
 
-add_definitions(
-    -DUSE_NX_HTTP
-    -D__STDC_CONSTANT_MACROS
-    -DENABLE_SSL
-    -DENABLE_SENDMAIL
-    -DBOOST_BIND_NO_PLACEHOLDERS
-    -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-    -DQT_NO_EXCEPTIONS
-)
-
-set(enableSpeechSynthesizer "true")
-
 set(enabledSanitizers "" CACHE STRING "A semicolon-separated list of enabled sanitizers")
-
-if(NOT "${enabledSanitizers}" STREQUAL "" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(NOT "${enabledSanitizers}" STREQUAL "" AND compilerClang)
     add_compile_options(
         "-fsanitize-blacklist=${PROJECT_SOURCE_DIR}/sanitize-blacklist.txt")
 endif()
 
 foreach(sanitizer ${enabledSanitizers})
-    if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    if(compilerMsvc)
         get_filename_component(cl_dir ${CMAKE_CXX_COMPILER} DIRECTORY)
         get_filename_component(cl_lib_dir "${cl_dir}/../../../lib/x64" ABSOLUTE)
         file(TO_NATIVE_PATH ${cl_lib_dir} cl_lib_dir)
@@ -127,90 +223,29 @@ foreach(sanitizer ${enabledSanitizers})
 endforeach()
 
 set(enableCoverage OFF CACHE BOOL "Enable source-based code coverage")
-
 if(enableCoverage)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if(compilerClang)
         add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
         add_link_options(-fprofile-instr-generate)
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    elseif(compilerGcc)
         add_compile_options(--coverage)
         add_link_options(--coverage)
-    elseif(MSVC)
+    elseif(compilerMsvc)
         add_link_options(/Profile)
     endif()
 endif()
 
-if(WINDOWS)
-    add_definitions(
-        -D_CRT_RAND_S
-        -D_WINSOCKAPI_=
-        -DNOMINMAX=
-        -DUNICODE
-        -DWIN32_LEAN_AND_MEAN
-    )
-endif()
+# -------------------------------------------------------------------------------------------------
+# Compiler options.
 
-if(ANDROID OR IOS)
-    remove_definitions(
-        -DENABLE_SENDMAIL
-    )
-endif()
-
-if(targetDevice STREQUAL "edge1")
-    set(enableAllVendors OFF)
-    set(enableSpeechSynthesizer "false")
-endif()
-
-if(MSVC)
-    set(API_IMPORT_MACRO "__declspec(dllimport)")
-    set(API_EXPORT_MACRO "__declspec(dllexport)")
-else()
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        set(API_IMPORT_MACRO "__attribute__((visibility(\"default\")))")
-        set(API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
-    else()
-        set(API_IMPORT_MACRO "")
-        set(API_EXPORT_MACRO "")
-    endif()
-endif()
-
-# On GCC/Clang, when a class template in a shared library has a static member variable, such
-# variable may produce duplicates (e.g. one in the library which "owns" the template, and one in a
-# library that uses it) in case the default symbol visibility is set to "hidden". To avoid the
-# issue, the following macro should be used when defining such static members, which raises the
-# symbol visibility from "hidden" to "default".
-#
-# It is unnecessary for windows because the MSVC compiler correctly exports static members of
-# a template if this template instance is exported.
-#
-# This macro doesn't prevent duplicates when the same class template instantiated in a different
-# shared libraries.
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_definitions([[-DNX_FORCE_EXPORT=__attribute__((visibility("default")))]])
-else()
-    add_definitions(-DNX_FORCE_EXPORT=)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(NOT WINDOWS)
-        add_definitions(-D_DEBUG)
-    endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(-Wall -Wextra)
-
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # Avoid multiple warnings with Singleton implementation.
-        add_compile_options(-Wno-undefined-var-template)
-    endif()
-endif()
-
-if(MSVC)
+if(compilerMsvc)
     add_compile_options(
         /MP
         /bigobj
         /Zc:inline
+
+        # Enable most warnings by default.
+        /W4
 
         /wd4290
         /wd4661
@@ -263,11 +298,6 @@ if(MSVC)
         add_compile_options(/wd26444)
     endif()
 
-    set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags} /entry:mainCRTStartup")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
-    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
-
     # "/Z7" flag tells the compiler to save the debug info to the .obj file instead of sending this
     # data to the process mspdbsrv.exe, which saves it to a .pdb file. This approach allows to
     # avoid possible interprocess locks, and thus improves the parallelability of the entire build
@@ -279,28 +309,96 @@ if(MSVC)
 
     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+endif()
+
+if(MSVC)
+    set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags} /entry:mainCRTStartup")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
     unset(_extra_linker_flags)
 endif()
 
-if(UNIX)
+if(NOT compilerMsvc)
+    if(compilerClangCl)
+        # Clang-cl tries to emulate and support most of the cl.exe options, sometimes overwriting
+        # default clang behavior.
+        add_compile_options(
+            /bigobj
+            /Zc:inline
+            # /W4 expands to -Wall, while -Wall itself, if passed directly, will be expanded to
+            # -Weverything "for compatibility reasons".
+            /W4
+
+            -fms-extensions
+            -fms-compatibility
+            -fms-compatibility-version=19.34.00000
+            -msse4.1
+        )
+
+        # This block contains warnings which should be fixed and changed to errors instead.
+        add_compile_options(
+            -Wno-non-virtual-dtor
+            -Wno-deprecated
+            -Wno-deprecated-declarations
+            -Wno-unused-parameter
+            -Wno-unused-but-set-parameter
+            -Wno-unused-exception-parameter
+            -Wno-newline-eof
+            -Wno-cast-align
+            -Wno-cast-function-type
+            -Wno-unreachable-code-break
+            -Wno-implicit-fallthrough
+            -Wno-range-loop-construct
+            -Wno-range-loop-bind-reference
+            -Wno-conditional-uninitialized
+        )
+
+        # Suppress some warnings which are not to be fixed in the nearest time.
+        add_compile_options(
+            -Wno-sign-compare
+            -Wno-microsoft-cast
+            -Wno-language-extension-token
+            -Wno-covered-switch-default #< Contradicts with MSVC warning.
+        )
+    else() # GCC / Native CLang
+        add_compile_options(
+            -Wall
+            -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
+        )
+
+        if("${arch}" STREQUAL "x86" OR "${arch}" STREQUAL "x64")
+            add_compile_options(-msse2)
+        else()
+            add_compile_options(-Wno-error=type-limits) #< Fix warnings from RapidJSON on ARM.
+        endif()
+    endif()
+
     add_compile_options(
+        -Wextra
         -Werror=enum-compare
         -Werror=return-type
         -Wuninitialized
         -Wno-error=unused-function
+        -Wno-unknown-pragmas
+        -Wno-ignored-qualifiers
+        -Werror=reorder
+        -Werror=delete-non-virtual-dtor
+        -Werror=conversion-null
     )
 
-    string(APPEND CMAKE_CXX_FLAGS
-        " -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=conversion-null"
-    )
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(compilerGcc)
         add_compile_options(
             -Wno-error=maybe-uninitialized
             -Wno-psabi
         )
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+            add_compile_options(-fno-devirtualize)
+        endif()
+    elseif(compilerClang)
         add_compile_options(
+            -Wno-undefined-var-template #< Avoid multiple warnings with Singleton implementation.
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
             -Werror=mismatched-tags
@@ -308,34 +406,18 @@ if(UNIX)
     endif()
 endif()
 
-set(CMAKE_SKIP_BUILD_RPATH ON)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-
 if(LINUX)
-    if("${arch}" STREQUAL "x86" OR "${arch}" STREQUAL "x64")
-        add_compile_options(-msse2)
-    else()
-        add_compile_options(-Wno-error=type-limits) #< Fix warnings from RapidJSON on ARM.
-    endif()
-
-    add_compile_options(
-        -Wno-unknown-pragmas
-        -Wno-ignored-qualifiers
-        -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
-    )
-
-    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-
     # The two compilers that we use for building VMS project (gcc and clang) use different defaults:
     # gcc uses "--disable-new-dtags", while clang uses "--enable-new-dtags", so we have to specify
     # this option explicitly.
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--disable-new-dtags")
 
-    if(NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT enabledSanitizers STREQUAL ""))
+    if(NOT (compilerClang AND NOT enabledSanitizers STREQUAL ""))
         string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
     else()
-        message(STATUS "Disabling -Wl,--no-undefined since Clang sanitizer is not compatible with it")
+        message(STATUS
+            "Disabling -Wl,--no-undefined since Clang sanitizer is not compatible with it")
     endif()
 
     set(link_flags " -Wl,--as-needed")
@@ -349,7 +431,7 @@ if(LINUX)
     string(APPEND CMAKE_SHARED_LINKER_FLAGS ${link_flags})
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
-        if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT verboseDebugInfoInRelease)
+        if(compilerClang AND NOT verboseDebugInfoInRelease)
             set(debug_level_options "-gline-directives-only")
         else()
             set(debug_level_options "-ggdb1")
@@ -359,6 +441,13 @@ if(LINUX)
         string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--compress-debug-sections=zlib")
         string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--compress-debug-sections=zlib")
     endif()
+endif()
+
+# -------------------------------------------------------------------------------------------------
+# OS-dependent options.
+
+if(LINUX)
+    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 endif()
 
 if(MACOSX)
@@ -371,40 +460,6 @@ endif()
 
 if(IOS)
     list(APPEND CMAKE_INSTALL_RPATH @executable_path/Frameworks)
-endif()
-
-if(IOS)
     # For some reason, the following warning is automatically enabled only on iOS build.
-    add_compile_options(
-        -Wno-shorten-64-to-32
-    )
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(_qml_debug ON)
-else()
-    set(_qml_debug OFF)
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    option(compileTimeTracing "Enable compile time tracing (-ftime-trace)" OFF)
-    if(compileTimeTracing)
-        add_compile_options(-ftime-trace)
-    endif()
-endif()
-
-option(qml_debug "Enable QML debugger" ${_qml_debug})
-unset(_qml_debug)
-if(qml_debug)
-    add_definitions(-DQT_QML_DEBUG)
-endif()
-
-option(colorOutput "Always produce ANSI-colored output (GNU/Clang only)." OFF)
-
-if(${colorOutput})
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       add_compile_options(-fdiagnostics-color=always)
-    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-       add_compile_options(-fcolor-diagnostics)
-    endif()
+    add_compile_options(-Wno-shorten-64-to-32)
 endif()

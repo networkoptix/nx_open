@@ -9,6 +9,14 @@
 
 namespace nx::utils {
 
+Settings::Settings()
+{
+}
+
+Settings::~Settings()
+{
+}
+
 void Settings::add(const QString& name, BaseOption* option)
 {
     NX_ASSERT(m_options.find(name) == m_options.end(), lit("Duplicate setting: %1.").arg(name));

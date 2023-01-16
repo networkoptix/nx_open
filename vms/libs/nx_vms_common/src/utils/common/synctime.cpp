@@ -17,18 +17,29 @@ struct QnSyncTime::Private
     mutable nx::Mutex mutex;
 };
 
-template<> QnSyncTime* Singleton<QnSyncTime>::s_instance = nullptr;
+static QnSyncTime* s_instance = nullptr;
 
 QnSyncTime::QnSyncTime(QObject *parent):
     QObject(parent),
     d(new Private())
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
 }
 
 QnSyncTime::~QnSyncTime()
 {
     // It should help tracking a crash when application exits.
     NX_VERBOSE(this, "~QnSyncTime()");
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+QnSyncTime* QnSyncTime::instance()
+{
+    return s_instance;
 }
 
 QDateTime QnSyncTime::currentDateTime() const

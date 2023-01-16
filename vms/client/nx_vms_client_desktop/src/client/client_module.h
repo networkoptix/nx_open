@@ -7,7 +7,6 @@
 
 #include <client/client_startup_parameters.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
 
 class QOpenGLWidget;
@@ -40,7 +39,7 @@ class AttributeHelper;
 
 } // namespace nx::vms::client::desktop
 
-class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public Singleton<QnClientModule>
+class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject
 {
     Q_OBJECT
 
@@ -48,7 +47,9 @@ public:
     explicit QnClientModule(
         const QnStartupParameters& startupParams,
         QObject* parent = nullptr);
-    virtual ~QnClientModule();
+    virtual ~QnClientModule() override;
+
+    static QnClientModule* instance();
 
     void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();

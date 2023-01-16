@@ -9,7 +9,6 @@
 #include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 
@@ -29,9 +28,7 @@ class SystemContext;
 
 } // namespace nx::vms::client::core
 
-class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
-    public QObject,
-    public Singleton<QnClientCoreModule>
+class NX_VMS_CLIENT_CORE_API QnClientCoreModule: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -39,6 +36,8 @@ class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
 public:
     QnClientCoreModule(nx::vms::client::core::SystemContext* systemContext);
     virtual ~QnClientCoreModule() override;
+
+    static QnClientCoreModule* instance();
 
     using CertificateValidationLevel =
         nx::vms::client::core::network::server_certificate::ValidationLevel;

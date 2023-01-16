@@ -111,7 +111,7 @@ NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)
     (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection) \
     (failOnDbTuneError)(concurrentModificationQueryLimit))
 
-enum class NX_SQL_API QueryType
+enum class QueryType
 {
     lookup,
     modification,

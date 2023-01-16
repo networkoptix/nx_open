@@ -38,15 +38,12 @@
 #include "../utils/cameras_actions.h"
 #include "../utils/client_webserver.h"
 #include "../utils/debug_custom_actions.h"
-#include "../utils/welcome_screen_test.h"
 
 namespace {
 
 using namespace nx::vms::rules;
 
-class DebugEventConnector:
-    public EventConnector,
-    public Singleton<DebugEventConnector>
+class DebugEventConnector: public EventConnector
 {
 public:
     void atInc()
@@ -65,9 +62,9 @@ public:
     }
 };
 
-} // namespace
+std::unique_ptr<DebugEventConnector> s_debugEventConnector;
 
-template<> DebugEventConnector* Singleton<DebugEventConnector>::s_instance = nullptr;
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -136,8 +133,12 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     QmlTestDialog::registerAction();
     ResourcePoolDialog::registerAction();
     WebEngineDialog::registerAction();
-    WelcomeScreenTest::registerAction();
     testkit::TestKit::registerAction();
+}
+
+DebugActionsHandler::~DebugActionsHandler()
+{
+    s_debugEventConnector.reset();
 }
 
 void DebugActionsHandler::registerDebugCounterActions()
@@ -148,8 +149,9 @@ void DebugActionsHandler::registerDebugCounterActions()
     connect(action(ui::action::DebugDecrementCounterAction), &QAction::triggered, this,
         &DebugActionsHandler::at_debugDecrementCounterAction_triggered);
 
-    auto connector = new DebugEventConnector(); // initialize instance
-    appContext()->currentSystemContext()->vmsRulesEngine()->addEventConnector(connector);
+    s_debugEventConnector = std::make_unique<DebugEventConnector>();
+    appContext()->currentSystemContext()->vmsRulesEngine()->addEventConnector(
+        s_debugEventConnector.get());
 
     registerDebugAction(
         "Debug counter ++",
@@ -169,7 +171,7 @@ void DebugActionsHandler::registerDebugCounterActions()
 void DebugActionsHandler::at_debugIncrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
-    DebugEventConnector::instance()->atInc();
+    s_debugEventConnector->atInc();
     NX_INFO(this,
         "+++++++++++++++++++++++++++++++++++++ %1 +++++++++++++++++++++++++++++++++++++",
         qnRuntime->debugCounter());
@@ -178,7 +180,7 @@ void DebugActionsHandler::at_debugIncrementCounterAction_triggered()
 void DebugActionsHandler::at_debugDecrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
-    DebugEventConnector::instance()->atDec();
+    s_debugEventConnector->atDec();
     NX_INFO(this,
         "------------------------------------- %1 -------------------------------------",
         qnRuntime->debugCounter());

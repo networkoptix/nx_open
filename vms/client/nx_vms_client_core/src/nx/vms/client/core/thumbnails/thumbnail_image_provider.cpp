@@ -2,17 +2,34 @@
 
 #include "thumbnail_image_provider.h"
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 #include "abstract_image_source.h"
 
 namespace nx::vms::client::core {
+
+static ThumbnailImageProvider* s_instance = nullptr;
 
 const QString ThumbnailImageProvider::id = "thumbnails";
 
 ThumbnailImageProvider::ThumbnailImageProvider():
     QQuickImageProvider(QQuickImageProvider::Image)
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+}
+
+ThumbnailImageProvider::~ThumbnailImageProvider()
+{
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+ThumbnailImageProvider* ThumbnailImageProvider::instance()
+{
+    return s_instance;
 }
 
 QImage ThumbnailImageProvider::requestImage(
@@ -48,6 +65,3 @@ void ThumbnailImageProvider::removeSource(AbstractImageSource* source)
 }
 
 } // namespace nx::vms::client::core
-
-template<> nx::vms::client::core::ThumbnailImageProvider*
-    Singleton<nx::vms::client::core::ThumbnailImageProvider>::s_instance = nullptr;

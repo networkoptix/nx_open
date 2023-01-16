@@ -7,11 +7,11 @@
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <core/resource/camera_resource.h>
-#include <utils/common/long_runable_cleanup.h>
-#include <utils/common/threadqueue.h>
-
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/vms/common/application_context.h>
+#include <utils/common/long_runable_cleanup.h>
+#include <utils/common/threadqueue.h>
 
 namespace nx::vms::client::desktop {
 
@@ -87,9 +87,8 @@ void LiveAnalyticsReceiver::Private::releaseArchiveReader()
         return;
 
     m_reader->removeDataProcessor(this);
-
-    if (QnLongRunableCleanup::instance())
-        QnLongRunableCleanup::instance()->cleanupAsync(std::move(m_reader));
+    if (auto context = nx::vms::common::appContext(); NX_ASSERT(context))
+        context->longRunableCleanup()->cleanupAsync(std::move(m_reader));
     else
         m_reader.reset();
 }

@@ -64,6 +64,7 @@ enum class InitState { none, inintializing, done, deinitializing };
 static std::atomic<InitState> s_initState(InitState::none);
 static size_t s_counter(0);
 static SocketGlobals* s_instance = nullptr;
+static SocketGlobalsHolder* s_holderInstance = nullptr;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -463,7 +464,18 @@ SocketGlobalsHolder::SocketGlobalsHolder(
     m_args(arguments),
     m_initializationFlags(initializationFlags)
 {
+    if (s_holderInstance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_holderInstance = this;
+
     initialize(/*initializePeerId*/ false);
+}
+
+SocketGlobalsHolder::~SocketGlobalsHolder()
+{
+    if (s_holderInstance == this)
+        s_holderInstance = nullptr;
 }
 
 void SocketGlobalsHolder::initialize(bool initializePeerId)
@@ -485,6 +497,11 @@ void SocketGlobalsHolder::reinitialize(bool initializePeerId)
 {
     uninitialize();
     initialize(initializePeerId);
+}
+
+SocketGlobalsHolder* SocketGlobalsHolder::instance()
+{
+    return s_holderInstance;
 }
 
 } // namespace network

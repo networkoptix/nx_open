@@ -3168,7 +3168,7 @@ void ActionHandler::openInBrowser(
 {
     targetUrl = QnNetworkProxyFactory::urlToResource(targetUrl, server);
 
-    const auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+    const auto gateway = appContext()->cloudGateway();
     nx::network::SocketAddress targetAddress{targetUrl.host(), (uint16_t) targetUrl.port()};
     switch (authMethod)
     {

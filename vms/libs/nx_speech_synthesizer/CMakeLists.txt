@@ -2,7 +2,12 @@
 
 set(libs nx_vms_common)
 
-if(enableSpeechSynthesizer)
+set(_enableSpeechSynthesizer ON)
+if(targetDevice STREQUAL "edge1")
+    set(_enableSpeechSynthesizer OFF)
+endif()
+
+if(_enableSpeechSynthesizer)
     find_package(flite)
     list(APPEND libs flite::flite)
 endif()
@@ -12,11 +17,13 @@ nx_add_target(nx_speech_synthesizer LIBRARY NO_API_MACROS
     FOLDER common/libs
 )
 
-if(NOT enableSpeechSynthesizer)
+if(NOT _enableSpeechSynthesizer)
     set_source_files_properties(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/speech_synthesizer/text_to_wave_server.cpp
         PROPERTIES COMPILE_FLAGS -DDISABLE_FLITE)
 endif()
+
+unset(_enableSpeechSynthesizer)
 
 if(MACOSX)
     find_library(CoreServices_LIBRARY CoreServices)

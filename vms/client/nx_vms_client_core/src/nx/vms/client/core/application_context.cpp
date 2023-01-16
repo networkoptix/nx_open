@@ -163,4 +163,9 @@ QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
     return d->voiceSpectrumAnalyzer.get();
 }
 
+QnClientCoreSettings* ApplicationContext::deprecatedSettings() const
+{
+    return d->deprecatedSettings.get();
+}
+
 } // namespace nx::vms::client::core

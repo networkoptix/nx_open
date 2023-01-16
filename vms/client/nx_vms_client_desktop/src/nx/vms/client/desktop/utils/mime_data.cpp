@@ -27,13 +27,10 @@ enum class Protocol
     v51,
 };
 
-enum
-{
-    RESOURCES_BINARY_V40_TAG = 0xE1E00003,
-    RESOURCES_BINARY_V51_TAG = 0xE1E00004,
-};
+static const qint32 RESOURCES_BINARY_V40_TAG = 0xE1E00003;
+static const qint32 RESOURCES_BINARY_V51_TAG = 0xE1E00004;
 
-Protocol protocolFromTag(quint32 tag)
+Protocol protocolFromTag(qint32 tag)
 {
     switch (tag)
     {
@@ -74,7 +71,7 @@ struct MimeData::Private
 
         QDataStream stream(&data, QIODevice::ReadOnly);
 
-        quint32 tag;
+        qint32 tag;
         stream >> tag;
 
         const auto protocol = protocolFromTag(tag);

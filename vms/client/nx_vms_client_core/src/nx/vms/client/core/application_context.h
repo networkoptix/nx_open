@@ -9,6 +9,7 @@
 
 class QQmlEngine;
 
+class QnClientCoreSettings;
 class QnSystemsFinder;
 class QnVoiceSpectrumAnalyzer;
 
@@ -60,6 +61,8 @@ public:
     QnSystemsFinder* systemsFinder() const;
 
     QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
+
+    QnClientCoreSettings* deprecatedSettings() const;
 
 private:
     struct Private;

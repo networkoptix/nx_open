@@ -7,13 +7,16 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/application_context.h>
 
-class QnClientCoreModule;
 class QnResourceDiscoveryManager;
 class QnResourcePool;
+
+class QnClientCoreModule;
+class QnForgottenSystemsManager;
 
 struct QnStartupParameters;
 
 namespace nx::vms::utils { class TranslationManager; }
+namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
 
 namespace nx::vms::client::desktop {
 
@@ -186,6 +189,10 @@ public:
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
 
     ResourcesChangesManager* resourcesChangesManager() const;
+
+    QnForgottenSystemsManager* forgottenSystemsManager() const;
+
+    nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

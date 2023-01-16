@@ -115,3 +115,5 @@ private:
 };
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::CaptureInfoPtr)

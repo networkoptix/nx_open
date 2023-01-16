@@ -5,21 +5,22 @@
 #include <QtCore/QVariantMap>
 
 #include <nx/utils/uuid.h>
-#include <nx/utils/singleton.h>
-#include "welcome_screen_info.h"
+
 #include "system_visibility_scope_info.h"
+#include "welcome_screen_info.h"
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API SystemsVisibilityManager:
-    public QObject,
-    public Singleton<SystemsVisibilityManager>
+class NX_VMS_CLIENT_CORE_API SystemsVisibilityManager: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
 
 public:
     SystemsVisibilityManager(QObject* parent = nullptr);
+    virtual ~SystemsVisibilityManager() override;
+
+    static SystemsVisibilityManager* instance();
 
     void removeSystemData(const QnUuid& localId);
 

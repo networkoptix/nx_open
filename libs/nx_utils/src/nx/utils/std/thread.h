@@ -3,18 +3,16 @@
 #pragma once
 
 #include <functional>
-#include <thread>
 #include <system_error>
+#include <thread>
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #include <nx/utils/std/cpp14.h>
 
-#include "future.h"
 #include "../move_only_func.h"
 #include "../type_utils.h"
-
-#include <nx/utils/singleton.h>
+#include "future.h"
 
 namespace nx {
 namespace utils {
@@ -84,7 +82,7 @@ private:
     std::unique_ptr<detail::thread> m_actualThread;
 };
 
-class NX_UTILS_API DetachedThreads: public Singleton<DetachedThreads>
+class NX_UTILS_API DetachedThreads
 {
 public:
     DetachedThreads();

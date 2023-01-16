@@ -7,7 +7,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnLongRunnable;
@@ -17,9 +16,7 @@ class QnLongRunnable;
  * It is single tone with managed life-time, so it guarantee
  * that all nested threads will be stopped before this class destroyed.
  */
-class NX_VMS_COMMON_API QnLongRunableCleanup:
-    public QObject,
-    public Singleton<QnLongRunableCleanup>
+class NX_VMS_COMMON_API QnLongRunableCleanup: public QObject
 {
 public:
     QnLongRunableCleanup();

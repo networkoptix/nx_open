@@ -4,8 +4,6 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <nx/utils/singleton.h>
-
 #include "thread.h"
 
 class QnLongRunnablePoolPrivate;
@@ -14,9 +12,7 @@ class NX_UTILS_API QnLongRunnable:
     public nx::utils::Thread
 {
     using base_type = nx::utils::Thread;
-
 public:
-
     QnLongRunnable(const char* threadName = nullptr);
     ~QnLongRunnable();
 
@@ -30,9 +26,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API QnLongRunnablePool:
-    public QObject,
-    public Singleton<QnLongRunnablePool>
+class NX_UTILS_API QnLongRunnablePool: public QObject
 {
 public:
     QnLongRunnablePool(QObject *parent = NULL);
@@ -49,6 +43,8 @@ public:
      * pool are stopped.
      */
     void waitAll();
+
+    static QnLongRunnablePool* instance();
 
 private:
     friend class QnLongRunnable;

@@ -10,7 +10,6 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/property_storage/storage.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
@@ -18,15 +17,16 @@
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API Settings:
-    public nx::utils::property_storage::Storage,
-    public Singleton<Settings>
+class NX_VMS_CLIENT_CORE_API Settings: public nx::utils::property_storage::Storage
 {
     Q_OBJECT
 
 public:
     /** Use QtKeyChain library to store secure settings if possible. */
     Settings(bool useKeyChain = true);
+    virtual ~Settings() override;
+
+    static Settings* instance();
 
     using SerializableCredentials = nx::network::http::SerializableCredentials;
     // Order is important as we are listing users by the last usage time.

@@ -26,8 +26,6 @@
 #include "utils/serialization.h"
 #include "utils/type.h"
 
-template<> nx::vms::rules::Engine* Singleton<nx::vms::rules::Engine>::s_instance = nullptr;
-
 namespace nx::vms::rules {
 
 namespace {

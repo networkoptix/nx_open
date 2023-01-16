@@ -10,6 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/system_utils.h>
 #include <nx/utils/url.h>
+#include <nx/vms/client/core/application_context.h>
 
 using KnownServerConnection = nx::vms::client::core::watchers::KnownServerConnections::Connection;
 
@@ -31,8 +32,6 @@ QList<KnownServerConnection> validKnownConnections(QList<KnownServerConnection> 
 
 } //namespace
 
-template<> QnClientCoreSettings* Singleton<QnClientCoreSettings>::s_instance = nullptr;
-
 QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     base_type(parent),
     m_settings(new QSettings(this))
@@ -47,6 +46,11 @@ QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
 QnClientCoreSettings::~QnClientCoreSettings()
 {
     submitToSettings(m_settings);
+}
+
+QnClientCoreSettings* QnClientCoreSettings::instance()
+{
+    return nx::vms::client::core::appContext()->deprecatedSettings();
 }
 
 void QnClientCoreSettings::writeValueToSettings(

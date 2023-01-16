@@ -62,7 +62,6 @@
 #include <nx/vms/rules/metatypes.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/model_data_accessor.h>
-#include <ui/models/ordered_systems_model.h>
 #include <ui/models/system_hosts_model.h>
 
 namespace nx::vms::client::core {
@@ -104,7 +103,6 @@ void initializeMetaTypes()
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
-    qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 
     qmlRegisterType<positioners::Grid>("Nx.Positioners", 1, 0, "Grid");

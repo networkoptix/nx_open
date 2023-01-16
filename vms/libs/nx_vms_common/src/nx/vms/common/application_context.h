@@ -8,6 +8,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/connection_types.h>
 
+class QnLongRunableCleanup;
 class QnStoragePluginFactory;
 
 namespace nx::utils { class TimerManager; }
@@ -49,6 +50,7 @@ public:
     QString moduleDisplayName(const QnUuid& id) const;
 
     QnStoragePluginFactory* storagePluginFactory() const;
+    QnLongRunableCleanup* longRunableCleanup() const;
 
 private:
     struct Private;

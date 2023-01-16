@@ -5,20 +5,15 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QSettings>
 
+#include <nx/branding.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/property_storage/qsettings_backend.h>
 #include <utils/crypt/symmetrical.h>
 
 #if defined(USE_QT_KEYCHAIN)
     #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
 #endif
-
-#include <nx/utils/app_info.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/property_storage/qsettings_backend.h>
-
-#include <nx/branding.h>
-
-template<>
-nx::vms::client::core::Settings* Singleton<nx::vms::client::core::Settings>::s_instance = nullptr;
 
 namespace nx::vms::client::core {
 
@@ -63,9 +58,16 @@ NX_REFLECTION_INSTRUMENT(SystemAuthenticationData_v42, (key)(value));
 
 } // namespace
 
+static Settings* s_instance = nullptr;
+
 Settings::Settings(bool useKeyChain):
     Storage(new utils::property_storage::QSettingsBackend(createSettings(), kGroupName))
 {
+    if (s_instance)
+        NX_ERROR(this, "Singleton is created more than once.");
+    else
+        s_instance = this;
+
     if (useKeyChain)
     {
         #if defined(USE_QT_KEYCHAIN)
@@ -89,6 +91,17 @@ Settings::Settings(bool useKeyChain):
 
     load();
     migrateSystemAuthenticationData();
+}
+
+Settings::~Settings()
+{
+    if (s_instance == this)
+        s_instance = nullptr;
+}
+
+Settings* Settings::instance()
+{
+    return s_instance;
 }
 
 CloudAuthData Settings::cloudAuthData() const
