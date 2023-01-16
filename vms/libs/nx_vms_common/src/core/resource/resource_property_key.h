@@ -231,8 +231,6 @@ NX_VMS_COMMON_API extern const QString kMediaTraits;
 // TODO: Rename to kDwRebrandedToIsd.
 NX_VMS_COMMON_API extern const QString kIsdDwCam;
 
-NX_VMS_COMMON_API extern const QString kDoNotAddVendorToDeviceName;
-
 NX_VMS_COMMON_API extern const QString kMultiresourceVideoChannelMapping;
 
 NX_VMS_COMMON_API extern const QString kParseOnvifNotificationsWithHttpReader;

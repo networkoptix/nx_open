@@ -168,8 +168,6 @@ const QString kMediaTraits("mediaTraits");
 
 const QString kIsdDwCam("isdDwCam");
 
-const QString kDoNotAddVendorToDeviceName("doNotAddVendorToDeviceName");
-
 const QString kMultiresourceVideoChannelMapping("multiresourceVideoChannelMapping");
 
 const QString kParseOnvifNotificationsWithHttpReader("parseOnvifNotificationsWithHttpReader");
