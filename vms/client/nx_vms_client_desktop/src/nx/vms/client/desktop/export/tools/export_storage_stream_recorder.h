@@ -82,7 +82,7 @@ private:
     virtual void fileFinished(
         qint64 durationMs, const QString& fileName, qint64 fileSize, qint64 startTimeMs = AV_NOPTS_VALUE) override;
 
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) override;
+    virtual bool fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) override;
     virtual void initMetadataStream(StorageContext& context) override;
 
     bool isTranscodingEnabled() const;
