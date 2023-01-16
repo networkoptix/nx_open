@@ -158,16 +158,16 @@ void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) 
 
 void Engine::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* outResult,
-    const IActiveSettingChangedAction* activeSettingChangeAction)
+    const IActiveSettingChangedAction* activeSettingChangedAction)
 {
     std::string parseError;
     Json::object model = Json::parse(
-        activeSettingChangeAction->settingsModel(), parseError).object_items();
+        activeSettingChangedAction->settingsModel(), parseError).object_items();
 
-    const std::string settingId(activeSettingChangeAction->activeSettingName());
+    const std::string settingId(activeSettingChangedAction->activeSettingName());
 
     std::map<std::string, std::string> values = toStdMap(shareToPtr(
-        activeSettingChangeAction->settingsValues()));
+        activeSettingChangedAction->settingsValues()));
 
     if (!processActiveSettings(&model, &values, {settingId}))
     {
@@ -182,7 +182,7 @@ void Engine::doGetSettingsOnActiveSettingChange(
     settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
     const nx::sdk::Ptr<nx::sdk::ActionResponse> actionResponse =
-        generateActionResponse(settingId, activeSettingChangeAction->params());
+        generateActionResponse(settingId, activeSettingChangedAction->params());
 
     auto response = makePtr<ActiveSettingChangedResponse>();
     response->setSettingsResponse(settingsResponse);

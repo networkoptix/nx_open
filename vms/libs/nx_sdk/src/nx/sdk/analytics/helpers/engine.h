@@ -103,7 +103,7 @@ protected:
 
     virtual void doGetSettingsOnActiveSettingChange(
         Result<const IActiveSettingChangedResponse*>* outResult,
-        const IActiveSettingChangedAction* activeSettingChangeAction) override;
+        const IActiveSettingChangedAction* activeSettingChangedAction) override;
 
 public:
     virtual ~Engine() override;
