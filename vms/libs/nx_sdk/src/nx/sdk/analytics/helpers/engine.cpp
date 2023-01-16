@@ -168,7 +168,7 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 
 void Engine::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* /*outResult*/,
-    const IActiveSettingChangedAction* /*activeSettingChangeAction*/)
+    const IActiveSettingChangedAction* /*activeSettingChangedAction*/)
 {
 }
 

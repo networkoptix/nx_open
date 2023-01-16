@@ -194,7 +194,7 @@ void ConsumingDeviceAgent::finalize()
 
 void ConsumingDeviceAgent::doGetSettingsOnActiveSettingChange(
     Result<const IActiveSettingChangedResponse*>* /*outResult*/,
-    const IActiveSettingChangedAction* /*activeSettingChangeAction*/)
+    const IActiveSettingChangedAction* /*activeSettingChangedAction*/)
 {
 }
 

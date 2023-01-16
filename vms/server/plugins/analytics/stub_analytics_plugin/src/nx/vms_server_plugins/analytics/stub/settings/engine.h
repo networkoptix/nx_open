@@ -36,7 +36,7 @@ protected:
 
     virtual void doGetSettingsOnActiveSettingChange(
         nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
-        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) override;
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangedAction) override;
 
 private:
     bool processActiveSettings(
