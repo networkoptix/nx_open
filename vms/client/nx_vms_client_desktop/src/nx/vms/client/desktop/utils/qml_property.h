@@ -17,6 +17,9 @@ public:
 
     QmlProperty(QQuickWidget* quickWidget, const QString& propertyName)
     {
+        if (!quickWidget) //< To allow debug suppression of QQuickWidget creation.
+            return;
+
         const auto connection = this->connection();
 
         const auto updateTarget =

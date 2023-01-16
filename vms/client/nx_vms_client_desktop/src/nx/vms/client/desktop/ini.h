@@ -321,6 +321,12 @@ struct Ini: nx::kit::IniConfig
         "[Support] How often Resource Tree thumbnails request updates from ARM servers,\n"
         "in seconds. Set 0 to disable automatic updates.");
 
+    // VMS-37530, VMS-37550.
+    NX_INI_FLAG(false, debugDisableAttributeTables,
+        "[Support] Disable analytics attribute tables for graphics debugging purposes");
+    NX_INI_FLAG(false, debugDisableQmlTooltips,
+        "[Support] Disable tooltips rendered to an offscreen buffer for graphics debugging purposes");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
