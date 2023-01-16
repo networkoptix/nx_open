@@ -54,7 +54,7 @@ public:
     /** Called by getSettingsOnActiveSettingChange() */
     protected: virtual void doGetSettingsOnActiveSettingChange(
         Result<const IActiveSettingChangedResponse*>* outResult,
-        const IActiveSettingChangedAction* activeSettingChangeAction) = 0;
+        const IActiveSettingChangedAction* activeSettingChangedAction) = 0;
     /**
      * When a setting marked as Active changes its value in the GUI, the Server calls this method
      * to notify the Plugin and allow it to adjust the values of the settings and the Settings
@@ -67,10 +67,10 @@ public:
      *     the new state of the settings dialog. Can be null if no user interaction is needed.
      */
     public: Result<const IActiveSettingChangedResponse*> getSettingsOnActiveSettingChange(
-        const IActiveSettingChangedAction* activeSettingChangeAction)
+        const IActiveSettingChangedAction* activeSettingChangedAction)
     {
         Result<const IActiveSettingChangedResponse*> result;
-        doGetSettingsOnActiveSettingChange(&result, activeSettingChangeAction);
+        doGetSettingsOnActiveSettingChange(&result, activeSettingChangedAction);
         return result;
     }
 };

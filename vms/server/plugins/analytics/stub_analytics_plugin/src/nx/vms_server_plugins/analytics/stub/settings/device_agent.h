@@ -39,14 +39,14 @@ protected:
 
     virtual void doGetSettingsOnActiveSettingChange(
         nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
-        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) override;
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangedAction) override;
 
 private:
     void dumpStringMap(
         const char* prefix, const char* appendix, const nx::sdk::IStringMap* stringMap) const;
 
     void dumpActiveSettingChangedAction(
-        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) const;
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangedAction) const;
 
 private:
     void processActiveSettings(
