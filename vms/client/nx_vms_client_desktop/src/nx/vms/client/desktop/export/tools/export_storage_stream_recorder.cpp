@@ -195,9 +195,10 @@ void ExportStorageStreamRecorder::fileFinished(
 {
 }
 
-void ExportStorageStreamRecorder::fileStarted(
+bool ExportStorageStreamRecorder::fileStarted(
     qint64 /*startTimeMs*/, int /*timeZone*/, const QString& /*fileName*/)
 {
+    return true;
 }
 
 void ExportStorageStreamRecorder::initMetadataStream(StorageContext& /*context*/)

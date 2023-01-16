@@ -402,7 +402,13 @@ bool StorageRecordingContext::doPrepareToStart(
         }
 
         allocateFfmpegObjects(mediaData, videoLayout, audioLayout, ctx);
-        fileStarted(startTimeUs() / 1000, currentTimeZone() / 60, ctx.fileName);
+        if (!fileStarted(startTimeUs() / 1000, currentTimeZone() / 60, ctx.fileName))
+        {
+            throw ErrorEx(
+                Error::Code::fileWrite,
+                NX_FMT("Failed to initialize catalog record for file '%1'",
+                    nx::utils::url::hidePassword(ctx.fileName)));
+        }
 
         return true;
     }
