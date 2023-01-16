@@ -86,7 +86,7 @@ protected:
     virtual void fileFinished(
         qint64 durationMs, const QString& fileName, qint64 fileSize, qint64 startTimeMs) = 0;
 
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) = 0;
+    virtual bool fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) = 0;
 
 private:
     QString m_container = "matroska";
