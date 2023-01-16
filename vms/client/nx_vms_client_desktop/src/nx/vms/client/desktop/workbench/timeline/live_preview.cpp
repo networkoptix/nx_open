@@ -7,6 +7,7 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/workbench/timeline/live_preview_thumbnail.h>
 #include <ui/graphics/items/controls/time_slider.h>
@@ -39,6 +40,9 @@ LivePreview::LivePreview(QnTimeSlider* slider, QObject* parent):
     base_type(QUrl("Nx/Timeline/private/LivePreview.qml"), slider->context(), parent),
     d(new Private{this, slider})
 {
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     widget()->setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setTimeMarkerDisplay(TimeMarkerDisplay::automatic);
 
