@@ -60,6 +60,10 @@ TimeMarker::TimeMarker(const QUrl& sourceUrl, QnWorkbenchContext* context, QObje
     d(new Private{this})
 {
     setOrientation(Qt::Vertical);
+
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     widget()->setAttribute(Qt::WA_TransparentForMouseEvents, false);
     widget()->setObjectName("TimeMarker");
 }

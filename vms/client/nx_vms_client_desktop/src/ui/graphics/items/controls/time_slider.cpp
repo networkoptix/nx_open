@@ -29,6 +29,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/math/arithmetic.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -725,7 +726,8 @@ QnTimeSlider::QnTimeSlider(
     connect(this, &QnTimeSlider::selectionPressed, this, &QnTimeSlider::updateLive);
     connect(this, &QnTimeSlider::selectionReleased, this, &QnTimeSlider::updateLive);
 
-    m_tooltip->widget()->installEventFilter(this);
+    if (!ini().debugDisableQmlTooltips)
+        m_tooltip->widget()->installEventFilter(this);
 
     connect(qApp, &QApplication::focusChanged, this,
         [this](QWidget* old, QWidget* /*now*/) { m_lastFocusedWidget = old; });
@@ -1529,6 +1531,9 @@ QPointF QnTimeSlider::positionFromMarker(Marker marker) const
 
 QPointF QnTimeSlider::tooltipPointedTo() const
 {
+    if (ini().debugDisableQmlTooltips)
+        return {};
+
     return mapFromScreen(m_tooltip->widget()->mapToGlobal(m_tooltip->pointerPos().toPoint()));
 }
 
@@ -1734,6 +1739,9 @@ void QnTimeSlider::setTooltipVisible(bool visible)
 
 void QnTimeSlider::stackWidgetUnderTooltip(QWidget* widget) const
 {
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     widget->stackUnder(m_tooltip->widget());
 }
 
@@ -1832,6 +1840,9 @@ void QnTimeSlider::updatePixmapCache()
 
 void QnTimeSlider::updateToolTipVisibilityInternal()
 {
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     if (m_updatingValue)
         return;
 
@@ -1861,6 +1872,9 @@ void QnTimeSlider::updateToolTipVisibilityInternal()
 
 void QnTimeSlider::updateToolTipPosition()
 {
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     if (m_updatingValue) //< Prevent inconsistent position updates.
         return;
 
@@ -1960,6 +1974,9 @@ void QnTimeSlider::setLivePreviewAllowed(bool allowed)
 
 void QnTimeSlider::updateLivePreview()
 {
+    if (ini().debugDisableQmlTooltips)
+        return;
+
     if (!m_useLivePreview)
         return;
 

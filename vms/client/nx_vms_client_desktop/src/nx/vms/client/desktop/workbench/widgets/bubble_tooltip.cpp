@@ -9,12 +9,12 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <client_core/client_core_module.h>
-#include <ui/workbench/workbench_context.h>
-#include <utils/common/event_processors.h>
-
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
 
@@ -26,8 +26,9 @@ struct BubbleToolTip::Private
 {
     BubbleToolTip* const q;
 
-    std::unique_ptr<QQuickWidget> widget{new QQuickWidget(
-        qnClientCoreModule->mainQmlEngine(), /*parent*/ nullptr)};
+    std::unique_ptr<QQuickWidget> widget{ini().debugDisableQmlTooltips
+        ? (QQuickWidget*) nullptr
+        : new QQuickWidget(qnClientCoreModule->mainQmlEngine(), /*parent*/ nullptr)};
 
     QRectF targetRect;
     QRectF enclosingRect;
@@ -59,6 +60,23 @@ BubbleToolTip::BubbleToolTip(
     QnWorkbenchContextAware(context),
     d(new Private{this})
 {
+    connect(MouseSpy::instance(), &MouseSpy::mouseMove, this,
+        [this]()
+        {
+            if (d->state == State::suppressed)
+                show();
+        });
+
+    connect(MouseSpy::instance(), &MouseSpy::mousePress, this,
+        [this]()
+        {
+            if (d->suppressedOnMouseClick)
+                suppress();
+        });
+
+    if (!d->widget)
+        return;
+
     d->widget->setVisible(false);
     d->widget->setResizeMode(QQuickWidget::SizeViewToRootObject);
     d->widget->setClearColor(Qt::transparent);
@@ -76,20 +94,6 @@ BubbleToolTip::BubbleToolTip(
 
     installEventHandler(d->widget.get(), QEvent::Resize, this,
         [this]() { d->updatePosition(); });
-
-    connect(MouseSpy::instance(), &MouseSpy::mouseMove, this,
-        [this]()
-        {
-            if (d->state == State::suppressed)
-                show();
-        });
-
-    connect(MouseSpy::instance(), &MouseSpy::mousePress, this,
-        [this]()
-        {
-            if (d->suppressedOnMouseClick)
-                suppress();
-        });
 }
 
 BubbleToolTip::~BubbleToolTip()
@@ -99,22 +103,28 @@ BubbleToolTip::~BubbleToolTip()
 
 void BubbleToolTip::show()
 {
-    d->widget->setParent(context()->mainWindowWidget());
+    if (d->widget)
+    {
+        d->widget->setParent(context()->mainWindowWidget());
+        invokeQmlMethod<void>(d->widget->rootObject(), "show");
+        d->widget->raise();
+    }
 
-    invokeQmlMethod<void>(d->widget->rootObject(), "show");
-    d->widget->raise();
     d->setState(State::shown);
 }
 
 void BubbleToolTip::hide(bool immediately)
 {
-    invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
+    if (d->widget)
+        invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
+
     d->setState(State::hidden);
 }
 
 void BubbleToolTip::suppress(bool immediately)
 {
-    invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
+    if (d->widget)
+        invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
     if (d->state == State::shown)
         d->setState(State::suppressed);
 }
@@ -193,6 +203,9 @@ QQuickWidget* BubbleToolTip::widget() const
 
 void BubbleToolTip::Private::updatePosition()
 {
+    if (!widget)
+        return;
+
     if (targetRect.width() < 0 || targetRect.height() < 0)
     {
         widget->move(-widget->width(), -widget->height());
