@@ -264,7 +264,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<HttpAction>();
     testActionRegistration<NotificationAction>();
     //testActionRegistration<OpenLayoutAction>();
-    //testActionRegistration<PanicRecordingAction>();
+    testActionRegistration<PanicRecordingAction>();
     //testActionRegistration<PlaySoundAction>();
     //testActionRegistration<PtzPresetAction>();
     //testActionRegistration<PushNotificationAction>();
