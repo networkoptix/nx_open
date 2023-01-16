@@ -636,13 +636,14 @@ ApplicationContext::~ApplicationContext()
     // Cross system manager should be destroyed before the network module.
     d->cloudCrossSystemManager.reset();
 
-    // Shared pointer to remote session must be freed as it's destructor depends on app context.
-    d->clientCoreModule.reset();
-
-    // Terminate running session if it sill exists.
+    // Terminate running session if it sill exists. Session depends on common module, so we must
+    // clean all shared pointers before destroying ClientCoreModule.
     d->mainSystemContext->setSession({});
     if (d->mainSystemContext && d->mainSystemContext->messageProcessor())
         d->mainSystemContext->deleteMessageProcessor();
+
+    // Shared pointer to remote session must be freed as it's destructor depends on app context.
+    d->clientCoreModule.reset();
 
     // Local resources context temporary implementation depends on main system context.
     d->localResourcesContext.reset();
