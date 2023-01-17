@@ -50,6 +50,9 @@ struct NX_VMS_API UserRoleData: IdData
 
     bool operator==(const UserRoleData& other) const = default;
     QString toString() const;
+
+    // Predefined id for LDAP Default user role in VMS DB.
+    static const QnUuid kLdapDefaultId;
 };
 #define UserRoleData_Fields \
     IdData_Fields \

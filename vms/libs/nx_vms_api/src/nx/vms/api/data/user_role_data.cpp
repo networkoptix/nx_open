@@ -36,6 +36,8 @@ QString UserRoleData::toString() const
     return QJson::serialized(*this);
 }
 
+const QnUuid UserRoleData::kLdapDefaultId("00000000-0000-0000-0000-100100000000");
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     UserRoleData, (ubjson)(json)(xml)(sql_record)(csv_record), UserRoleData_Fields)
 
