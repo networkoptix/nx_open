@@ -2,6 +2,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.15
 
 import Nx 1.0
 
@@ -14,6 +15,7 @@ CheckBox
     property Item middleItem: null //< An optional item between indicator and text.
     property alias middleSpacing: middleContainer.rightPadding //< Between middleItem and text.
     property alias textFormat: controlText.textFormat
+    property alias wrapMode: controlText.wrapMode
 
     padding: 0
     topPadding: 0
@@ -36,11 +38,13 @@ CheckBox
         hovered: control.hovered
     }
 
-    contentItem: Row
+    contentItem: RowLayout
     {
         Row
         {
             id: middleContainer
+
+            Layout.alignment: Qt.AlignTop
 
             height: parent.height
             rightPadding: 2
@@ -50,6 +54,9 @@ CheckBox
         Text
         {
             id: controlText
+
+            Layout.alignment: Qt.AlignTop
+            Layout.fillWidth: true
 
             leftPadding: 2
             rightPadding: 2
