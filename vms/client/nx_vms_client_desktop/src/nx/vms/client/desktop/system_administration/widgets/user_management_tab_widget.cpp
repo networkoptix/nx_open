@@ -77,6 +77,11 @@ bool UserManagementTabWidget::hasChanges() const
     return result;
 }
 
+void UserManagementTabWidget::discardChanges()
+{
+    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->discardChanges(); });
+}
+
 void UserManagementTabWidget::manageDigestUsers()
 {
     constexpr int kUserListTab = 0;
