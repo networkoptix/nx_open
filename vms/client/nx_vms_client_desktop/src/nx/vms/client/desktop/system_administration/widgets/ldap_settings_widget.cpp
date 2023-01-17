@@ -2,17 +2,206 @@
 
 #include "ldap_settings_widget.h"
 
+#include <chrono>
+#include <memory>
+#include <optional>
+#include <unordered_set>
+
+#include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickItem>
+#include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QVBoxLayout>
+
+#include <api/server_rest_connection.h>
+#include <client_core/client_core_module.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/ldap.h>
+#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/system_administration/globals/results_reporter.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/client/desktop/utils/qml_property.h>
+#include <nx/vms/common/system_settings.h>
+#include <nx/vms/time/formatter.h>
+#include <ui/dialogs/common/message_box.h>
+#include <utils/common/synctime.h>
+
+#include "../models/ldap_filters_model.h"
+
+namespace {
+
+static const QUrl kLdapSettingsQmlComponentUrl("qrc:/qml/Nx/Dialogs/Ldap/Tabs/LdapSettings.qml");
+
+} // namespace
+
 namespace nx::vms::client::desktop {
+
+using LdapState = QmlDialogWithState<LdapSettings>;
 
 struct LdapSettingsWidget::Private
 {
     LdapSettingsWidget* const q;
+
+    QQuickWidget* const quickWidget;
+
+    QmlProperty<QObject*> self;
+    QmlProperty<TestState> testState;
+    QmlProperty<QString> testMessage;
+
+    QmlProperty<QString> lastSync;
+    QmlProperty<int> userCount;
+    QmlProperty<int> groupCount;
+
+    QmlProperty<bool> checkingStatus;
+    QmlProperty<bool> online;
+
+    QmlProperty<bool> modified;
+
+    nx::vms::api::LdapSettings initialSettings;
+
+    rest::Handle currentHandle = 0;
+
+    Private(LdapSettingsWidget* parent):
+        q(parent),
+        quickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent)),
+        self(quickWidget, "self"),
+        testState(quickWidget, "testState"),
+        testMessage(quickWidget, "testMessage"),
+        lastSync(quickWidget, "lastSync"),
+        userCount(quickWidget, "userCount"),
+        groupCount(quickWidget, "groupCount"),
+        checkingStatus(quickWidget, "checkingStatus"),
+        online(quickWidget, "online"),
+        modified(quickWidget, "modified")
+    {
+        connect(quickWidget, &QQuickWidget::statusChanged,
+            [this](QQuickWidget::Status status)
+            {
+                switch (status)
+                {
+                    case QQuickWidget::Error:
+                        for (const auto& error: quickWidget->errors())
+                            NX_ERROR(this, "QML Error: %1", error.toString());
+                        return;
+
+                    case QQuickWidget::Ready:
+                        LdapState::subscribeToChanges(
+                            quickWidget->rootObject(),
+                            q, &LdapSettingsWidget::stateChanged);
+                        return;
+
+                    default:
+                        return;
+                };
+            });
+
+        // Export TestState enum to QML.
+        qmlRegisterUncreatableType<LdapSettingsWidget>(
+            "nx.vms.client.desktop", 1, 0, "LdapSettings",
+            "Cannot create an instance of LdapSettings.");
+
+        quickWidget->setMinimumSize({750, 450});
+        quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        quickWidget->setSource(kLdapSettingsQmlComponentUrl);
+
+        QObject::connect(q, &LdapSettingsWidget::stateChanged,
+            [this]
+            {
+                const auto currentSettings = getState();
+                modified = currentSettings != initialSettings;
+            });
+
+        modified.connectNotifySignal(q, [this]{ emit q->hasChangesChanged(); });
+        self = parent;
+    }
+
+    void setState(const nx::vms::api::LdapSettings& settings)
+    {
+        LdapSettings state;
+
+        state.uri = settings.uri.toString();
+        state.adminDn = settings.adminDn;
+        state.password = settings.adminPassword.value_or("");
+        state.syncTimeoutS = settings.continuousSyncIntervalS.count();
+        for (const auto& filter: settings.filters)
+        {
+            state.filters.push_back({
+                .name = filter.name,
+                .base = filter.base,
+                .filter = filter.filter
+            });
+        }
+        state.continuousSync =
+            settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
+
+        state.loginAttribute = settings.loginAttribute;
+        state.groupObjectClass = settings.groupObjectClass;
+        state.memberAttribute = settings.memberAttribute;
+
+        LdapState::stateToObject(state, quickWidget->rootObject());
+    }
+
+    nx::vms::api::LdapSettings getState() const
+    {
+        nx::vms::api::LdapSettings settings = initialSettings;
+
+        const auto state = LdapState::objectToState(quickWidget->rootObject());
+
+        settings.uri = nx::utils::Url::fromUserInput(state.uri);
+        settings.adminDn = state.adminDn;
+        settings.adminPassword = state.password.isEmpty()
+            ? std::nullopt
+            : std::optional<QString>(state.password);
+        settings.continuousSyncIntervalS = std::chrono::seconds(state.syncTimeoutS);
+        settings.filters.clear();
+        for (const auto& filter: state.filters)
+        {
+            settings.filters.push_back({
+                .name = filter.name,
+                .base = filter.base,
+                .filter = filter.filter
+            });
+        }
+
+        settings.continuousSync = state.continuousSync
+            ? nx::vms::api::LdapSettings::Sync::usersAndGroups
+            : nx::vms::api::LdapSettings::Sync::disabled;
+
+        settings.loginAttribute = state.loginAttribute;
+        settings.groupObjectClass = state.groupObjectClass;
+        settings.memberAttribute = state.memberAttribute;
+
+        return settings;
+    }
+
+    void updateUserAndGroupCount()
+    {
+        const auto resourcePool = q->systemContext()->resourcePool();
+
+        const auto ldapUsers = resourcePool->getResources<QnUserResource>(
+            [](const auto& user) { return user->isLdap(); });
+        userCount = ldapUsers.size();
+
+        auto rolesManager = q->systemContext()->userRolesManager();
+
+        const auto groups = rolesManager->userRoles();
+        groupCount = std::count_if(groups.begin(), groups.end(), [](auto g) { return g.isLdap; });
+    }
 };
 
 LdapSettingsWidget::LdapSettingsWidget(QWidget* parent):
     base_type(parent),
-    d(new Private{.q = this})
+    QnWorkbenchContextAware(parent),
+    d(new Private(this))
 {
+    auto boxLayout = new QVBoxLayout(this);
+    boxLayout->addWidget(d->quickWidget);
 }
 
 LdapSettingsWidget::~LdapSettingsWidget()
@@ -20,20 +209,466 @@ LdapSettingsWidget::~LdapSettingsWidget()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+void LdapSettingsWidget::discardChanges()
+{
+    if (d->currentHandle)
+    {
+        connectedServerApi()->cancelRequest(d->currentHandle);
+        d->currentHandle = 0;
+    }
+
+    d->setState(d->initialSettings);
+}
+
+void LdapSettingsWidget::checkStatus()
+{
+    d->checkingStatus = true;
+
+    const auto statusCallback = nx::utils::guarded(this,
+        [this](
+            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
+        {
+            if (handle == d->currentHandle)
+            {
+                d->currentHandle = 0;
+                d->checkingStatus = false;
+            }
+
+            if (auto status = std::get_if<nx::vms::api::LdapStatus>(&errorOrData))
+            {
+                NX_ASSERT(success);
+
+                d->online = status->state == nx::vms::api::LdapStatus::State::online;
+
+                if (status->timeSinceSyncS)
+                {
+                    using namespace std::chrono;
+                    const auto syncTimeMs = nx::utils::millisSinceEpoch()
+                        - duration_cast<milliseconds>(*status->timeSinceSyncS);
+
+                    const auto timeWatcher = systemContext()->serverTimeWatcher();
+                    const auto dateTime = timeWatcher->displayTime(syncTimeMs.count());
+
+                    d->lastSync = nx::vms::time::toString(
+                        dateTime,
+                        nx::vms::time::dd_MM_yyyy_hh_mm_ss);
+                }
+                else
+                {
+                    d->lastSync = "";
+                }
+
+                d->updateUserAndGroupCount();
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            {
+                d->online = false;
+                showError(error->errorString);
+            }
+            else
+            {
+                showError(tr("Connection failed"));
+            }
+        });
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->getLdapStatusAsync(
+        statusCallback,
+        thread());
+}
+
 void LdapSettingsWidget::loadDataToUi()
 {
-    // TODO: Implement me!
+    const auto loadSettingsCallback = nx::utils::guarded(this,
+        [this](
+            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
+        {
+            if (handle == d->currentHandle)
+                d->currentHandle = 0;
+
+            if (auto settings = std::get_if<nx::vms::api::LdapSettings>(&errorOrData))
+            {
+                NX_ASSERT(success);
+                d->initialSettings = *settings;
+                d->setState(d->initialSettings);
+                d->modified = false;
+
+                if (settings->isValid(/*checkPassword=*/ false))
+                    checkStatus();
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            {
+                showError(error->errorString);
+            }
+            else
+            {
+                showError(tr("Connection failed"));
+            }
+        });
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->getLdapSettingsAsync(loadSettingsCallback, thread());
+}
+
+void LdapSettingsWidget::resetLdap()
+{
+    const QString mainText = tr("Disconnect LDAP server?");
+    const QString extraText =
+        tr("All LDAP users and groups will be deleted from the system.<br><br>"
+        "LDAP settings will be also deleted.");
+
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Question,
+        mainText,
+        extraText,
+        QDialogButtonBox::Cancel,
+        QDialogButtonBox::NoButton,
+        this);
+    messageBox.addButton(tr("Disconnect"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    if (messageBox.exec() != QDialogButtonBox::AcceptRole)
+        return;
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Reset Settings"),
+        tr("Enter your account password"),
+        tr("Reset"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
+    const auto resetCallback = nx::utils::guarded(this,
+        [this](bool success, rest::Handle handle, const rest::ErrorOrEmpty& result)
+        {
+            if (handle == d->currentHandle)
+                d->currentHandle = 0;
+
+            if (success)
+            {
+                d->initialSettings = {};
+                d->setState(d->initialSettings);
+                d->modified = false;
+                removeExisting();
+                return;
+            }
+
+            if (auto error = std::get_if<nx::network::rest::Result>(&result))
+            {
+                showError(error->errorString);
+            }
+            else
+            {
+                showError(tr("Connection failed"));
+            }
+        });
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->resetLdapAsync(
+        sessionTokenHelper,
+        resetCallback,
+        thread());
 }
 
 void LdapSettingsWidget::applyChanges()
 {
-    // TODO: Implement me!
+    if (!hasChanges())
+        return;
+
+    bool removeExisting = false;
+
+    if (d->initialSettings.uri.host() != d->getState().uri.host())
+    {
+        const QString mainText = tr("Remove existing LDAP users and groups?");
+        const QString extraText = tr("Looks like you have changed LDAP server. It is recommended"
+            " to remove all existing LDAP users and groups before importing users and groups from"
+            " a new LDAP server.");
+
+        QnMessageBox messageBox(
+            QnMessageBoxIcon::Question,
+            mainText,
+            extraText,
+            QDialogButtonBox::Cancel | QDialogButtonBox::No,
+            QDialogButtonBox::NoButton,
+            this);
+        messageBox.addButton(tr("Yes"), QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
+        
+        switch (messageBox.exec())
+        {
+            case QDialogButtonBox::AcceptRole:
+                removeExisting = true;
+                break;
+            case QDialogButtonBox::No:
+                break;
+            default:
+                return;
+        }
+    }
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Apply Settings"),
+        tr("Enter your account password"),
+        tr("Apply"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
+    nx::vms::api::LdapSettingsChange settingsChange = {d->getState()};
+    settingsChange.removeRecords = removeExisting;
+
+    const auto settingsCallback = nx::utils::guarded(this,
+        [this](
+            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
+        {
+            if (handle == d->currentHandle)
+                d->currentHandle = 0;
+
+            if (auto settings = std::get_if<nx::vms::api::LdapSettings>(&errorOrData))
+            {
+                NX_ASSERT(success);
+
+                d->initialSettings = *settings;
+                d->setState(d->initialSettings);
+                d->modified = false;
+
+                checkStatus();
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            {
+                showError(error->errorString);
+            }
+            else
+            {
+                showError(tr("Connection failed"));
+            }
+        });
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->modifyLdapSettingsAsync(
+        settingsChange,
+        sessionTokenHelper,
+        settingsCallback,
+        thread());
+}
+
+void LdapSettingsWidget::requestSync()
+{
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        this,
+        tr("Synchronize LDAP Users and Groups"),
+        tr("Enter your account password"),
+        tr("Synchronize"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->syncLdapAsync(
+        sessionTokenHelper,
+        nx::utils::guarded(this,
+            [this](bool success, int handle, const rest::ErrorOrEmpty& result)
+            {
+                if (handle == d->currentHandle)
+                    d->currentHandle = 0;
+
+                if (success)
+                    checkStatus();
+                else if (auto error = std::get_if<nx::network::rest::Result>(&result))
+                    showError(error->errorString);
+                else
+                    showError(tr("Connection failed"));
+            }),
+        thread());
 }
 
 bool LdapSettingsWidget::hasChanges() const
 {
-    // TODO: Implement me!
-    return false;
+    return d->modified;
+}
+
+void LdapSettingsWidget::testConnection(
+    const QString& url,
+    const QString& adminDn,
+    const QString& password)
+{
+    d->testMessage = "";
+
+    nx::vms::api::LdapSettings settings;
+    settings.uri = nx::utils::Url::fromUserInput(url);
+    settings.adminDn = adminDn;
+    settings.adminPassword = password;
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->testLdapSettingsAsync(
+        settings,
+        nx::utils::guarded(this,
+            [this](
+                bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+            {
+                if (handle == d->currentHandle)
+                {
+                    d->currentHandle = 0;
+                }
+                else
+                {
+                    d->testMessage = "";
+                    return;
+                }
+
+                if (auto firstDnPerFilter = std::get_if<std::vector<QString>>(&errorOrData))
+                {
+                    d->testMessage = tr("Connection OK");
+                    d->testState = TestState::ok;
+                }
+                else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                {
+                    d->testMessage = error->errorString;
+                    d->testState = TestState::error;
+                }
+                else
+                {
+                    d->testMessage = tr("Connection failed");
+                    d->testState = TestState::error;
+                }
+            }),
+        thread());
+
+    if (d->currentHandle)
+        d->testState = TestState::connecting;
+}
+
+void LdapSettingsWidget::testOnline(
+    const QString& url,
+    const QString& adminDn,
+    const QString& password)
+{
+    d->checkingStatus = true;
+
+    nx::vms::api::LdapSettings settings;
+    settings.uri = nx::utils::Url::fromUserInput(url);
+    settings.adminDn = adminDn;
+    settings.adminPassword = password;
+
+    if (d->currentHandle)
+        connectedServerApi()->cancelRequest(d->currentHandle);
+
+    d->currentHandle = connectedServerApi()->testLdapSettingsAsync(
+        settings,
+        nx::utils::guarded(this,
+            [this](
+                bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+            {
+                if (handle == d->currentHandle)
+                {
+                    d->currentHandle = 0;
+                    d->checkingStatus = false;
+                }
+
+                d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
+            }),
+        thread());
+}
+
+void LdapSettingsWidget::removeExisting()
+{
+    // TODO: Server should do the removal.
+
+    auto rolesManager = systemContext()->userRolesManager();
+    std::unordered_set<QnUuid> ldapGroupIds;
+
+    for (auto group: rolesManager->userRoles())
+    {
+        if (group.isLdap)
+            ldapGroupIds.insert(group.id);
+    }
+
+    auto resultsReporter = ResultsReporter::create(
+        nx::utils::guarded(this,
+            [ldapGroupIds](bool success)
+            {
+                if (success)
+                {
+                    // Delete LDAP groups.
+                    for (const auto& id: ldapGroupIds)
+                        qnResourcesChangesManager->removeUserRole(id);
+                }
+            }));
+
+    // Delete LDAP groups from existing groups.
+
+    auto handleGroupSaved = nx::utils::guarded(this,
+        [resultsReporter](
+            bool roleIsStored,
+            const api::UserRoleData&)
+        {
+            resultsReporter->add(roleIsStored);
+        });
+
+    for (auto group: rolesManager->userRoles())
+    {
+        if (group.isLdap)
+            continue;
+
+        const auto last = group.parentRoleIds.end();
+        const auto it = group.parentRoleIds.erase(
+            std::remove_if(
+                group.parentRoleIds.begin(),
+                last,
+                [&ldapGroupIds](auto id){ return ldapGroupIds.contains(id); }),
+            last);
+
+        if (it == last)
+            continue;
+
+        qnResourcesChangesManager->saveUserRole(group, handleGroupSaved);
+    }
+
+    // Delete LDAP users.
+
+    auto deleteCallback = nx::utils::guarded(this,
+        [resultsReporter](bool success)
+        {
+            resultsReporter->add(success);
+        });
+
+    const auto resourcePool = systemContext()->resourcePool();
+
+    QnSharedResourcePointerList<QnUserResource> ldapUsers =
+        resourcePool->getResources<QnUserResource>(
+            [](const auto& user) { return user->isLdap(); });
+
+    qnResourcesChangesManager->deleteResources(ldapUsers, deleteCallback);
+}
+
+void LdapSettingsWidget::showError(const QString& errorMessage)
+{
+     // Do not show errors from a cancelled request.
+    if (d->currentHandle)
+        return;
+
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Critical,
+        errorMessage,
+        {},
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Ok,
+        this);
+    messageBox.exec();
+}
+
+void LdapSettingsWidget::cancelCurrentRequest()
+{
+    if (d->currentHandle)
+    {
+        connectedServerApi()->cancelRequest(d->currentHandle);
+        d->currentHandle = 0;
+    }
 }
 
 } // namespace nx::vms::client::desktop

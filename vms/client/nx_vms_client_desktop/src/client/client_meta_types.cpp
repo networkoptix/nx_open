@@ -50,6 +50,7 @@
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
 #include <nx/vms/client/desktop/system_administration/models/global_permissions_model.h>
+#include <nx/vms/client/desktop/system_administration/models/ldap_filters_model.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
@@ -260,6 +261,7 @@ void QnClientMetaTypes::registerQmlTypes()
     AudioDispatcher::registerQmlType();
     UserSettingsGlobal::registerQmlTypes();
     MembersModel::registerQmlType();
+    LdapFiltersModel::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");
