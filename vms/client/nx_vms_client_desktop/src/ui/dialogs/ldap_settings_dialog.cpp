@@ -149,7 +149,7 @@ nx::vms::api::LdapSettings QnLdapSettingsDialogPrivate::settings() const
     {
         if (url.port() == -1)
             url.setPort(nx::vms::api::LdapSettingsBase::defaultPort(url.scheme() == "ldaps"));
-        result.uri = url;
+        result.uri = nx::utils::Url::fromQUrl(url);
     }
 
     result.adminDn = q->ui->adminDnLineEdit->text().trimmed();
@@ -173,7 +173,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     const auto& settings = systemSettings()->ldap();
 
-    QUrl url = settings.uri;
+    QUrl url = settings.uri.toQUrl();
     if (url.port() == nx::vms::api::LdapSettingsBase::defaultPort(url.scheme() == "ldaps"))
         url.setPort(-1);
 

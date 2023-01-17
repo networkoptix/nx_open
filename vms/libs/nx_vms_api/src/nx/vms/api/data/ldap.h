@@ -8,6 +8,8 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
+#include <nx/utils/url.h>
+
 #include "data_macros.h"
 #include "void.h"
 
@@ -27,7 +29,7 @@ struct NX_VMS_API LdapSettingsBase
     /**%apidoc:string
      * %example ldap://organization-server-address.com
      */
-    QUrl uri;
+    nx::utils::Url uri;
 
     /**%apidoc
      * %example cn=admin,dc=la
@@ -106,6 +108,7 @@ struct NX_VMS_API LdapSettingSearchFilter
 };
 #define LdapSettingSearchFilter_Fields (name)(base)(filter)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettingSearchFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LdapSettingSearchFilter, LdapSettingSearchFilter_Fields)
 
 struct NX_VMS_API LdapSettings: LdapSettingsBase
 {
@@ -131,6 +134,7 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
 #define LdapSettings_Fields LdapSettingsBase_Fields \
     (filters)(continuousSync)(continuousSyncIntervalS)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)
 
 struct NX_VMS_API LdapSettingsChange: LdapSettings
 {
@@ -139,6 +143,7 @@ struct NX_VMS_API LdapSettingsChange: LdapSettings
 };
 #define LdapSettingsChange_Fields LdapSettings_Fields (removeRecords)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettingsChange, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LdapSettingsChange, LdapSettingsChange_Fields)
 
 // TODO: Remove this struct after `/api/testLdapSettings` support is dropped.
 struct NX_VMS_API LdapSettingsDeprecated: LdapSettingsBase
@@ -183,6 +188,7 @@ struct NX_VMS_API LdapStatus
 };
 #define LdapStatus_Fields (state)(isRunning)(message)(timeSinceSyncS)
 NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
+NX_REFLECTION_INSTRUMENT(LdapStatus, LdapStatus_Fields)
 
 } // namespace nx::vms::api
 
