@@ -8,8 +8,6 @@
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
 
-#include "server_certificate_validation_level.h"
-
 class QnCommonModule;
 namespace nx::vms::api { enum class PeerType; }
 
@@ -29,12 +27,10 @@ class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject
     Q_OBJECT
 
 public:
-    using ServerCertificateValidationLevel = network::server_certificate::ValidationLevel;
     NetworkModule(
         QnCommonModule* commonmModule,
         nx::vms::api::PeerType peerType,
-        Qn::SerializationFormat serializationFormat,
-        ServerCertificateValidationLevel certificateValidationLevel);
+        Qn::SerializationFormat serializationFormat);
     virtual ~NetworkModule();
 
     RemoteConnectionFactory* connectionFactory() const;
@@ -50,8 +46,7 @@ public:
     void setSession(std::shared_ptr<RemoteSession> session);
     QnUuid currentServerId() const;
 
-    void reinitializeCertificateStorage(
-        ServerCertificateValidationLevel certificateValidationLevel);
+    void reinitializeCertificateStorage();
 
 private:
     struct Private;

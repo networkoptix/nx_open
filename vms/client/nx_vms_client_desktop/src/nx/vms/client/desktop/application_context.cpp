@@ -458,8 +458,7 @@ struct ApplicationContext::Private
         {
             clientCoreModule->initializeNetworking(
                 q->localPeerType(),
-                serializationFormat(),
-                core::settings()->certificateValidationLevel());
+                serializationFormat());
         }
 
         if (!startupParameters.engineVersion.isEmpty())

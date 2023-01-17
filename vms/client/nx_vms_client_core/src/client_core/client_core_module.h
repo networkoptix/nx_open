@@ -10,7 +10,6 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/network/server_certificate_validation_level.h>
 
 class QQmlEngine;
 
@@ -39,12 +38,9 @@ public:
 
     static QnClientCoreModule* instance();
 
-    using CertificateValidationLevel =
-        nx::vms::client::core::network::server_certificate::ValidationLevel;
     void initializeNetworking(
         nx::vms::api::PeerType peerType,
-        Qn::SerializationFormat serializationFormat,
-        CertificateValidationLevel certificateValidationLevel);
+        Qn::SerializationFormat serializationFormat);
 
     nx::vms::client::core::NetworkModule* networkModule() const;
 
