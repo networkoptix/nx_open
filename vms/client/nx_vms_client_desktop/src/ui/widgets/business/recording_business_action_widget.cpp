@@ -150,7 +150,7 @@ void QnRecordingBusinessActionWidget::paramsChanged()
         ui->qualityComboBox->currentIndex()).toInt();
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked()
-        ? ui->fixedDuration->value() * 1000
+        ? ui->fixedDuration->value() * kMsecPerSecond
         : 0;
 
     model()->setActionParams(params);

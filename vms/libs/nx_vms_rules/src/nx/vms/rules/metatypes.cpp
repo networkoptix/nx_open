@@ -42,6 +42,7 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::api::EventLevels>();
 
     QnJsonSerializer::registerSerializer<nx::vms::api::EventReason>();
+    QnJsonSerializer::registerSerializer<nx::vms::api::StreamQuality>();
 
     qRegisterMetaType<nx::vms::api::rules::RuleList>("nx::vms::api::rules::RuleList");
 

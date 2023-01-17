@@ -2,7 +2,6 @@
 
 #include "bookmark_action.h"
 
-#include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_field.h"
@@ -21,7 +20,7 @@ const ItemDescriptor& BookmarkAction::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            makeFieldDescriptor<OptionalTimeField>(utils::kDurationFieldName, tr("Fixed duration")),
+            utils::makeDurationFieldDescriptor(tr("Fixed duration")),
             makeFieldDescriptor<TimeField>("recordBefore", tr("Pre-recording")),
             makeFieldDescriptor<TimeField>("recordAfter", tr("Post-recording")),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
