@@ -79,20 +79,17 @@ QnClientCoreModule* QnClientCoreModule::instance()
 
 void QnClientCoreModule::initializeNetworking(
     nx::vms::api::PeerType peerType,
-    Qn::SerializationFormat serializationFormat,
-    CertificateValidationLevel certificateValidationLevel)
+    Qn::SerializationFormat serializationFormat)
 {
     d->networkModule = std::make_unique<NetworkModule>(
         d->commonModule.get(),
         peerType,
-        serializationFormat,
-        certificateValidationLevel);
+        serializationFormat);
 
     connect(&settings()->certificateValidationLevel, &Settings::BaseProperty::changed, this,
         [this](nx::utils::property_storage::BaseProperty* /*property*/)
         {
-            const auto level = settings()->certificateValidationLevel();
-            d->networkModule->reinitializeCertificateStorage(level);
+            d->networkModule->reinitializeCertificateStorage();
         });
 }
 

@@ -263,8 +263,8 @@ void QnAdvancedSettingsWidget::applyChanges()
         const auto updateSecurityLevel =
             [level=newCertificateValidationLevel]()
             {
-                qnClientCoreModule->networkModule()->reinitializeCertificateStorage(level);
                 nx::vms::client::core::settings()->certificateValidationLevel.setValue(level);
+                // Certificate Verifier and related classes are updated by QnClientCoreModule.
             };
 
         if (connected || otherWindowsExist)

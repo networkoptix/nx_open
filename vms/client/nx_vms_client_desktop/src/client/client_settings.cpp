@@ -9,8 +9,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
 
-#include <client_core/client_core_settings.h>
-
 #include <client/client_meta_types.h>
 
 #include <utils/common/util.h>
@@ -38,9 +36,6 @@
 using namespace nx::vms::client::desktop;
 
 namespace {
-
-using CertificateValidationLevel =
-    nx::vms::client::core::network::server_certificate::ValidationLevel;
 
 QString getMoviesDirectory()
 {
