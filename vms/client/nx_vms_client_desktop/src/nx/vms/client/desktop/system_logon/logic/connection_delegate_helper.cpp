@@ -14,12 +14,6 @@ namespace nx::vms::client::desktop {
 std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
     createConnectionUserInteractionDelegate(QPointer<QWidget> mainWindow)
 {
-    const auto certificateValidationLevel =
-        []()
-        {
-            return nx::vms::client::core::settings()->certificateValidationLevel();
-        };
-
     const auto validateToken =
         [mainWindow](const nx::network::http::Credentials& credentials)
         {
@@ -59,7 +53,7 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     return std::make_unique<core::RemoteConnectionUserInteractionDelegate>(
-        certificateValidationLevel, validateToken, askToAcceptCertificate, showCertificateError);
+        validateToken, askToAcceptCertificate, showCertificateError);
 }
 
 } // namespace nx::vms::client::desktop

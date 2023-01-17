@@ -16,8 +16,6 @@ class NX_VMS_CLIENT_CORE_API RemoteConnectionUserInteractionDelegate:
     using base_type = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;
 
 public:
-    using CertificateValidationLevelGetter =
-        std::function<network::server_certificate::ValidationLevel ()>;
     using TokenValidator =
         std::function<bool (const nx::network::http::Credentials& credentials)>;
     using AskUserToAcceptCertificate = std::function<bool (
@@ -31,7 +29,6 @@ public:
         const nx::network::ssl::CertificateChain& chain)>;
 
     RemoteConnectionUserInteractionDelegate(
-        CertificateValidationLevelGetter validationLevel,
         TokenValidator validateToken,
         AskUserToAcceptCertificate askToAcceptCertificate,
         ShowCertificateError showCertificateError,
