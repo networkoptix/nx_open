@@ -6,20 +6,30 @@ import Nx 1.0
 
 Item
 {
+    id: control
+
     width: parent.width
     height: innerItem.childrenRect.height
 
     default property alias data: innerItem.data
     property alias text: label.text
 
+    property real leftSideMargin: 240
+    property real rightSideMargin: 240
+
+    property bool textVCenter: false
+
     Item
     {
         id: innerItem
 
-        x: 240
-        width: parent.width - 240 * 2
-
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors
+        {
+            left: control.left
+            leftMargin: control.leftSideMargin
+            right: control.right
+            rightMargin: control.rightSideMargin
+        }
     }
 
     Text
@@ -27,7 +37,7 @@ Item
         id: label
         height: 16
         anchors.top: parent.top
-        anchors.topMargin: 4
+        anchors.topMargin: control.textVCenter ? (control.height / 2 - height / 2) : 4
         anchors.right: innerItem.left
         anchors.rightMargin: 8
 

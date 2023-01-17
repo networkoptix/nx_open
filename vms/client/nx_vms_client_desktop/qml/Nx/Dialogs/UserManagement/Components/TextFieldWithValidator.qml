@@ -16,7 +16,6 @@ TextFieldWithWarning
     property var validateFunc: (text) => ""
     readonly property bool valid: !warningText
 
-    width: parent.width
     warningText: ""
 
     textField.onTextChanged: warningState = false

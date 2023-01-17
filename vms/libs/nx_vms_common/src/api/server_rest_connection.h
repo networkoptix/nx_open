@@ -702,17 +702,28 @@ public:
         LdapSettingsCallback&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Tests connection with the LDAP Server using settings provided. Returns first user DNs found
+     * per each filter from `filters` into the callback.
+     */
     Handle testLdapSettingsAsync(
         const nx::vms::api::LdapSettings& settings,
         Result<ErrorOrData<std::vector<QString>>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Overwrites existing settings with provided settings.
+     */
     Handle setLdapSettingsAsync(
         const nx::vms::api::LdapSettings& settings,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Modifies existing settings with provided non-empty settings and allows to clear exising LDAP
+     * users/groups.
+     */
     Handle modifyLdapSettingsAsync(
         const nx::vms::api::LdapSettingsChange& settings,
         nx::vms::common::SessionTokenHelperPtr helper,

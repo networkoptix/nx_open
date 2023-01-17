@@ -12,6 +12,7 @@ Item
 
     property alias text: headerText.text
     property int counter: 0
+    property alias textLeftMargin: headerText.x
 
     baselineOffset: headerText.y + headerText.baselineOffset
 
