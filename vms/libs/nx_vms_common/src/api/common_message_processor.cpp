@@ -653,35 +653,10 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
 }
 
 bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
-    const nx::vms::api::ResourceParamWithRefData& param,
-    ec2::NotificationSource source)
+    const nx::vms::api::ResourceParamWithRefData& /*param*/,
+    ec2::NotificationSource /*source*/)
 {
-    if (param.name != QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty
-        || source != ec2::NotificationSource::Remote)
-    {
-        return false;
-    }
-
-    const auto resource = resourcePool()->getResourceById(param.resourceId);
-    if (!resource)
-        return false;
-
-    const auto parentServer = resource->getParentResource();
-    if (!parentServer || parentServer->getId() != m_context->peerId())
-        return false;
-
-    nx::vms::api::ResourceParamWithRefDataList kvPairs;
-    const auto ownData =
-        m_context->resourcePropertyDictionary()->value(param.resourceId, param.name);
-    if (ownData != param.value)
-    {
-        kvPairs.push_back(nx::vms::api::ResourceParamWithRefData(
-            param.resourceId, param.name, ownData));
-
-        messageBusConnection()->getResourceManager(Qn::kSystemAccess)->save(
-            kvPairs, [](int /*requestId*/, ec2::ErrorCode) {});
-    }
-    return true;
+    return false;
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(
