@@ -70,7 +70,7 @@ ComboBox
     //pressed: hoverArea.pressed
 
     // Cancel current edit if an item is re-selected from the popup.
-    onActivated: editText = textAt(index)
+    onActivated: (index) => editText = textAt(index)
 
     Loader
     {

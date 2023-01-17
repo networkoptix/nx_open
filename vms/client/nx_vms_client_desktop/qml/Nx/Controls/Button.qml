@@ -105,7 +105,7 @@ Button
 
     background: ButtonBackground
     {
-        hovered: control.hovered
+        hovered: control.hovered && control.enabled
         pressed: control.pressed
         flat: control.flat
         backgroundColor: control.backgroundColor
