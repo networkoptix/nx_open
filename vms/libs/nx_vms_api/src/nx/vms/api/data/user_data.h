@@ -28,6 +28,10 @@ struct NX_VMS_API UserData: ResourceData
 {
     UserData(): ResourceData(kResourceTypeId) {}
 
+    UserData(const UserData& other) = default;
+    UserData(UserData&& other) = default;
+    UserData& operator=(const UserData& other) = default;
+    UserData& operator=(UserData&& other) = default;
     bool operator==(const UserData& other) const = default;
 
     /** See fillId() in IdData. */

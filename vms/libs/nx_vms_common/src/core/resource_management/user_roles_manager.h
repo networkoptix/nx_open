@@ -4,6 +4,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -127,6 +128,9 @@ private:
     {
         for (const auto& id: roleIds)
         {
+            if (nx::utils::find_if(*list, [&id](const auto& r) { return r.id == id; }))
+                continue;
+
             auto role = QnPredefinedUserRoles::get(id);
             if (!role)
             {
