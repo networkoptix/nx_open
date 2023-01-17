@@ -6,18 +6,24 @@
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
 
+using CertificateValidationLevel = network::server_certificate::ValidationLevel;
+
 struct RemoteConnectionUserInteractionDelegate::Private
 {
-    const CertificateValidationLevelGetter validationLevel;
     const TokenValidator validateToken;
     const AskUserToAcceptCertificate askToAcceptCertificate;
     const ShowCertificateError showCertificateError;
 
+    CertificateValidationLevel validationLevel()
+    {
+        return settings()->certificateValidationLevel();
+    }
+
     Private(
-        CertificateValidationLevelGetter validationLevel,
         TokenValidator validateToken,
         AskUserToAcceptCertificate askToAcceptCertificate,
         ShowCertificateError showCertificateError);
@@ -29,12 +35,10 @@ struct RemoteConnectionUserInteractionDelegate::Private
 };
 
 RemoteConnectionUserInteractionDelegate::Private::Private(
-    CertificateValidationLevelGetter validationLevel,
     TokenValidator validateToken,
     AskUserToAcceptCertificate askToAcceptCertificate,
     ShowCertificateError showCertificateError)
     :
-    validationLevel(validationLevel),
     validateToken(validateToken),
     askToAcceptCertificate(askToAcceptCertificate),
     showCertificateError(showCertificateError)
@@ -56,18 +60,14 @@ void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
 //-------------------------------------------------------------------------------------------------
 // RemoteConnectionUserInteractionDelegate
 
-using CertificateValidationLevel =
-    nx::vms::client::core::network::server_certificate::ValidationLevel;
-
 RemoteConnectionUserInteractionDelegate::RemoteConnectionUserInteractionDelegate(
-    CertificateValidationLevelGetter validationLevel,
     TokenValidator validateToken,
     AskUserToAcceptCertificate askToAcceptCertificate,
     ShowCertificateError showCertificateError,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(validationLevel, validateToken, askToAcceptCertificate, showCertificateError))
+    d(new Private(validateToken, askToAcceptCertificate, showCertificateError))
 {
     NX_ASSERT(validateToken, "Validate token handler should be specified!");
     NX_ASSERT(askToAcceptCertificate, "Ask to accept certificate handler should be specified!");
