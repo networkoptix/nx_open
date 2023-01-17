@@ -142,7 +142,7 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const = 0;
 
-    bool handleRemoteAnalyticsNotification(
+    virtual bool handleRemoteAnalyticsNotification(
         const nx::vms::api::ResourceParamWithRefData& param,
         ec2::NotificationSource source);
 
