@@ -235,6 +235,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
 TEST_F(BuiltinTypesTest, BuiltinActions)
 {
     // Action fields need to be registered first.
+    testActionFieldRegistration<ActionIntField>();
     testActionFieldRegistration<ActionTextField>();
     testActionFieldRegistration<ContentTypeField>();
     testActionFieldRegistration<EmailMessageField>(systemContext());
@@ -242,9 +243,11 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<EventDevicesField>();
     testActionFieldRegistration<ExtractDetailField>(systemContext());
     testActionFieldRegistration<FlagField>();
+    testActionFieldRegistration<FpsField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<PasswordField>();
+    testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>(systemContext());
@@ -255,7 +258,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     // TODO: #amalov Uncomment all types after manifest definition.
     testActionRegistration<BookmarkAction>();
     //testActionRegistration<DeviceOutputAction>();
-    //testActionRegistration<DeviceRecordingAction>();
+    testActionRegistration<DeviceRecordingAction>();
     //testActionRegistration<EnterFullscreenAction>();
     //testActionRegistration<ExitFullscreenAction>();
     testActionRegistration<HttpAction>();

@@ -43,7 +43,11 @@ struct NX_VMS_COMMON_API ActionParameters
     /**%apidoc Stream quality for recording. */
     Qn::StreamQuality streamQuality = Qn::StreamQuality::highest;
 
-    /**%apidoc For Bookmarks - the epsilon which the Bookmark end time is extended by, in ms. */
+    /**%apidoc
+     * Field is used in different scenarios, the unit depends on action type:
+     * - cameraRecordingAction - time the recording continues after the event end, in seconds.
+     * - bookmarkAction - the epsilon which the end time is extended by, in milliseconds.
+     */
     int recordAfter = 0;
 
     /**%apidoc Id of Device Output. */

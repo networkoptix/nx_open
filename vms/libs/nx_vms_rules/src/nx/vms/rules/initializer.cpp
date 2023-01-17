@@ -47,6 +47,7 @@ void Initializer::registerActions() const
 {
     // Register built-in actions.
     registerAction<BookmarkAction>();
+    registerAction<DeviceRecordingAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<SendEmailAction>();
@@ -80,8 +81,10 @@ void Initializer::registerFields() const
     registerEventField<StateField>();
     registerEventField<UniqueIdField>();
 
+    registerActionField<ActionIntField>();
     registerActionField<ActionTextField>();
     registerActionField<FlagField>();
+    registerActionField<FpsField>();
     registerActionField<ContentTypeField>();
     m_engine->registerActionField(
         fieldMetatype<EmailMessageField>(),
@@ -94,6 +97,7 @@ void Initializer::registerFields() const
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();
+    registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();
     m_engine->registerActionField(
         fieldMetatype<TargetUserField>(),

@@ -20,6 +20,17 @@ FieldDescriptor makeIntervalFieldDescriptor(
         {});
 }
 
+FieldDescriptor makeDurationFieldDescriptor(
+    const QString& displayName,
+    const QString& description)
+{
+    return makeFieldDescriptor<OptionalTimeField>(
+        kDurationFieldName,
+        displayName,
+        description,
+        {});
+}
+
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
     const QString& description)

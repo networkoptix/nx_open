@@ -24,6 +24,10 @@ FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
     const QString& description = {});
 
+FieldDescriptor makeDurationFieldDescriptor(
+    const QString& displayName,
+    const QString& description = {});
+
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
     const QString& description = {});

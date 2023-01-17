@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <cassert>
 #include <functional>
+
 #include <nx/utils/log/assert.h>
 
 namespace nx {
