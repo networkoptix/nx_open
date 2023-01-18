@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/group_settings_dialog.h>
 #include <nx/vms/client/desktop/system_administration/models/user_group_list_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -217,8 +218,7 @@ void UserGroupsWidget::applyChanges()
     const auto deletedGroupIds = d->deletedGroupIds;
     d->deletedGroupIds = {};
 
-    for (const auto& groupId: deletedGroupIds)
-        qnResourcesChangesManager->removeUserRole(groupId);
+    GroupSettingsDialog::removeGroups(systemContext(), deletedGroupIds);
 }
 
 bool UserGroupsWidget::hasChanges() const

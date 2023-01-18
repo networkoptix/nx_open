@@ -425,6 +425,14 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     const ScopedRemoveRows removeRows(this, row, row);
     d->orderedGroups.erase(it);
     d->checkedGroupIds.remove(groupId);
+
+    // Remove group from other groups.
+    for (auto& group: d->orderedGroups)
+    {
+        auto groupIt = std::find(group.parentRoleIds.begin(), group.parentRoleIds.end(), groupId);
+        if (groupIt != group.parentRoleIds.end())
+            group.parentRoleIds.erase(groupIt);
+    }
     return true;
 }
 

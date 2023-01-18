@@ -95,6 +95,11 @@ public:
 
     Q_INVOKABLE QString validateName(const QString& text);
 
+    static void removeGroups(
+        nx::vms::client::desktop::SystemContext* context,
+        const QSet<QnUuid>& idsToRemove,
+        std::function<void(bool)> callback = {});
+
 public slots:
     void onDeleteRequested();
     void onGroupClicked(const QVariant& idVariant);
