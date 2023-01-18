@@ -277,41 +277,42 @@ private:
             std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileDataList>)
             return ApiCommand::Value::getStoredFiles;
-        if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsDataList>)
             return ApiCommand::Value::getAccessRights;
-        if constexpr(std::is_same_v<T, nx::vms::api::UserDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::UserDataList>)
             return ApiCommand::Value::getUsers;
-        if constexpr(std::is_same_v<T, nx::vms::api::UserRoleDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::UserRoleDataList>)
             return ApiCommand::Value::getUserRoles;
-        if constexpr(std::is_same_v<T, nx::vms::api::LayoutDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::LayoutDataList>)
             return ApiCommand::Value::getLayouts;
-        if constexpr(std::is_same_v<T, nx::vms::api::LayoutTourDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::LayoutTourDataList>)
             return ApiCommand::Value::getLayoutTours;
-        if constexpr(std::is_same_v<T, nx::vms::api::VideowallDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::VideowallDataList>)
             return ApiCommand::Value::getVideowalls;
-        if constexpr(std::is_same_v<T, nx::vms::api::LicenseDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::LicenseDataList>)
             return ApiCommand::Value::getLicenses;
-        if constexpr(std::is_same_v<T, nx::vms::api::CameraDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::CameraDataList>)
             return ApiCommand::Value::getCameras;
-        if constexpr(std::is_same_v<T, nx::vms::api::CameraAttributesDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::CameraAttributesDataList>)
             return ApiCommand::Value::getCameraUserAttributesList;
-        if constexpr(std::is_same_v<T, nx::vms::api::WebPageDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::WebPageDataList>)
             return ApiCommand::Value::getWebPages;
-        if constexpr(std::is_same_v<T, nx::vms::api::StorageDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::StorageDataList>)
             return ApiCommand::Value::getStorages;
-        if constexpr(std::is_same_v<T, nx::vms::api::MediaServerDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::MediaServerDataList>)
             return ApiCommand::Value::getMediaServers;
-        if constexpr(std::is_same_v<T, nx::vms::api::MediaServerUserAttributesDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::MediaServerUserAttributesDataList>)
             return ApiCommand::Value::getMediaServerUserAttributesList;
-        if constexpr(std::is_same_v<T, nx::vms::api::ResourceStatusDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::ResourceStatusDataList>)
             return ApiCommand::Value::getStatusList;
-        if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList>)
             return ApiCommand::Value::getResourceParams;
-        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsPluginDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsPluginDataList>)
             return ApiCommand::Value::getAnalyticsPlugins;
-        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>)
             return ApiCommand::Value::getAnalyticsEngines;
-        return ApiCommand::NotDefined;
+        else
+            return ApiCommand::NotDefined;
     }
 
     template<typename T>
@@ -338,41 +339,42 @@ private:
             std::is_same_v<T, nx::vms::api::AnalyticsEngineData>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileData>)
             return ApiCommand::Value::updateStoredFile;
-        if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsData>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsData>)
             return ApiCommand::Value::setAccessRights;
-        if constexpr(std::is_same_v<T, nx::vms::api::UserDataEx>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::UserDataEx>)
             return ApiCommand::Value::saveUser;
-        if constexpr(std::is_same_v<T, nx::vms::api::UserRoleData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::UserRoleData>)
             return ApiCommand::Value::saveUserRole;
-        if constexpr(std::is_same_v<T, nx::vms::api::LayoutData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::LayoutData>)
             return ApiCommand::Value::saveLayout;
-        if constexpr(std::is_same_v<T, nx::vms::api::LayoutTourData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::LayoutTourData>)
             return ApiCommand::Value::saveLayoutTour;
-        if constexpr(std::is_same_v<T, nx::vms::api::VideowallData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::VideowallData>)
             return ApiCommand::Value::saveVideowall;
-        if constexpr(std::is_same_v<T, nx::vms::api::LicenseData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::LicenseData>)
             return ApiCommand::Value::addLicense;
-        if constexpr(std::is_same_v<T, nx::vms::api::CameraData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::CameraData>)
             return ApiCommand::Value::saveCamera;
-        if constexpr(std::is_same_v<T, nx::vms::api::CameraAttributesData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::CameraAttributesData>)
             return ApiCommand::Value::saveCameraUserAttributes;
-        if constexpr(std::is_same_v<T, nx::vms::api::WebPageData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::WebPageData>)
             return ApiCommand::Value::saveWebPage;
-        if constexpr(std::is_same_v<T, nx::vms::api::StorageData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::StorageData>)
             return ApiCommand::Value::saveStorage;
-        if constexpr(std::is_same_v<T, nx::vms::api::MediaServerData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::MediaServerData>)
             return ApiCommand::Value::saveMediaServer;
-        if constexpr(std::is_same_v<T, nx::vms::api::MediaServerUserAttributesData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::MediaServerUserAttributesData>)
             return ApiCommand::Value::saveMediaServerUserAttributes;
-        if constexpr(std::is_same_v<T, nx::vms::api::ResourceStatusData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::ResourceStatusData>)
             return ApiCommand::Value::setResourceStatus;
-        if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
             return ApiCommand::Value::setResourceParam;
-        if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsPluginData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::AnalyticsPluginData>)
             return ApiCommand::Value::saveAnalyticsPlugin;
-        if constexpr(std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
             return ApiCommand::Value::saveAnalyticsEngine;
-        return ApiCommand::NotDefined;
+        else
+            return ApiCommand::NotDefined;
     }
 
     template<typename T>
@@ -439,7 +441,10 @@ private:
                 throw nx::network::rest::Exception::notFound();
             }
         }
-        return ErrorCode::ok;
+        else
+        {
+            return ErrorCode::ok;
+        }
     }
 };
 
