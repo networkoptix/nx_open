@@ -116,17 +116,5 @@ qint32 BidirectionRoutingInfo::distanceTo(
     return result;
 }
 
-void BidirectionRoutingInfo::updateLocalDistance(const PersistentIdData& peer, qint32 sequence)
-{
-    return;
-    if (peer == m_localPeer)
-        return;
-    const qint32 localOfflineDistance = kMaxDistance - sequence;
-    addRecord(
-        m_localPeer,
-        peer,
-        RoutingRecord(localOfflineDistance));
-}
-
 } // namespace p2p
 } // namespace nx
