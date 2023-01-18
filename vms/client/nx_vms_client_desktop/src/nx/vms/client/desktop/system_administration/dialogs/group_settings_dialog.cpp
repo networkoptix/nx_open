@@ -160,62 +160,97 @@ void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
             .withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
-void GroupSettingsDialog::onDeleteRequested()
+void GroupSettingsDialog::removeGroups(
+    nx::vms::client::desktop::SystemContext* systemContext,
+    const QSet<QnUuid>& idsToRemove,
+    std::function<void(bool)> callback)
 {
     auto resultsReporter = ResultsReporter::create(
-        nx::utils::guarded(this,
-            [this](bool success)
+        [callback = std::move(callback), idsToRemove](bool success)
+        {
+            if (success)
             {
-                if (success)
-                {
-                    qnResourcesChangesManager->removeUserRole(d->groupId);
-                    reject();
-                }
-            }));
+                for (const auto& id: idsToRemove)
+                    qnResourcesChangesManager->removeUserRole(id);
+            }
+            if (callback)
+                callback(success);
+        });
 
     // Delete the group from existing users and groups.
 
-    const auto handleUserSaved = nx::utils::guarded(this,
+    const auto handleUserSaved =
         [resultsReporter](bool success, const QnUserResourcePtr&)
         {
             resultsReporter->add(success);
-        });
+        };
 
-    const auto applyRemove = nx::utils::guarded(this,
-        [this](const QnUserResourcePtr& user)
+    const auto applyRemove =
+        [idsToRemove](const QnUserResourcePtr& user)
         {
             std::vector<QnUuid> ids = user->userRoleIds();
-            ids.erase(std::remove(ids.begin(), ids.end(), d->groupId), ids.end());
-            user->setUserRoleIds(ids);
-        });
 
-    for (const auto& user: systemContext()->resourcePool()->getResources<QnUserResource>())
+            ids.erase(
+                std::remove_if(
+                    ids.begin(),
+                    ids.end(),
+                    [&idsToRemove](auto id){ return idsToRemove.contains(id); }),
+                ids.end());
+
+            user->setUserRoleIds(ids);
+        };
+
+    for (const auto& user: systemContext->resourcePool()->getResources<QnUserResource>())
     {
         const auto groupIds = user->userRoleIds();
-        if (std::find(groupIds.begin(), groupIds.end(), d->groupId) != groupIds.end())
+
+        const auto it = std::find_if(
+            groupIds.begin(),
+            groupIds.end(),
+            [&idsToRemove](auto id){ return idsToRemove.contains(id); });
+
+        if (it != groupIds.end())
         {
             qnResourcesChangesManager->saveUser(
                 user, QnUserResource::DigestSupport::keep, applyRemove, handleUserSaved);
         }
     }
 
-    auto handleGroupSaved = nx::utils::guarded(this,
+    auto handleGroupSaved =
         [resultsReporter](
             bool roleIsStored,
             const api::UserRoleData&)
         {
             resultsReporter->add(roleIsStored);
+        };
+
+    for (auto group: systemContext->userRolesManager()->userRoles())
+    {
+        const auto last = group.parentRoleIds.end();
+        const auto it = group.parentRoleIds.erase(
+            std::remove_if(
+                group.parentRoleIds.begin(),
+                last,
+                [&idsToRemove](auto id){ return idsToRemove.contains(id); }),
+            last);
+
+        if (it == last) // Nothing was removed.
+            continue;
+
+        qnResourcesChangesManager->saveUserRole(group, handleGroupSaved);
+    }
+}
+
+void GroupSettingsDialog::onDeleteRequested()
+{
+    const auto handleRemove = nx::utils::guarded(this,
+        [this](bool success)
+        {
+            if (success)
+                reject();
         });
 
-    for (auto group: systemContext()->userRolesManager()->userRoles())
-    {
-        if (auto it = std::find(group.parentRoleIds.begin(), group.parentRoleIds.end(), d->groupId);
-            it != group.parentRoleIds.end())
-        {
-            group.parentRoleIds.erase(it);
-            qnResourcesChangesManager->saveUserRole(group, handleGroupSaved);
-        }
-    }
+    removeGroups(systemContext(), {d->groupId}, std::move(handleRemove));
 }
 
 void GroupSettingsDialog::setGroup(const QnUuid& groupId)
