@@ -8977,7 +8977,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>現在のシステム %1 を統合しようとしています</translation>
+      <translation>現在のシステム %1 を次のシステムと統合しようとしています:</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -8985,11 +8985,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation>URL が無効です</translation>
+      <translation>URL が無効です。</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>ログインを空にすることはできません</translation>
+      <translation>ログインは空にできません。</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -9014,7 +9014,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>%1. よりも具体的なホスト名またはIPアドレスを使用してください</translation>
+      <translation>%1 よりも具体的なホスト名またはIPアドレスを使用してください。</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
@@ -9026,11 +9026,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>データベースの同期が完了すると、他のシステムのサーバーがリソースツリーに表示されます</translation>
+      <translation>データベースの同期が完了すると、他のシステムのサーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>再接続されます.</translation>
+      <translation>再接続されます。</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
