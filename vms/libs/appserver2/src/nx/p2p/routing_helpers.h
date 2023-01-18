@@ -70,7 +70,6 @@ struct BidirectionRoutingInfo
 
     qint32 distanceTo(const vms::api::PersistentIdData& peer, RoutingInfo* outVia = nullptr) const;
     qint32 distanceTo(const QnUuid& peerId, RoutingInfo* outVia = nullptr) const;
-    void updateLocalDistance(const vms::api::PersistentIdData& peer, qint32 sequence);
 
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
     RouteToPeerMap allPeerDistances;  //< vice versa
