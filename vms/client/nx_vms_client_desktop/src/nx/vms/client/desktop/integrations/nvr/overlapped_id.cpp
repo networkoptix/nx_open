@@ -18,7 +18,49 @@
 #include "overlapped_id_state.h"
 #include "overlapped_id_dialog.h"
 
+using namespace nx::vms::client::desktop::ui::action;
+
 namespace nx::vms::client::desktop::integrations {
+
+class IsNvrNodeCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(
+        const Parameters& parameters, QnWorkbenchContext* context) override;
+};
+
+ActionVisibility IsNvrNodeCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
+{
+    bool isNvr = false;
+    QString groupId;
+
+    const auto& resources = parameters.resources();
+    for (const auto& resource: resources)
+    {
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (camera->isNvr())
+            isNvr = true;
+
+        const auto cameraGroupId = camera->getGroupId();
+
+        // The checks hide action if user selected several different NVR nodes.
+        if (groupId.isEmpty())
+        {
+            if (cameraGroupId.isEmpty())
+                return InvisibleAction;
+
+            groupId = cameraGroupId;
+        }
+        else if (groupId != cameraGroupId)
+        {
+            return InvisibleAction;
+        }
+    }
+
+    return isNvr ? EnabledAction : InvisibleAction;
+}
 
 OverlappedIdIntegration::OverlappedIdIntegration(QObject* parent):
     base_type(parent),
@@ -36,23 +78,12 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
 
     const auto action = factory->registerAction()
         .mode(DesktopMode)
-        .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .flags(Tree | MultiTarget | ResourceTarget)
         .text(tr("Overlapped ID..."))
         .requiredGlobalPermission(GlobalPermission::viewArchive)
         .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::any)
-            && condition::scoped(
-                SceneScope,
-                !condition::isLayoutTourReviewMode()
-                && !condition::isPreviewSearchMode())
             && condition::treeNodeType({ResourceTree::NodeType::recorder})
-            && ConditionWrapper(
-                new ResourceCondition(
-                    [this](const QnResourcePtr& resource)
-                    {
-                        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-                        return camera ? camera->isNvr() : false;
-                    },
-                    MatchMode::all))
+            && ConditionWrapper(new IsNvrNodeCondition())
         )
         .action();
 
