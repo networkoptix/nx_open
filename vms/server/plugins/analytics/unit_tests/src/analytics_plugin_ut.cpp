@@ -59,8 +59,8 @@ public:
 
     ~RefCountableResultHolder()
     {
-        toPtr(result.value()); //< releaseRef
-        toPtr(result.error().errorMessage()); //< releaseRef
+        Ptr(result.value()); //< releaseRef
+        Ptr(result.error().errorMessage()); //< releaseRef
     }
 
     bool isOk() const { return result.isOk(); }
@@ -76,7 +76,7 @@ public:
 
     ~ResultHolder()
     {
-        toPtr(result.error().errorMessage()); //< releaseRef
+        Ptr(result.error().errorMessage()); //< releaseRef
     }
 
     bool isOk() const { return result.isOk(); }
@@ -512,7 +512,7 @@ static void testPluginLibrary(const std::string& libFilename)
     if (multiEntryPointFunc) //< Do not use entryPointFunc even if it is exported.
     {
         int instanceIndex = 0;
-        while (const auto plugin = toPtr(multiEntryPointFunc(instanceIndex)))
+        while (const auto plugin = Ptr(multiEntryPointFunc(instanceIndex)))
         {
             if (g_pluginInstanceIndex == -1 || g_pluginInstanceIndex == instanceIndex)
             {
@@ -525,7 +525,7 @@ static void testPluginLibrary(const std::string& libFilename)
     }
     else //< Use entryPointFunc.
     {
-        const auto plugin = toPtr(entryPointFunc());
+        const auto plugin = Ptr(entryPointFunc());
         ASSERT_TRUE(plugin);
         testPlugin(plugin);
     }

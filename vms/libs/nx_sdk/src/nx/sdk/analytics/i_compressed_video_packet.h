@@ -8,9 +8,7 @@
 #include <nx/sdk/analytics/i_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_media_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class ICompressedVideoPacket0: public Interface<ICompressedVideoPacket0, ICompressedMediaPacket0>
 {
@@ -40,11 +38,9 @@ public:
     protected: virtual IList<IMetadataPacket>* getMetadataList() const = 0;
     public: Ptr<IList<IMetadataPacket>> metadataList() const
     {
-        return toPtr(getMetadataList());
+        return Ptr(getMetadataList());
     }
 };
 using ICompressedVideoPacket1 = ICompressedVideoPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

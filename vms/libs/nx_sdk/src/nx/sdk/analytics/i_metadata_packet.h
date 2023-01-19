@@ -6,9 +6,7 @@
 
 #include <nx/sdk/analytics/i_data_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Packet containing metadata (e.g. events, object detections).
@@ -20,6 +18,4 @@ public:
 };
 using IMetadataPacket0 = IMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

@@ -13,9 +13,7 @@
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IEngine; //< Forward declaration for the parent object.
 
@@ -162,6 +160,4 @@ public:
 };
 using IDeviceAgent0 = IDeviceAgent;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

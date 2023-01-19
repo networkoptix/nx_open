@@ -8,8 +8,7 @@
 #include <nx/sdk/i_string_list.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class StringList: public nx::sdk::RefCountable<IStringList>
 {
@@ -26,5 +25,4 @@ private:
     std::vector<std::string> m_strings;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

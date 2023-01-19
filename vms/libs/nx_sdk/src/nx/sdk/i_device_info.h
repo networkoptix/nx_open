@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Provides various information about a Device. For multichannel devices, the Device represents a
@@ -59,5 +58,4 @@ public:
 };
 using IDeviceInfo0 = IDeviceInfo;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

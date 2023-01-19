@@ -6,9 +6,7 @@
 
 #include <nx/sdk/i_string_list.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IMetadataTypes: public Interface<IMetadataTypes>
 {
@@ -19,16 +17,14 @@ public:
 
     /** Called by eventTypeIds() */
     protected: virtual const IStringList* getEventTypeIds() const = 0;
-    public: Ptr<const IStringList> eventTypeIds() const { return toPtr(getEventTypeIds()); }
+    public: Ptr<const IStringList> eventTypeIds() const { return Ptr(getEventTypeIds()); }
 
     /** Called by objectTypeIds() */
     protected: virtual const IStringList* getObjectTypeIds() const = 0;
-    public: Ptr<const IStringList> objectTypeIds() const { return toPtr(getObjectTypeIds()); }
+    public: Ptr<const IStringList> objectTypeIds() const { return Ptr(getObjectTypeIds()); }
 
     virtual bool isEmpty() const = 0;
 };
 using IMetadataTypes0 = IMetadataTypes;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

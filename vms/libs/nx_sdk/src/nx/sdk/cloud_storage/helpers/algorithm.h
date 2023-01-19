@@ -4,9 +4,7 @@
 
 #include "data.h"
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
+namespace nx::sdk::cloud_storage {
 
 bool bookmarkMatches(const Bookmark& bookmark, const BookmarkFilter& filter);
 void sortAndLimitBookmarks(const BookmarkFilter& filter, std::vector<Bookmark>* outBookmarks);
@@ -38,6 +36,4 @@ std::string dumpObjects(const std::vector<T>& objects)
 
 std::vector<std::string> split(const std::string& original, const std::string& separator);
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::cloud_storage

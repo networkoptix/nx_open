@@ -2,8 +2,7 @@
 
 #include "action_response.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void ActionResponse::setActionUrl(std::string value)
 {
@@ -27,5 +26,4 @@ const char* ActionResponse::messageToUser() const
     return m_messageToUser.c_str();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class IStringList: public Interface<IStringList>
 {
@@ -19,5 +18,4 @@ public:
 };
 using IStringList0 = IStringList;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

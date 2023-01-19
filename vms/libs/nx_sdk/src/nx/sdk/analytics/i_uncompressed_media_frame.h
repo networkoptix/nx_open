@@ -6,9 +6,7 @@
 
 #include <nx/sdk/analytics/i_data_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Decoded media frame, e.g. video or audio.
@@ -37,6 +35,4 @@ public:
 };
 using IUncompressedMediaFrame0 = IUncompressedMediaFrame;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

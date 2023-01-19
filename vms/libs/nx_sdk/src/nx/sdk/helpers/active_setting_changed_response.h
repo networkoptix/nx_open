@@ -9,8 +9,7 @@
 #include <nx/sdk/helpers/action_response.h>
 #include <nx/sdk/helpers/settings_response.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class ActiveSettingChangedResponse: public RefCountable<IActiveSettingChangedResponse>
 {
@@ -29,5 +28,4 @@ private:
     Ptr<const SettingsResponse> m_settingsResponse;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

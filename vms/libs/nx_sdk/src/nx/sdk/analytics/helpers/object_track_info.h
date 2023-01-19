@@ -8,9 +8,7 @@
 
 #include <nx/sdk/analytics/i_object_track_info.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class ObjectTrackInfo: public RefCountable<IObjectTrackInfo>
 {
@@ -41,6 +39,4 @@ private:
     std::string m_bestShotImageDataFormat;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

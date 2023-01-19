@@ -10,10 +10,8 @@
 
 #include "data.h"
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
-
+namespace nx::sdk::cloud_storage {
+    
 class TimePeriods: public nx::sdk::RefCountable<ITimePeriods>
 {
 public:
@@ -29,7 +27,4 @@ private:
     mutable TimePeriodList::const_iterator m_it;
 };
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
-
+} // namespace nx::sdk::cloud_storage

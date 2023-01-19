@@ -9,9 +9,7 @@
 
 #include "i_media_data_packet.h"
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
+namespace nx::sdk::cloud_storage {
 
 /**
  * Stream writer abstraction. Stream is a sequence of media data packets, which more or
@@ -51,6 +49,4 @@ public:
     virtual void close(int64_t durationMs) = 0;
 };
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::cloud_storage

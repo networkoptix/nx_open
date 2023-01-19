@@ -13,9 +13,7 @@
 #include <nx/sdk/analytics/i_object_metadata.h>
 #include <nx/sdk/helpers/attribute.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class ObjectMetadata: public RefCountable<IObjectMetadata>
 {
@@ -48,6 +46,4 @@ private:
     Rect m_rect;
 };
 
-} // namespace nx
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

@@ -4,9 +4,7 @@
 
 #include <nx/sdk/analytics/point.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 struct Rect
 {
@@ -58,6 +56,4 @@ struct Rect
     }
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

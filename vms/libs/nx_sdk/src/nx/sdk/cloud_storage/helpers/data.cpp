@@ -10,10 +10,8 @@
 #include "media_data_packet.h"
 #include "algorithm.h"
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
-
+namespace nx::sdk::cloud_storage {
+    
 using namespace std::chrono;
 
 namespace {
@@ -387,7 +385,7 @@ std::optional<std::string> DeviceDescription::deviceId() const
 
 std::string deviceId(nx::sdk::cloud_storage::IDeviceAgent* deviceAgent)
 {
-    return nx::sdk::toPtr(deviceAgent->deviceInfo().value())->id();
+    return nx::sdk::Ptr(deviceAgent->deviceInfo().value())->id();
 }
 
 int toStreamIndex(nxcip::MediaStreamQuality quality)
@@ -1368,6 +1366,4 @@ MediaPacketData::MediaPacketData(
     }
 }
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::cloud_storage

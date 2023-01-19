@@ -10,9 +10,7 @@
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/analytics/i_object_track_info.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Data supplied to IEngine::executeAction().
@@ -38,7 +36,7 @@ public:
     /** Called by objectTrackInfo() */
     protected: virtual IObjectTrackInfo* getObjectTrackInfo() const = 0;
     /** Info about an object track this action has been triggered for. */
-    public: Ptr<IObjectTrackInfo> objectTrackInfo() const { return toPtr(getObjectTrackInfo()); }
+    public: Ptr<IObjectTrackInfo> objectTrackInfo() const { return Ptr(getObjectTrackInfo()); }
 
     /** Timestamp of a video frame from which the action has been triggered. */
     virtual int64_t timestampUs() const = 0;
@@ -49,7 +47,7 @@ public:
      * If the Engine manifest defines params for this action type, contains the array of their
      * values after they are filled by the user via Client form. Otherwise, null.
      */
-    public: Ptr<const IStringMap> params() const { return toPtr(getParams()); }
+    public: Ptr<const IStringMap> params() const { return Ptr(getParams()); }
 
     /**
      * Data returned to the Server after the Action has been executed. Only one of the strings can
@@ -66,6 +64,4 @@ public:
 };
 using IAction0 = IAction;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

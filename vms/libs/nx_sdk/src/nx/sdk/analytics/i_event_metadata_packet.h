@@ -7,9 +7,7 @@
 #include "i_event_metadata.h"
 #include "i_compound_metadata_packet.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Metadata packet containing information about some event which occurred on the scene.
@@ -21,7 +19,7 @@ public:
 
     /** Called by at() */
     protected: virtual const IEventMetadata* getAt(int index) const override = 0;
-    public: Ptr<const IEventMetadata> at(int index) const { return toPtr(getAt(index)); }
+    public: Ptr<const IEventMetadata> at(int index) const { return Ptr(getAt(index)); }
 };
 
 class IEventMetadataPacket: public Interface<IEventMetadataPacket, IEventMetadataPacket0>
@@ -33,6 +31,4 @@ public:
 };
 using IEventMetadataPacket1 = IEventMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

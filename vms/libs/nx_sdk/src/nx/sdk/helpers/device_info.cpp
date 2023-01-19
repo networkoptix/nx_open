@@ -2,8 +2,7 @@
 
 #include "device_info.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 const char* DeviceInfo::id() const
 {
@@ -115,5 +114,4 @@ void DeviceInfo::setChannelNumber(int channelNumber)
     m_channelNumber = channelNumber;
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

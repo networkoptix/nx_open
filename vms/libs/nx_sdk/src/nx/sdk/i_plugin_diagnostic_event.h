@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * VMS Event which can be triggered by a Plugin to inform the System about some issue or status
@@ -29,5 +28,4 @@ public:
 };
 using IPluginDiagnosticEvent0 = IPluginDiagnosticEvent;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

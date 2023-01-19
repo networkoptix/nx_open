@@ -6,8 +6,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/ptr.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Data sent from the Client to the plugin when the user changes the state of an Active setting.
@@ -32,7 +31,7 @@ public:
     /**
      * @return Values currently set in the GUI. Never null.
      */
-    public: Ptr<const IStringMap> settingsValues() const { return toPtr(getSettingsValues()); }
+    public: Ptr<const IStringMap> settingsValues() const { return Ptr(getSettingsValues()); }
 
     /** Called by params() */
     protected: virtual const IStringMap* getParams() const = 0;
@@ -40,9 +39,8 @@ public:
      * If the Active setting defines params in the Manifest, contains the array of their
      * values after they are filled by the user via the Client form. Otherwise, null.
      */
-    public: Ptr<const IStringMap> params() const { return toPtr(getParams()); }
+    public: Ptr<const IStringMap> params() const { return Ptr(getParams()); }
 };
 using IActiveSettingChangedAction0 = IActiveSettingChangedAction;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

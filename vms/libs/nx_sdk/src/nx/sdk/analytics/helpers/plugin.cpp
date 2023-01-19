@@ -10,9 +10,7 @@
 
 #include "engine.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 Plugin::Plugin()
 {
@@ -87,6 +85,4 @@ void Plugin::logError(const std::string& message) const
     NX_PRINT << "ERROR: " << libContext().name() << ": " << message;
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

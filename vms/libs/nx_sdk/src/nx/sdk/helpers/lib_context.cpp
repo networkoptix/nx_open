@@ -5,8 +5,7 @@
 #define NX_PRINT_PREFIX "[nx::sdk::LibContext] "
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void LibContext::setName(const char* name)
 {
@@ -89,5 +88,4 @@ std::map<std::string, std::string>& unitTestOptions()
         unitTestOptions().emplace(options->key(i), options->value(i));
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

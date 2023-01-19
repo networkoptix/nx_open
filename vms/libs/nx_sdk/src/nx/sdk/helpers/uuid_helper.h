@@ -8,8 +8,7 @@
 
 #include <nx/sdk/uuid.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 namespace UuidHelper
 {
@@ -41,8 +40,7 @@ namespace UuidHelper
     Uuid randomUuid();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk
 
 //-------------------------------------------------------------------------------------------------
 // Functions that need to be in namespace std for compatibility with STL features.

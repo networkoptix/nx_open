@@ -4,9 +4,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 TimestampedObjectMetadata::TimestampedObjectMetadata():
     m_objectMetadata(nx::sdk::makePtr<ObjectMetadata>())
@@ -100,6 +98,4 @@ void TimestampedObjectMetadata::setTimestampUs(int64_t timestamp)
     m_timestampUs = timestamp;
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

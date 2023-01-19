@@ -7,8 +7,7 @@
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class Attribute: public nx::sdk::RefCountable<IAttribute>
 {
@@ -37,5 +36,4 @@ private:
     float m_confidence;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

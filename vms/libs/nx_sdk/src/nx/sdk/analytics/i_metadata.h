@@ -5,9 +5,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/i_attribute.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * A particular item of metadata (e.g. event, detected object) which is contained in a metadata
@@ -39,7 +37,7 @@ public:
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */
-    public: Ptr<const IAttribute> attribute(int index) const { return toPtr(getAttribute(index)); }
+    public: Ptr<const IAttribute> attribute(int index) const { return Ptr(getAttribute(index)); }
 
     /**
      * @return Number of items in the attribute array.
@@ -48,6 +46,4 @@ public:
 };
 using IMetadata0 = IMetadata;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

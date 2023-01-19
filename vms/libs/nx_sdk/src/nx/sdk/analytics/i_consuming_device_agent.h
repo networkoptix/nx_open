@@ -10,9 +10,7 @@
 #include "i_data_packet.h"
 #include "i_device_agent.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IConsumingDeviceAgent0: public Interface<IConsumingDeviceAgent0, IDeviceAgent0>
 {
@@ -78,6 +76,4 @@ public:
 };
 using IConsumingDeviceAgent2 = IConsumingDeviceAgent;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

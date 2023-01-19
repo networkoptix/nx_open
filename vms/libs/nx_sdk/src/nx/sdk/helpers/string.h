@@ -8,8 +8,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class String: public RefCountable<IString>
 {
@@ -35,5 +34,4 @@ private:
     std::string m_string;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

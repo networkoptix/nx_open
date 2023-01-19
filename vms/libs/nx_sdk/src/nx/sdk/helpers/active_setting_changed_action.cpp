@@ -2,8 +2,7 @@
 
 #include "active_setting_changed_action.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void ActiveSettingChangedAction::setActiveSettingId(std::string value)
 {
@@ -45,5 +44,4 @@ const IStringMap* ActiveSettingChangedAction::getParams() const
     return shareToPtr(m_params).releasePtr();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

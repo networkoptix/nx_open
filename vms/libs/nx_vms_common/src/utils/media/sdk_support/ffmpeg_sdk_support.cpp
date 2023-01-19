@@ -421,7 +421,7 @@ nx::sdk::Ptr<nx::sdk::cloud_storage::IMediaDataPacket> mediaPacketFromFrame(
             break;
     }
 
-    return nx::sdk::toPtr(new nx::sdk::cloud_storage::MediaDataPacket(data));
+    return nx::sdk::makePtr<nx::sdk::cloud_storage::MediaDataPacket>(data);
 }
 
 QnAbstractMediaData::DataType toMediaDataType(nxcip::DataPacketType type)
