@@ -14,8 +14,7 @@
 
 #include "i_device.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 namespace archive {
 
 enum class ArchiveAction
@@ -70,5 +69,4 @@ public:
 };
 
 } // namespace archive
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

@@ -4,8 +4,7 @@
 
 #include <nx/sdk/i_string.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /** Error codes used by Plugin methods. */
 enum class ErrorCode: int
@@ -99,5 +98,4 @@ private:
     Error m_error;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

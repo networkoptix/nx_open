@@ -7,8 +7,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 Error error(ErrorCode errorCode, std::string errorMessage)
 {
@@ -19,5 +18,4 @@ Error error(ErrorCode errorCode, std::string errorMessage)
     return {errorCode, new String(std::move(errorMessage))};
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

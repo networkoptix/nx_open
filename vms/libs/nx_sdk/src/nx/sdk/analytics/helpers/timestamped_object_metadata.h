@@ -11,9 +11,7 @@
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/helpers/attribute.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class TimestampedObjectMetadata: public RefCountable<ITimestampedObjectMetadata>
 {
@@ -45,6 +43,4 @@ private:
     int64_t m_timestampUs = 0;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

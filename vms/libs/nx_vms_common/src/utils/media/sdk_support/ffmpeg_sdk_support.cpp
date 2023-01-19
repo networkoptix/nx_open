@@ -481,10 +481,7 @@ nx::sdk::Ptr<nxcip::MediaDataPacket> mediaPacketFromFrame(
     const QnConstAbstractMediaDataPtr& mediaData,
     std::optional<int> streamIndex)
 {
-    nx::sdk::Ptr<nxcip::MediaDataPacket> result = nx::sdk::toPtr(
-        new ThirdPartyMediaDataPacket(mediaData, streamIndex));
-
-    return result;
+    return nx::sdk::makePtr<ThirdPartyMediaDataPacket>(mediaData, streamIndex);
 }
 
 QnAbstractMediaData::DataType toMediaDataType(nxcip::DataPacketType type)

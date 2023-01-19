@@ -10,8 +10,7 @@
 #include <nx/sdk/i_list.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 template<typename IItem>
 class List: public RefCountable<IList<IItem>>
@@ -51,5 +50,4 @@ private:
     std::vector<nx::sdk::Ptr<IItem>> m_items;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

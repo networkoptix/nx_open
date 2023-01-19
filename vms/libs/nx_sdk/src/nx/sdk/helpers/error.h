@@ -6,11 +6,9 @@
 
 #include <nx/sdk/result.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /** Intended to return an error from a method. */
 Error error(ErrorCode errorCode, std::string errorMessage);
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

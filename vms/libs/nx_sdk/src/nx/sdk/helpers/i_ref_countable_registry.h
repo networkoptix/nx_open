@@ -4,8 +4,7 @@
 
 #include <nx/sdk/i_ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Debugging mechanism that tracks ref-countable objects to detect leaks, double-frees and the
@@ -36,5 +35,4 @@ public:
         const nx::sdk::IRefCountable* refCountable, int refCount) = 0;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

@@ -126,7 +126,7 @@ TEST(Ptr, inheritance)
 
         const IBase* tmp = data.get();
 
-        Ptr<const IBase> base(toPtr(tmp));
+        Ptr<const IBase> base(tmp);
         ASSERT_EQ(1, data->refCount());
         base.releasePtr();
 
@@ -135,12 +135,12 @@ TEST(Ptr, inheritance)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
-TEST(Ptr, toPtr)
+TEST(Ptr, PtrCtor)
 {
     Data::s_destructorCalled = false;
     {
         Data* p = new Data(42);
-        const Ptr<Data> data = toPtr(p);
+        const Ptr<Data> data(p);
         ASSERT_EQ(p, data.get());
         ASSERT_EQ(1, data->refCount());
         ASSERT_FALSE(Data::s_destructorCalled);

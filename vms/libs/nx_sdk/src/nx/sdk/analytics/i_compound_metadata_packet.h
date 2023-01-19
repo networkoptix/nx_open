@@ -9,9 +9,7 @@
 #include "i_metadata_packet.h"
 #include "i_metadata.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Packet containing metadata (e.g. events, object detections).
@@ -34,10 +32,8 @@ public:
     /**
      * @return Element at the zero-based index, or null if the index is invalid.
      */
-    public: Ptr<const IMetadata> at(int index) const { return toPtr(getAt(index)); }
+    public: Ptr<const IMetadata> at(int index) const { return Ptr(getAt(index)); }
 };
 using ICompoundMetadataPacket0 = ICompoundMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

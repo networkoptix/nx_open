@@ -6,9 +6,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 const char* EventMetadata::typeId() const
 {
@@ -110,6 +108,4 @@ void EventMetadata::getTrackId(Uuid* outValue) const
     *outValue = m_trackId;
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

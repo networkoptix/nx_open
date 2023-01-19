@@ -8,8 +8,7 @@
 #include "i_action_response.h"
 #include "i_settings_response.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Data returned from the plugin when the user changes some setting in the dialog.
@@ -26,7 +25,7 @@ public:
      */
     public: Ptr<const IActionResponse> actionResponse() const
     {
-        return toPtr(getActionResponse());
+        return Ptr(getActionResponse());
     }
 
     /** Called by settingsResponse() */
@@ -38,10 +37,9 @@ public:
      */
     public: Ptr<const ISettingsResponse> settingsResponse() const
     {
-        return toPtr(getSettingsResponse());
+        return Ptr(getSettingsResponse());
     }
 };
 using IActiveSettingChangedResponse0 = IActiveSettingChangedResponse;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

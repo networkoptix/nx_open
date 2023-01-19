@@ -10,9 +10,7 @@
 
 #include "i_engine.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * The main interface for an Analytics Plugin instance.
@@ -53,6 +51,4 @@ public:
 };
 using IPlugin0 = IPlugin;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

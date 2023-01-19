@@ -6,9 +6,7 @@
 
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Metadata packet containing information about motion on the scene.
@@ -59,6 +57,4 @@ public:
 };
 using IMotionMetadataPacket0 = IMotionMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

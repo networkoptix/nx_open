@@ -9,8 +9,7 @@
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/string_map.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class SettingsResponse: public RefCountable<ISettingsResponse>
 {
@@ -42,5 +41,4 @@ private:
     Ptr<String> m_model;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

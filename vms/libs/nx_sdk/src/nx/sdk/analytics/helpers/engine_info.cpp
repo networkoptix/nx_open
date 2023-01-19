@@ -2,9 +2,7 @@
 
 #include <nx/sdk/analytics/helpers/engine_info.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 const char* EngineInfo::id() const
 {
@@ -26,6 +24,4 @@ void EngineInfo::setName(std::string name)
     m_name = std::move(name);
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

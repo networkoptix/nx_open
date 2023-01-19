@@ -8,9 +8,7 @@
 #include <nx/sdk/helpers/string_list.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class MetadataTypes: public RefCountable<IMetadataTypes>
 {
@@ -31,6 +29,4 @@ private:
     nx::sdk::Ptr<StringList> m_objectTypeIds;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

@@ -17,9 +17,7 @@
 #include "i_engine_info.h"
 #include "i_action.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IPlugin; //< Forward declaration for the parent object.
 
@@ -203,6 +201,4 @@ public:
 };
 using IEngine1 = IEngine;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

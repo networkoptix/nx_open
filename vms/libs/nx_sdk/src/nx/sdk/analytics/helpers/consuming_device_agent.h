@@ -19,9 +19,7 @@
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/analytics/i_custom_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Base class for a typical implementation of DeviceAgent which receives a stream and sends
@@ -158,6 +156,4 @@ private:
     std::map<std::string, std::string> m_settings;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

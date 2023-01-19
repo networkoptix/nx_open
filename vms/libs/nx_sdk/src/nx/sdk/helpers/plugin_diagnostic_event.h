@@ -7,8 +7,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class PluginDiagnosticEvent: public RefCountable<IPluginDiagnosticEvent>
 {
@@ -32,5 +31,4 @@ private:
     std::string m_description;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

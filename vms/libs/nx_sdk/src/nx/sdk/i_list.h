@@ -2,8 +2,7 @@
 
 #pragma once
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 template<typename IItem>
 class IList: public Interface<IList<IItem>>
@@ -19,10 +18,9 @@ public:
     /** Called by at() */
     protected: virtual IItem* getAt(int index) const = 0;
     /** @return Element at the zero-based index, or null if the index is invalid. */
-    public: Ptr<IItem> at(int index) const { return toPtr(getAt(index)); }
+    public: Ptr<IItem> at(int index) const { return Ptr(getAt(index)); }
 };
 template<typename IItem>
 using IList0 = IList<IItem>;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

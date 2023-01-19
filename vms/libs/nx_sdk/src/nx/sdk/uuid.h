@@ -6,8 +6,7 @@
 #include <cstring>
 #include <stdint.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 using UuidBase = std::array<uint8_t, 16>;
 
@@ -45,5 +44,4 @@ public:
     bool isNull() const { return *this == Uuid(); }
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

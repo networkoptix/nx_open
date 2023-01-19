@@ -13,8 +13,7 @@
 #include <nx/sdk/archive/i_stream_writer.h>
 #include <nx/sdk/archive/i_codec_info.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 namespace archive {
 
 enum class MetadataType
@@ -99,5 +98,4 @@ public:
 };
 
 } // namespace archive
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk
