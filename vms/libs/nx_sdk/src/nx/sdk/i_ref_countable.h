@@ -8,8 +8,7 @@
 
 #include <nx/sdk/ptr.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Base for all interfaces - abstract classes with only pure-virtual non-overloaded functions, so
@@ -136,13 +135,13 @@ public:
     template<class Interface>
     Ptr<Interface> queryInterface()
     {
-        return toPtr(static_cast<Interface*>(queryInterface(Interface::interfaceId())));
+        return Ptr(static_cast<Interface*>(queryInterface(Interface::interfaceId())));
     }
 
     template<class Interface>
     Ptr<const Interface> queryInterface() const
     {
-        return toPtr(static_cast<const Interface*>(
+        return Ptr(static_cast<const Interface*>(
             const_cast<IRefCountable*>(this)->queryInterface(Interface::interfaceId())));
     }
 
@@ -173,5 +172,4 @@ public:
     }
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

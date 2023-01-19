@@ -6,9 +6,7 @@
 
 #include "i_metadata.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IEventMetadata0: public Interface<IEventMetadata0, IMetadata0>
 {
@@ -64,6 +62,4 @@ public:
 };
 using IEventMetadata2 = IEventMetadata;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

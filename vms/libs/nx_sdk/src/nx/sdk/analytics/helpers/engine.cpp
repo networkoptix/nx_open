@@ -19,9 +19,7 @@
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/lib_context.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 static std::string makePrintPrefix(
     const std::string& pluginInstanceId, const IEngineInfo* engineInfo = nullptr)
@@ -174,6 +172,4 @@ void Engine::doGetSettingsOnActiveSettingChange(
 {
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

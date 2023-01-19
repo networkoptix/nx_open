@@ -7,9 +7,7 @@
 #include <nx/kit/utils.h>
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 // TODO: Consider changing PixelFormat values to power of 2; change std::array to std::map.
 
@@ -105,6 +103,4 @@ std::string allPixelFormatsToStdString(const std::string& separator)
     return result;
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

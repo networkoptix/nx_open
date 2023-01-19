@@ -12,9 +12,7 @@
 
 #include "engine.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Base class for a typical implementation of an Analytics Plugin. Hides many technical details of
@@ -80,6 +78,4 @@ private:
     Ptr<IUtilityProvider> m_utilityProvider;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

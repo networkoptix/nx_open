@@ -5,8 +5,7 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 static const int kLevelIndent = 4;
 
@@ -101,5 +100,4 @@ std::string toString(ErrorCode errorCode)
     }
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

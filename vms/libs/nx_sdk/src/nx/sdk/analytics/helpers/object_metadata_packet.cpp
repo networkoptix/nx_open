@@ -4,9 +4,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 ObjectMetadataPacket::Flags ObjectMetadataPacket::flags() const
 {
@@ -63,6 +61,4 @@ void ObjectMetadataPacket::clear()
     m_objects.clear();
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

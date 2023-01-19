@@ -2,8 +2,7 @@
 
 #include "string_list.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 int StringList::count() const
 {
@@ -28,5 +27,4 @@ void StringList::clear()
     m_strings.clear();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

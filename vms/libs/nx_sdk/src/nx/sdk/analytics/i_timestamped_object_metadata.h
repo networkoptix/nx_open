@@ -4,9 +4,7 @@
 
 #include <nx/sdk/analytics/i_object_metadata.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class ITimestampedObjectMetadata: public Interface<ITimestampedObjectMetadata, IObjectMetadata0>
 {
@@ -18,6 +16,4 @@ public:
 };
 using ITimestampedObjectMetadata0 = ITimestampedObjectMetadata;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

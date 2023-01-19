@@ -4,9 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /** Provides various information about an Engine. */
 class IEngineInfo: public Interface<IEngineInfo>
@@ -22,6 +20,4 @@ public:
 };
 using IEngineInfo0 = IEngineInfo;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

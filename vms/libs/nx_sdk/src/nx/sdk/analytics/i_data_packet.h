@@ -7,9 +7,7 @@
 #include <nx/kit/flags.h>
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Base class for classes that represent the packet of data (e.g. audio, video, metadata).
@@ -40,6 +38,4 @@ using IDataPacket0 = IDataPacket;
 
 NX_KIT_ENABLE_FLAGS(IDataPacket::Flags);
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

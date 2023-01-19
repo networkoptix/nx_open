@@ -5,8 +5,7 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 PluginDiagnosticEvent::PluginDiagnosticEvent(Level level, std::string caption, std::string description):
     m_level(level),
@@ -70,5 +69,4 @@ std::string PluginDiagnosticEvent::toString() const
         + "}";
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

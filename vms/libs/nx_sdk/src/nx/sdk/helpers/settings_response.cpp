@@ -2,8 +2,7 @@
 
 #include "settings_response.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 SettingsResponse::SettingsResponse(
     Ptr<StringMap> values,
@@ -68,5 +67,4 @@ void SettingsResponse::setModel(std::string model)
         m_model = makePtr<String>(model);
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

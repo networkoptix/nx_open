@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Defines how the Client must interact with the user after the plugin executes some action
@@ -30,5 +29,4 @@ public:
 };
 using IActionResponse0 = IActionResponse;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

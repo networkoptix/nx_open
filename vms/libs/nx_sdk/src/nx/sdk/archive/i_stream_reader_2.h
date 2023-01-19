@@ -7,8 +7,7 @@
 #include <nx/sdk/i_list.h>
 #include <nx/sdk/ptr.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 namespace archive {
 
 // FBE3E8A5-E70C-4E1A-BB13-B77C218EF325
@@ -17,12 +16,11 @@ static const nxpl::NX_GUID IID_StreamReader2 = { { 0xFB, 0xE3, 0xE8, 0xA5, 0xE7,
 class StreamReader2: public nxcip::StreamReader
 {
     protected: virtual const IList<ICodecInfo>* getCodecList() const = 0;
-    public: Ptr<const IList<ICodecInfo>> codecList() const { return toPtr(getCodecList()); }
+    public: Ptr<const IList<ICodecInfo>> codecList() const { return Ptr(getCodecList()); }
 
     public: virtual bool providesMotionPackets() const = 0;
     public: virtual const char* opaqueMetadata() const = 0;
 };
 
 } // namespace archive
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

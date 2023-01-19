@@ -4,9 +4,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 MetadataTypes::MetadataTypes():
     m_eventTypeIds(nx::sdk::makePtr<StringList>()),
@@ -54,6 +52,4 @@ void MetadataTypes::addObjectTypeId(std::string objectTypeId)
     m_objectTypeIds->addString(std::move(objectTypeId));
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

@@ -2,8 +2,7 @@
 
 #include "active_setting_changed_response.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void ActiveSettingChangedResponse::setActionResponse(Ptr<const ActionResponse> value)
 {
@@ -26,5 +25,4 @@ const ISettingsResponse* ActiveSettingChangedResponse::getSettingsResponse() con
     return shareToPtr(m_settingsResponse).releasePtr();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

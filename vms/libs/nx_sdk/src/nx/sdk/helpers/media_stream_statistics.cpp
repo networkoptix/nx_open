@@ -4,8 +4,7 @@
 
 #include <algorithm>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 using namespace std::chrono;
 
@@ -112,5 +111,4 @@ float MediaStreamStatistics::getAverageGopSize() const
     return keyFrames > 0 ? m_data.size() / (float) keyFrames : 0;
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

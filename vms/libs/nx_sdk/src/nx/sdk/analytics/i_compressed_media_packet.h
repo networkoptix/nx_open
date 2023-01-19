@@ -9,9 +9,7 @@
 #include "i_data_packet.h"
 #include "i_media_context.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Packet containing compressed media data (audio or video).
@@ -49,7 +47,7 @@ public:
     /**
      * @return Pointer to the codec context, or null if not available.
      */
-    public: Ptr<const IMediaContext> context() const { return toPtr(getContext()); }
+    public: Ptr<const IMediaContext> context() const { return Ptr(getContext()); }
 
     enum class MediaFlags: uint32_t
     {
@@ -65,6 +63,4 @@ public:
 };
 using ICompressedMediaPacket0 = ICompressedMediaPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

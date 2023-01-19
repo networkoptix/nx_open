@@ -8,9 +8,7 @@
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class EventMetadataPacket: public RefCountable<IEventMetadataPacket>
 {
@@ -38,6 +36,4 @@ private:
     std::vector<Ptr<const IEventMetadata>> m_events;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

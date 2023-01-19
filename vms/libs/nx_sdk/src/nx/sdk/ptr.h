@@ -26,6 +26,11 @@ public:
             "Ptr layout should be the same as of a raw pointer.");
     }
 
+    explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
+
+    template<class OtherRefCountable>
+    explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
+
     template<class OtherRefCountable>
     Ptr(const Ptr<OtherRefCountable>& other): m_ptr(other.get()) { addRef(); }
 
@@ -98,14 +103,6 @@ public:
     explicit operator bool() const { return m_ptr != nullptr; }
 
 private:
-    template<class OtherRefCountable>
-    friend Ptr<OtherRefCountable> toPtr(OtherRefCountable* refCountable);
-
-    explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
-
-    template<class OtherRefCountable>
-    explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
-
     void addRef()
     {
         if (m_ptr)
@@ -186,18 +183,6 @@ bool operator<(std::nullptr_t, const Ptr<RefCountable>& refCountable)
 }
 
 /**
- * Wrapper for Ptr constructor - needed to use the template argument deduction.
- *
- * NOTE: Will not be needed after migrating to C++17 because of the support for constructor
- * template argument deduction.
- */
-template<class RefCountable>
-static Ptr<RefCountable> toPtr(RefCountable* refCountable)
-{
-    return Ptr<RefCountable>(refCountable);
-}
-
-/**
  * Increments the reference counter and returns a new owning smart pointer. If refCountable is
  * null, just returns null.
  */
@@ -206,7 +191,7 @@ static Ptr<RefCountable> shareToPtr(RefCountable* refCountable)
 {
     if (refCountable)
         refCountable->addRef();
-    return toPtr(refCountable);
+    return Ptr(refCountable);
 }
 
 /**
@@ -225,7 +210,7 @@ static Ptr<RefCountable> shareToPtr(const Ptr<RefCountable>& ptr)
 template<class RefCountable, typename... Args>
 static Ptr<RefCountable> makePtr(Args&&... args)
 {
-    return toPtr(new RefCountable(std::forward<Args>(args)...));
+    return Ptr(new RefCountable(std::forward<Args>(args)...));
 }
 
 /**
@@ -238,7 +223,7 @@ static Ptr<Interface> queryInterfaceOfOldSdk(
     RefCountablePtr refCountable, const OldInterfaceId& interfaceId)
 {
     return refCountable
-        ? toPtr(static_cast<Interface*>(refCountable->queryInterface(interfaceId)))
+        ? Ptr(static_cast<Interface*>(refCountable->queryInterface(interfaceId)))
         : nullptr;
 }
 

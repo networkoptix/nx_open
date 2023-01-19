@@ -5,8 +5,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/i_string.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Represents an object which the plugin can use for calling back to access some data and
@@ -42,7 +41,7 @@ public:
      *
      * @return Absolute path to the Plugin's Home Directory, or an empty string if it is absent.
      */
-    public: std::string homeDir() const { return toPtr(getHomeDir())->str(); }
+    public: std::string homeDir() const { return Ptr(getHomeDir())->str(); }
 };
 
 class IUtilityProvider1: public Interface<IUtilityProvider1, IUtilityProvider0>
@@ -55,7 +54,7 @@ public:
     /**
      * @return The version of the Server's built-in SDK.
      */
-    public: std::string serverSdkVersion() const { return toPtr(getServerSdkVersion())->str(); }
+    public: std::string serverSdkVersion() const { return Ptr(getServerSdkVersion())->str(); }
 };
 
 class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider1>
@@ -67,5 +66,4 @@ public:
 };
 using IUtilityProvider2 = IUtilityProvider;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

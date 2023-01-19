@@ -8,9 +8,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 {
@@ -78,6 +76,4 @@ private:
     std::vector<Ptr<Attribute>> m_attributes;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

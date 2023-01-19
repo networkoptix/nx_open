@@ -7,9 +7,7 @@
 
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /** @param outValue Can be null if the value is not needed. */
 bool pixelFormatFromStdString(
@@ -40,6 +38,4 @@ const PixelFormatDescriptor* getPixelFormatDescriptor(
 
 std::vector<IUncompressedVideoFrame::PixelFormat> getAllPixelFormats();
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

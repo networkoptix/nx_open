@@ -2,8 +2,7 @@
 
 #include "attribute.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 Attribute::Attribute(
     Type type,
@@ -54,5 +53,4 @@ float Attribute::confidence() const
     return m_confidence;
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

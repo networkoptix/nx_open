@@ -6,8 +6,7 @@
 #include <nx/sdk/result.h>
 #include <camera/camera_plugin.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 namespace archive {
 
 struct Rational
@@ -43,5 +42,4 @@ public:
 };
 
 } // namespace archive
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

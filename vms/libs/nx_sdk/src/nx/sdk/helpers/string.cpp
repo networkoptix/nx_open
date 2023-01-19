@@ -2,8 +2,7 @@
 
 #include "string.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 String::String(std::string s):
     m_string(std::move(s))
@@ -43,5 +42,4 @@ bool String::empty() const
     return m_string.empty();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk
