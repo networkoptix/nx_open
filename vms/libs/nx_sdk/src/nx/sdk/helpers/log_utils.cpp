@@ -8,8 +8,7 @@
 
 #include <nx/sdk/i_string_map.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void LogUtils::setPrintPrefix(std::string newPrefix)
 {
@@ -58,5 +57,4 @@ bool LogUtils::convertAndOutputStringMap(
     return true;
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

@@ -18,9 +18,7 @@
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 static std::string makePrintPrefix(
     const std::string& pluginInstanceId, const IDeviceInfo* deviceInfo)
@@ -140,7 +138,7 @@ void ConsumingDeviceAgent::processMetadataPackets(
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         for (int i = 0; i < (int) metadataPackets.size(); ++i)
-            processMetadataPacket(toPtr(metadataPackets.at(i)).get(), i);
+            processMetadataPacket(Ptr(metadataPackets.at(i)).get(), i);
     }
 }
 
@@ -300,6 +298,4 @@ void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     }
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

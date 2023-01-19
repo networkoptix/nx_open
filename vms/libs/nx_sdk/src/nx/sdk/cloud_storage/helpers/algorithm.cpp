@@ -5,9 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
+namespace nx::sdk::cloud_storage {
 
 using namespace std::chrono;
 
@@ -657,7 +655,4 @@ nx::sdk::cloud_storage::IDeviceAgent* findDeviceAgentById(
     return resultIt->get();
 }
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
-
+} // namespace nx::sdk::cloud_storage

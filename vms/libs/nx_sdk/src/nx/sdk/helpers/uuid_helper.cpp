@@ -13,8 +13,7 @@
 #include <stdint.h>
 #include <mutex>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 namespace UuidHelper {
 
@@ -155,5 +154,4 @@ Uuid randomUuid()
 
 } // namespace UuidHelper
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

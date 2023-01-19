@@ -6,9 +6,7 @@
 
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Arbitrary metadata represented as a byte array.
@@ -47,6 +45,4 @@ public:
 };
 using ICustomMetadataPacket0 = ICustomMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

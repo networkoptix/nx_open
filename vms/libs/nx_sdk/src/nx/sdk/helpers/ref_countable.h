@@ -7,8 +7,7 @@
 #include <nx/sdk/i_ref_countable.h>
 #include <nx/sdk/helpers/lib_context.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Not recommended to be used directly - use RefCountable, unless there is some special case.
@@ -111,5 +110,4 @@ private:
     const RefCountableHolder m_refCountableHolder;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

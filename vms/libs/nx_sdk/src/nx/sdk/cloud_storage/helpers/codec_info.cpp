@@ -4,10 +4,8 @@
 
 #include <nx/sdk/cloud_storage/helpers/algorithm.h>
 
-namespace nx {
-namespace sdk {
-namespace cloud_storage {
-
+namespace nx::sdk::cloud_storage {
+    
 CodecInfo::CodecInfo(const CodecInfoData& codecInfo) : m_codecInfo(codecInfo)
 {
     m_extradata = nx::sdk::cloud_storage::fromBase64(m_codecInfo.extradataBase64);
@@ -98,6 +96,4 @@ int CodecInfo::channelNumber() const
     return m_codecInfo.channelNumber;
 }
 
-} // namespace cloud_storage
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::cloud_storage

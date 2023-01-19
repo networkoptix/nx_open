@@ -41,7 +41,7 @@ public:
     * Returns codec info list that was provided to the plugin when a stream writer for the
     * corresponding media data chunk was created.
     */
-    public: Ptr<const IList<ICodecInfo>> codecInfoList() const { return toPtr(getCodecInfoList()); }
+    public: Ptr<const IList<ICodecInfo>> codecInfoList() const { return Ptr(getCodecInfoList()); }
 
     virtual int64_t startTimeUs() const = 0;
     virtual int64_t endTimeUs() const = 0;

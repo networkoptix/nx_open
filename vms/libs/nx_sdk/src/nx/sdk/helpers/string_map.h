@@ -8,8 +8,7 @@
 
 #include <nx/sdk/i_string_map.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 // TODO: Do something with O(N^2) complexity of lookup by index.
 class StringMap: public RefCountable<IStringMap>
@@ -39,5 +38,4 @@ private:
     Map m_map;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

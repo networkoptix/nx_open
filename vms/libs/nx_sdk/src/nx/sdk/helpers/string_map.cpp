@@ -6,8 +6,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 void StringMap::setItem(const std::string& key, const std::string& value)
 {
@@ -57,5 +56,4 @@ const char* StringMap::value(const char* key) const
     return it->second.c_str();
 }
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

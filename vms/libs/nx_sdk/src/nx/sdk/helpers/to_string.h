@@ -10,8 +10,7 @@
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_device_info.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 std::string toString(const IString* string);
 
@@ -42,8 +41,7 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent = 0);
 
 std::string toString(ErrorCode errorCode);
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk
 
 //-------------------------------------------------------------------------------------------------
 // Functions that need to be in namespace std for compatibility with STL features.

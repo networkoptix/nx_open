@@ -6,9 +6,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 ObjectTrackBestShotPacket::ObjectTrackBestShotPacket(
     Uuid trackId,
@@ -129,6 +127,4 @@ void ObjectTrackBestShotPacket::addAttributes(const std::vector<Ptr<Attribute>>&
         addAttribute(newAttribute);
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

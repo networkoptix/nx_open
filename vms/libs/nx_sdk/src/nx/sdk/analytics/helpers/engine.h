@@ -16,9 +16,7 @@
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/log_utils.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Base class for a typical implementation of an Analytics Engine. Hides many technical details of
@@ -136,6 +134,4 @@ private:
     std::string m_pluginInstanceId;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

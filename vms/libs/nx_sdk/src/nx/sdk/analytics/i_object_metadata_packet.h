@@ -7,9 +7,7 @@
 #include "i_object_metadata.h"
 #include "i_compound_metadata_packet.h"
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Metadata packet that contains data about objects detected on the scene.
@@ -21,7 +19,7 @@ public:
 
     /** Called by at() */
     protected: virtual const IObjectMetadata* getAt(int index) const override = 0;
-    public: Ptr<const IObjectMetadata> at(int index) const { return toPtr(getAt(index)); }
+    public: Ptr<const IObjectMetadata> at(int index) const { return Ptr(getAt(index)); }
 };
 
 class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, IObjectMetadataPacket0>
@@ -33,6 +31,4 @@ public:
 };
 using IObjectMetadataPacket1 = IObjectMetadataPacket;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

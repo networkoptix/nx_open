@@ -11,8 +11,7 @@
 
 #include <nx/sdk/helpers/i_ref_countable_registry.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Interface to LibContext which is used by the Server to set up the context for each plugin
@@ -134,5 +133,4 @@ extern "C" NX_SDK_API void nxSetUnitTestOptions(const IStringMap* options);
 static constexpr const char* kNxSetUnitTestOptionsFuncName = "nxSetUnitTestOptions";
 typedef void (*NxSetUnitTestOptionsFunc)(const IStringMap* options);
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

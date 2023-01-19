@@ -11,9 +11,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/attribute.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class EventMetadata: public RefCountable<IEventMetadata>
 {
@@ -51,6 +49,4 @@ private:
     std::string m_key;
 };
 
-} // namespace nx
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

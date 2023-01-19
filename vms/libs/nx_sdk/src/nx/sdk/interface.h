@@ -8,8 +8,7 @@
 
 #include "i_ref_countable.h"
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Helper class to define interfaces: provides the appropriate queryInterface().
@@ -101,5 +100,4 @@ private:
     }
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

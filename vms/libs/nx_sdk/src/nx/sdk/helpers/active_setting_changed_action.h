@@ -9,8 +9,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/string_map.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class ActiveSettingChangedAction: public RefCountable<IActiveSettingChangedAction>
 {
@@ -36,5 +35,4 @@ private:
     Ptr<const StringMap> m_params;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

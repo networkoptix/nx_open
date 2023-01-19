@@ -7,8 +7,7 @@
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class DeviceInfo: public nx::sdk::RefCountable<IDeviceInfo>
 {
@@ -51,5 +50,4 @@ private:
     int m_channelNumber = 0;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

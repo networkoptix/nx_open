@@ -7,8 +7,7 @@
 #include <chrono>
 #include <limits>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * This class calculates media stream bitrate, average frame rate and GOP size.
@@ -59,5 +58,4 @@ private:
     std::chrono::steady_clock::time_point m_lastDataTimer;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

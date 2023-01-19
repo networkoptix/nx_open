@@ -7,9 +7,7 @@
 #include <nx/sdk/analytics/i_engine_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class EngineInfo: public RefCountable<IEngineInfo>
 {
@@ -27,6 +25,4 @@ private:
     std::string m_name;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

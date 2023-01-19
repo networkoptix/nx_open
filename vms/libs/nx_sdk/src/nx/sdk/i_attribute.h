@@ -4,8 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class IAttribute: public Interface<IAttribute>
 {
@@ -34,5 +33,4 @@ public:
 };
 using IAttribute0 = IAttribute;
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

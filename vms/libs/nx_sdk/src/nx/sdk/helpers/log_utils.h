@@ -7,8 +7,7 @@
 
 namespace nx { namespace sdk { class IStringMap; } }
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 /**
  * Plugin utils providing convenience for using NX_PRINT/NX_OUTPUT with their settings
@@ -48,5 +47,4 @@ struct LogUtils
         int outputIndent = 0) const;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

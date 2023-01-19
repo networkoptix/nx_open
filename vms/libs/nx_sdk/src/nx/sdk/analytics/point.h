@@ -2,9 +2,7 @@
 
 #pragma once
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 struct Point
 {
@@ -23,6 +21,4 @@ struct Point
     float y = -1;
 };
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

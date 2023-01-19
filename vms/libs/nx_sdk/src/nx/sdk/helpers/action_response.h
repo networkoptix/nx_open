@@ -8,8 +8,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 
-namespace nx {
-namespace sdk {
+namespace nx::sdk {
 
 class ActionResponse: public RefCountable<IActionResponse>
 {
@@ -30,5 +29,4 @@ private:
     std::string m_messageToUser;
 };
 
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk

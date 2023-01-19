@@ -4,9 +4,7 @@
 
 #include <nx/sdk/interface.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * Codec context for encoding/decoding.
@@ -29,6 +27,4 @@ public:
 };
 using IMediaContext0 = IMediaContext;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

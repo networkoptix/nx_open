@@ -8,9 +8,7 @@
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/i_metadata.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 /**
  * A single object detected on the scene on a particular video frame, defined as a bounding box.
@@ -44,6 +42,4 @@ public:
 };
 using IObjectMetadata0 = IObjectMetadata;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

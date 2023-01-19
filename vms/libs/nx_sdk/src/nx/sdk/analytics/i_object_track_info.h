@@ -9,9 +9,7 @@
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 class IObjectTrackInfo0: public Interface<IObjectTrackInfo0>
 {
@@ -21,7 +19,7 @@ public:
     /** Called by track() */
     protected: virtual IList<ITimestampedObjectMetadata>* getTrack() const = 0;
     /** @return List of metadata that share the same trackId. */
-    public: Ptr<IList<ITimestampedObjectMetadata>> track() const { return toPtr(getTrack()); }
+    public: Ptr<IList<ITimestampedObjectMetadata>> track() const { return Ptr(getTrack()); }
 
     /** Called by bestShotVideoFrame() */
     protected: virtual IUncompressedVideoFrame* getBestShotVideoFrame() const = 0;
@@ -33,7 +31,7 @@ public:
      */
     public: Ptr<IUncompressedVideoFrame> bestShotVideoFrame() const
     {
-        return toPtr(getBestShotVideoFrame());
+        return Ptr(getBestShotVideoFrame());
     }
 
     /** Called by bestShotObjectMetadata() */
@@ -46,7 +44,7 @@ public:
      */
     public: Ptr<ITimestampedObjectMetadata> bestShotObjectMetadata() const
     {
-        return toPtr(getBestShotObjectMetadata());
+        return Ptr(getBestShotObjectMetadata());
     }
 };
 
@@ -77,6 +75,4 @@ public:
 };
 using IObjectTrackInfo1 = IObjectTrackInfo;
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

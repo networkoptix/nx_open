@@ -4,9 +4,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 IList<ITimestampedObjectMetadata>* ObjectTrackInfo::getTrack() const
 {
@@ -92,6 +90,4 @@ void ObjectTrackInfo::setBestShotImage(
     setBestShotImageDataFormat(std::move(bestShotImageDataFormat));
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics

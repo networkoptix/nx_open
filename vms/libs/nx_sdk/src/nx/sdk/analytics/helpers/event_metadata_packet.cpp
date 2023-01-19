@@ -4,9 +4,7 @@
 
 #include <nx/kit/debug.h>
 
-namespace nx {
-namespace sdk {
-namespace analytics {
+namespace nx::sdk::analytics {
 
 EventMetadataPacket::Flags EventMetadataPacket::flags() const
 {
@@ -63,6 +61,4 @@ void EventMetadataPacket::clear()
     m_events.clear();
 }
 
-} // namespace analytics
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::analytics
