@@ -5015,9 +5015,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sertifikalar</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Sertifikalar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6735,9 +6735,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
       </translation>
     </message>
   </context>
@@ -9042,9 +9042,9 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Hata ayıklama günlüğü Sunucu %n üzerinde etkinleştirildi</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>Hata ayıklama günlüğü %n Sunucuda etkinleştirildi</numerusform>
+        <numerusform>Hata ayıklama kaydı %n Sunucuda etkinleştirildi</numerusform>
       </translation>
     </message>
     <message>
@@ -9628,9 +9628,9 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Bildirimleri Tuttur</numerusform>
         <numerusform>%n bildirimler</numerusform>
-        <numerusform>%n notifications</numerusform>
       </translation>
     </message>
     <message>
@@ -10664,9 +10664,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Kayıt programı %n kamera için geçersiz</numerusform>
         <numerusform>Kayıt programı %n kameralar için geçersiz</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -10719,23 +10719,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Sunucusunda yedek depolama yapılandırılmamış</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      <translation>
+        <numerusform>Yedek depolama %n Sunucuda yapılandırılmadı</numerusform>
+        <numerusform>Yedek depolama %n Sunucuda yapılandırılmadı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Sunucusunda Analitik Verileri için depolama yapılandırılmamış</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>Analitik verileri için depolama, %n Sunucuda ayarlanmamış</numerusform>
+        <numerusform>Analitik verileri için %n depolama ayarlanmamış</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Sunucusu üzerindeki sistem depolaması analiz verileri için kullanıldı</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      <translation>
+        <numerusform>Sistem depolaması, %n Sunucudaki analiz verileri için kullanılır</numerusform>
+        <numerusform>Sistem depolaması, %n Sunucudaki analiz verileri için kullanılır</numerusform>
       </translation>
     </message>
     <message>

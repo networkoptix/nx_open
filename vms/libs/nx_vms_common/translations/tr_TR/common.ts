@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>İstemci ayarları anonim istatistik raporu</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
@@ -1319,11 +1319,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Son ana Sistem birleştirme kimliği</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>Son alt Sistem birleştirme kimliği</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1340,7 +1340,7 @@
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>E-posta göndermek için SMTP istemcisi yerine %1 hizmetini kullanın</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1372,7 +1372,7 @@
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>RTSPS'yi zorunlu kılın (video trafik şifrelemesi)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
@@ -1396,7 +1396,7 @@
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Bulut barındırıcı etkisizleştirme</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1408,19 +1408,19 @@
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Maks. P2P kuyruğu boyutu (bayt, 32-512MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Maks P2P tüm istemci boyutu (bayt, 32-512MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Maksimum kayıt kuyruğu boyutu (bayt, 6-96MB)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Maksimum kayıt kuyruğu boyutu (öğeler, 250-4000)</translation>
     </message>
     <message>
       <source>RTP retry count</source>
@@ -1432,11 +1432,11 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Maks. RTSP bağlantı süresi (saniye)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Cloud-bağlantısı UDP boşluk açmayı etkinleştirin</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
@@ -1460,7 +1460,7 @@
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Dosyalar için eşleri indir</translation>
     </message>
     <message>
       <source>Client update settings</source>
@@ -1472,23 +1472,23 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Yetkilendirme Oturumu jeton ömrü (dakika)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Tek Sunucuda oturum belirteci sayısı sınırı</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Tek Sunucuda kullanıcı başına maksimum oturum belirteci sayısı</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Uzak oturum belirteci önbelleği için güncelleme aralığı (diğer Sunucular ve Bulut)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Uzak oturum belirteç önbelleği için zaman aşımı (diğer Sunucular ve Bulut)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>Resource_data.json otomatik güncellemesi için URI</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1532,7 +1532,7 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Hata durumunda analitik DB depolama bağlama noktası izinlerini zorunlu kıl</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
@@ -1552,7 +1552,7 @@
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>HTTP başlığı: X-Frame-Seçenekleri</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
@@ -1584,12 +1584,12 @@
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+      <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+      <translation>Şu anda %1 yazılım tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
@@ -1601,7 +1601,7 @@
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Yalnızca ses aygıtları için ortam arabelleği boyutu (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
@@ -1609,27 +1609,27 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>VMS'de saklanan cihaz şifrelerini Yöneticiler için açığa çıkarın (web sayfaları için)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Uzak arşiv senkronizasyonu için maks. iş parçacığı sayısı (&lt;=0 - otomatik, maks. 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>Kamera arşivi senkronizasyonu için iş parçacığı sayısı sınırı</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı, belirtilen değerden %20 kadar daha yüksek olabilir.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Birincil akış için bazı karelerin önbelleğe alınıp alınmaması. Değerler: &apos;evet&apos; - her zaman etkin (çok fazla RAM kullanabilir), &apos;hayır&apos; - arşiv oynatmanın gerektirdiği durumlar dışında her zaman devre dışı (örn. HLS), &apos;otomatik&apos; - &apos;hayır&apos; a benzer, ancak kullanıcı deneyimini arttırır (örneğin, Kamera üzerinde çalışan bazı Analitik eklentileri).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Sunucud kod çevrimi kullanan maksimum HTTP bağlantısı miktarı. Chrome aynı anda 2 bağlantı açar, ardından ilkini kapatır. Bu parametreyi &apos; olarak veya 2 ve daha fazla olarak ayarlamanızı öneririz.</translation>
     </message>
   </context>
   <context>
@@ -2234,12 +2234,12 @@
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Adres %1, birincil akışta %2 tarafından zaten kullanılıyor.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Adres %1, ikincil akışta %2 tarafından zaten kullanılıyor.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
@@ -2255,7 +2255,7 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>İnterkom bilgilendiricisini göster</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
@@ -2275,15 +2275,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Kamera saati kullanmaya çalışılırken hata oluştu, çok fazla gecikme var. Sistem saati kullanılacak.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analitik depolama &quot;%1&quot; veritabanı hatası: Bağlama noktasında izinler yetersiz.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Medya arşivinde kayıt etkinken AES şifrelemesi başlatılamıyor. Veriler şifrelenmeden yazılır.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
