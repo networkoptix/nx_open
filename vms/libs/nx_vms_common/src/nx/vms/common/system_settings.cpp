@@ -162,7 +162,7 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
 SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
 {
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "statisticsAllowed", false, this,
+        "statisticsAllowed", true, this,
         [] { return tr("Anonymous statistics report allowed"); });
 
     m_statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
