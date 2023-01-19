@@ -4832,9 +4832,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sertifikalar</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Sertifikalar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10317,9 +10317,9 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Kayıt programı %n kamera için geçersiz</numerusform>
         <numerusform>Kayıt programı %n kameralar için geçersiz</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
     </message>
     <message>
