@@ -697,10 +697,45 @@ public:
         const nx::vms::api::LdapUserList& result,
         const QString& message)>;
 
-    Handle testLdapSettingsAsync(
+    Handle testLdapSettingsDeprecatedAsync(
         const nx::vms::api::LdapSettingsDeprecated& settings,
         LdapSettingsCallback&& callback,
         QThread* targetThread = nullptr);
+
+    Handle testLdapSettingsAsync(
+        const nx::vms::api::LdapSettings& settings,
+        Result<ErrorOrData<std::vector<QString>>>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle setLdapSettingsAsync(
+        const nx::vms::api::LdapSettings& settings,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle modifyLdapSettingsAsync(
+        const nx::vms::api::LdapSettingsChange& settings,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getLdapSettingsAsync(
+        Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getLdapStatusAsync(
+        Result<ErrorOrData<nx::vms::api::LdapStatus>>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle syncLdapAsync(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrEmpty>::type&& callback,
+        QThread* targetThread);
+
+    Handle resetLdapAsync(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrEmpty>::type&& callback,
+        QThread* targetThread);
 
     Handle loginAsync(
         const nx::vms::api::LoginSessionRequest& data,

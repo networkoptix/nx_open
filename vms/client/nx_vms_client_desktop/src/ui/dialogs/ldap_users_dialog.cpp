@@ -78,7 +78,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     });
     m_timeoutTimer->start();
 
-    connectedServerApi()->testLdapSettingsAsync(
+    connectedServerApi()->testLdapSettingsDeprecatedAsync(
         std::move(settings),
         nx::utils::guarded(this,
             [this](bool success, int handle, auto users, auto errorString)

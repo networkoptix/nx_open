@@ -40,6 +40,7 @@
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/device_actions.h>
 #include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/storage_encryption_data.h>
 #include <nx/vms/api/data/system_information.h>
@@ -1661,7 +1662,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
         };
 }
 
-Handle ServerConnection::testLdapSettingsAsync(
+Handle ServerConnection::testLdapSettingsDeprecatedAsync(
     const nx::vms::api::LdapSettingsDeprecated& settings,
     LdapSettingsCallback&& callback,
     QThread* targetThread)
@@ -1682,6 +1683,124 @@ Handle ServerConnection::testLdapSettingsAsync(
 
     return postJsonResult("/api/testLdapSettings", {},
         QJson::serialized(settings), callback_wrapper, targetThread, timeouts);
+}
+
+Handle ServerConnection::testLdapSettingsAsync(
+    const nx::vms::api::LdapSettings& settings,
+    Result<ErrorOrData<std::vector<QString>>>::type&& callback,
+    QThread* targetThread)
+{
+    return executePost(
+        "/rest/v3/ldap/test",
+        nx::reflect::json::serialize(settings),
+        std::move(callback),
+        targetThread);
+}
+
+Handle ServerConnection::setLdapSettingsAsync(
+    const nx::vms::api::LdapSettings& settings,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::put,
+        prepareUrl(
+            "/rest/v3/ldap/settings",
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(settings));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::modifyLdapSettingsAsync(
+    const nx::vms::api::LdapSettingsChange& settings,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::patch,
+        prepareUrl(
+            "/rest/v3/ldap/settings",
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(settings));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::getLdapSettingsAsync(
+    Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet("/rest/v3/ldap/settings", {}, callback, targetThread);
+}
+
+Handle ServerConnection::getLdapStatusAsync(
+    Result<ErrorOrData<nx::vms::api::LdapStatus>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet("/rest/v3/ldap/sync", {}, callback, targetThread);
+}
+
+Handle ServerConnection::syncLdapAsync(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrEmpty>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::post,
+        prepareUrl(
+            "/rest/v3/ldap/sync",
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::resetLdapAsync(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrEmpty>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::delete_,
+        prepareUrl(
+            "/rest/v3/ldap/settings",
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
 Handle ServerConnection::loginAsync(

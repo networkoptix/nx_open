@@ -103,7 +103,7 @@ void QnLdapSettingsDialogPrivate::testSettings()
         settings.searchTimeoutS.count() * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = connectedServerApi()->testLdapSettingsAsync(
+    testHandle = connectedServerApi()->testLdapSettingsDeprecatedAsync(
         settings,
         nx::utils::guarded(this,
             [q](bool success, int handle, auto users, auto errorString)
