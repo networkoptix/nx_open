@@ -160,9 +160,9 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cihaz Bağlantısı Kesildi</numerusform>
+      <translation>
         <numerusform>Device Disconnected</numerusform>
+        <numerusform>Cihaz bağlantısı kesildi</numerusform>
       </translation>
     </message>
     <message>
@@ -171,9 +171,9 @@
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Kameraların bağlantısı kesildi</numerusform>
         <numerusform>Kamera Bağlantısı Kesildi</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
       </translation>
     </message>
   </context>
@@ -347,9 +347,9 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>Son %n saniye süresince veri alınamadı.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>%n saniye boyunca veri alınmadı.</numerusform>
+        <numerusform>Son %n saniye boyunca veri alınmadı.</numerusform>
       </translation>
     </message>
     <message>
@@ -375,12 +375,12 @@
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Adres %1, birincil akışta %2 tarafından zaten kullanılıyor.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Adres %1, ikincil akışta %2 tarafından zaten kullanılıyor.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
@@ -388,23 +388,23 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Ağ adresi %1, çoklu yayın adresi değil.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Kamera bağlantısı (birincil akış) beklenmedik şekilde kapatıldı.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Kamera bağlantısı (ikincil akış) beklenmedik şekilde kapatıldı.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Cihaz bağlantısı beklenmedik bir şekilde kapandı.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Kamera saati kullanmaya çalışılırken hata oluştu, çok fazla gecikme var. Sistem saati kullanılacak.</translation>
     </message>
   </context>
   <context>
@@ -520,7 +520,7 @@
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Sunucu &quot;%1&quot; sertifika hatası</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
@@ -668,31 +668,31 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD diski &quot;%1&quot; dolu. Disk, VMS tarafından yönetilmeyen çok fazla veri içeriyor.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Sistem diski &quot;%1&quot; neredeyse dolu.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analitik depolama &quot;%1&quot; çevrimdışı.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analitik depolama &quot;%1&quot; neredeyse dolu.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Arşiv yedekleme başarısız oldu. %1 dosyası yedeklenemedi.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analitik depolama &quot;%1&quot; veritabanı hatası: Bağlama noktasında izinler yetersiz.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Medya arşivinde kayıt etkinken AES şifrelemesi başlatılamıyor. Veriler şifrelenmeden yazılır.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
