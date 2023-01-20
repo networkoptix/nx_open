@@ -56,6 +56,7 @@ struct CompatibilityVersionInstallationDialog::Private
     Clock::time_point lastActionStamp;
 
     UpdateContents updateContents;
+    ClientUpdateTool::SystemServersInfo serversInfo;
 };
 
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
@@ -253,8 +254,6 @@ QString CompatibilityVersionInstallationDialog::errorString() const
 
 void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 {
-    ClientUpdateTool::SystemServersInfo serversInfo;
-
     if (m_private->checkingUpdates)
     {
         const auto processInfoReply =
@@ -290,7 +289,7 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
         {
             --m_private->requestsLeft;
 
-            serversInfo = m_private->systemServersInfo.get();
+            m_private->serversInfo = m_private->systemServersInfo.get();
         }
 
         // Done waiting for update information
@@ -298,7 +297,7 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
         {
             if (m_private->updateContents.isValidToInstall())
             {
-                m_private->clientUpdateTool->setupProxyConnections(serversInfo);
+                m_private->clientUpdateTool->setupProxyConnections(m_private->serversInfo);
                 m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
             }
             else
@@ -347,6 +346,7 @@ void CompatibilityVersionInstallationDialog::startUpdate()
     if (m_private->targetUpdateInfoMediaserver.valid())
         ++m_private->requestsLeft;
 
+    m_private->serversInfo = {};
     m_private->systemServersInfo = std::async(
         std::launch::async,
         [this]()
