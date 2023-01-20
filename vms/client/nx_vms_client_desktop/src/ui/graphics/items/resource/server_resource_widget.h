@@ -17,7 +17,8 @@ class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 class QnGlFunctions;
 
-class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerListener {
+class QnServerResourceWidget: public QnResourceWidget
+{
     Q_OBJECT
     typedef QnResourceWidget base_type;
 
@@ -49,7 +50,6 @@ protected:
     virtual int calculateButtonsVisibility() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
-    virtual void tick(int deltaMSecs) override;
 
     virtual void at_itemDataChanged(int role) override;
 
@@ -81,6 +81,8 @@ private:
 
     bool isLegendVisible() const;
     void createButtons();
+
+    void tick(int deltaMSecs);
 
 private:
     // TODO: #sivanov Move all required fields to inner class.
@@ -143,6 +145,8 @@ private:
 
     int m_hddCount;
     int m_networkCount;
+
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };
 
 #endif // QN_SERVER_RESOURCE_WIDGET_H

@@ -15,6 +15,8 @@ namespace {
 AbstractAnimator::AbstractAnimator(QObject* parent):
     QObject(parent)
 {
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &AbstractAnimator::tick);
 }
 
 AbstractAnimator::~AbstractAnimator() {
@@ -127,8 +129,12 @@ void AbstractAnimator::updateState(State newState) {
     State oldState = m_state;
     m_state = newState;
 
-    if (newState == Running && timer() == nullptr && m_group == nullptr)
+    if (newState == Running
+        && m_animationTimerListener->timer() == nullptr
+        && m_group == nullptr)
+    {
         NX_ASSERT(false, "This animator is not assigned to an animation timer, animation won't work.");
+    }
 
     switch(newState) {
     case Stopped: /* Paused -> Stopped. */
@@ -139,12 +145,12 @@ void AbstractAnimator::updateState(State newState) {
             emit started();
         } else { /* Running -> Paused. */
             m_currentTime = 0;
-            stopListening();
+            m_animationTimerListener->stopListening();
         }
         break;
     case Running: /* Paused -> Running. */
         m_currentTime = 0;
-        startListening();
+        m_animationTimerListener->startListening();
         if(duration() <= minimalDurationMSec)
             tick(minimalDurationMSec);
         break;

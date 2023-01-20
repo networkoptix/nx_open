@@ -32,10 +32,13 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &QnFisheyePtzController::tick);
+
     m_unitSpeed = {60.0, 60.0, 0.0, 30.0};
 
     m_widget = widget;
-    m_widget->registerAnimation(this);
+    m_widget->registerAnimation(m_animationTimerListener);
 
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
@@ -253,7 +256,7 @@ void QnFisheyePtzController::tick(int deltaMSecs)
         if (m_progress >= 1.0)
         {
             absoluteMoveInternal(m_endPosition);
-            stopListening();
+            m_animationTimerListener->stopListening();
         }
         else
         {
@@ -334,12 +337,12 @@ bool QnFisheyePtzController::continuousMove(
 
     if (qFuzzyIsNull(speed))
     {
-        stopListening();
+        m_animationTimerListener->stopListening();
     }
     else
     {
         m_animationMode = SpeedAnimation;
-        startListening();
+        m_animationTimerListener->startListening();
     }
 
     return true;
@@ -366,7 +369,7 @@ bool QnFisheyePtzController::absoluteMove(
         return false;
 
     m_speed = Vector();
-    stopListening();
+    m_animationTimerListener->stopListening();
 
     if (!qFuzzyEquals(speed, 1.0) && speed > 1.0)
     {
@@ -401,7 +404,7 @@ bool QnFisheyePtzController::absoluteMove(
         const qreal zoomTime = distance.zoom / m_unitSpeed.zoom;
         m_relativeSpeed = qBound(0.0, speed, 1.0) / qMax(panTiltTime, zoomTime);
 
-        startListening();
+        m_animationTimerListener->startListening();
     }
 
     return true;

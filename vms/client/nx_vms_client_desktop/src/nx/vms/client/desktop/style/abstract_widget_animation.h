@@ -8,21 +8,20 @@
 #include <QtWidgets/QWidget>
 
 #include <ui/animation/animation_timer.h>
-#include <ui/animation/animation_timer_listener.h>
 
 namespace nx::vms::client::desktop {
 
-class AbstractWidgetAnimation: public QObject, protected AnimationTimerListener
+class AbstractWidgetAnimation: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     AbstractWidgetAnimation(QObject* parent = nullptr):
         QObject(parent)
     {
         auto animationTimer = new QtBasedAnimationTimer(this);
-        setTimer(animationTimer);
-        startListening();
+        connect(animationTimer, &QtBasedAnimationTimer::tick, this,
+            &AbstractWidgetAnimation::tick);
     }
 
     void start(const QWidget* widget, qreal speed, qreal value)
@@ -72,8 +71,8 @@ public:
         return pos->running;
     }
 
-protected:
-    virtual void tick(int deltaTime) override
+private:
+    void tick(int deltaMs)
     {
         for (auto pos = m_animationByWidget.begin(); pos != m_animationByWidget.end(); ++pos)
         {
@@ -81,7 +80,7 @@ protected:
                 continue;
 
             const_cast<QWidget*>(pos.key())->update();
-            pos->value += pos->speed * deltaTime / 1000.0;
+            pos->value += pos->speed * deltaMs / 1000.0;
         }
     }
 

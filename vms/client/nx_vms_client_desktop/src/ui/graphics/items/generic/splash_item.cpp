@@ -18,6 +18,9 @@ QnSplashItem::QnSplashItem(QGraphicsItem *parent):
 {
     setAcceptedMouseButtons(Qt::NoButton);
     setColor(Qt::white);
+
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &QnSplashItem::tick);
 }
 
 QnSplashItem::~QnSplashItem() {
@@ -70,7 +73,7 @@ void QnSplashItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             m_rect.bottomRight(),
             m_rect.bottomLeft()
         };
-        
+
         qreal d = qMin(m_rect.width(), m_rect.height()) / 2;
         QPointF centers[5] = {
             m_rect.bottomLeft()     + QPointF( d, -d),
@@ -93,14 +96,14 @@ void QnSplashItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
         }
     }
 }
-        
+
 void QnSplashItem::animate(qint64 endTimeMSec, const QRectF &endRect, qreal endOpacity, bool destroy, qint64 midTimeMSec, qreal midOpacity) {
     if(!m_animation) {
         m_animation.reset(new AnimationData());
-        registerAnimation(this);
+        registerAnimation(m_animationTimerListener);
     }
-        
-    startListening();
+
+    m_animationTimerListener->startListening();
 
     AnimationData *a = m_animation.data();
     a->time = 0;
@@ -134,7 +137,7 @@ void QnSplashItem::tick(int deltaMSecs) {
     }
 
     if(a->time >= a->endTime) {
-        stopListening();
+        m_animationTimerListener->stopListening();
 
         emit animationFinished();
 

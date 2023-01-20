@@ -622,6 +622,9 @@ QnTimeSlider::QnTimeSlider(
     setOrientation(Qt::Horizontal);
     setFlag(ItemSendsScenePositionChanges, true);
 
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &QnTimeSlider::tick);
+
     connect(this, &QGraphicsObject::visibleChanged, this,
         [this]()
         {
@@ -662,7 +665,7 @@ QnTimeSlider::QnTimeSlider(
     kineticZoomProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
     kineticZoomProcessor->setMaxSpeedMagnitude(kWindowZoomMaxSpeed);
     kineticZoomProcessor->setSpeedCuttingThreshold(kZoomProcessorSpeedCuttingThreshold);
-    registerAnimation(kineticZoomProcessor);
+    registerAnimation(kineticZoomProcessor->animationTimerListener());
     m_kineticZoomHandler->updateKineticProcessor();
 
     /* Prepare kinetic drag processor. */
@@ -671,7 +674,7 @@ QnTimeSlider::QnTimeSlider(
     kineticScrollProcessor->setMaxShiftInterval(kScrollProcessorMaxShiftIntervalSeconds);
     kineticScrollProcessor->setMaxSpeedMagnitude(kWindowScrollMaxSpeed);
     kineticScrollProcessor->setSpeedCuttingThreshold(kScrollProcessorSpeedCuttingThreshold);
-    registerAnimation(kineticScrollProcessor);
+    registerAnimation(kineticScrollProcessor->animationTimerListener());
     m_kineticScrollHandler->updateKineticProcessor();
 
     /* Prepare zoom processor. */
@@ -682,8 +685,8 @@ QnTimeSlider::QnTimeSlider(
     dragProcessor->setStartDragTime(-1); /* No drag on timeout. */
 
     /* Prepare animation timer listener. */
-    startListening();
-    registerAnimation(this);
+    m_animationTimerListener->startListening();
+    registerAnimation(m_animationTimerListener);
 
     /* Set default property values. */
     setAcceptHoverEvents(true);

@@ -36,6 +36,9 @@ KineticProcessor::KineticProcessor(QMetaType type, QObject *parent):
         mLinearCombinator = LinearCombinator::forType({});
     }
 
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &KineticProcessor::tick);
+
     reset();
 }
 
@@ -196,19 +199,20 @@ void KineticProcessor::transition(State state) {
 
     switch(state) {
     case Measuring: /* Running -> Measuring. */
-        stopListening();
+        m_animationTimerListener->stopListening();
         if(mHandler != nullptr)
             mHandler->finishKinetic();
         return;
     case Running: /* Measuring -> Running. */
         mInitialSpeed = mCurrentSpeed = calculateSpeed();
         if(mState == state) { /* State may get changed in a callback. */
-            if(timer() == nullptr) {
+            if(m_animationTimerListener->timer() == nullptr)
+            {
                 AnimationTimer *timer = new QtBasedAnimationTimer(this);
-                timer->addListener(this);
+                timer->addListener(m_animationTimerListener);
             }
 
-            startListening();
+            m_animationTimerListener->startListening();
             if(mState == state && mHandler != nullptr) /* And again, state may have changed. */
                 mHandler->startKinetic();
         }

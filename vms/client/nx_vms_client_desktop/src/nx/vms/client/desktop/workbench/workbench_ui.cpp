@@ -243,8 +243,10 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     createControlsWidget();
 
     /* Animation. */
-    setTimer(m_instrumentManager->animationTimer());
-    startListening();
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &WorkbenchUi::tick);
+    m_animationTimerListener->setTimer(m_instrumentManager->animationTimer());
+    m_animationTimerListener->startListening();
 
     /* Fps counter. */
     createFpsWidget();

@@ -48,8 +48,7 @@ class QnTimeSlider:
     public Animated<GraphicsSlider>,
     public HelpTopicQueryable,
     public QnWorkbenchContextAware, //< Required for live preview.
-    protected DragProcessHandler,
-    protected AnimationTimerListener
+    protected DragProcessHandler
 {
     Q_OBJECT
     Q_PROPERTY(std::chrono::milliseconds windowStart READ windowStart WRITE setWindowStart)
@@ -348,8 +347,6 @@ protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
 
-    virtual void tick(int deltaMSecs) override;
-
     virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
     virtual void dragMove(DragInfo* info) override;
@@ -424,6 +421,8 @@ private:
     class KineticScrollHandler;
 
 private:
+    void tick(int deltaMSecs);
+
     // These two functions are crucial for AbstractLinearGraphicsSlider to work correctly.
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF& position, bool bound = true) const override;
@@ -649,6 +648,8 @@ private:
     bool m_isLive;
 
     QPointer<QWidget> m_lastFocusedWidget;
+
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

@@ -14,21 +14,6 @@ using nx::vms::client::core::Geometry;
 namespace nx::vms::client::desktop {
 
 //-------------------------------------------------------------------------------------------------
-// BusyIndicatorBase
-
-BusyIndicatorBase::BusyIndicatorBase(QObject* parent) :
-    base_type(parent)
-{
-    auto animationTimer = new QtBasedAnimationTimer(this);
-    animationTimer->addListener(this);
-    startListening();
-}
-
-BusyIndicatorBase::~BusyIndicatorBase()
-{
-}
-
-//-------------------------------------------------------------------------------------------------
 // BusyIndicator::Private
 
 struct BusyIndicator::Private
@@ -109,6 +94,8 @@ BusyIndicator::BusyIndicator(QObject* parent) :
     base_type(parent),
     d(new Private())
 {
+    auto animationTimer = new QtBasedAnimationTimer(this);
+    connect(animationTimer, &QtBasedAnimationTimer::tick, this, &BusyIndicator::tick);
 }
 
 BusyIndicator::~BusyIndicator()
