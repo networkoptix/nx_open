@@ -280,6 +280,8 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (!NX_ASSERT(server))
         return StartResult::failed;
 
+    NX_VERBOSE(this, "Request camera history for %1", camera);
+
     // if camera belongs to a single server not need to do API request to build detailed history information. generate it instead.
     QnMediaServerResourceList serverList = getCameraFootageData(camera->getId(), true);
     if (serverList.size() <= 1)
@@ -298,6 +300,13 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (m_asyncRunningRequests.count(camera->getId()) > 0)
+        {
+            NX_VERBOSE(this, "Camera history request is in progress already for %1", camera);
+            return StartResult::ommited;
+        }
+
         QPointer<QnCameraHistoryPool> guard(this);
 
         auto handle = server->restConnection()->cameraHistoryAsync(request,
@@ -326,15 +335,15 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
                 executeDelayed(timerCallback, kDefaultDelay, thread);
             });
 
-        bool started = handle > 0;
-        if (started)
+        const bool started = handle > 0;
+        if (!started)
         {
-            NX_ASSERT(m_asyncRunningRequests.count(camera->getId()) == 0,
-                "Existing request won't be terminated on invalidate call.");
-            m_asyncRunningRequests[camera->getId()] = {serverId, handle};
+            NX_WARNING(this, "Network request cannot be sent");
+            return StartResult::failed;
         }
 
-        return started ? StartResult::started : StartResult::failed;
+        m_asyncRunningRequests[camera->getId()] = {serverId, handle};
+        return StartResult::started;
     }
 }
 
