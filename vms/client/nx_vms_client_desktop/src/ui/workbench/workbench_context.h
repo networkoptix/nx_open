@@ -45,7 +45,7 @@ class QnWorkbenchContext:
     Q_OBJECT
     using base_type = QObject;
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
-    Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget NOTIFY mainWindowChanged)
+    Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget)
 
 public:
     QnWorkbenchContext(
@@ -98,8 +98,6 @@ signals:
 
     /** Property change notification signal, emitted together with userChanged(). */
     void userIdChanged();
-
-    void mainWindowChanged();
 
 private:
     void initWorkarounds();

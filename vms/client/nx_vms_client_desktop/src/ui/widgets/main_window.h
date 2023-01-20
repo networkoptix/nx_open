@@ -44,6 +44,10 @@ public:
 
     virtual ~MainWindow() override;
 
+    QGraphicsView* view() const;
+
+    QGraphicsScene* scene() const;
+
     bool isTitleVisible() const;
 
     Options options() const;

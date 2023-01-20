@@ -262,7 +262,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     QScopedPointer<MainWindow> mainWindow(
         new MainWindow(workbenchContext.get(), /*parent*/ nullptr, calculateWindowFlags()));
-    workbenchContext->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
     auto hidJoystickManager = std::make_unique<joystick::JoystickSettingsActionHandler>(

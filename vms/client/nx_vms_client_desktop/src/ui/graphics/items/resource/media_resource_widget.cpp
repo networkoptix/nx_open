@@ -568,7 +568,7 @@ void QnMediaResourceWidget::handleDewarpingParamsChanged()
 void QnMediaResourceWidget::initRenderer()
 {
     // TODO: We shouldn't be using OpenGL context in class constructor.
-    QGraphicsView *view = WindowContextAware::display()->view();
+    QGraphicsView *view = mainWindow()->view();
     const auto viewport = dynamic_cast<QOpenGLWidget*>(view ? view->viewport() : nullptr);
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
