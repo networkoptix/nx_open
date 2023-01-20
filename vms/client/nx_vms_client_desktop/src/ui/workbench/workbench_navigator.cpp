@@ -844,7 +844,6 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     }
 
     m_motionIgnoreWidgets.remove(widget);
-    m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
     if (noMoreWidgetsOfThisResource)
     {
