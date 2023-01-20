@@ -50,7 +50,6 @@ struct QnPtzControllerPool::Private
     QThread *executorThread = nullptr;
     QThreadPool *commandThreadPool = nullptr;
     QnPtzControllerPool *q;
-    std::atomic<bool> deinitialized = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -91,7 +90,21 @@ QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* 
 
 QnPtzControllerPool::~QnPtzControllerPool()
 {
-    deinitialize();
+    {
+        NX_MUTEX_LOCKER locker(&d->mutex);
+        d->controllerByResource.clear();
+    }
+
+    // Have to wait until all posted events are processed, deleteLater() can be called
+    // within the event slot, that's why we specify the second parameter.
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
+    waitingForObjectsToBeFreed.join();
+
+    d->executorThread->exit();
+    d->executorThread->wait();
+
+    d->commandThreadPool->clear();
+    d->commandThreadPool->waitForDone();
 }
 
 void QnPtzControllerPool::init()
@@ -107,31 +120,6 @@ void QnPtzControllerPool::init()
 
     for (const QnResourcePtr& resource: resourcePool()->getResources())
         registerResource(resource);
-}
-
-void QnPtzControllerPool::deinitialize()
-{
-    if (!d->deinitialized)
-    {
-        while (!d->controllerByResource.isEmpty())
-        {
-            auto resourcePtr = d->controllerByResource.begin().key();
-            unregisterResource(resourcePtr);
-        }
-
-        // Have to wait until all posted events are processed, deleteLater() can be called
-        // within the event slot, that's why we specify the second parameter.
-        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
-        waitingForObjectsToBeFreed.join();
-
-        d->executorThread->exit();
-        d->executorThread->wait();
-
-        d->commandThreadPool->clear();
-        d->commandThreadPool->waitForDone();
-
-        d->deinitialized = true;
-    }
 }
 
 QThread* QnPtzControllerPool::executorThread() const

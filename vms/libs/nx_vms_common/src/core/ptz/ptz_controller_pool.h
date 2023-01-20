@@ -55,8 +55,6 @@ protected:
 
     void updateController(const QnResourcePtr& resource);
 
-    virtual void deinitialize();
-
 private:
     friend class QnPtzControllerCreationCommand;
     struct Private;
