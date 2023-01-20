@@ -37,7 +37,7 @@ struct NX_VMS_API IdData
     void fillId() { id = QnUuid::createUuid(); }
 
     QnUuid getId() const { return id; }
-    void setId(QnUuid id) { this->id = std::move(id); }
+    void setId(QnUuid value) { id = std::move(value); }
     static_assert(isFlexibleIdModelV<IdData>);
 
     QnUuid id;

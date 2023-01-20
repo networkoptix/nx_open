@@ -286,9 +286,9 @@ protected:
             .appendPath("/").appendPath(requestPath).setQuery(query).toUrl();
         if (!m_authenticationKey.isEmpty())
         {
-            QUrlQuery query(requestUrl.query());
-            query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), m_authenticationKey);
-            requestUrl.setQuery(query);
+            QUrlQuery authQuery(requestUrl.query());
+            authQuery.addQueryItem(Qn::URL_QUERY_AUTH_KEY_NAME, m_authenticationKey);
+            requestUrl.setQuery(authQuery);
         }
         nx::network::http::Credentials credentials;
         if (m_credentials)

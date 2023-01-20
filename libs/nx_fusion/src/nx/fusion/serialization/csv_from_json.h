@@ -28,10 +28,10 @@ inline void collectHeader(const QJsonValue& value, Fields* fields)
     const auto object = value.toObject();
     for (auto it = object.begin(); it != object.end(); ++it)
     {
-        const auto value = it.value();
-        if (value.isObject())
-            collectHeader(value, &fields->nested[it.key()]);
-        else if (!value.isArray())
+        const auto field = it.value();
+        if (field.isObject())
+            collectHeader(field, &fields->nested[it.key()]);
+        else if (!field.isArray())
             NX_ASSERT(fields->nested[it.key()].nested.isEmpty());
     }
 }
