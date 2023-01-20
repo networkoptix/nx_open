@@ -10,7 +10,8 @@
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 
-class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
+class QnSplashItem: public Animated<QGraphicsObject>
+{
     Q_OBJECT
     Q_PROPERTY(QColor color READ color WRITE setColor)
     Q_PROPERTY(SplashType splashType READ splashType WRITE setSplashType)
@@ -60,8 +61,8 @@ public:
 signals:
     void animationFinished();
 
-protected:
-    virtual void tick(int deltaMSecs) override;
+private:
+    void tick(int deltaMSecs);
 
 private:
     struct AnimationData {
@@ -85,4 +86,6 @@ private:
 
     /** Whether this splash item is animated. */
     QScopedPointer<AnimationData> m_animation;
+
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };

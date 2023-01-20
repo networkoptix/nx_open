@@ -13,14 +13,15 @@ class InstrumentEventDispatcher;
 class Instrument;
 class InstrumentPaintSyncer;
 
-class InstrumentManagerPrivate: protected SceneDestructionListener, protected AnimationTimerListener {
+class InstrumentManagerPrivate final: public QObject, protected SceneDestructionListener
+{
 public:
     InstrumentManagerPrivate();
 
 private:
     virtual void destroyed(SceneEventFilterItem *item) override;
 
-    virtual void tick(int deltaTime) override;
+    void tick(int deltaTime);
 
     void init();
 
@@ -78,6 +79,8 @@ private:
 
     QSet<QGraphicsItem *> delayedItems;
     bool pendingDelayedItemProcessing;
+
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 
 private:
     Q_DECLARE_PUBLIC(InstrumentManager);

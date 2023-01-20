@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include <QtCore/QAbstractAnimation>
 
 #include "animation_timer_listener.h"
@@ -16,11 +19,9 @@ public:
 
     virtual ~AnimationTimer();
 
-    QList<AnimationTimerListener*> listeners() const;
+    void addListener(AnimationTimerListenerPtr listener);
 
-    void addListener(AnimationTimerListener* listener);
-
-    void removeListener(AnimationTimerListener* listener);
+    void removeListener(AnimationTimerListenerPtr listener);
 
     void clearListeners();
 
@@ -35,22 +36,21 @@ public:
     void activate();
 
     /**
-     * \returns                         Whether this timer is active.
+     * Whether this timer is active.
      */
     bool isActive() const;
 
     /**
      * This function is to be called by external time source at regular intervals.
-     *
-     * \param time                      Current time, in milliseconds.
+     * @param time Current time, in milliseconds.
      */
     void updateCurrentTime(qint64 time);
 
     /**
      * Resets the stored last tick time of this animation timer.
      *
-     * This function should be called if the "current time" of the time source
-     * for <tt>updateCurrentTime</tt> calls was forcibly changed.
+     * This function should be called if the "current time" of the time source for
+     * updateCurrentTime calls was forcibly changed.
      */
     void reset();
 
@@ -59,29 +59,36 @@ protected:
 
     virtual void activatedNotify() {}
     virtual void deactivatedNotify() {}
+    virtual void tickNotify(int deltaMs) {}
 
     void listenerStartedListening();
     void listenerStoppedListening();
 
 private:
-    QList<AnimationTimerListener*> m_listeners;
+    std::vector<std::weak_ptr<AnimationTimerListener>> m_listeners;
     qint64 m_lastTickTime = -1;
-    bool m_deactivated = false;
+    bool m_active = true;
     int m_activeListeners = 0;
 };
 
 /**
  * Animation timer that ticks in sync with Qt animations.
  */
-class QtBasedAnimationTimer: public AnimationTimer, protected QAbstractAnimation
+class QtBasedAnimationTimer: public QAbstractAnimation, public AnimationTimer
 {
+    Q_OBJECT
+
 public:
     QtBasedAnimationTimer(QObject* parent = nullptr);
     virtual ~QtBasedAnimationTimer() override;
 
+signals:
+    void tick(int deltaMs);
+
 protected:
     virtual void activatedNotify() override;
     virtual void deactivatedNotify() override;
+    virtual void tickNotify(int deltaMs) override;
 
     virtual int duration() const override;
     virtual void updateCurrentTime(int currentTime) override;

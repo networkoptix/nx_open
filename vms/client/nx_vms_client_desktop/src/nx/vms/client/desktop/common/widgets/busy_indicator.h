@@ -5,43 +5,18 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/animation/animation_timer_listener.h>
 #include <qt_graphics_items/graphics_widget.h>
 
-
 namespace nx::vms::client::desktop {
-
-/*
-* Abstract base class of animated indicators able to draw themselves with specified painter.
-*/
-class BusyIndicatorBase: public QObject, protected AnimationTimerListener
-{
-    Q_OBJECT
-    using base_type = QObject;
-
-public:
-    explicit BusyIndicatorBase(QObject* parent = nullptr);
-    virtual ~BusyIndicatorBase();
-
-    /** Size of entire indicator without any margins: */
-    virtual QSize size() const = 0;
-
-    /** Paint method: */
-    virtual void paint(QPainter*) = 0;
-
-signals:
-    void sizeChanged();
-    void updated();
-};
 
 /*
 * Primitive class able to paint dot indicator with specified painter.
 */
 class BusyIndicatorPrivate;
-class BusyIndicator: public BusyIndicatorBase
+class BusyIndicator: public QObject
 {
     Q_OBJECT
-    using base_type = BusyIndicatorBase;
+    using base_type = QObject;
 
 public:
     explicit BusyIndicator(QObject* parent = nullptr);
@@ -60,7 +35,7 @@ public:
     void setDotRadius(qreal radius);
 
     /** Size of entire indicator without any margins: */
-    virtual QSize size() const override;
+    QSize size() const;
 
     /** Minimum opacity: */
     qreal minimumOpacity() const;
@@ -91,15 +66,14 @@ public:
     void setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs);
 
     /** Paint method: */
-    virtual void paint(QPainter* painter) override;
+    void paint(QPainter* painter);
 
 signals:
     void sizeChanged();
     void updated();
 
-protected:
-    /** Overridden tick of animation timer listener: */
-    virtual void tick(int deltaMs) override;
+private:
+    void tick(int deltaMs);
 
 private:
     struct Private;

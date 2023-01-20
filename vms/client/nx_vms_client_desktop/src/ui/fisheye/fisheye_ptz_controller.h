@@ -17,7 +17,7 @@
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
 
-class QnFisheyePtzController: public QnBasicPtzController, public AnimationTimerListener
+class QnFisheyePtzController: public QnBasicPtzController
 {
     Q_OBJECT
     using base_type = QnBasicPtzController;
@@ -64,10 +64,9 @@ public:
 
     Q_SLOT void updateLimits();
 
-protected:
-    virtual void tick(int deltaMSecs) override;
-
 private:
+    void tick(int deltaMSecs);
+
     Q_SLOT void updateCapabilities();
     Q_SLOT void updateAspectRatio();
 
@@ -105,4 +104,5 @@ private:
 
     nx::vms::api::dewarping::MediaData m_mediaDewarpingParams;
     nx::vms::api::dewarping::ViewData m_itemDewarpingParams;
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };

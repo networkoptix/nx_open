@@ -434,8 +434,11 @@ QnServerResourceWidget::QnServerResourceWidget(
     m_hddCount(0),
     m_networkCount(0)
 {
-    registerAnimation(this);
-    startListening();
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &QnServerResourceWidget::tick);
+
+    registerAnimation(m_animationTimerListener);
+    m_animationTimerListener->startListening();
 
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
 

@@ -26,7 +26,6 @@
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
 
-#include "abstract_widget_animation.h"
 #include "skin.h"
 
 namespace nx::vms::client::desktop {
@@ -58,7 +57,6 @@ nx::utils::SharedGuardPtr make3xHiDpiWorkaround(QPainter* painter)
 
 OldStyle::OldStyle(QStyle* style):
     base_type(style),
-    m_hoverAnimator(new AbstractWidgetAnimation(this)),
     m_skin(qnSkin)
 {
 }
@@ -245,52 +243,6 @@ bool OldStyle::drawItemViewItemControl(
     localOption.text = QString();
     base_type::drawControl(CE_ItemViewItem, &localOption, painter, widget);
     return true;
-}
-
-// -------------------------------------------------------------------------- //
-// Hover animations
-// -------------------------------------------------------------------------- //
-void OldStyle::setHoverProgress(const QWidget* widget, qreal value) const
-{
-    m_hoverAnimator->setValue(widget, value);
-}
-
-void OldStyle::stopHoverTracking(const QWidget* widget) const
-{
-    m_hoverAnimator->stop(widget);
-}
-
-qreal OldStyle::hoverProgress(
-    const QStyleOption* option,
-    const QWidget* widget,
-    qreal speed) const
-{
-    bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
-
-    /* Get animation progress & stop animation if necessary. */
-    qreal progress = m_hoverAnimator->value(widget, 0.0);
-    if (progress < 0.0 || progress > 1.0)
-    {
-        progress = qBound(0.0, progress, 1.0);
-        m_hoverAnimator->stop(widget);
-    }
-
-    /* Update animation if needed. */
-    bool wasHovered = widget->property(qn_hoveredPropertyName).toBool();
-    const_cast<QWidget*>(widget)->setProperty(qn_hoveredPropertyName, hovered);
-    if (hovered != wasHovered)
-    {
-        if (hovered)
-        {
-            m_hoverAnimator->start(widget, speed, progress);
-        }
-        else
-        {
-            m_hoverAnimator->start(widget, -speed, progress);
-        }
-    }
-
-    return progress;
 }
 
 } // namespace nx::vms::client::desktop

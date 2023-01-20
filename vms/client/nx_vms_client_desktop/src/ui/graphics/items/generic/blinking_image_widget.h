@@ -9,7 +9,7 @@ class QnParticleItem;
 /**
 * An image button widget that displays thumbnail behind the button.
 */
-class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener
+class QnBlinkingImageButtonWidget: public QnImageButtonWidget
 {
     Q_OBJECT
 
@@ -22,15 +22,14 @@ public slots:
     void setNotificationCount(int count);
     void setColor(const QColor& color);
 
-protected:
-    virtual void tick(int deltaMSecs) override;
-
 private:
+    void tick(int deltaMSecs);
     void updateParticleGeometry();
     void updateParticleVisibility();
     void updateToolTip();
 
 private:
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
     QnParticleItem* m_particle;
     qint64 m_time;
     int m_count;
