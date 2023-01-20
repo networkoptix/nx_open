@@ -158,17 +158,19 @@ distrib_copyMediaserverPluginsToDir() # plugins-folder-name target-dir plugin_li
     done
 }
 
-distrib_stripDirectory() # directory [additional_files...]
+# In the specified directory and all subdirectories recursively, strips from debug symbols all .so
+# and .so.<version> files, and files from additional_file_names (must be specified without paths).
+distrib_stripDirectory() # directory [additional_file_names...]
 {
     local -r dir="$1" && shift;
-    local -a additional_files=("$@")
+    local -a additional_file_names=("$@")
 
-    local -a files;
-    readarray -d "" files < <(find "${dir}" -name "*.so" -print0)
-    for file in "${additional_files[@]}"; do
-        local -a tmp
-        readarray -d "" tmp < <(find "${dir}" -name "${file}" -print0)
-        files+=("${tmp[@]}")
+    local -a files
+    readarray -d "" files < <(find "${dir}"  -type f -name "*.so*" -print0)
+    for file_name in "${additional_file_names[@]}"; do
+        local -a additional_files
+        readarray -d "" additional_files < <(find "${dir}" -type f -name "${file_name}" -print0)
+        files+=("${additional_files[@]}")
     done
 
     local file
@@ -179,7 +181,7 @@ distrib_stripDirectory() # directory [additional_files...]
 
         echo "  Stripping ${file}"
         local -i strip_status=0
-         "${STRIP}" "${file}" || strip_status="$?"
+        "${STRIP}" "${file}" || strip_status="$?"
         if [[ "${strip_status}" != 0 ]]; then
             echo "\"strip\" failed (status ${strip_status}) for ${file}" >&2
             exit "${strip_status}"
