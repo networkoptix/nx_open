@@ -610,6 +610,12 @@ public:
     bool operator==(const Message& msg) const;
 };
 
+NX_REFLECTION_ENUM_CLASS(AuthType,
+    authBasicAndDigest,
+    authDigest,
+    authBasic
+)
+
 /** Contains HTTP header structures. */
 namespace header {
 

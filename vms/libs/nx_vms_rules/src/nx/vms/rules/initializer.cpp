@@ -95,6 +95,7 @@ void Initializer::registerFields() const
         [this] { return new ExtractDetailField(this->m_context); });
     registerActionField<EventIdField>();
     registerActionField<EventDevicesField>();
+    registerActionField<HttpAuthTypeField>();
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();

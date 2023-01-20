@@ -1,30 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef AUDIO_PLAYER_H
-#define AUDIO_PLAYER_H
+#pragma once
 
+#include <functional>
 #include <memory>
 
-#include <QtCore/QBuffer>
+#include <core/storage/memory/ext_iodevice_storage.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
-#include <nx/streaming/abstract_data_packet.h>
-#include <core/storage/memory/ext_iodevice_storage.h>
 #include <utils/common/adaptive_sleep.h>
-#include <nx/utils/thread/long_runnable.h>
 
-
+class QBuffer;
 class QnAviArchiveDelegate;
 class QnAudioStreamDisplay;
 
-//!Plays audio file
-/*!
-    Underlying API uses ffmpeg, so any ffmpeg-supported file format can be used. If file contains multiple audio streams, it is unspecified which one is played
-*/
-class AudioPlayer
-:
-    public QnLongRunnable
+/**
+ * Plays audio file
+ * Underlying API uses ffmpeg, so any ffmpeg-supported file format can be used.
+ * If file contains multiple audio streams, it is unspecified which one is played.
+ */
+class AudioPlayer: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -36,11 +33,13 @@ public:
         rcMediaInitializationError
     };
 
-    /*!
-        \param filePath If not empty, calls \a open(\a filePath)
-    */
-    AudioPlayer( const QString& filePath = QString() );
-    virtual ~AudioPlayer();
+    using Callback = std::function<void()>;
+
+    /**
+     * \param filePath If not empty, calls \a open(\a filePath)
+     */
+    AudioPlayer(const QString& filePath = {});
+    virtual ~AudioPlayer() override;
 
     //!Returns true, if media file opened successfully
     bool isOpened() const;
@@ -67,11 +66,13 @@ public:
     /*!
         Creates \a AudioPlayer object, which is removed on playback finish
         \param target       Signal will be sent to this target on play end (can be null).
-        \param slot         Slot that will be called on play end if target is not null.
+        \param callback     Function that will be called on play end if target is not null.
         \return             True if playback started, false - otherwise
     */
     static bool sayTextAsync(
-        const QString& text, QObject* target = nullptr, const char* slot = nullptr);
+        const QString& text,
+        QObject* target = nullptr,
+        Callback callback = {});
 
     //!Reads tag \a tagName
     /*!
@@ -139,7 +140,7 @@ private:
     nx::WaitCondition m_cond;
     State m_state = sInit;
     QnExtIODeviceStorageResourcePtr m_storage;
-    std::unique_ptr<QBuffer> m_synthesizingTarget = nullptr;
+    std::unique_ptr<QBuffer> m_synthesizingTarget;
     QString m_textToPlay;
     ResultCode m_resultCode = rcNoError;
 
@@ -148,5 +149,3 @@ private:
     void closeNonSafe();
     void doRealtimeDelay( const QnAbstractDataPacketPtr& media );
 };
-
-#endif  //AUDIO_PLAYER_H

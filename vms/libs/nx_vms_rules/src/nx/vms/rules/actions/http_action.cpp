@@ -3,6 +3,7 @@
 #include "http_action.h"
 
 #include "../action_builder_fields/content_type_field.h"
+#include "../action_builder_fields/http_auth_type_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/password_field.h"
@@ -22,12 +23,12 @@ const ItemDescriptor& HttpAction::manifest()
         .fields = {
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TextWithFields>("url", tr("HTTP(S) URL")),
-            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) Content")),
-            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content Type")),
+            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) content")),
+            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
             makeFieldDescriptor<ActionTextField>("login", tr("Login")),
             makeFieldDescriptor<PasswordField>("password", tr("Password")),
-            makeFieldDescriptor<HttpMethodField>("method", tr("Request Method")),
-            // TODO: #amalov Add auth type field.
+            makeFieldDescriptor<HttpMethodField>("method", tr("Request method")),
+            makeFieldDescriptor<HttpAuthTypeField>("authType", tr("Authentication type")),
         }
     };
     return kDescriptor;

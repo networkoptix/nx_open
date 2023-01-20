@@ -5,6 +5,8 @@
 #include "../basic_action.h"
 #include "../data_macros.h"
 
+#include <nx/network/http/http_types.h>
+
 namespace nx::vms::rules {
 
 class NX_VMS_RULES_API HttpAction: public nx::vms::rules::BasicAction
@@ -19,7 +21,7 @@ class NX_VMS_RULES_API HttpAction: public nx::vms::rules::BasicAction
     Q_PROPERTY(QString login READ login WRITE setLogin)
     Q_PROPERTY(QString password READ password WRITE setPassword)
     FIELD(QString, method, setMethod)
-    // TODO: #amalov Decide what to do with auth type enum.
+    FIELD(nx::network::http::AuthType, authType, setAuthType)
 
 public:
     static const ItemDescriptor& manifest();

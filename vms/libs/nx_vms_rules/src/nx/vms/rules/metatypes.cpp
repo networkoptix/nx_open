@@ -5,6 +5,7 @@
 #include <analytics/common/object_metadata.h>
 #include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
@@ -32,6 +33,11 @@ void Metatypes::initialize()
     QnCommonMetaTypes::initialize();
 
     // Register types and serializers in alphabetical order.
+
+    qRegisterMetaType<email::Message>();
+
+    qRegisterMetaType<nx::network::http::AuthType>();
+    QnJsonSerializer::registerSerializer<nx::network::http::AuthType>();
 
     QnJsonSerializer::registerSerializer<nx::common::metadata::Attributes>();
 
@@ -67,6 +73,9 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::rules::NetworkIssueInfo>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::NetworkIssueInfo>();
 
+    qRegisterMetaType<nx::vms::rules::UuidSelection>();
+    QnJsonSerializer::registerSerializer<nx::vms::rules::UuidSelection>();
+
     qRegisterMetaType<QnUuidList>("QnUuidList");
     QnJsonSerializer::registerSerializer<QnUuidList>();
 
@@ -74,8 +83,6 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<QnUuidSet>();
 
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();
-
-    qRegisterMetaType<email::Message>();
 };
 
 } // namespace nx::vms::rules

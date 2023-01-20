@@ -8,6 +8,7 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/utils.h>
 #include <nx/kit/utils.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context.h>
 

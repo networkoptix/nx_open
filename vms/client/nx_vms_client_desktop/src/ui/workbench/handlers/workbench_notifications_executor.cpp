@@ -72,8 +72,17 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
 
         if (const auto text = speakAction->text(); !text.isEmpty())
         {
-            nx::audio::AudioDevice::instance()->setVolume(speakAction->volume());
-            AudioPlayer::sayTextAsync(speakAction->text());
+            auto callback = AudioPlayer::Callback();
+
+            if (const auto volume = speakAction->volume(); volume >= 0)
+            {
+                auto device = nx::audio::AudioDevice::instance();
+                callback = [device, volume = device->volume()] { device->setVolume(volume); };
+
+                device->setVolume(speakAction->volume());
+            }
+
+            AudioPlayer::sayTextAsync(speakAction->text(), this, std::move(callback));
         }
     }
 }

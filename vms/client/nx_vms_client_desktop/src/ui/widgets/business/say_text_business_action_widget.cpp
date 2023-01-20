@@ -111,7 +111,9 @@ void QnSayTextBusinessActionWidget::at_testButton_clicked()
     if (ui->textEdit->text().isEmpty())
         return;
 
-    if (AudioPlayer::sayTextAsync(ui->textEdit->text(), this, SLOT(enableTestButton())))
+    auto callback = [this] { enableTestButton(); };
+
+    if (AudioPlayer::sayTextAsync(ui->textEdit->text(), this, std::move(callback)))
         ui->testButton->setEnabled(false);
 }
 

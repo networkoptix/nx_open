@@ -73,7 +73,7 @@ void VolumePickerWidget::onTestButtonClicked()
 
     m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
     nx::audio::AudioDevice::instance()->setVolume(m_field->value());
-    if (AudioPlayer::sayTextAsync(text, this, SLOT(onTextSaid())))
+    if (AudioPlayer::sayTextAsync(text, this, [this] { onTextSaid(); }))
         m_testPushButton->setEnabled(false);
 }
 
