@@ -234,9 +234,6 @@ EventPanel::Private::Private(EventPanel* q):
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
 
-    q->setAutoFillBackground(false);
-    q->setAttribute(Qt::WA_TranslucentBackground);
-
     if (ini().newPanelsLayout)
     {
         layout->addWidget(m_notificationsTab);
