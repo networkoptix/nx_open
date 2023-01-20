@@ -56,6 +56,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -281,18 +282,18 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     if (ini().developerMode && ini().developerGuiPanel)
         createDebugWidget();
 
-    new nx::vms::client::desktop::SceneBanners(display()->view()); //< Owned by the view.
+    new nx::vms::client::desktop::SceneBanners(mainWindow()->view()); //< Owned by the view.
 
     // This overlay is kept for compatibility with some old features.
     // For example its removal causes some graphics scene item cursors not working.
     auto guiElementsWidget = new QnGuiElementsWidget();
     guiElementsWidget->setObjectName("OverlayWidgetLayer");
     guiElementsWidget->setAcceptedMouseButtons(Qt::NoButton);
-    display()->scene()->addItem(guiElementsWidget);
+    mainWindow()->scene()->addItem(guiElementsWidget);
     display()->setLayer(guiElementsWidget, QnWorkbenchDisplay::MessageBoxLayer);
 
     /* Connect to display. */
-    display()->view()->addAction(action(action::FreespaceAction));
+    mainWindow()->view()->addAction(action(action::FreespaceAction));
     m_connections << connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         &WorkbenchUi::at_display_widgetChanged);
 
@@ -453,8 +454,8 @@ void WorkbenchUi::updateCursor()
 {
 #ifndef Q_OS_MACX
     bool curtained = m_inactive;
-    if (display()->view() && !m_timeline->isHovered())
-        display()->view()->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+    if (mainWindow()->view() && !m_timeline->isHovered())
+        mainWindow()->view()->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
 #endif
 }
 
@@ -500,7 +501,7 @@ action::ActionScope WorkbenchUi::currentScope() const
             return lp->currentScope();
     }
 
-    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    QGraphicsItem *focusItem = mainWindow()->scene()->focusItem();
     if (focusItem == m_timeline->item)
         return action::TimelineScope;
 
@@ -508,7 +509,7 @@ action::ActionScope WorkbenchUi::currentScope() const
     if (dynamic_cast<GraphicsWebEngineView*>(focusItem))
         return action::InvalidScope;
 
-    if (display()->scene()->hasFocus())
+    if (mainWindow()->scene()->hasFocus())
         return action::SceneScope;
 
     return action::MainScope;
@@ -532,10 +533,10 @@ action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) con
 
         case action::SceneScope:
         {
-            auto selectedItems = display()->scene()->selectedItems();
+            auto selectedItems = mainWindow()->scene()->selectedItems();
             if (selectedItems.empty())
             {
-                auto focused = dynamic_cast<QnResourceWidget*>(display()->scene()->focusItem());
+                auto focused = dynamic_cast<QnResourceWidget*>(mainWindow()->scene()->focusItem());
                 if (focused)
                     selectedItems.append(focused);
             }
@@ -753,7 +754,7 @@ void WorkbenchUi::tick(int deltaMSecs)
     if (m_timeline->item->zooming() == QnNavigationItem::Zooming::None)
         return;
 
-    if (!display()->scene())
+    if (!mainWindow()->scene())
         return;
 
     auto slider = m_timeline->item->timeSlider();
@@ -770,7 +771,7 @@ void WorkbenchUi::tick(int deltaMSecs)
     event.setDelta(360 * 8 * (deltaMSecs * zooming) / 2000);
     event.setPos(pos);
     event.setScenePos(slider->mapToScene(pos));
-    display()->scene()->sendEvent(slider, &event);
+    mainWindow()->scene()->sendEvent(slider, &event);
 }
 
 void WorkbenchUi::at_freespaceAction_triggered()
@@ -1025,11 +1026,11 @@ void WorkbenchUi::createControlsWidget()
     m_controlsWidget = new QnGuiElementsWidget();
     m_controlsWidget->setObjectName("UIControlsLayer");
     m_controlsWidget->setAcceptedMouseButtons(Qt::NoButton);
-    display()->scene()->addItem(m_controlsWidget);
+    mainWindow()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
 
     installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
-        [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
+        [this]() { mainWindow()->scene()->setActiveWindow(m_controlsWidget); });
 
     m_connections << connect(m_controlsWidget, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::at_controlsWidget_geometryChanged);
 }
@@ -1151,12 +1152,12 @@ void WorkbenchUi::updateLeftPanelMaximumWidth()
 
     // Avoid shrinking the left panel when it is invisible. Do not use isWorkbenchVisible()
     // here because it gives wrong result (visible == true) when the application starts.
-    if (!display()->view()->isVisible())
+    if (!mainWindow()->view()->isVisible())
         return;
 
     const auto rightLimit = m_notifications && m_notifications->isVisible()
         ? m_notifications->geometry().x()
-        : display()->view()->width();
+        : mainWindow()->view()->width();
 
     leftPanel->setMaximumAllowedWidth(rightLimit - kReservedSceneWidth);
 }
@@ -1165,11 +1166,11 @@ void WorkbenchUi::createLeftPanelWidget(const QnPaneSettings& settings)
 {
     if (ini().newPanelsLayout)
     {
-        m_leftPanel = new LeftWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
+        m_leftPanel = new LeftWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
     }
     else
     {
-        m_leftPanel = new ResourceTreeWorkbenchPanel(settings, display()->view(), m_controlsWidget,
+        m_leftPanel = new ResourceTreeWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget,
             this);
     }
 
@@ -1193,7 +1194,7 @@ void WorkbenchUi::createLeftPanelWidget(const QnPaneSettings& settings)
     m_connections << connect(m_leftPanel, &AbstractWorkbenchPanel::geometryChanged, this,
         &WorkbenchUi::updateLayoutPanelGeometry);
 
-    installEventHandler(display()->view(), {QEvent::Show, QEvent::Resize}, this,
+    installEventHandler(mainWindow()->view(), {QEvent::Show, QEvent::Resize}, this,
         &WorkbenchUi::updateLeftPanelMaximumWidth);
 }
 
@@ -1238,7 +1239,7 @@ bool WorkbenchUi::isTitleOpened() const
 
 void WorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_title = new TitleWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
+    m_title = new TitleWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
     m_connections << connect(m_title, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
@@ -1406,7 +1407,7 @@ void WorkbenchUi::updateNotificationsGeometry()
 
 void WorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
-    m_notifications = new NotificationsWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
+    m_notifications = new NotificationsWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
     m_connections << connect(m_notifications, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
@@ -1488,7 +1489,7 @@ void WorkbenchUi::updateCalendarGeometry()
 
 void WorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 {
-    m_calendar = new CalendarWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
+    m_calendar = new CalendarWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
 
     // TODO: #sivanov Refactor indirect dependency.
     m_connections << connect(navigator()->calendar(), &TimelineCalendarWidget::emptyChanged, this,
@@ -1620,7 +1621,6 @@ void WorkbenchUi::createDebugWidget()
     }
     updateDebugGeometry();
 
-    display()->view()->addAction(action(action::ShowDebugOverlayAction));
     m_connections << connect(action(action::ShowDebugOverlayAction), &QAction::toggled, this,
         [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
 }

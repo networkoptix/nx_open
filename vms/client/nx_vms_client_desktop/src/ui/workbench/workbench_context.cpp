@@ -174,11 +174,7 @@ QWidget* QnWorkbenchContext::mainWindowWidget() const
 
 void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
-    if (m_mainWindow == mainWindow)
-        return;
-
     m_mainWindow = mainWindow;
-    emit mainWindowChanged();
 }
 
 ResourceTreeSettings* QnWorkbenchContext::resourceTreeSettings() const

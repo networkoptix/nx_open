@@ -5,8 +5,9 @@
 #include <chrono>
 
 #include <QtGui/QAction>
-#include <QtWidgets/QApplication>
 #include <QtMultimedia/QMediaDevices>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsView>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -29,7 +30,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <utils/common/delayed.h>
 
 using namespace std::chrono;
@@ -69,7 +69,7 @@ QnWorkbenchScreenRecordingHandler::QnWorkbenchScreenRecordingHandler(QObject *pa
     if (!NX_ASSERT(screenRecordingAction))
         return;
 
-    display()->view()->window()->addAction(screenRecordingAction);
+    mainWindow()->view()->window()->addAction(screenRecordingAction);
 
     connect(screenRecordingAction, &QAction::triggered, this,
         [this](bool checked)
