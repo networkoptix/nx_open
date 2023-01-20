@@ -267,9 +267,11 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
     {
         const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
             overlayAction->duration());
-        const QString text = overlayAction->text().trimmed();
-        // TODO: #amalov Check formatting.
-        const QString textHtml = formatOverlayText(text, {}, {});
+
+        const QString textHtml = formatOverlayText(
+            overlayAction->text().trimmed(),
+            overlayAction->extendedCaption(),
+            overlayAction->detailing());
 
         for (const auto& camera: cameras)
             d->showTextOverlays(camera, ruleId, textHtml, duration);
