@@ -71,7 +71,7 @@ struct NX_VMS_API DeviceSearchBase
     std::optional<std::vector<DeviceModelGeneral>> devices;
 
     QnUuid getId() const { return id; }
-    void setId(QnUuid id) { this->id = std::move(id); }
+    void setId(QnUuid value) { id = std::move(value); }
     static_assert(nx::vms::api::isCreateModelV<DeviceSearchBase>);
 };
 #define DeviceSearchBase_Fields (id)(port)(credentials)(mode)(status)(devices)

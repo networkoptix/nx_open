@@ -81,9 +81,9 @@ struct NX_VMS_API ServerLogSettings
 
     QnUuid getId() const { return id; }
 
-    LogSettings& logSettings(nx::log::LogName id)
+    LogSettings& logSettings(nx::log::LogName logName)
     {
-        switch (id)
+        switch (logName)
         {
             case nx::log::LogName::main:
                 return mainLog;

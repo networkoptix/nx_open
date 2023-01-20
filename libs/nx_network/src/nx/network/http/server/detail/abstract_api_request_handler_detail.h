@@ -136,11 +136,13 @@ void BaseApiRequestHandler<Input, Descendant>::processRequest(
 
     // TODO: #akolesnikov Not good that request that does not provide any result may be rejected
     // with "unsupported format" error.
-    ApiRequestResult error;
-    if (!this->getOutputFormat(request, &error))
     {
-        this->requestCompleted(std::move(error));
-        return;
+        ApiRequestResult error;
+        if (!this->getOutputFormat(request, &error))
+        {
+            this->requestCompleted(std::move(error));
+            return;
+        }
     }
 
     if (!requestMethodCorrespondsToTheHanderSpecialization())
