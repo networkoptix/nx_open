@@ -7,55 +7,6 @@
 #include <nx/utils/log/assert.h>
 
 //-------------------------------------------------------------------------------------------------
-// AnimationTimerListener
-
-AnimationTimerListener::AnimationTimerListener()
-{
-}
-
-AnimationTimerListener::~AnimationTimerListener()
-{
-    if (m_timer != nullptr)
-        m_timer->removeListener(this);
-}
-
-void AnimationTimerListener::startListening()
-{
-    if (m_listening)
-        return;
-
-    m_listening = true;
-    if (m_timer != nullptr)
-        m_timer->listenerStartedListening();
-}
-
-void AnimationTimerListener::stopListening()
-{
-    if (!m_listening)
-        return;
-
-    m_listening = false;
-    if (m_timer != nullptr)
-        m_timer->listenerStoppedListening();
-}
-
-void AnimationTimerListener::setTimer(AnimationTimer* timer)
-{
-    // Note that m_timer field is changed in addListener/removeListener methods.
-    if (m_timer == timer)
-        return;
-
-    if (timer != nullptr)
-    {
-        timer->addListener(this);
-    }
-    else if (m_timer != nullptr)
-    {
-        m_timer->removeListener(this);
-    }
-}
-
-//-------------------------------------------------------------------------------------------------
 // AnimationTimer
 
 AnimationTimer::AnimationTimer()
@@ -69,11 +20,11 @@ AnimationTimer::~AnimationTimer()
 
 void AnimationTimer::deactivate()
 {
-    if (m_deactivated)
+    if (!m_active)
         return;
 
     bool oldActive = isActive();
-    m_deactivated = true;
+    m_active = false;
 
     if (oldActive != isActive())
         deactivatedNotify();
@@ -81,11 +32,11 @@ void AnimationTimer::deactivate()
 
 void AnimationTimer::activate()
 {
-    if (!m_deactivated)
+    if (m_active)
         return;
 
     bool oldActive = isActive();
-    m_deactivated = false;
+    m_active = true;
 
     if (oldActive != isActive())
         activatedNotify();
@@ -93,7 +44,7 @@ void AnimationTimer::activate()
 
 bool AnimationTimer::isActive() const
 {
-    return !m_deactivated && m_activeListeners > 0;
+    return m_active && m_activeListeners > 0;
 }
 
 void AnimationTimer::reset()
@@ -115,53 +66,39 @@ void AnimationTimer::updateCurrentTime(qint64 time)
         // have to iterate by index. Note: listeners cannot be removed from the list meanwhile.
         for (int i = 0; i < m_listeners.size(); i++)
         {
-            AnimationTimerListener* listener = m_listeners[i];
+            auto listener = m_listeners[i].lock();
             if (!listener)
                 hasNullListeners = true;
             else if (deltaTime > 0 && listener->isListening())
-                listener->tick(deltaTime);
+                listener->doTick(deltaTime);
         }
 
         if (hasNullListeners)
-            m_listeners.removeAll(nullptr);
+            std::erase_if(m_listeners, [](const auto& listener) { return !listener.lock(); });
     }
-
-    NX_ASSERT(m_listeners.indexOf(nullptr) < 0,
-        "Null listeners while delta %1, isActive %2",
-        deltaTime,
-        isActive());
 
     m_lastTickTime = time;
-}
 
-QList<AnimationTimerListener*> AnimationTimer::listeners() const
-{
-    QList<AnimationTimerListener*> result = m_listeners;
-
-    /* Remove manually so that list does not detach if there is nothing to remove. */
-    for (int i = result.size() - 1; i >= 0; i--)
-    {
-        if (result[i] == nullptr)
-            result.removeAt(i);
-    }
-
-    return result;
+    if (deltaTime > 0)
+        tickNotify(deltaTime);
 }
 
 void AnimationTimer::clearListeners()
 {
+    const bool wasActive = isActive();
     for (int i = 0; i < m_listeners.size(); i++)
     {
-        if (m_listeners[i] != nullptr)
-            removeListener(m_listeners[i]);
+        if (auto listener = m_listeners[i].lock())
+            listener->m_timer = nullptr;
     }
+    m_listeners.clear();
+    m_activeListeners = 0;
+    if (wasActive)
+        deactivatedNotify();
 }
 
-void AnimationTimer::addListener(AnimationTimerListener* listener)
+void AnimationTimer::addListener(AnimationTimerListenerPtr listener)
 {
-    if (!NX_ASSERT(listener))
-        return;
-
     if (listener->m_timer == this)
         return;
 
@@ -174,18 +111,20 @@ void AnimationTimer::addListener(AnimationTimerListener* listener)
         listenerStartedListening();
 }
 
-void AnimationTimer::removeListener(AnimationTimerListener* listener)
+void AnimationTimer::removeListener(AnimationTimerListenerPtr listener)
 {
-    if (!NX_ASSERT(listener))
-        return;
-
     // Removing a listener that is not there is OK.
     if (listener->m_timer != this)
         return;
 
     if (listener->isListening())
         listenerStoppedListening();
-    m_listeners[m_listeners.indexOf(listener)] = nullptr;
+
+    auto iter = std::find_if(m_listeners.begin(), m_listeners.end(),
+        [listener](const auto& ptr) { return ptr.lock() == listener; });
+    if (iter != m_listeners.end())
+        *iter = {};
+
     listener->m_timer = nullptr;
 }
 
@@ -228,6 +167,11 @@ void QtBasedAnimationTimer::activatedNotify()
 void QtBasedAnimationTimer::deactivatedNotify()
 {
     stop();
+}
+
+void QtBasedAnimationTimer::tickNotify(int deltaMs)
+{
+    emit tick(deltaMs);
 }
 
 int QtBasedAnimationTimer::duration() const

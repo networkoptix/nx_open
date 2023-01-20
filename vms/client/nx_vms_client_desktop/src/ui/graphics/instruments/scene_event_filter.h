@@ -8,15 +8,15 @@
 class SceneEventFilterItem;
 
 /**
- * Interface for detached filtering of graphics items' events. 
- * 
+ * Interface for detached filtering of graphics items' events.
+ *
  * It can be used in conjunction with <tt>SceneEventFilterItem</tt>.
  */
 class SceneEventFilter {
 public:
     /**
      * This function performs scene event filtering.
-     * 
+     *
      * \param watched                  Graphics item that is being watched.
      * \param event                    Filtered event.
      * \returns                        Whether the event was filtered.
@@ -27,19 +27,22 @@ public:
 /**
  * Interface for receiving destruction notifications from <tt>SceneEventFilterItem</tt>.
  */
-class SceneDestructionListener {
+class SceneDestructionListener
+{
 public:
+    virtual ~SceneDestructionListener() = default;
+
     /**
-     * This functions is called when scene event filter item is destroyed. 
+     * This functions is called when scene event filter item is destroyed.
      * This usually means that the scene is being destroyed.
-     * 
+     *
      * \param item                     Scene event filter item that is being destroyed.
      */
     virtual void destroyed(SceneEventFilterItem *item) = 0;
 };
 
 /**
- * This is a graphics item that can be added to the scene to filter events of 
+ * This is a graphics item that can be added to the scene to filter events of
  * this scene's items.
  */
 class SceneEventFilterItem: public QGraphicsItem {

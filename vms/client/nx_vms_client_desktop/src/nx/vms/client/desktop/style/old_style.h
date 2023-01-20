@@ -9,7 +9,6 @@
 
 namespace nx::vms::client::desktop {
 
-class AbstractWidgetAnimation;
 class Skin;
 
 /**
@@ -60,12 +59,6 @@ protected:
         const QStyleOption* option, QPainter* painter, const QWidget* widget) const;
 
 private:
-    void setHoverProgress(const QWidget* widget, qreal value) const;
-    qreal hoverProgress(const QStyleOption* option, const QWidget* widget, qreal speed) const;
-    void stopHoverTracking(const QWidget* widget) const;
-
-private:
-    AbstractWidgetAnimation* m_hoverAnimator;
     Skin* m_skin;
 };
 

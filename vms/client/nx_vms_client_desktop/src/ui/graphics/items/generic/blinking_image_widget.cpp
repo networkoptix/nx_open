@@ -15,8 +15,11 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem* parent):
     m_time(0),
     m_count(0)
 {
-    registerAnimation(this);
-    startListening();
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &QnBlinkingImageButtonWidget::tick);
+
+    registerAnimation(m_animationTimerListener);
+    m_animationTimerListener->startListening();
 
     connect(this, &QGraphicsWidget::geometryChanged, this,
         &QnBlinkingImageButtonWidget::updateParticleGeometry);

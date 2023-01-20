@@ -39,8 +39,7 @@ namespace ui::workbench { class SpecialLayoutPanel; }
 class WorkbenchUi:
     public QObject,
     public QnWorkbenchContextAware,
-    public ui::action::TargetProvider,
-    public AnimationTimerListener
+    public ui::action::TargetProvider
 {
     Q_OBJECT
     Q_ENUMS(Flags Flag)
@@ -134,8 +133,8 @@ private:
     void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
 
-protected:
-    virtual void tick(int deltaMSecs) override;
+private:
+    void tick(int deltaMSecs);
 
     QMargins calculateViewportMargins(
         const QRectF& treeGeometry,
@@ -162,7 +161,6 @@ protected:
     bool isHovered() const;
     void loadSettings(bool animated, bool useDefault);
 
-private:
     class StateDelegate;
 
     void createControlsWidget();
@@ -261,6 +259,8 @@ private:
     QnPaneSettingsMap m_settings;
 
     nx::utils::ScopedConnections m_connections;
+
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WorkbenchUi::Flags)

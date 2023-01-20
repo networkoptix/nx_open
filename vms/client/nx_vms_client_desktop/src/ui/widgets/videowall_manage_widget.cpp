@@ -2,21 +2,18 @@
 
 #include "videowall_manage_widget.h"
 
-#include <QtGui/QMouseEvent>
-
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtGui/QMouseEvent>
 
 #include <client/client_settings.h>
-
 #include <core/resource/videowall_resource.h>
-
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <ui/animation/animation_timer.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/widgets/videowall_manage_widget_p.h>
-
-#include <nx/utils/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace nx::vms::client::desktop;
@@ -37,8 +34,8 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget* parent /* = 0*/):
 
     m_dragProcessor->setHandler(this);
 
-    setTimer(new QtBasedAnimationTimer(this));
-    startListening();
+    auto animationTimer = new QtBasedAnimationTimer(this);
+    connect(animationTimer, &QtBasedAnimationTimer::tick, this, &QnVideowallManageWidget::tick);
 
     connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }

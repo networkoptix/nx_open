@@ -24,8 +24,11 @@ InstrumentPaintSyncer::InstrumentPaintSyncer(QObject* parent):
     m_update->setFlags(nx::utils::PendingOperation::FireImmediately);
     m_update->setCallback([this]() { m_currentWidget->update(); });
 
-    m_animationTimer->addListener(this);
-    startListening();
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &InstrumentPaintSyncer::tick);
+
+    m_animationTimer->addListener(m_animationTimerListener);
+    m_animationTimerListener->startListening();
 }
 
 void InstrumentPaintSyncer::setFpsLimit(int limit)

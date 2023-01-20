@@ -2,17 +2,13 @@
 
 #pragma once
 
-#include "videowall_model.h"
-
 #include <QtWidgets/QWidget>
 
 #include <client/client_model_types.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <ui/animation/animation_timer.h>
-#include <ui/animation/animation_timer_listener.h>
 #include <ui/processors/drag_process_handler.h>
+
+#include "videowall_model.h"
 
 class DragProcessor;
 class QAbstractAnimation;
@@ -20,8 +16,7 @@ class QAbstractAnimation;
 class QnVideowallManageWidgetPrivate;
 
 class QnVideowallManageWidget: public QWidget,
-    protected DragProcessHandler,
-    protected AnimationTimerListener
+    protected DragProcessHandler
 {
     Q_OBJECT
 
@@ -61,7 +56,8 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
 
-    virtual void tick(int deltaTime) override;
+private:
+    void tick(int deltaTime);
 
 private:
     QScopedPointer<QnVideowallManageWidgetPrivate> d_ptr;
