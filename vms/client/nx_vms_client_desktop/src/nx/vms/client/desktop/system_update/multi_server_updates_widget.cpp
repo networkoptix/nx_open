@@ -1579,19 +1579,23 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
         NX_VERBOSE(this, "Peer %1 was removed. We should repeat validation.", item->id);
         repeatUpdateValidation();
     }
-    else if (!item->offline)
+    else
     {
-        // TODO: this triggers too often, when server goes offline, online, added or removed.
-        // We need to get these events here.
-        NX_VERBOSE(this,
-           "peer %1 has changed online status. We should repeat validation.", item->id);
-        repeatUpdateValidation();
-    }
-    else if (item->offline)
-    {
-        m_updateRemoteStateChanged = true;
-        if (item->isServer())
-            m_serverUpdateTool->stopUploadsToServer(item->id);
+        if (!item->offline || m_widgetState == WidgetUpdateState::ready)
+        {
+            // TODO: this triggers too often, when server goes offline, online, added or removed.
+            // We need to get these events here.
+            NX_VERBOSE(this, "Server %1 has changed online status. We should repeat validation.",
+                item->id);
+            repeatUpdateValidation();
+        }
+
+        if (item->offline)
+        {
+            m_updateRemoteStateChanged = true;
+            if (item->isServer())
+                m_serverUpdateTool->stopUploadsToServer(item->id);
+        }
     }
 
     // TODO: We need task sets to be processed here and then to call loadDataToUi();
