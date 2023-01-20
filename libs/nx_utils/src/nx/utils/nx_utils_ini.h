@@ -56,10 +56,10 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
     NX_INI_INT(kLogLevelReducerWindowSizeS, logLevelReducerWindowSizeS,
         "Replace error and warning logs with debugs within this time.");
 
-    NX_INI_FLOAT(1.0, valueHistoryAgeDelimiter,
+    NX_INI_FLOAT(1.0f, valueHistoryAgeDelimiter,
         "Reduces max age of all ValueHistory storage and requests.");
 
-    NX_INI_FLOAT(1.0, loadFactor,
+    NX_INI_FLOAT(1.0f, loadFactor,
         "Load factor for unit tests, in range (0..1]. The smaller this value is, the less amount\n"
         "of testing is performed by certain unit tests, which leads to faster test execution and\n"
         "less system load. For details, see the usages in the C++ code.");
