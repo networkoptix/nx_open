@@ -71,10 +71,14 @@ auto switch_(const Value& value, const Match& match, const Action& action,
         return action();
 
     if constexpr (sizeof...(tail) > 0)
+    {
         return switch_(value, std::forward<Tail>(tail)...);
-
-    NX_ASSERT(false, "Unmatched switch value");
-    return decltype(action())();
+    }
+    else
+    {
+        NX_ASSERT(false, "Unmatched switch value");
+        return decltype(action())();
+    }
 }
 
 } // namespace nx::utils
