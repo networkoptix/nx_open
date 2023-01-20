@@ -25,6 +25,7 @@ const ItemDescriptor& BookmarkAction::manifest()
             makeFieldDescriptor<TimeField>("recordAfter", tr("Post-recording")),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
 
+            // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("name", utils::kExtendedCaptionDetailName),
             utils::makeExtractDetailFieldDescriptor("description", utils::kDetailingDetailName),
         }

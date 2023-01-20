@@ -10,11 +10,14 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API TextOverlayAction: public BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.showTextOverlay")
+    Q_CLASSINFO("type", "nx.actions.textOverlay")
 
     FIELD(QnUuidList, deviceIds, setDeviceIds)
     FIELD(std::chrono::microseconds, duration, setDuration)
     FIELD(QString, text, setText)
+
+    FIELD(QString, extendedCaption, setExtendedCaption)
+    FIELD(QStringList, detailing, setDetailing)
 
 public:
     static const ItemDescriptor& manifest();
