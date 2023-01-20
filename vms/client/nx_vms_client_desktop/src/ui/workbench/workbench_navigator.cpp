@@ -56,6 +56,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -1384,7 +1385,7 @@ VariantAnimator* QnWorkbenchNavigator::createPositionAnimator()
     };
 
     VariantAnimator* animator = new VariantAnimator(this);
-    animator->setTimer(InstrumentManager::animationTimer(display()->scene()));
+    animator->setTimer(InstrumentManager::animationTimer(mainWindow()->scene()));
     animator->setAccessor(newAccessor(positionGetter, positionSetter));
     animator->setTargetObject(this);
     return animator;

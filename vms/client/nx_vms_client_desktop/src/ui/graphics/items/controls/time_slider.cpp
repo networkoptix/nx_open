@@ -2,28 +2,26 @@
 
 #include "time_slider.h"
 
-#include <cassert>
+#include <array>
 #include <cmath>
 #include <limits>
-#include <array>
 
-#include <nx/vms/client/desktop/ini.h>
-
-#include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDateTime>
+#include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtCore/QtMath>
-#include <QtCore/QScopedValueRollback>
-
 #include <QtGui/QMouseEvent>
-#include <QtGui/QWheelEvent>
 #include <QtGui/QPainter>
+#include <QtGui/QWheelEvent>
 #include <QtGui/QWindow>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 #include <QtWidgets/QGraphicsView>
+
+#include <qt_graphics_items/graphics_label.h>
+#include <qt_graphics_items/graphics_slider_p.h>
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_bookmark.h>
@@ -41,10 +39,8 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/time_strings.h>
 #include <nx/vms/time/formatter.h>
-#include <qt_graphics_items/graphics_label.h>
-#include <qt_graphics_items/graphics_slider_p.h>
-#include <recording/time_period_list.h>
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
@@ -53,8 +49,8 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/aspect_ratio.h>
@@ -574,7 +570,7 @@ QnTimeSlider::QnTimeSlider(
     :
     base_type(Qt::Horizontal, parent),
     QnWorkbenchContextAware(context),
-    m_view(context->display()->view()),
+    m_view(context->mainWindow()->view()),
     m_tooltipParent(tooltipParent),
     m_tooltip(new TimeMarker(context)),
     m_windowStart(0),
@@ -604,7 +600,7 @@ QnTimeSlider::QnTimeSlider(
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
     m_lastLineBarValue(),
-    m_bookmarksViewer(createBookmarksViewer(context->display()->view())),
+    m_bookmarksViewer(createBookmarksViewer(context->mainWindow()->view())),
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
     m_liveSupported(false),

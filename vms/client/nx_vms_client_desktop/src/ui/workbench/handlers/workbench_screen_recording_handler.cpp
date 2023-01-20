@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsView>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -27,7 +28,6 @@
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <utils/common/delayed.h>
 
 using namespace std::chrono;
@@ -66,7 +66,7 @@ QnWorkbenchScreenRecordingHandler::QnWorkbenchScreenRecordingHandler(QObject *pa
     if (!NX_ASSERT(screenRecordingAction))
         return;
 
-    display()->view()->window()->addAction(screenRecordingAction);
+    mainWindow()->view()->window()->addAction(screenRecordingAction);
 
     connect(screenRecordingAction, &QAction::triggered, this,
         [this](bool checked)

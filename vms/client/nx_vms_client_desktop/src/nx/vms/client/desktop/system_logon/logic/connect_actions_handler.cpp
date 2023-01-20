@@ -340,12 +340,8 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
 
-    connect(context(), &QnWorkbenchContext::mainWindowChanged, this,
-        [this]()
-        {
-            qnClientCoreModule->networkModule()->connectionFactory()->setUserInteractionDelegate(
-                createConnectionUserInteractionDelegate(mainWindowWidget()));
-        });
+    qnClientCoreModule->networkModule()->connectionFactory()->setUserInteractionDelegate(
+        createConnectionUserInteractionDelegate(mainWindowWidget()));
 
     // The only instance of UserAuthDebugInfoWatcher is created to be owned by the context.
     context()->instance<UserAuthDebugInfoWatcher>();

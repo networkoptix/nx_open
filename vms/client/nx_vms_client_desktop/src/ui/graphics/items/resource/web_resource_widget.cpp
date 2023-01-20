@@ -3,6 +3,7 @@
 #include "web_resource_widget.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/webpage_resource.h>
@@ -24,8 +25,8 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
 using namespace nx::vms::client::desktop;
@@ -192,7 +193,7 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
     if (object == m_webEngineView.get())
     {
         const auto isFocused =
-            [this]() { return display() && display()->view() && display()->view()->hasFocus(); };
+            [this]() { return mainWindow()->view()->hasFocus(); };
 
         if (event->type() == QEvent::GraphicsSceneMousePress)
         {

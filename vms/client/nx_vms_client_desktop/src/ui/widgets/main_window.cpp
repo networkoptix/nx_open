@@ -236,9 +236,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_view->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     /* Set up model & control machinery. */
-    display()->setLightMode(qnRuntime->lightMode());
-    display()->setScene(m_scene.data());
-    display()->setView(m_view.data());
+    display()->initialize(m_scene.data(), m_view.data());
+
+    // Controls which are initialized further access mainWindow() through the context. Set it here
+    // to avoid passing main window pointer to constructors (though it will certainly be more
+    // correct).
+    context->setMainWindow(this);
 
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags({});
@@ -378,6 +381,10 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::ToggleMuteAction));
     addAction(action(action::JumpToLiveAction));
     addAction(action(action::ToggleSyncAction));
+    addAction(action(action::ToggleSmartSearchAction));
+    addAction(action(action::ToggleInfoAction));
+    addAction(action(action::FreespaceAction));
+    addAction(action(action::ShowDebugOverlayAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
@@ -458,6 +465,18 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
 MainWindow::~MainWindow()
 {
+    // Deinitialize display before scene is destroyed.
+    display()->deinitialize();
+}
+
+QGraphicsScene* MainWindow::scene() const
+{
+    return m_scene.data();
+}
+
+QGraphicsView* MainWindow::view() const
+{
+    return m_view.data();
 }
 
 QWidget *MainWindow::viewport() const {

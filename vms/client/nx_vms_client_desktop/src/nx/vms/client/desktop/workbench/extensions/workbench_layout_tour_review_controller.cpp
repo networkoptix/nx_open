@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
@@ -293,7 +294,7 @@ void LayoutTourReviewController::updatePlaceholders()
             QSharedPointer<LayoutTourDropPlaceholder> result(new LayoutTourDropPlaceholder());
             result->setRect(geometry);
             display()->setLayer(result.data(), QnWorkbenchDisplay::BackLayer);
-            display()->scene()->addItem(result.data());
+            mainWindow()->scene()->addItem(result.data());
             return result;
         };
 

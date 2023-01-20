@@ -4,8 +4,8 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
@@ -15,15 +15,15 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/resizer_widget.h>
-#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <ui/workbench/workbench_ui_globals.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
@@ -97,7 +97,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
             if (!m_resizerWidget->isBeingMoved())
                 return;
 
-            const qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+            const qreal x = mainWindow()->view()->mapFromGlobal(QCursor::pos()).x();
             updatePaneWidth(x);
             updateControlsGeometry();
             updateResizerGeometry();

@@ -279,38 +279,40 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
 
     /* We should disable all one-key shortcuts while web view is in the focus. */
-    connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
-    {
-        const bool isWebView = view()
-            && view()->hasFocus()
-            && scene()
-            && dynamic_cast<GraphicsWebEngineView*>(scene()->focusItem());
-
-        for (auto actionId: {
-            action::NotificationsTabAction, //< N
-            action::ResourcesTabAction, //< C
-            action::MotionTabAction, //< M
-            action::BookmarksTabAction, //< B
-            action::EventsTabAction, //< E
-            action::ObjectsTabAction, //< O
-            action::JumpToLiveAction, //< L
-            action::ToggleMuteAction, //< U
-            action::ToggleSyncAction, //< S
-            action::JumpToEndAction,  //< X
-            action::JumpToStartAction,//< Z
-            action::ToggleInfoAction, //< I
-
-            /* "Delete" button */
-            action::DeleteVideowallMatrixAction,
-            action::RemoveLayoutItemAction,
-            action::RemoveLayoutItemFromSceneAction,
-            action::RemoveFromServerAction,
-            action::StopSharingLayoutAction,
-            action::RemoveLayoutTourAction})
+    connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this,
+        [this]()
         {
-            action(actionId)->setEnabled(!isWebView);
-        }
-    });
+            if (!NX_ASSERT(m_view) || !NX_ASSERT(m_scene))
+                return;
+
+            const bool isWebView = m_view->hasFocus()
+                && dynamic_cast<GraphicsWebEngineView*>(m_scene->focusItem());
+
+            for (auto actionId: {
+                action::NotificationsTabAction, //< N
+                action::ResourcesTabAction, //< C
+                action::MotionTabAction, //< M
+                action::BookmarksTabAction, //< B
+                action::EventsTabAction, //< E
+                action::ObjectsTabAction, //< O
+                action::JumpToLiveAction, //< L
+                action::ToggleMuteAction, //< U
+                action::ToggleSyncAction, //< S
+                action::JumpToEndAction,  //< X
+                action::JumpToStartAction,//< Z
+                action::ToggleInfoAction, //< I
+
+                /* "Delete" button */
+                action::DeleteVideowallMatrixAction,
+                action::RemoveLayoutItemAction,
+                action::RemoveLayoutItemFromSceneAction,
+                action::RemoveFromServerAction,
+                action::StopSharingLayoutAction,
+                action::RemoveLayoutTourAction})
+            {
+                action(actionId)->setEnabled(!isWebView);
+            }
+        });
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(this);
@@ -342,7 +344,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
 {
-    setScene(nullptr);
+    NX_ASSERT(!m_scene);
+    NX_ASSERT(!m_view);
 }
 
 void QnWorkbenchDisplay::at_settingsValueChanged(int id)
@@ -367,25 +370,6 @@ void QnWorkbenchDisplay::updateAudioPlayback()
                 && (qnSettings->playAudioForAllItems() || w == centralWidget));
         }
     }
-}
-
-Qn::LightModeFlags QnWorkbenchDisplay::lightMode() const
-{
-    return m_lightMode;
-}
-
-void QnWorkbenchDisplay::setLightMode(Qn::LightModeFlags mode)
-{
-    if (m_lightMode == mode)
-        return;
-
-    if (m_scene && m_view)
-        deinitSceneView();
-
-    m_lightMode = mode;
-
-    if (m_scene && m_view)
-        initSceneView();
 }
 
 InstrumentManager* QnWorkbenchDisplay::instrumentManager() const
@@ -433,50 +417,14 @@ FrameTimePointsProviderInstrument* QnWorkbenchDisplay::frameTimePointsInstrument
     return m_frameTimePointsInstrument;
 }
 
-QGraphicsScene* QnWorkbenchDisplay::scene() const
-{
-    return m_scene;
-}
-
-void QnWorkbenchDisplay::setScene(QGraphicsScene *scene)
-{
-    if (m_scene == scene)
-        return;
-
-    if (m_scene && m_view)
-        deinitSceneView();
-
-    m_scene = scene;
-
-    if (m_scene && m_view)
-        initSceneView();
-}
-
-QGraphicsView* QnWorkbenchDisplay::view() const
-{
-    return m_view;
-}
-
-void QnWorkbenchDisplay::setView(QGraphicsView *view)
-{
-    if (m_view == view)
-        return;
-
-    if (m_scene && m_view)
-        deinitSceneView();
-
-    m_view = view;
-
-    if (m_scene && m_view)
-        initSceneView();
-}
-
-void QnWorkbenchDisplay::deinitSceneView()
+void QnWorkbenchDisplay::deinitialize()
 {
     NX_ASSERT(m_scene && m_view);
 
     /* Deinit view. */
     m_instrumentManager->unregisterView(m_view);
+
+    m_viewportAnimator->disconnect(this);
     m_viewportAnimator->setView(nullptr);
 
     m_view->disconnect(this);
@@ -511,6 +459,9 @@ void QnWorkbenchDisplay::deinitSceneView()
 
     if (gridBackgroundItem())
         delete gridBackgroundItem();
+
+    m_scene = nullptr;
+    m_view = nullptr;
 }
 
 QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const
@@ -541,7 +492,7 @@ void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value, bo
 
 bool QnWorkbenchDisplay::animationAllowed() const
 {
-    return !m_lightMode.testFlag(Qn::LightModeNoAnimation);
+    return !qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -554,9 +505,12 @@ public:
 };
 // ------------------------------------------------------------------------------------------------
 
-void QnWorkbenchDisplay::initSceneView()
+void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
 {
-    NX_ASSERT(m_scene && m_view);
+    m_scene = scene;
+    m_view = view;
+    if (!NX_ASSERT(m_scene && m_view))
+        return;
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
@@ -567,7 +521,6 @@ void QnWorkbenchDisplay::initSceneView()
             context()->menu()->trigger(action::SelectionChangeAction);
         });
     connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
-    connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 
     connect(action(action::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
 
@@ -577,8 +530,6 @@ void QnWorkbenchDisplay::initSceneView()
     /* Init view. */
     m_view->setScene(m_scene);
     m_instrumentManager->registerView(m_view);
-
-    connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
 
     /* Configure OpenGL */
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
@@ -1028,7 +979,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
     emit widgetChanged(role);
 
     if (role == Qn::SingleSelectedRole && !m_inChangeSelection && widget && widget->isVisible()
-        && scene()->selectedItems() != QList<QGraphicsItem*>({widget}))
+        && m_scene->selectedItems() != QList<QGraphicsItem*>({widget}))
     {
         QScopedValueRollback updateGuard(m_inChangeSelection, true);
         widget->selectThisWidget(true);
@@ -1118,7 +1069,7 @@ void QnWorkbenchDisplay::updateSelectionFromTree()
         return;
 
     /* Just deselect all items for now. See #4480. */
-    foreach(QGraphicsItem *item, scene()->selectedItems())
+    foreach(QGraphicsItem *item, m_scene->selectedItems())
         item->setSelected(false);
 }
 
@@ -2452,11 +2403,6 @@ void QnWorkbenchDisplay::at_widget_aspectRatioChanged()
     synchronizeGeometry(static_cast<QnResourceWidget*>(sender()), animate);
 }
 
-void QnWorkbenchDisplay::at_scene_destroyed()
-{
-    setScene(nullptr);
-}
-
 void QnWorkbenchDisplay::at_scene_selectionChanged()
 {
     if (!m_instrumentManager->scene() || m_inChangeSelection)
@@ -2496,11 +2442,6 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
     workbench()->setItem(Qn::SingleSelectedRole, suitableItem);
 }
 
-void QnWorkbenchDisplay::at_view_destroyed()
-{
-    setView(nullptr);
-}
-
 void QnWorkbenchDisplay::at_mapper_originChanged()
 {
     const bool animate = animationAllowed();
@@ -2528,7 +2469,7 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
 
 void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::event::AbstractActionPtr &businessAction)
 {
-    if (m_lightMode & Qn::LightModeNoNotifications)
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
 
     if (workbench()->currentLayout()->isPreviewSearchLayout())
@@ -2582,7 +2523,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
 
 void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const vms::event::AbstractActionPtr &businessAction)
 {
-    if (m_lightMode & Qn::LightModeNoNotifications)
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
 
     foreach(QnResourceWidget *widget, this->widgets(resource))
@@ -2608,7 +2549,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, Geometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
-        scene()->addItem(splashItem);
+        m_scene->addItem(splashItem);
         setLayer(splashItem, QnWorkbenchDisplay::EffectsLayer);
     }
 }
@@ -2618,7 +2559,7 @@ bool QnWorkbenchDisplay::canShowLayoutBackground() const
     if (qnRuntime->isAcsMode())
         return false;
 
-    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoLayoutBackground))
         return false;
 
     return true;
