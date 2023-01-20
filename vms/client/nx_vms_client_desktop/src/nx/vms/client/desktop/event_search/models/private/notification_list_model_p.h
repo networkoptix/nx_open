@@ -38,7 +38,7 @@ private:
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
     void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
- 
+
     void updateCloudItems(const QString& systemId);
     void removeCloudItems(const QString& systemId);
 

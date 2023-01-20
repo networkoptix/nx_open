@@ -4,6 +4,8 @@
 
 #include <QtCore/QSet>
 
+#include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/fusion/serialization/json_fwd.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::rules {
@@ -21,5 +23,8 @@ struct UuidSelection
 
     bool operator==(const UuidSelection&) const = default;
 };
+
+#define UuidSelection_Fields (ids)(all)
+QN_FUSION_DECLARE_FUNCTIONS(UuidSelection, (json), NX_VMS_RULES_API);
 
 } // namespace nx::vms::rules

@@ -18,7 +18,7 @@ class NX_VMS_RULES_API EmailMessageField:
 {
     Q_OBJECT
 
-    Q_CLASSINFO("metatype", "nx.actions.fields.emailMessageField")
+    Q_CLASSINFO("metatype", "nx.actions.fields.emailMessage")
 
     Q_PROPERTY(QString caption READ caption WRITE setCaption NOTIFY captionChanged)
     Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)

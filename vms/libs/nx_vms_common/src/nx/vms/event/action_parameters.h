@@ -4,7 +4,6 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>

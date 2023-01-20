@@ -23,12 +23,6 @@
 
 namespace nx::network::http {
 
-NX_REFLECTION_ENUM_CLASS(AuthType,
-    authBasicAndDigest,
-    authDigest,
-    authBasic
-)
-
 /**
  * HTTP client. All operations are done asynchronously.
  *

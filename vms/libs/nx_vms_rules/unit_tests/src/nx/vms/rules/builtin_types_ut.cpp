@@ -244,6 +244,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ExtractDetailField>(systemContext());
     testActionFieldRegistration<FlagField>();
     testActionFieldRegistration<FpsField>();
+    testActionFieldRegistration<HttpAuthTypeField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<PasswordField>();
