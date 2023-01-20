@@ -9,7 +9,7 @@
 
 #include <ui/animation/animation_timer.h>
 
-class InstrumentPaintSyncer: public QObject, public AnimationTimer, public AnimationTimerListener
+class InstrumentPaintSyncer: public QObject, public AnimationTimer
 {
 public:
     InstrumentPaintSyncer(QObject* parent = nullptr);
@@ -19,16 +19,18 @@ public:
     void setFpsLimit(int limit);
 
 protected:
-    virtual void tick(int deltaTime) override;
-
     virtual void activatedNotify() override;
     virtual void deactivatedNotify() override;
 
     QObject* currentWatched() const;
 
 private:
+    void tick(int deltaTime);
+
+private:
     QtBasedAnimationTimer* m_animationTimer;
     QPointer<QObject> m_currentWatched;
     QWidget* m_currentWidget;
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_update;
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
 };

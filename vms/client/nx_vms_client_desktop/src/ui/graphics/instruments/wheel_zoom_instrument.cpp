@@ -36,7 +36,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject* parent):
     processor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
     processor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
     processor->setFlags(KineticProcessor::IgnoreDeltaTime);
-    animationTimer()->addListener(processor);
+    animationTimer()->addListener(processor->animationTimerListener());
 }
 
 WheelZoomInstrument::~WheelZoomInstrument()

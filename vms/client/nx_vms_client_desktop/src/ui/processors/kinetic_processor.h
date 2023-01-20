@@ -36,7 +36,8 @@
  * then <tt>finishKinetic()</tt> will also be called even if this kinetic
  * processor is destroyed.
  */
-class KineticProcessor : public QObject, public AnimationTimerListener {
+class KineticProcessor : public QObject
+{
     Q_OBJECT;
     Q_FLAGS(Flags Flag);
     Q_ENUMS(State);
@@ -204,6 +205,8 @@ public:
         return mCurrentSpeed;
     }
 
+    AnimationTimerListenerPtr animationTimerListener() const { return m_animationTimerListener; }
+
 protected:
     struct Shift {
         QVariant dv; /**< Spatial displacement. */
@@ -250,12 +253,14 @@ protected:
      */
     virtual QVariant updateSpeed(const QVariant &initialSpeed, const QVariant &currentSpeed, const QVariant &speedGain, qreal dt) const;
 
-    virtual void tick(int deltaTimeMSec) override;
 
   private:
+    void tick(int deltaTimeMSec);
     void transition(State state);
 
   private:
+    AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
+
     /* 'Working' state. */
 
     /** Current state. */

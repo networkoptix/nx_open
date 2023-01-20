@@ -35,7 +35,10 @@ InstrumentManagerPrivate::InstrumentManagerPrivate():
     itemDispatcher(nullptr),
     totalTickTime(0),
     pendingDelayedItemProcessing(false)
-{}
+{
+    connect(m_animationTimerListener.get(), &AnimationTimerListener::tick, this,
+        &InstrumentManagerPrivate::tick);
+}
 
 void InstrumentManagerPrivate::init() {
     Q_Q(InstrumentManager);
@@ -46,8 +49,8 @@ void InstrumentManagerPrivate::init() {
     itemDispatcher     = new InstrumentEventDispatcher<QGraphicsItem>(q);
 
     paintSyncer        = new InstrumentPaintSyncer(q);
-    paintSyncer->addListener(this);
-    startListening();
+    paintSyncer->addListener(m_animationTimerListener);
+    m_animationTimerListener->startListening();
 }
 
 void InstrumentManagerPrivate::reinstallPaintSyncer(QWidget *oldViewport, QWidget *newViewport) {
@@ -344,7 +347,7 @@ const QList<Instrument *> &InstrumentManager::instruments() const {
 
 bool InstrumentManager::isAnimationEnabled() const
 {
-    return d_func()->timer()->isActive();
+    return d_func()->paintSyncer->isActive();
 }
 
 void InstrumentManager::setAnimationsEnabled(bool enabled)
@@ -353,9 +356,9 @@ void InstrumentManager::setAnimationsEnabled(bool enabled)
         return;
 
     if (enabled)
-        d_func()->timer()->activate();
+        d_func()->paintSyncer->activate();
     else
-        d_func()->timer()->deactivate();
+        d_func()->paintSyncer->deactivate();
 }
 
 void InstrumentManager::setFpsLimit(int limit)
