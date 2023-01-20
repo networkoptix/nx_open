@@ -31,7 +31,8 @@ class TimeMarker: public BubbleToolTip
 public:
     struct TimeContent
     {
-        std::chrono::milliseconds position{};
+        std::chrono::milliseconds archivePosition{};
+        std::chrono::milliseconds displayPosition{};
         bool isTimestamp = true;
         std::chrono::milliseconds localFileLength{}; //< Should be 0 if archive is not local file.
         bool showDate = true;
