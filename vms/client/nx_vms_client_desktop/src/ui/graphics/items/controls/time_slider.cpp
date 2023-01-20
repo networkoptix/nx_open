@@ -1907,7 +1907,8 @@ workbench::timeline::TimeMarker::TimeContent QnTimeSlider::tooltipTimeContent(
 {
     TimeMarker::TimeContent content;
     const bool isUtc = m_options.testFlag(UseUTC);
-    content.position = isUtc ? (pos + m_localOffset) : pos;
+    content.displayPosition = isUtc ? (pos + localOffset()) : pos;
+    content.archivePosition = pos;
     content.isTimestamp = isUtc;
     if (!isUtc)
         content.localFileLength = maximum();
@@ -1997,7 +1998,7 @@ void QnTimeSlider::updateLivePreview()
         m_livePreview->showAt(
             globalCursorPos,
             globalRect,
-            tooltipTimeContent(timeFromPosition(localCursorPos) - localOffset()));
+            tooltipTimeContent(timeFromPosition(localCursorPos)));
 
         m_livePreview->widget()->raise();
     }
