@@ -192,7 +192,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, compactSearchFilterEditors,
         "[Design] Tag and combo box attribute filter editors instead of radio button groups.");
 
-    NX_INI_FLOAT(1.0, attributeTableLineHeightFactor,
+    NX_INI_FLOAT(1.0f, attributeTableLineHeightFactor,
         "[Design] Line height multiplier for analytics attribute tables.");
 
     NX_INI_INT(4, attributeTableSpacing,
@@ -217,7 +217,7 @@ struct Ini: nx::kit::IniConfig
         "over the timeline.");
 
     // VMS-10483
-    NX_INI_FLOAT(0.3, timelineThumbnailBehindPreviewOpacity,
+    NX_INI_FLOAT(0.3f, timelineThumbnailBehindPreviewOpacity,
         "[Feature] Opacity of Thumbnail Panel when Timeline Preview is shown in front of it.");
 
     // VMS-20240
