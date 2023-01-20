@@ -108,7 +108,7 @@ void TimeMarker::setMode(Mode value)
 void TimeMarker::setTimeContent(const TimeContent& value)
 {
     d->timeContent = value;
-    d->timestampMs = value.position.count();
+    d->timestampMs = value.archivePosition.count();
     d->applyTimeContent();
 }
 
@@ -141,7 +141,8 @@ void TimeMarker::Private::applyTimeContent()
     Format timeFormat;
     if (timeContent->isTimestamp)
     {
-        const QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(timeContent->position.count());
+        const QDateTime dateTime =
+            QDateTime::fromMSecsSinceEpoch(timeContent->displayPosition.count());
         dateTextLine = toString(dateTime.date(), Format::dd_MM_yyyy, dateFormatter);
         timeFormat = timeContent->showMilliseconds ? Format::hh_mm_ss_zzz : Format::hh_mm_ss;
     }
@@ -153,7 +154,7 @@ void TimeMarker::Private::applyTimeContent()
             : (timeContent->showMilliseconds ? Format::mm_ss_zzz : Format::mm_ss);
     }
 
-    timeTextLine = toString(timeContent->position.count(), timeFormat);
+    timeTextLine = toString(timeContent->displayPosition.count(), timeFormat);
 
     if (dateTextLine.isEmpty())
     {
