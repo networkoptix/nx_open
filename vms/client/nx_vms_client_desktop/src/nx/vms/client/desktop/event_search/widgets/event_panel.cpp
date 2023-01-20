@@ -17,6 +17,11 @@ EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
     QnWorkbenchContextAware(context),
     d(new Private(this))
 {
+    setAttribute(Qt::WA_TranslucentBackground);
+    #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        setAutoFillBackground(true);
+    #endif
+
     setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark4"));
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark5"));
     setPaletteColor(this, QPalette::Light, colorTheme()->color("dark8"));
