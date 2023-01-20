@@ -18,7 +18,6 @@
 #include <nx/vms/common/api/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
-#include <utils/common/optional.h>
 #include <utils/email/email_fwd.h>
 
 class QnAbstractResourcePropertyAdaptor;

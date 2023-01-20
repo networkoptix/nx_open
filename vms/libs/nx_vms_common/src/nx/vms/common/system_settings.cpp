@@ -17,29 +17,6 @@
 #include <nx/vms/common/system_context.h>
 #include <utils/email/email.h>
 
-static void serialize(QnJsonContext*, const QnOptionalBool& value, QJsonValue* outJson)
-{
-    if (value.isDefined())
-        *outJson = value.value();
-    else
-        *outJson = {};
-}
-
-static bool deserialize(QnJsonContext*, QnConversionWrapper<QJsonValue> json, QnOptionalBool* outValue)
-{
-    if (QJsonValue(json).isNull())
-    {
-        *outValue = {};
-        return true;
-    }
-    if (QJsonValue(json).isBool())
-    {
-        *outValue = QJsonValue(json).toBool();
-        return true;
-    }
-    return false;
-}
-
 namespace {
 
 QSet<QString> parseDisabledVendors(const QString& disabledVendors)
