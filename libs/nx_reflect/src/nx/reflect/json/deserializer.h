@@ -352,8 +352,11 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         }
         return DeserializationResult(true);
     }
-    *data = T();
-    return {false, "Unknown type", getStringRepresentation(ctx.value)};
+    else
+    {
+        *data = T();
+        return {false, "Unknown type", getStringRepresentation(ctx.value)};
+    }
 }
 
 template<typename Data>

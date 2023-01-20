@@ -96,8 +96,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-constexpr bool kCustomizePopupShadows = false;
-
 #if defined(Q_OS_WIN) || defined(Q_OS_OSX)
 constexpr bool kForceMenuMouseReplay = true;
 #else
@@ -4182,15 +4180,12 @@ void Style::polish(QWidget* widget)
         }
     }
 
-    QWidget* popupToCustomizeShadow = nullptr;
-
     if (qobject_cast<QMenu*>(widget))
     {
         widget->setAttribute(Qt::WA_TranslucentBackground);
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
 #endif
-        popupToCustomizeShadow = widget;
     }
 
     if (auto view = qobject_cast<QAbstractItemView*>(widget))
@@ -4202,7 +4197,6 @@ void Style::polish(QWidget* widget)
         {
             /* Set margins for drop-down list container: */
             topLevel->setContentsMargins(0, 2, 0, 2);
-            popupToCustomizeShadow = topLevel;
         }
         else
         {
@@ -4242,22 +4236,6 @@ void Style::polish(QWidget* widget)
 
     if (auto label = qobject_cast<QLabel*>(widget))
         ObjectCompanion<LinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
-
-    if (kCustomizePopupShadows && popupToCustomizeShadow)
-    {
-        /* Create customized shadow: */
-        if (auto shadow = ObjectCompanion<PopupShadow>::install(popupToCustomizeShadow,
-                kPopupShadowCompanion,
-                /*unique*/ true))
-        {
-            QColor shadowColor = colorTheme()->color("dark4");
-            shadowColor.setAlphaF(0.5);
-            shadow->setColor(shadowColor);
-            shadow->setOffset(0, 10);
-            shadow->setBlurRadius(20);
-            shadow->setSpread(0);
-        }
-    }
 
     if (qobject_cast<QAbstractButton*>(widget) || qobject_cast<QAbstractSlider*>(widget)
         || qobject_cast<QGroupBox*>(widget) || qobject_cast<QTabBar*>(widget)
@@ -4306,11 +4284,6 @@ void Style::unpolish(QWidget* widget)
     if ((widget->windowFlags() & Qt::ToolTip) == Qt::ToolTip)
         QnAbstractPropertyBackup::restore(widget, kContentsMarginsBackupId);
 
-    QWidget* popupWithCustomizedShadow = nullptr;
-
-    if (auto menu = qobject_cast<QMenu*>(widget))
-        popupWithCustomizedShadow = menu;
-
     if (auto view = qobject_cast<QAbstractItemView*>(widget))
     {
         if (isWidgetOwnedBy<QComboBox>(view))
@@ -4318,15 +4291,11 @@ void Style::unpolish(QWidget* widget)
             /* Reset margins for drop-down list container: */
             QWidget* parentWidget = view->parentWidget();
             parentWidget->setContentsMargins(0, 0, 0, 0);
-            popupWithCustomizedShadow = parentWidget;
         }
     }
 
     if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
         ObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
-
-    if (kCustomizePopupShadows && popupWithCustomizedShadow)
-        ObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
 
     if (auto label = qobject_cast<QLabel*>(widget))
         ObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
