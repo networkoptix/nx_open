@@ -1015,11 +1015,23 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
 
 void ClientUpdateTool::setupProxyConnections(const SystemServersInfo& serversInfo)
 {
+    NX_VERBOSE(this,
+        "Setting up the proxy connections... Have %1 persistent storage servers and %2 servers "
+        "with internet access.",
+        serversInfo.persistentStorageServers.size(),
+        serversInfo.serversWithInternet.size());
+
     for (const auto& id: serversInfo.persistentStorageServers)
+    {
         m_peerManager->setServerDirectConnection(id, m_serverConnection);
+        NX_VERBOSE(this, "Added server %1 as a persistent storage server.", id);
+    }
 
     for (const auto& id: serversInfo.serversWithInternet)
+    {
         m_proxyPeerManager->setServerDirectConnection(id, m_serverConnection);
+        NX_VERBOSE(this, "Added server %1 as a server with internet access.", id);
+    }
 }
 
 } // namespace nx::vms::client::desktop
