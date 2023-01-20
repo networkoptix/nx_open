@@ -98,17 +98,9 @@ public:
      */
     virtual ~QnWorkbenchDisplay();
 
-    /**
-    * \returns                         Light mode of this workbench display.
-    */
-    Qn::LightModeFlags lightMode() const;
+    void initialize(QGraphicsScene* scene, QGraphicsView* view);
 
-    /**
-    * \param mode                      Light mode for the current display.
-    *                                  Enables or disables certain visualization features
-    *                                  to simplify and speed up painting.
-    */
-    void setLightMode(Qn::LightModeFlags mode);
+    void deinitialize();
 
     /**
      * \returns                         Instrument manager owned by this workbench display.
@@ -139,33 +131,6 @@ public:
     SignalingInstrument* afterPaintInstrument() const;
 
     nx::vms::client::desktop::FrameTimePointsProviderInstrument* frameTimePointsInstrument() const;
-
-    /**
-     * Note that this function never returns nullptr.
-     *
-     * \returns                         Current scene of this workbench display.
-     */
-    QGraphicsScene* scene() const;
-
-    /**
-     * Note that workbench manager does not take ownership of the supplied scene.
-     *
-     * \param scene                     New scene for this workbench display.
-     *                                  If nullptr is supplied, an empty scene
-     *                                  owned by this workbench display is used.
-     */
-    void setScene(QGraphicsScene* scene);
-
-    /**
-     * \returns                         Current graphics view of this workbench display.
-     *                                  May be nullptr.
-     */
-    QGraphicsView* view() const;
-
-    /**
-     * \param view                      New view for this workbench display.
-     */
-    void setView(QGraphicsView* view);
 
     /**
      * \returns                         Grid item.
@@ -352,8 +317,6 @@ protected:
     bool removeZoomLinkInternal(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
     bool removeZoomLinksInternal(QnWorkbenchItem *item);
 
-    void deinitSceneView();
-    void initSceneView();
     void initBoundingInstrument();
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
@@ -370,7 +333,6 @@ protected slots:
     /** Mark item on the scene selected as it was selected in the tree. */
     void updateSelectionFromTree();
 
-    void at_scene_destroyed();
     void at_scene_selectionChanged();
 
     void at_viewportAnimator_finished();
@@ -397,8 +359,6 @@ protected slots:
 
     void at_widget_aspectRatioChanged();
 
-    void at_view_destroyed();
-
     void at_mapper_originChanged();
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
@@ -415,13 +375,10 @@ private:
     /* Directly visible state */
 
     /** Current scene. */
-    QGraphicsScene *m_scene;
+    QGraphicsScene* m_scene = nullptr;
 
     /** Current view. */
     QGraphicsView* m_view = nullptr;
-
-    /** Set of flags to simplify and speed up painting. */
-    Qn::LightModeFlags m_lightMode;
 
     /* Internal state. */
     QList<QnResourceWidget *> m_widgets;

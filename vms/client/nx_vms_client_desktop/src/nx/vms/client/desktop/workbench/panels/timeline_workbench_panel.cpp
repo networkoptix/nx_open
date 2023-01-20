@@ -2,19 +2,17 @@
 
 #include "timeline_workbench_panel.h"
 
-#include <QtCore/QTimer>
 #include <QtCore/QScopedValueRollback>
-
+#include <QtCore/QTimer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/navigation_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
-#include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -28,12 +26,13 @@
 #include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <utils/math/math.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
+#include <utils/math/math.h>
 
 #include "../workbench_animations.h"
 #include "buttons.h"
@@ -73,8 +72,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
-    m_navigationWidget(new workbench::timeline::NavigationWidget(context(), display()->view())),
-    m_controlWidget(new workbench::timeline::ControlWidget(context(), display()->view())),
+    m_navigationWidget(new workbench::timeline::NavigationWidget(context(), mainWindow()->view())),
+    m_controlWidget(new workbench::timeline::ControlWidget(context(), mainWindow()->view())),
     m_pinButton(newPinTimelineButton(parentWidget, context(),
         ui::action::PinTimelineAction)),
     m_showButton(newShowHideButton(parentWidget, context(),
@@ -688,7 +687,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     if (!m_resizerWidget->isBeingMoved())
         return;
 
-    qreal y = display()->view()->mapFromGlobal(QCursor::pos()).y();
+    qreal y = mainWindow()->view()->mapFromGlobal(QCursor::pos()).y();
     qreal parentBottom = m_parentWidget->rect().bottom();
     qreal targetHeight = parentBottom - y;
     qreal minHeight = minimumHeight();
@@ -723,7 +722,7 @@ void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target
     newEvent.setDelta(oldEvent->delta());
     newEvent.setPos(item->timeSlider()->mapFromItem(m_resizerWidget, oldEvent->pos()));
     newEvent.setScenePos(oldEvent->scenePos());
-    display()->scene()->sendEvent(item->timeSlider(), &newEvent);
+    mainWindow()->scene()->sendEvent(item->timeSlider(), &newEvent);
 }
 
 } //namespace nx::vms::client::desktop

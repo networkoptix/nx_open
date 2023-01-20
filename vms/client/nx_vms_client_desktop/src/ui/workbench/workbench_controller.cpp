@@ -411,16 +411,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != nullptr);
 
-    /* Set up context menu. */
-    // #sandreenko most probably this is to activate key shortcuts, not for the menu.
-    QWidget *window = display()->view()->window();
-    window->addAction(action(action::ToggleSmartSearchAction));
-    window->addAction(action(action::ToggleInfoAction));
-
-    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
-    if (screenRecordingAction)
-        window->addAction(screenRecordingAction);
-
     connect(action(action::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(action::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
     connect(action(action::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
@@ -487,7 +477,7 @@ bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
         {
             /* Clicking on close button of a widget that is not selected should clear selection. */
             if (!widget->isSelected())
-                display()->scene()->clearSelection();
+                mainWindow()->scene()->clearSelection();
 
             menu()->trigger(action::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
@@ -568,7 +558,7 @@ void QnWorkbenchController::moveCursor(const QPoint& aAxis, const QPoint& bAxis)
     else if (!workbench()->item(role))
         role = Qn::RaisedRole;
 
-    display()->scene()->clearSelection();
+    mainWindow()->scene()->clearSelection();
     display()->widget(item)->setSelected(true);
     workbench()->setItem(role, item);
     m_cursorPos = pos;
@@ -580,7 +570,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
     if (!m_menuEnabled)
         return;
 
-    WeakGraphicsItemPointerList items(display()->scene()->selectedItems());
+    WeakGraphicsItemPointerList items(mainWindow()->scene()->selectedItems());
     executeDelayedParented(
         [this, pos, items]()
         {
@@ -765,8 +755,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             break;
         case Qt::Key_Menu:
         {
-            QGraphicsView *view = display()->view();
-            QList<QGraphicsItem *> items = display()->scene()->selectedItems();
+            QGraphicsView *view = mainWindow()->view();
+            QList<QGraphicsItem *> items = mainWindow()->scene()->selectedItems();
             QPoint offset = view->mapToGlobal(QPoint(0, 0));
             if (items.count() == 0)
             {
@@ -1341,7 +1331,7 @@ void QnWorkbenchController::at_item_doubleClicked(
 
 void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *widget)
 {
-    display()->scene()->clearSelection();
+    mainWindow()->scene()->clearSelection();
     widget->setSelected(true);
 
     if (workbench()->currentLayout()->isShowreelReviewLayout())
@@ -1427,7 +1417,7 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role)
 
     m_widgetByRole[role] = newWidget;
 
-    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    QGraphicsItem *focusItem = mainWindow()->scene()->focusItem();
     bool canMoveFocus = !focusItem
         || dynamic_cast<QnResourceWidget*>(focusItem)
         || dynamic_cast<GraphicsWebEngineView*>(focusItem);
@@ -1436,7 +1426,7 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role)
     // its content as focused, but won't be able to receive any input events. To prevent this,
     // never focus a web page if the scene itself does not have focus.
     const bool invalidFocus =
-        qobject_cast<QnWebResourceWidget*>(newWidget) && !display()->scene()->hasFocus();
+        qobject_cast<QnWebResourceWidget*>(newWidget) && !mainWindow()->scene()->hasFocus();
 
     if (newWidget && canMoveFocus && !invalidFocus)
         newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */
@@ -1489,7 +1479,7 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget* 
 
 void QnWorkbenchController::at_widget_rotationStartRequested(QnResourceWidget* widget)
 {
-    m_rotationInstrument->start(display()->view(), widget);
+    m_rotationInstrument->start(mainWindow()->view(), widget);
 }
 
 void QnWorkbenchController::at_widget_rotationStartRequested()
@@ -1509,7 +1499,7 @@ void QnWorkbenchController::at_selectAllAction_triggered()
 
     /* Move focus to scene if it's not there. */
     if (menu()->targetProvider() && menu()->targetProvider()->currentScope() != action::SceneScope)
-        display()->scene()->setFocusItem(nullptr);
+        mainWindow()->scene()->setFocusItem(nullptr);
 }
 
 void QnWorkbenchController::at_stopSmartSearchAction_triggered()
@@ -1693,7 +1683,7 @@ void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget* widget)
         return;
 
     workbench()->setItem(Qn::RaisedRole, nullptr); /* Un-raise currently raised item so that it doesn't interfere with ptz. */
-    display()->scene()->clearSelection();
+    mainWindow()->scene()->clearSelection();
     widget->setSelected(true);
     display()->bringToFront(widget);
 }
