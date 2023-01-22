@@ -7290,7 +7290,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>%n kameralar için yedekleme etkinleştirildi</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
@@ -7556,7 +7556,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Tüm cihazları göster</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -8177,7 +8177,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Şifreyi kaldır</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8294,11 +8294,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Arşiv şifreli.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
@@ -8440,7 +8440,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Yük Devretme Yok</translation>
     </message>
   </context>
   <context>
@@ -8514,7 +8514,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Daha fazla okumak için simgeye tıklayın</translation>
     </message>
   </context>
   <context>
@@ -8672,20 +8672,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Oturumunuzun süresi yakında sona eriyor</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Yeniden Kimlik Doğrulayın</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Bir dakikadan az kaldı</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n dakika kaldı</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
@@ -8763,7 +8763,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Sistemleri birleştirmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9988,15 +9988,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Sunucuyla bağlantı başarısız</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Sertifikayı görüntüle</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Sunucunun sertifikası geçersiz.</translation>
     </message>
   </context>
   <context>
@@ -10015,11 +10015,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Özel Sertifika</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Bilinmeyen sertifika</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -10052,7 +10052,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Yine de Bağlan</translation>
     </message>
     <message>
       <source>I trust this server</source>
@@ -11617,7 +11617,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Güncelleme kontrol edilemiyor.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>

@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Nesne Türü:</translation>
     </message>
   </context>
   <context>
