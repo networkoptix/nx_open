@@ -9,6 +9,7 @@
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/data/analytics_integration_model.h>
 
 namespace nx::vms::common {
 
@@ -45,6 +46,8 @@ public:
      * Device-dependent Engines are always running on a Device and cannot be disabled by the user.
      */
     virtual bool isDeviceDependent() const;
+
+    virtual nx::vms::api::analytics::IntegrationType integrationType() const;
 
     bool isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
 

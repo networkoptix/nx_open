@@ -3,6 +3,7 @@
 #include "analytics_engines_watcher.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/analytics_integration_model.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
@@ -145,7 +146,7 @@ void AnalyticsEnginesWatcher::Private::at_enginePropertyChanged(
 void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    if (key == AnalyticsPluginResource::kPluginManifestProperty)
+    if (key == nx::vms::api::analytics::kPluginManifestProperty)
     {
         const auto plugin = resource.staticCast<AnalyticsPluginResource>();
         const QJsonObject& settingsModel = plugin->manifest().engineSettingsModel;

@@ -5,20 +5,21 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
-namespace nx::vms::api {
+namespace nx::vms::api::analytics {
 
-static const QString kPluginManifestProperty("pluginManifest");
+const QString kPluginManifestProperty("pluginManifest");
+const QString kIntegrationTypeProperty("integrationType");
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AnalyticsIntegrationModel, (json), nx_vms_api_AnalyticsIntegrationModel_Fields);
+    IntegrationModel, (json), nx_vms_api_analytics_IntegrationModel_Fields);
 
-AnalyticsIntegrationModel::AnalyticsIntegrationModel(AnalyticsPluginData data):
+IntegrationModel::IntegrationModel(AnalyticsPluginData data):
     id(data.id),
     name(data.name)
 {
 }
 
-AnalyticsIntegrationModel::DbUpdateTypes AnalyticsIntegrationModel::toDbTypes() &&
+IntegrationModel::DbUpdateTypes IntegrationModel::toDbTypes() &&
 {
     AnalyticsPluginData result;
     result.id = id;
@@ -27,9 +28,10 @@ AnalyticsIntegrationModel::DbUpdateTypes AnalyticsIntegrationModel::toDbTypes() 
     return result;
 }
 
-std::vector<AnalyticsIntegrationModel> AnalyticsIntegrationModel::fromDbTypes(DbListTypes data)
+std::vector<IntegrationModel> IntegrationModel::fromDbTypes(DbListTypes data)
 {
     std::map<QnUuid, analytics::PluginManifest> manifests;
+    std::map<QnUuid, IntegrationType> integrationTypes;
     for (const auto& property: std::get<1>(data))
     {
         if (property.name == kPluginManifestProperty)
@@ -37,12 +39,17 @@ std::vector<AnalyticsIntegrationModel> AnalyticsIntegrationModel::fromDbTypes(Db
             manifests[property.resourceId] =
                 QJson::deserialized(property.value.toUtf8(), analytics::PluginManifest());
         }
+        else if (property.name == kIntegrationTypeProperty)
+        {
+            integrationTypes[property.resourceId] =
+                nx::reflect::fromString<IntegrationType>(property.value.toStdString());
+        }
     }
 
-    std::vector<AnalyticsIntegrationModel> result;
+    std::vector<IntegrationModel> result;
     for (auto& analyticsIntegrationData: std::get<0>(data))
     {
-        AnalyticsIntegrationModel model(std::move(analyticsIntegrationData));
+        IntegrationModel model(std::move(analyticsIntegrationData));
         if (manifests.contains(model.id))
         {
             auto& manifest = manifests[model.id];
@@ -51,15 +58,14 @@ std::vector<AnalyticsIntegrationModel> AnalyticsIntegrationModel::fromDbTypes(Db
             model.version = std::move(manifest.version);
             model.integrationId = std::move(manifest.id);
         }
+
+        if (integrationTypes.contains(model.id))
+            model.type = integrationTypes[model.id];
+
         result.push_back(std::move(model));
     }
 
     return result;
 }
 
-AnalyticsIntegrationModel fromDb(AnalyticsPluginData data)
-{
-    return AnalyticsIntegrationModel(std::move(data));
-}
-
-} // namespace nx::vms::api
+} // namespace nx::vms::api::analytics

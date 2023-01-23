@@ -104,4 +104,13 @@ EngineManifest AnalyticsEngineResource::fetchManifest() const
     return QJson::deserialized<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8());
 }
 
+nx::vms::api::analytics::IntegrationType AnalyticsEngineResource::integrationType() const
+{
+    const AnalyticsPluginResourcePtr parentPlugin = plugin();
+    if (!NX_ASSERT(parentPlugin))
+        return nx::vms::api::analytics::IntegrationType::sdk;
+
+    return parentPlugin->integrationType();
+}
+
 } // namespace nx::vms::common

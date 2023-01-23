@@ -4,19 +4,19 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::vms::api {
+namespace nx::vms::api::analytics {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AnalyticsEngineModel, (json), nx_vms_api_AnalyticsEngineModel_Fields);
+    EngineModel, (json), nx_vms_api_analytics_EngineModel_Fields);
 
-AnalyticsEngineModel::AnalyticsEngineModel(AnalyticsEngineData data):
+EngineModel::EngineModel(AnalyticsEngineData data):
     id(std::move(data.id)),
     name(std::move(data.name)),
     integrationId(std::move(data.parentId))
 {
 }
 
-AnalyticsEngineModel::DbUpdateTypes AnalyticsEngineModel::toDbTypes() &&
+EngineModel::DbUpdateTypes EngineModel::toDbTypes() &&
 {
     AnalyticsEngineData result;
     result.id = id;
@@ -26,18 +26,18 @@ AnalyticsEngineModel::DbUpdateTypes AnalyticsEngineModel::toDbTypes() &&
     return result;
 }
 
-std::vector<AnalyticsEngineModel> AnalyticsEngineModel::fromDbTypes(DbListTypes data)
+std::vector<EngineModel> EngineModel::fromDbTypes(DbListTypes data)
 {
-    std::vector<AnalyticsEngineModel> result;
+    std::vector<EngineModel> result;
     for (auto& analyticsEngineData: std::get<0>(data))
-        result.push_back(AnalyticsEngineModel(analyticsEngineData));
+        result.push_back(EngineModel(analyticsEngineData));
 
     return result;
 }
 
-AnalyticsEngineModel AnalyticsEngineModel::fromDb(AnalyticsEngineData data)
+EngineModel EngineModel::fromDb(AnalyticsEngineData data)
 {
-    return AnalyticsEngineModel(std::move(data));
+    return EngineModel(std::move(data));
 }
 
-} // namespace nx::vms::api
+} // namespace nx::vms::api::analytics

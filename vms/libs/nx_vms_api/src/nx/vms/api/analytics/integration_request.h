@@ -12,10 +12,29 @@
 
 namespace nx::vms::api::analytics {
 
+struct NX_VMS_API IntegrationRequestIdentity
+{
+    /**%apidoc Integration request id. */
+    QnUuid requestId;
+
+    IntegrationRequestIdentity() = default;
+    IntegrationRequestIdentity(const QnUuid& requestId): requestId(requestId) {}
+
+    QnUuid getId() { return requestId; }
+
+    bool operator==(const IntegrationRequestIdentity& other) const = default;
+};
+#define nx_vms_api_analytics_IntegrationRequestIdentity_Fields (requestId)
+QN_FUSION_DECLARE_FUNCTIONS(
+    IntegrationRequestIdentity, (json)(ubjson), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(
+    IntegrationRequestIdentity,
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields);
+
 /**%apidoc
  * Data to create/update an Integration request in the VMS.
  */
-struct NX_VMS_API RegisterIntegrationRequest
+struct NX_VMS_API RegisterIntegrationRequest: public IntegrationRequestIdentity
 {
     /**%apidoc Integration id. */
     QString id;
@@ -38,7 +57,13 @@ struct NX_VMS_API RegisterIntegrationRequest
     bool operator==(const RegisterIntegrationRequest& other) const = default;
 };
 #define nx_vms_api_analytics_RegisterIntegrationRequest_Fields \
-    (id)(name)(description)(version)(vendor)(pinCode)
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+    (id) \
+    (name) \
+    (description) \
+    (version) \
+    (vendor) \
+    (pinCode)
 QN_FUSION_DECLARE_FUNCTIONS(
     RegisterIntegrationRequest, (json)(ubjson), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
@@ -48,11 +73,8 @@ NX_REFLECTION_INSTRUMENT(
 /**%apidoc
  * Data to be returned after creating an Integration request.
  */
-struct NX_VMS_API RegisterIntegrationResponse
+struct NX_VMS_API RegisterIntegrationResponse: public IntegrationRequestIdentity
 {
-    /**%apidoc Integration request id. */
-    QnUuid integrationRequestId;
-
     /**%apidoc
      * Username of the user, which should be used by the Integration to log in to the VMS.
      */
@@ -64,7 +86,9 @@ struct NX_VMS_API RegisterIntegrationResponse
     QString password;
 };
 #define nx_vms_api_analytics_RegisterIntegrationResponse_Fields \
-    (integrationRequestId)(user)(password)
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields \
+    (user) \
+    (password)
 QN_FUSION_DECLARE_FUNCTIONS(
     RegisterIntegrationResponse, (json)(ubjson), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(
@@ -104,27 +128,5 @@ QN_FUSION_DECLARE_FUNCTIONS(
 NX_REFLECTION_INSTRUMENT(
     IntegrationRequestData,
     nx_vms_api_analytics_IntegrationRequestData_Fields);
-
-/**%apidoc
- * Inforamtion about an Integration request.
- */
-struct NX_VMS_API IntegrationRequestDataResponse: public IntegrationRequestData
-{
-    IntegrationRequestDataResponse() = default;
-    IntegrationRequestDataResponse(IntegrationRequestData integrationRequestData):
-        IntegrationRequestData(integrationRequestData)
-    {
-    }
-
-    /**%apidoc Integration request id. */
-    QnUuid integrationRequestId;
-};
-#define nx_vms_api_analytics_IntegrationRequestDataResponse_Fields \
-    nx_vms_api_analytics_IntegrationRequestData_Fields (integrationRequestId)
-QN_FUSION_DECLARE_FUNCTIONS(
-    IntegrationRequestDataResponse, (json)(ubjson), NX_VMS_API);
-NX_REFLECTION_INSTRUMENT(
-    IntegrationRequestDataResponse,
-    nx_vms_api_analytics_IntegrationRequestDataResponse_Fields);
 
 } // namespace nx::vms::api::analytics
