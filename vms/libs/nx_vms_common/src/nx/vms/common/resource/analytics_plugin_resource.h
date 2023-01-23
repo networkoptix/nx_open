@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/data/analytics_integration_model.h>
 
 namespace nx::vms::common {
 
@@ -22,8 +23,6 @@ class NX_VMS_COMMON_API AnalyticsPluginResource: public QnResource
     using base_type = QnResource;
 
 public:
-    static QString kPluginManifestProperty;
-
     AnalyticsPluginResource();
     virtual ~AnalyticsPluginResource() override = default;
 
@@ -32,6 +31,8 @@ public:
 
     AnalyticsEngineResourceList engines() const;
     bool hasDefaultEngine() const;
+
+    virtual nx::vms::api::analytics::IntegrationType integrationType() const;
 
     virtual QString idForToStringFromPtr() const override;
 };

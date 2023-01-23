@@ -6,16 +6,24 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/utils/uuid.h>
 
-namespace nx::vms::api {
+namespace nx::vms::api::analytics {
 
-struct NX_VMS_API AnalyticsIntegrationModel
+extern NX_VMS_API const QString kPluginManifestProperty;
+extern NX_VMS_API const QString kIntegrationTypeProperty;
+
+NX_REFLECTION_ENUM_CLASS(IntegrationType,
+    sdk = 1 << 0,
+    api = 1 << 1
+);
+
+struct NX_VMS_API IntegrationModel
 {
     /**%apidoc
      * Id of the Integration Resource, as a UUID.
-     * %example {cef375cf-5ad9-42c1-8bd2-4f12b3cb47d0}
      */
     QnUuid id;
 
@@ -49,22 +57,26 @@ struct NX_VMS_API AnalyticsIntegrationModel
      */
     QString vendor;
 
+    /**%apidoc
+     * Integration type (whether the integration is an SDK or API one).
+     */
+    IntegrationType type = IntegrationType::sdk;
+
     QnUuid getId() const { return id; }
 
-    AnalyticsIntegrationModel() = default;
-    explicit AnalyticsIntegrationModel(AnalyticsPluginData data);
+    IntegrationModel() = default;
+    explicit IntegrationModel(AnalyticsPluginData data);
 
     using DbReadTypes = std::tuple<AnalyticsPluginData, ResourceParamWithRefData>;
     using DbListTypes = std::tuple<AnalyticsPluginDataList, ResourceParamWithRefDataList>;
     using DbUpdateTypes = std::tuple<AnalyticsPluginData>;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<AnalyticsIntegrationModel> fromDbTypes(DbListTypes data);
-    static AnalyticsIntegrationModel fromDb(AnalyticsPluginData data);
+    static std::vector<IntegrationModel> fromDbTypes(DbListTypes data);
 };
-#define nx_vms_api_AnalyticsIntegrationModel_Fields \
-    (id)(integrationId)(name)(description)(version)(vendor)
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsIntegrationModel, (json), NX_VMS_API);
-NX_REFLECTION_INSTRUMENT(AnalyticsIntegrationModel, nx_vms_api_AnalyticsIntegrationModel_Fields);
+#define nx_vms_api_analytics_IntegrationModel_Fields \
+    (id)(integrationId)(name)(description)(version)(vendor)(type)
+QN_FUSION_DECLARE_FUNCTIONS(IntegrationModel, (json), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(IntegrationModel, nx_vms_api_analytics_IntegrationModel_Fields);
 
-} // namespace nx::vms::api
+} // namespace nx::vms::api::analytics

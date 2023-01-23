@@ -11,9 +11,9 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/analytics_data.h>
 
-namespace nx::vms::api {
+namespace nx::vms::api::analytics {
 
-struct NX_VMS_API AnalyticsEngineModel
+struct NX_VMS_API EngineModel
 {
     QnUuid id;
     QString name;
@@ -21,19 +21,19 @@ struct NX_VMS_API AnalyticsEngineModel
 
     QnUuid getId() const { return id; }
 
-    AnalyticsEngineModel() = default;
-    explicit AnalyticsEngineModel(AnalyticsEngineData data);
+    EngineModel() = default;
+    explicit EngineModel(AnalyticsEngineData data);
 
     using DbReadTypes = std::tuple<AnalyticsEngineData>;
     using DbListTypes = std::tuple<AnalyticsEngineDataList>;
     using DbUpdateTypes = std::tuple<AnalyticsEngineData>;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<AnalyticsEngineModel> fromDbTypes(DbListTypes data);
-    static AnalyticsEngineModel fromDb(AnalyticsEngineData data);
+    static std::vector<EngineModel> fromDbTypes(DbListTypes data);
+    static EngineModel fromDb(AnalyticsEngineData data);
 };
-#define nx_vms_api_AnalyticsEngineModel_Fields (id)(integrationId)(name)
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEngineModel, (json), NX_VMS_API);
-NX_REFLECTION_INSTRUMENT(AnalyticsEngineModel, nx_vms_api_AnalyticsEngineModel_Fields);
+#define nx_vms_api_analytics_EngineModel_Fields (id)(integrationId)(name)
+QN_FUSION_DECLARE_FUNCTIONS(EngineModel, (json), NX_VMS_API);
+NX_REFLECTION_INSTRUMENT(EngineModel, nx_vms_api_analytics_EngineModel_Fields);
 
-} // namespace nx::vms::api
+} // namespace nx::vms::api::analytics

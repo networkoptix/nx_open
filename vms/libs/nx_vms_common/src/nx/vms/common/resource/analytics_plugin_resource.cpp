@@ -17,8 +17,6 @@ namespace nx::vms::common {
 
 using namespace nx::vms::api::analytics;
 
-QString AnalyticsPluginResource::kPluginManifestProperty("pluginManifest");
-
 AnalyticsPluginResource::AnalyticsPluginResource():
     base_type()
 {
@@ -26,12 +24,16 @@ AnalyticsPluginResource::AnalyticsPluginResource():
 
 PluginManifest AnalyticsPluginResource::manifest() const
 {
-    return QJson::deserialized(getProperty(kPluginManifestProperty).toUtf8(), PluginManifest());
+    return QJson::deserialized(getProperty(
+        nx::vms::api::analytics::kPluginManifestProperty).toUtf8(),
+        PluginManifest());
 }
 
 void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
 {
-    setProperty(kPluginManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
+    setProperty(
+        nx::vms::api::analytics::kPluginManifestProperty,
+        QString::fromUtf8(QJson::serialized(manifest)));
 }
 
 AnalyticsEngineResourceList AnalyticsPluginResource::engines() const
@@ -51,6 +53,13 @@ bool AnalyticsPluginResource::hasDefaultEngine() const
 {
     // TODO: #dmishin take this value from manifest
     return true;
+}
+
+nx::vms::api::analytics::IntegrationType AnalyticsPluginResource::integrationType() const
+{
+    return nx::reflect::fromString(
+        getProperty(kIntegrationTypeProperty).toStdString(),
+        nx::vms::api::analytics::IntegrationType::sdk);
 }
 
 QString AnalyticsPluginResource::idForToStringFromPtr() const
