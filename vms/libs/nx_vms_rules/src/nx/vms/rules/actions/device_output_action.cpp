@@ -2,6 +2,26 @@
 
 #include "device_output_action.h"
 
+#include "../utils/type.h"
+#include "../utils/field.h"
+#include "../action_builder_fields/target_device_field.h"
+#include "../action_builder_fields/output_port_field.h"
+
 namespace nx::vms::rules {
+
+const ItemDescriptor& DeviceOutputAction::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<DeviceOutputAction>(),
+        .displayName = tr("Camera output"),
+        .flags = ItemFlag::prolonged,
+        .fields = {
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
+            utils::makeDurationFieldDescriptor(tr("Fixed duration")),
+            makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
+        }
+    };
+    return kDescriptor;
+}
 
 } // namespace nx::vms::rules

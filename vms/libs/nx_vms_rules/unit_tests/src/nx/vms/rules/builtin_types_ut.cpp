@@ -247,6 +247,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<HttpAuthTypeField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
+    testActionFieldRegistration<OutputPortField>();
     testActionFieldRegistration<PasswordField>();
     testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<Substitution>();
@@ -258,7 +259,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
 
     // TODO: #amalov Uncomment all types after manifest definition.
     testActionRegistration<BookmarkAction>();
-    //testActionRegistration<DeviceOutputAction>();
+    testActionRegistration<DeviceOutputAction>();
     testActionRegistration<DeviceRecordingAction>();
     //testActionRegistration<EnterFullscreenAction>();
     //testActionRegistration<ExitFullscreenAction>();
