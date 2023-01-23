@@ -66,8 +66,7 @@ set(copied_samples_dir ${open_source_root}/vms/server/plugins/analytics)
 # Collect source files for the sample 1 - Sample Analytics Plugin.
 set(copied_sample_1_target sample_analytics_plugin)
 set(copied_sample_1_origin ${copied_samples_dir}/${copied_sample_1_target})
-file(GLOB_RECURSE copied_sample_1_files CONFIGURE_DEPENDS
-    ${copied_sample_1_origin}/src/*)
+file(GLOB_RECURSE copied_sample_1_files CONFIGURE_DEPENDS ${copied_sample_1_origin}/src/*)
 
 # Collect source files for the sample 2 - Stub Analytics Plugin.
 set(copied_sample_2_target stub_analytics_plugin)
@@ -157,7 +156,7 @@ nx_add_custom_command(OUTPUT ${zip_file}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_sdk_files}
-        ${copied_nx_sdk_resources_files}
+        ${copied_nx_sdk_analytics_resources_files}
         ${copied_sample_1_files}
         ${copied_sample_2_files}
         ${copied_sample_unit_tests_files}
