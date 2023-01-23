@@ -2,7 +2,6 @@
 
 #include "test_options.h"
 
-#include <QtCore/QCommandLineParser>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
@@ -101,27 +100,74 @@ void TestOptions::setLoadMode(const QString& mode)
         NX_CRITICAL(false, nx::format("Unrecognized load mode: %1").arg(mode));
 }
 
+static void printHelp()
+{
+    // ATTENTION: The format of this help is similar to the gtest's help which is printed before.
+    // The CI scripts parse this help text in order to understand which options are supported.
+
+    std::cout << //< The initial newline separates this printout from the gtest's one.
+R"(
+The following command line arguments are supported by this particular unit test suite:
+  -h, --help
+      Show this help, and exit with a successful (zero) exit status.
+  -t, --tmp=[TMP_DIR]
+      Set the path to a directory for temporary files.
+  --enable-discovery
+      Enable the discovery.
+  --timeout-multiplier=[VALUE]
+      Set the timeout multiplier to speed up realtime tests.
+  --load-factor=[VALUE]
+      Increase the amount of work for some tests. Default value is 1.0.
+  --disable-time-asserts
+      Do not check the calendar time.
+  --keep-temporary-directory
+      Do not delete the temporary directory after the test is finished.
+  --load-mode=(light|normal|stress)
+      Set the load mode.
+  --log-level=[LOG_LEVEL]
+      Set the log level using the same language as in the respective Server and Client command-line
+      argument: a comma-separated list of items, each being a log level name (none, error, warning,
+      info, debug, verbose, trace) possibly followed by a bracketed tag prefix.
+  --log-file=[ABSOLUTE_FILE_PATH]
+      Redirect logging to the file with the specified absolute path.
+)";        
+
+    #if defined(_WIN32)
+        std::cout << /*suppress newline*/ 1 + (const char*)
+R"(
+  --disable-crash-dump
+      Do not create a crash dump if the test fails.
+  --enable-full-crash-dump
+      Generate full crash dump if the test fails.
+)";        
+    #endif
+}
+
+static void showHelpAndExitIfNeeded(const utils::ArgumentParser& argumentParser)
+{
+    // ATTENTION: The arguments which trigger the help are consistent with those of the gtest
+    // itself, so that the gtest's help is printed before our help.
+
+    if (argumentParser.get("help", "h", "?"))
+    {
+        printHelp();
+        exit(0);
+    }
+
+    for (const auto& arg: argumentParser.getPositionalArgs())
+    {
+        if (arg == "/?")
+        {
+            printHelp();
+            exit(0);
+        }    
+    }
+}
+
 void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 {
-    QStringList args;
-    for (const auto& [key, value] : arguments.allArgs())
-        args.push_back(QString("--%1=%2").arg(key).arg(value));
-
-    QCommandLineParser parser;
-    parser.addOptions({
-        {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
-        {"enable-discovery", "Enable discovery"},
-        {"timeout-multiplier", "Timeout multiplier to speedup realtime tests"},
-        {"load-factor", "Increase amount of work for some tests. Default value is 1.0"},
-        {"disable-time-asserts", "Do not check calendar time."},
-        {"keep-temporary-directory", "Do not delete tmp directory after test is finished"},
-        {"load-mode", "Available values: light/normal/stress"},
-        {"disable-crash-dump", "Do not create crash dump if test fails"},
-        {"enable-full-crash-dump", "Generate full crash dump if test fails"},
-        });
-    parser.addHelpOption();
-    parser.parse(args);
-
+    showHelpAndExitIfNeeded(arguments);
+    
     if (const auto value = arguments.get<size_t>("timeout-multiplier"))
         setTimeoutMultiplier(*value);
 
@@ -140,24 +186,14 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
 
-#ifdef _WIN32
-    bool enableCrashDump = true;
-    if (arguments.get("disable-crash-dump"))
-        enableCrashDump = false;
-
-    bool generateFullCrashDump = false;
-    if (arguments.get("enable-full-crash-dump"))
-        generateFullCrashDump = true;
-
-    if (enableCrashDump)
-    {
-        win32_exception::installGlobalUnhandledExceptionHandler();
-        win32_exception::setCreateFullCrashDump(generateFullCrashDump);
-    }
-#endif
-
-    if (parser.isSet("help"))
-        parser.showHelp();
+    #if defined(_WIN32)
+        if (!arguments.get("disable-crash-dump"))
+        {
+            win32_exception::installGlobalUnhandledExceptionHandler();
+            win32_exception::setCreateFullCrashDump(
+                arguments.get("enable-full-crash-dump").has_value());
+        }
+    #endif
 }
 
 TestOptions::TemporaryDirectory& TestOptions::tmpDirInstance()
