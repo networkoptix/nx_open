@@ -47,6 +47,7 @@ void Initializer::registerActions() const
 {
     // Register built-in actions.
     registerAction<BookmarkAction>();
+    registerAction<DeviceOutputAction>();
     registerAction<DeviceRecordingAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
@@ -98,6 +99,7 @@ void Initializer::registerFields() const
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
+    registerActionField<OutputPortField>();
     registerActionField<PasswordField>();
     registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();

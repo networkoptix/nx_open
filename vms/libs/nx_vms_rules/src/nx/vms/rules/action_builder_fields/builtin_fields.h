@@ -13,6 +13,7 @@
 #include "http_method_field.h"
 #include "int_field.h"
 #include "optional_time_field.h"
+#include "output_port_field.h"
 #include "password_field.h"
 #include "stream_quality_field.h"
 #include "substitution.h"
