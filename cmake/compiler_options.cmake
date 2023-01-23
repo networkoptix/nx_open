@@ -238,6 +238,12 @@ endif()
 # -------------------------------------------------------------------------------------------------
 # Compiler options.
 
+if(compilerGcc AND CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    # Workaround of a GCC compilation issue.
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+endif()
+
 if(compilerMsvc)
     add_compile_options(
         /MP
