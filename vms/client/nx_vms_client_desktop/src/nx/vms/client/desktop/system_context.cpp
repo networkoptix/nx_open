@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -53,6 +54,7 @@ struct SystemContext::Private
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
+    std::unique_ptr<SystemSpecificLocalSettings> localSettings;
     std::unique_ptr<RestApiHelper> restApiHelper;
 
     void initLocalRuntimeInfo()
@@ -101,6 +103,7 @@ SystemContext::SystemContext(
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
+            d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
             break;
 
@@ -192,6 +195,11 @@ LogsManagementWatcher* SystemContext::logsManagementWatcher() const
 QnMediaServerStatisticsManager* SystemContext::mediaServerStatisticsManager() const
 {
     return d->mediaServerStatisticsManager.get();
+}
+
+SystemSpecificLocalSettings* SystemContext::localSettings() const
+{
+    return d->localSettings.get();
 }
 
 RestApiHelper* SystemContext::restApiHelper() const
