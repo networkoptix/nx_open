@@ -172,8 +172,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
-    qRegisterMetaType<QnLicenseWarningState>();
-    qRegisterMetaType<QnLicenseWarningStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehavior>();

@@ -9,7 +9,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/compare.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBackgroundImage, (json), QnBackgroundImage_Fields, (brief, true));
 
 qreal QnBackgroundImage::actualImageOpacity() const

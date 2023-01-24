@@ -48,7 +48,6 @@ public:
         AUDIO_VOLUME,
         MEDIA_FOLDERS,
         WORKBENCH_STATES,
-        LICENSE_WARNING_STATES,
 
         LAST_DATABASE_BACKUP_DIR,
         LAST_SCREENSHOT_DIR,
@@ -246,7 +245,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastDownloadDir,        setLastDownloadDir,         LAST_DOWNLOAD_DIR,          QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
-        QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
 
         QN_DECLARE_RW_PROPERTY(nx::vms::client::core::ConnectionData,
             lastUsedConnection,
