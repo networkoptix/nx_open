@@ -22,6 +22,8 @@ class SystemSpecificLocalSettings:
 
 public:
     SystemSpecificLocalSettings(SystemContext* systemContext);
+
+    Property<std::map<QString, qint64>> licenseLastWarningTime{this, "licenseLastWarningTime"};
 };
 
 } // namespace nx::vms::client::desktop

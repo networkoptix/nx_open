@@ -7,12 +7,15 @@
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <ui/dialogs/license_notification_dialog.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -28,8 +31,7 @@ const qint64 kWarningTimes[] = {
     0
 };
 
-} // anonymous namespace
-
+} // namespace
 
 QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
     QObject(parent),
@@ -52,7 +54,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
     if (!accessController()->hasAdminPermissions())
         return;
 
-    auto licenseWarningStates = qnSettings->licenseWarningStates();
+    auto licenseLastWarningTime = systemContext()->localSettings()->licenseLastWarningTime();
 
     const auto currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
@@ -72,6 +74,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
     nx::vms::license::Validator validator(systemContext());
     for (const auto& license: systemContext()->licensePool()->getLicenses())
     {
+        const auto licenseKey = QString::fromUtf8(license->key());
         const auto errorCode = validator.validate(license);
 
         if (someLicenseWillBeBlocked
@@ -80,7 +83,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
             && errorCode != nx::vms::license::QnLicenseErrorCode::TemporaryExpired)
         {
             licenses.push_back(license);
-            licenseWarningStates[license->key()].lastWarningTime = currentTime;
+            licenseLastWarningTime[licenseKey] = currentTime;
             warn = true;
             continue;
         }
@@ -90,9 +93,9 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
         if (expirationTime < 0)
             continue;
 
-        const auto licenseWarningState = licenseWarningStates.value(license->key());
+        const auto licenseWarningTime = licenseLastWarningTime[licenseKey];
         // skip already notified expired license
-        const auto lastTimeLeft = expirationTime - licenseWarningState.lastWarningTime;
+        const auto lastTimeLeft = expirationTime - licenseWarningTime;
         if (lastTimeLeft < 0)
             continue;
         // skip license that didn't pass the maximum pre-notification interval
@@ -114,7 +117,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
             continue;
 
         warn = true;
-        licenseWarningStates[license->key()].lastWarningTime = currentTime;
+        licenseLastWarningTime[licenseKey] = currentTime;
     }
 
     if (warn && mainWindowWidget())
@@ -124,6 +127,6 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
         dialog->setLicenses(licenses);
         dialog->exec();
 
-        qnSettings->setLicenseWarningStates(licenseWarningStates);
+        systemContext()->localSettings()->licenseLastWarningTime = licenseLastWarningTime;
     }
 }

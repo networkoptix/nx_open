@@ -80,22 +80,6 @@ QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState::UnsavedLayout, (json))
 
 // -------------------------------------------------------------------------- //
-// QnLicenseWarningState
-// -------------------------------------------------------------------------- //
-struct QnLicenseWarningState {
-    QnLicenseWarningState(qint64 lastWarningTime = 0): lastWarningTime(lastWarningTime) {}
-
-    qint64 lastWarningTime;
-};
-
-/**
- * Mapping from license key to license warning state.
- */
-typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
-
-QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
-
-// -------------------------------------------------------------------------- //
 // QnBackgroundImage
 // -------------------------------------------------------------------------- //
 /**
