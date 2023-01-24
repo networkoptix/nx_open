@@ -22,6 +22,7 @@ class LogsManagementWatcher;
 class RestApiHelper;
 class ShowreelStateManager;
 class ServerRuntimeEventConnector;
+class SystemSpecificLocalSettings;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -65,6 +66,7 @@ public:
     ShowreelStateManager* showreelStateManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
+    SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
 
 protected:
