@@ -49,6 +49,8 @@ void Initializer::registerActions() const
     registerAction<BookmarkAction>();
     registerAction<DeviceOutputAction>();
     registerAction<DeviceRecordingAction>();
+    registerAction<EnterFullscreenAction>();
+    registerAction<ExitFullscreenAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<PanicRecordingAction>();
@@ -110,6 +112,8 @@ void Initializer::registerFields() const
         fieldMetatype<TextWithFields>(),
         [this] { return new TextWithFields(this->m_context); });
     registerActionField<Substitution>();
+    registerActionField<TargetLayoutField>();
+    registerActionField<TargetSingleDeviceField>();
     registerActionField<TimeField>();
     registerActionField<VolumeField>();
 }

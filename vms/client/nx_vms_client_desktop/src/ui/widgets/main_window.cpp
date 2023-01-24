@@ -4,9 +4,9 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QAction>
 #include <QtGui/QFileOpenEvent>
 #include <QtGui/QWindowStateChangeEvent>
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QStackedLayout>
@@ -41,8 +41,8 @@
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_merge/incompatible_servers_action_handler.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
