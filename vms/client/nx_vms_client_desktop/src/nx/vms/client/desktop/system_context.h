@@ -20,6 +20,7 @@ namespace nx::vms::client::desktop {
 class LayoutSnapshotManager;
 class LogsManagementWatcher;
 class ServerRuntimeEventConnector;
+class SystemSpecificLocalSettings;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -62,6 +63,7 @@ public:
     LayoutSnapshotManager* layoutSnapshotManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
+    SystemSpecificLocalSettings* localSettings() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

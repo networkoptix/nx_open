@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -50,6 +51,7 @@ struct SystemContext::Private
     std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
+    std::unique_ptr<SystemSpecificLocalSettings> localSettings;
 
     void initLocalRuntimeInfo()
     {
@@ -96,6 +98,7 @@ SystemContext::SystemContext(
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
+            d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             break;
 
         case Mode::crossSystem:
@@ -181,6 +184,11 @@ LogsManagementWatcher* SystemContext::logsManagementWatcher() const
 QnMediaServerStatisticsManager* SystemContext::mediaServerStatisticsManager() const
 {
     return d->mediaServerStatisticsManager.get();
+}
+
+SystemSpecificLocalSettings* SystemContext::localSettings() const
+{
+    return d->localSettings.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
