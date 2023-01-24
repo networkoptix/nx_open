@@ -18,6 +18,8 @@
 #include "stream_quality_field.h"
 #include "substitution.h"
 #include "target_device_field.h"
+#include "target_layout_field.h"
+#include "target_single_device_field.h"
 #include "target_user_field.h"
 #include "text_field.h"
 #include "text_with_fields.h"

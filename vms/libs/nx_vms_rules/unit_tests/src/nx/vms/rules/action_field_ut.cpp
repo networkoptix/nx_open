@@ -226,4 +226,28 @@ TEST_F(ActionFieldTest, EventIdField)
     ASSERT_EQ(value.value<QnUuid>(), aggEvent->id());
 }
 
+TEST_F(ActionFieldTest, TargetSingleDeviceTest)
+{
+    const auto event = QSharedPointer<TestEvent>::create();
+    event->m_cameraId = QnUuid::createUuid();
+    event->m_deviceIds = {QnUuid::createUuid(), QnUuid::createUuid()};
+    const auto aggEvent = AggregatedEventPtr::create(event);
+
+    TargetSingleDeviceField field;
+    field.setUseSource(true);
+
+    auto value = field.build(aggEvent);
+    ASSERT_TRUE(value.isValid());
+    ASSERT_FALSE(value.isNull());
+    ASSERT_EQ(value.value<QnUuid>(), event->m_deviceIds.last());
+
+    field.setUseSource(false);
+    field.setId(QnUuid::createUuid());
+
+    value = field.build(aggEvent);
+    ASSERT_TRUE(value.isValid());
+    ASSERT_FALSE(value.isNull());
+    ASSERT_EQ(value.value<QnUuid>(), field.id());
+}
+
 } // namespace nx::vms::rules::test

@@ -10,8 +10,8 @@
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/utils/serialization.h>
@@ -184,6 +184,11 @@ public:
             EXPECT_TRUE(value.isValid());
 
             const auto prop = meta.property(meta.indexOfProperty(name.toUtf8().data()));
+
+            SCOPED_TRACE(nx::format(
+                "Property type: %1, value type: %2",
+                QMetaType(prop.userType()).name(),
+                QMetaType(value.userType()).name()).toStdString());
             EXPECT_EQ(prop.userType(), value.userType());
         }
     }
@@ -255,14 +260,16 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetUserField>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
     testActionFieldRegistration<TimeField>();
+    testActionFieldRegistration<TargetLayoutField>();
+    testActionFieldRegistration<TargetSingleDeviceField>();
     testActionFieldRegistration<VolumeField>();
 
     // TODO: #amalov Uncomment all types after manifest definition.
     testActionRegistration<BookmarkAction>();
     testActionRegistration<DeviceOutputAction>();
     testActionRegistration<DeviceRecordingAction>();
-    //testActionRegistration<EnterFullscreenAction>();
-    //testActionRegistration<ExitFullscreenAction>();
+    testActionRegistration<EnterFullscreenAction>();
+    testActionRegistration<ExitFullscreenAction>();
     testActionRegistration<HttpAction>();
     testActionRegistration<NotificationAction>();
     //testActionRegistration<OpenLayoutAction>();
