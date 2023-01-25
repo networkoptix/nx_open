@@ -12,8 +12,6 @@ namespace nx::utils {
 /** The structure gives a short description of an operating system. */
 struct NX_UTILS_API OsInfo
 {
-    static const QString kDefaultFlavor;
-
     /** Typically contains the OS family name and architecture: windows_x64, linux_arm32, etc. */
     QString platform;
     /** Used only for Linux. Contains the distribution name: ubuntu, debian, etc. */
@@ -21,22 +19,14 @@ struct NX_UTILS_API OsInfo
     /** OS or Linux distribution version. */
     QString variantVersion;
 
-    /**
-     * A configurable vendor-specific identifier. Should be used to identify a VMS component which
-     * receives customized updates.
-     */
-    QString flavor = kDefaultFlavor;
-
     OsInfo(
         const QString& platform = {},
         const QString& variant = {},
-        const QString& variantVersion = {},
-        const QString& flavor = kDefaultFlavor)
+        const QString& variantVersion = {})
         :
         platform(platform),
         variant(variant),
-        variantVersion(variantVersion),
-        flavor(flavor)
+        variantVersion(variantVersion)
     {
     }
 
@@ -52,9 +42,8 @@ struct NX_UTILS_API OsInfo
 
     static OsInfo current();
     static void overrideVariant(const QString& variant, const QString& variantVersion);
-    static void setCurrentFlavor(const QString& flavor);
 };
-#define OsInfo_Fields (platform)(variant)(variantVersion)(flavor)
+#define OsInfo_Fields (platform)(variant)(variantVersion)
 NX_REFLECTION_INSTRUMENT(OsInfo, OsInfo_Fields);
 
 NX_UTILS_API QString toString(const OsInfo& info);

@@ -75,6 +75,6 @@ namespace nx::utils {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OsInfo,
     (ubjson)(json)(xml)(csv_record),
-    (platform)(flavor)(variant)(variantVersion))
+    (platform)(variant)(variantVersion))
 
 } // namespace nx::utils
