@@ -19,6 +19,7 @@ class CameraHotspotItem: public QGraphicsItem
 public:
     CameraHotspotItem(
         const nx::vms::common::CameraHotspotData& hotspotData,
+        QnWorkbenchContext* context,
         QGraphicsItem* parent = nullptr);
     virtual ~CameraHotspotItem() override;
 
@@ -30,8 +31,6 @@ public:
         QPainter* painter,
         const QStyleOptionGraphicsItem* option,
         QWidget* widget = nullptr) override;
-
-    void initTooltip(QnWorkbenchContext* context, const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

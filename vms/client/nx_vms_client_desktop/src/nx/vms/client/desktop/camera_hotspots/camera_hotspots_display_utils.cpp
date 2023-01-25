@@ -144,7 +144,7 @@ void paintHotspot(
 
     // Paint pixmap.
     painter->setOpacity(1.0);
-    QPixmap pixmap = qnResIconCache->icon(QnResourceIconCache::Camera)
+    QPixmap pixmap = qnResIconCache->icon(option.iconKey)
         .pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
 
     if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)

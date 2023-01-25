@@ -351,8 +351,13 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         {
             option.cameraState = CameraHotspotDisplayOption::CameraState::valid;
             const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-            if (!resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.cameraId))
+            const auto camera =
+                resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.cameraId);
+
+            if (!camera)
                 option.cameraState = CameraHotspotDisplayOption::CameraState::invalid;
+            else
+                option.iconKey = QnResourceIconCache::key(camera);
         }
 
         paintHotspot(&painter, hotspot, option);

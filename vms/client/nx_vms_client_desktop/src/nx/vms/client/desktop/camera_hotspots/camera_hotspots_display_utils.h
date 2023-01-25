@@ -5,6 +5,7 @@
 #include <QtGui/QPainterPath>
 #include <QtCore/QPointF>
 
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 
 namespace nx::vms::client::desktop {
@@ -44,6 +45,7 @@ struct CameraHotspotDisplayOption
     CameraState cameraState = CameraState::noCamera;
 
     QRectF rect;
+    QnResourceIconCache::Key iconKey = QnResourceIconCache::Camera;
 };
 
 void paintHotspot(

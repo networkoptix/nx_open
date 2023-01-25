@@ -96,10 +96,9 @@ void CameraHotspotsOverlayWidget::Private::initHotspots()
         if (!hotspotCamera || !accessProvider()->hasAccess(accessSubject(), hotspotCamera))
             continue;
 
-        CameraHotspotItem* item(new CameraHotspotItem(hotspotData, q));
+        CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
         item->setPos(Geometry::subPoint(q->rect(), hotspotData.pos));
         hotspotItems.push_back(item);
-        item->initTooltip(workbenchContext(), hotspotCamera);
     }
 }
 
