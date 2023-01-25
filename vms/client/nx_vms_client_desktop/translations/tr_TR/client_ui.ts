@@ -651,7 +651,7 @@
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Videoyu otomatik olarak dışa aktarma</translation>
     </message>
     <message>
       <source>Export From Device</source>

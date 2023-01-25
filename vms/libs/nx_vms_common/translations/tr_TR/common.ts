@@ -2251,7 +2251,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>%1 dosyası yedeklenemedi</translation>
     </message>
     <message>
       <source>Show Intercom Informer</source>

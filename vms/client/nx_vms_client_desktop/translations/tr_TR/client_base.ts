@@ -5187,7 +5187,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ERİŞİM ENGELLENDİ</translation>
     </message>
   </context>
   <context>
@@ -7361,7 +7361,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Bu kameralardan alınan görüntüler %1 %2 tamamen yedeklenir</translation>
     </message>
   </context>
   <context>
@@ -7412,11 +7412,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Sessiz</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Sesi aç</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -8807,7 +8807,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Düzen</translation>
     </message>
   </context>
   <context>
@@ -9621,7 +9621,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Arıyor...</translation>
     </message>
   </context>
   <context>
@@ -10370,7 +10370,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>Önerilen maksimum kullanıcı oturumu ömrü %1</translation>
     </message>
   </context>
   <context>
@@ -10408,7 +10408,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Sertifika otomatik olarak oluşturulur ve %1 ile sabitlendi</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
@@ -10695,7 +10695,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Cihaz üzerinde kayıtlar bulundu</translation>
     </message>
     <message>
       <source>Import in progress...</source>
