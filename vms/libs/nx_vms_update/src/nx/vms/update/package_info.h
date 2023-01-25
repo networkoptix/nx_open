@@ -43,7 +43,6 @@ struct NX_VMS_UPDATE_API PackageInfo
     Component component;
     QString cloudHost;
     QString platform;
-    QString flavor = nx::utils::OsInfo::kDefaultFlavor;
     PlatformVariantList variants;
     QString installScript;
     qint64 freeSpaceRequired = 0;
@@ -56,7 +55,6 @@ struct NX_VMS_UPDATE_API PackageInfo
     (component) \
     (cloudHost) \
     (platform) \
-    (flavor) \
     (variants) \
     (installScript) \
     (freeSpaceRequired)
@@ -64,7 +62,6 @@ QN_FUSION_DECLARE_FUNCTIONS(PackageInfo, (json), NX_VMS_UPDATE_API)
 
 NX_VMS_UPDATE_API bool isPackageCompatibleTo(
     const QString& packagePlatform,
-    const QString& packageFlavor,
     const PlatformVariantList& packageVariants,
     const nx::utils::OsInfo& osInfo,
     bool ignoreVersion = false);

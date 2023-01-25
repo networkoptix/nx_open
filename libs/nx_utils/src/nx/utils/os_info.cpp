@@ -12,15 +12,12 @@
 
 namespace nx::utils {
 
-const QString OsInfo::kDefaultFlavor = "default";
-
 QJsonObject OsInfo::toJson() const
 {
     return QJsonObject{
         {"platform", platform},
         {"variant", variant},
-        {"variantVersion", variantVersion},
-        {"flavor", flavor}
+        {"variantVersion", variantVersion}
     };
 }
 
@@ -29,8 +26,7 @@ OsInfo OsInfo::fromJson(const QJsonObject& obj)
     return OsInfo{
         obj["platform"].toString(),
         obj["variant"].toString(),
-        obj["variantVersion"].toString(),
-        obj["flavor"].toString()};
+        obj["variantVersion"].toString()};
 }
 
 QString OsInfo::toString() const
@@ -56,7 +52,6 @@ static nx::ReadWriteLock& mutex()
 
 static QString currentVariantOverride;
 static QString currentVariantVersionOverride;
-static QString currentFlavor;
 
 void OsInfo::overrideVariant(const QString& variant, const QString& variantVersion)
 {
@@ -73,7 +68,6 @@ OsInfo OsInfo::current()
         NX_READ_LOCKER lock(&mutex());
         result.variant = currentVariantOverride;
         result.variantVersion = currentVariantVersionOverride;
-        result.flavor = currentFlavor;
     }
 
     if (result.variant.isEmpty())
@@ -88,29 +82,17 @@ OsInfo OsInfo::current()
             nx::build_info::isWindows() ? QSysInfo::kernelVersion() : QSysInfo::productVersion();
     }
 
-    if (result.flavor.isEmpty())
-        result.flavor = kDefaultFlavor;
-
     return result;
-}
-
-void OsInfo::setCurrentFlavor(const QString& flavor)
-{
-    NX_WRITE_LOCKER lock(&mutex());
-    currentFlavor = flavor;
 }
 
 QString toString(const OsInfo& info)
 {
-    QStringList components{info.platform, info.variant, info.variantVersion};
-    if (!info.flavor.isEmpty())
-        components.append(info.flavor);
-    return components.join('-');
+    return QStringList{info.platform, info.variant, info.variantVersion}.join('-');
 }
 
 size_t qHash(const OsInfo& osInfo, size_t seed)
 {
-    return ::qHash(osInfo.platform + osInfo.variant + osInfo.variantVersion + osInfo.flavor, seed);
+    return ::qHash(osInfo.platform + osInfo.variant + osInfo.variantVersion, seed);
 }
 
 } // namespace nx::utils
