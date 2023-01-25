@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Giriş</translation>
     </message>
   </context>
   <context>
@@ -1201,7 +1201,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>Erişim engellendi</translation>
     </message>
   </context>
   <context>
