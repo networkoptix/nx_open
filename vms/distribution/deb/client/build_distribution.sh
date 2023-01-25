@@ -63,7 +63,7 @@ copyHelpFiles()
     echo ""
 
     echo "Copying Desktop Client help"
-    local -r STAGE_HELP="$STAGE_MODULE/help"
+    local -r STAGE_HELP="$STAGE_BIN/help"
     mkdir -p "$STAGE_HELP"
     cp -r "$CLIENT_HELP_PATH"/* "$STAGE_HELP/"
 
