@@ -1,6 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 include(utils)
+include(vcs_helpers)
 
 set(UPDATE_SERVER_URL "https://updates.networkoptix.com")
 set(SERVER_PLATFORMS windows_x64 linux_x64 linux_arm32 linux_arm64)
@@ -18,10 +19,18 @@ function(nx_generate_compatible_servers_txt)
         return()
     endif()
 
+    set(is_beta FALSE)
+    nx_vcs_is_meta_release_beta(is_beta)
+    if(is_beta)
+        set(suffix "-beta")
+    else()
+        set(suffix "")
+    endif()
+
     set(compatible_server_urls "")
     foreach(platform ${SERVER_PLATFORMS})
         set(server_distribution_file_name
-            "metavms-server_update-${releaseVersion.full}-${platform}.zip")
+            "metavms-server_update-${releaseVersion.full}-${platform}${suffix}.zip")
         list(APPEND compatible_server_urls
             "${UPDATE_SERVER_URL}/metavms/${buildNumber}/${server_distribution_file_name}")
     endforeach()
