@@ -4,7 +4,7 @@ include_guard(GLOBAL)
 
 # ATTENTION: These expressions are valid only for single-digit VMS version numbers.
 set(META_RELEASE_TAG_GLOB "vms/[0-9].[0-9]/[0-9]*_meta_*")
-set(META_RELEASE_TAG_REGEX "^vms/[0-9]\.[0-9]/([0-9]+).*_meta_.+$")
+set(META_RELEASE_TAG_REGEX "^vms/[0-9]\.[0-9]/([0-9]+)(_beta)?.*_meta_.+$")
 set(PROTECTED_BRANCH_REGEX "^(master$|vms_[0-9]\.[0-9](_patch)?$)")
 
 # The BUILD_NUMBER argument can be omitted - in this case we do not try to obtain the compatible
@@ -290,3 +290,20 @@ macro(_execute_git_command_and_return_if_error command)
         return()
     endif()
 endmacro()
+
+function(nx_vcs_is_meta_release_beta is_beta_variable)
+    set(get_commit_release_tag_command
+        git -C "${CMAKE_CURRENT_LIST_DIR}" describe --tags --match "${META_RELEASE_TAG_GLOB}"
+    )
+    execute_process(
+        COMMAND ${get_commit_release_tag_command}
+        OUTPUT_VARIABLE _git_tag
+        RESULT_VARIABLE _return_code
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(_return_code EQUAL 0 AND _git_tag MATCHES ${META_RELEASE_TAG_REGEX} AND CMAKE_MATCH_2)
+        set(${is_beta_variable} TRUE PARENT_SCOPE)
+    else()
+        set(${is_beta_variable} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
