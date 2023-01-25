@@ -5117,7 +5117,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ERİŞİM ENGELLENDİ</translation>
     </message>
   </context>
   <context>
@@ -5571,7 +5571,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <translation>Uzak arşiv senkronizasyonu mevcut</translation>
     </message>
   </context>
   <context>
@@ -7297,7 +7297,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Bu kameralardan alınan görüntüler %1 %2 tamamen yedeklenir</translation>
     </message>
   </context>
   <context>
@@ -7348,11 +7348,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Sessiz</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Sesi aç</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -7360,7 +7360,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
+      <translation>Kesmek</translation>
     </message>
   </context>
   <context>
@@ -7438,7 +7438,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <translation>Kamera dahili depolamasına kaydedilen video, ana arşive otomatik olarak yüklenmeyecektir.</translation>
     </message>
   </context>
   <context>
@@ -8574,7 +8574,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Düzen</translation>
     </message>
   </context>
   <context>
@@ -9251,7 +9251,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Arıyor...</translation>
     </message>
   </context>
   <context>
@@ -9981,7 +9981,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>Önerilen maksimum kullanıcı oturumu ömrü %1</translation>
     </message>
   </context>
   <context>
@@ -10036,16 +10036,16 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Birisi kişisel bilgilerinizi çalmak için %1 taklit ediyor olabilir.
+Sunucu %2 SSL sertifikasını değiştirmediyseniz bu sertifikayı sabitlemeyin.</translation>
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Otomatik oluşturulan sertifika</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Sertifika otomatik olarak oluşturulur ve %1 ile sabitlendi</translation>
     </message>
   </context>
   <context>
@@ -10328,27 +10328,27 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>Dışa aktarma devam ediyor...</translation>
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>%1 Arşivini dışa aktarma tamamlandı</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>%1 Arşivini dışa aktarma başarısız oldu</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Cihaz %1 üzerinde dışa aktarılmamış arşiv bulundu</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Kamera %1 üzerinde dışa aktarılmamış arşiv bulundu</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>%1 Arşivini dışa aktar</translation>
     </message>
     <message>
       <source>Export</source>
@@ -10356,7 +10356,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Cihaz üzerinde kayıtlar bulundu</translation>
     </message>
   </context>
   <context>

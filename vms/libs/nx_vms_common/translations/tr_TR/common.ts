@@ -1755,11 +1755,11 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>İnterkom bilgilendiricisi</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <translation>%1 dosyası yedeklenemedi</translation>
     </message>
   </context>
   <context>
