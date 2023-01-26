@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QPointer>
+#include <QtWidgets/QWidget>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>

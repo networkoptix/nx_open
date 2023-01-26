@@ -84,6 +84,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
@@ -2481,8 +2482,40 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::videowall);
         });
 
+    if (resources.isEmpty())
+        return;
+
     if (ui::messages::Resources::deleteResources(mainWindowWidget(), resources))
-        qnResourcesChangesManager->deleteResources(resources);
+    {
+        if (systemContext()->restApiHelper()->restApiEnabled())
+        {
+            auto callback =
+                [this,
+                    resourcesFailed = QnResourceList(),
+                    resourcesSuccess = QnResourceList(),
+                    n = resources.size()](bool result, const QnResourcePtr& resource) mutable
+                {
+                    if (result)
+                        resourcesSuccess << resource;
+                    else
+                        resourcesFailed << resource;
+
+                    if ((resourcesFailed.size() + resourcesSuccess.size() == n)
+                        && !resourcesFailed.isEmpty())
+                    {
+                        ui::messages::Resources::deleteResourcesFailed(
+                            mainWindowWidget(), resourcesFailed);
+                    }
+                };
+
+            for (const auto& resource: resources)
+                qnResourcesChangesManager->deleteResource(resource, callback);
+        }
+        else
+        {
+            qnResourcesChangesManager->deleteResources(resources);
+        }
+    }
 }
 
 void ActionHandler::at_saveSessionState_triggered()

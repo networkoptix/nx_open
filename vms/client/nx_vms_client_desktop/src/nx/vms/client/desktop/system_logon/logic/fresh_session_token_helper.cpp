@@ -88,7 +88,8 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
             m_title,
             info(m_actionType).clientType,
             /*sessionAware*/ true,
-            connection->moduleInformation().cloudSystemId
+            connection->moduleInformation().cloudSystemId,
+            Qt::WindowStaysOnTopHint
         ).credentials.authToken;
     }
     else
@@ -100,7 +101,8 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
             /*infoText*/ QString(),
             m_actionText,
             info(m_actionType).isImportant,
-            /*passwordValidationMode*/ false
+            /*passwordValidationMode*/ false,
+            Qt::WindowStaysOnTopHint
         ).token;
     }
     NX_ASSERT(token.empty() || token.isBearerToken());

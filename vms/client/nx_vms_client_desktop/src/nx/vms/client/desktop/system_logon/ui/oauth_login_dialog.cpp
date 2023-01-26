@@ -31,9 +31,10 @@ static constexpr QSize kLoginDialogSize(480, 480);
 OauthLoginDialog::OauthLoginDialog(
     QWidget* parent,
     core::OauthClientType clientType,
-    const QString& cloudSystem)
+    const QString& cloudSystem,
+    Qt::WindowFlags flags)
 :
-    base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent, Qt::MSWindowsFixedSizeDialogHint | flags),
     d(new OauthLoginDialogPrivate(this, clientType, cloudSystem))
 {
     QSize fixedSize = kLoginDialogSize;
@@ -66,11 +67,13 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
     const QString& title,
     core::OauthClientType clientType,
     bool sessionAware,
-    const QString& cloudSystem)
+    const QString& cloudSystem,
+    Qt::WindowFlags flags)
 {
     std::unique_ptr<OauthLoginDialog> dialog = !sessionAware
-        ? std::make_unique<OauthLoginDialog>(parent, clientType, cloudSystem)
-        : std::make_unique<QnSessionAware<OauthLoginDialog>>(parent, clientType, cloudSystem);
+        ? std::make_unique<OauthLoginDialog>(parent, clientType, cloudSystem, flags)
+        : std::make_unique<QnSessionAware<OauthLoginDialog>>(
+            parent, clientType, cloudSystem, flags);
     dialog->setWindowTitle(title);
     connect(
         dialog.get(),

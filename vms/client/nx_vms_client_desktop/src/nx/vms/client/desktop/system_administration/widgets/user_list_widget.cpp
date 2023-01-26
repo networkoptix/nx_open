@@ -24,9 +24,11 @@
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
@@ -259,12 +261,28 @@ void UserListWidget::applyChanges()
     {
         if (messages::Resources::deleteResources(this, usersToDelete))
         {
-            qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-                [this](bool /*success*/)
+            if (systemContext()->restApiHelper()->restApiEnabled())
+            {
+                for (const auto& user: usersToDelete)
                 {
-                    setEnabled(true);
-                    emit hasChangesChanged();
-                }));
+                    qnResourcesChangesManager->deleteResource(user,
+                        nx::utils::guarded(this,
+                            [this](bool /*success*/, const QnResourcePtr& /*resource*/)
+                            {
+                                setEnabled(true);
+                                emit hasChangesChanged();
+                            }));
+                }
+            }
+            else
+            {
+                qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
+                    [this](bool /*success*/)
+                    {
+                        setEnabled(true);
+                        emit hasChangesChanged();
+                    }));
+            }
 
             setEnabled(false);
             emit hasChangesChanged();

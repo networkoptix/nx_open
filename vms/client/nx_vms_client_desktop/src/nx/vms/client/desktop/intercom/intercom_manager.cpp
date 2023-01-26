@@ -15,7 +15,9 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
@@ -26,6 +28,7 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
 
@@ -158,9 +161,17 @@ struct IntercomManager::Private: public QObject
         if (layoutResource && !layoutResource->hasFlags(Qn::removed))
         {
             if (layoutResource->hasFlags(Qn::local))
+            {
                 resourcePool->removeResource(layoutResource);
+            }
             else if (!localOnly)
-                qnResourcesChangesManager->deleteResources({layoutResource});
+            {
+                const auto systemContext = SystemContext::fromResource(layoutResource);
+                if (systemContext->restApiHelper()->restApiEnabled())
+                    qnResourcesChangesManager->deleteResource(layoutResource);
+                else
+                    qnResourcesChangesManager->deleteResources({layoutResource});
+            }
         }
     }
 }; // struct IntercomManager::Private

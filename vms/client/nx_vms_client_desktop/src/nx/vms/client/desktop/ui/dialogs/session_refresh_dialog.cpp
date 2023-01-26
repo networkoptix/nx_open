@@ -27,10 +27,11 @@ SessionRefreshDialog::SessionRefreshResult SessionRefreshDialog::refreshSession(
     const QString& infoText,
     const QString& actionText,
     bool warningStyledAction,
-    bool passwordValidationMode)
+    bool passwordValidationMode,
+    Qt::WindowFlags flags)
 {
     SessionRefreshDialog dialog(
-        parent, title, mainText, infoText, actionText, warningStyledAction);
+        parent, title, mainText, infoText, actionText, warningStyledAction, flags);
 
     dialog.setPasswordValidationMode(passwordValidationMode);
     connect(
@@ -49,7 +50,8 @@ SessionRefreshDialog::SessionRefreshDialog(
     const QString& mainText,
     const QString& infoText,
     const QString& actionText,
-    bool warningStyledAction)
+    bool warningStyledAction,
+    Qt::WindowFlags flags)
     :
     base_type(parent)
 {
@@ -57,6 +59,7 @@ SessionRefreshDialog::SessionRefreshDialog(
     setIcon(Icon::Warning);
     setText(mainText);
     setInformativeText(infoText);
+    setWindowFlags(windowFlags() | flags);
 
     // Login input(disabled) and label;
     auto loginLabel = new QLabel(tr("Login"), this);

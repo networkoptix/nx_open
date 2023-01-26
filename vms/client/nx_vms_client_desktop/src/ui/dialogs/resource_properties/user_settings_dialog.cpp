@@ -677,7 +677,7 @@ void QnUserSettingsDialog::applyChanges()
     // Handle new user creating.
     const auto actionManager = QPointer<action::Manager>(menu());
     ResourcesChangesManager::UserCallbackFunction callbackFunction =
-        [actionManager, mode, customUserResources](bool success, const QnUserResourcePtr& user)
+        [this, actionManager, mode, customUserResources](bool success, const QnUserResourcePtr& user)
         {
             if (!success || !actionManager)
                 return;
@@ -697,7 +697,7 @@ void QnUserSettingsDialog::applyChanges()
                         action::Parameters(layout).withArgument(Qn::UserResourceRole, user));
                 }
                 qnResourcesChangesManager->saveAccessibleResources(
-                    user, **customUserResources, user->getRawPermissions());
+                    user, **customUserResources, user->getRawPermissions(), systemContext());
             }
 
             if (mode == QnUserSettingsModel::NewUser)
@@ -705,10 +705,13 @@ void QnUserSettingsDialog::applyChanges()
         };
 
     qnResourcesChangesManager->saveUser(
-        m_user, m_model->digestSupport(), applyChangesFunction, callbackFunction);
+        m_user, m_model->digestSupport(), applyChangesFunction, systemContext(), callbackFunction);
 
     if (!isCustomUser(m_user) && (m_model->mode() != QnUserSettingsModel::NewUser))
-        qnResourcesChangesManager->saveAccessibleResources(m_user, QSet<QnUuid>(), GlobalPermission::none);
+    {
+        qnResourcesChangesManager->saveAccessibleResources(
+            m_user, QSet<QnUuid>(), GlobalPermission::none, systemContext());
+    }
 
     // We may fill password field to change current user password.
     m_user->resetPassword();

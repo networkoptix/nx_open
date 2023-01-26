@@ -590,13 +590,13 @@ void LdapSettingsWidget::removeExisting()
 
     auto resultsReporter = ResultsReporter::create(
         nx::utils::guarded(this,
-            [ldapGroupIds](bool success)
+            [this, ldapGroupIds](bool success)
             {
                 if (success)
                 {
                     // Delete LDAP groups.
                     for (const auto& id: ldapGroupIds)
-                        qnResourcesChangesManager->removeUserRole(id);
+                        qnResourcesChangesManager->removeUserRole(id, systemContext());
                 }
             }));
 
@@ -626,7 +626,7 @@ void LdapSettingsWidget::removeExisting()
         if (it == last)
             continue;
 
-        qnResourcesChangesManager->saveUserRole(group, handleGroupSaved);
+        qnResourcesChangesManager->saveUserRole(group, systemContext(), handleGroupSaved);
     }
 
     // Delete LDAP users.

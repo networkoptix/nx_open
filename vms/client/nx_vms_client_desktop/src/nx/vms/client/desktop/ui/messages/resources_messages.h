@@ -37,6 +37,8 @@ public:
 
     static bool deleteResources(QWidget* parent, const QnResourceList& resources);
 
+    static bool deleteResourcesFailed(QWidget* parent, const QnResourceList& resources);
+
     static bool stopVirtualCameraUploads(QWidget* parent, const QnResourceList& resources);
 
     static bool mergeResourceGroups(QWidget* parent, const QString& groupName);

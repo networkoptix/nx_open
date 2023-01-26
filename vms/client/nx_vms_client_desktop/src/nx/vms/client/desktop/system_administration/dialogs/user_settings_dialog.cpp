@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -226,14 +227,26 @@ void UserSettingsDialog::onDeleteRequested()
         return;
     }
 
-    auto callback = nx::utils::guarded(this,
-        [this](bool success)
-        {
-            if (success)
-                reject();
-        });
-
-    qnResourcesChangesManager->deleteResources({d->user}, callback);
+    if (systemContext()->restApiHelper()->restApiEnabled())
+    {
+        auto callback = nx::utils::guarded(this,
+            [this](bool success, const QnResourcePtr& /*resource*/)
+            {
+                if (success)
+                    reject();
+            });
+        qnResourcesChangesManager->deleteResource(d->user, callback);
+    }
+    else
+    {
+        auto callback = nx::utils::guarded(this,
+                [this](bool success)
+                {
+                    if (success)
+                        reject();
+                });
+        qnResourcesChangesManager->deleteResources({d->user}, callback);
+    }
 }
 
 void UserSettingsDialog::onAuditTrailRequested()
@@ -328,13 +341,13 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         });
 
     ResourcesChangesManager::UserCallbackFunction callbackFunction = nx::utils::guarded(this,
-        [state, saveAccessRightsCallback](bool success, const QnUserResourcePtr& user)
+        [this, state, saveAccessRightsCallback](bool success, const QnUserResourcePtr& user)
         {
             if (!success)
                 return;
 
             qnResourcesChangesManager->saveAccessRights(
-                user, state.sharedResources, saveAccessRightsCallback);
+                user, state.sharedResources, saveAccessRightsCallback, systemContext());
         });
 
     if (d->dialogType == createUser)
@@ -359,10 +372,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         d->user->setPasswordAndGenerateHash(state.password, digestSupport);
 
     qnResourcesChangesManager->saveUser(
-        d->user,
-        digestSupport,
-        applyChangesFunction,
-        callbackFunction);
+        d->user, digestSupport, applyChangesFunction, systemContext(), callbackFunction);
 }
 
 void UserSettingsDialog::setUser(const QnUserResourcePtr& user)

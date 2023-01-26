@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -907,7 +908,9 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     auto accessible = sharedResourcesManager()->sharedResources(subject);
     for (const auto& toShare : calculateResourcesToShare(change.added, user))
         accessible << toShare->getId();
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible, user->getRawPermissions());
+
+    qnResourcesChangesManager->saveAccessibleResources(
+        subject, accessible, user->getRawPermissions(), systemContext());
 }
 
 bool LayoutsHandler::canRemoveLayouts(const LayoutResourceList &layouts)
@@ -942,7 +945,15 @@ void LayoutsHandler::removeLayouts(const LayoutResourceList &layouts)
             remoteResources << layout;
     }
 
-    qnResourcesChangesManager->deleteResources(remoteResources);
+    if (systemContext()->restApiHelper()->restApiEnabled())
+    {
+        for (const auto& resource: remoteResources)
+            qnResourcesChangesManager->deleteResource(resource);
+    }
+    else
+    {
+        qnResourcesChangesManager->deleteResources(remoteResources);
+    }
 }
 
 bool LayoutsHandler::closeLayouts(const QnWorkbenchLayoutList& layouts)

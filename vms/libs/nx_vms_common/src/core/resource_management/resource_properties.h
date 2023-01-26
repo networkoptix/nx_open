@@ -35,6 +35,7 @@ public:
     bool hasProperty(const QString& key, const QString& value) const;
     nx::vms::api::ResourceParamDataList allProperties(const QnUuid& resourceId) const;
     nx::vms::api::ResourceParamWithRefDataList allProperties() const;
+    QMap<QnUuid, QMap<QString, QString>> modifiedProperties(const QnUuid& resourceId) const;
 
     /**
      * Mark all params for resource as unsaved

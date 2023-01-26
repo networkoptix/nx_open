@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -1602,6 +1603,9 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
                 && resource->hasFlags(Qn::videowall);
         });
 
+    if (resources.isEmpty())
+        return;
+
     if (messages::Resources::deleteResources(mainWindowWidget(), resources))
     {
         VideoWallShortcutHelper videoWallShortcutHelper;
@@ -1616,7 +1620,16 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
                 videoWallShortcutHelper.deleteShortcut(videoWall);
             }
         }
-        qnResourcesChangesManager->deleteResources(resources);
+
+        if (systemContext()->restApiHelper()->restApiEnabled())
+        {
+            for (const auto& resource: resources)
+                qnResourcesChangesManager->deleteResource(resource);
+        }
+        else
+        {
+            qnResourcesChangesManager->deleteResources(resources);
+        }
     }
 }
 
