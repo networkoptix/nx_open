@@ -25,6 +25,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/params.h>
 #include <nx/network/rest/result.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/system_error.h>
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>
@@ -807,6 +808,22 @@ public:
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});
 
+    Handle putRest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const QByteArray& body,
+        Result<ErrorOrEmpty>::type callback,
+        nx::utils::AsyncHandlerExecutor executor = {});
+
+    Handle patchRest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const QByteArray& body,
+        Result<ErrorOrEmpty>::type callback,
+        nx::utils::AsyncHandlerExecutor executor = {});
+
     Handle getUbJsonResult(
         const QString& action,
         nx::network::rest::Params params,
@@ -832,6 +849,13 @@ public:
         const nx::network::rest::Params& params,
         PostCallback&& callback,
         QThread* target = nullptr);
+
+    Handle deleteRest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        Result<ErrorOrEmpty>::type callback,
+        nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
      * Cancel running request by known requestId. If request is canceled, callback isn't called.
@@ -873,6 +897,13 @@ private:
         QThread* targetThread,
         std::optional<Timeouts> timeouts = {});
 
+    template <typename ResultType>
+    Handle executeRequest(
+        const nx::network::http::ClientPool::Request& request,
+        Callback<ResultType> callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        std::optional<Timeouts> timeouts = {});
+
     Handle executeRequest(
         const nx::network::http::ClientPool::Request& request,
         Result<QByteArray>::type callback,
@@ -909,6 +940,12 @@ private:
         const nx::network::http::ClientPool::Request& request,
         std::function<void (ContextPtr)> callback = {},
         QThread* thread = nullptr,
+        std::optional<Timeouts> timeouts = {});
+
+    Handle sendRequest(
+        const nx::network::http::ClientPool::Request& request,
+        std::function<void (ContextPtr)> callback = {},
+        nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<Timeouts> timeouts = {});
 
     /** Passes Context to ClientPool. */

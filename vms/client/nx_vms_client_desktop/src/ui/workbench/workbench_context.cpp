@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -175,6 +176,7 @@ QWidget* QnWorkbenchContext::mainWindowWidget() const
 void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     m_mainWindow = mainWindow;
+    systemContext()->restApiHelper()->setParent(mainWindow);
 }
 
 ResourceTreeSettings* QnWorkbenchContext::resourceTreeSettings() const

@@ -357,6 +357,19 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     return result != QDialogButtonBox::Cancel;
 }
 
+bool Resources::deleteResourcesFailed(QWidget* parent, const QnResourceList& resources)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(tr("%n items were not deleted.", "", resources.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
+    messageBox.setCheckBoxEnabled(false);
+
+    const auto result = messageBox.exec();
+    return result != QDialogButtonBox::Cancel;
+}
+
 bool Resources::stopVirtualCameraUploads(QWidget* parent, const QnResourceList& resources)
 {
     if (resources.isEmpty())

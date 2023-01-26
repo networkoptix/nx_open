@@ -151,6 +151,10 @@ struct Ini: nx::kit::IniConfig
         allowOwnCloudNotifications,
         "[Dev] Allow receiving cloud notifications from the current cloud system");
 
+    NX_INI_FLAG(true,
+        restApiResourceChangesManager,
+        "[Dev] Enable rest api for resource change manager requests");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

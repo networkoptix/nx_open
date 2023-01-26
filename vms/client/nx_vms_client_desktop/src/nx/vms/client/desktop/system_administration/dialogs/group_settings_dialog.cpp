@@ -166,12 +166,12 @@ void GroupSettingsDialog::removeGroups(
     std::function<void(bool)> callback)
 {
     auto resultsReporter = ResultsReporter::create(
-        [callback = std::move(callback), idsToRemove](bool success)
+        [callback = std::move(callback), idsToRemove, systemContext](bool success)
         {
             if (success)
             {
                 for (const auto& id: idsToRemove)
-                    qnResourcesChangesManager->removeUserRole(id);
+                    qnResourcesChangesManager->removeUserRole(id, systemContext);
             }
             if (callback)
                 callback(success);
@@ -211,8 +211,11 @@ void GroupSettingsDialog::removeGroups(
 
         if (it != groupIds.end())
         {
-            qnResourcesChangesManager->saveUser(
-                user, QnUserResource::DigestSupport::keep, applyRemove, handleUserSaved);
+            qnResourcesChangesManager->saveUser(user,
+                QnUserResource::DigestSupport::keep,
+                applyRemove,
+                systemContext,
+                handleUserSaved);
         }
     }
 
@@ -237,7 +240,7 @@ void GroupSettingsDialog::removeGroups(
         if (it == last) // Nothing was removed.
             continue;
 
-        qnResourcesChangesManager->saveUserRole(group, handleGroupSaved);
+        qnResourcesChangesManager->saveUserRole(group, systemContext, handleGroupSaved);
     }
 }
 
@@ -351,17 +354,18 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
             });
 
         auto setupAccessibleResources = nx::utils::guarded(this,
-            [saveAccessRightsCallback, resultsReporter, state, resourcePool](
+            [this, saveAccessRightsCallback, resultsReporter, state, resourcePool](
                 bool roleIsStored,
                 const api::UserRoleData& group)
             {
                 resultsReporter->add(roleIsStored);
 
                 qnResourcesChangesManager->saveAccessRights(
-                    group, state.sharedResources, saveAccessRightsCallback);
+                    group, state.sharedResources, saveAccessRightsCallback, systemContext());
             });
 
-        qnResourcesChangesManager->saveUserRole(groupData, setupAccessibleResources);
+        qnResourcesChangesManager->saveUserRole(
+            groupData, systemContext(), setupAccessibleResources);
     }
 
     // There is no server API call to update the whole hierarchy with a single call and intermidiate
@@ -387,7 +391,8 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
                 {
                     auto userGroup = systemContext()->userRolesManager()->userRole(id);
                     userGroup.parentRoleIds.push_back(groupData.id);
-                    qnResourcesChangesManager->saveUserRole(userGroup, handleGroupAdded);
+                    qnResourcesChangesManager->saveUserRole(
+                        userGroup, systemContext(), handleGroupAdded);
                 }
 
                 // Add users.
@@ -410,8 +415,11 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
                 {
                     if (auto user = resourcePool->getResourceById<QnUserResource>(userId))
                     {
-                        qnResourcesChangesManager->saveUser(
-                            user, QnUserResource::DigestSupport::keep, applyAdd, handleUserAdded);
+                        qnResourcesChangesManager->saveUser(user,
+                            QnUserResource::DigestSupport::keep,
+                            applyAdd,
+                            systemContext(),
+                            handleUserAdded);
                     }
                 }
             }));
@@ -435,7 +443,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
                 groupData.id),
             userGroup.parentRoleIds.end());
 
-        qnResourcesChangesManager->saveUserRole(userGroup, handleGroupRemoved);
+        qnResourcesChangesManager->saveUserRole(userGroup, systemContext(), handleGroupRemoved);
     }
 
     // Remove users.
@@ -458,8 +466,11 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     {
         if (auto user = resourcePool->getResourceById<QnUserResource>(userId))
         {
-            qnResourcesChangesManager->saveUser(
-                user, QnUserResource::DigestSupport::keep, applyRemove, handleUserRemoved);
+            qnResourcesChangesManager->saveUser(user,
+                QnUserResource::DigestSupport::keep,
+                applyRemove,
+                systemContext(),
+                handleUserRemoved);
         }
     }
 }

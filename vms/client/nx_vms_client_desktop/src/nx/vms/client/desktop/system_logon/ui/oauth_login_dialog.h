@@ -25,7 +25,8 @@ public:
         const QString& title,
         core::OauthClientType clientType,
         bool sessionAware,
-        const QString& cloudSystem = QString());
+        const QString& cloudSystem = QString(),
+        Qt::WindowFlags flags = {});
 
     /** Helper method for access token 2FA validation. */
     static bool validateToken(
@@ -36,7 +37,8 @@ public:
     OauthLoginDialog(
         QWidget* parent,
         core::OauthClientType clientType,
-        const QString& cloudSystem = QString());
+        const QString& cloudSystem = QString(),
+        Qt::WindowFlags flags = {});
 
     virtual ~OauthLoginDialog() override;
 

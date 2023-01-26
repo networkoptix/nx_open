@@ -33,7 +33,8 @@ public:
         const QString& infoText,
         const QString& actionText,
         bool warningStyledAction,
-        bool passwordValidationMode);
+        bool passwordValidationMode,
+        Qt::WindowFlags flags = {});
 
     SessionRefreshDialog(
         QWidget* parent,
@@ -41,7 +42,8 @@ public:
         const QString& mainText,
         const QString& infoText,
         const QString& actionText,
-        bool warningStyledAction);
+        bool warningStyledAction,
+        Qt::WindowFlags flags = {});
 
     SessionRefreshResult refreshResult() const;
 

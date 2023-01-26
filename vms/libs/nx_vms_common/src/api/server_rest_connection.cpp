@@ -1459,6 +1459,49 @@ Handle ServerConnection::putEmptyResult(
         proxyToServer);
 }
 
+Handle ServerConnection::putRest(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    const QString &action,
+    const nx::network::rest::Params &params,
+    const QByteArray &body,
+    Result<ErrorOrEmpty>::type callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::put,
+        prepareUrl(action, params),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        body);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), executor)
+        : Handle();
+
+    return handle;
+}
+
+Handle ServerConnection::patchRest(nx::vms::common::SessionTokenHelperPtr helper,
+    const QString& action,
+    const nx::network::rest::Params& params,
+    const QByteArray& body,
+    Result<ErrorOrEmpty>::type callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto request = prepareRequest(nx::network::http::Method::patch,
+        prepareUrl(action, params),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        body);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle =
+        request.isValid() ? executeRequest(request, std::move(wrapper), executor) : Handle();
+
+    return handle;
+}
+
 Handle ServerConnection::getUbJsonResult(
     const QString& path,
     nx::network::rest::Params params,
@@ -1503,6 +1546,26 @@ Handle ServerConnection::deleteEmptyResult(
         params,
         callback,
         targetThread);
+}
+
+Handle ServerConnection::deleteRest(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    const QString &action,
+    const nx::network::rest::Params &params,
+    Result<ErrorOrEmpty>::type callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::delete_,
+        prepareUrl(action, params));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), executor)
+        : Handle();
+
+    return handle;
 }
 
 Handle ServerConnection::postUbJsonResult(
@@ -2241,6 +2304,62 @@ Handle ServerConnection::executeRequest(
     return sendRequest(request, {}, targetThread);
 }
 
+template<typename ResultType>
+Handle ServerConnection::executeRequest(
+    const nx::network::http::ClientPool::Request &request,
+    Callback<ResultType> callback,
+    nx::utils::AsyncHandlerExecutor executor,
+    std::optional<Timeouts> timeouts)
+{
+    if (!callback)
+        return sendRequest(request, {}, executor);
+
+    if constexpr (std::is_base_of_v<nx::network::rest::Result, ResultType>)
+    {
+        NX_ASSERT(!request.url.path().startsWith("/rest/"),
+            "/rest handler responses with Result if request is failed, use ErrorOrData");
+    }
+    const QString serverId = d->serverId.toString();
+    return sendRequest(
+        request,
+        [this, callback = std::move(callback), serverId](ContextPtr context)
+        {
+            NX_VERBOSE(d->logTag,
+                "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
+                context->handle,
+                context->systemError,
+                context->getStatusCode());
+            bool success = false;
+            const auto format =
+                Qn::serializationFormatFromHttpContentType(context->response.contentType);
+
+            // All parsing fuctions can handle incorrect format.
+            auto resultPtr = std::make_shared<ResultType>(parseMessageBody<ResultType>(
+                format, context->response.messageBody, context->getStatusCode(), &success));
+
+            if (!success)
+                NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
+
+            if (context->systemError != SystemError::noError
+                || context->getStatusCode() != nx::network::http::StatusCode::ok)
+            {
+                success = false;
+            }
+
+            const auto id = context->handle;
+
+            auto internal_callback = [callback = std::move(callback), success, id, resultPtr]()
+            {
+                if (callback)
+                    callback(success, id, std::move(*resultPtr));
+            };
+
+            invoke(context, std::move(internal_callback), success, serverId);
+        },
+        executor,
+        timeouts);
+}
+
 // This is a specialization for request with QByteArray in response. Its callback is a bit different
 // from regular Result<SomeType>::type. Result<QByteArray>::type has 4 arguments:
 // `(bool success, Handle requestId, QByteArray result, nx::network::http::HttpHeaders& headers)`
@@ -2509,6 +2628,36 @@ Handle ServerConnection::sendRequest(
     context->completionFunc = callback;
     context->timeouts = timeouts;
     context->setTargetThread(thread);
+
+    Handle requestId = d->httpClientPool->sendRequest(context);
+
+    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
+    if (!requestId || context->isFinished())
+        return 0;
+
+    return requestId;
+}
+
+Handle ServerConnection::sendRequest(
+    const nx::network::http::ClientPool::Request &request,
+    std::function<void (ContextPtr)> callback,
+    nx::utils::AsyncHandlerExecutor executor,
+    std::optional<Timeouts> timeouts)
+{
+    auto certificateVerifier = d->directConnect
+        ? d->directConnect->certificateVerifier
+        : d->systemContext->certificateVerifier();
+    if (!NX_ASSERT(certificateVerifier))
+        return 0;
+
+    ContextPtr context(new nx::network::http::ClientPool::Context(
+        d->serverId,
+        certificateVerifier->makeAdapterFunc(
+            request.gatewayId.value_or(d->serverId), request.url)));
+    context->request = request;
+    context->completionFunc = executor.bind(callback);
+    context->timeouts = timeouts;
+    context->setTargetThread(this->thread());
 
     Handle requestId = d->httpClientPool->sendRequest(context);
 

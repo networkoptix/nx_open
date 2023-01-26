@@ -8,8 +8,11 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
+
+class SystemContext;
 
 /**
  * Utility class for saving resources user attributes.
@@ -41,9 +44,14 @@ public:
 
     using GenericChangesFunction = std::function<void()>;
     using GenericCallbackFunction = std::function<void(bool)>;
+    using DeleteResourceCallbackFunction = std::function<void(bool, const QnResourcePtr&)>;
 
     /** Generic function to delete resources. */
-    void deleteResources(
+    void deleteResource(const QnResourcePtr& resource,
+        const DeleteResourceCallbackFunction& callback = DeleteResourceCallbackFunction(),
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
+
+   void deleteResources(
         const QnResourceList& resources,
         const GenericCallbackFunction& callback = GenericCallbackFunction());
 
@@ -68,41 +76,44 @@ public:
 
     /** Apply changes to the given server. */
     void saveServer(const QnMediaServerResourcePtr& server,
-        ServerChangesFunction applyChanges);
-
-    /** Apply changes to the given list of servers. */
-    void saveServers(const QnMediaServerResourceList& servers,
-        ServerChangesFunction applyChanges);
-
-    /** Apply changes to the given list of servers. */
-    void saveServersBatch(const QnMediaServerResourceList& servers,
-        GenericChangesFunction applyChanges);
+        ServerChangesFunction applyChanges,
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Apply changes to the given user. */
     void saveUser(const QnUserResourcePtr& user,
         QnUserResource::DigestSupport digestSupport,
         UserChangesFunction applyChanges,
-        UserCallbackFunction callback = UserCallbackFunction());
+        SystemContext* systemContext,
+        UserCallbackFunction callback = UserCallbackFunction(),
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Apply changes to the given users. */
     void saveUsers(const QnUserResourceList& users,
-        QnUserResource::DigestSupport digestSupport = QnUserResource::DigestSupport::keep);
+        QnUserResource::DigestSupport digestSupport = QnUserResource::DigestSupport::keep,
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Save accessible resources for the given user. */
-    void saveAccessibleResources(
-        const QnResourceAccessSubject& subject,
+    void saveAccessibleResources(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& accessibleResources,
-        GlobalPermissions permissions);
+        GlobalPermissions permissions,
+        SystemContext* systemContext,
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Save accessible rights for the given subject. */
-    void saveAccessRights(
-        const QnResourceAccessSubject& subject,
+    void saveAccessRights(const QnResourceAccessSubject& subject,
         const nx::core::access::ResourceAccessMap& accessRights,
-        AccessRightsCallbackFunction callback);
+        AccessRightsCallbackFunction callback,
+        SystemContext* systemContext,
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     void saveUserRole(const nx::vms::api::UserRoleData& role,
-        RoleCallbackFunction callback = RoleCallbackFunction());
-    void removeUserRole(const QnUuid& id);
+        SystemContext* systemContext,
+        RoleCallbackFunction callback = RoleCallbackFunction(),
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
+
+    void removeUserRole(const QnUuid& id,
+        SystemContext* systemContext,
+        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr& videoWall,

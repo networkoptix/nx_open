@@ -115,7 +115,7 @@ void PermissionsHandler::shareResourceWith(const QnUuid& resourceId,
 
     accessible << resourceId;
     qnResourcesChangesManager->saveAccessibleResources(
-        subject, accessible, resourceAccessManager()->globalPermissions(subject));
+        subject, accessible, resourceAccessManager()->globalPermissions(subject), systemContext());
 }
 
 bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -220,7 +220,7 @@ void PermissionsHandler::at_stopSharingLayoutAction_triggered()
         accessible.remove(layout->getId());
     }
     qnResourcesChangesManager->saveAccessibleResources(
-        subject, accessible, resourceAccessManager()->globalPermissions(subject));
+        subject, accessible, resourceAccessManager()->globalPermissions(subject), systemContext());
 }
 
 void PermissionsHandler::at_shareCameraAction_triggered()

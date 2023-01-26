@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
@@ -52,6 +53,7 @@ struct SystemContext::Private
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
+    std::unique_ptr<RestApiHelper> restApiHelper;
 
     void initLocalRuntimeInfo()
     {
@@ -99,6 +101,7 @@ SystemContext::SystemContext(
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
+            d->restApiHelper = std::make_unique<RestApiHelper>(this);
             break;
 
         case Mode::crossSystem:
@@ -189,6 +192,11 @@ LogsManagementWatcher* SystemContext::logsManagementWatcher() const
 QnMediaServerStatisticsManager* SystemContext::mediaServerStatisticsManager() const
 {
     return d->mediaServerStatisticsManager.get();
+}
+
+RestApiHelper* SystemContext::restApiHelper() const
+{
+    return d->restApiHelper.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

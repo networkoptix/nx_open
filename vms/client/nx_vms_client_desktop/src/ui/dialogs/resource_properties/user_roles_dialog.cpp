@@ -15,7 +15,9 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
@@ -214,6 +216,7 @@ void QnUserRolesDialog::applyChanges()
         return;
 
     QSet<QnUuid> userRolesLeft;
+
     for (const auto& userRole: m_model->userRoles())
     {
         userRolesLeft << userRole.id;
@@ -223,7 +226,8 @@ void QnUserRolesDialog::applyChanges()
         m_sharedResourcesQueuedToSave.insert(userRole.id, accessibleResources);
 
         auto setupAccessibleResources =
-            [accessibleResources,
+            [this,
+                accessibleResources,
                 dialog = QPointer(this),
                 resourcePool = QPointer<QnResourcePool>(context()->resourcePool()),
                 actionManager = QPointer<action::Manager>(menu())](
@@ -242,13 +246,19 @@ void QnUserRolesDialog::applyChanges()
                     actionManager->trigger(action::ShareLayoutAction,
                         action::Parameters(layout).withArgument(Qn::UuidRole, role.id));
                 }
-                qnResourcesChangesManager->saveAccessibleResources(role, accessibleResources, role.permissions);
+                qnResourcesChangesManager->saveAccessibleResources(
+                    role, accessibleResources, role.permissions, systemContext());
             };
 
         if (existing != userRole)
-            qnResourcesChangesManager->saveUserRole(userRole, setupAccessibleResources);
+        {
+            qnResourcesChangesManager->saveUserRole(
+                userRole, systemContext(), setupAccessibleResources);
+        }
         else
+        {
             setupAccessibleResources(/*roleIsStored*/ true, userRole);
+        }
     }
 
     for (const auto& userRole: userRolesManager()->userRoles())
@@ -259,28 +269,45 @@ void QnUserRolesDialog::applyChanges()
         const auto& usersWithUserRole = m_model->users(userRole.id, false);
         if (usersWithUserRole.isEmpty())
         {
-            qnResourcesChangesManager->removeUserRole(userRole.id);
+            qnResourcesChangesManager->removeUserRole(userRole.id, systemContext());
             continue;
         }
 
         const auto replacement = m_model->replacement(userRole.id);
+
         if (replacement.isEmpty())
         {
-            auto callback = nx::utils::guarded(this,
-                [roleId = userRole.id](bool success)
-                {
-                    if (success)
-                        qnResourcesChangesManager->removeUserRole(roleId);
-                });
+            if (systemContext()->restApiHelper()->restApiEnabled())
+            {
+                auto callback = nx::utils::guarded(this,
+                    [this, roleId = userRole.id](
+                        bool success, const QnResourcePtr& /*resource*/)
+                    {
+                        if (success)
+                            qnResourcesChangesManager->removeUserRole(roleId, systemContext());
+                    });
 
-            qnResourcesChangesManager->deleteResources(usersWithUserRole, callback);
+                for (const auto& user: usersWithUserRole)
+                    qnResourcesChangesManager->deleteResource(user, callback);
+            }
+            else
+            {
+                auto callback = nx::utils::guarded(this,
+                    [this, roleId = userRole.id](bool success)
+                    {
+                        if (success)
+                            qnResourcesChangesManager->removeUserRole(roleId, systemContext());
+                    });
+
+                qnResourcesChangesManager->deleteResources(usersWithUserRole, callback);
+            }
         }
         else
         {
             const auto deleteRoleGuard = nx::utils::makeSharedGuard(
-                [roleId = userRole.id]()
+                [this, roleId = userRole.id]()
                 {
-                    qnResourcesChangesManager->removeUserRole(roleId);
+                    qnResourcesChangesManager->removeUserRole(roleId, systemContext());
                 });
 
             const auto handleUserSaved = nx::utils::guarded(this,
@@ -300,13 +327,16 @@ void QnUserRolesDialog::applyChanges()
 
             for (const auto& user: usersWithUserRole)
             {
-                qnResourcesChangesManager->saveUser(
-                    user, QnUserResource::DigestSupport::keep, applyChanges, handleUserSaved);
+                qnResourcesChangesManager->saveUser(user,
+                    QnUserResource::DigestSupport::keep,
+                    applyChanges,
+                    systemContext(),
+                    handleUserSaved);
 
                 if (replacement.permissions == GlobalPermissions(GlobalPermission::customUser))
                 {
                     qnResourcesChangesManager->saveAccessibleResources(
-                        user, QSet<QnUuid>(), GlobalPermission::none);
+                        user, QSet<QnUuid>(), GlobalPermission::none, systemContext());
                 }
             }
         }

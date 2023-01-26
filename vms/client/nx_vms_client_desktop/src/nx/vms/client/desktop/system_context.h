@@ -19,6 +19,7 @@ namespace nx::vms::client::desktop {
 
 class LayoutSnapshotManager;
 class LogsManagementWatcher;
+class RestApiHelper;
 class ShowreelStateManager;
 class ServerRuntimeEventConnector;
 class VideoCache;
@@ -64,6 +65,7 @@ public:
     ShowreelStateManager* showreelStateManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
+    RestApiHelper* restApiHelper() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
