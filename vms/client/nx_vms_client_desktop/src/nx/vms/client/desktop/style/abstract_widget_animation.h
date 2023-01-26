@@ -22,6 +22,7 @@ public:
         auto animationTimer = new QtBasedAnimationTimer(this);
         connect(animationTimer, &QtBasedAnimationTimer::tick, this,
             &AbstractWidgetAnimation::tick);
+        animationTimer->start();
     }
 
     void start(const QWidget* widget, qreal speed, qreal value)
