@@ -21,9 +21,10 @@ struct QnManualResourceSearchEntry
     QString manufacturer;
     QString vendor;
     QString physicalId;
-    bool existsInPool;
+    QString mac;
+    bool existsInPool = false;
 
-    QnManualResourceSearchEntry(): existsInPool(false) {}
+    QnManualResourceSearchEntry() = default;
 
     QnManualResourceSearchEntry(
         const QString& name,
@@ -32,6 +33,7 @@ struct QnManualResourceSearchEntry
         const QString& manufacturer,
         const QString& vendor,
         const QString& physicalId,
+        const QString& mac,
         bool existsInPool)
         :
         name(name),
@@ -40,6 +42,7 @@ struct QnManualResourceSearchEntry
         manufacturer(manufacturer),
         vendor(vendor),
         physicalId(physicalId),
+        mac(mac),
         existsInPool(existsInPool)
     {
     }
@@ -55,7 +58,8 @@ struct QnManualResourceSearchEntry
     }
 };
 
-#define QnManualResourceSearchEntry_Fields (name)(url)(manufacturer)(vendor)(existsInPool)(physicalId)
+#define QnManualResourceSearchEntry_Fields (name)(url)(manufacturer)(vendor) \
+    (existsInPool)(physicalId)(mac)
 
 typedef QList<QnManualResourceSearchEntry> QnManualResourceSearchEntryList;
 
