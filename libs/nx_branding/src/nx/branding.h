@@ -159,6 +159,12 @@ NX_BRANDING_API bool clientAutoUpdateEnabledByDefault();
 /** Unique string designating a certain vendor-modified Client. */
 NX_BRANDING_API QString customClientVariant();
 
+/** URL referencing the releases.json file of the update server. */
+NX_BRANDING_API QString customReleaseListUrl();
+
+/** Offline update generator URL. */
+NX_BRANDING_API QString customOfflineUpdateGeneratorUrl();
+
 /** Custom url for information about the open source libraries. */
 NX_BRANDING_API QString customOpenSourceLibrariesUrl();
 

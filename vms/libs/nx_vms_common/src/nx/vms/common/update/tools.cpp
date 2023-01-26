@@ -3,7 +3,6 @@
 #include "tools.h"
 
 #include <nx/branding.h>
-
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/nx_system_updates_ini.h>
@@ -19,16 +18,26 @@ nx::utils::Url releaseListUrl(SystemContext* context)
         if (context && !context->globalSettings()->customReleaseListUrl().isEmpty())
             return context->globalSettings()->customReleaseListUrl();
 
+        if (!branding::customReleaseListUrl().isEmpty())
+            return branding::customReleaseListUrl();
+
         value = "https://updates.vmsproxy.com/{customization}/releases.json";
     }
 
-    value.replace("{customization}", nx::branding::customization());
+    value.replace("{customization}", branding::customization());
     return value;
 }
 
 nx::utils::Url updateGeneratorUrl()
 {
-    return "https://updates.hdw.mx/upcombiner/upcombine";
+    if (!branding::customOfflineUpdateGeneratorUrl().isEmpty())
+        return branding::customOfflineUpdateGeneratorUrl();
+
+    // We can use the default value only for the default releaseListUrl.
+    if (branding::customReleaseListUrl().isEmpty())
+        return "https://updates.hdw.mx/upcombiner/upcombine";
+
+    return {};
 }
 
 QString passwordForBuild(const QString& build)
