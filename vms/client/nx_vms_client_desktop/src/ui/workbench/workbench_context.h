@@ -45,7 +45,7 @@ class QnWorkbenchContext:
     Q_OBJECT
     using base_type = QObject;
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
-    Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget)
+    Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget CONSTANT)
 
 public:
     QnWorkbenchContext(
