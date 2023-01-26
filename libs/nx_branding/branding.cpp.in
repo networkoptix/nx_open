@@ -250,6 +250,16 @@ QString customClientVariant()
     return R"(${customization.desktop.customClientVariant})";
 }
 
+QString customReleaseListUrl()
+{
+    return R"(${customization.desktop.releaseListUrl})";
+}
+
+QString customOfflineUpdateGeneratorUrl()
+{
+    return R"(${customization.desktop.offlineUpdateGeneratorUrl})";
+}
+
 QString customOpenSourceLibrariesUrl()
 {
     return R"(${customization.customOpenSourceLibrariesUrl})";

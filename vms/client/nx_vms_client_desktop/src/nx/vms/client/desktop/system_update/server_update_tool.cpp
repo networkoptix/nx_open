@@ -119,9 +119,9 @@ void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
 {
     m_systemId = systemId;
 
-    if (ini().saveCustomReleaseListUrlToSystemSettings)
+    if (!branding::customReleaseListUrl().isEmpty())
     {
-        systemSettings()->setCustomReleaseListUrl(common::update::ini().releaseListUrl);
+        systemSettings()->setCustomReleaseListUrl(branding::customReleaseListUrl());
         systemSettings()->synchronizeNow();
     }
 
