@@ -1153,7 +1153,7 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Ongeldige parameter `%1`: %2.</translation>
     </message>
   </context>
   <context>
@@ -2255,7 +2255,7 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>Toon Intercom Informer</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>

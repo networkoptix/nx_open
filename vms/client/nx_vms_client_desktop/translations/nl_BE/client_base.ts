@@ -1564,7 +1564,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>Kan e-mailinstellingen niet testen vanwege geen internetverbinding op een van de actieve servers</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
