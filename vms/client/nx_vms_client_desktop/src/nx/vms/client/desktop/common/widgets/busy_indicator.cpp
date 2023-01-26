@@ -96,6 +96,7 @@ BusyIndicator::BusyIndicator(QObject* parent) :
 {
     auto animationTimer = new QtBasedAnimationTimer(this);
     connect(animationTimer, &QtBasedAnimationTimer::tick, this, &BusyIndicator::tick);
+    animationTimer->start();
 }
 
 BusyIndicator::~BusyIndicator()

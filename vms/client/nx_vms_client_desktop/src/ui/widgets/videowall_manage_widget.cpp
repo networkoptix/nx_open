@@ -36,6 +36,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget* parent /* = 0*/):
 
     auto animationTimer = new QtBasedAnimationTimer(this);
     connect(animationTimer, &QtBasedAnimationTimer::tick, this, &QnVideowallManageWidget::tick);
+    animationTimer->start();
 
     connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }
