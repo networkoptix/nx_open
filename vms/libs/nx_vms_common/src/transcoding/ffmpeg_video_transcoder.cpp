@@ -120,9 +120,17 @@ void QnFfmpegVideoTranscoder::setSourceResolution(const QSize& resolution)
     m_sourceResolution = resolution;
 }
 
+void QnFfmpegVideoTranscoder::setKeepOriginalTimestamps(bool value)
+{
+    m_keepOriginalTimestamps = value;
+}
+
 bool QnFfmpegVideoTranscoder::prepareFilters(
     AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video)
 {
+    if (m_filters.isReady())
+        return true;
+
     if (!m_sourceResolution.isValid())
         m_sourceResolution = nx::transcoding::findMaxSavedResolution(video);
 
@@ -361,7 +369,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
 
     // FFmpeg encoder failed when PTS <= last PTS, (at least mjpeg encoder)
-    if (m_lastEncodedPts && decodedFrame->pts <= m_lastEncodedPts)
+    if (m_lastEncodedPts && decodedFrame->pts <= m_lastEncodedPts && !m_keepOriginalTimestamps)
         decodedFrame->pts = m_lastEncodedPts.value() + 1;
 
     m_lastEncodedPts = decodedFrame->pts;

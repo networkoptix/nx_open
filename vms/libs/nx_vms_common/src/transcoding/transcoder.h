@@ -213,6 +213,7 @@ public:
         const QnConstCompressedAudioDataPtr & audio)>;
 
     void setBeforeOpenCallback(BeforeOpenCallback callback);
+
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -227,7 +228,6 @@ private:
     int openAndTranscodeDelayedData();
 
 protected:
-
     DecoderConfig m_decoderConfig;
     QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
@@ -237,13 +237,14 @@ protected:
     bool m_audioStreamCopy;
     QnByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
-    qint64 m_firstTime;
+
 protected:
     bool m_initialized;
     //! Make sure to correctly fill these member variables in overriden open() function.
     bool m_initializedAudio;    // Incoming audio packets will be ignored.
     bool m_initializedVideo;    // Incoming video packets will be ignored.
     nx::metrics::Storage* m_metrics = nullptr;
+
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;

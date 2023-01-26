@@ -94,7 +94,6 @@ QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Stor
     m_videoStreamCopy(false),
     m_audioStreamCopy(false),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE),
-    m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
     m_initializedAudio(false),
     m_initializedVideo(false),
@@ -402,9 +401,6 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         return 0; // transcode only audio and video, skip packet
 
     m_eofCounter = 0;
-
-    if (m_firstTime == AV_NOPTS_VALUE)
-        m_firstTime = media->timestamp;
 
     int errCode = OperationResult::Success;
     bool doTranscoding = true;
