@@ -2443,7 +2443,8 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     ui->selectUpdateTypeButton->setText(toString(m_updateSourceMode));
 
-    const bool showDownloadButton = !isChecking && !latestVersion
+    const bool showDownloadButton = !common::update::updateGeneratorUrl().isEmpty()
+        && !isChecking && !latestVersion
         && m_updateSourceMode != UpdateSourceType::file
         && (m_widgetState == WidgetUpdateState::ready
             || m_widgetState != WidgetUpdateState::initial)
