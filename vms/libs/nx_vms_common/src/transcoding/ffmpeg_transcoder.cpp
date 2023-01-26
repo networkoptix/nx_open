@@ -182,6 +182,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoCodecParameters->codec_id = m_videoCodec;
         if (m_vTranscoder)
         {
+            m_vTranscoder->setKeepOriginalTimestamps(m_config.keepOriginalTimestamps);
             m_vTranscoder->setSourceResolution(m_sourceResolution);
             if (!m_vTranscoder->open(video))
             {
@@ -374,7 +375,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     if (m_config.useAbsoluteTimestamp)
         packet.pts = av_rescale_q(mediaPacket->timestamp, srcRate, stream->time_base);
     else
-       packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
+        packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
 
     packet.data = (uint8_t*)mediaPacket->data();
     packet.size = static_cast<int>(mediaPacket->dataSize());
@@ -383,6 +384,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
 
     packet.stream_index = streamIndex;
     packet.dts = packet.pts;
+
     m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
     m_lastPacketTimestamp.rtpTimestamp = packet.pts;
 
@@ -403,11 +405,46 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     return 0;
 }
 
-int QnFfmpegTranscoder::transcodePacketInternal(
+bool QnFfmpegTranscoder::handleSeek(
     const QnConstAbstractMediaDataPtr& media)
 {
     if (m_baseTime == AV_NOPTS_VALUE)
+    {
         m_baseTime = media->timestamp - m_startTimeOffset;
+        m_isSeeking = false;
+    }
+    else if (m_isSeeking)
+    {
+        if (m_config.keepOriginalTimestamps)
+        {
+            // Recalculate m_baseTime after seek by new frame timestamp.
+            m_baseTime =
+                media->timestamp
+                - (m_lastPacketTimestamp.ntpTimestamp - m_baseTime + m_startTimeOffset);
+        }
+        if (m_vTranscoder)
+        {
+            const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+            if (video)
+            {
+                auto result = m_vTranscoder->open(video); //< Works as reopen too.
+                if (!result)
+                {
+                    NX_DEBUG(this, "Failed to reopen video transcoder");
+                    return false;
+                }
+            }
+        }
+        m_isSeeking = false;
+    }
+    return true;
+}
+
+int QnFfmpegTranscoder::transcodePacketInternal(
+    const QnConstAbstractMediaDataPtr& media)
+{
+    if (!handleSeek(media))
+        return -1;
 
     if (m_audioCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;

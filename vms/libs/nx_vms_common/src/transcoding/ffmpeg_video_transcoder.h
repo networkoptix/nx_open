@@ -51,6 +51,8 @@ public:
     void setOutputResolutionLimit(const QSize& resolution);
     // Force to use this source resolution, instead of max stream resolution from resource streams
     void setSourceResolution(const QSize& resolution);
+    // Do not rewrite a "strange" timestamps, e.g. in case with seek.
+    void setKeepOriginalTimestamps(bool value);
 
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
@@ -88,6 +90,7 @@ private:
     qint64 m_droppedFrames;
 
     bool m_useRealTimeOptimization;
+    bool m_keepOriginalTimestamps = false;
     CodecParametersConstPtr m_ctxPtr;
     nx::metrics::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;

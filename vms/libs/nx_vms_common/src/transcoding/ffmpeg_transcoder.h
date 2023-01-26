@@ -26,6 +26,7 @@ public:
     {
         bool computeSignature = false;
         bool useAbsoluteTimestamp = false;
+        bool keepOriginalTimestamps = false;
         DecoderConfig decoderConfig;
     };
 
@@ -60,6 +61,7 @@ public:
     };
     PacketTimestamp getLastPacketTimestamp() const { return m_lastPacketTimestamp; }
     void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
+    void setSeeking() { m_isSeeking = true; };
 
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media) override;
@@ -71,6 +73,7 @@ private:
     void closeFfmpegContext();
     int muxPacket(const QnConstAbstractMediaDataPtr& packet);
     AVPixelFormat getPixelFormatJpeg(const QnConstCompressedVideoDataPtr& video);
+    bool handleSeek(const QnConstAbstractMediaDataPtr& packet);
 
 private:
     Config m_config;
@@ -88,4 +91,5 @@ private:
     bool m_inMiddleOfStream = false;
     qint64 m_startTimeOffset = 0;
     int m_rtpMtu = MTU_SIZE;
+    bool m_isSeeking = false;
 };
