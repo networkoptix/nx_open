@@ -3,6 +3,7 @@
 #include "connection_diagnostics_helper.h"
 
 #include <QtCore/QThread>
+#include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <ui/dialogs/common/message_box.h>
@@ -375,6 +377,24 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
             error.code,
             moduleInformation,
             engineVersion).longText;
+
+    if (error.code == RemoteConnectionErrorCode::cloudSessionExpired)
+    {
+        QnMessageBox msgBox(icon,
+            title,
+            extras,
+            /*buttons*/ QDialogButtonBox::Ok,
+            /*defaultButton*/ QDialogButtonBox::NoButton,
+            parentWidget);
+        auto okButton = msgBox.button(QDialogButtonBox::Ok);
+        okButton->setText(tr("Log In..."));
+        connect(okButton,
+            &QPushButton::clicked,
+            [context]() { context->menu()->trigger(ui::action::LoginToCloud); });
+
+        msgBox.exec();
+        return;
+    }
 
     QnMessageBox msgBox(
         icon,
