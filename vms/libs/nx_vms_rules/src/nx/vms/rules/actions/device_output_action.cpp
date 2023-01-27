@@ -2,10 +2,10 @@
 
 #include "device_output_action.h"
 
-#include "../utils/type.h"
-#include "../utils/field.h"
-#include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/output_port_field.h"
+#include "../action_builder_fields/target_device_field.h"
+#include "../utils/field.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 

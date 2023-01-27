@@ -54,6 +54,8 @@ void Initializer::registerActions() const
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<PanicRecordingAction>();
+    registerAction<PlaySoundAction>();
+    registerAction<RepeatSoundAction>();
     registerAction<SendEmailAction>();
     registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();
@@ -103,6 +105,7 @@ void Initializer::registerFields() const
     registerActionField<OptionalTimeField>();
     registerActionField<OutputPortField>();
     registerActionField<PasswordField>();
+    registerActionField<SoundField>();
     registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();
     m_engine->registerActionField(

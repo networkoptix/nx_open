@@ -12,9 +12,11 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/rules/actions/enter_fullscreen_action.h>
 #include <nx/vms/rules/actions/exit_fullscreen_action.h>
+#include <nx/vms/rules/actions/play_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/speak_action.h>
 #include <nx/vms/rules/engine.h>
@@ -59,6 +61,7 @@ QnWorkbenchNotificationsExecutor::QnWorkbenchNotificationsExecutor(QObject* pare
     engine->addActionExecutor(utils::type<EnterFullscreenAction>(), this);
     engine->addActionExecutor(utils::type<ExitFullscreenAction>(), this);
     engine->addActionExecutor(utils::type<NotificationAction>(), this);
+    engine->addActionExecutor(utils::type<PlaySoundAction>(), this);
     engine->addActionExecutor(utils::type<SpeakAction>(), this);
 }
 
@@ -74,6 +77,19 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
             return;
 
         emit notificationActionReceived(notificationAction);
+    }
+    else if (action->type() == utils::type<PlaySoundAction>())
+    {
+        auto soundAction = action.dynamicCast<PlaySoundAction>();
+        if (!NX_ASSERT(soundAction))
+            return;
+
+        QString filePath = context()
+            ->instance<nx::vms::client::desktop::ServerNotificationCache>()->getFullPath(
+                soundAction->sound());
+        // If file doesn't exist then it's already deleted or not downloaded yet.
+        // It should not be played when downloaded.
+        AudioPlayer::playFileAsync(filePath);
     }
     else if (action->type() == utils::type<SpeakAction>())
     {
