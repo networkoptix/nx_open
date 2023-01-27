@@ -96,6 +96,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
+#include "nx/utils/guarded_callback.h"
 
 #ifdef Q_OS_WIN
     #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
@@ -165,7 +166,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
 #ifdef Q_OS_MACX
     // Workaround prevents hangs on moving to the fullscreen mode in and out.
-    setFullscreenTransitionHandler(this,
+
+    const auto handler = nx::utils::guarded(this,
         [this](bool inProgress)
         {
             if (inProgress)
@@ -177,6 +179,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             static constexpr int kSomeSmallDelay = 50;
             executeDelayedParented([this]() { setUpdatesEnabled(true); }, kSomeSmallDelay, this);
         });
+
+    setFullscreenTransitionHandler(this, handler);
 
     // Since we have patch qt563_macos_window_level.patch we have to discard hidesOnDeactivate
     // flag for main window. Otherwise, each time it looses focus it becomes hidden.
