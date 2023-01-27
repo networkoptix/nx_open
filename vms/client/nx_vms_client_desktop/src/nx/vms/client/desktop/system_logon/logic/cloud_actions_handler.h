@@ -23,6 +23,7 @@ private:
     void at_loginToCloudAction_triggered();
     void at_logoutFromCloudAction_triggered();
 
+    void at_logout();
     void at_forcedLogout();
 };
 

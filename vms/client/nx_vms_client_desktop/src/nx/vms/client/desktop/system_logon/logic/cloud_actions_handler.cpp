@@ -62,6 +62,8 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     auto watcher = qnCloudStatusWatcher;
     connect(watcher, &core::CloudStatusWatcher::forcedLogout,
         this, &CloudActionsHandler::at_forcedLogout);
+    connect(watcher, &core::CloudStatusWatcher::loggedOut, this,
+        &CloudActionsHandler::at_logout);
 
     connect(
         appContext()->sharedMemoryManager(),
@@ -105,6 +107,15 @@ void CloudActionsHandler::at_logoutFromCloudAction_triggered()
 {
     logoutFromCloud();
     appContext()->sharedMemoryManager()->requestLogoutFromCloud();
+}
+
+void CloudActionsHandler::at_logout()
+{
+    QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
+        context(),
+        nx::vms::client::core::RemoteConnectionErrorCode::cloudSessionExpired,
+        /*moduleInformation*/ {},
+        appContext()->version());
 }
 
 void CloudActionsHandler::at_forcedLogout()

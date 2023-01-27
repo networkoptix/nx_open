@@ -106,6 +106,7 @@ signals:
     void credentialsChanged();
     void cloudLoginChanged();
     void forcedLogout();
+    void loggedOut();
     void statusChanged(Status status);
     void errorChanged(ErrorCode error);
     void isCloudEnabledChanged();

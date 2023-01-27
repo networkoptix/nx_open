@@ -653,6 +653,7 @@ void CloudStatusWatcher::Private::setStatus(
 {
     const bool isNewStatus = (status != newStatus);
     const bool isNewErrorCode = (errorCode != newErrorCode);
+    const bool isJustLoggedOut = status == Online && newStatus == LoggedOut;
 
     if (!isNewStatus && !isNewErrorCode)
         return;
@@ -679,6 +680,9 @@ void CloudStatusWatcher::Private::setStatus(
 
     if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);
+    
+    if (isJustLoggedOut)
+        emit q->loggedOut();
 }
 
 void CloudStatusWatcher::Private::setCloudSystems(const QnCloudSystemList &newCloudSystems)
