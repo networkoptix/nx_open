@@ -254,6 +254,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<OutputPortField>();
     testActionFieldRegistration<PasswordField>();
+    testActionFieldRegistration<SoundField>();
     testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
@@ -274,10 +275,10 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<NotificationAction>();
     //testActionRegistration<OpenLayoutAction>();
     testActionRegistration<PanicRecordingAction>();
-    //testActionRegistration<PlaySoundAction>();
+    testActionRegistration<PlaySoundAction>();
     //testActionRegistration<PtzPresetAction>();
     //testActionRegistration<PushNotificationAction>();
-    //testActionRegistration<RepeatSoundAction>();
+    testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();
     //testActionRegistration<ShowOnAlarmLayoutAction>();
     testActionRegistration<SpeakAction>();
