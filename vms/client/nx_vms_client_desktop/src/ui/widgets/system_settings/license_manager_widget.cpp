@@ -22,6 +22,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/connection_types.h>
@@ -72,55 +73,44 @@ QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager)
 }
 
 QString licenseReplyLogString(
-    QNetworkReply* reply,
-    const QByteArray& replyBody,
-    const QByteArray& licenseKey)
+    QNetworkReply* reply, const QByteArray& replyBody, const QByteArray& licenseKey)
 {
     if (!reply)
         return QString();
 
-    static const auto kReplyLogTemplate =
-        lit("\nReceived response from license server (license key is %1):\n"
+    static const QString kReplyLogTemplate =
+        "\nReceived response from license server (license key is %1):\n"
             "Response: %2 (%3)\n"
             "Headers:\n%4\n"
-            "Body:\n%5\n");
+            "Body:\n%5\n";
 
     QStringList headers;
-    for (const auto& header: reply->rawHeaderPairs())
-    {
-        headers.push_back(lit("%1: %2").arg(
-            QString::fromLatin1(header.first),
-            QString::fromLatin1(header.second)));
-    }
+    for (const auto& [header, value]: reply->rawHeaderPairs())
+        headers.append(nx::format("%1: %2", header, value));
 
-    return kReplyLogTemplate.arg(
-        QString::fromLatin1(licenseKey),
-        QString::number(reply->error()), reply->errorString(),
-        headers.join(lit("\n")),
-        QString::fromLatin1(replyBody));
+    return nx::format(kReplyLogTemplate,
+        licenseKey, reply->error(), reply->errorString(), headers.join('\n'), replyBody);
 }
 
 QString licenseRequestLogString(const QByteArray& body, const QByteArray& licenseKey)
 {
-    static const auto kRequestLogTemplate =
-        lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
-    return kRequestLogTemplate.arg(
-        QString::fromLatin1(licenseKey), QString::fromUtf8(body));
+    static const QString kRequestLogTemplate =
+        "\nSending request to license server (license key is %1).\nBody:\n%2\n";
+    return nx::format(kRequestLogTemplate, licenseKey, body);
 }
 
 
 license::DeactivationErrors filterDeactivationErrors(const license::DeactivationErrors& errors)
 {
     license::DeactivationErrors result;
-    for (auto it = errors.begin(); it != errors.end(); ++it)
+    for (const auto& [key, code]: errors.asKeyValueRange())
     {
         using ErrorCode = nx::vms::client::desktop::license::Deactivator::ErrorCode;
 
-        const auto code = it.value();
         if (code == ErrorCode::noError || code == ErrorCode::keyIsNotActivated)
-            continue; //< Filter out non-actual-error codes
+            continue; //< Filter out non-actual-error codes.
 
-        result.insert(it.key(), it.value());
+        result.insert(key, code);
     }
     return result;
 }
@@ -132,9 +122,9 @@ QStringList licenseHtmlDescription(const QnLicensePtr& license)
     QStringList result;
 
     const QString licenseKey = html::monospace(
-        html::colored(QString::fromLatin1(license->key()), kLightTextColor));
+        html::colored(QLatin1StringView(license->key()), kLightTextColor));
 
-    const QString channelsCount = QnLicenseManagerWidget::tr(
+    const QString channelsCount = LicenseManagerWidget::tr(
         "%n channels.", "", license->cameraCount());
 
     result.push_back(licenseKey);
@@ -147,27 +137,27 @@ class QnLicenseListSortProxyModel : public QSortFilterProxyModel
     using base_type = QSortFilterProxyModel;
 
 public:
-    QnLicenseListSortProxyModel(QObject* parent = nullptr) :
+    QnLicenseListSortProxyModel(QObject* parent = nullptr):
         base_type(parent)
     {
     }
 
 protected:
-    virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
+    virtual bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight) const
     {
-        if (source_left.column() != source_right.column())
-            return base_type::lessThan(source_left, source_right);
+        if (sourceLeft.column() != sourceRight.column())
+            return base_type::lessThan(sourceLeft, sourceRight);
 
-        QnLicensePtr left = source_left.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
-        QnLicensePtr right = source_right.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+        const auto left = sourceLeft.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+        const auto right = sourceRight.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
 
         if (!left || !right)
             return (left < right);
 
-        switch (source_left.column())
+        switch (sourceLeft.column())
         {
             case QnLicenseListModel::ExpirationDateColumn:
-                /* Permanent licenses should be the last. */
+                // Permanent licenses should be the last.
                 if (left->neverExpire() != right->neverExpire())
                     return right->neverExpire();
 
@@ -180,13 +170,15 @@ protected:
                 break;
         }
 
-        return base_type::lessThan(source_left, source_right);
+        return base_type::lessThan(sourceLeft, sourceRight);
     }
 };
 
 } // namespace
 
-QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
+namespace nx::vms::client::desktop {
+
+LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
@@ -228,22 +220,15 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseKeyColumn, QHeaderView::ResizeMode::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
-    /* By [Delete] key remove licenses. */
+    // Remove licenses by the [Delete] key.
     installEventHandler(ui->gridLicenses, QEvent::KeyPress, this,
-        [this](QObject* object, QEvent* event)
+        [this](QObject* /*object*/, QEvent* event)
         {
-            Q_UNUSED(object);
-            int key = static_cast<QKeyEvent*>(event)->key();
-            switch (key)
+            const int key = static_cast<QKeyEvent*>(event)->key();
+            if (key == Qt::Key_Delete || (nx::build_info::isMacOsX() && key == Qt::Key_Backspace))
             {
-                case Qt::Key_Delete:
-#if defined(Q_OS_MAC)
-                case Qt::Key_Backspace:
-#endif
-                    if (ui->removeButton->isVisible() && m_isRemoveTakeAwayOperation)
-                        takeAwaySelectedLicenses();
-                default:
-                    return;
+                if (ui->removeButton->isVisible() && m_isRemoveTakeAwayOperation)
+                    takeAwaySelectedLicenses();
             }
         });
 
@@ -256,22 +241,22 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         });
 
     connect(ui->removeButton, &QPushButton::clicked,
-        this, &QnLicenseManagerWidget::takeAwaySelectedLicenses);
+        this, &LicenseManagerWidget::takeAwaySelectedLicenses);
 
     connect(m_exportLicensesButton, &QPushButton::clicked,
-        this, &QnLicenseManagerWidget::exportLicenses);
+        this, &LicenseManagerWidget::exportLicenses);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::currentChanged,
-        this, &QnLicenseManagerWidget::updateButtons);
+        this, &LicenseManagerWidget::updateButtons);
 
     connect(ui->gridLicenses->selectionModel(), &QItemSelectionModel::selectionChanged,
-        this, &QnLicenseManagerWidget::updateButtons);
+        this, &LicenseManagerWidget::updateButtons);
 
     connect(ui->gridLicenses, &QTreeView::doubleClicked,
-        this,   &QnLicenseManagerWidget::licenseDetailsRequested);
+        this,   &LicenseManagerWidget::licenseDetailsRequested);
 
     connect(ui->licenseWidget, &QnLicenseWidget::stateChanged, this,
-        &QnLicenseManagerWidget::at_licenseWidget_stateChanged);
+        &LicenseManagerWidget::handleWidgetStateChange);
 
     auto updateLicensesIfNeeded = [this]
     {
@@ -283,54 +268,53 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     auto camerasUsageWatcher = new CamLicenseUsageWatcher(systemContext(), this);
     auto videowallUsageWatcher = new VideoWallLicenseUsageWatcher(systemContext(), this);
-    connect(camerasUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
-        updateLicensesIfNeeded);
-    connect(videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
-        updateLicensesIfNeeded);
-    connect(licensePool(), &QnLicensePool::licensesChanged, this,
-        updateLicensesIfNeeded);
+    connect(camerasUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
+    connect(
+        videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
+    connect(licensePool(), &QnLicensePool::licensesChanged, this, updateLicensesIfNeeded);
 
     connect(context(),
         &QnWorkbenchContext::userChanged,
         this,
-        [this]() { m_deactivationReason = RequestInfo(); });
+        [this]() { m_deactivationReason = {}; });
 }
 
-QnLicenseManagerWidget::~QnLicenseManagerWidget()
+LicenseManagerWidget::~LicenseManagerWidget()
 {
 }
 
-void QnLicenseManagerWidget::loadDataToUi()
+void LicenseManagerWidget::loadDataToUi()
 {
     if (connection())
         updateLicenses();
 }
 
-bool QnLicenseManagerWidget::hasChanges() const
+bool LicenseManagerWidget::hasChanges() const
 {
     return false;
 }
 
-void QnLicenseManagerWidget::applyChanges()
+void LicenseManagerWidget::applyChanges()
 {
-    /* This widget is read-only. */
+    // This widget is read-only.
 }
 
-void QnLicenseManagerWidget::showEvent(QShowEvent *event)
+void LicenseManagerWidget::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
     loadDataToUi();
 }
 
-void QnLicenseManagerWidget::updateLicenses()
+void LicenseManagerWidget::updateLicenses()
 {
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != nx::vms::api::PeerType::server)
-            continue;
-        connected = true;
-        break;
+        if (info.data.peer.peerType == nx::vms::api::PeerType::server)
+        {
+            connected = true;
+            break;
+        }
     }
 
     setEnabled(connected);
@@ -347,16 +331,16 @@ void QnLicenseManagerWidget::updateLicenses()
 
     ListHelper licenseListHelper(m_licenses);
 
-    /* Update license widget. */
+    // Update license widget.
     ui->licenseWidget->setFreeLicenseAvailable(
         !licenseListHelper.haveLicenseKey(nx::branding::freeLicenseKey().toLatin1()));
 
-    /* Update grid. */
+    // Update grid.
     m_model->updateLicenses(m_licenses);
     ui->licensesGroupBox->setVisible(!m_licenses.isEmpty());
     ui->alertBar->setVisible(m_licenses.isEmpty());
 
-    /* Update info label. */
+    // Update info label.
     if (!m_licenses.isEmpty())
     {
         // TODO: #sivanov Problem with numerous forms, and no idea how to fix it in a sane way.
@@ -365,41 +349,40 @@ void QnLicenseManagerWidget::updateLicenses()
 
         CamLicenseUsageHelper camUsageHelper(systemContext());
         VideoWallLicenseUsageHelper vwUsageHelper(systemContext());
-        QList<UsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
+        QList<UsageHelper*> helpers{&camUsageHelper, &vwUsageHelper};
 
         for (auto helper: helpers)
         {
-            for (Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType type: helper->licenseTypes())
             {
-                const int total = helper->totalLicenses(lt);
+                const int total = helper->totalLicenses(type);
                 if (total > 0)
-                    messages << QnLicense::displayText(lt, total);
+                    messages.append(QnLicense::displayText(type, total));
             }
         }
 
         for (auto helper: helpers)
         {
-            for (Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType type: helper->licenseTypes())
             {
-                const int used = helper->usedLicenses(lt);
+                const int used = helper->usedLicenses(type);
                 if (used == 0)
                     continue;
 
-                if (helper->isValid(lt))
+                if (helper->isValid(type))
                 {
-                    messages << tr("%1 are currently in use",
-                        "Text like '6 Profesional Licenses' will be substituted",
-                        used)
-                        .arg(QnLicense::displayText(lt, used));
+                    messages.append(
+                        tr("%1 are currently in use",
+                            "Text like '6 Profesional Licenses' will be substituted",
+                            used).arg(QnLicense::displayText(type, used)));
                 }
                 else
                 {
-                    const int required = helper->requiredLicenses(lt);
-                    messages << setWarningStyleHtml(
+                    const int required = helper->requiredLicenses(type);
+                    messages.append(setWarningStyleHtml(
                         tr("At least %1 are required",
                             "Text like '6 Profesional Licenses' will be substituted",
-                            required)
-                        .arg(QnLicense::displayText(lt, required)));
+                            required).arg(QnLicense::displayText(type, required))));
                 }
             }
         }
@@ -410,12 +393,12 @@ void QnLicenseManagerWidget::updateLicenses()
     updateButtons();
 }
 
-QnLicensePool* QnLicenseManagerWidget::licensePool() const
+QnLicensePool* LicenseManagerWidget::licensePool() const
 {
     return systemContext()->licensePool();
 }
 
-QnUuid QnLicenseManagerWidget::serverId() const
+QnUuid LicenseManagerWidget::serverId() const
 {
     if (auto connection = this->connection(); NX_ASSERT(connection))
         return connection->moduleInformation().id;
@@ -423,12 +406,11 @@ QnUuid QnLicenseManagerWidget::serverId() const
     return QnUuid();
 }
 
-void QnLicenseManagerWidget::updateFromServer(
+void LicenseManagerWidget::updateFromServer(
     const QByteArray& licenseKey,
     bool infoMode,
     const QUrl& url)
 {
-
     const QVector<QString> hardwareIds = licensePool()->hardwareIds(serverId());
 
     if (remoteInfo(runtimeInfoManager()).isNull())
@@ -447,12 +429,12 @@ void QnLicenseManagerWidget::updateFromServer(
     request.setUrl(url.toString());
 
     QUrlQuery params;
-    params.addQueryItem(lit("license_key"), QLatin1String(licenseKey));
+    params.addQueryItem("license_key", QLatin1StringView(licenseKey));
 
     int n = 1;
     for (const QByteArray& licenseKey: ListHelper(m_licenses).allLicenseKeys())
     {
-        params.addQueryItem(lit("license_key%1").arg(n), QLatin1String(licenseKey));
+        params.addQueryItem(nx::format("license_key%1", n), QLatin1StringView(licenseKey));
         n++;
     }
 
@@ -462,39 +444,35 @@ void QnLicenseManagerWidget::updateFromServer(
 
         QString name;
         if (version == 0)
-            name = lit("oldhwid[]");
+            name = "oldhwid[]";
         else if (version == 1)
-            name = lit("hwid[]");
+            name = "hwid[]";
         else
-            name = lit("hwid%1[]").arg(version);
+            name = nx::format("hwid%1[]", version);
 
         params.addQueryItem(name, hwid);
     }
 
     if (infoMode)
-        params.addQueryItem(lit("mode"), lit("info"));
+        params.addQueryItem("mode", "info");
 
     const auto runtimeData = remoteInfo(runtimeInfoManager()).data;
 
-    params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), appContext()->version().toString());
-    params.addQueryItem(lit("lang"), qnRuntime->locale());
+    params.addQueryItem("brand", runtimeData.brand);
+    params.addQueryItem("version", appContext()->version().toString());
+    params.addQueryItem("lang", qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
-    {
-        params.addQueryItem(lit("mac"), runtimeData.nx1mac);
-    }
+        params.addQueryItem("mac", runtimeData.nx1mac);
 
     if (!runtimeData.nx1serial.isEmpty())
-    {
-        params.addQueryItem(lit("serial"), runtimeData.nx1serial);
-    }
+        params.addQueryItem("serial", runtimeData.nx1serial);
 
     const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
     NX_VERBOSE(this, licenseRequestLogString(messageBody, licenseKey));
     QNetworkReply* reply = m_httpClient->post(request, messageBody);
 
-    connect(reply, &QNetworkReply::errorOccurred, this, &QnLicenseManagerWidget::at_downloadError);
+    connect(reply, &QNetworkReply::errorOccurred, this, &LicenseManagerWidget::handleDownloadError);
     connect(reply, &QNetworkReply::finished, this,
         [this, licenseKey, infoMode, url, reply]
         {
@@ -511,9 +489,8 @@ void QnLicenseManagerWidget::updateFromServer(
         });
 }
 
-void QnLicenseManagerWidget::validateLicenses(
-    const QByteArray& licenseKey,
-    const QnLicenseList& licenses)
+void LicenseManagerWidget::validateLicenses(
+    const QByteArray& licenseKey, const QnLicenseList& licenses)
 {
     auto connection = messageBusConnection();
     if (!connection)
@@ -563,8 +540,8 @@ void QnLicenseManagerWidget::validateLicenses(
             this);
     }
 
-    /* There is an issue when we are trying to activate and Edge license on the PC.
-     * In this case activation server will return no error but local check will fail.  */
+    // There is an issue when we are trying to activate an Edge license on a PC. In this case
+    // the activation server will return no error but the local check will fail.
     if (!keyLicense)
     {
         // QNetworkReply slots should not start event loop.
@@ -577,7 +554,7 @@ void QnLicenseManagerWidget::validateLicenses(
     }
 }
 
-void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
+void LicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
 {
     if (!NX_ASSERT(license))
         return;
@@ -586,19 +563,19 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
     dialog->exec();
 }
 
-QnLicenseList QnLicenseManagerWidget::selectedLicenses() const
+QnLicenseList LicenseManagerWidget::selectedLicenses() const
 {
     QnLicenseList result;
-    for (const QModelIndex& idx : ui->gridLicenses->selectionModel()->selectedIndexes())
+    for (const QModelIndex& index: ui->gridLicenses->selectionModel()->selectedIndexes())
     {
-        QnLicensePtr license = idx.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
+        const auto license = index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>();
         if (license && !result.contains(license))
-            result << license;
+            result.append(license);
     }
     return result;
 }
 
-bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
+bool LicenseManagerWidget::canRemoveLicense(const QnLicensePtr& license) const
 {
     if (!NX_ASSERT(license))
         return false;
@@ -608,7 +585,7 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
         && errorCode != QnLicenseErrorCode::FutureLicense;
 }
 
-bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr& license) const
+bool LicenseManagerWidget::canDeactivateLicense(const QnLicensePtr& license) const
 {
     if (!NX_ASSERT(license))
         return false;
@@ -620,7 +597,7 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr& license) c
         && context()->user() && context()->user()->isOwner();
 }
 
-void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
+void LicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
 {
     if (force == ForceRemove::No && !canRemoveLicense(license))
         return;
@@ -645,7 +622,7 @@ void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRem
         this);
 }
 
-bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
+bool LicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 {
     ui::dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
     if (dialog.exec() == QDialogButtonBox::Cancel)
@@ -685,7 +662,7 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
     return true;
 }
 
-void QnLicenseManagerWidget::showDeactivationErrorsDialog(
+void LicenseManagerWidget::showDeactivationErrorsDialog(
     const QnLicenseList& licenses,
     const license::DeactivationErrors& errors)
 {
@@ -719,7 +696,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     }
 }
 
-void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
+void LicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
 {
     using Deactivator = nx::vms::client::desktop::license::Deactivator;
     using Result = Deactivator::Result;
@@ -763,7 +740,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
         m_deactivationReason, licenses, handler, parentWidget());
 }
 
-void QnLicenseManagerWidget::takeAwaySelectedLicenses()
+void LicenseManagerWidget::takeAwaySelectedLicenses()
 {
     const auto licenses = selectedLicenses();
     if (m_isRemoveTakeAwayOperation)
@@ -785,7 +762,7 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
     }
 }
 
-void QnLicenseManagerWidget::exportLicenses()
+void LicenseManagerWidget::exportLicenses()
 {
     QnTableExportHelper::exportToFile(
         ui->gridLicenses->model(),
@@ -794,7 +771,7 @@ void QnLicenseManagerWidget::exportLicenses()
         tr("Export licenses to a file"));
 }
 
-void QnLicenseManagerWidget::updateButtons()
+void LicenseManagerWidget::updateButtons()
 {
     m_exportLicensesButton->setEnabled(!m_licenses.isEmpty());
 
@@ -819,11 +796,10 @@ void QnLicenseManagerWidget::updateButtons()
     ui->removeButton->setText(m_isRemoveTakeAwayOperation ? tr("Remove") : tr("Deactivate"));
 }
 
-// -------------------------------------------------------------------------- //
+//-------------------------------------------------------------------------------------------------
 // Handlers
-// -------------------------------------------------------------------------- //
 
-void QnLicenseManagerWidget::at_downloadError()
+void LicenseManagerWidget::handleDownloadError()
 {
     if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
@@ -843,8 +819,7 @@ void QnLicenseManagerWidget::at_downloadError()
                 [this]
                 {
                     LicenseActivationDialogs::freeLicenseNetworkError(
-                        this,
-                        licensePool()->currentHardwareId(serverId()));
+                        this, licensePool()->currentHardwareId(serverId()));
                 },
                 this);
         }
@@ -858,11 +833,8 @@ void QnLicenseManagerWidget::at_downloadError()
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::processReply(
-    QNetworkReply* reply,
-    const QByteArray& licenseKey,
-    const QUrl& url,
-    bool infoMode)
+void LicenseManagerWidget::processReply(
+    QNetworkReply* reply, const QByteArray& licenseKey, const QUrl& url, bool infoMode)
 {
     QList<QnLicensePtr> licenses;
 
@@ -881,28 +853,29 @@ void QnLicenseManagerWidget::processReply(
         return;
     }
 
-    QTextStream is(&replyData);
-    is.setEncoding(QStringConverter::Utf8);
+    QTextStream stream(&replyData);
+    stream.setEncoding(QStringConverter::Utf8);
     reply->deleteLater();
 
-    while (!is.atEnd())
+    while (!stream.atEnd())
     {
-        QnLicensePtr license = QnLicense::readFromStream(is);
+        QnLicensePtr license = QnLicense::readFromStream(stream);
         if (!license)
             break;
 
         if (infoMode)
         {
-            QnLicenseErrorCode errCode = m_validator->validate(license,
-                Validator::VM_CanActivate);
+            QnLicenseErrorCode errorCode =
+                m_validator->validate(license, Validator::VM_CanActivate);
 
-            if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
+            if (errorCode != QnLicenseErrorCode::NoError
+                && errorCode != QnLicenseErrorCode::Expired)
             {
                 // QNetworkReply slots should not start event loop.
                 executeLater(
-                    [this, errCode, licenseType = license->type()]
+                    [this, errorCode, licenseType = license->type()]
                     {
-                        LicenseActivationDialogs::activationError(this, errCode, licenseType);
+                        LicenseActivationDialogs::activationError(this, errorCode, licenseType);
                     }, this);
 
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
@@ -916,21 +889,23 @@ void QnLicenseManagerWidget::processReply(
         }
         else
         {
-            QnLicenseErrorCode errCode = m_validator->validate(license,
-                Validator::VM_JustCreated);
+            QnLicenseErrorCode errorCode =
+                m_validator->validate(license, Validator::VM_JustCreated);
 
-            if (errCode == QnLicenseErrorCode::NoError)
+            switch (errorCode)
             {
-                licenses.append(license);
-            }
-            else if (errCode == QnLicenseErrorCode::Expired
-                || errCode == QnLicenseErrorCode::TemporaryExpired)
-            {
-                licenses.append(license); // ignore expired error code
-            }
-            else if (errCode == QnLicenseErrorCode::FutureLicense)
-            {
-                licenses.append(license); // add future licenses
+                case QnLicenseErrorCode::NoError:
+                    licenses.append(license);
+                    break;
+                case QnLicenseErrorCode::Expired:
+                case QnLicenseErrorCode::TemporaryExpired:
+                    licenses.append(license); //< Ignore an expired error code.
+                    break;
+                case QnLicenseErrorCode::FutureLicense:
+                    licenses.append(license); //< Add future licenses.
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -940,13 +915,13 @@ void QnLicenseManagerWidget::processReply(
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
+void LicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
 {
     if (index.isValid())
         showLicenseDetails(index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>());
 }
 
-void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
+void LicenseManagerWidget::handleWidgetStateChange()
 {
     if (ui->licenseWidget->state() != QnLicenseWidget::Waiting)
         return;
@@ -960,15 +935,16 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     else
     {
         const QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        const QnLicenseErrorCode errCode =
+        const QnLicenseErrorCode errorCode =
             m_validator->validate(license, Validator::VM_JustCreated);
-        switch (errCode)
+
+        switch (errorCode)
         {
             case QnLicenseErrorCode::NoError:
             case QnLicenseErrorCode::Expired:
             case QnLicenseErrorCode::TemporaryExpired:
                 ui->licenseWidget->clearManualActivationUserInput();
-                validateLicenses(license->key(), QList<QnLicensePtr>() << license);
+                validateLicenses(license->key(), {license});
                 break;
             case QnLicenseErrorCode::InvalidSignature:
                     // QNetworkReply slots should not start event loop.
@@ -981,7 +957,8 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                         [this, hwid = license->hardwareId()]
                         {
                             LicenseActivationDialogs::licenseAlreadyActivated(this, hwid);
-                        }, this);
+                        },
+                        this);
                 break;
             case QnLicenseErrorCode::InvalidBrand:
             case QnLicenseErrorCode::InvalidType:
@@ -992,10 +969,11 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
             case QnLicenseErrorCode::TooManyLicensesPerSystem:
                 // QNetworkReply slots should not start event loop.
                 executeLater(
-                    [this, errCode, licenseType = license->type()]
+                    [this, errorCode, licenseType = license->type()]
                     {
-                        LicenseActivationDialogs::activationError(this, errCode, licenseType);
-                    }, this);
+                        LicenseActivationDialogs::activationError(this, errorCode, licenseType);
+                    },
+                    this);
                 break;
             default:
                 break;
@@ -1005,9 +983,9 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     }
 }
 
-void QnLicenseManagerWidget::showActivationErrorMessage(QJsonObject errorMessage)
+void LicenseManagerWidget::showActivationErrorMessage(QJsonObject errorMessage)
 {
-    const auto messageId = errorMessage.value(lit("messageId")).toString();
+    const auto messageId = errorMessage.value("messageId").toString();
 
     if (messageId == "DatabaseError")
     {
@@ -1027,9 +1005,11 @@ void QnLicenseManagerWidget::showActivationErrorMessage(QJsonObject errorMessage
     }
     else if (messageId == "AlreadyActivated")
     {
-        const auto arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-        const auto hwid = arguments.value(lit("hwid")).toString();
-        const auto time = arguments.value(lit("time")).toString();
+        const auto arguments = errorMessage.value("arguments").toObject().toVariantMap();
+        const auto hwid = arguments.value("hwid").toString();
+        const auto time = arguments.value("time").toString();
         LicenseActivationDialogs::licenseAlreadyActivated(this, hwid, time);
     }
 }
+
+} // namespace nx::vms::client::desktop
