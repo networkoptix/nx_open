@@ -31,7 +31,7 @@ using namespace nx::vms::client::desktop;
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     base_type(parent),
-    ui(new Ui::QnSystemAdministrationDialog)
+    ui(new ::Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
@@ -56,7 +56,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto multiUpdatesWidget = new MultiServerUpdatesWidget(this);
     addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
 
-    addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
+    addPage(LicensesPage, new LicenseManagerWidget(this), tr("Licenses"));
 
     auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(systemContext(), this);
     addPage(MailSettingsPage, outgoingMailSettingsWidget, tr("Email"));
