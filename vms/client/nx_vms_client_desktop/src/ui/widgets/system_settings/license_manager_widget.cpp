@@ -3,34 +3,28 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
 
-#include <QtCore/QFile>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QTextStream>
 #include <QtCore/QUrlQuery>
-#include <QtGui/QClipboard>
 #include <QtGui/QKeyEvent>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
-#include <QtWidgets/QAbstractItemView>
-#include <QtWidgets/QTreeWidgetItem>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-#include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 #include <nx/vms/client/desktop/licensing/license_management_dialogs.h>
@@ -46,6 +40,7 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_license_manager.h>
 #include <ui/delegates/license_list_item_delegate.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -71,44 +66,6 @@ QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager)
 
     return manager->item(currentServerId);
 }
-
-QString licenseReplyLogString(
-    QNetworkReply* reply,
-    const QByteArray& replyBody,
-    const QByteArray& licenseKey)
-{
-    if (!reply)
-        return QString();
-
-    static const auto kReplyLogTemplate =
-        lit("\nReceived response from license server (license key is %1):\n"
-            "Response: %2 (%3)\n"
-            "Headers:\n%4\n"
-            "Body:\n%5\n");
-
-    QStringList headers;
-    for (const auto header: reply->rawHeaderPairs())
-    {
-        headers.push_back(lit("%1: %2").arg(
-            QString::fromLatin1(header.first),
-            QString::fromLatin1(header.second)));
-    }
-
-    return kReplyLogTemplate.arg(
-        QString::fromLatin1(licenseKey),
-        QString::number(reply->error()), reply->errorString(),
-        headers.join(lit("\n")),
-        QString::fromLatin1(replyBody));
-}
-
-QString licenseRequestLogString(const QByteArray& body, const QByteArray& licenseKey)
-{
-    static const auto kRequestLogTemplate =
-        lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
-    return kRequestLogTemplate.arg(
-        QString::fromLatin1(licenseKey), QString::fromUtf8(body));
-}
-
 
 license::DeactivationErrors filterDeactivationErrors(const license::DeactivationErrors& errors)
 {
@@ -425,9 +382,7 @@ QnUuid QnLicenseManagerWidget::serverId() const
 }
 
 void QnLicenseManagerWidget::updateFromServer(
-    const QByteArray& licenseKey,
-    bool infoMode,
-    const QUrl& url)
+    const QByteArray& licenseKey, bool infoMode, const nx::utils::Url& url)
 {
 
     const QVector<QString> hardwareIds = licensePool()->hardwareIds(serverId());
@@ -440,12 +395,6 @@ void QnLicenseManagerWidget::updateFromServer(
         ui->licenseWidget->setOnline(false);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
-
-    if (!m_httpClient)
-        m_httpClient = new QNetworkAccessManager(this);
-
-    QNetworkRequest request;
-    request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(lit("license_key"), QLatin1String(licenseKey));
@@ -492,24 +441,41 @@ void QnLicenseManagerWidget::updateFromServer(
     }
 
     const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
-    NX_VERBOSE(this, licenseRequestLogString(messageBody, licenseKey));
-    QNetworkReply* reply = m_httpClient->post(request, messageBody);
 
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
-    connect(reply, &QNetworkReply::finished, this,
-        [this, licenseKey, infoMode, url, reply]
-        {
-            const QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
-                .value<QUrl>();
-            if (!redirectUrl.isEmpty())
+    NX_VERBOSE(this, "Sending request to license server. License key: \"%1\"\nBody:\n%2",
+        licenseKey, messageBody);
+
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>(
+        nx::network::ssl::kDefaultCertificateCheck);
+    m_httpClient->doPost(
+        url,
+        std::make_unique<nx::network::http::BufferSource>(
+            nx::network::http::header::ContentType::kForm, std::move(messageBody)),
+        nx::utils::guarded(this,
+            [this, licenseKey, infoMode, url]()
             {
-                NX_VERBOSE(this, "Request redirected to %1", redirectUrl);
-                // TODO: #sivanov Add possible redirect loop check.
-                updateFromServer(licenseKey, infoMode, redirectUrl);
-                return;
-            }
-            processReply(reply, licenseKey, url, infoMode);
-        });
+                const QByteArray replyData = m_httpClient->fetchMessageBodyBuffer().toByteArray();
+
+                if (m_httpClient->hasRequestSucceeded())
+                {
+                    NX_VERBOSE(this,
+                        "Received response from license server. License key: \"%1\"\n%2",
+                        licenseKey,
+                        replyData);
+                    executeLater(
+                        [this, replyData, licenseKey, infoMode, url]()
+                        {
+                            processReply(licenseKey, replyData, url, infoMode);
+                        },
+                        this);
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Network error occured: %1\n%2",
+                        m_httpClient->lastSysErrorCode(), replyData);
+                    executeLater([this]() { handleDownloadError(); }, this);
+                }
+            }));
 }
 
 void QnLicenseManagerWidget::validateLicenses(
@@ -820,71 +786,42 @@ void QnLicenseManagerWidget::updateButtons()
     ui->removeButton->setText(m_isRemoveTakeAwayOperation ? tr("Remove") : tr("Deactivate"));
 }
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-
-void QnLicenseManagerWidget::at_downloadError()
+void QnLicenseManagerWidget::handleDownloadError()
 {
-    if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
+    if (ui->licenseWidget->isFreeLicenseKey())
     {
-        NX_VERBOSE(this,
-            "Network error occured: %1\n%2\nError code: %3",
-            reply->error(),
-            licenseReplyLogString(reply, reply->readAll(), "no-key"),
-            reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
-
-        reply->disconnect(this); //< Avoid double "onError" handling.
-        reply->deleteLater();
-
-        // QNetworkReply slots should not start event loop.
-        if (ui->licenseWidget->isFreeLicenseKey())
-        {
-            executeLater(
-                [this]
-                {
-                    LicenseActivationDialogs::freeLicenseNetworkError(
-                        this,
-                        licensePool()->currentHardwareId(serverId()));
-                },
-                this);
-        }
-        else
-        {
-            executeLater([this]{ LicenseActivationDialogs::networkError(this); }, this);
-        }
-
-        ui->licenseWidget->setOnline(false);
+        LicenseActivationDialogs::freeLicenseNetworkError(
+            this, licensePool()->currentHardwareId(serverId()));
     }
+    else
+    {
+        LicenseActivationDialogs::networkError(this);
+    }
+
+    ui->licenseWidget->setOnline(false);
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
 void QnLicenseManagerWidget::processReply(
-    QNetworkReply* reply,
     const QByteArray& licenseKey,
-    const QUrl& url,
+    const QByteArray& replyData,
+    const nx::utils::Url& url,
     bool infoMode)
 {
     QList<QnLicensePtr> licenses;
-
-    QByteArray replyData = reply->readAll();
-
-    NX_VERBOSE(this, licenseReplyLogString(reply, replyData, licenseKey));
 
     // TODO: #sivanov Use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
     QJsonObject errorMessage;
     if (QJson::deserialize(replyData, &errorMessage))
     {
-        // QNetworkReply slots should not start event loop.
-        executeLater([this, errorMessage] { showActivationErrorMessage(errorMessage); }, this);
+        showActivationErrorMessage(errorMessage);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
         return;
     }
 
-    QTextStream is(&replyData);
+    QTextStream is(replyData);
     is.setCodec("UTF-8");
-    reply->deleteLater();
 
     while (!is.atEnd())
     {
@@ -899,13 +836,7 @@ void QnLicenseManagerWidget::processReply(
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {
-                // QNetworkReply slots should not start event loop.
-                executeLater(
-                    [this, errCode, licenseType = license->type()]
-                    {
-                        LicenseActivationDialogs::activationError(this, errCode, licenseType);
-                    }, this);
-
+                LicenseActivationDialogs::activationError(this, errCode, license->type());
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else
@@ -949,7 +880,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         updateFromServer(
             ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            LicenseServer::activateUrl(systemContext()).toQUrl());
+            LicenseServer::activateUrl(systemContext()));
     }
     else
     {
@@ -964,31 +895,17 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                 validateLicenses(license->key(), QList<QnLicensePtr>() << license);
                 break;
             case QnLicenseErrorCode::InvalidSignature:
-                    // QNetworkReply slots should not start event loop.
-                    executeLater(
-                        [this] { LicenseActivationDialogs::invalidKeyFile(this); }, this);
+                    LicenseActivationDialogs::invalidKeyFile(this);
                 break;
             case QnLicenseErrorCode::InvalidHardwareID:
-                    // QNetworkReply slots should not start event loop.
-                    executeLater(
-                        [this, hwid = license->hardwareId()]
-                        {
-                            LicenseActivationDialogs::licenseAlreadyActivated(this, hwid);
-                        }, this);
+                LicenseActivationDialogs::licenseAlreadyActivated(this, license->hardwareId());
                 break;
             case QnLicenseErrorCode::InvalidBrand:
             case QnLicenseErrorCode::InvalidType:
-                    // QNetworkReply slots should not start event loop.
-                    executeLater(
-                        [this] { LicenseActivationDialogs::licenseIsIncompatible(this); }, this);
+                LicenseActivationDialogs::licenseIsIncompatible(this);
                 break;
             case QnLicenseErrorCode::TooManyLicensesPerSystem:
-                // QNetworkReply slots should not start event loop.
-                executeLater(
-                    [this, errCode, licenseType = license->type()]
-                    {
-                        LicenseActivationDialogs::activationError(this, errCode, licenseType);
-                    }, this);
+                LicenseActivationDialogs::activationError(this, errCode, license->type());
                 break;
             default:
                 break;

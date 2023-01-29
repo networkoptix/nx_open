@@ -4,10 +4,9 @@
 
 #include <memory>
 
-#include <QtWidgets/QWidget>
-
-#include <nx_ec/ec_api_fwd.h>
 #include <licensing/license_fwd.h>
+#include <nx/vms/client/desktop/license/license_helpers.h>
+#include <nx/vms/license/license_usage_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 
@@ -16,11 +15,11 @@
 #include <nx/vms/license/license_usage_fwd.h>
 
 class QModelIndex;
-class QNetworkAccessManager;
-class QNetworkReply;
 class QPushButton;
 class QnLicensePool;
 class QnLicenseListModel;
+
+namespace nx::network::http { class AsyncClient; }
 
 namespace nx::vms::client::desktop { class LayoutWidgetHider; }
 
@@ -50,7 +49,6 @@ private slots:
     void updateLicenses();
     void updateButtons();
 
-    void at_downloadError();
     void at_licenseWidget_stateChanged();
 
     void licenseDetailsRequested(const QModelIndex& index);
@@ -59,8 +57,13 @@ private:
     QnLicensePool* licensePool() const;
     QnUuid serverId() const;
 
-    void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
-    void processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url, bool infoMode);
+    void updateFromServer(const QByteArray& licenseKey, bool infoMode, const nx::utils::Url& url);
+    void processReply(
+        const QByteArray& licenseKey,
+        const QByteArray& replyData,
+        const nx::utils::Url& url,
+        bool infoMode);
+    void handleDownloadError();
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 
@@ -95,7 +98,7 @@ private:
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel* m_model {nullptr};
-    QNetworkAccessManager* m_httpClient {nullptr};
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     QPushButton* m_exportLicensesButton {nullptr};
     std::unique_ptr<nx::vms::client::desktop::LayoutWidgetHider> m_removeDetailsButtonsHider;
     QnLicenseList m_licenses;
