@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation>Kết nối đã hết hạn</translation>
+      <translation>Hết thời gian kết nối</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
