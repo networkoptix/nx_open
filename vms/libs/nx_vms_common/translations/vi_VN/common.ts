@@ -1836,7 +1836,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Máy chủ &quot;%1&quot; có vấn đề về bản quyền</translation>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề về giấy phép</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
@@ -1844,11 +1844,11 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>Sự kiện Generic %1</translation>
+      <translation>Sự kiện chung tại %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation>Một sự kiện chưa biết</translation>
+      <translation>Đã xảy ra lỗi chưa xác định</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1872,7 +1872,7 @@
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>Mâu thuẫn Địa chỉ: %1</translation>
+      <translation>Địa chỉ xung đột: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -1882,11 +1882,11 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Mâu thuẫn máy chủ #%1:%2</translation>
+      <translation>Máy chủ xung đột #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>Mâu thuẫn Server: %1</translation>
+      <translation>Máy chủ xung đột: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
@@ -1913,30 +1913,30 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>Lần đầu xuất hiện: %1 trong %2 ( %n xuất hiện thứ hai)</numerusform>
+        <numerusform>Lần xuất hiện đầu tiên: %1 trên %2 ( tổng cộng%n lần)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Không có dữ liệu nhận được trong %n seconds cuối cùng.</numerusform>
+        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTP Phát hiện mất gói tin.</translation>
+      <translation>Phát hiện mất gói tin RTP.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>Thiết bị không đáp ứng yêu cầu mạng.</translation>
+      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>Kết nối đến máy chủ bị mất.</translation>
+      <translation>Kết nối với máy chủ bị mất.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>Máy chủ dừng bất ngờ.</translation>
+      <translation>Máy chủ dừng đột ngột.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1944,15 +1944,15 @@
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD %1 Đủ để video nhanh.</translation>
+      <translation>Không đủ tốc độ HDD/SSD để ghi tới %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Ổ đĩa HDD / SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
+      <translation>Ổ đĩa HDD/SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Đĩa hệ thống &quot;%1&quot; gần như đầy.</translation>
+      <translation>Đĩa hệ thống &quot;%1&quot; gần đầy.</translation>
     </message>
     <message>
       <source>start</source>
@@ -1960,7 +1960,7 @@
     </message>
     <message>
       <source>stop</source>
-      <translation>dừng lại</translation>
+      <translation>kết thúc</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -2147,11 +2147,11 @@
     </message>
     <message>
       <source>Archive backup failed</source>
-      <translation>Sao lưu video không thành công</translation>
+      <translation>Sao lưu lưu trữ không thành công</translation>
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation>Dữ liệu được sao lưu lên đến %1</translation>
+      <translation>Dữ liệu được sao lưu về %1</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
@@ -2159,7 +2159,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Máy chủ &quot;%1&quot; lỗi chứng chỉ</translation>
+      <translation>Lỗi chứng chỉ máy chủ &quot;%1&quot;</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
@@ -2205,15 +2205,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng chính) đã bất ngờ đóng cửa.</translation>
+      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
+      <translation>Kết nối với camera (luồng phụ) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>Kết nối với thiết bị đã bất ngờ đóng cửa.</translation>
+      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
