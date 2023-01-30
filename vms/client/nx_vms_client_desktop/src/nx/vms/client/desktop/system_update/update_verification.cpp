@@ -244,8 +244,8 @@ bool verifyUpdateContents(
         contents.alreadyInstalled = false;
         contents.needClientUpdate = true;
 
-        const update::PublicationInfo::FindPackageResult searchResult =
-            contents.info.findPackage(update::Component::client, clientData.osInfo);
+        const update::PublicationInfo::FindPackageResult searchResult = contents.info.findPackage(
+            update::Component::client, clientData.osInfo, branding::customClientVariant());
         if (const auto& package = std::get_if<update::Package>(&searchResult))
         {
             contents.clientPackage = *package;

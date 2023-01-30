@@ -156,6 +156,9 @@ NX_BRANDING_API bool isMobileClientEnabledInCustomization();
 /** Whether Client auto-update should be enabled by default. */
 NX_BRANDING_API bool clientAutoUpdateEnabledByDefault();
 
+/** Unique string designating a certain vendor-modified Client. */
+NX_BRANDING_API QString customClientVariant();
+
 /** Custom url for information about the open source libraries. */
 NX_BRANDING_API QString customOpenSourceLibrariesUrl();
 

@@ -37,8 +37,14 @@ function(set_distribution_names)
     endif()
 
 
+    if(NOT "${customization.desktop.customClientVariant}" STREQUAL "")
+        set(custom_client_suffix "-${customization.desktop.customClientVariant}")
+    else()
+        set(custom_client_suffix "")
+    endif()
+
     set(client_distribution_name
-        "${prefix}-client-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+        "${prefix}-client${custom_client_suffix}-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_distribution_name
         "${prefix}-server-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(bundle_distribution_name
@@ -46,7 +52,8 @@ function(set_distribution_names)
     set(servertool_distribution_name
         "${prefix}-servertool-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(client_update_distribution_name
-        "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+        "${prefix}-client_update${custom_client_suffix}-${releaseVersion.full}-${suffix}"
+        PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
 
