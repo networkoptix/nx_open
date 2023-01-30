@@ -2536,13 +2536,10 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
     if (mode == AppClosingMode::CloseAll)
         qnClientModule->clientStateHandler()->sharedMemoryManager()->requestToExit();
 
-    // tryClose() may clear the context user.
-    const bool storeSystemSpecificParameters =
-        context()->user() && mode != AppClosingMode::External;
+    if (context()->user() && mode != AppClosingMode::External)
+        qnClientModule->clientStateHandler()->storeSystemSpecificState();
 
-    // Store system-specific parameters.
-    if (storeSystemSpecificParameters)
-        qnClientModule->clientStateHandler()->clientDisconnected();
+    menu()->trigger(action::BeforeExitAction);
 
     // Try close, if force - exit anyway.
     // The tryClose() method may return false (when a user rejects closing). So any disconnecting
@@ -2555,7 +2552,6 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
     if (mode != AppClosingMode::External)
         qnClientModule->clientStateHandler()->clientClosed();
 
-    menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);
     mainWindowWidget()->hide();
     qApp->exit(0);

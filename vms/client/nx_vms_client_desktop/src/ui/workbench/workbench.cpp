@@ -563,7 +563,7 @@ void QnWorkbench::update(const QnWorkbenchState& state)
 
 void QnWorkbench::submit(QnWorkbenchState& state)
 {
-    auto isLayoutSupported = [](const QnLayoutResourcePtr& layout)
+    auto isLayoutSupported = [](const QnLayoutResourcePtr& layout, bool allowLocals)
         {
             // Support layout tours.
             if (!layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull())
@@ -573,7 +573,7 @@ void QnWorkbench::submit(QnWorkbenchState& state)
                 return true;
 
             // Ignore other service layouts, e.g. videowall control layouts.
-            if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
+            if ((layout->hasFlags(Qn::local) && !allowLocals) || layout->isServiceLayout())
                 return false;
 
             return true;
@@ -595,14 +595,14 @@ void QnWorkbench::submit(QnWorkbenchState& state)
 
     {
         auto currentResource = currentLayout()->resource();
-        if (currentResource && isLayoutSupported(currentResource))
+        if (currentResource && isLayoutSupported(currentResource, /*allowLocals*/ true))
             state.currentLayoutId = sourceId(currentResource);
     }
 
-    for (auto layout: m_layouts)
+    for (const auto& layout: m_layouts)
     {
         auto resource = layout->resource();
-        if (resource && isLayoutSupported(resource))
+        if (resource && isLayoutSupported(resource, /*allowLocals*/ false))
             state.layoutUuids.push_back(sourceId(resource));
     }
 
