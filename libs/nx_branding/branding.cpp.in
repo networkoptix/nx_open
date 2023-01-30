@@ -245,6 +245,11 @@ bool clientAutoUpdateEnabledByDefault()
     return result;
 }
 
+QString customClientVariant()
+{
+    return R"(${customization.desktop.customClientVariant})";
+}
+
 QString customOpenSourceLibrariesUrl()
 {
     return R"(${customization.customOpenSourceLibrariesUrl})";

@@ -21,6 +21,7 @@ struct NX_VMS_UPDATE_API Package
     Component component;
 
     QString platform;
+    QString customClientVariant;
     PlatformVariantList variants;
 
     QString file;
@@ -38,7 +39,8 @@ struct NX_VMS_UPDATE_API Package
     bool isNewerThan(const QString& variant, const Package& other) const;
     bool isSameTarget(const Package& other) const;
 };
-#define Package_Fields (component)(platform)(variants)(file)(size)(md5)(url)(signature)
+#define Package_Fields \
+    (component)(platform)(customClientVariant)(variants)(file)(size)(md5)(url)(signature)
 
 QN_FUSION_DECLARE_FUNCTIONS(Package, (hash)(json), NX_VMS_UPDATE_API)
 
@@ -73,7 +75,10 @@ struct NX_VMS_UPDATE_API PublicationInfo
 
     using FindPackageResult = std::variant<Package, FindPackageError>;
 
-    FindPackageResult findPackage(Component component, const nx::utils::OsInfo& osInfo) const;
+    FindPackageResult findPackage(
+        Component component,
+        const nx::utils::OsInfo& osInfo,
+        const QString& customClientVariant = {}) const;
 };
 #define PublicationInfo_Fields \
     (version) \

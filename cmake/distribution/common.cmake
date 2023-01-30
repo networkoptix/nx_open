@@ -22,10 +22,14 @@ function(nx_generate_package_json file_name)
     set(platform ${platform_new})
     set(cloud_host ${cloudHost})
 
-    if(PACK_COMPONENT)
-        set(component ${PACK_COMPONENT})
-    else()
+    if(NOT PACK_COMPONENT)
         set(component server)
+    elseif(PACK_COMPONENT STREQUAL "client"
+        AND NOT "${customization.desktop.customClientVariant}" STREQUAL "")
+
+        set(component "customClient")
+    else()
+        set(component ${PACK_COMPONENT})
     endif()
 
     set(variants ${PACK_VARIANTS})
