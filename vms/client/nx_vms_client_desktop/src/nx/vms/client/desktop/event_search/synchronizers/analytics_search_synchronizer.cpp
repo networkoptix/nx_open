@@ -59,8 +59,6 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
 
     instances().push_back(this);
 
-    m_filter.withBestShotOnly = true;
-
     setupInstanceSynchronization();
 
     connect(this, &AbstractSearchSynchronizer::activeChanged, this,
