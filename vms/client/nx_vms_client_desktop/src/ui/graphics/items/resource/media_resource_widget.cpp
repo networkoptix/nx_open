@@ -267,7 +267,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_recordingStatusHelper(new RecordingStatusHelper(systemContext, this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
-    m_encryptedArchivePasswordDialog(new EncryptedArchivePasswordDialog(mainWindow())),
     m_itemId(item->uuid()),
     m_triggerWatcher(new SoftwareTriggersWatcher(systemContext, this)),
     m_triggersController(
@@ -2874,6 +2873,11 @@ void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
 {
     statisticsModule()->controls()->registerClick(
         "resource_status_overlay_unlock_encrypted_archive");
+    if (!m_encryptedArchivePasswordDialog)
+    {
+        m_encryptedArchivePasswordDialog.reset(
+            new EncryptedArchivePasswordDialog(mainWindow()));
+    }
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
 }
 
