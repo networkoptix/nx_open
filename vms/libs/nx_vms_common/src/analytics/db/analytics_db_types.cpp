@@ -239,9 +239,6 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
             return false;
     }
 
-    if (withBestShotOnly && !track.bestShot.initialized())
-        return false;
-
     return true;
 }
 
@@ -275,8 +272,7 @@ bool Filter::operator==(const Filter& right) const
         && timePeriod == right.timePeriod
         && freeText == right.freeText
         && sortOrder == right.sortOrder
-        && deviceIds == right.deviceIds
-        && withBestShotOnly == right.withBestShotOnly;
+        && deviceIds == right.deviceIds;
 }
 
 bool Filter::operator!=(const Filter& right) const
@@ -322,8 +318,6 @@ void serializeToParams(const Filter& filter, nx::network::rest::Params* params)
 
     if (filter.needFullTrack)
         params->insert(lit("needFullTrack"), "true");
-    if (filter.withBestShotOnly)
-        params->insert(lit("withBestShotOnly"), "true");
 
     params->insert("sortOrder", nx::reflect::toString(filter.sortOrder));
 }
@@ -444,7 +438,6 @@ bool deserializeFromParams(
         filter->maxObjectTracksToSelect = params.value(lit("maxObjectsToSelect")).toInt();
 
     static const QString kNeedFullTrack = "needFullTrack";
-    static const QString kWithBestShotOnly = "withBestShotOnly";
     if (params.contains(kNeedFullTrack))
     {
         bool success = false;
@@ -459,9 +452,6 @@ bool deserializeFromParams(
             return false;
         }
     }
-
-    if (params.contains(kWithBestShotOnly))
-        filter->withBestShotOnly = QnLexical::deserialized<bool>(params.value(kWithBestShotOnly), true);
 
     return true;
 }
@@ -487,7 +477,6 @@ bool deserializeFromParams(
 
     os << "maxObjectsToSelect " << filter.maxObjectTracksToSelect << "; ";
     os << "needFullTrack " << filter.needFullTrack << "; ";
-    os << "withBestShotOnly " << filter.withBestShotOnly << "; ";
 
     if (!filter.analyticsEngineId.isNull())
         os << "analyticsEngineId " << filter.analyticsEngineId.toSimpleString().toStdString() << "; ";

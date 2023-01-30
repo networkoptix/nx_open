@@ -502,7 +502,6 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
     filter.deviceIds.insert(camera->getId());
     filter.maxObjectTracksToSelect = 1;
     filter.timePeriod = {QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue};
-    filter.withBestShotOnly = true;
 
     auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle /*handle*/, nx::analytics::db::LookupResult&& result)
