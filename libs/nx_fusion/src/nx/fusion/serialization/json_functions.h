@@ -99,6 +99,24 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *targ
     return true;
 }
 
+inline void serialize(QnJsonContext* ctx, const QVariant& value, QJsonValue* target)
+{
+    if (value == QVariant())
+    {
+        *target = QJsonValue();
+        return;
+    }
+
+    auto serializer = QnJsonSerializer::serializer(value.userType());
+    if (!NX_ASSERT(serializer,
+        "Unregistered serializer for type %1 named \"%2\"", value.userType(), value.typeName()))
+    {
+        return;
+    }
+
+    serializer->serialize(ctx, value, target);
+}
+
 namespace QJsonDetail {
 
     template<class Element, class Tag>

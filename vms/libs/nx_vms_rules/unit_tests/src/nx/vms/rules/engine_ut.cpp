@@ -28,9 +28,7 @@ const QString kTestActionFieldId = "nx.events.field.test";
 
 api::Rule makeEmptyRuleData()
 {
-    return api::Rule{
-        .id = QnUuid::createUuid(),
-    };
+    return {{QnUuid::createUuid()}};
 }
 
 } // namespace

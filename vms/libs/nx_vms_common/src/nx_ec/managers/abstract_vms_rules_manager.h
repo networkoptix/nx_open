@@ -57,7 +57,7 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode broadcastEventSync(const nx::vms::api::rules::EventInfo& info);
+    Result broadcastEventSync(const nx::vms::api::rules::EventInfo& info);
 
     virtual int resetVmsRules(
         Handler<> handler,
