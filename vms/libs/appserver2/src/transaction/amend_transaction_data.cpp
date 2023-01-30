@@ -7,8 +7,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/app_info.h>
-#include <nx/utils/url.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/url.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -30,7 +31,6 @@
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/action_parameters.h>
 #include <transaction/transaction_descriptor.h>
-#include <utils/crypt/symmetrical.h>
 
 namespace ec2 {
 
@@ -53,13 +53,13 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     {
         if (accessData == Qn::kSystemAccess)
         {
-            paramData->value = nx::utils::decodeStringFromHexStringAES128CBC(paramData->value);
+            paramData->value = nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value);
         }
         else if (paramData->name == ResourcePropertyKey::kCredentials
             || paramData->name == ResourcePropertyKey::kDefaultCredentials)
         {
             paramData->value = nx::vms::api::Credentials::parseColon(
-                nx::utils::decodeStringFromHexStringAES128CBC(paramData->value)).asString();
+                nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value)).asString();
         }
         else
         {
@@ -104,7 +104,7 @@ bool amendOutputDataIfNeeded(
         return false;
 
     if (accessData == Qn::kSystemAccess || accessManager->hasAdminPermissions(accessData))
-        url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC((url.password())));
+        url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC((url.password())));
     else
         url.setPassword(kHiddenPasswordFiller);
 
@@ -153,7 +153,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
 
     const bool isGranted = accessData == Qn::kSystemAccess || accessManager->hasAdminPermissions(accessData);
     if (isGranted)
-        url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC(url.password()));
+        url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
         url.setPassword(kHiddenPasswordFiller);
     params.url = url.toString();

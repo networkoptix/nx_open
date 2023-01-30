@@ -5,14 +5,15 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_module.h>
-#include <core/resource_access/user_access_data.h>
 #include <core/resource/camera_media_stream_info.h>
+#include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/kit/utils.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/api/data/camera_data.h>
@@ -21,7 +22,6 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <utils/common/util.h>
-#include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
 
 #include "media_server_resource.h"

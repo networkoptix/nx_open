@@ -8,7 +8,7 @@
 
 #include <QtCore/QString>
 
-#include <utils/crypt/symmetrical.h>
+#include <nx/utils/crypt/symmetrical.h>
 
 namespace {
 
@@ -51,7 +51,7 @@ const std::vector<QByteArray> kTestData{
 
 TEST(SymmetricalEncryptionCBC, AesExtraKey)
 {
-    const auto key = nx::utils::generateAesExtraKey();
+    const auto key = nx::crypt::generateAesExtraKey();
     ASSERT_EQ(key.size(), 16);
 }
 
@@ -59,8 +59,8 @@ TEST(SymmetricalEncryptionCBC, ArrayKey)
 {
     for (const auto& data : kTestData)
     {
-        auto encryptedData = nx::utils::encodeAES128CBC(data, kArrayKey);
-        ASSERT_EQ(nx::utils::decodeAES128CBC(encryptedData, kArrayKey), data);
+        auto encryptedData = nx::crypt::encodeAES128CBC(data, kArrayKey);
+        ASSERT_EQ(nx::crypt::decodeAES128CBC(encryptedData, kArrayKey), data);
     }
 }
 
@@ -71,8 +71,8 @@ TEST(SymmetricalEncryptionCBC, ByteArrayVariableKeys)
         for (const auto& data : kTestData)
         {
             QByteArray baKey((const char*)k.data(), k.size());
-            auto encryptedData = nx::utils::encodeAES128CBC(data, baKey);
-            ASSERT_EQ(nx::utils::decodeAES128CBC(encryptedData, baKey), data);
+            auto encryptedData = nx::crypt::encodeAES128CBC(data, baKey);
+            ASSERT_EQ(nx::crypt::decodeAES128CBC(encryptedData, baKey), data);
         }
     }
 }
@@ -81,8 +81,8 @@ TEST(SymmetricalEncryptionCBC, BuiltInKey)
 {
     for (const auto& data : kTestData)
     {
-        auto encryptedData = nx::utils::encodeAES128CBC(data);
-        ASSERT_EQ(nx::utils::decodeAES128CBC(encryptedData), data);
+        auto encryptedData = nx::crypt::encodeAES128CBC(data);
+        ASSERT_EQ(nx::crypt::decodeAES128CBC(encryptedData), data);
     }
 }
 
@@ -91,8 +91,8 @@ TEST(SymmetricalEncryptionCBC, StringFunctionsBuiltInKey)
     for (const auto& data : kTestData)
     {
         auto dataString = QString::fromUtf8(data);
-        auto encryptedString = nx::utils::encodeHexStringFromStringAES128CBC(dataString);
-        ASSERT_EQ(nx::utils::decodeStringFromHexStringAES128CBC(encryptedString), dataString);
+        auto encryptedString = nx::crypt::encodeHexStringFromStringAES128CBC(dataString);
+        ASSERT_EQ(nx::crypt::decodeStringFromHexStringAES128CBC(encryptedString), dataString);
     }
 }
 
@@ -104,8 +104,8 @@ TEST(SymmetricalEncryptionCBC, StringFunctionsBAKeys)
         {
             auto dataString = QString::fromUtf8(data);
             QByteArray baKey((const char*)k.data(), k.size());
-            auto encryptedString = nx::utils::encodeHexStringFromStringAES128CBC(dataString, baKey);
-            ASSERT_EQ(nx::utils::decodeStringFromHexStringAES128CBC(encryptedString, baKey), dataString);
+            auto encryptedString = nx::crypt::encodeHexStringFromStringAES128CBC(dataString, baKey);
+            ASSERT_EQ(nx::crypt::decodeStringFromHexStringAES128CBC(encryptedString, baKey), dataString);
         }
     }
 }

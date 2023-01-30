@@ -7,21 +7,20 @@
 #include <QtCore/QString>
 #include <QtCore/QFile>
 
-#include <utils/crypt/crypto_functions.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::utils {
+#include "crypto_functions.h"
+
+namespace nx::crypt {
 
 /**
  * Class that represents a crypted stream in a file.
  * The stream may constitute the whole file or part of it.
  * Additionally provides thread-safe access.
  */
-
-class NX_VMS_COMMON_API CryptedFileStream: public QIODevice
+class NX_UTILS_API CryptedFileStream: public QIODevice
 {
     Q_OBJECT
-    using Key = crypto_functions::Key;
 
 public:
     CryptedFileStream(const QString& fileName, const QString& password = QString());
@@ -123,4 +122,4 @@ private:
     void decryptBlock();
 };
 
-} // namespace nx::utils
+} // namespace nx::crypt

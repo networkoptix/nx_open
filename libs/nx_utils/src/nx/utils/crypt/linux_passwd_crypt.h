@@ -4,13 +4,13 @@
 
 #include <QtCore/QByteArray>
 
-namespace nx::utils {
+namespace nx::crypt {
 
 static constexpr size_t kLinuxCryptSaltLength = 8;
 
 QByteArray NX_UTILS_API generateSalt(int length);
 
-/** 
+/**
  * Calculates sha512 hash suitable for /etc/shadow file.
  */
 QByteArray NX_UTILS_API linuxCryptSha512(const QByteArray& password, const QByteArray& salt);
@@ -22,4 +22,4 @@ QByteArray NX_UTILS_API linuxCryptSha512(const QByteArray& password, const QByte
  */
 bool NX_UTILS_API setRootPasswordDigest(const QByteArray& userName, const QByteArray& digest);
 
-} // namespace nx::utils
+} // namespace nx::crypt

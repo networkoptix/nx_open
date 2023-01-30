@@ -4,11 +4,15 @@ if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()
 
+set(aes_library_root "${open_source_root}/artifacts/tiny_aes_c")
+file(GLOB_RECURSE aes_library_sources "${aes_library_root}/src/tiny_aes_c/*")
+
 nx_add_target(nx_utils LIBRARY
     WERROR_IF NOT WINDOWS
     NO_MOC
     ADDITIONAL_SOURCES
         ${ios_sources}
+        ${aes_library_sources}
     OTHER_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/qt5.natvis"
     PUBLIC_LIBS
@@ -28,6 +32,7 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/safe_direct_connection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/uuid.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/url.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/crypt/crypted_file_stream.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/async_handler_executor_detail.h)
@@ -44,6 +49,7 @@ target_compile_definitions(nx_utils
 target_include_directories(nx_utils
     PRIVATE
         ${Qt6Core_PRIVATE_INCLUDE_DIRS}
+        ${aes_library_root}/src
 )
 
 if (IOS)

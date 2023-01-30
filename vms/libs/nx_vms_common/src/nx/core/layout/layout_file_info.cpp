@@ -7,7 +7,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
-#include <utils/crypt/crypted_file_stream.h>
+#include <nx/utils/crypt/crypted_file_stream.h>
 
 namespace nx::core::layout {
 
@@ -75,7 +75,7 @@ FileInfo identifyFile(const QString& fileName, bool allowTemp)
 
 bool checkPassword(const QString& password, const FileInfo& fileInfo)
 {
-    return nx::utils::crypto_functions::checkSaltedPassword(password,
+    return nx::crypt::checkSaltedPassword(password,
         fileInfo.passwordSalt, fileInfo.passwordHash);
 }
 

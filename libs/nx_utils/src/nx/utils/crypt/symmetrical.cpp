@@ -14,7 +14,7 @@ extern "C" {
 #include <tiny_aes_c/aes.h>
 } // extern "C"
 
-namespace nx::utils {
+namespace nx::crypt {
 
 namespace detail {
 
@@ -137,4 +137,4 @@ QString decodeStringFromHexStringAES128CBC(const QString& s, const QByteArray& k
     return QString::fromUtf8(decodeAES128CBC(QByteArray::fromHex(s.toLatin1()), key));
 }
 
-} // namespace nx::utils
+} // namespace nx::crypt

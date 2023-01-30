@@ -4,13 +4,12 @@
 
 #include <QtCore/QString>
 
-namespace nx::utils {
+namespace nx::crypt {
 
 /**
  * Class that is a concept base for encryptable entities. Default realization is private.
  * Methods can be overriden partially.
  */
-
 class Encryptable
 {
 public:
@@ -31,4 +30,4 @@ protected: //< These functions do nothing and should be overwritten as public, a
     virtual QString password() const { return {}; }
 };
 
-} // namespace nx::utils
+} // namespace nx::crypt

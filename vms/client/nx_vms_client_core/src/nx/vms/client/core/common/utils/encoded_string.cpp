@@ -2,15 +2,13 @@
 
 #include "encoded_string.h"
 
-#include <utils/crypt/symmetrical.h>
-
 #include <nx/fusion/model_functions.h>
-
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::core {
 
-using namespace nx::utils;
+using namespace nx::crypt;
 
 EncodedString::EncodedString(const QByteArray& key):
     m_key(key)

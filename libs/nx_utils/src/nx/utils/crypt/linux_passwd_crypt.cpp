@@ -13,9 +13,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 
-namespace nx::utils {
+namespace nx::crypt {
 
-namespace 
+namespace
 {
     const int SHUFFLE_INDEXES[] =
     { 63, 62, 20, 41, 40, 61, 19, 18, 39, 60, 59, 17, 38, 37, 58, 16, 15, 36, 57, 56, 14, 35,
@@ -186,4 +186,4 @@ bool setRootPasswordDigest( const QByteArray& userName, [[maybe_unused]] const Q
 #endif
 }
 
-} // namespace nx::utils
+} // namespace nx::crypt

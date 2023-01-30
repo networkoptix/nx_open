@@ -2,15 +2,13 @@
 
 #include "password_data.h"
 
+#include <core/resource/user_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/utils/random.h>
-
 #include <nx/utils/crypt/linux_passwd_crypt.h>
-#include <utils/crypt/symmetrical.h>
-
-#include <core/resource/user_resource.h>
+#include <nx/utils/crypt/symmetrical.h>
+#include <nx/utils/random.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PasswordData, (json), PasswordData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraPasswordData, (json), CameraPasswordData_Fields)
@@ -31,9 +29,9 @@ PasswordHashes PasswordHashes::calculateHashes(
         result.realm.toStdString(),
         password.toStdString()).c_str();
 
-    result.cryptSha512Hash = nx::utils::linuxCryptSha512(
+    result.cryptSha512Hash = nx::crypt::linuxCryptSha512(
         password.toUtf8(),
-        nx::utils::generateSalt(nx::utils::kLinuxCryptSaltLength));
+        nx::crypt::generateSalt(nx::crypt::kLinuxCryptSaltLength));
 
     return result;
 }
