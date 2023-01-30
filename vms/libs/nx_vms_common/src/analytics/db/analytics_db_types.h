@@ -187,9 +187,6 @@ struct NX_VMS_COMMON_API Filter
     /** Found tracks are sorted by the minimum track time using this order. */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
-    /** If true, track with best shots only will be selected. */
-    bool withBestShotOnly = false;
-
     /** Null value treated as any engine. */
     QnUuid analyticsEngineId;
     Options options{};
@@ -284,7 +281,7 @@ NX_VMS_COMMON_API std::set<QString> addDerivedTypeIds(
 
 #define Filter_analytics_storage_Fields \
     (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)\
-    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(withBestShotOnly)(analyticsEngineId)
+    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(analyticsEngineId)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json), NX_VMS_COMMON_API);
 
 NX_REFLECTION_INSTRUMENT(Filter, Filter_analytics_storage_Fields)

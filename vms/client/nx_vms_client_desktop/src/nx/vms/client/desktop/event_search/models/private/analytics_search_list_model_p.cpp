@@ -640,7 +640,6 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.timePeriod = period;
     request.maxObjectTracksToSelect = limit;
     request.freeText = q->combinedTextFilter();
-    request.withBestShotOnly = true;
     request.analyticsEngineId = m_selectedEngine;
 
     if (!m_selectedObjectTypes.isEmpty())
@@ -657,15 +656,13 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         : Qt::AscendingOrder;
 
     NX_VERBOSE(q, "Requesting object tracks:\n    from: %1\n    to: %2\n"
-        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6\n"
-        "    withBestShotOnly: %7",
+        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6",
         nx::utils::timestampToDebugString(period.startTimeMs),
         nx::utils::timestampToDebugString(period.endTimeMs()),
         request.boundingBox,
         request.freeText,
         QVariant::fromValue(request.sortOrder).toString(),
-        request.maxObjectTracksToSelect,
-        request.withBestShotOnly);
+        request.maxObjectTracksToSelect);
 
     return lookupObjectTracksCached(request, nx::utils::guarded(this, callback));
 }
@@ -967,7 +964,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     nx::analytics::db::Filter filter;
     filter.freeText = q->combinedTextFilter();
-    filter.withBestShotOnly = false;
     filter.objectTypeId = m_relevantObjectTypes;
     filter.analyticsEngineId = m_selectedEngine;
 
