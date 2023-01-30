@@ -4,13 +4,13 @@
 
 #include <QtCore/QString>
 
-#include <utils/crypt/crypted_file_stream.h>
+#include <nx/utils/crypt/crypted_file_stream.h>
 
 #include "layout_storage_stream.h"
 #include "layout_storage_resource.h"
 
 class NX_VMS_COMMON_API QnLayoutCryptoStream:
-    public nx::utils::CryptedFileStream,
+    public nx::crypt::CryptedFileStream,
     public QnLayoutStreamSupport
 {
 public:

@@ -1457,9 +1457,9 @@ void AsyncClient::doSomeCustomLogic(
         m_credentials.username,
         realmIter->second,
         m_credentials.authToken.value);
-    const auto cryptSha512Hash = nx::utils::linuxCryptSha512(
+    const auto cryptSha512Hash = nx::crypt::linuxCryptSha512(
         QByteArray::fromStdString(m_credentials.authToken.value),
-        nx::utils::generateSalt(nx::utils::kLinuxCryptSaltLength));
+        nx::crypt::generateSalt(nx::crypt::kLinuxCryptSaltLength));
 
     nx::network::http::insertOrReplaceHeader(
         &request->headers,

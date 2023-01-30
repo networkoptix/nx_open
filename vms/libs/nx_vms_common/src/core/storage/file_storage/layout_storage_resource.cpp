@@ -1,20 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "layout_storage_resource.h"
-#include "layout_storage_filestream.h"
-#include "layout_storage_cryptostream.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
+#include <core/resource/avi/filetypesupport.h>
 #include <nx/core/layout/layout_file_info.h>
+#include <nx/utils/crypt/crypto_functions.h>
 #include <nx/utils/fs/file.h>
 #include <nx/utils/random.h>
-
 #include <recording/time_period_list.h>
 #include <utils/common/util.h>
-#include <utils/crypt/crypto_functions.h>
-#include <core/resource/avi/filetypesupport.h>
+
+#include "layout_storage_cryptostream.h"
+#include "layout_storage_filestream.h"
 
 namespace {
     /* Max future nov-file version that should be opened by the current client version. */
@@ -25,7 +25,7 @@ namespace {
 } // namespace
 
 using namespace nx::core::layout;
-using namespace nx::utils::crypto_functions;
+using namespace nx::crypt;
 
 struct QnLayoutFileStorageResourceGlobalContext
 {

@@ -2,14 +2,13 @@
 
 #include "fix_transaction_input_from_api.h"
 
+#include <api/model/password_data.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/event/action_parameters.h>
-
-#include <api/model/password_data.h>
-#include <utils/crypt/symmetrical.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
@@ -52,7 +51,7 @@ void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 {
     if (kResourceParamToAmend.contains(paramData->name))
-        paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
+        paramData->value = nx::crypt::encodeHexStringFromStringAES128CBC(paramData->value);
 }
 
 void fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
@@ -61,7 +60,7 @@ void fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
     if (url.password().isEmpty())
         return;
 
-    url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+    url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
     paramData->url = url.toString();
 }
 
@@ -137,7 +136,7 @@ QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
     *result = Result();
     if (nx::utils::Url url = params.url; !url.password().isEmpty())
     {
-        url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+        url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
         params.url = url.toString();
         QnTransaction<nx::vms::api::EventRuleData> fixedTransaction(originalTran);
         fixedTransaction.params.actionParams = QJson::serialized(params);

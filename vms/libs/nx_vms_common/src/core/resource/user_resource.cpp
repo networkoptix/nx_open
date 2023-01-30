@@ -12,6 +12,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
@@ -21,7 +22,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
-#include <utils/crypt/symmetrical.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
@@ -145,7 +145,7 @@ QByteArray QnUserHash::hashPassword(const QString& password) const
         }
 
         case Type::ldapPassword:
-            return nx::utils::encodeSimple(password.toUtf8(), QByteArray::fromHex(salt)).toHex();
+            return nx::crypt::encodeSimple(password.toUtf8(), QByteArray::fromHex(salt)).toHex();
 
         case Type::scrypt:
             if (!NX_ASSERT(options))
@@ -179,7 +179,7 @@ bool QnUserHash::checkPassword(const QString& password) const
 
 QString QnUserHash::toLdapPassword() const
 {
-    return nx::utils::encodeSimple(QByteArray::fromHex(hash), QByteArray::fromHex(salt));
+    return nx::crypt::encodeSimple(QByteArray::fromHex(hash), QByteArray::fromHex(salt));
 }
 
 QnUserHash QnUserHash::ldapPassword(const QString& password)

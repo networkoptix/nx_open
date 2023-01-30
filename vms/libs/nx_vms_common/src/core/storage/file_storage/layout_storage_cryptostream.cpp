@@ -2,7 +2,7 @@
 
 #include "layout_storage_cryptostream.h"
 
-using nx::utils::CryptedFileStream;
+using nx::crypt::CryptedFileStream;
 
 QnLayoutCryptoStream::QnLayoutCryptoStream(QnLayoutFileStorageResource& storageResource,
     const QString& fileName, const QString& password)

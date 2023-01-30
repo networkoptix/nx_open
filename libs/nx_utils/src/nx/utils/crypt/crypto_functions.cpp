@@ -8,7 +8,7 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx::utils::crypto_functions {
+namespace nx::crypt {
 
 const Key kHashSalt {
     0x89, 0x1e, 0xed, 0x37, 0xb9, 0x5f, 0xcc, 0x9f, 0xd0, 0x3b, 0x29, 0x7e, 0x59, 0x6d, 0xed, 0xe,
@@ -32,7 +32,7 @@ Key adaptPassword(const char* password)
     const size_t passLength = std::max((size_t) 1, strlen(password));
     Key key = kPasswordSalt;
     for (size_t i = 0; i < passLength; i++)
-        key[i % kKeySize] ^= password[i] ^ (char) (i & 0xFF); 
+        key[i % kKeySize] ^= password[i] ^ (char) (i & 0xFF);
     return key;
 }
 
@@ -94,4 +94,4 @@ Key getRandomSalt()
     return key;
 }
 
-} // namespace nx::utils::crypto_functions
+} // namespace nx::crypt

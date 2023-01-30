@@ -2,8 +2,7 @@
 
 #include "storage.h"
 
-#include <utils/crypt/symmetrical.h>
-
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::utils::property_storage {
@@ -52,7 +51,7 @@ void Storage::loadProperty(BaseProperty* property)
 {
     QString rawValue = readValue(property->name);
     if (property->secure)
-        rawValue = decodeStringFromHexStringAES128CBC(rawValue, m_securityKey);
+        rawValue = crypt::decodeStringFromHexStringAES128CBC(rawValue, m_securityKey);
     property->loadSerializedValue(rawValue);
 }
 
@@ -60,7 +59,7 @@ void Storage::saveProperty(BaseProperty* property)
 {
     QString rawValue = property->serialized();
     if (property->secure)
-        rawValue = encodeHexStringFromStringAES128CBC(rawValue, m_securityKey);
+        rawValue = crypt::encodeHexStringFromStringAES128CBC(rawValue, m_securityKey);
     writeValue(property->name, rawValue);
 }
 

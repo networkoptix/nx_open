@@ -181,7 +181,7 @@ static void KeyExpansion(void)
 
             // Function RotWord()
             {
-                const auto k = tempa[0];
+                const uint8_t k = tempa[0];
                 tempa[0] = tempa[1];
                 tempa[1] = tempa[2];
                 tempa[2] = tempa[3];

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vector>
+
 #include <QtCore/QString>
 
 #include <nx/fusion/serialization/csv.h>
@@ -10,7 +11,7 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/fusion/serialization/xml.h>
 #include <nx/reflect/instrument.h>
-
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/vms/api/data/database_dump_to_file_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/hardware_id_mapping.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx_ec/abstract_ec_connection.h>
-#include <utils/crypt/symmetrical.h>
 
 namespace ec2 {
 

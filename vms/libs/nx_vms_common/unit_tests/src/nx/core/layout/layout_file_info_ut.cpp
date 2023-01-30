@@ -3,8 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/core/layout/layout_file_info.h>
-#include <utils/crypt/crypted_file_stream.h>
-
+#include <nx/utils/crypt/crypted_file_stream.h>
 #include <nx/utils/test_support/test_options.h>
 
 using namespace nx::core::layout;
@@ -29,9 +28,9 @@ static void writeTestFile(const QString& name)
     file.write((char *) &index, sizeof(StreamIndex));
 
     CryptoInfo crypto;
-    crypto.passwordSalt = nx::utils::crypto_functions::getRandomSalt();
+    crypto.passwordSalt = nx::crypt::getRandomSalt();
     crypto.passwordHash =
-        nx::utils::crypto_functions::getSaltedPasswordHash(thePassword, crypto.passwordSalt);
+        nx::crypt::getSaltedPasswordHash(thePassword, crypto.passwordSalt);
     file.write((char *) &crypto, sizeof(CryptoInfo));
 
     for (int i = 0; i < 10000; i++)

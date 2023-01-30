@@ -7,9 +7,9 @@
 
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/qsettings_backend.h>
-#include <utils/crypt/symmetrical.h>
 
 #if defined(USE_QT_KEYCHAIN)
     #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
@@ -77,7 +77,7 @@ Settings::Settings(bool useKeyChain):
             QByteArray key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
             if (key.isEmpty())
             {
-                key = nx::utils::generateAesExtraKey();
+                key = nx::crypt::generateAesExtraKey();
                 if (!keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key)))
                 {
                     NX_WARNING(this, "Keychain is not available, using predefined key");

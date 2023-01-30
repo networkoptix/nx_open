@@ -2,15 +2,16 @@
 
 #pragma once
 
-#include "abstract_storage_resource.h"
-#include <utils/crypt/encryptable.h>
+#include <nx/utils/crypt/encryptable.h>
 #include <nx/vms/api/data/storage_status_list.h>
+
+#include "abstract_storage_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
 
 class NX_VMS_COMMON_API QnStorageResource:
     public QnAbstractStorageResource,
-    public nx::utils::Encryptable
+    public nx::crypt::Encryptable
 {
     using base_type = QnAbstractStorageResource;
 

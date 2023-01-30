@@ -9,7 +9,7 @@ TEST(linuxCrypt, generateSalt)
 {
     for (int i = 0; i < 10000; ++i)
     {
-        const auto salt = nx::utils::generateSalt(nx::utils::kLinuxCryptSaltLength);
+        const auto salt = nx::crypt::generateSalt(nx::crypt::kLinuxCryptSaltLength);
         ASSERT_TRUE(salt.indexOf('\0') == -1);
     }
 }
