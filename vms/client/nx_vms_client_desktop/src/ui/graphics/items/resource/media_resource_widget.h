@@ -520,8 +520,8 @@ private:
     nx::vms::client::desktop::RoiFiguresOverlayWidget* m_roiFiguresOverlayWidget = nullptr;
     nx::vms::client::desktop::AnalyticsOverlayWidget* m_analyticsOverlayWidget = nullptr;
     nx::vms::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
-    nx::vms::client::desktop::EncryptedArchivePasswordDialog*
-        m_encryptedArchivePasswordDialog = nullptr;
+    QScopedPointer<nx::vms::client::desktop::EncryptedArchivePasswordDialog>
+        m_encryptedArchivePasswordDialog;
     mutable QByteArray m_encryptedArchiveData;
 
     nx::vms::client::desktop::CameraHotspotsOverlayWidget* m_cameraHotspotsOverlayWidget = nullptr;
