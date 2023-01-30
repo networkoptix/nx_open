@@ -281,6 +281,10 @@ void QnResourceWidget::setupSelectionOverlay()
 
 QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
 {
+    static QHash<QString, QIcon> sIconCache;
+    if (sIconCache.contains(name))
+        return sIconCache[name];
+
     static const QMap<QIcon::Mode, QColor> colors = {
         {QIcon::Normal, colorTheme()->color("light4")},
         {QIcon::Active, colorTheme()->color("light1")},
@@ -327,6 +331,7 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
         icon.addPixmap(preparePixmap(colorized, checkedBgColor), mode, QIcon::On);
     }
 
+    sIconCache.insert(name, icon);
     return icon;
 }
 
