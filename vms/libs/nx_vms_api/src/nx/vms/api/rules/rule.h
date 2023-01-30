@@ -7,15 +7,15 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
+#include <nx/vms/api/data/id_data.h>
 
 namespace nx::vms::api::rules {
 
-struct NX_VMS_API Rule
+struct NX_VMS_API Rule: IdData
 {
     Q_GADGET
 
 public:
-    QnUuid id;
     // TODO: #spanasenko and-or logic
     QList<EventFilter> eventList;
     QList<ActionBuilder> actionList;
@@ -24,7 +24,7 @@ public:
     QString comment;
 };
 #define nx_vms_api_rules_Rule_Fields \
-    (id)(eventList)(actionList)(enabled)(schedule)(comment)
+    IdData_Fields(eventList)(actionList)(enabled)(schedule)(comment)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(Rule)
 
 // A dummy struct used in ec2 transactions.

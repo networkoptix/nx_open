@@ -274,7 +274,8 @@ private:
             std::is_same_v<T, nx::vms::api::ResourceStatusDataList> ||
             std::is_same_v<T, nx::vms::api::ResourceParamWithRefDataList> ||
             std::is_same_v<T, nx::vms::api::AnalyticsPluginDataList> ||
-            std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>);
+            std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList> ||
+            std::is_same_v<T, nx::vms::api::rules::RuleList>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileDataList>)
             return ApiCommand::Value::getStoredFiles;
         else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsDataList>)
@@ -311,6 +312,8 @@ private:
             return ApiCommand::Value::getAnalyticsPlugins;
         else if constexpr(std::is_same_v<T, nx::vms::api::AnalyticsEngineDataList>)
             return ApiCommand::Value::getAnalyticsEngines;
+        else if constexpr (std::is_same_v<T, nx::vms::api::rules::RuleList>)
+            return ApiCommand::Value::getVmsRules;
         else
             return ApiCommand::NotDefined;
     }
@@ -336,7 +339,8 @@ private:
             std::is_same_v<T, nx::vms::api::ResourceStatusData> ||
             std::is_same_v<T, nx::vms::api::ResourceParamWithRefData> ||
             std::is_same_v<T, nx::vms::api::AnalyticsPluginData> ||
-            std::is_same_v<T, nx::vms::api::AnalyticsEngineData>);
+            std::is_same_v<T, nx::vms::api::AnalyticsEngineData> ||
+            std::is_same_v<T, nx::vms::api::rules::Rule>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileData>)
             return ApiCommand::Value::updateStoredFile;
         else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsData>)
@@ -373,6 +377,8 @@ private:
             return ApiCommand::Value::saveAnalyticsPlugin;
         else if constexpr (std::is_same_v<T, nx::vms::api::ResourceParamWithRefData>)
             return ApiCommand::Value::saveAnalyticsEngine;
+        else if constexpr (std::is_same_v<T, nx::vms::api::rules::Rule>)
+            return ApiCommand::Value::saveVmsRule;
         else
             return ApiCommand::NotDefined;
     }
