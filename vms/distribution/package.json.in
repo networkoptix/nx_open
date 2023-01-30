@@ -1,6 +1,7 @@
 {
     "version" : "@version@",
     "component": "@component@",
+    "customClientVariant": "@customization.desktop.customClientVariant@",
     "cloudHost" : "@cloud_host@",
     "platform": "@platform@",
     "variants": [@variants@],
