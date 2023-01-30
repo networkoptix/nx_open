@@ -3,6 +3,7 @@
 #include "requests.h"
 
 #include <api/server_rest_connection.h>
+#include <nx/branding.h>
 
 using namespace nx::vms::update;
 
@@ -31,6 +32,30 @@ rest::Handle requestUpdateStatus(
         network::rest::Params{},
         std::move(callback),
         targetThread);
+}
+
+// When we receive update infrmation via a 5.0 (or older) Server, it will not recognize the
+// `customClient` component and its related `customClientVariant` field (unless we backported the
+// necessary changes into a patch release). After parsing the update information it will get
+// `unknown` as the component. This function is a workaround. If the update package file name
+// contains a specific substring "client_update-<customClientVariant>", the unrecognized fields
+// will be restored.
+static void patchUpdateInfoFromOldServer(common::update::Information& updateInfo)
+{
+    const QString customClientVariant = branding::customClientVariant();
+    if (customClientVariant.isEmpty())
+        return;
+
+    for (auto& package: updateInfo.packages)
+    {
+        if (package.component == update::Component::unknown
+            && package.customClientVariant.isEmpty()
+            && package.file.contains("client_update-" + customClientVariant))
+        {
+            package.component = update::Component::customClient;
+            package.customClientVariant = customClientVariant;
+        }
+    }
 }
 
 UpdateContents getUpdateContents(
@@ -117,6 +142,7 @@ UpdateContents getUpdateContents(
                 {
                     contents.error = InformationError::noError;
                     contents.info = result.deserialized<common::update::Information>();
+                    patchUpdateInfoFromOldServer(contents.info);
                 }
             }
             else
