@@ -31,6 +31,7 @@ using PlatformVariantList = QVector<PlatformVariant>;
 NX_REFLECTION_ENUM_CLASS(Component,
     unknown,
     client,
+    customClient,
     server
 )
 
@@ -45,6 +46,7 @@ struct NX_VMS_UPDATE_API PackageInfo
     Component component;
     QString cloudHost;
     QString platform;
+    QString customClientVariant;
     PlatformVariantList variants;
     QString installScript;
     qint64 freeSpaceRequired = 0;
@@ -57,6 +59,7 @@ struct NX_VMS_UPDATE_API PackageInfo
     (component) \
     (cloudHost) \
     (platform) \
+    (customClientVariant) \
     (variants) \
     (installScript) \
     (freeSpaceRequired)

@@ -29,6 +29,7 @@ bool Package::isSameTarget(const Package& other) const
 {
     return component == other.component
         && platform == other.platform
+        && customClientVariant == other.customClientVariant
         && variants == other.variants;
 }
 
@@ -36,15 +37,26 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PublicationInfo, (json), PublicationInfo_Fields
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (hash)(json), Package_Fields)
 
 PublicationInfo::FindPackageResult PublicationInfo::findPackage(
-    Component component, const utils::OsInfo& osInfo) const
+    Component component,
+    const nx::utils::OsInfo& osInfo,
+    const QString& customClientVariant) const
 {
     bool variantFound = false;
     const Package* bestPackage = nullptr;
+
+    if (component == Component::client && !customClientVariant.isEmpty())
+        component = Component::customClient;
 
     for (const auto& package: packages)
     {
         if (package.component != component)
             continue;
+
+        if (package.component == Component::customClient
+            && package.customClientVariant != customClientVariant)
+        {
+            continue;
+        }
 
         if (package.isCompatibleTo(osInfo))
         {
