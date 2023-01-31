@@ -4,8 +4,6 @@
 
 #include <QtCore/QRegularExpression>
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
-
 #include "../interfaces.h"
 
 class QnWorkbenchContext;
@@ -20,8 +18,7 @@ class OverlappedIdStore;
  */
 class OverlappedIdIntegration:
     public Integration,
-    public IMenuActionFactory,
-    public nx::vms::client::core::RemoteConnectionAware
+    public IMenuActionFactory
 {
     Q_OBJECT
     using base_type = Integration;
@@ -37,7 +34,7 @@ private:
     void openOverlappedIdDialog(QnWorkbenchContext* context);
 
 private:
-    std::unique_ptr<OverlappedIdStore> m_store;
+    std::shared_ptr<OverlappedIdStore> m_store;
 };
 
 } // namespace nx::vms::client::desktop::integrations
