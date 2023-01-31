@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -14,9 +15,10 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
-#include "overlapped_id_store.h"
-#include "overlapped_id_state.h"
 #include "overlapped_id_dialog.h"
+#include "overlapped_id_loader.h"
+#include "overlapped_id_state.h"
+#include "overlapped_id_store.h"
 
 using namespace nx::vms::client::desktop::ui::action;
 
@@ -108,7 +110,7 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
     connect(dialog.get(), &OverlappedIdDialog::accepted,
         [this, context, groupId, cameras]()
         {
-            auto connection = connectedServerApi();
+            auto connection = context->systemContext()->connectedServerApi();
             if (!connection)
                 return;
 
@@ -131,27 +133,8 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
                 thread());
         });
 
-    auto callback = nx::utils::guarded(this,
-        [this](
-            bool success,
-            rest::Handle /*requestId*/,
-            nx::vms::api::OverlappedIdResponse result)
-        {
-            if (!success)
-            {
-                NX_WARNING(this, "Received invalid overlapped id data.");
-                return;
-            }
-
-            m_store->setCurrentId(result.currentOverlappedId);
-            m_store->setIdList(result.availableOverlappedIds);
-        });
-
-    auto connection = connectedServerApi();
-    if (!connection)
-        return;
-
-    connection->getOverlappedIds(groupId, callback, thread());
+    OverlappedIdLoader loader(context->systemContext(), groupId, m_store, this);
+    loader.start();
 
     dialog->exec();
 }
