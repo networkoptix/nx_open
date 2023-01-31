@@ -16,14 +16,13 @@ QnResourcePool::Private::Private(
 
 void QnResourcePool::Private::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (const auto networkResource = resource.dynamicCast<QnNetworkResource>())
-        resourcesByPhysicalId.insert(networkResource->getPhysicalId(), networkResource);
-    else if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto server = resource.dynamicCast<QnMediaServerResource>())
     {
         mediaServers.insert(server);
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
+        resourcesByPhysicalId.insert(camera->getPhysicalId(), camera);
         QObject::connect(camera.data(), &QnVirtualCameraResource::isIOModuleChanged, q,
             [this, camera]() { updateIsIOModule(camera); });
 
@@ -33,20 +32,17 @@ void QnResourcePool::Private::handleResourceAdded(const QnResourcePtr& resource)
 
 void QnResourcePool::Private::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    if (const auto networkResource = resource.dynamicCast<QnNetworkResource>())
-    {
-        resourcesByPhysicalId.remove(networkResource->getPhysicalId());
-    }
-    else if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto server = resource.dynamicCast<QnMediaServerResource>())
     {
         mediaServers.remove(server);
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
+        resourcesByPhysicalId.remove(camera->getPhysicalId());
         camera->disconnect(q);
         ioModules.remove(camera);
+        hasIoModules = !ioModules.isEmpty();
     }
-    hasIoModules = !ioModules.isEmpty();
 }
 
 void QnResourcePool::Private::updateIsIOModule(const QnVirtualCameraResourcePtr& camera)
