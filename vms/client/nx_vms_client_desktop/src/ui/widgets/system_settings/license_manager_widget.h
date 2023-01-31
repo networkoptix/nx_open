@@ -21,8 +21,6 @@ namespace nx::vms::client::desktop {
 
 namespace Ui { class LicenseManagerWidget; }
 
-class LayoutWidgetHider;
-
 class LicenseManagerWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -93,7 +91,6 @@ private:
     QnLicenseListModel* m_model = nullptr;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     QPushButton* m_exportLicensesButton = nullptr;
-    std::unique_ptr<nx::vms::client::desktop::LayoutWidgetHider> m_removeDetailsButtonsHider;
     QnLicenseList m_licenses;
     nx::vms::license::Validator* m_validator = nullptr;
     bool m_isRemoveTakeAwayOperation = true;
