@@ -190,12 +190,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
             }
             return QnAbstractMediaDataPtr();
         }
-        if (packet.stream_index >= m_indexToChannel.size())
-        {
-            NX_DEBUG(this, "Invalid packet stream number: %1, overall streams: %2",
-                packet.stream_index, m_indexToChannel.size());
-            continue;
-        }
 
         stream = m_formatContext->streams[packet.stream_index];
         if (stream->codecpar->codec_id == AV_CODEC_ID_H264 && packet.size == 6)
@@ -205,19 +199,24 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 continue; // skip delimiter
         }
 
-        if (m_indexToChannel.isEmpty())
+        if (m_indexToChannel.empty())
             initLayoutStreams();
+
+        auto indexToChannelIt = m_indexToChannel.find(packet.stream_index);
+        if (indexToChannelIt == m_indexToChannel.cend())
+        {
+            NX_DEBUG(this, "Skip packet, stream number: %1, overall streams: %2",
+                packet.stream_index, m_indexToChannel.size());
+            continue;
+        }
 
         switch(stream->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
             {
-                if (m_indexToChannel[packet.stream_index] == -1)
-                    continue;
-
                 auto videoData = new QnWritableCompressedVideoData(packet.size,
                     getCodecContext(stream));
-                videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
+                videoData->channelNumber = indexToChannelIt->second;
                 if (stream->codecpar->width > 16 && stream->codecpar->height > 16)
                 {
                     videoData->width = stream->codecpar->width;
@@ -231,7 +230,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/)
+                if (packet.stream_index != m_audioStreamIndex || stream->codecpar->channels < 1)
                     continue;
 
                 qint64 timestamp = packetTimestamp(packet);
@@ -244,7 +243,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
-                audioData->channelNumber = m_indexToChannel[packet.stream_index];
+                audioData->channelNumber = indexToChannelIt->second;
                 audioData->timestamp = timestamp;
                 audioData->m_data.write((const char*) packet.data, packet.size);
                 break;
@@ -517,6 +516,7 @@ void QnAviArchiveDelegate::close()
     m_lastPacketTimes.clear();
     m_lastSeekTime = AV_NOPTS_VALUE;
     m_keyFrameFound.clear();
+    m_indexToChannel.clear();
 }
 
 const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
@@ -588,55 +588,55 @@ bool QnAviArchiveDelegate::findStreams()
     if (!m_formatContext)
         return false;
 
-    if (!m_streamsFound)
+    if (m_streamsFound)
+        return true;
+
+    if (m_fastStreamFind) {
+        m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
+        avformat_find_stream_info(m_formatContext, nullptr);
+        m_formatContext->interrupt_callback.callback = 0;
+        m_streamsFound = m_formatContext->nb_streams > 0;
+        for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
+            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
+    }
+    else {
+        // TODO: #rvasilenko avoid using deprecated methods
+        m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
+    }
+
+    m_firstDts = 0;
+    if (m_streamsFound)
     {
-        if (m_fastStreamFind) {
-            m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
-            avformat_find_stream_info(m_formatContext, nullptr);
-            m_formatContext->interrupt_callback.callback = 0;
-            m_streamsFound = m_formatContext->nb_streams > 0;
-            for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
-                m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
-        }
-        else {
-            // TODO: #rvasilenko avoid using deprecated methods
-            m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
-        }
+        m_durationUs = m_formatContext->duration;
+        initLayoutStreams();
+        if (m_firstVideoIndex >= 0)
+            m_firstDts = m_formatContext->streams[m_firstVideoIndex]->start_time;
+        if (m_firstDts == qint64(AV_NOPTS_VALUE))
+            m_firstDts = 0;
 
-        m_firstDts = 0;
-        if (m_streamsFound)
+        if (m_durationUs == AV_NOPTS_VALUE
+            && !m_fastStreamFind
+            && m_formatContext->nb_streams > 0
+            && !m_resource->flags().testFlag(Qn::still_image))
         {
-            m_durationUs = m_formatContext->duration;
-            initLayoutStreams();
-            if (m_firstVideoIndex >= 0)
-                m_firstDts = m_formatContext->streams[m_firstVideoIndex]->start_time;
-            if (m_firstDts == qint64(AV_NOPTS_VALUE))
-                m_firstDts = 0;
-
-            if (m_durationUs == AV_NOPTS_VALUE
-                && !m_fastStreamFind
-                && m_formatContext->nb_streams > 0
-                && !m_resource->flags().testFlag(Qn::still_image))
+            av_seek_frame(m_formatContext,
+                /*stream_index*/ -1,
+                /*timestamp*/ std::numeric_limits<qint64>::max(),
+                /*flags*/ AVSEEK_FLAG_ANY);
+            const auto stream = m_formatContext->streams[0];
+            if (stream && stream->cur_dts != AV_NOPTS_VALUE)
             {
-                av_seek_frame(m_formatContext,
-                    /*stream_index*/ -1,
-                    /*timestamp*/ std::numeric_limits<qint64>::max(),
-                    /*flags*/ AVSEEK_FLAG_ANY);
-                const auto stream = m_formatContext->streams[0];
-                if (stream && stream->cur_dts != AV_NOPTS_VALUE)
-                {
-                    const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
-                        ? stream->cur_dts
-                        : stream->cur_dts - stream->first_dts;
-                    const static AVRational r{1, 1000000};
-                    m_durationUs = av_rescale_q(dtsRange, stream->time_base, r);
-                }
-                av_seek_frame(m_formatContext, /*stream_index*/ -1, 0, AVSEEK_FLAG_ANY);
+                const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
+                    ? stream->cur_dts
+                    : stream->cur_dts - stream->first_dts;
+                const static AVRational r{1, 1000000};
+                m_durationUs = av_rescale_q(dtsRange, stream->time_base, r);
             }
+            av_seek_frame(m_formatContext, /*stream_index*/ -1, 0, AVSEEK_FLAG_ANY);
         }
-        else {
-            close();
-        }
+    }
+    else {
+        close();
     }
     return m_streamsFound;
 }
@@ -648,11 +648,13 @@ void QnAviArchiveDelegate::setForcedVideoChannelsCount(int videoChannels)
 
 void QnAviArchiveDelegate::initLayoutStreams()
 {
-    int videoNum= 0;
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
     m_hasVideo = false;
 
+    std::set<int> videoStreams;
+    std::set<int> audioStreams;
+    std::set<int> subtitleStreams;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -668,48 +670,34 @@ void QnAviArchiveDelegate::initLayoutStreams()
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-            while (m_indexToChannel.size() <= static_cast<int>(i))
-                m_indexToChannel << -1;
-            m_indexToChannel[i] = videoNum;
-            videoNum++;
+
+            // Ffmpeg has a bug when mux AAC into mkv, see
+            // https://github.com/HandBrake/HandBrake/issues/2809.
+            // So force video channles count from resource video layout.
+            if (m_forceVideoChannelsCount.has_value() && m_forceVideoChannelsCount <= videoStreams.size())
+                continue;
+            videoStreams.insert(i);
             m_hasVideo = true;
             break;
-
-        default:
-            break;
-        }
-
-        // Ffmpeg has a bug when mux AAC into mkv, see
-        // https://github.com/HandBrake/HandBrake/issues/2809.
-        // So force video channles count from resource video layout.
-        if (m_forceVideoChannelsCount.has_value() && m_forceVideoChannelsCount <= videoNum)
-            break;
-    }
-
-    lastStreamID = -1;
-    int audioNum = 0;
-    for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
-    {
-        AVStream *strm= m_formatContext->streams[i];
-        if(strm->codecpar->codec_type >= AVMEDIA_TYPE_NB)
-            continue;
-
-        if (strm->id && strm->id == lastStreamID)
-            continue; // duplicate
-        lastStreamID = strm->id;
-
-        switch(strm->codecpar->codec_type)
-        {
         case AVMEDIA_TYPE_AUDIO:
-            while ((uint)m_indexToChannel.size() <= i)
-                m_indexToChannel << -1;
-            m_indexToChannel[i] = videoNum + audioNum++;
+            audioStreams.insert(i);
             break;
 
+        case AVMEDIA_TYPE_SUBTITLE:
+            subtitleStreams.insert(i);
+            break;
         default:
             break;
         }
     }
+    int channel = 0;
+    for (auto& streamIndex: videoStreams)
+        m_indexToChannel[streamIndex] = channel++;
+    for (auto& streamIndex: audioStreams)
+        m_indexToChannel[streamIndex] = channel++;
+    for (auto& streamIndex: subtitleStreams)
+        m_indexToChannel[streamIndex] = channel++;
+
     m_audioLayout.reset(new AudioLayout(m_formatContext));
 }
 
