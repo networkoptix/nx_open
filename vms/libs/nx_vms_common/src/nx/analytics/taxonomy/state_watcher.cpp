@@ -27,12 +27,6 @@ StateWatcher::StateWatcher(
 std::shared_ptr<AbstractState> StateWatcher::state() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (m_state)
-        return m_state;
-
-    StateCompiler::Result result = StateCompiler::compile(currentDescriptors());
-    m_state = result.state;
-
     return m_state;
 }
 
@@ -43,9 +37,11 @@ Descriptors StateWatcher::currentDescriptors() const
 
 void StateWatcher::at_descriptorsUpdated()
 {
+    StateCompiler::Result result = StateCompiler::compile(currentDescriptors());
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        m_state.reset();
+        m_state = result.state;
     }
 
     emit stateChanged();
