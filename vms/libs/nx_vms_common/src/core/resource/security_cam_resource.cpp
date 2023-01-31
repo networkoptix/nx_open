@@ -94,6 +94,7 @@ void QnSecurityCamResource::setSystemContext(nx::vms::common::SystemContext* sys
     {
         connect(context->resourceDataPool(), &QnResourceDataPool::changed, this,
             &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+        resetCachedValues();
     }
 }
 
