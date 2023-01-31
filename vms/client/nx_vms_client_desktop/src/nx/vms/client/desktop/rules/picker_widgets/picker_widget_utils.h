@@ -9,6 +9,7 @@ namespace nx::vms::client::desktop::rules {
     using FieldPickerWidget<F>::m_fieldDescriptor;\
     using FieldPickerWidget<F>::m_field;\
     using FieldPickerWidget<F>::connect;\
-    using FieldPickerWidget<F>::resourcePool;
+    using FieldPickerWidget<F>::resourcePool;\
+    using FieldPickerWidget<F>::parentParamsWidget;
 
 } // namespace nx::vms::client::desktop::rules

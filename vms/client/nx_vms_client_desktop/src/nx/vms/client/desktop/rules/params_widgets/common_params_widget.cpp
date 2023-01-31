@@ -22,7 +22,7 @@ void CommonParamsWidget::onDescriptorSet()
 
     for (const auto& fieldDescriptor: descriptor().fields)
     {
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, systemContext());
+        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, systemContext(), this);
         layout->addWidget(picker);
     }
 

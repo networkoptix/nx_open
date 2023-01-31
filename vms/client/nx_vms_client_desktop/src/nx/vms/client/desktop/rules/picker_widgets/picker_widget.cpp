@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/desktop/rules/params_widgets/common_params_widget.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/widgets/common/elided_label.h>
 
@@ -12,7 +13,7 @@ namespace nx::vms::client::desktop::rules {
 using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 
-PickerWidget::PickerWidget(SystemContext* context, QWidget* parent):
+PickerWidget::PickerWidget(SystemContext* context, CommonParamsWidget* parent):
     QWidget(parent),
     SystemContextAware(context)
 {
@@ -32,6 +33,18 @@ PickerWidget::PickerWidget(SystemContext* context, QWidget* parent):
     mainLayout->setStretch(1, 5);
 
     setLayout(mainLayout);
+
+    connect(
+        parent,
+        &CommonParamsWidget::actionBuilderChanged,
+        this,
+        &PickerWidget::onActionBuilderChanged);
+
+    connect(
+        parent,
+        &CommonParamsWidget::eventFilterChanged,
+        this,
+        &PickerWidget::onEventFilterChanged);
 }
 
 void PickerWidget::setDescriptor(const FieldDescriptor& descriptor)
@@ -51,10 +64,6 @@ bool PickerWidget::hasDescriptor() const
     return m_fieldDescriptor != std::nullopt;
 }
 
-void PickerWidget::setFields(const QHash<QString, vms::rules::Field*>& /*fields*/)
-{
-}
-
 void PickerWidget::setReadOnly(bool value)
 {
     m_contentWidget->setEnabled(!value);
@@ -65,8 +74,9 @@ void PickerWidget::onDescriptorSet()
     m_label->setText(m_fieldDescriptor->displayName);
 }
 
-void PickerWidget::onFieldsSet()
+CommonParamsWidget* PickerWidget::parentParamsWidget() const
 {
+    return dynamic_cast<CommonParamsWidget*>(parent());
 }
 
 } // namespace nx::vms::client::desktop::rules

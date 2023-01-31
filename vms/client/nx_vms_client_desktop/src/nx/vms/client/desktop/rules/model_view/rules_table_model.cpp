@@ -135,6 +135,11 @@ QString SimplifiedRule::eventType() const
     return "";
 }
 
+vms::rules::EventFilter* SimplifiedRule::eventFilter() const
+{
+    return m_rule->eventFilters().constFirst();
+}
+
 void SimplifiedRule::setEventType(const QString& eventType)
 {
     if (!m_rule->eventFilters().empty())
@@ -164,6 +169,11 @@ QString SimplifiedRule::actionType() const
         return m_rule->actionBuilders().constFirst()->actionType();
 
     return "";
+}
+
+vms::rules::ActionBuilder* SimplifiedRule::actionBuilder() const
+{
+    return m_rule->actionBuilders().constFirst();
 }
 
 void SimplifiedRule::setActionType(const QString& actionType)

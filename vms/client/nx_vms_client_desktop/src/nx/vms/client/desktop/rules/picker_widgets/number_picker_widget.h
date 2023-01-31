@@ -13,35 +13,36 @@
 namespace nx::vms::client::desktop::rules {
 
 template<typename F>
-class NumberPickerWidget: public FieldPickerWidget<F>
+class NumberPickerWidget: public SimpleFieldPickerWidget<F>
 {
 public:
-    NumberPickerWidget(SystemContext* context, QWidget* parent = nullptr):
-        FieldPickerWidget<F>(context, parent)
+    NumberPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+        SimpleFieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
-        m_valueSpinBox = new QSpinBox;
-        contentLayout->addWidget(m_valueSpinBox);
+        m_SpinBox = new QSpinBox;
+        contentLayout->addWidget(m_SpinBox);
         contentLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
         m_contentWidget->setLayout(contentLayout);
+
+        connect(
+            m_SpinBox,
+            QOverload<int>::of(&QSpinBox::valueChanged),
+            this,
+            &NumberPickerWidget<F>::onValueChanged);
     }
 
 private:
     PICKER_WIDGET_COMMON_USINGS
 
-    QSpinBox* m_valueSpinBox{};
+    QSpinBox* m_SpinBox{};
 
-    virtual void onFieldsSet() override
+    void updateValue() override
     {
-        m_valueSpinBox->setValue(m_field->value());
-
-        connect(m_valueSpinBox,
-            QOverload<int>::of(&QSpinBox::valueChanged),
-            this,
-            &NumberPickerWidget<F>::onValueChanged,
-            Qt::UniqueConnection);
+        QSignalBlocker blocker{m_SpinBox};
+        m_SpinBox->setValue(m_field->value());
     }
 
     void onValueChanged(int value)

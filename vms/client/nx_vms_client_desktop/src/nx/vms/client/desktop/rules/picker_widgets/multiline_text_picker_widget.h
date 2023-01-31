@@ -23,7 +23,7 @@ template<typename F>
 class MultilineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    MultilineTextPickerWidget(SystemContext* context, QWidget* parent = nullptr):
+    MultilineTextPickerWidget(SystemContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -35,13 +35,19 @@ public:
         m_completer = new Completer{wordsToComplete(), m_textEdit, this};
 
         m_contentWidget->setLayout(contentLayout);
+
+        connect(
+            m_textEdit,
+            &QTextEdit::textChanged,
+            this,
+            &MultilineTextPickerWidget<F>::onTextChanged);
     }
 
 private:
     PICKER_WIDGET_COMMON_USINGS
 
-    QTextEdit* m_textEdit;
-    Completer* m_completer{};
+    QTextEdit* m_textEdit{nullptr};
+    Completer* m_completer{nullptr};
 
     virtual void onDescriptorSet() override
     {
@@ -49,18 +55,14 @@ private:
         m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
-    virtual void onFieldsSet() override
+    void onActionBuilderChanged() override
     {
+        FieldPickerWidget<F>::onActionBuilderChanged();
+
         {
             const QSignalBlocker blocker{m_textEdit};
             m_textEdit->setText(text());
         }
-
-        connect(m_textEdit,
-            &QTextEdit::textChanged,
-            this,
-            &MultilineTextPickerWidget<F>::onTextChanged,
-            Qt::UniqueConnection);
     }
 
     void onTextChanged()

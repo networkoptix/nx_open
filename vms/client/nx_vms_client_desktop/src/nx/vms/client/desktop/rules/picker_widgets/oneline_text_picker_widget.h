@@ -31,7 +31,7 @@ template<typename F>
 class OnelineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    OnelineTextPickerWidget(SystemContext* context, QWidget* parent = nullptr):
+    OnelineTextPickerWidget(SystemContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -41,6 +41,12 @@ public:
         contentLayout->addWidget(m_lineEdit);
 
         m_contentWidget->setLayout(contentLayout);
+
+        connect(
+            m_lineEdit,
+            &QLineEdit::textEdited,
+            this,
+            &OnelineTextPickerWidget<F>::onTextChanged);
     }
 
 private:
@@ -48,24 +54,30 @@ private:
 
     QLineEdit* m_lineEdit{};
 
-    virtual void onDescriptorSet() override
+    void onDescriptorSet() override
     {
         FieldPickerWidget<F>::onDescriptorSet();
         m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
-    virtual void onFieldsSet() override
+    void onActionBuilderChanged() override
     {
-        {
-            const QSignalBlocker blocker{m_lineEdit};
-            m_lineEdit->setText(text());
-        }
+        FieldPickerWidget<F>::onActionBuilderChanged();
+        if (std::is_base_of<vms::rules::ActionBuilderField, F>())
+            updateText();
+    }
 
-        connect(m_lineEdit,
-            &QLineEdit::textEdited,
-            this,
-            &OnelineTextPickerWidget<F>::onTextChanged,
-            Qt::UniqueConnection);
+    void onEventFilterChanged() override
+    {
+        FieldPickerWidget<F>::onEventFilterChanged();
+        if (std::is_base_of<vms::rules::EventFilterField, F>())
+            updateText();
+    }
+
+    void updateText()
+    {
+        const QSignalBlocker blocker{m_lineEdit};
+        m_lineEdit->setText(text());
     }
 
     void onTextChanged(const QString& text)

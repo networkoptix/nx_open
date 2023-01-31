@@ -25,11 +25,9 @@ public:
 
     QString eventType() const;
     void setEventType(const QString& eventType);
-    api::rules::State eventContinuance() const;
 
 signals:
     void eventTypePicked(const QString& eventType);
-    void eventContinuancePicked(api::rules::State eventContinuance);
 
 private:
     QScopedPointer<Ui::EventTypePickerWidget> ui;

@@ -24,7 +24,7 @@ template<typename F>
 class FlagsPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    FlagsPickerWidget(SystemContext* context, QWidget* parent = nullptr):
+    FlagsPickerWidget(SystemContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto flagsLayout = new QHBoxLayout;
@@ -36,6 +36,12 @@ public:
             flagsLayout->addWidget(checkBox);
 
             checkBoxes.insert({checkBox, flag});
+
+            connect(
+                checkBox,
+                &QCheckBox::toggled,
+                this,
+                &FlagsPickerWidget::onValueChanged);
         }
 
         m_contentWidget->setLayout(flagsLayout);
@@ -46,7 +52,21 @@ private:
 
     std::map<QCheckBox*, typename F::value_type::enum_type> checkBoxes;
 
-    virtual void onFieldsSet() override
+    void onActionBuilderChanged() override
+    {
+        FieldPickerWidget<F>::onActionBuilderChanged();
+        if (std::is_base_of<vms::rules::ActionBuilderField, F>())
+            updateValue();
+    }
+
+    void onEventFilterChanged() override
+    {
+        FieldPickerWidget<F>::onEventFilterChanged();
+        if (std::is_base_of<vms::rules::EventFilterField, F>())
+            updateValue();
+    }
+
+    void updateValue()
     {
         const auto fieldValue = m_field->value();
         for (const auto& [checkBox, flag]: checkBoxes)
@@ -55,12 +75,6 @@ private:
                 QSignalBlocker blocker{checkBox};
                 checkBox->setChecked(fieldValue.testFlag(flag));
             }
-
-            connect(checkBox,
-                &QCheckBox::toggled,
-                this,
-                &FlagsPickerWidget::onValueChanged,
-                Qt::UniqueConnection);
         }
     }
 

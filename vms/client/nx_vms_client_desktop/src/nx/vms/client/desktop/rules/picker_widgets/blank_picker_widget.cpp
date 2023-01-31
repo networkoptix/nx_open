@@ -4,13 +4,21 @@
 
 namespace nx::vms::client::desktop::rules {
 
-BlankPickerWidget::BlankPickerWidget(SystemContext* context, QWidget* parent):
+BlankPickerWidget::BlankPickerWidget(SystemContext* context, CommonParamsWidget* parent):
     PickerWidget(context, parent)
 {
     setVisible(false);
 }
 
 void BlankPickerWidget::onDescriptorSet()
+{
+}
+
+void BlankPickerWidget::onActionBuilderChanged()
+{
+}
+
+void BlankPickerWidget::onEventFilterChanged()
 {
 }
 

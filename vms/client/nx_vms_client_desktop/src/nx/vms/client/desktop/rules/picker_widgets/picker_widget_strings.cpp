@@ -39,6 +39,21 @@ QString DropdownTextPickerWidgetStrings::autoValue()
     return tr("Auto");
 }
 
+QString DropdownTextPickerWidgetStrings::state(api::rules::State value)
+{
+    switch (value)
+    {
+        case api::rules::State::instant:
+            return tr("Occurs");
+        case api::rules::State::started:
+            return tr("Starts");
+        case api::rules::State::stopped:
+            return tr("Stops");
+        default:
+            return tr("None");
+    }
+}
+
 QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventLevel)
 {
     switch(eventLevel)
@@ -52,6 +67,13 @@ QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventL
         default:
             return tr("Undefined");
     }
+}
+
+QString DurationPickerWidgetStrings::intervalOfActionHint(bool isInstant)
+{
+    return isInstant
+        ? tr("Interval of action: Instant")
+        : tr("Interval of action: No more than once per");
 }
 
 } // namespace nx::vms::client::desktop::rules

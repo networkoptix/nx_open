@@ -97,7 +97,6 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         .displayName = tr("Soft Trigger"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State")),
             makeFieldDescriptor<UniqueIdField>("triggerId", "Invisible"),
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Cameras")),
             makeFieldDescriptor<SourceUserField>("userId", tr("Users")),

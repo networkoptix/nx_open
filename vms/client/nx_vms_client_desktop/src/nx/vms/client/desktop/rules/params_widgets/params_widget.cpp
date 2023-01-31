@@ -34,9 +34,32 @@ const vms::rules::ItemDescriptor& ParamsWidget::descriptor() const
     return itemDescriptor;
 }
 
-void ParamsWidget::setInstant(bool /*value*/)
+void ParamsWidget::setActionBuilder(vms::rules::ActionBuilder* actionBuilder)
 {
-    // Some widgets not depends on state.
+    if (m_actionBuilder == actionBuilder)
+        return;
+
+    m_actionBuilder = actionBuilder;
+    emit actionBuilderChanged();
+}
+
+vms::rules::ActionBuilder* ParamsWidget::actionBuilder() const
+{
+    return m_actionBuilder;
+}
+
+void ParamsWidget::setEventFilter(vms::rules::EventFilter* eventFilter)
+{
+    if (m_eventFilter == eventFilter)
+        return;
+
+    m_eventFilter = eventFilter;
+    emit eventFilterChanged();
+}
+
+vms::rules::EventFilter* ParamsWidget::eventFilter() const
+{
+    return m_eventFilter;
 }
 
 void ParamsWidget::setReadOnly(bool value)
@@ -49,27 +72,12 @@ void ParamsWidget::onDescriptorSet()
 {
 }
 
-void ParamsWidget::setFields(const QHash<QString, Field*>& fields)
-{
-    for (const auto& picker: findChildren<PickerWidget*>())
-    {
-        if (!picker->hasDescriptor())
-            continue;
-
-        auto pickerDescriptor = picker->descriptor();
-        if (!fields.contains(pickerDescriptor->fieldName))
-            continue;
-
-        picker->setFields(fields);
-    }
-}
-
 std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName)
 {
-    for (auto field = itemDescriptor.fields.cbegin(); field != itemDescriptor.fields.cend(); ++field)
+    for (const auto& field: itemDescriptor.fields)
     {
-        if (field->fieldName == fieldName)
-            return *field;
+        if (field.fieldName == fieldName)
+            return field;
     }
 
     return std::nullopt;

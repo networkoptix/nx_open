@@ -88,6 +88,12 @@ public:
         return fieldByNameImpl<T>(name);
     }
 
+    template<class T>
+    T* fieldByName(const QString& name)
+    {
+        return fieldByNameImpl<T>(name);
+    }
+
 signals:
     void stateChanged();
     void action(const ActionPtr& action);

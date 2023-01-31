@@ -13,7 +13,7 @@ class InputIdPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    InputIdPickerWidget(SystemContext* context, QWidget* parent = nullptr);
+    InputIdPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
 private:
     QComboBox* m_comboBox{};
