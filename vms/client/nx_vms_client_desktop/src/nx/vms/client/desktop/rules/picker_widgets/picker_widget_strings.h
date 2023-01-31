@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/device_dependent_strings.h>
+#include <nx/vms/api/rules/common.h>
 #include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -34,6 +35,7 @@ class DropdownTextPickerWidgetStrings
 
 public:
     static QString autoValue();
+    static QString state(api::rules::State value);
 };
 
 class FlagsPickerWidgetStrings
@@ -42,6 +44,14 @@ class FlagsPickerWidgetStrings
 
 public:
     static QString eventLevelDisplayString(api::EventLevel eventLevel);
+};
+
+class DurationPickerWidgetStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(DurationPickerWidgetStrings)
+
+public:
+    static QString intervalOfActionHint(bool isInstant);
 };
 
 } // namespace nx::vms::client::desktop::rules

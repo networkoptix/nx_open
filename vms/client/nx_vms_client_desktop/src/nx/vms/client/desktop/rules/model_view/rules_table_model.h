@@ -25,10 +25,12 @@ public:
 
     QString eventType() const;
     void setEventType(const QString& eventType);
+    vms::rules::EventFilter* eventFilter() const;
     QHash<QString, nx::vms::rules::Field*> eventFields() const;
     std::optional<nx::vms::rules::ItemDescriptor> eventDescriptor() const;
 
     QString actionType() const;
+    vms::rules::ActionBuilder* actionBuilder() const;
     void setActionType(const QString& actionType);
     QHash<QString, nx::vms::rules::Field*> actionFields() const;
     std::optional<nx::vms::rules::ItemDescriptor> actionDescriptor() const;

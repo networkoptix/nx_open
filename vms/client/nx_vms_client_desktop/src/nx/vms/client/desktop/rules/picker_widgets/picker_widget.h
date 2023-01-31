@@ -9,8 +9,13 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <nx/vms/rules/field.h>
+#include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_field.h>
+#include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/manifest.h>
+
+#include "../params_widgets/common_params_widget.h"
 
 class QnElidedLabel;
 
@@ -25,7 +30,7 @@ class PickerWidget: public QWidget, public SystemContextAware
     Q_OBJECT
 
 public:
-    PickerWidget(SystemContext* context, QWidget* parent = nullptr);
+    PickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
     /** Sets field descriptor the picker customization is depends on. */
     void setDescriptor(const vms::rules::FieldDescriptor& descriptor);
@@ -34,12 +39,6 @@ public:
     std::optional<vms::rules::FieldDescriptor> descriptor() const;
 
     bool hasDescriptor() const;
-
-    /**
-     * Sets fields the picker will use to display and edit. The fields must be consistant with the
-     * descriptor, otherwise the field will not be edited.
-     */
-    virtual void setFields(const QHash<QString, vms::rules::Field*>& fields);
 
     virtual void setReadOnly(bool value);
 
@@ -50,12 +49,11 @@ protected:
      */
     virtual void onDescriptorSet();
 
-    /**
-     * Calls when field and linkedFields are set. Here derived classes must cast the field to
-     * the type described in the fieldDescriptor and display field data. Derived classes might
-     * be sure field is not nullptr.
-     */
-    virtual void onFieldsSet();
+    virtual void onActionBuilderChanged() = 0;
+
+    virtual void onEventFilterChanged() = 0;
+
+    CommonParamsWidget* parentParamsWidget() const;
 
     QnElidedLabel* m_label{};
     QWidget* m_contentWidget{};
@@ -65,61 +63,102 @@ protected:
 template<typename F>
 class FieldPickerWidget: public PickerWidget
 {
+    static_assert(std::is_base_of<vms::rules::Field, F>());
+
 public:
-    FieldPickerWidget(SystemContext* context, QWidget* parent = nullptr):
-        PickerWidget(context, parent)
+    using PickerWidget::PickerWidget;
+
+protected:
+    template<typename T>
+    T* getActionField(const QString& name) const
     {
-    }
-
-    virtual void setFields(const QHash<QString, vms::rules::Field*>& fields) override
-    {
-        if (!NX_ASSERT(m_fieldDescriptor))
-            return;
-
-        disconnectFromFields();
-
-        m_field = dynamic_cast<F*>(fields.value(m_fieldDescriptor->fieldName));
-
-        if (m_field)
-        {
-            for (const auto linkedFieldName: m_fieldDescriptor->linkedFields)
-            {
-                const auto linkedField = fields.value(linkedFieldName);
-                if (NX_ASSERT(linkedField))
-                    m_linkedFields[linkedFieldName] = linkedField;
-            }
-
-            onFieldsSet();
-        }
+        return parentParamsWidget()->actionBuilder()->template fieldByName<T>(name);
     }
 
     template<typename T>
-    T* getLinkedField(const char* fieldName) const
+    T* getEventField(const QString& name) const
     {
-        return dynamic_cast<T*>(m_linkedFields.value(fieldName).data());
+        return parentParamsWidget()->eventFilter()->template fieldByName<T>(name);
     }
 
-protected:
-    static_assert(std::is_base_of<vms::rules::Field, F>());
+    void onActionBuilderChanged() override
+    {
+        onActionBuilderChangedImpl<F>();
+    }
 
-    /** The field described in the descriptor, the picker gets value for. */
-    QPointer<F> m_field{};
+    void onEventFilterChanged() override
+    {
+        onEventFilterChangedImpl<F>();
+    }
 
-    /** Another fields from the entity(ActionBuilder or EventFilter fields). */
-    QHash<QString, QPointer<vms::rules::Field>> m_linkedFields;
+    F* m_field{nullptr};
 
 private:
-    /** Disconnect the picker from the fields. */
-    void disconnectFromFields()
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
+    void onActionBuilderChangedImpl()
     {
-        if (m_field)
-            m_field->disconnect(this);
+        m_field = getActionField<F>(m_fieldDescriptor->fieldName);
+    }
 
-        for (const auto& linkedField: m_linkedFields)
-        {
-            if (linkedField)
-                linkedField->disconnect(this);
-        }
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
+    void onActionBuilderChangedImpl()
+    {
+    }
+
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
+    void onEventFilterChangedImpl()
+    {
+    }
+
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
+    void onEventFilterChangedImpl()
+    {
+        m_field = getEventField<F>(m_fieldDescriptor->fieldName);
+    }
+};
+
+template <typename F>
+class SimpleFieldPickerWidget: public FieldPickerWidget<F>
+{
+public:
+    using FieldPickerWidget<F>::FieldPickerWidget;
+
+protected:
+    virtual void updateValue() = 0;
+
+    void onActionBuilderChanged() override
+    {
+        FieldPickerWidget<F>::onActionBuilderChanged();
+        onActionBuilderChangedImpl<F>();
+    }
+
+    void onEventFilterChanged() override
+    {
+        FieldPickerWidget<F>::onEventFilterChanged();
+        onEventFilterChangedImpl<F>();
+    }
+
+private:
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
+    void onActionBuilderChangedImpl()
+    {
+        updateValue();
+    }
+
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
+    void onActionBuilderChangedImpl()
+    {
+    }
+
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
+    void onEventFilterChangedImpl()
+    {
+    }
+
+    template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
+    void onEventFilterChangedImpl()
+    {
+        updateValue();
     }
 };
 

@@ -22,25 +22,6 @@ EventTypePickerWidget::EventTypePickerWidget(QWidget* parent):
         {
             emit eventTypePicked(eventType());
         });
-
-    connect(ui->continuanceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-        [this]()
-        {
-            emit eventContinuancePicked(eventContinuance());
-        });
-
-    std::list<std::pair<QString, QVariant>> continuanceList {
-        {tr("None"), QVariant::fromValue(api::rules::State::none)},
-        {tr("Starts"), QVariant::fromValue(api::rules::State::started)},
-        {tr("Stops"), QVariant::fromValue(api::rules::State::stopped)},
-        {tr("Instant"), QVariant::fromValue(api::rules::State::instant)}
-    };
-
-    ui->continuanceComboBox->clear();
-    for (const auto& item: continuanceList)
-        ui->continuanceComboBox->addItem(item.first, item.second);
-
-    ui->continuanceComboBox->setCurrentIndex(3);
 }
 
 // Non-inline destructor is required for member scoped pointers to forward declared classes.
@@ -63,11 +44,6 @@ QString EventTypePickerWidget::eventType() const
 void EventTypePickerWidget::setEventType(const QString& eventType)
 {
     ui->eventTypeComboBox->setCurrentIndex(ui->eventTypeComboBox->findData(eventType));
-}
-
-api::rules::State EventTypePickerWidget::eventContinuance() const
-{
-    return ui->continuanceComboBox->currentData().value<api::rules::State>();
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -12,10 +12,12 @@ class BlankPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    BlankPickerWidget(SystemContext* context, QWidget* parent = nullptr);
+    BlankPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
 private:
     virtual void onDescriptorSet() override;
+    virtual void onActionBuilderChanged() override;
+    virtual void onEventFilterChanged() override;
 };
 
 } // namespace nx::vms::client::desktop::rules

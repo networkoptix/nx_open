@@ -21,8 +21,10 @@ const ItemDescriptor& BookmarkAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeDurationFieldDescriptor(tr("Fixed duration")),
-            makeFieldDescriptor<TimeField>("recordBefore", tr("Pre-recording")),
-            makeFieldDescriptor<TimeField>("recordAfter", tr("Post-recording")),
+            makeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
+            makeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording")),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine

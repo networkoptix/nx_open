@@ -81,13 +81,6 @@ RulesDialog::RulesDialog(QWidget* parent):
                 rule->setEventType(eventType);
         });
 
-    connect(ui->eventTypePicker, &EventTypePickerWidget::eventContinuancePicked, this,
-        [this](api::rules::State eventContinuance)
-        {
-            if (actionEditorWidget)
-                actionEditorWidget->setInstant(eventContinuance == api::rules::State::instant);
-        });
-
     connect(ui->actionTypePicker, &ActionTypePickerWidget::actionTypePicked, this,
         [this](const QString& actionType)
         {
@@ -290,8 +283,6 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
         return;
 
     actionEditorWidget->setReadOnly(readOnly);
-    actionEditorWidget->setInstant(
-        ui->eventTypePicker->eventContinuance() == api::rules::State::instant);
 
     ui->actionEditorContainerWidget->layout()->addWidget(actionEditorWidget);
 }
@@ -325,7 +316,10 @@ void RulesDialog::displayEvent(const SimplifiedRule& rule)
         createEventEditor(*eventDescriptor);
 
     if (eventEditorWidget)
-        eventEditorWidget->setFields(rule.eventFields());
+    {
+        eventEditorWidget->setActionBuilder(rule.actionBuilder());
+        eventEditorWidget->setEventFilter(rule.eventFilter());
+    }
 }
 
 void RulesDialog::displayAction(const SimplifiedRule& rule)
@@ -343,7 +337,10 @@ void RulesDialog::displayAction(const SimplifiedRule& rule)
         createActionEditor(*actionDescriptor);
 
     if (actionEditorWidget)
-        actionEditorWidget->setFields(rule.actionFields());
+    {
+        actionEditorWidget->setActionBuilder(rule.actionBuilder());
+        actionEditorWidget->setEventFilter(rule.eventFilter());
+    }
 }
 
 void RulesDialog::resetFilter()

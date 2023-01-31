@@ -66,7 +66,7 @@ const ItemDescriptor& GenericEvent::manifest()
         .displayName = tr("Generic Event"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<StateField>(utils::kStateFieldName, tr("State"), {}),
+            utils::makeStateFieldDescriptor(tr("State")),
             makeFieldDescriptor<KeywordsField>("source", tr("Source"), kKeywordFieldDescription),
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption"), kKeywordFieldDescription),
             makeFieldDescriptor<KeywordsField>("description",

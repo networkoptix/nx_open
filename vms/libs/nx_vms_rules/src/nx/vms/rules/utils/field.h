@@ -16,9 +16,11 @@ static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
-static constexpr auto kTextFieldName = "text";
+static constexpr auto kRecordAfterFieldName = "recordAfter";
+static constexpr auto kRecordBeforeFieldName = "recordBefore";
 static constexpr auto kServerIdFieldName = "serverId";
 static constexpr auto kStateFieldName = "state";
+static constexpr auto kTextFieldName = "text";
 static constexpr auto kUsersFieldName = "users";
 
 FieldDescriptor makeIntervalFieldDescriptor(
@@ -31,7 +33,8 @@ FieldDescriptor makeDurationFieldDescriptor(
 
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
-    const QString& description = {});
+    const QString& description = {},
+    const QVariantMap& properties = {});
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,

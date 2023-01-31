@@ -24,8 +24,10 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
             makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
             makeFieldDescriptor<FpsField>("fps", tr("FPS"), {}, {}, {utils::kDeviceIdsFieldName}),
             utils::makeDurationFieldDescriptor(tr("Fixed duration")),
-            makeFieldDescriptor<TimeField>("recordBefore", tr("Pre-recording")),
-            makeFieldDescriptor<TimeField>("recordAfter", tr("Post-recording")),
+            makeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
+            makeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording")),
         }
     };
     return kDescriptor;

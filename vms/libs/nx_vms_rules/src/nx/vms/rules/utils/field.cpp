@@ -33,13 +33,14 @@ FieldDescriptor makeDurationFieldDescriptor(
 
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
-    const QString& description)
+    const QString& description,
+    const QVariantMap& properties)
 {
     return makeFieldDescriptor<StateField>(
         kStateFieldName,
         displayName,
         description,
-        {});
+        properties);
 }
 
 FieldDescriptor makeExtractDetailFieldDescriptor(

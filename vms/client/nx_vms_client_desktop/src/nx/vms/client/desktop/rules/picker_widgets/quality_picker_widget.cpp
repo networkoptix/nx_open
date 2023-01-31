@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-QualityPickerWidget::QualityPickerWidget(SystemContext* context, QWidget* parent):
+QualityPickerWidget::QualityPickerWidget(SystemContext* context, CommonParamsWidget* parent):
     PickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;

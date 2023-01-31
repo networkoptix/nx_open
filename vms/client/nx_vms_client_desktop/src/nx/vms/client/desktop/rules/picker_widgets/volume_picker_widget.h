@@ -16,14 +16,14 @@ class VolumePickerWidget: public FieldPickerWidget<vms::rules::VolumeField>
     Q_OBJECT
 
 public:
-    explicit VolumePickerWidget(SystemContext* context, QWidget* parent = nullptr);
+    VolumePickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
 private:
     QSlider* m_volumeSlider = nullptr;
     QPushButton* m_testPushButton = nullptr;
     float m_audioDeviceCachedVolume = 0.;
 
-    void onFieldsSet() override;
+    void onActionBuilderChanged() override;
 
     void onVolumeChanged();
     void onTestButtonClicked();

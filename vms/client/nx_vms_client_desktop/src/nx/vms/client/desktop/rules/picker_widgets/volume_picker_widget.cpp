@@ -20,7 +20,7 @@ constexpr auto kOneHundredPercent = 100;
 
 } // namespace
 
-VolumePickerWidget::VolumePickerWidget(SystemContext* context, QWidget* parent):
+VolumePickerWidget::VolumePickerWidget(SystemContext* context, CommonParamsWidget* parent):
     FieldPickerWidget<vms::rules::VolumeField>(context, parent)
 {
     auto contentLayout = new QHBoxLayout;
@@ -50,8 +50,10 @@ VolumePickerWidget::VolumePickerWidget(SystemContext* context, QWidget* parent):
         &VolumePickerWidget::onTestButtonClicked);
 }
 
-void VolumePickerWidget::onFieldsSet()
+void VolumePickerWidget::onActionBuilderChanged()
 {
+    FieldPickerWidget<vms::rules::VolumeField>::onActionBuilderChanged();
+
     QSignalBlocker blocker{m_volumeSlider};
     m_volumeSlider->setValue(qRound(m_field->value() * kOneHundredPercent));
 }
@@ -63,7 +65,7 @@ void VolumePickerWidget::onVolumeChanged()
 
 void VolumePickerWidget::onTestButtonClicked()
 {
-    auto textField = getLinkedField<vms::rules::TextWithFields>(vms::rules::utils::kTextFieldName);
+    auto textField = getActionField<vms::rules::TextWithFields>(vms::rules::utils::kTextFieldName);
     if (!NX_ASSERT(textField))
         return;
 

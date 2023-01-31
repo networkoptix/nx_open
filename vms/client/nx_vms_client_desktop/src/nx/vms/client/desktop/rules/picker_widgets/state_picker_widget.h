@@ -1,60 +1,93 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/event_filter_fields/state_field.h>
+#include <nx/vms/rules/utils/field.h>
+
+#include "dropdown_text_picker_widget_base.h"
+#include "picker_widget_strings.h"
+
 #pragma once
-
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QHBoxLayout>
-
-#include <nx/vms/rules/action_builder_fields/flag_field.h>
-
-#include "picker_widget.h"
-#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
-template<typename F>
-class StatePickerWidget: public FieldPickerWidget<F>
+class StatePicker: public DropdownTextPickerWidgetBase<vms::rules::StateField>
 {
 public:
-    StatePickerWidget(SystemContext* context, QWidget* parent = nullptr):
-        FieldPickerWidget<F>(context, parent)
-    {
-        auto contentLayout = new QHBoxLayout;
-        m_checkBox = new QCheckBox;
-        m_checkBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        contentLayout->addWidget(m_checkBox);
+    using DropdownTextPickerWidgetBase<vms::rules::StateField>::DropdownTextPickerWidgetBase;
 
-        m_contentWidget->setLayout(contentLayout);
+protected:
+    void onDescriptorSet() override
+    {
+        DropdownTextPickerWidgetBase<vms::rules::StateField>::onDescriptorSet();
+
+        const auto itemFlags = parentParamsWidget()->descriptor().flags;
+        QSignalBlocker blocker{m_comboBox};
+
+        if (itemFlags.testFlag(vms::rules::ItemFlag::instant))
+        {
+            m_comboBox->addItem(
+                DropdownTextPickerWidgetStrings::state(api::rules::State::instant),
+                QVariant::fromValue(api::rules::State::instant));
+        }
+
+        if (itemFlags.testFlag(vms::rules::ItemFlag::prolonged))
+        {
+            m_comboBox->addItem(
+                DropdownTextPickerWidgetStrings::state(api::rules::State::started),
+                QVariant::fromValue(api::rules::State::started));
+            m_comboBox->addItem(
+                DropdownTextPickerWidgetStrings::state(api::rules::State::stopped),
+                QVariant::fromValue(api::rules::State::stopped));
+        }
+    }
+
+    void onActionBuilderChanged() override
+    {
+        DropdownTextPickerWidgetBase<vms::rules::StateField>::onActionBuilderChanged();
+
+        QSignalBlocker blocker{m_comboBox};
+
+        auto stateValue = m_comboBox->currentData().value<api::rules::State>();
+        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(stateValue)));
+
+        if (const auto durationField =
+            getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName))
+        {
+            const auto updateState =
+                [this, durationField, stateValue]
+                {
+                    if (durationField->value() == vms::rules::OptionalTimeField::value_type::zero())
+                    {
+                        setVisible(false);
+                        m_comboBox->setCurrentIndex(-1);
+                    }
+                    else
+                    {
+                        m_comboBox->setCurrentIndex(
+                            m_comboBox->findData(QVariant::fromValue(stateValue)));
+                        setVisible(true);
+                    }
+                };
+
+            updateState();
+
+            m_scopedConnections << connect(
+                durationField,
+                &vms::rules::OptionalTimeField::valueChanged,
+                this,
+                updateState);
+        }
+    }
+
+    void onCurrentIndexChanged() override
+    {
+        m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
     }
 
 private:
-    PICKER_WIDGET_COMMON_USINGS
-
-    QCheckBox* m_checkBox{};
-
-    virtual void onDescriptorSet() override
-    {
-        m_checkBox->setText(m_fieldDescriptor->displayName);
-    }
-
-    virtual void onFieldsSet() override
-    {
-        {
-            QSignalBlocker blocker{m_checkBox};
-            m_checkBox->setChecked(m_field->value());
-        }
-
-        connect(m_checkBox,
-            &QCheckBox::stateChanged,
-            this,
-            &StatePickerWidget<F>::onStateChanged,
-            Qt::UniqueConnection);
-    }
-
-    void onStateChanged(int state)
-    {
-        m_field->setValue(state == Qt::Checked);
-    }
+    utils::ScopedConnections m_scopedConnections;
 };
 
 } // namespace nx::vms::client::desktop::rules
