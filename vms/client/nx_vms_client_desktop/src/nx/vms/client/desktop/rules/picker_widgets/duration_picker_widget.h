@@ -7,7 +7,9 @@
 
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/actions/bookmark_action.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/widgets/business/time_duration_widget.h>
 
 #include "picker_widget.h"
@@ -66,10 +68,17 @@ protected:
             FieldPickerWidget<F>::template getActionField<vms::rules::OptionalTimeField>(
                 vms::rules::utils::kDurationFieldName);
 
+        if (!durationField)
+            return;
+
         // TODO: #mmalofeev add property to the manifest to be able check dependencies.
-        if (durationField
-            && (m_fieldDescriptor->fieldName == vms::rules::utils::kRecordBeforeFieldName
-                || m_fieldDescriptor->fieldName == vms::rules::utils::kRecordAfterFieldName))
+        const bool isRecordingBeforeField =
+            m_fieldDescriptor->fieldName == vms::rules::utils::kRecordBeforeFieldName;
+        const bool isRecordingAfterField =
+            m_fieldDescriptor->fieldName == vms::rules::utils::kRecordAfterFieldName;
+        const bool belongsToBookmarkAction = parentParamsWidget()->descriptor().id
+            == vms::rules::utils::type<vms::rules::BookmarkAction>();
+        if ((isRecordingBeforeField && !belongsToBookmarkAction) || isRecordingAfterField)
         {
             const auto updateEnabledState =
                 [this, durationField]
@@ -106,6 +115,7 @@ public:
     OptionalDurationPickerWidget(SystemContext* context, CommonParamsWidget* parent = nullptr):
         DurationPickerWidget<F>(context, parent)
     {
+        m_label->setVisible(false);
         m_checkBox = new QCheckBox;
         static_cast<QHBoxLayout*>(m_contentWidget->layout())->insertWidget(0, m_checkBox);
 
@@ -129,6 +139,9 @@ private:
         DurationPickerWidget<F>::onDescriptorSet();
 
         m_isDurationField = m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName;
+
+        if (m_isDurationField)
+            m_checkBox->setText(m_fieldDescriptor->displayName);
     }
 
     virtual void onActionBuilderChanged() override
@@ -139,7 +152,7 @@ private:
         const bool isZero = m_initialValue == F::value_type::zero();
 
         {
-            QSignalBlocker blocker{m_checkBox};
+            const QSignalBlocker blocker{m_checkBox};
             m_checkBox->setChecked(!isZero);
         }
 

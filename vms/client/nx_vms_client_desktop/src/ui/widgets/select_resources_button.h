@@ -121,3 +121,18 @@ protected:
     virtual Appearance appearanceForAll() const override;
     virtual Appearance appearanceForSelected(int count) const override;
 };
+
+
+class QnSelectLayoutsButton: public QnSelectResourcesButton
+{
+    Q_OBJECT
+
+public:
+    explicit QnSelectLayoutsButton(QWidget* parent = nullptr);
+    void selectLayouts(const QnLayoutResourceList& layouts);
+
+protected:
+    virtual Appearance appearanceForAny() const override;
+    virtual Appearance appearanceForAll() const override;
+    virtual Appearance appearanceForSelected(int count) const override;
+};

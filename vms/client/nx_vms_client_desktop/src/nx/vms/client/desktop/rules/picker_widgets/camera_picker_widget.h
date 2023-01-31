@@ -15,7 +15,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-template<typename F, typename P = MultiChoicePolicy>
+template<typename F>
 class CameraPickerWidgetBase: public ResourcePickerWidgetBase<F, QnSelectDevicesButton>
 {
 public:
@@ -101,7 +101,7 @@ protected:
     }
 
 private:
-    QCheckBox* m_checkBox = nullptr;
+    QCheckBox* m_checkBox{nullptr};
 
     void onStateChanged()
     {
@@ -113,17 +113,31 @@ class SingleTargetCameraPicker:
     public ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField, QnSelectDevicesButton>
 {
 public:
-    using ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField,
-        QnSelectDevicesButton>::ResourcePickerWidgetBase;
+    SingleTargetCameraPicker(SystemContext* context, CommonParamsWidget* parent):
+        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField, QnSelectDevicesButton>(context, parent)
+    {
+        auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
+
+        m_checkBox = new QCheckBox;
+        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString());
+
+        contentLayout->addWidget(m_checkBox);
+
+        connect(
+            m_checkBox,
+            &QCheckBox::stateChanged,
+            this,
+            &SingleTargetCameraPicker::onStateChanged);
+    }
 
 private:
+    QCheckBox* m_checkBox{nullptr};
+
     void onSelectButtonClicked() override
     {
         auto selectedCameras = QnUuidSet{m_field->id()};
 
-        CameraSelectionDialog::selectCameras<SingleChoicePolicy>(
-            selectedCameras,
-            this);
+        CameraSelectionDialog::selectCameras<SingleChoicePolicy>(selectedCameras, this);
 
         m_field->setId(*selectedCameras.begin());
 
@@ -133,7 +147,7 @@ private:
     void updateValue() override
     {
         auto resourceList =
-            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(QnUuidSet{m_field->id()});
+            resourcePool()->getResourcesByIds<QnVirtualCameraResource>(QnUuidSet{m_field->id()});
 
         m_selectButton->selectDevices(resourceList);
 
@@ -149,6 +163,33 @@ private:
         else
         {
             m_alertLabel->setVisible(false);
+        }
+
+        {
+            const QSignalBlocker blocker{m_checkBox};
+            m_checkBox->setChecked(m_field->useSource());
+        }
+
+        updateUi();
+    }
+
+    void onStateChanged()
+    {
+        m_field->setUseSource(m_checkBox->isChecked());
+        updateUi();
+    }
+
+    void updateUi()
+    {
+        if (m_checkBox->isChecked())
+        {
+            m_label->setVisible(false);
+            m_selectResourceWidget->setVisible(false);
+        }
+        else
+        {
+            m_label->setVisible(true);
+            m_selectResourceWidget->setVisible(true);
         }
     }
 };

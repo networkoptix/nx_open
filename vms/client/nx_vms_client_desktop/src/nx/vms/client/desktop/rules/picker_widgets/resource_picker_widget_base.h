@@ -25,6 +25,7 @@ public:
         auto contentLayout = new QVBoxLayout;
         contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
+        m_selectResourceWidget = new QWidget;
         auto selectResourceLayout = new QHBoxLayout;
 
         m_selectButton = new B;
@@ -52,7 +53,9 @@ public:
         selectResourceLayout->setStretch(0, 5);
         selectResourceLayout->setStretch(1, 3);
 
-        contentLayout->addLayout(selectResourceLayout);
+        m_selectResourceWidget->setLayout(selectResourceLayout);
+
+        contentLayout->addWidget(m_selectResourceWidget);
 
         m_contentWidget->setLayout(contentLayout);
 
@@ -66,6 +69,7 @@ public:
 protected:
     PICKER_WIDGET_COMMON_USINGS
 
+    QWidget* m_selectResourceWidget{nullptr};
     B* m_selectButton{nullptr};
     QnElidedLabel* m_alertLabel{nullptr};
 

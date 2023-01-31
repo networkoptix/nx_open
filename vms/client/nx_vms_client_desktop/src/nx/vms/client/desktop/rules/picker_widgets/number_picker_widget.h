@@ -5,7 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QSpinBox>
 
-#include <nx/vms/rules/event_filter_fields/int_field.h>
+#include <nx/vms/rules/utils/field.h>
 
 #include "picker_widget.h"
 #include "picker_widget_utils.h"
@@ -21,28 +21,28 @@ public:
     {
         auto contentLayout = new QHBoxLayout;
 
-        m_SpinBox = new QSpinBox;
-        contentLayout->addWidget(m_SpinBox);
+        m_spinBox = new QSpinBox;
+        contentLayout->addWidget(m_spinBox);
         contentLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
         m_contentWidget->setLayout(contentLayout);
 
         connect(
-            m_SpinBox,
+            m_spinBox,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
             &NumberPickerWidget<F>::onValueChanged);
     }
 
-private:
+protected:
     PICKER_WIDGET_COMMON_USINGS
 
-    QSpinBox* m_SpinBox{};
+    QSpinBox* m_spinBox{};
 
     void updateValue() override
     {
-        QSignalBlocker blocker{m_SpinBox};
-        m_SpinBox->setValue(m_field->value());
+        QSignalBlocker blocker{m_spinBox};
+        m_spinBox->setValue(m_field->value());
     }
 
     void onValueChanged(int value)
