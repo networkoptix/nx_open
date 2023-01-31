@@ -1106,7 +1106,6 @@ AnalyticsFilter::AnalyticsFilter(const nx::kit::Json& json)
         maxObjectTracksToSelect = (int) *maybeMaxObjectTracksToSelect;
 
     order = sortOrderFromString(getStringValue(json, "order"));
-    withBestShotOnly = getBoolValue(json, "withBestShotOnly");
     analyticsEngineId = getOptionalStringValue(json, "analyticsEngineId");
     options = optionsFromString(getStringValue(json, "options"));
     detailLevel = getDurationValue<milliseconds>(json, "detailLevel");
@@ -1121,8 +1120,7 @@ bool AnalyticsFilter::operator==(const AnalyticsFilter& other) const
         && other.boundingBox == boundingBox && other.detailLevel == detailLevel
         && other.deviceIds == deviceIds && other.maxObjectTracksToSelect == maxObjectTracksToSelect
         && other.objectTrackId == objectTrackId && other.objectTypeIds == objectTypeIds
-        && other.options == options && other.order == order && other.timePeriod == timePeriod
-        && other.withBestShotOnly == withBestShotOnly;
+        && other.options == options && other.order == order && other.timePeriod == timePeriod;
 }
 
 nx::kit::Json AnalyticsFilter::to_json() const
@@ -1141,7 +1139,6 @@ nx::kit::Json AnalyticsFilter::to_json() const
         result["maxObjectTracksToSelect"] = *maxObjectTracksToSelect;
 
     result["order"] = sortOrderToString(order);
-    result["withBestShotOnly"] = withBestShotOnly;
     if (analyticsEngineId)
         result["analyticsEngineId"] = *analyticsEngineId;
 

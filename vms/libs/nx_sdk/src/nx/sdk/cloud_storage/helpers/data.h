@@ -548,8 +548,6 @@ struct AnalyticsFilter
     /** Found tracks are sorted by the minimum track time using this order. */
     SortOrder order = SortOrder::descending;
 
-    // If true, track with non null best shots only should be selected.
-    bool withBestShotOnly = false;
     std::optional<std::string> analyticsEngineId;
     int options = Option::none;
     std::chrono::milliseconds detailLevel{};
