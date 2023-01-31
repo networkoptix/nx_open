@@ -37,7 +37,6 @@ if(withMediaServer
     OR withTestCamera
     OR withDesktopClient
     OR withMobileClient
-    OR withTrayTool
     OR withClouds
     OR openSourceBuild
 )
