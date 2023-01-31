@@ -33,7 +33,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
-#include <nx/vms/client/desktop/utils/layout_widget_hider.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/license/validator.h>
@@ -167,9 +166,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     static const int kButtonTopAdjustment = -4;
     anchorWidgetToParent(
         m_exportLicensesButton, Qt::TopEdge | Qt::RightEdge, {0, kButtonTopAdjustment, 0, 0});
-
-    m_removeDetailsButtonsHider = std::make_unique<LayoutWidgetHider>(
-        ui->gridLayout, QList<QWidget*>({ui->removeButton, ui->detailsButton}), Qt::AlignRight);
 
     SnappedScrollBar* tableScrollBar = new SnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
@@ -766,8 +762,7 @@ void QnLicenseManagerWidget::updateButtons()
     m_exportLicensesButton->setEnabled(!m_licenses.isEmpty());
 
     QnLicenseList selected = selectedLicenses();
-    m_removeDetailsButtonsHider->setVisible(
-        ui->detailsButton, selected.size() == 1 && !selected[0].isNull());
+    ui->detailsButton->setVisible(selected.size() == 1 && !selected[0].isNull());
 
     const bool canRemoveAll = selected.size() > 0
         && std::all_of(
@@ -782,7 +777,7 @@ void QnLicenseManagerWidget::updateButtons()
 
     m_isRemoveTakeAwayOperation = canRemoveAll || !canDeactivateAny;
 
-    m_removeDetailsButtonsHider->setVisible(ui->removeButton, canRemoveAll || canDeactivateAny);
+    ui->removeButton->setVisible(canRemoveAll || canDeactivateAny);
     ui->removeButton->setText(m_isRemoveTakeAwayOperation ? tr("Remove") : tr("Deactivate"));
 }
 
