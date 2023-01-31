@@ -8,7 +8,6 @@
 #include <nx/vms/rules/action_builder_fields/password_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
-#include <nx/vms/rules/event_filter_fields/keywords_field.h>
 #include <nx/vms/rules/event_filter_fields/text_field.h>
 
 #include "picker_widget.h"
@@ -22,21 +21,21 @@ namespace nx::vms::client::desktop::rules {
  * Has implementations for:
  * - nx.events.fields.customizableText
  * - nx.events.fields.expectedString
- * - nx.events.fields.keywords
  *
  * - nx.actions.fields.text
  * - nx.actions.fields.password
  */
+
 template<typename F>
-class OnelineTextPickerWidget: public FieldPickerWidget<F>
+class OnelineTextPickerWidgetBase: public SimpleFieldPickerWidget<F>
 {
 public:
-    OnelineTextPickerWidget(SystemContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+    OnelineTextPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
+        SimpleFieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
-        m_lineEdit = createLineEdit();
+        m_lineEdit = new QLineEdit;
         m_lineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         contentLayout->addWidget(m_lineEdit);
 
@@ -46,86 +45,47 @@ public:
             m_lineEdit,
             &QLineEdit::textEdited,
             this,
-            &OnelineTextPickerWidget<F>::onTextChanged);
+            &OnelineTextPickerWidgetBase<F>::onTextChanged);
     }
 
-private:
+protected:
     PICKER_WIDGET_COMMON_USINGS
 
-    QLineEdit* m_lineEdit{};
+    QLineEdit* m_lineEdit{nullptr};
 
-    void onDescriptorSet() override
-    {
-        FieldPickerWidget<F>::onDescriptorSet();
-        m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
-    };
+    virtual void onTextChanged(const QString& text) = 0;
+};
 
-    void onActionBuilderChanged() override
+template<typename F>
+class OnelineTextPickerWidgetCommon: public OnelineTextPickerWidgetBase<F>
+{
+public:
+    OnelineTextPickerWidgetCommon(SystemContext* context, CommonParamsWidget* parent):
+        OnelineTextPickerWidgetBase<F>(context, parent)
     {
-        FieldPickerWidget<F>::onActionBuilderChanged();
-        if (std::is_base_of<vms::rules::ActionBuilderField, F>())
-            updateText();
+        if (std::is_same<F, vms::rules::PasswordField>())
+            m_lineEdit->setEchoMode(QLineEdit::Password);
     }
 
-    void onEventFilterChanged() override
-    {
-        FieldPickerWidget<F>::onEventFilterChanged();
-        if (std::is_base_of<vms::rules::EventFilterField, F>())
-            updateText();
-    }
+protected:
+    PICKER_WIDGET_COMMON_USINGS
+    using OnelineTextPickerWidgetBase<F>::m_lineEdit;
 
-    void updateText()
+    void updateValue() override
     {
         const QSignalBlocker blocker{m_lineEdit};
-        m_lineEdit->setText(text());
+        m_lineEdit->setText(m_field->value());
     }
 
-    void onTextChanged(const QString& text)
-    {
-        setText(text);
-    }
-
-    QString text() const
-    {
-        return m_field->value();
-    }
-
-    void setText(const QString& text)
+    void onTextChanged(const QString& text) override
     {
         m_field->setValue(text);
     }
-
-    QLineEdit* createLineEdit()
-    {
-        return new QLineEdit;
-    }
 };
 
-using ActionTextPicker = OnelineTextPickerWidget<vms::rules::ActionTextField>;
-using CustomizableTextPicker = OnelineTextPickerWidget<vms::rules::CustomizableTextField>;
-using EventTextPicker = OnelineTextPickerWidget<vms::rules::EventTextField>;
-using KeywordsPicker = OnelineTextPickerWidget<vms::rules::KeywordsField>;
-using PasswordPicker = OnelineTextPickerWidget<vms::rules::PasswordField>;
-
-template<>
-QLineEdit* PasswordPicker::createLineEdit()
-{
-    auto passwordLineEdit = new QLineEdit;
-    passwordLineEdit->setEchoMode(QLineEdit::Password);
-
-    return passwordLineEdit;
-}
-
-template<>
-QString KeywordsPicker::text() const
-{
-    return m_field->string();
-}
-
-template<>
-void KeywordsPicker::setText(const QString& text)
-{
-    m_field->setString(text);
-}
+using ActionTextPicker = OnelineTextPickerWidgetCommon<vms::rules::ActionTextField>;
+using CustomizableTextPicker = OnelineTextPickerWidgetCommon<vms::rules::CustomizableTextField>;
+using EventTextPicker = OnelineTextPickerWidgetCommon<vms::rules::EventTextField>;
+using PasswordPicker = OnelineTextPickerWidgetCommon<vms::rules::PasswordField>;
 
 } // namespace nx::vms::client::desktop::rules

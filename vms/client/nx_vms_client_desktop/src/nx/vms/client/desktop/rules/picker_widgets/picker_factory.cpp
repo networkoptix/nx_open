@@ -5,6 +5,7 @@
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 
+#include "analytics_object_attributes_picker_widget.h"
 #include "blank_picker_widget.h"
 #include "camera_picker_widget.h"
 #include "customizable_icon_picker_widget.h"
@@ -12,13 +13,17 @@
 #include "duration_picker_widget.h"
 #include "flag_picker_widget.h"
 #include "flags_picker_widget.h"
+#include "fps_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
+#include "keywords_picker_widget.h"
+#include "layout_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
 #include "server_picker_widget.h"
 #include "state_picker_widget.h"
+#include "stream_quality_picker_widget.h"
 #include "user_picker_widget.h"
 #include "volume_picker_widget.h"
 
@@ -80,13 +85,19 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectTypeField>())
         pickerWidget = new AnalyticsObjectTypePicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectAttributesField>())
-        pickerWidget = new OnelineTextPickerWidget<vms::rules::AnalyticsObjectAttributesField>(context, parent);
+        pickerWidget = new AnalyticsObjectAttributesPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
         pickerWidget = new VolumePickerWidget(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetDeviceField>())
         pickerWidget = new TargetCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetSingleDeviceField>())
         pickerWidget = new SingleTargetCameraPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::StreamQualityField>())
+        pickerWidget = new StreamQualityPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::FpsField>())
+        pickerWidget = new FpsPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::TargetLayoutField>())
+        pickerWidget = new TargetLayoutPicker(context, parent);
     else
         pickerWidget = new BlankPickerWidget(context, parent);
 

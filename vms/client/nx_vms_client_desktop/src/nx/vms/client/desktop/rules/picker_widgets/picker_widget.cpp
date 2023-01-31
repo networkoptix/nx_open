@@ -20,7 +20,7 @@ PickerWidget::PickerWidget(SystemContext* context, CommonParamsWidget* parent):
     auto mainLayout = new QHBoxLayout;
     mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-    m_label = new QnElidedLabel;
+    m_label = new WidgetWithHint<QnElidedLabel>;
     m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     m_label->setElideMode(Qt::ElideRight);
     m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));

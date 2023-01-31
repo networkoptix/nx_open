@@ -5,6 +5,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtWidgets/QHBoxLayout>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
@@ -16,6 +17,9 @@
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
 #include "picker_widget.h"
@@ -171,6 +175,8 @@ private:
 
 class AnalyticsEventTypePicker: public DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>
 {
+    Q_OBJECT
+
 public:
     AnalyticsEventTypePicker(SystemContext* context, CommonParamsWidget* parent):
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(context, parent)
@@ -184,6 +190,17 @@ public:
     }
 
 protected:
+    void onDescriptorSet() override
+    {
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField,
+            QnTreeComboBox>::onDescriptorSet();
+
+        m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
+        m_label->addHintLine(
+            tr("Choose cameras using the button above to see the list of supported events."));
+        setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
+    }
+
     void onEventFilterChanged() override
     {
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField,
@@ -265,11 +282,24 @@ private:
 class AnalyticsObjectTypePicker:
     public DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>
 {
+    Q_OBJECT
+
 public:
     using DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,
         DetectableObjectTypeComboBox>::DropdownIdPickerWidgetBase;
 
 protected:
+    void onDescriptorSet() override
+    {
+        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,
+            DetectableObjectTypeComboBox>::onDescriptorSet();
+
+        m_label->addHintLine(tr("Analytics object detection can be set up on a certain cameras."));
+        m_label->addHintLine(
+            tr("Choose cameras using the button above to see the list of supported events."));
+        setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
+    }
+
     void onEventFilterChanged() override
     {
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,

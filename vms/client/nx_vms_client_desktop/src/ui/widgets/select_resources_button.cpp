@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -204,4 +205,33 @@ QnSelectResourcesButton::Appearance QnSelectServersButton::appearanceForSelected
     return {
         iconHelper(count == 1 ? QnResourceIconCache::Server : QnResourceIconCache::Servers),
         tr("%n Servers", "", count) };
+}
+
+QnSelectLayoutsButton::QnSelectLayoutsButton(QWidget* parent): QnSelectResourcesButton(parent)
+{
+}
+
+void QnSelectLayoutsButton::selectLayouts(const QnLayoutResourceList& layouts)
+{
+    selectList(layouts);
+}
+
+QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForAny() const
+{
+    return { iconHelper(QnResourceIconCache::Layout), tr("Any Layout") };
+}
+
+QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForAll() const
+{
+    return { iconHelper(QnResourceIconCache::Layouts), tr("All Layouts") };
+}
+
+QnSelectLayoutsButton::Appearance QnSelectLayoutsButton::appearanceForSelected(int count) const
+{
+    if (count == 0)
+        return{ QIcon(), tr("Select Layouts...") };
+
+    return {
+        iconHelper(count == 1 ? QnResourceIconCache::Layout : QnResourceIconCache::Layouts),
+        tr("%n Layouts", "", count) };
 }

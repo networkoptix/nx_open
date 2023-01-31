@@ -14,6 +14,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
 
 #include "../params_widgets/common_params_widget.h"
 
@@ -55,7 +56,7 @@ protected:
 
     CommonParamsWidget* parentParamsWidget() const;
 
-    QnElidedLabel* m_label{};
+    WidgetWithHint<QnElidedLabel>* m_label{};
     QWidget* m_contentWidget{};
     std::optional<vms::rules::FieldDescriptor> m_fieldDescriptor;
 };
