@@ -662,11 +662,11 @@ void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
         changes.push_back(server->userAttributes());
         connection->getMediaServerManager(Qn::kSystemAccess)
             ->saveUserAttributes(changes, makeReplyProcessor(this, handler), this);
-    }
 
-    // TODO: #sivanov Values are not rolled back in case of failure.
-    auto idList = idListFromResList(QnResourceList() << server);
-    resourcePropertyDictionary()->saveParamsAsync(idList);
+        // TODO: #sivanov Values are not rolled back in case of failure.
+        auto idList = idListFromResList(QnResourceList() << server);
+        resourcePropertyDictionary()->saveParamsAsync(idList);
+    }
 }
 
 /************************************************************************/
