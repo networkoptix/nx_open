@@ -122,7 +122,7 @@ private:
     bool m_streamsFound = false;
     QnCustomResourceVideoLayoutPtr m_videoLayout;
     AudioLayoutPtr m_audioLayout;
-    QVector<int> m_indexToChannel;
+    std::map<int, int> m_indexToChannel;
     QList<CodecParametersConstPtr> m_contexts;
     QnAviArchiveMetadata m_metadata;
 
