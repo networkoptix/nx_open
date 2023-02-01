@@ -254,6 +254,15 @@ void ClientUpdateManager::Private::checkUpdateTime()
         return;
 
     const auto now = qnSyncTime->currentDateTime();
+
+    if (const int day = now.date().dayOfWeek(); day >= Qt::Thursday && day <= Qt::Saturday)
+    {
+        NX_VERBOSE(this,
+            "Updates are prohibited on Thursdays, Fridays and Saturdays. "
+                "Skipping the update time check. Current date: %1", now);
+        return;
+    }
+
     const auto updateDateTime = q->plannedUpdateDate();
 
     NX_VERBOSE(this,
