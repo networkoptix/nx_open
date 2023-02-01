@@ -82,6 +82,12 @@ public:
 
     void close(IQnFile* file, CloseHandler handler);
 
+    /**
+     * Executes handler in the same thread that is used for I/O operations.
+     * May be used for delayed file object destruction.
+     */
+    void post(nx::utils::MoveOnlyFunc<void()> handler);
+
 private:
     void taskProcessingThread();
 

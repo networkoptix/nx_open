@@ -17,8 +17,17 @@ FileBody::FileBody(
     m_fileAsyncIoScheduler(fileAsyncIoScheduler),
     m_filePath(filePath),
     m_file(std::move(file)),
-    m_fileStat(fileStat)
+    m_fileStat(fileStat),
+    m_readBuf(std::make_unique<nx::Buffer>())
 {
+}
+
+FileBody::~FileBody()
+{
+    // Removing file and buffer delayed to avoid accessing freed memory.
+    m_fileAsyncIoScheduler->post(
+        [f = std::exchange(m_file, nullptr),
+            buf = std::exchange(m_readBuf, nullptr)] {});
 }
 
 std::string FileBody::mimeType() const
@@ -58,11 +67,11 @@ void FileBody::readAsync(CompletionHandler completionHandler)
             });
     }
 
-    m_readBuf.reserve(m_readBuf.size() + m_readSize);
+    m_readBuf->reserve(m_readBuf->size() + m_readSize);
 
     m_file->readAsync(
         m_fileAsyncIoScheduler,
-        &m_readBuf,
+        m_readBuf.get(),
         [this, completionHandler = std::move(completionHandler),
             guard = m_guard.sharedGuard()](
                 SystemError::ErrorCode resultCode, std::size_t bytesRead) mutable
@@ -75,7 +84,7 @@ void FileBody::readAsync(CompletionHandler completionHandler)
                 [this, completionHandler = std::move(completionHandler), resultCode, bytesRead]() mutable
                 {
                     m_done = resultCode == SystemError::noError && bytesRead == 0;
-                    completionHandler(resultCode, std::exchange(m_readBuf, nx::Buffer()));
+                    completionHandler(resultCode, std::exchange(*m_readBuf, nx::Buffer()));
                 });
         });
 }

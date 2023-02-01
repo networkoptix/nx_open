@@ -31,6 +31,8 @@ public:
         std::unique_ptr<nx::utils::fs::File> file,
         nx::utils::fs::FileStat fileStat);
 
+    virtual ~FileBody();
+
     virtual std::string mimeType() const override;
     virtual std::optional<uint64_t> contentLength() const override;
     virtual void readAsync(CompletionHandler completionHandler) override;
@@ -51,7 +53,7 @@ private:
     bool m_done = false;
     nx::utils::AsyncOperationGuard m_guard;
     std::size_t m_readSize = kDefaultReadSize;
-    nx::Buffer m_readBuf;
+    std::unique_ptr<nx::Buffer> m_readBuf;
 };
 
 } // namespace nx::network::http
