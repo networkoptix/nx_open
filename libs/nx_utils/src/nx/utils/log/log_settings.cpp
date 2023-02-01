@@ -88,32 +88,54 @@ bool LoggerSettings::operator==(const LoggerSettings& right) const
 
 //-------------------------------------------------------------------------------------------------
 
+static void readRotationParams(
+    QSettings* settings, LoggerSettings* target, const LoggerSettings& defaults)
+{
+    target->maxVolumeSizeB = settings->value(
+        kMaxLogVolumeSizeSymbolicName, defaults.maxVolumeSizeB).toLongLong();
+    target->maxFileSizeB = settings->value(
+        kMaxLogFileSizeSymbolicName, defaults.maxFileSizeB).toLongLong();
+    target->maxFileTimePeriodS = std::chrono::seconds((size_t) settings->value(
+        kMaxLogFileTimePeriodSymbolicName, (int) defaults.maxFileTimePeriodS.count()).toLongLong());
+
+    if (!NX_ASSERT(target->maxVolumeSizeB >= target->maxFileSizeB,
+        "Volume size %1 is less then file size %2", target->maxVolumeSizeB, target->maxFileSizeB))
+    {
+        target->maxVolumeSizeB = target->maxFileSizeB;
+    }
+}
+
 Settings::Settings(QSettings* settings)
 {
     NX_ASSERT(settings);
     if (!settings)
         return;
 
-    auto maxLogVolumeSizeB = settings->value(kMaxLogVolumeSizeSymbolicName, kDefaultMaxLogVolumeSizeB).toLongLong();
-    const auto maxLogFileSizeB = settings->value(kMaxLogFileSizeSymbolicName, kDefaultMaxLogFileSizeB).toLongLong();
-    const auto maxLogFileTimePeriodS = std::chrono::seconds(
-        settings->value(kMaxLogFileTimePeriodSymbolicName, (uint)kDefaultMaxLogFileTimePeriodS.count()).toUInt());
-
-    if (!NX_ASSERT(maxLogVolumeSizeB >= maxLogFileSizeB))
-        maxLogVolumeSizeB = maxLogFileSizeB;
+    LoggerSettings baseValues;
+    readRotationParams(settings, &baseValues, LoggerSettings{
+        .maxVolumeSizeB = kDefaultMaxLogVolumeSizeB,
+        .maxFileSizeB = kDefaultMaxLogFileSizeB,
+        .maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS,
+    });
 
     for (const auto& group: settings->childGroups())
     {
+        settings->beginGroup(group);
+
         LoggerSettings logger;
         logger.logBaseName = group;
-        logger.maxVolumeSizeB = maxLogVolumeSizeB;
-        logger.maxFileSizeB = maxLogFileSizeB;
-        logger.maxFileTimePeriodS = maxLogFileTimePeriodS;
         logger.level.primary = Level::none;
+        readRotationParams(settings, &logger, baseValues);
 
-        settings->beginGroup(group);
         for (const QString& levelKey: settings->childKeys())
         {
+            if (levelKey == kMaxLogVolumeSizeSymbolicName
+                || levelKey == kMaxLogFileSizeSymbolicName
+                || levelKey == kMaxLogFileTimePeriodSymbolicName)
+            {
+                continue; //< Already parsed by readRotationParams.
+            }
+
             const Level level = levelFromString(levelKey);
             const QVariant& value = settings->value(levelKey);
 

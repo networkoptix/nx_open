@@ -1,10 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <QtCore/QDir>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace utils {
@@ -23,9 +26,23 @@ protected:
         logSettings.load(settings, "log");
     }
 
-    log::Settings logSettings;
+    void constructFromIni(const QByteArray& configData)
+    {
+        QDir dir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir().mkpath(dir.absolutePath());
 
-private:
+        const auto fileName = dir.absolutePath() + "/logs.conf";
+        {
+            QFile file(fileName);
+            ASSERT_TRUE(file.open(QFile::WriteOnly)) << fileName.toStdString() << "\n" << file.errorString().toStdString();
+            file.write(configData);
+        }
+
+        QSettings qSettings(fileName, QSettings::IniFormat);
+        logSettings = log::Settings(&qSettings);
+    }
+
+    log::Settings logSettings;
 };
 
 TEST_F(LogSettings, correct_parsing)
@@ -87,6 +104,86 @@ TEST_F(LogSettings, compatibility_settings)
     logger0Settings.level.primary = nx::utils::log::Level::verbose;
     logger0Settings.logBaseName = "/var/log/utils_ut";
     ASSERT_EQ(logger0Settings, logSettings.loggers[0]);
+}
+
+TEST_F(LogSettings, IniBase)
+{
+    constructFromIni(R"ini(
+[General]
+maxLogVolumeSizeB=1000000
+maxLogFileSizeB=1000
+
+[-]
+debug=*
+none=re:network
+
+[client_log]
+verbose=*
+debug=re:^nx::vms::discovery
+    )ini");
+
+    ASSERT_EQ(2, logSettings.loggers.size());
+    {
+        auto logger = logSettings.loggers[0];
+        EXPECT_EQ(logger.logBaseName, "-");
+        EXPECT_EQ(logger.maxVolumeSizeB, 1000000);
+        EXPECT_EQ(logger.maxFileSizeB, 1000);
+        EXPECT_EQ(logger.maxFileTimePeriodS.count(), kDefaultMaxLogFileTimePeriodS.count());
+        EXPECT_EQ(logger.level.primary, log::Level::debug);
+        EXPECT_EQ(logger.level.filters.size(), 1);
+        EXPECT_EQ(logger.level.filters[Filter(QString("re:network"))], log::Level::none);
+    }
+    {
+        auto logger = logSettings.loggers[1];
+        EXPECT_EQ(logger.logBaseName, "client_log");
+        EXPECT_EQ(logger.maxVolumeSizeB, 1000000);
+        EXPECT_EQ(logger.maxFileSizeB, 1000);
+        EXPECT_EQ(logger.maxFileTimePeriodS.count(), kDefaultMaxLogFileTimePeriodS.count());
+        EXPECT_EQ(logger.level.primary, log::Level::verbose);
+        EXPECT_EQ(logger.level.filters.size(), 1);
+        EXPECT_EQ(logger.level.filters[Filter(QString("re:^nx::vms::discovery"))], log::Level::debug);
+    }
+}
+
+TEST_F(LogSettings, IniSectionOverride)
+{
+    constructFromIni(R"ini(
+[General]
+maxLogVolumeSizeB=1000000
+maxLogFileSizeB=1000
+
+[-]
+maxLogVolumeSizeB=2000000
+maxLogFileTimePeriodS=100500
+debug=*
+none=re:network
+
+[client_log]
+verbose=*
+debug=re:^nx::vms::discovery
+    )ini");
+
+    ASSERT_EQ(2, logSettings.loggers.size());
+    {
+        auto logger = logSettings.loggers[0];
+        EXPECT_EQ(logger.logBaseName, "-");
+        EXPECT_EQ(logger.maxVolumeSizeB, 2000000);
+        EXPECT_EQ(logger.maxFileSizeB, 1000);
+        EXPECT_EQ(logger.maxFileTimePeriodS.count(), 100500);
+        EXPECT_EQ(logger.level.primary, log::Level::debug);
+        EXPECT_EQ(logger.level.filters.size(), 1);
+        EXPECT_EQ(logger.level.filters[Filter(QString("re:network"))], log::Level::none);
+    }
+    {
+        auto logger = logSettings.loggers[1];
+        EXPECT_EQ(logger.logBaseName, "client_log");
+        EXPECT_EQ(logger.maxVolumeSizeB, 1000000);
+        EXPECT_EQ(logger.maxFileSizeB, 1000);
+        EXPECT_EQ(logger.maxFileTimePeriodS.count(), kDefaultMaxLogFileTimePeriodS.count());
+        EXPECT_EQ(logger.level.primary, log::Level::verbose);
+        EXPECT_EQ(logger.level.filters.size(), 1);
+        EXPECT_EQ(logger.level.filters[Filter(QString("re:^nx::vms::discovery"))], log::Level::debug);
+    }
 }
 
 } // namespace test
