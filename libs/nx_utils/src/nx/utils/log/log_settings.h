@@ -66,8 +66,6 @@ public:
     std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; //< 0.
     QString logBaseName;
 
-    LoggerSettings() = default;
-
     bool parse(const QString& str);
     void updateDirectoryIfEmpty(const QString& logDirectory);
 
