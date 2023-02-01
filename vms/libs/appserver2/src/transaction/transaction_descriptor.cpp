@@ -667,6 +667,16 @@ struct RemoveResourceAccess
                 target ? target->getId().toSimpleString() : QString()));
         }
 
+        const auto storage = target.dynamicCast<QnStorageResource>();
+        bool isOwnStorage = (storage && storage->getParentId() == commonModule->peerId());
+        if (isOwnStorage && !storage->isExternal() && storage->isWritable())
+        {
+            NX_DEBUG(this, "Attempt to delete own local storage %1", storage->getId());
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "It is forbidden to delete own local storage %1."),
+                storage->getId().toSimpleString()));
+        }
+
         return Result();
     }
 };
