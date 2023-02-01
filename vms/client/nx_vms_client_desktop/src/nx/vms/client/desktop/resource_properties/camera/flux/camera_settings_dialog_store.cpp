@@ -595,12 +595,12 @@ void CameraSettingsDialogStore::setForcedSecondaryProfile(const QString& value)
         [&](State state) { return Reducer::setForcedSecondaryProfile(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setRemoteArchiveAutoExportDisabled(const bool& value)
+void CameraSettingsDialogStore::setRemoteArchiveAutoImportEnabled(const bool& value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setRemoteArchiveAutoExportDisabled(std::move(state), value);
+            return Reducer::setRemoteArchiveAutoImportEnabled(std::move(state), value);
         });
 }
 
