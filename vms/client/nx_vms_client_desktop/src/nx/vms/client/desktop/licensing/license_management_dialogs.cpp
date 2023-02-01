@@ -417,6 +417,18 @@ void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QS
     messageBox.exec();
 }
 
+void LicenseActivationDialogs::failure(QWidget* parent, const QString& description)
+{
+    const QString supportContactString = Private::getValidLicenseKeyMessage(parent);
+
+    Private::showMessage(
+        parent,
+        QnMessageBoxIcon::Warning,
+        tr("Failed to activate license"),
+        description
+    );
+}
+
 void LicenseActivationDialogs::success(QWidget* parent)
 {
     Private::showMessage(

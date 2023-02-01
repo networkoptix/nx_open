@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <licensing/license_fwd.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 #include <nx/vms/license/license_usage_fwd.h>
@@ -14,8 +12,6 @@ class QModelIndex;
 class QPushButton;
 class QnLicensePool;
 class QnLicenseListModel;
-
-namespace nx::network::http { class AsyncClient; }
 
 namespace nx::vms::client::desktop {
 
@@ -51,13 +47,6 @@ private:
     QnLicensePool* licensePool() const;
     QnUuid serverId() const;
 
-    void updateFromServer(const QByteArray& licenseKey, bool infoMode, const nx::utils::Url& url);
-    void processReply(
-        const QByteArray& licenseKey,
-        const QByteArray& replyData,
-        const nx::utils::Url& url,
-        bool infoMode);
-    void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr>& licenses);
     void showLicenseDetails(const QnLicensePtr& license);
 
     QnLicenseList selectedLicenses() const;
@@ -84,12 +73,9 @@ private:
 
     void exportLicenses();
 
-    void showActivationErrorMessage(QJsonObject errorMessage);
-
 private:
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel* m_model = nullptr;
-    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     QPushButton* m_exportLicensesButton = nullptr;
     QnLicenseList m_licenses;
     nx::vms::license::Validator* m_validator = nullptr;

@@ -8,6 +8,7 @@
 
 #include "data_macros.h"
 #include "map.h"
+#include "nx/reflect/instrument.h"
 
 namespace nx {
 namespace vms {
@@ -29,6 +30,7 @@ struct NX_VMS_API LicenseKey
 };
 #define LicenseKey_Fields (key)
 NX_VMS_API_DECLARE_STRUCT(LicenseKey)
+NX_REFLECTION_INSTRUMENT(LicenseKey, LicenseKey_Fields)
 
 struct NX_VMS_API LicenseData: LicenseKey
 {
@@ -64,6 +66,7 @@ struct NX_VMS_API LicenseData: LicenseKey
 };
 #define LicenseData_Fields (key)(licenseBlock)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LicenseData)
+NX_REFLECTION_INSTRUMENT(LicenseData, LicenseData_Fields)
 
 /**
  * Structured representation of LicenseData::licenseBlock.
@@ -136,9 +139,11 @@ struct NX_VMS_API LicenseSummaryData
     (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)\
     (orderType)(company)(support)(deactivations)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(DetailedLicenseData)
+NX_REFLECTION_INSTRUMENT(DetailedLicenseData, DetailedLicenseData_Fields)
 
 #define LicenseSummaryData_Fields (total)(available)(inUse)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LicenseSummaryData)
+NX_REFLECTION_INSTRUMENT(LicenseSummaryData, LicenseSummaryData_Fields)
 
 using LicenseSummaryValues = Map<QString /*type*/, LicenseSummaryData /*summary*/>;
 
