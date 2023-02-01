@@ -9,6 +9,7 @@
 #include <QtGui/QKeyEvent>
 
 #include <api/runtime_info_manager.h>
+#include <api/server_rest_connection.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
@@ -18,8 +19,11 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/rest/params.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -28,9 +32,11 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 #include <nx/vms/client/desktop/licensing/license_management_dialogs.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
 #include <nx/vms/common/html/html.h>
@@ -369,161 +375,6 @@ QnUuid LicenseManagerWidget::serverId() const
     return QnUuid();
 }
 
-void LicenseManagerWidget::updateFromServer(
-    const QByteArray& licenseKey, bool infoMode, const nx::utils::Url& url)
-{
-    const QVector<QString> hardwareIds = licensePool()->hardwareIds(serverId());
-
-    if (remoteInfo(runtimeInfoManager()).isNull())
-    {
-        // QNetworkReply slots should not start event loop.
-        executeLater([this]{ LicenseActivationDialogs::networkError(this); }, this);
-
-        ui->licenseWidget->setOnline(false);
-        ui->licenseWidget->setState(QnLicenseWidget::Normal);
-    }
-
-    QUrlQuery params;
-    params.addQueryItem("license_key", QLatin1StringView(licenseKey));
-
-    int n = 1;
-    for (const QByteArray& licenseKey: ListHelper(m_licenses).allLicenseKeys())
-    {
-        params.addQueryItem(nx::format("license_key%1", n), QLatin1StringView(licenseKey));
-        n++;
-    }
-
-    for (const QString& hwid: hardwareIds)
-    {
-        int version = licensePool()->hardwareIdVersion(hwid);
-
-        QString name;
-        if (version == 0)
-            name = "oldhwid[]";
-        else if (version == 1)
-            name = "hwid[]";
-        else
-            name = nx::format("hwid%1[]", version);
-
-        params.addQueryItem(name, hwid);
-    }
-
-    if (infoMode)
-        params.addQueryItem("mode", "info");
-
-    const auto runtimeData = remoteInfo(runtimeInfoManager()).data;
-
-    params.addQueryItem("brand", runtimeData.brand);
-    params.addQueryItem("version", appContext()->version().toString());
-    params.addQueryItem("lang", qnRuntime->locale());
-
-    if (!runtimeData.nx1mac.isEmpty())
-        params.addQueryItem("mac", runtimeData.nx1mac);
-
-    if (!runtimeData.nx1serial.isEmpty())
-        params.addQueryItem("serial", runtimeData.nx1serial);
-
-    const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
-
-    NX_VERBOSE(this, "Sending request to license server. License key: \"%1\"\nBody:\n%2",
-        licenseKey, messageBody);
-
-    m_httpClient = std::make_unique<nx::network::http::AsyncClient>(
-        nx::network::ssl::kDefaultCertificateCheck);
-    m_httpClient->doPost(
-        url,
-        std::make_unique<nx::network::http::BufferSource>(
-            nx::network::http::header::ContentType::kForm, std::move(messageBody)),
-        nx::utils::guarded(this,
-            [this, licenseKey, infoMode, url]()
-            {
-                const QByteArray replyData = m_httpClient->fetchMessageBodyBuffer().toByteArray();
-
-                if (m_httpClient->hasRequestSucceeded())
-                {
-                    NX_VERBOSE(this, "Received response from license server. License key: \"%1\"\n%2",
-                        licenseKey, replyData);
-                    executeLater(
-                        [this, replyData, licenseKey, infoMode, url]()
-                        {
-                            processReply(licenseKey, replyData, url, infoMode);
-                        },
-                        this);
-                }
-                else
-                {
-                    NX_VERBOSE(this, "Network error occured: %1\n%2",
-                        m_httpClient->lastSysErrorCode(), replyData);
-                    executeLater([this]() { handleDownloadError(); }, this);
-                }
-            }));
-}
-
-void LicenseManagerWidget::validateLicenses(
-    const QByteArray& licenseKey, const QnLicenseList& licenses)
-{
-    auto connection = messageBusConnection();
-    if (!connection)
-        return;
-
-    QList<QnLicensePtr> licensesToUpdate;
-    QnLicensePtr keyLicense;
-
-    ListHelper licenseListHelper(licensePool()->getLicenses());
-    for (const QnLicensePtr& license: licenses)
-    {
-        if (!license)
-            continue;
-
-        if (license->key() == licenseKey)
-            keyLicense = license;
-
-        QnLicensePtr ownLicense = licenseListHelper.getLicenseByKey(license->key());
-        if (!ownLicense || ownLicense->signature() != license->signature())
-            licensesToUpdate.append(license);
-    }
-
-    if (!licensesToUpdate.isEmpty())
-    {
-        connection->getLicenseManager(Qn::kSystemAccess)->addLicenses(
-            licensesToUpdate,
-            [this, licensesToUpdate, licenseKey](int /*reqID*/, ec2::ErrorCode errorCode)
-            {
-                ListHelper licenseListHelper(licensesToUpdate);
-                QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
-
-                if (!license || (errorCode != ec2::ErrorCode::ok))
-                    LicenseActivationDialogs::networkError(this);
-                else if (license)
-                    LicenseActivationDialogs::success(this);
-
-                if (!licensesToUpdate.isEmpty())
-                {
-                    m_licenses.append(licensesToUpdate);
-                    licensePool()->addLicenses(licensesToUpdate);
-                }
-
-                ui->licenseWidget->setSerialKey(QString());
-
-                updateLicenses();
-            },
-            this);
-    }
-
-    // There is an issue when we are trying to activate an Edge license on a PC. In this case
-    // the activation server will return no error but the local check will fail.
-    if (!keyLicense)
-    {
-        // QNetworkReply slots should not start event loop.
-        executeLater([this]{ LicenseActivationDialogs::licenseIsIncompatible(this); }, this);
-    }
-    else if (licenseListHelper.getLicenseByKey(licenseKey))
-    {
-        executeLater(
-            [this]{ LicenseActivationDialogs::licenseAlreadyActivatedHere(this); }, this);
-    }
-}
-
 void LicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
 {
     if (!NX_ASSERT(license))
@@ -781,79 +632,6 @@ void LicenseManagerWidget::handleDownloadError()
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void LicenseManagerWidget::processReply(
-    const QByteArray& licenseKey,
-    const QByteArray& replyData,
-    const nx::utils::Url& url,
-    bool infoMode)
-{
-    QList<QnLicensePtr> licenses;
-
-    // TODO: #sivanov Use JSON mapping here.
-    // If we can deserialize JSON it means there is an error.
-    QJsonObject errorMessage;
-    if (QJson::deserialize(replyData, &errorMessage))
-    {
-        showActivationErrorMessage(errorMessage);
-        ui->licenseWidget->setState(QnLicenseWidget::Normal);
-        return;
-    }
-
-    QTextStream stream(replyData);
-    stream.setEncoding(QStringConverter::Utf8);
-
-    while (!stream.atEnd())
-    {
-        QnLicensePtr license = QnLicense::readFromStream(stream);
-        if (!license)
-            break;
-
-        if (infoMode)
-        {
-            QnLicenseErrorCode errorCode =
-                m_validator->validate(license, Validator::VM_CanActivate);
-
-            if (errorCode != QnLicenseErrorCode::NoError
-                && errorCode != QnLicenseErrorCode::Expired)
-            {
-                LicenseActivationDialogs::activationError(this, errorCode, license->type());
-                ui->licenseWidget->setState(QnLicenseWidget::Normal);
-            }
-            else
-            {
-                updateFromServer(license->key(), /*infoMode*/ false, url);
-            }
-
-            return;
-        }
-        else
-        {
-            QnLicenseErrorCode errorCode =
-                m_validator->validate(license, Validator::VM_JustCreated);
-
-            switch (errorCode)
-            {
-                case QnLicenseErrorCode::NoError:
-                    licenses.append(license);
-                    break;
-                case QnLicenseErrorCode::Expired:
-                case QnLicenseErrorCode::TemporaryExpired:
-                    licenses.append(license); //< Ignore an expired error code.
-                    break;
-                case QnLicenseErrorCode::FutureLicense:
-                    licenses.append(license); //< Add future licenses.
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    validateLicenses(licenseKey, licenses);
-
-    ui->licenseWidget->setState(QnLicenseWidget::Normal);
-}
-
 void LicenseManagerWidget::licenseDetailsRequested(const QModelIndex& index)
 {
     if (index.isValid())
@@ -867,9 +645,65 @@ void LicenseManagerWidget::handleWidgetStateChange()
 
     if (ui->licenseWidget->isOnline())
     {
-        updateFromServer(
-            ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            LicenseServer::activateUrl(systemContext()));
+        auto sessionTokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
+
+        nx::vms::api::LicenseData body;
+        body.licenseBlock = {};
+        body.key = ui->licenseWidget->serialKey().toLatin1();
+
+        auto callback =
+            [this, body](
+                bool success,
+                rest::Handle /*requestId*/,
+                rest::ServerConnection::ErrorOrEmpty result)
+            {
+                NX_VERBOSE(this, "Received response from license server. License key: %1",
+                    body.key);
+                if (!success)
+                {
+                    if (!std::holds_alternative<rest::Empty>(result))
+                    {
+                        auto res = std::get<nx::network::rest::Result>(result);
+                        if (res.error == nx::network::rest::Result::ServiceUnavailable)
+                        {
+                            NX_VERBOSE(this, "Network error occured activating license key.");
+                            handleDownloadError();
+                        }
+                        else
+                        {
+                            NX_VERBOSE(this,
+                                "License was not activated: %1",
+                                nx::network::rest::Result::errorToString(res.error));
+                            LicenseActivationDialogs::failure(this, res.errorString);
+                        }
+                    }
+                    else
+                    {
+                        NX_VERBOSE(this, "License was not activated for unknown reason.");
+                        LicenseActivationDialogs::failure(this);
+                    }
+                }
+                else 
+                {
+                    NX_VERBOSE(this, "License activated successfully.");
+                    LicenseActivationDialogs::success(this);
+                }
+
+                ui->licenseWidget->setState(QnLicenseWidget::Normal);
+            };
+        
+        NX_VERBOSE(this,
+            "Activating license using VMS Server. License key: %1",
+            body.key);
+
+        connection()->serverApi()->putRest(
+            sessionTokenHelper,
+            QString("/rest/v2/licenses/%1").arg(body.key),
+            nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
+            QByteArray::fromStdString(nx::reflect::json::serialize(body)),
+            callback,
+            this
+        );
     }
     else
     {
@@ -883,7 +717,6 @@ void LicenseManagerWidget::handleWidgetStateChange()
             case QnLicenseErrorCode::Expired:
             case QnLicenseErrorCode::TemporaryExpired:
                 ui->licenseWidget->clearManualActivationUserInput();
-                validateLicenses(license->key(), {license});
                 break;
             case QnLicenseErrorCode::InvalidSignature:
                     LicenseActivationDialogs::invalidKeyFile(this);
@@ -903,35 +736,6 @@ void LicenseManagerWidget::handleWidgetStateChange()
         }
 
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
-    }
-}
-
-void LicenseManagerWidget::showActivationErrorMessage(QJsonObject errorMessage)
-{
-    const auto messageId = errorMessage.value("messageId").toString();
-
-    if (messageId == "DatabaseError")
-    {
-        LicenseActivationDialogs::databaseErrorOccurred(this);
-    }
-    else if (messageId == "InvalidData")
-    {
-        LicenseActivationDialogs::invalidDataReceived(this);
-    }
-    else if (messageId == "InvalidKey")
-    {
-        LicenseActivationDialogs::invalidLicenseKey(this);
-    }
-    else if (messageId == "InvalidBrand")
-    {
-        LicenseActivationDialogs::licenseIsIncompatible(this);
-    }
-    else if (messageId == "AlreadyActivated")
-    {
-        const auto arguments = errorMessage.value("arguments").toObject().toVariantMap();
-        const auto hwid = arguments.value("hwid").toString();
-        const auto time = arguments.value("time").toString();
-        LicenseActivationDialogs::licenseAlreadyActivated(this, hwid, time);
     }
 }
 

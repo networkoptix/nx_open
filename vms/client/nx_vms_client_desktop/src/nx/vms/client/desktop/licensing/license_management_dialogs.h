@@ -57,6 +57,9 @@ public:
     /** Warn about a network error when activating the free license. */
     static void freeLicenseNetworkError(QWidget* parent, const QString& hardwareId);
 
+    /** Notify about license activation failure, propagate description provided from mediaserver. */
+    static void failure(QWidget* parent, const QString& description = "");
+
     /** Notify about successful license activation. */
     static void success(QWidget* parent);
 };
