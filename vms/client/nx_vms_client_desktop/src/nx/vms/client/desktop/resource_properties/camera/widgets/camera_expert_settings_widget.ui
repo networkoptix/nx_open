@@ -394,16 +394,16 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
+              <widget class="QGroupBox" name="remoteArchiveAutoImportGroupBox">
                <property name="title">
-                <string>Export From Device</string>
+                <string>Import From Device</string>
                </property>
                <property name="flat">
                 <bool>true</bool>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6_1">
                 <item>
-                 <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="disableAutoExportCheckBox">
+                 <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="remoteArchiveAutoImportCheckBox">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -411,7 +411,7 @@
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Do not export video automatically</string>
+                   <string>Import video automatically</string>
                   </property>
                  </widget>
                 </item>
