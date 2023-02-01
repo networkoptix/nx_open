@@ -16,6 +16,12 @@ class File:
     public utils::test::TestWithTemporaryDirectory,
     public ::testing::Test
 {
+public:
+    File():
+        m_readBuffer(std::make_shared<nx::Buffer>())
+    {
+    }
+
 protected:
     virtual void SetUp() override
     {
@@ -75,11 +81,11 @@ protected:
     {
         static constexpr int kReadSize = 1;
 
-        m_readBuffer.reserve(m_readBuffer.size() + kReadSize);
+        m_readBuffer->reserve(m_readBuffer->size() + kReadSize);
 
         m_file->readAsync(
             &m_scheduler,
-            &m_readBuffer,
+            m_readBuffer.get(),
             [this](SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
             {
                 if (sysErrorCode != SystemError::noError)
@@ -90,7 +96,7 @@ protected:
                     // EOF
                     return m_readAllResults.emplace(
                         sysErrorCode,
-                        std::exchange(m_readBuffer, nx::Buffer()));
+                        std::exchange(*m_readBuffer, nx::Buffer()));
                 }
 
                 // Continuing reading file.
@@ -122,6 +128,13 @@ protected:
             m_readAllResults.emplace(SystemError::noError, std::move(*data));
         else
             m_readAllResults.emplace(SystemError::getLastOSErrorCode(), nx::Buffer());
+    }
+
+    void whenDeleteFile()
+    {
+        m_scheduler.post(
+            [file = std::exchange(m_file, nullptr),
+                m_readBuffer = std::exchange(m_readBuffer, nullptr)]() {});
     }
 
     void thenStatSucceeded()
@@ -161,7 +174,7 @@ private:
     std::string m_resourceFilePath;
     std::string m_filePath;
     std::string m_fileContents;
-    nx::Buffer m_readBuffer;
+    std::shared_ptr<nx::Buffer> m_readBuffer;
 
     nx::utils::SyncQueue<SystemError::ErrorCode> m_openResults;
 
@@ -242,6 +255,16 @@ TEST_F(File, async_read_all)
 
     thenReadSucceeded();
     andTheWholeFileWasRead();
+}
+
+TEST_F(File, interrupt_async_reading)
+{
+    givenOpenedFile();
+    whenReadWholeFileAsync();
+
+    whenDeleteFile();
+    // then process does not crash.
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 } // namespace nx::utils::fs::test

@@ -199,6 +199,26 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class Post: public AbstractTask
+{
+public:
+    Post(nx::utils::MoveOnlyFunc<void()> handler):
+        AbstractTask(nullptr),
+        m_handler(std::move(handler))
+    {
+    }
+
+    virtual void run() override
+    {
+        m_handler();
+    }
+
+private:
+    nx::utils::MoveOnlyFunc<void()> m_handler;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 FileAsyncIoScheduler::FileAsyncIoScheduler()
 {
     m_ioThread = std::thread([this]() { taskProcessingThread(); });
@@ -252,6 +272,11 @@ void FileAsyncIoScheduler::write(
 void FileAsyncIoScheduler::close(IQnFile* file, CloseHandler handler)
 {
     m_tasks.push(std::make_unique<Close>(file, std::move(handler)));
+}
+
+void FileAsyncIoScheduler::post(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_tasks.push(std::make_unique<Post>(std::move(handler)));
 }
 
 void FileAsyncIoScheduler::taskProcessingThread()
