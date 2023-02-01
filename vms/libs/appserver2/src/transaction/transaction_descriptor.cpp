@@ -60,6 +60,15 @@ ErrorCode canModifyStorage(const CanModifyStorageData& data)
 
 namespace detail {
 
+namespace {
+
+struct ServerApiErrors
+{
+    Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
+};
+
+} // namespace
+
 struct InvalidGetHashHelper
 {
     template<typename Param>
