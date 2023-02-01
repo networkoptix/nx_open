@@ -38,102 +38,102 @@ namespace nx::vms::api {
 
 namespace nx::settings_names {
 
-NX_VMS_API extern const QString kNameDisabledVendors;
-NX_VMS_API extern const QString kNameCameraSettingsOptimization;
-NX_VMS_API extern const QString kNameAutoUpdateThumbnails;
-NX_VMS_API extern const QString kMaxSceneItemsOverrideKey;
-NX_VMS_API extern const QString kUseTextEmailFormat;
-NX_VMS_API extern const QString kUseWindowsEmailLineFeed;
-NX_VMS_API extern const QString kNameAuditTrailEnabled;
-NX_VMS_API extern const QString kAuditTrailPeriodDaysName;
-NX_VMS_API extern const QString kNameTrafficEncryptionForced;
-NX_VMS_API extern const QString kNameVideoTrafficEncryptionForced;
-NX_VMS_API extern const QString kNameInsecureDeprecatedApiEnabled;
-NX_VMS_API extern const QString kEventLogPeriodDaysName;
-NX_VMS_API extern const QString kNameHost;
-NX_VMS_API extern const QString kNamePort;
-NX_VMS_API extern const QString kNameUser;
-NX_VMS_API extern const QString kNameSmtpPassword;
-NX_VMS_API extern const QString kNameConnectionType;
-NX_VMS_API extern const QString kNameSimple;
-NX_VMS_API extern const QString kNameTimeout;
-NX_VMS_API extern const QString kNameFrom;
-NX_VMS_API extern const QString kNameSignature;
-NX_VMS_API extern const QString kNameSupportEmail;
-NX_VMS_API extern const QString kNameUpdateNotificationsEnabled;
+NX_VMS_COMMON_API extern const QString kNameDisabledVendors;
+NX_VMS_COMMON_API extern const QString kNameCameraSettingsOptimization;
+NX_VMS_COMMON_API extern const QString kNameAutoUpdateThumbnails;
+NX_VMS_COMMON_API extern const QString kMaxSceneItemsOverrideKey;
+NX_VMS_COMMON_API extern const QString kUseTextEmailFormat;
+NX_VMS_COMMON_API extern const QString kUseWindowsEmailLineFeed;
+NX_VMS_COMMON_API extern const QString kNameAuditTrailEnabled;
+NX_VMS_COMMON_API extern const QString kAuditTrailPeriodDaysName;
+NX_VMS_COMMON_API extern const QString kNameTrafficEncryptionForced;
+NX_VMS_COMMON_API extern const QString kNameVideoTrafficEncryptionForced;
+NX_VMS_COMMON_API extern const QString kNameInsecureDeprecatedApiEnabled;
+NX_VMS_COMMON_API extern const QString kEventLogPeriodDaysName;
+NX_VMS_COMMON_API extern const QString kNameHost;
+NX_VMS_COMMON_API extern const QString kNamePort;
+NX_VMS_COMMON_API extern const QString kNameUser;
+NX_VMS_COMMON_API extern const QString kNameSmtpPassword;
+NX_VMS_COMMON_API extern const QString kNameConnectionType;
+NX_VMS_COMMON_API extern const QString kNameSimple;
+NX_VMS_COMMON_API extern const QString kNameTimeout;
+NX_VMS_COMMON_API extern const QString kNameFrom;
+NX_VMS_COMMON_API extern const QString kNameSignature;
+NX_VMS_COMMON_API extern const QString kNameSupportEmail;
+NX_VMS_COMMON_API extern const QString kNameUpdateNotificationsEnabled;
 
-NX_VMS_API extern const QString kNameTimeSynchronizationEnabled;
-NX_VMS_API extern const QString kNamePrimaryTimeServer;
+NX_VMS_COMMON_API extern const QString kNameTimeSynchronizationEnabled;
+NX_VMS_COMMON_API extern const QString kNamePrimaryTimeServer;
 
 /* Max rtt for internet time synchronization request */
-NX_VMS_API extern const QString kMaxDifferenceBetweenSynchronizedAndInternetTime;
+NX_VMS_COMMON_API extern const QString kMaxDifferenceBetweenSynchronizedAndInternetTime;
 
 /* Max rtt for server to server or client to server time synchronization request */
-NX_VMS_API extern const QString kMaxDifferenceBetweenSynchronizedAndLocalTime;
+NX_VMS_COMMON_API extern const QString kMaxDifferenceBetweenSynchronizedAndLocalTime;
 
 /* Period to check local time for changes */
-NX_VMS_API extern const QString kOsTimeChangeCheckPeriod;
+NX_VMS_COMMON_API extern const QString kOsTimeChangeCheckPeriod;
 
 /* Period to synchronize time via network */
-NX_VMS_API extern const QString kSyncTimeExchangePeriod;
-NX_VMS_API extern const QString kSyncTimeEpsilon;
+NX_VMS_COMMON_API extern const QString kSyncTimeExchangePeriod;
+NX_VMS_COMMON_API extern const QString kSyncTimeEpsilon;
 
-NX_VMS_API extern const QString kNameAutoDiscoveryEnabled;
-NX_VMS_API extern const QString kNameAutoDiscoveryResponseEnabled;
-NX_VMS_API extern const QString kNameBackupSettings;
-NX_VMS_API extern const QString kNameCrossdomainEnabled;
-NX_VMS_API extern const QString kCloudHostName;
+NX_VMS_COMMON_API extern const QString kNameAutoDiscoveryEnabled;
+NX_VMS_COMMON_API extern const QString kNameAutoDiscoveryResponseEnabled;
+NX_VMS_COMMON_API extern const QString kNameBackupSettings;
+NX_VMS_COMMON_API extern const QString kNameCrossdomainEnabled;
+NX_VMS_COMMON_API extern const QString kCloudHostName;
 
-NX_VMS_API extern const QString kNameStatisticsAllowed;
-NX_VMS_API extern const QString kNameStatisticsReportLastTime;
-NX_VMS_API extern const QString kNameStatisticsReportLastVersion;
-NX_VMS_API extern const QString kNameStatisticsReportLastNumber;
-NX_VMS_API extern const QString kNameStatisticsReportTimeCycle;
-NX_VMS_API extern const QString kNameStatisticsReportUpdateDelay;
-NX_VMS_API extern const QString kNameLocalSystemId;
-NX_VMS_API extern const QString kNameLastMergeMasterId;
-NX_VMS_API extern const QString kNameLastMergeSlaveId;
-NX_VMS_API extern const QString kNameSystemName;
-NX_VMS_API extern const QString kNameStatisticsReportServerApi;
-NX_VMS_API extern const QString kNameSettingsUrlParam;
-NX_VMS_API extern const QString kNameSpecificFeatures;
+NX_VMS_COMMON_API extern const QString kNameStatisticsAllowed;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportLastTime;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportLastVersion;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportLastNumber;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportTimeCycle;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportUpdateDelay;
+NX_VMS_COMMON_API extern const QString kNameLocalSystemId;
+NX_VMS_COMMON_API extern const QString kNameLastMergeMasterId;
+NX_VMS_COMMON_API extern const QString kNameLastMergeSlaveId;
+NX_VMS_COMMON_API extern const QString kNameSystemName;
+NX_VMS_COMMON_API extern const QString kNameStatisticsReportServerApi;
+NX_VMS_COMMON_API extern const QString kNameSettingsUrlParam;
+NX_VMS_COMMON_API extern const QString kNameSpecificFeatures;
 
-NX_VMS_API extern const QString ldapUri;
-NX_VMS_API extern const QString ldapAdminDn;
-NX_VMS_API extern const QString ldapAdminPassword;
-NX_VMS_API extern const QString ldapSearchBase;
-NX_VMS_API extern const QString ldapSearchFilter;
-NX_VMS_API extern const QString ldapPasswordExpirationPeriodMs;
-NX_VMS_API extern const QString ldapSearchTimeoutS;
+NX_VMS_COMMON_API extern const QString ldapUri;
+NX_VMS_COMMON_API extern const QString ldapAdminDn;
+NX_VMS_COMMON_API extern const QString ldapAdminPassword;
+NX_VMS_COMMON_API extern const QString ldapSearchBase;
+NX_VMS_COMMON_API extern const QString ldapSearchFilter;
+NX_VMS_COMMON_API extern const QString ldapPasswordExpirationPeriodMs;
+NX_VMS_COMMON_API extern const QString ldapSearchTimeoutS;
 constexpr const int ldapSearchTimeoutSDefault(30);
 
-NX_VMS_API extern const QString kNameCloudAccountName;
-NX_VMS_API extern const QString kNameCloudSystemId;
-NX_VMS_API extern const QString kNameCloudAuthKey;
-NX_VMS_API extern const QString kNameUpnpPortMappingEnabled;
-NX_VMS_API extern const QString kConnectionKeepAliveTimeoutKey;
-NX_VMS_API extern const QString kKeepAliveProbeCountKey;
+NX_VMS_COMMON_API extern const QString kNameCloudAccountName;
+NX_VMS_COMMON_API extern const QString kNameCloudSystemId;
+NX_VMS_COMMON_API extern const QString kNameCloudAuthKey;
+NX_VMS_COMMON_API extern const QString kNameUpnpPortMappingEnabled;
+NX_VMS_COMMON_API extern const QString kConnectionKeepAliveTimeoutKey;
+NX_VMS_COMMON_API extern const QString kKeepAliveProbeCountKey;
 
-NX_VMS_API extern const QString kTargetUpdateInformationName;
-NX_VMS_API extern const QString kInstalledUpdateInformationName;
-NX_VMS_API extern const QString kTargetPersistentUpdateStorageName;
-NX_VMS_API extern const QString kInstalledPersistentUpdateStorageName;
-NX_VMS_API extern const QString kDownloaderPeersName;
-NX_VMS_API extern const QString kClientUpdateSettings;
+NX_VMS_COMMON_API extern const QString kTargetUpdateInformationName;
+NX_VMS_COMMON_API extern const QString kInstalledUpdateInformationName;
+NX_VMS_COMMON_API extern const QString kTargetPersistentUpdateStorageName;
+NX_VMS_COMMON_API extern const QString kInstalledPersistentUpdateStorageName;
+NX_VMS_COMMON_API extern const QString kDownloaderPeersName;
+NX_VMS_COMMON_API extern const QString kClientUpdateSettings;
 
-NX_VMS_API extern const QString kWatermarkSettingsName;
-NX_VMS_API extern const QString kDefaultVideoCodec;
-NX_VMS_API extern const QString kDefaultExportVideoCodec;
-NX_VMS_API extern const QString kLowQualityScreenVideoCodec;
-NX_VMS_API extern const QString kForceLiveCacheForPrimaryStream;
-NX_VMS_API extern const QString kMetadataStorageChangePolicyName;
+NX_VMS_COMMON_API extern const QString kWatermarkSettingsName;
+NX_VMS_COMMON_API extern const QString kDefaultVideoCodec;
+NX_VMS_COMMON_API extern const QString kDefaultExportVideoCodec;
+NX_VMS_COMMON_API extern const QString kLowQualityScreenVideoCodec;
+NX_VMS_COMMON_API extern const QString kForceLiveCacheForPrimaryStream;
+NX_VMS_COMMON_API extern const QString kMetadataStorageChangePolicyName;
 
-NX_VMS_API extern const QString kShowServersInTreeForNonAdmins;
-NX_VMS_API extern const QString kShowMouseTimelinePreview;
+NX_VMS_COMMON_API extern const QString kShowServersInTreeForNonAdmins;
+NX_VMS_COMMON_API extern const QString kShowMouseTimelinePreview;
 
-NX_VMS_API extern const std::set<QString> kReadOnlyNames;
+NX_VMS_COMMON_API extern const std::set<QString> kReadOnlyNames;
 
-NX_VMS_API extern const std::set<QString> kWriteOnlyNames;
+NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
 
 } // namespace nx::settings_names
 
