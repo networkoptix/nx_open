@@ -479,7 +479,7 @@ bool isDefaultExpertSettings(const State& state)
     if (state.expert.trustCameraTime.valueOr(true))
         return false;
 
-    if (state.expert.remoteArchiveAutoExportDisabled.valueOr(true))
+    if (state.expert.remoteArchiveAutoImportEnabled.valueOr(false))
         return false;
 
     return state.expert.rtpTransportType.hasValue()
@@ -1216,8 +1216,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 vms::api::RtpTransportType::automatic);
         });
 
-    fetchFromCameras<bool>(state.expert.remoteArchiveAutoExportDisabled, cameras,
-        [](const Camera& camera) { return !camera->isRemoteArchiveSynchronizationEnabled(); });
+    fetchFromCameras<bool>(state.expert.remoteArchiveAutoImportEnabled, cameras,
+        [](const Camera& camera) { return camera->isRemoteArchiveSynchronizationEnabled(); });
 
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)
@@ -2289,12 +2289,12 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setRemoteArchiveAutoExportDisabled(
+State CameraSettingsDialogStateReducer::setRemoteArchiveAutoImportEnabled(
     State state, const bool& value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    state.expert.remoteArchiveAutoExportDisabled.setUser(value);
+    state.expert.remoteArchiveAutoImportEnabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -2417,7 +2417,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
-    state = setRemoteArchiveAutoExportDisabled(std::move(state), false);
+    state = setRemoteArchiveAutoImportEnabled(std::move(state), false);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);
     state = setLogicalId(std::move(state), {});

@@ -293,7 +293,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         int customMediaPortDisplayValue = kDefaultRtspPort;
         bool areOnvifSettingsApplicable = false;
         UserEditableMultiple<bool> trustCameraTime;
-        UserEditableMultiple<bool> remoteArchiveAutoExportDisabled;
+        UserEditableMultiple<bool> remoteArchiveAutoImportEnabled;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

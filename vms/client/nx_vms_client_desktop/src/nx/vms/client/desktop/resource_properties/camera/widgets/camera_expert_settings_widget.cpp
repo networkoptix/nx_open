@@ -167,8 +167,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
 
-    connect(ui->disableAutoExportCheckBox, &QCheckBox::clicked,
-        store, &CameraSettingsDialogStore::setRemoteArchiveAutoExportDisabled);
+    connect(ui->remoteArchiveAutoImportCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveAutoImportEnabled);
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
@@ -272,7 +272,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->secondStreamDisableCheckBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->keepCameraTimeSettingsCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
-    setHelpTopic(ui->disableAutoExportCheckBox, Qn::CameraSettings_Expert_AutomaticExport_Help);
+    setHelpTopic(ui->remoteArchiveAutoImportCheckBox, Qn::CameraSettings_Expert_AutomaticExport_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
@@ -291,8 +291,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     logicalIdHint->setHintText(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
-    ui->disableAutoExportCheckBox->setHint(tr("Video recorded on the internal camera's storage "
-        "will not be uploaded to the main archive automatically."));
+    ui->remoteArchiveAutoImportCheckBox->setHint(tr("Video recorded on the internal "
+        "camera's storage will be automatically uploaded to the main archive."));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -471,12 +471,12 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // ONVIF Profile G remote archive automatic export.
 
-    ui->remoteArchiveAutoExportGroupBox->setVisible(
+    ui->remoteArchiveAutoImportGroupBox->setVisible(
         ini().enableRemoteArchiveSynchronization && remoteArchiveMdSupported);
 
     check_box_utils::setupTristateCheckbox(
-        ui->disableAutoExportCheckBox,
-        state.expert.remoteArchiveAutoExportDisabled);
+        ui->remoteArchiveAutoImportCheckBox,
+        state.expert.remoteArchiveAutoImportEnabled);
 
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()

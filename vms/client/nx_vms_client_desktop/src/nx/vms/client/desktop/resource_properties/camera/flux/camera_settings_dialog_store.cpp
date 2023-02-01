@@ -581,12 +581,12 @@ void CameraSettingsDialogStore::setRtpTransportType(nx::vms::api::RtpTransportTy
         [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setRemoteArchiveAutoExportDisabled(const bool& value)
+void CameraSettingsDialogStore::setRemoteArchiveAutoImportEnabled(const bool& value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setRemoteArchiveAutoExportDisabled(std::move(state), value);
+            return Reducer::setRemoteArchiveAutoImportEnabled(std::move(state), value);
         });
 }
 
