@@ -49,10 +49,14 @@ class NxOpenConan(ConanFile):
     options = {
         "targetDevice": "ANY",
         "useClang": (True, False),
+        "skipCustomizationPackage": (True, False),
+        "customization": "ANY",
     }
     default_options = {
         "targetDevice": None,
         "useClang": False,
+        "skipCustomizationPackage": False,
+        "customization": "default",
     }
 
     ffmpeg_version_and_revision = "4.4#c466a4cd83fb41e24104060a371c688c"
@@ -62,6 +66,11 @@ class NxOpenConan(ConanFile):
         "qt/6.4.1" "#e5f378ecdbcc948496a08d46175c58fd",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
+
+    def configure(self):
+        # The open-source Customization Package coming from Conan has the name "opensource-meta",
+        # but its id (the "id" field in description.json inside the zip) is "metavms".
+        self.options["customization"].customization = "opensource-meta"
 
     def generate(self):
         generate_conan_package_paths(self)
@@ -83,6 +92,9 @@ class NxOpenConan(ConanFile):
             self.build_requires("doxygen/1.8.14" "#ad17490b6013c61d63e10c0e8ea4d6c9")
 
     def requirements(self):
+        if not self.options.skipCustomizationPackage:
+            self.requires("customization/1.0" "#b041611acc87f515c44f54bd75fdec29")
+
         self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
 
         if self.isWindows or self.isLinux:
