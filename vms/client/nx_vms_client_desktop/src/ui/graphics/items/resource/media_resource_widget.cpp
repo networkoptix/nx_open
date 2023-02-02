@@ -2582,7 +2582,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     }
     else if (key == ResourcePropertyKey::kCameraCapabilities
         || key == ResourcePropertyKey::kTwoWayAudioEnabled
-        || key == ResourcePropertyKey::kAudioOutputDeviceId)
+        || key == ResourcePropertyKey::kAudioOutputDeviceId
+        || key == ResourcePropertyKey::kIoSettings)
     {
         updateCameraButtons();
     }
