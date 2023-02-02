@@ -182,16 +182,22 @@ struct LdapSettingsWidget::Private
 
     void updateUserAndGroupCount()
     {
-        const auto resourcePool = q->systemContext()->resourcePool();
+        userCount = getLdapUserCount();
+        groupCount = getLdapGroupCount();
+    }
 
-        const auto ldapUsers = resourcePool->getResources<QnUserResource>(
+    int getLdapUserCount() const
+    {
+        const auto ldapUsers = q->systemContext()->resourcePool()->getResources<QnUserResource>(
             [](const auto& user) { return user->isLdap(); });
-        userCount = ldapUsers.size();
 
-        auto rolesManager = q->systemContext()->userRolesManager();
+        return ldapUsers.size();
+    }
 
-        const auto groups = rolesManager->userRoles();
-        groupCount = std::count_if(groups.begin(), groups.end(), [](auto g) { return g.isLdap; });
+    int getLdapGroupCount() const
+    {
+        const auto groups = q->systemContext()->userRolesManager()->userRoles();
+        return std::count_if(groups.begin(), groups.end(), [](auto g) { return g.isLdap; });
     }
 };
 
@@ -380,7 +386,11 @@ void LdapSettingsWidget::applyChanges()
 
     bool removeExisting = false;
 
-    if (d->initialSettings.uri.host() != d->getState().uri.host())
+    const bool firstImport = d->initialSettings.uri.isEmpty()
+        && d->getLdapUserCount() == 0
+        && d->getLdapGroupCount() == 0;
+
+    if (d->initialSettings.uri.host() != d->getState().uri.host() && !firstImport)
     {
         const QString mainText = tr("Remove existing LDAP users and groups?");
         const QString extraText = tr("Looks like you have changed LDAP server. It is recommended"
@@ -395,7 +405,7 @@ void LdapSettingsWidget::applyChanges()
             QDialogButtonBox::NoButton,
             this);
         messageBox.addButton(tr("Yes"), QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
-        
+
         switch (messageBox.exec())
         {
             case QDialogButtonBox::AcceptRole:
