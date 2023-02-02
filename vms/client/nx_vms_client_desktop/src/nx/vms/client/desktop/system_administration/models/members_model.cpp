@@ -17,6 +17,8 @@
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <ui/workbench/workbench_access_controller.h>
+
 #include "../globals/user_settings_global.h"
 
 namespace nx::vms::client::desktop {
@@ -590,9 +592,12 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
     if (isPredefined(m_subjectId))
         return false;
 
-    static const auto kOwnerId = QnPredefinedUserRoles::id(Qn::UserRole::owner);
-    if (groupId == kOwnerId)
-        return false;
+    if (const auto user = systemContext()->accessController()->user(); user && !user->isOwner())
+    {
+        static const auto kOwnerId = QnPredefinedUserRoles::id(Qn::UserRole::owner);
+        if (groupId == kOwnerId)
+            return false;
+    }
 
     return !m_subjectContext->subjectHierarchy()->recursiveParents({groupId}).contains(m_subjectId);
 }
