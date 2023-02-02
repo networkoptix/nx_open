@@ -3,6 +3,7 @@
 #include "camera_password_change_dialog.h"
 #include "ui_camera_password_change_dialog.h"
 
+#include <QtNetwork/QAuthenticator>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/resource.h>

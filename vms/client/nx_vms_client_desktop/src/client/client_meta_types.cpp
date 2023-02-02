@@ -98,8 +98,6 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/ping_utility.h>
 
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
-
 Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
 Q_DECLARE_METATYPE(nx::cloud::db::api::SystemData)
 Q_DECLARE_METATYPE(rest::ServerConnectionPtr)

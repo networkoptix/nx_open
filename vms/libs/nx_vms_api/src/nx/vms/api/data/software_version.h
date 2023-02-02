@@ -38,7 +38,7 @@ public:
     }
 
     QN_FUSION_DECLARE_FUNCTIONS(SoftwareVersion,
-        (ubjson)(json)(xml)(lexical)(datastream)(csv_field),
+        (ubjson)(json)(xml)(lexical)(csv_field),
         friend NX_VMS_API)
 };
 

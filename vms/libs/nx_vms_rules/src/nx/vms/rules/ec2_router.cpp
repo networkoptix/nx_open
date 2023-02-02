@@ -2,8 +2,6 @@
 
 #include "ec2_router.h"
 
-#include <QDataStream>
-
 #include <api/common_message_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>

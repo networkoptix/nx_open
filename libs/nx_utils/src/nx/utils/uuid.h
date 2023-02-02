@@ -5,8 +5,9 @@
 #include <string>
 #include <string_view>
 
-#include <QtCore/QObject>
 #include <QtCore/QByteArray>
+#include <QtCore/QDataStream>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 

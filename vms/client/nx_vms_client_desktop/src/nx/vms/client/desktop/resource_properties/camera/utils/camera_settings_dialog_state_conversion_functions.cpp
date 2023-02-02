@@ -2,6 +2,7 @@
 
 #include "camera_settings_dialog_state_conversion_functions.h"
 
+#include <QtNetwork/QAuthenticator>
 #include <QtWidgets/QApplication>
 
 #include <core/ptz/ptz_preset.h>

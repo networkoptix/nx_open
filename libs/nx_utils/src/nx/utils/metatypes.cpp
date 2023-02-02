@@ -4,32 +4,12 @@
 
 #include <atomic>
 
-#include <QtCore/QDataStream>
-
 #include "buffer.h"
 #include "mac_address.h"
 #include "url.h"
 #include "uuid.h"
 #include "scope_guard.h"
 #include "async_handler_executor_detail.h"
-
-template<class Rep, class Period>
-QDataStream& operator<<(QDataStream& out, const std::chrono::duration<Rep, Period>& duration)
-{
-    // GCC and Clang compilers uses long int as duration representation, as QDataStream does not
-    // have appropriate operator<< it is required to cast it manually.
-    out << static_cast<long long>(duration.count());
-    return out;
-}
-
-template<class Rep, class Period>
-QDataStream& operator>>(QDataStream& in, std::chrono::duration<Rep, Period>& duration)
-{
-    long long count;
-    in >> count;
-    duration = std::chrono::duration<Rep, Period>(count);
-    return in;
-}
 
 namespace nx::utils {
 

@@ -156,19 +156,6 @@ QDebug operator<<(QDebug dbg, const EncodedString& value)
     return dbg.space();
 }
 
-QDataStream& operator<<(QDataStream& stream, const EncodedString& value)
-{
-    return stream << value.encoded();
-}
-
-QDataStream& operator>>(QDataStream& stream, EncodedString& value)
-{
-    QString encoded;
-    stream >> encoded;
-    value.setEncoded(encoded);
-    return stream;
-}
-
 void PrintTo(const EncodedString& value, ::std::ostream* os)
 {
     *os << value.decoded().toStdString()

@@ -3,7 +3,6 @@
 #include "software_version.h"
 
 #include <QtCore/QStringList>
-#include <QtCore/QDataStream>
 
 #include <nx/fusion/model_functions.h>
 
@@ -50,22 +49,6 @@ bool deserialize(QnUbjsonReader<QByteArray>* stream, SoftwareVersion* target)
 void serialize(const SoftwareVersion& value, QnCsvStreamWriter<QByteArray>* target)
 {
     target->writeField(value.toString());
-}
-
-QDataStream& operator<<(QDataStream& stream, const SoftwareVersion& version)
-{
-    for (const auto value: version.m_data)
-        stream << value;
-
-    return stream;
-}
-
-QDataStream& operator>>(QDataStream& stream, SoftwareVersion& version)
-{
-    for (auto& valueRef: version.m_data)
-        stream >> valueRef;
-
-    return stream;
 }
 
 QN_FUSION_DEFINE_FUNCTIONS(SoftwareVersion, (json_lexical)(xml_lexical))

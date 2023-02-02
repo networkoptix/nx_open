@@ -7,6 +7,7 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
 #include <nx/core/layout/layout_file_info.h>
+#include <nx/utils/scope_guard.h>
 #include <ui/dialogs/common/input_dialog.h>
 
 namespace {

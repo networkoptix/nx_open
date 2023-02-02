@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QDataStream>
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QObject>

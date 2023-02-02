@@ -7,7 +7,7 @@
 namespace nx::vms::common::update {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    PersistentUpdateStorage, (ubjson)(json)(datastream),
+    PersistentUpdateStorage, (ubjson)(json),
     PersistentUpdateStorage_Fields)
 
 } // namespace nx::vms::common::update
