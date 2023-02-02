@@ -729,18 +729,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::licenseRemoved:
         {
-            QnVirtualCameraResourceList disabledCameras;
-            for (const auto& id: nx::vms::event::LicenseIssueEvent::decodeCameras(params))
-            {
-                if (const auto& camera =
-                        resourcePool()->getResourceById<QnVirtualCameraResource>(
-                            QnUuid(id)))
-                {
-                    disabledCameras << camera;
-                }
-            }
-
-            NX_ASSERT(!disabledCameras.isEmpty(), "At least one camera should be disabled on this event");
+            const auto idList = nx::vms::event::LicenseIssueEvent::decodeCameras(params);
+            NX_ASSERT(!idList.isEmpty(), "At least one camera should be disabled on this event");
 
             result = QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
@@ -748,7 +738,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                     tr("Not enough licenses. Recording has been disabled on the following devices:"),
                     tr("Not enough licenses. Recording has been disabled on the following cameras:"),
                     tr("Not enough licenses. Recording has been disabled on the following I/O modules:")),
-                disabledCameras);
+                resourcePool()->getResourcesByIds<QnVirtualCameraResource>(idList));
 
             break;
         }
