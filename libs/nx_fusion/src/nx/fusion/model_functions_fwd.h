@@ -4,7 +4,6 @@
 
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/serialization/csv_fwd.h>
-#include <nx/fusion/serialization/data_stream_fwd.h>
 #include <nx/fusion/serialization/debug_fwd.h>
 #include <nx/fusion/serialization/json_fwd.h>
 #include <nx/fusion/serialization/lexical_fwd.h>

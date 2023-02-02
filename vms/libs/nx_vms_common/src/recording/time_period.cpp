@@ -14,7 +14,7 @@
 #include <nx/utils/datetime.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimePeriod,
-    (ubjson)(datastream)(xml)(csv_record), (startTimeMs)(durationMs))
+    (ubjson)(xml)(csv_record), (startTimeMs)(durationMs))
 
 namespace detail {
 

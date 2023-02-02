@@ -4,6 +4,9 @@
 
 #include <atomic>
 
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QAuthenticator>
+
 #include <api/model/api_ioport_data.h>
 #include <api/model/audit/audit_record.h>
 #include <api/model/backup_status_reply.h>
@@ -60,6 +63,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/string.h>
 #include <nx/utils/metatypes.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/metatypes.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/ptz/command.h>
@@ -85,8 +89,6 @@
 #include <recording/time_period_list.h>
 #include <utils/common/optional.h>
 #include <utils/math/space_mapper.h>
-
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize()
 {
@@ -288,5 +290,5 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<nx::String>();
-    
+
 }

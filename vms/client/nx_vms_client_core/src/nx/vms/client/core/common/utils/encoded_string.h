@@ -68,8 +68,6 @@ private:
     mutable std::optional<QString> m_decodedValue;
 };
 
-QDataStream &operator<<(QDataStream& stream, const EncodedString& value);
-QDataStream &operator>>(QDataStream& stream, EncodedString& value);
 QDebug operator<<(QDebug dbg, const EncodedString& value);
 void PrintTo(const EncodedString& value, ::std::ostream* os);
 

@@ -246,9 +246,6 @@ class QJsonValue;
 NX_UTILS_API void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target);
 NX_UTILS_API bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target);
 
-NX_UTILS_API QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url);
-NX_UTILS_API QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url);
-
 namespace std {
 
 template<>

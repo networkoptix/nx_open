@@ -200,7 +200,7 @@ NX_VMS_COMMON_API std::string toString(const QnTimePeriod& period);
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod,
-    (json)(datastream)(ubjson)(xml)(csv_record),
+    (json)(ubjson)(xml)(csv_record),
     NX_VMS_COMMON_API)
 
 NX_REFLECTION_INSTRUMENT(QnTimePeriod, (startTimeMs)(durationMs))

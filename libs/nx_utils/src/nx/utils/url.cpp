@@ -3,7 +3,6 @@
 #include <cctype>
 
 #include <QtNetwork/QHostAddress>
-#include <QtCore/QDataStream>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrlQuery>
 
@@ -547,18 +546,4 @@ bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url
 {
     *target = nx::utils::Url(value.toString());
     return true;
-}
-
-QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url)
-{
-    stream << url.toString();
-    return stream;
-}
-
-QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url)
-{
-    QString urlString;
-    stream >> urlString;
-    url = nx::utils::Url(urlString);
-    return stream;
 }

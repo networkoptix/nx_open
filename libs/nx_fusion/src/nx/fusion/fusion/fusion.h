@@ -223,7 +223,6 @@ namespace QnFusionDetail {
  * Accepted tokens are:
  * <ul>
  * <li> <tt>csv_record</tt>     --- csv record serialization functions. </li>
- * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
  * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
  * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
  * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
