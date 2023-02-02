@@ -186,13 +186,13 @@ During the Build stage the following things happen:
 ---------------------------------------------------------------------------------------------------
 ## Building VMS Desktop Client
 
-To build the Client, besides cloning this repository, you must obtain a Customization Package -
-it is a collection of texts and graphics used in the GUI; it defines the branding of the VMS. The
-Customization Package comes as a zip file.
-
-If you want to build an Nx-Meta-branded VMS Client, create a Custom Client on the Nx Meta Developer
-Portal and download its customization package at https://meta.nxvms.com/developers/custom-clients/.
-Otherwise, request a different Powered-by-Nx customization package.
+The Client uses in its GUI a collection of texts and graphics called a Customization Package; it
+defines the branding of the VMS. The Customization Package comes as a zip file. A default one is
+taken from Conan - the Client will be branded as Nx Meta and will show placeholders for such traits
+as the company name, web site and End-User License Agreement text. If you want to define these
+traits, create a "Custom Client" entity on the Nx Meta Developer Portal and download the generated
+Customization Package zip at https://meta.nxvms.com/developers/custom-clients/. Customization
+Packages with branding other than Nx Meta can be available there as well.
 
 All the commands necessary to perform the CMake Configuration and Build stages are written in the
 scripts `build.sh` (for Linux and MacOS) and `build.bat` (for Windows) located in the repository
@@ -213,22 +213,32 @@ to the Generation stage).
 ATTENTION: If the generation fails for any reason, remove `CMakeCache.txt` manually before the next
 attempt of running the build script.
 
-Below are the usage examples, where `<build>` is `./build.sh` on Linux and `build.bat` on Windows.
+Below are the usage examples, where `<build>` is `./build.sh` for Linux and macOS, and `build.bat`
+for Windows.
 
 - To make a clean Debug build, delete the build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackageFile=<customization.zip>
+    <build>
     ```
     The built executables will be placed in `nx_open-build/bin/`.
 
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF
+    <build> -DdeveloperBuild=OFF
     ```
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
     executables in it either one-by-one, or in parallel.
+
+- To use the obtained Customization Package rather than the default one coming from Conan
+    (Nx-Meta-branded with placeholders), add the following arguments to the `<build>` script:
+    ```
+    -DcustomizationPackageFile=<customization.zip> [-Dcustomization=<customization_id>]
+    ```
+    The value of `<customization_id>` can be obtained from the `"id": "<customization_id>"` line
+    of `description.json` inside the Customization Package zip file, and can be omitted for
+    Nx-Meta-branded Customization Packages (their `<customization_id>` is `metavms`).
 
 - To perform an incremental build after some changes, run the `<build>` script without arguments.
     - Note that there is no need to explicitly call the generation stage after adding/deleting
@@ -303,7 +313,7 @@ The VMS Desktop Client can be run directly from the build directory, without ins
 distribution package.
 
 After the successful build, the Desktop Client executable is located in `nx_open-build/bin/`; its
-name may depend on the customization package.
+name may depend on the Customization Package.
 
 For **Linux** and **MacOS**, just run the Desktop Client executable.
 
@@ -336,11 +346,8 @@ recommended to base the Client modification branches from tagged commits corresp
 public releases, including Nx Meta VMS releases, and rebase them as soon as next public release
 from this branch is available.
 
-Besides having the compatible code, to be able to work together, the Client and Server have to use
-the same customization package. If, however, for experimental purposes (not for the production use)
-you need to connect to a Server with a different customization, the following option can be added
-to `desktop_client.ini`: `developerMode=true`. For the details, see the documentation for the
-IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
+ATTENTION: Besides having the compatible code, to be able to work together, the Client and the
+Server have to use Customization Packages with the same `<customization_id>` value.
 
 During the Generation stage, the build system tries to determine the compatible Server version
 checking the git tags. It searches for the first commit common for the current branch and one of

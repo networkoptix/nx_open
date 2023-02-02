@@ -49,10 +49,14 @@ class NxOpenConan(ConanFile):
     options = {
         "targetDevice": "ANY",
         "useClang": (True, False),
+        "skipCustomizationPackage": (True, False),
+        "customization": "ANY",
     }
     default_options = {
         "targetDevice": None,
         "useClang": False,
+        "skipCustomizationPackage": False,
+        "customization": "default",
     }
 
     ffmpeg_version_and_revision = "4.4#c466a4cd83fb41e24104060a371c688c"
@@ -62,6 +66,11 @@ class NxOpenConan(ConanFile):
         "qt/5.15.2" "#86503340155e8896b26aa6ce2e1905fe",
         "roboto-fonts/1.0" "#d9dbbcbc40cbdeb6dfaa382399bccfd6",
     )
+
+    def configure(self):
+        # The open-source Customization Package coming from Conan has the name "opensource-meta",
+        # but its id (the "id" field in description.json inside the zip) is "metavms".
+        self.options["customization"].customization = "opensource-meta"
 
     def generate(self):
         generate_conan_package_paths(self)
@@ -81,6 +90,9 @@ class NxOpenConan(ConanFile):
             self.build_requires("doxygen/1.8.14" "#100a69d210981b259d85d575da0e5e7d")
 
     def requirements(self):
+        if not self.options.skipCustomizationPackage:
+            self.requires("customization/1.0" "#b041611acc87f515c44f54bd75fdec29")
+
         self.requires("boost/1.76.0" "#bf922d85865a39cc5d2bc9dc3cf3ff6e")
 
         # Until we have arm64 macs in CI to build native tools, run x86_64 tools using Rosetta 2.

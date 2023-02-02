@@ -22,10 +22,10 @@ else()
     set(build_type "Release")
 endif()
 
-if(NOT "${customization}" STREQUAL "")
-    list(APPEND _additional_conan_parameters
-        "-o customization=${customization}"
-    )
+if(customizationPackageFile)
+    list(APPEND _additional_conan_parameters "-o skipCustomizationPackage=True")
+elseif(NOT "${customization}" STREQUAL "")
+    list(APPEND _additional_conan_parameters "-o customization=${customization}")
 endif()
 
 if(targetDevice MATCHES "^linux|^edge")

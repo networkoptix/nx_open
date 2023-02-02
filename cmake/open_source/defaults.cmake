@@ -5,6 +5,9 @@
 # Turn on openSourceBuild flag.
 set(openSourceBuild ON CACHE BOOL "Is open source build" FORCE)
 
+# Default open-source customization.
+set(customization "metavms" CACHE STRING "Product customization")
+
 # Values for cache variables not used in open source libraries but needed by cmake scripts common
 # with the main project.
 set(productType "vms" CACHE STRING "Product type" FORCE)
@@ -22,7 +25,8 @@ set(statisticsServerUser "" CACHE STRING "Default statistics server user")
 set(statisticsServerPassword "" CACHE STRING "Default statistics server password")
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(signtoolConfig "" CACHE PATH "Path to the configuration file of the signing tool. Leave empty to turn off the signing.")
+    set(signtoolConfig "" CACHE PATH
+        "Path to the configuration file of the signing tool. Leave empty to turn off the signing.")
 
     if(signtoolConfig)
         set(codeSigning true)
