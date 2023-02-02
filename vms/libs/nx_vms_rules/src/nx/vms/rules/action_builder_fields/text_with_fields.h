@@ -14,7 +14,6 @@ class NX_VMS_RULES_API TextWithFields:
     public common::SystemContextAware
 {
     Q_OBJECT
-
     Q_CLASSINFO("metatype", "nx.actions.fields.textWithFields")
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
@@ -43,6 +42,16 @@ private:
 
     QList<FieldType> m_types;
     QList<QString> m_values;
+};
+
+/** Same as base class but hidden from user. */
+class NX_VMS_RULES_API TextFormatter: public TextWithFields
+{
+    Q_OBJECT
+    Q_CLASSINFO("metatype", "nx.actions.fields.textFormatter")
+
+public:
+    using TextWithFields::TextWithFields;
 };
 
 } // namespace nx::vms::rules

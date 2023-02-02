@@ -2,10 +2,12 @@
 
 #include "repeat_sound_action.h"
 
+#include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -21,6 +23,12 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Play to users")),
             makeFieldDescriptor<SoundField>("sound", tr("Sound")),
             makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
+
+            makeFieldDescriptor<EventIdField>("id", "Event ID"),
+            utils::makeTextFormatterFieldDescriptor("caption", "{@EventCaption}"),
+            utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
+            utils::makeTextFormatterFieldDescriptor("tooltip", "{@EventTooltip}"),
+            utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
         }
     };
     return kDescriptor;

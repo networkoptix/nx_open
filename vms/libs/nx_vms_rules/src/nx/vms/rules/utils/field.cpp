@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/text_with_fields.h"
 #include "../aggregated_event.h"
 #include "../event_filter_fields/state_field.h"
 
@@ -52,6 +53,17 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
         fieldName,
         {},
         {{ "detailName", detailName }});
+}
+
+FieldDescriptor makeTextFormatterFieldDescriptor(
+    const QString& fieldName,
+    const QString& formatString)
+{
+    return makeFieldDescriptor<TextFormatter>(
+        fieldName,
+        fieldName,
+        {},
+        {{ "text", formatString }});
 }
 
 QnUuidList getDeviceIds(const AggregatedEventPtr& event)

@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
@@ -23,18 +24,15 @@ class QnWorkbenchNotificationsHandler:
 
 public:
     explicit QnWorkbenchNotificationsHandler(QObject* parent = nullptr);
-    virtual ~QnWorkbenchNotificationsHandler();
-
-    void addSystemHealthEvent(QnSystemHealth::MessageType message);
-    void addSystemHealthEvent(QnSystemHealth::MessageType message,
-        const nx::vms::event::AbstractActionPtr& action);
+    virtual ~QnWorkbenchNotificationsHandler() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message,
-        const QnResourcePtr& resource, bool visible);
+    void setSystemHealthEventVisible(
+        QnSystemHealth::MessageType message,
+        const QnResourcePtr& resource,
+        bool visible);
 
 signals:
     void systemHealthEventAdded(QnSystemHealth::MessageType message, const QVariant& params);
@@ -48,18 +46,22 @@ signals:
 
     void cleared();
 
-public slots:
+private:
     void clear();
 
-private slots:
     void at_context_userChanged();
-    void at_eventManager_actionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void at_businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
 
-private:
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
 
-    void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
-        const QVariant& params, bool visible);
+    void addSystemHealthEvent(
+        QnSystemHealth::MessageType message,
+        const nx::vms::event::AbstractActionPtr& action);
+
+    void setSystemHealthEventVisibleInternal(
+        QnSystemHealth::MessageType message,
+        const QVariant& params,
+        bool visible);
 
     void handleAcknowledgeEventAction();
 

@@ -2,19 +2,19 @@
 
 #include "event_list_model.h"
 
-#include <QtCore/QDateTime>
-
 #include <core/resource/camera_resource.h>
-#include <nx/utils/metatypes.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <utils/common/delayed.h>
-#include <utils/common/synctime.h>
 
 #include "private/event_list_model_p.h"
 
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
+
+QnUuid EventListModel::EventData::sourceId() const
+{
+    return source ? source->getId() : QnUuid();
+}
 
 EventListModel::EventListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(context, parent),

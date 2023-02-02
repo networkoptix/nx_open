@@ -4,30 +4,20 @@
 
 #include <chrono>
 
-#include <QtCore/QtGlobal>
 #include <QtGui/QAction>
 #include <QtGui/QGuiApplication>
-
 
 #include <business/business_resource_validation.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/metatypes.h>
-#include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -36,9 +26,8 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/resource/property_adaptors.h>
-#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -96,7 +85,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     QnCommonMessageProcessor* messageProcessor = systemContext()->messageProcessor();
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
+        &QnWorkbenchNotificationsHandler::at_businessActionReceived);
 
     connect(action(action::AcknowledgeEventAction), &QAction::triggered,
         this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
@@ -257,24 +246,14 @@ void QnWorkbenchNotificationsHandler::clear()
 
 void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
-    vms::event::EventParameters params = action->getRuntimeParams();
-    vms::api::EventType eventType = params.eventType;
+    const auto eventType = action->getRuntimeParams().eventType;
 
-    if (eventType >= vms::api::EventType::systemHealthEvent && eventType <= vms::api::EventType::maxSystemHealthEvent)
+    if (eventType >= vms::api::EventType::systemHealthEvent
+        && eventType <= vms::api::EventType::maxSystemHealthEvent)
     {
         int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
         return;
-    }
-
-    if (!context()->user())
-        return;
-
-    if (action->actionType() == vms::api::ActionType::showOnAlarmLayoutAction)
-    {
-        /* Skip action if it contains list of users, and we are not on the list. */
-        if (!QnBusiness::actionAllowedForUser(action, context()->user()))
-            return;
     }
 
     bool alwaysNotify = false;
@@ -297,11 +276,6 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     emit notificationAdded(action);
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message)
-{
-    addSystemHealthEvent(message, vms::event::AbstractActionPtr());
-}
-
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message,
     const vms::event::AbstractActionPtr &action)
 {
@@ -316,11 +290,6 @@ bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
 
 void QnWorkbenchNotificationsHandler::forcedUpdate()
 {
-}
-
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible)
-{
-    setSystemHealthEventVisibleInternal(message, QVariant(), visible);
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message,
@@ -380,13 +349,16 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
-    m_adaptor->setResource(context()->user());
-    if (!context()->user())
+    const auto user = context()->user();
+
+    m_adaptor->setResource(user);
+
+    if (!user)
     {
         clear();
         m_listener.reset();
     }
-    else if (context()->user()->isCloud())
+    else if (user->isCloud())
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),
@@ -394,9 +366,13 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
             this,
             &QnWorkbenchNotificationsHandler::notificationActionReceived);
     }
+    else
+    {
+        m_listener.reset();
+    }
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
+void QnWorkbenchNotificationsHandler::at_businessActionReceived(
     const vms::event::AbstractActionPtr& action)
 {
     NX_VERBOSE(this, "An action is received: %1", toString(action));
@@ -428,6 +404,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
         case vms::api::ActionType::showOnAlarmLayoutAction:
             addNotification(action);
             break;
+
         case vms::api::ActionType::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
