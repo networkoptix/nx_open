@@ -487,7 +487,7 @@ FocusScope
                                         return
 
                                     DragAndDrop.execute(
-                                        treeView,
+                                        listItem,
                                         DragAndDrop.createMimeData(
                                             selectionModel.optimizedSelectedIndexes),
                                         DragAndDrop.supportedDragActions(linearizationListModel),
