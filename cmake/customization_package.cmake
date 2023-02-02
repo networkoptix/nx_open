@@ -34,7 +34,7 @@ function(nx_store_customization_package target_directory)
     )
 
     if(NOT list_result STREQUAL "0")
-        message(FATAL_ERROR "error: Customization listing failed. See ${log_file} for details.")
+        message(FATAL_ERROR "Customization listing failed. See ${log_file} for details.")
     endif()
 
     string(REPLACE "\n" ";" listed_files ${listed_files})
@@ -48,23 +48,12 @@ elseif(CONAN_CUSTOMIZATION_ROOT)
     set(customization_package_file "${CONAN_CUSTOMIZATION_ROOT}/package.zip")
     set(customization_name ${customization})
 else()
-    if(NOT openSourceBuild)
-        set(error_message "No customization package is found. Check if it is downloaded by Rdep.")
-    else()
-        set(error_message
-            "Customization package file not specified. Download the Nx Meta customization package "
-            "from https://meta.nxvms.com, or download a different Powered-by-Nx customization package "
-            "using the corresponding Developer account, and specify the path to it with "
-            "-DcustomizationPackageFile=<filename>"
-        )
-    endif()
-
-    message(FATAL_ERROR "\n" ${error_message} "\n")
+    message(FATAL_ERROR "Customization Package not found in Conan.")
 endif()
 
 if(NOT EXISTS "${customization_package_file}")
     message(FATAL_ERROR
-        "The customization package file (${customization_package_file}) was not found")
+        "The Customization Package file (${customization_package_file}) was not found.")
 endif()
 
 set(customization_dir "${CMAKE_BINARY_DIR}/customization/${customization_name}")
