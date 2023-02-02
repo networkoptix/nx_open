@@ -450,6 +450,7 @@ TEST_F(MembersModelTest, allowedParents)
     m_model->setGroupId(m_group2);
 
     static const QStringList kAllowedParents = {
+        "Owner",
         "Administrator",
         "Advanced Viewer",
         "Viewer",
