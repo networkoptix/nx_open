@@ -176,7 +176,7 @@ public:
 
     void reopen();
     bool isJumpProcessing() const;
-	
+
 protected:
     virtual bool init();
 
@@ -210,7 +210,7 @@ private:
     void setSpeedInternal(double speed, qint64 currentTimeHint = AV_NOPTS_VALUE);
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
     virtual bool needKeyData(int channel) const override;
-    void emitJumpOccured(qint64 mksec, int sequence);
+    void emitJumpOccured(qint64 jumpTime, bool usePreciseSeek, int sequence);
 
 private:
     unsigned m_selectedAudioChannel;
@@ -219,7 +219,8 @@ private:
     qint64 m_lastGopSeekTime;
     QVector<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
-    std::atomic<qint64> m_requiredJumpTime;
+    qint64 m_requiredJumpTime;
+    bool m_lastUsePreciseSeek;
     QString m_onDestroyFileName;
     bool m_BOF;
     int m_afterBOFCounter;
@@ -232,8 +233,6 @@ private:
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
     bool m_ignoreSkippingFrame;
-    qint64 m_lastJumpTime;
-    qint64 m_lastSkipTime;
     qint64 m_skipFramesToTime;
     bool m_keepLastSkkipingFrame;
     bool m_singleShot;
