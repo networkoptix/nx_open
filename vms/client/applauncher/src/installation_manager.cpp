@@ -206,7 +206,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
     else
     {
-        NX_WARNING(this, "Can't find client binary in %1", QCoreApplication::applicationDirPath());
+        NX_DEBUG(this, "Can't find client binary in %1", QCoreApplication::applicationDirPath());
     }
 
     const auto fillInstallationFromDir =
