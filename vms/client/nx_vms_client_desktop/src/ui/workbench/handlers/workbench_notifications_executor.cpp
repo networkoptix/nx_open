@@ -17,6 +17,7 @@
 #include <nx/vms/rules/actions/enter_fullscreen_action.h>
 #include <nx/vms/rules/actions/exit_fullscreen_action.h>
 #include <nx/vms/rules/actions/play_sound_action.h>
+#include <nx/vms/rules/actions/repeat_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/speak_action.h>
 #include <nx/vms/rules/engine.h>
@@ -62,6 +63,7 @@ QnWorkbenchNotificationsExecutor::QnWorkbenchNotificationsExecutor(QObject* pare
     engine->addActionExecutor(utils::type<ExitFullscreenAction>(), this);
     engine->addActionExecutor(utils::type<NotificationAction>(), this);
     engine->addActionExecutor(utils::type<PlaySoundAction>(), this);
+    engine->addActionExecutor(utils::type<RepeatSoundAction>(), this);
     engine->addActionExecutor(utils::type<SpeakAction>(), this);
 }
 
@@ -70,10 +72,13 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
     if (!checkUserPermissions(context()->user(), action))
         return;
 
-    if (action->type() == utils::type<NotificationAction>())
+    const auto& actionType = action->type();
+
+    if (actionType == utils::type<NotificationAction>()
+        || actionType == utils::type<RepeatSoundAction>())
     {
-        auto notificationAction = action.dynamicCast<NotificationAction>();
-        if (!NX_ASSERT(notificationAction))
+        auto notificationAction = action.dynamicCast<NotificationActionBase>();
+        if (!NX_ASSERT(notificationAction, "Unexpected action: %1", actionType))
             return;
 
         emit notificationActionReceived(notificationAction);

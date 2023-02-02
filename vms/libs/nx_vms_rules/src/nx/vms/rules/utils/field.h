@@ -40,6 +40,10 @@ FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
     const QString& detailName);
 
+FieldDescriptor makeTextFormatterFieldDescriptor(
+    const QString& fieldName,
+    const QString& formatString);
+
 template <class T, class E>
 T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
 {

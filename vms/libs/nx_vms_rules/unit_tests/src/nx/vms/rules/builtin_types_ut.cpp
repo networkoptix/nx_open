@@ -259,6 +259,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>(systemContext());
+    testActionFieldRegistration<TextFormatter>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
     testActionFieldRegistration<TimeField>();
     testActionFieldRegistration<TargetLayoutField>();

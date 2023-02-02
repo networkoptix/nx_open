@@ -2,19 +2,16 @@
 
 #pragma once
 
-#include "../basic_action.h"
-#include "../data_macros.h"
+#include "notification_action_base.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API RepeatSoundAction: public nx::vms::rules::BasicAction
+class NX_VMS_RULES_API RepeatSoundAction: public NotificationActionBase
 {
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.repeatSound")
 
-    FIELD(QnUuidList, deviceIds, setDeviceIds)
     // TODO: #amalov Consider adding duration field or merging with PlaySound.
-    FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(QString, sound, setSound)
     FIELD(float, volume, setVolume)
 

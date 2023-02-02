@@ -63,6 +63,8 @@ public:
         // Analytics data.
         QnUuid objectTrackId;
         nx::common::metadata::GroupedAttributes attributes;
+
+        QnUuid sourceId() const;
     };
 
 public:

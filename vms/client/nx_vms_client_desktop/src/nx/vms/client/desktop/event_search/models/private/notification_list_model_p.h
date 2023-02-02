@@ -12,7 +12,13 @@
 
 class AudioPlayer;
 
-namespace nx::vms::rules { class NotificationAction; }
+namespace nx::vms::rules {
+
+class NotificationActionBase;
+class NotificationAction;
+class RepeatSoundAction;
+
+} // namespace nx::vms::rules
 
 namespace nx::vms::client::desktop {
 
@@ -31,9 +37,16 @@ public:
     void setMaximumCount(int value);
 
 private:
+    void onNotificationActionBase(
+        const QSharedPointer<nx::vms::rules::NotificationActionBase>& action);
+
     void onNotificationAction(
         const QSharedPointer<nx::vms::rules::NotificationAction>& action,
-        QString cloudSystemId = {});
+        QString cloudSystemId);
+
+    void onRepeatSoundAction(
+        const QSharedPointer<nx::vms::rules::RepeatSoundAction>& action);
+
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
@@ -71,14 +84,19 @@ private:
 
     void truncateToMaximumCount();
 
+    void removeAllItems(QnUuid ruleId);
+
 private:
     NotificationListModel* const q = nullptr;
     int m_maximumCount = NotificationListModel::kDefaultMaximumCount;
     QScopedPointer<vms::event::StringsHelper> m_helper;
 
-    QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
+    // Used for deduplication of alarm layout tiles.
+    QHash<QnUuid/*ruleId*/, QHash<QnUuid /*sourceId*/, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
+
     QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
-    QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
+    QHash<QnUuid /*item id*/, QSharedPointer<AudioPlayer>> m_players;
+
     QMultiHash<QString /*system id*/, QnUuid /*item id*/> m_itemsByCloudSystem;
 };
 

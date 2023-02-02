@@ -31,7 +31,9 @@
 #include <nx/vms/event/events/license_issue_event.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/actions/repeat_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/utils/type.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
@@ -61,25 +63,25 @@ QPixmap toPixmap(const QIcon& icon)
 
 QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 {
-    QScopedPointer<AudioPlayer> player(new AudioPlayer());
+    auto player = std::make_unique<AudioPlayer>();
     if (!player->open(filePath))
         return {};
 
     const auto restart =
-        [filePath, player = player.data()]()
+        [filePath, player = player.get()]()
         {
             player->close();
             if (player->open(filePath))
                 player->playAsync();
         };
 
-    const auto loopConnection = QObject::connect(player.data(), &AudioPlayer::done,
-        player.data(), restart, Qt::QueuedConnection);
+    const auto loopConnection = QObject::connect(player.get(), &AudioPlayer::done,
+        player.get(), restart, Qt::QueuedConnection);
 
     if (!player->playAsync())
         return {};
 
-    return QSharedPointer<AudioPlayer>(player.take(),
+    return QSharedPointer<AudioPlayer>(player.release(),
         [loopConnection](AudioPlayer* player)
         {
             // Due to AudioPlayer strange architecture simple calling pleaseStop doesn't work well:
@@ -144,10 +146,28 @@ QnVirtualCameraResourceList getActionDevices(
     return result;
 }
 
+void fillEventData(
+    const nx::vms::rules::NotificationActionBase* action,
+    EventListModel::EventData& eventData)
+{
+    eventData.id = action->id();
+    eventData.ruleId = action->ruleId();
+    eventData.title = action->caption();
+    eventData.description = action->description();
+    eventData.toolTip = action->tooltip();
+    eventData.removable = true;
+    eventData.timestamp = action->timestamp();
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
+
+    eventData.objectTrackId = action->objectTrackId();
+    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
+        action->objectTypeId(),
+        action->attributes());
+}
+
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
-    base_type(),
     QnWorkbenchContextAware(q),
     q(q),
     m_helper(new vms::event::StringsHelper(systemContext()))
@@ -189,9 +209,8 @@ NotificationListModel::Private::Private(NotificationListModel* q):
 
     connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
         &QnWorkbenchNotificationsExecutor::notificationActionReceived,
-        this,
-        [this](const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction)
-        { onNotificationAction(notificationAction); });
+        this, &NotificationListModel::Private::onNotificationActionBase);
+
     connect(context()->instance<QnWorkbenchNotificationsHandler>(),
         &QnWorkbenchNotificationsHandler::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationAction);
@@ -256,7 +275,7 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
     for (int row = first; row <= last; ++row)
     {
         const auto& event = this->q->getEvent(row);
-        m_uuidHashes[event.ruleId][event.source].remove(event.id);
+        m_uuidHashes[event.ruleId][event.sourceId()].remove(event.id);
         m_players.remove(event.id);
 
         for (auto it = m_itemsByLoadingSound.begin(); it != m_itemsByLoadingSound.end(); ++it)
@@ -273,12 +292,27 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
     }
 }
 
+void NotificationListModel::Private::onNotificationActionBase(
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
+{
+    using namespace nx::vms::rules;
+
+    const auto& actionType = action->type();
+
+    NX_VERBOSE(this, "Received action: %1, state: %2, id: %3",
+        actionType, action->state(), action->id());
+
+    if (actionType == rules::utils::type<NotificationAction>())
+        onNotificationAction(action.dynamicCast<NotificationAction>(), {});
+    else if (actionType == rules::utils::type<RepeatSoundAction>())
+        onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
+}
+
 void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action,
     QString cloudSystemId)
 {
-    NX_VERBOSE(this, "Received action: %1, id: %2, system: %3",
-        action->type(), action->id(), cloudSystemId);
+    NX_VERBOSE(this, "Cloud system id: %1", cloudSystemId);
 
     if (!cloudSystemId.isEmpty())
     {
@@ -296,23 +330,11 @@ void NotificationListModel::Private::onNotificationAction(
     }
 
     EventData eventData;
-    eventData.id = action->id();
-    eventData.title = action->caption();
-    eventData.description = action->description();
-    eventData.toolTip = action->tooltip();
     eventData.lifetime = kDisplayTimeout;
-    eventData.removable = true;
-    eventData.timestamp = action->timestamp();
     eventData.level = QnNotificationLevel::convert(action->level());
-    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
-    eventData.ruleId = action->ruleId();
-
-    eventData.objectTrackId = action->objectTrackId();
-    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
-        action->objectTypeId(),
-        action->attributes());
+    fillEventData(action.get(), eventData);
 
     setupClientAction(action.get(), eventData);
 
@@ -325,23 +347,69 @@ void NotificationListModel::Private::onNotificationAction(
     truncateToMaximumCount();
 }
 
+void NotificationListModel::Private::onRepeatSoundAction(
+    const QSharedPointer<nx::vms::rules::RepeatSoundAction>& action)
+{
+    if (action->state() == nx::vms::rules::State::started)
+    {
+        EventData eventData;
+        eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
+        eventData.icon = qnSkin->pixmap("events/sound.png");
+        eventData.sourceName = action->sourceName();
+        fillEventData(action.get(), eventData);
+
+        if (!this->q->addEvent(eventData))
+            return;
+
+        const auto soundUrl = action->sound();
+        if (!m_itemsByLoadingSound.contains(soundUrl))
+            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+
+        m_itemsByLoadingSound.insert(soundUrl, eventData.id);
+
+        m_uuidHashes[action->ruleId()][eventData.sourceId()].insert(eventData.id);
+
+        truncateToMaximumCount();
+    }
+    else if (action->state() == nx::vms::rules::State::stopped)
+    {
+        if (auto it = m_uuidHashes.find(action->ruleId()); it != m_uuidHashes.end())
+        {
+            QnUuidSet itemsToRemove;
+            for (const auto& idSet: *it)
+                itemsToRemove.unite(idSet);
+
+            for (const auto id: itemsToRemove)
+                q->removeEvent(id);
+        }
+    }
+    else
+    {
+        NX_ASSERT(this, "Unexpected action state: %1", action->state());
+    }
+}
+
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
     using namespace std::chrono;
 
-    if (action->actionType() == ActionType::showIntercomInformer)
+    const auto actionType = action->actionType();
+
+    if (actionType == ActionType::showIntercomInformer)
         return;
 
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
+    const auto actionId = action->getParams().actionId;
+    // The actionId is set for notifications only, see RuleProcessor::executeActionInternal.
+    // Used for hiding acknowledged notifications.
+    const bool actionHasId = !actionId.isNull();
 
-    NX_VERBOSE(this, "Received action: %1, id: %2", action->actionType(), action->getParams().actionId);
+    NX_VERBOSE(this, "Received action: %1, id: %2", actionType, actionId);
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
-    const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
-        Qn::ViewContentPermission);
 
     auto title = caption(params, camera);
     const microseconds timestamp(params.eventTimestampUsec);
@@ -358,7 +426,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     alarmCameras.erase(std::unique(alarmCameras.begin(), alarmCameras.end()), alarmCameras.end());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
 
-    const auto actionType = action->actionType();
     if (actionType == ActionType::showOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
@@ -380,9 +447,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         title = tr("Alarm: %1").arg(title);
     }
 
-    const auto actionId = action->getParams().actionId;
-    const bool actionHasId = !actionId.isNull();
-
     EventData eventData;
     eventData.id = actionHasId ? actionId : QnUuid::createUuid();
     eventData.title = title;
@@ -390,14 +454,17 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.toolTip = tooltip(action);
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
+    eventData.icon = pixmapForAction(action, eventData.titleColor);
     eventData.timestamp = timestamp;
     eventData.removable = true;
     eventData.ruleId = action->getRuleId();
     eventData.source = resource;
-    eventData.objectTrackId = params.objectTrackId;
 
+    eventData.objectTrackId = params.objectTrackId;
     eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
-        params.getAnalyticsObjectTypeId(), params.attributes);
+        params.getAnalyticsObjectTypeId(),
+        params.attributes);
 
     if (actionType == ActionType::playSoundAction)
     {
@@ -414,8 +481,11 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         eventData.previewCamera = camera;
         eventData.cameras = alarmCameras;
     }
-    else
+    else if (actionType == ActionType::showPopupAction)
     {
+        const bool hasViewPermission = resource &&
+            accessController()->hasPermissions(resource, Qn::ViewContentPermission);
+
         switch (params.eventType)
         {
             case EventType::poeOverBudgetEvent:
@@ -504,22 +574,24 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             default:
                 break;
         }
+
+        if (camera)
+            setupAcknowledgeAction(eventData, camera->getId(), action);
+    }
+    else
+    {
+        NX_ASSERT(false, "Unexpected action type: %1", actionType);
+        return;
     }
 
     if (eventData.removable && actionType != ActionType::playSoundAction)
         eventData.lifetime = kDisplayTimeout;
 
-    if (actionType == ActionType::showPopupAction && camera)
-        setupAcknowledgeAction(eventData, camera->getId(), action);
-
-    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
-    eventData.icon = pixmapForAction(action, eventData.titleColor);
-
     if (!q->addEvent(eventData))
         return;
 
     if (!actionHasId)
-        m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
+        m_uuidHashes[action->getRuleId()][eventData.sourceId()].insert(eventData.id);
 
     truncateToMaximumCount();
 }
@@ -605,29 +677,30 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
     if (iter == m_uuidHashes.end())
         return;
 
-    auto& uuidHash = *iter;
-
-    const auto removeEvents =
-        [this](const QList<QnUuid>& ids)
-        {
-            for (const auto& id: ids)
-                q->removeEvent(id);
-        };
+    auto& itemsByResource = *iter;
 
     if (action->actionType() == ActionType::playSoundAction)
     {
-        for (const auto& ids: uuidHash.values()) //< Must iterate a copy of the list.
-            removeEvents(ids.values());
-
+        removeAllItems(ruleId);
         return;
     }
 
-    const auto resource = resourcePool()->getResourceById(action->getRuntimeParams().eventResourceId);
-    if (!resource)
-        return;
+    const auto resourceId = action->getRuntimeParams().eventResourceId;
+    for (const auto id: itemsByResource.value(resourceId)) //< Must iterate a copy of the list.
+        q->removeEvent(id);
+}
 
-    if (uuidHash.contains(resource))
-        removeEvents(uuidHash[resource].values());
+void NotificationListModel::Private::removeAllItems(QnUuid ruleId)
+{
+    if (auto it = m_uuidHashes.find(ruleId); it != m_uuidHashes.end())
+    {
+        QnUuidSet itemsToRemove;
+        for (const auto& idSet: *it)
+            itemsToRemove.unite(idSet);
+
+        for (const auto id: itemsToRemove)
+            q->removeEvent(id);
+    }
 }
 
 void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData,

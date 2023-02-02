@@ -112,6 +112,9 @@ void Initializer::registerFields() const
         fieldMetatype<TargetUserField>(),
         [this] { return new TargetUserField(this->m_context); });
     m_engine->registerActionField(
+        fieldMetatype<TextFormatter>(),
+        [this] { return new TextFormatter(this->m_context); });
+    m_engine->registerActionField(
         fieldMetatype<TextWithFields>(),
         [this] { return new TextWithFields(this->m_context); });
     registerActionField<Substitution>();
