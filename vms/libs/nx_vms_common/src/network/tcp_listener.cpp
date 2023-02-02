@@ -122,11 +122,7 @@ bool QnTcpListener::bindToLocalAddress()
     if (!serverSocket
         || !serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
-        const auto errorMessage = nx::format("Error: Unable to bind and listen on %1: %2")
-            .args(localAddress, SystemError::toString(lastError()));
-
-        NX_WARNING(this, errorMessage);
-        qCritical() << errorMessage;
+        NX_ERROR(this, "Unable to bind and listen on %1: %2", localAddress, lastError());
         return false;
     }
     d->serverSocket = std::move(serverSocket);
@@ -386,7 +382,7 @@ void QnTcpListener::run()
     }
     catch (const std::exception& e)
     {
-        NX_WARNING(this, "Exception in TCPListener (%1:%2). %3",
+        NX_ERROR(this, "Exception in TCPListener (%1:%2). %3",
             d->serverAddress, d->localPort, e.what());
     }
 
@@ -410,15 +406,16 @@ void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractSt
     {
         if (!d->ddosWarned)
         {
-            qWarning() << "Amount of TCP connections reached"
-                << d->connections.size() << "of" << d->maxConnections
-                << "Possible ddos attack! Reject incoming TCP connection";
+            NX_WARNING(this,
+                "Amount of TCP connections reached %1 of %2. Possible ddos attack!"
+                " Reject %3 from %4",
+                d->connections.size(), d->maxConnections, socket, socket->getForeignAddress());
             d->ddosWarned = true;
         }
         return;
     }
     d->ddosWarned = false;
-    NX_VERBOSE(this, "New client connection from %1", socket->getForeignAddress());
+    NX_VERBOSE(this, "New client connection %1 from %2", socket, socket->getForeignAddress());
 
     socket->setRecvTimeout(kDefaultSocketTimeout);
     socket->setSendTimeout(kDefaultSocketTimeout);
