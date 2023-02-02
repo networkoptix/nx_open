@@ -180,7 +180,7 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
                 },
             };
 
-            if (!nx::branding::isMobileClientEnabledInCustomization())
+            if (nx::branding::isMobileClientEnabledInCustomization())
             {
                 helpFileDescriptions.push_back(
                     {
