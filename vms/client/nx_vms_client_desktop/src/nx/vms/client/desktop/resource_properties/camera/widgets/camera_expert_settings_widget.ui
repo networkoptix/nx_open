@@ -481,7 +481,7 @@
                   <item>
                    <widget class="QSpinBox" name="logicalIdSpinBox">
                     <property name="maximum">
-                     <number>999</number>
+                     <number>999999</number>
                     </property>
                    </widget>
                   </item>
