@@ -7,7 +7,9 @@
 #include <QtCore/QString>
 
 #include <nx/utils/property_storage/storage.h>
+#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,6 +26,17 @@ public:
     SystemSpecificLocalSettings(SystemContext* systemContext);
 
     Property<std::map<QString, qint64>> licenseLastWarningTime{this, "licenseLastWarningTime"};
+
+    // Updates-related settings.
+
+    /** Do not show update notification for the selected version. */
+    Property<nx::vms::api::SoftwareVersion> ignoredUpdateVersion{this, "ignoredUpdateVersion"};
+
+    /** Latest known update info. */
+    Property<UpdateDeliveryInfo> updateDeliveryInfo{this, "updateDeliveryInfo"};
+
+    /** Estimated update delivery date (in msecs since epoch). */
+    Property<qint64> updateDeliveryDate{this, "updateDeliveryDate"};
 };
 
 } // namespace nx::vms::client::desktop

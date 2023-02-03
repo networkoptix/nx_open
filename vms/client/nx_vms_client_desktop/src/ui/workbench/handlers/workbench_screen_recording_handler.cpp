@@ -15,6 +15,7 @@
 #include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_data_provider_base.h>

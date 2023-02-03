@@ -9,6 +9,7 @@
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
+#include <nx/build_info.h>
 #include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <ui/dialogs/common/custom_file_dialog.h>

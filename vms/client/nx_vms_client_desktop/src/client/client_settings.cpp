@@ -235,14 +235,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
             return QVariant::fromValue(QnSystemHealth::unpackVisibleInSettings(packed));
         }
 
-        case UPDATE_DELIVERY_INFO:
-        {
-            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
-                .value<QString>().toUtf8();
-            return QVariant::fromValue(QJson::deserialized<UpdateDeliveryInfo>(asJson,
-                defaultValue.value<UpdateDeliveryInfo>()));
-        }
-
         case AUTH_ALLOWED_URLS:
         {
             auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -333,14 +325,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             packed = QnSystemHealth::packVisibleInSettings(packed,
                 value.value<QSet<QnSystemHealth::MessageType>>());
             base_type::writeValueToSettings(settings, id, packed);
-            break;
-        }
-
-        case UPDATE_DELIVERY_INFO:
-        {
-            const auto& updateInfo = value.value<UpdateDeliveryInfo>();
-            QString asJson = QString::fromUtf8(QJson::serialized(updateInfo));
-            base_type::writeValueToSettings(settings, id, asJson);
             break;
         }
 

@@ -14,6 +14,7 @@
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <network/system_helpers.h>
+#include <nx/build_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
