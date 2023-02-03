@@ -159,7 +159,9 @@ private:
         NX_CRITICAL(rootItem);
         QQmlEngine::setObjectOwnership(rootItem.get(), QQmlEngine::CppOwnership);
         rootItem->setParentItem(quickWindow->contentItem());
-        quickWindow->setColor(Qt::transparent);
+
+        // Setting parameters of QQuickWindow other than geometry before its QQuickRenderControl
+        // initialization leads to UI freeze on certain platforms.
         quickWindow->setGeometry({0, 0, 1, 1});
 
         QSurfaceFormat format;
@@ -175,6 +177,8 @@ private:
 
         const auto contextGuard = bindContext();
         renderControl->initialize(QOpenGLContext::currentContext());
+
+        quickWindow->setColor(Qt::transparent);
     }
 
     QOpenGLFramebufferObject* ensureFramebuffer(NameValueTable* widget, const QSize& size)
