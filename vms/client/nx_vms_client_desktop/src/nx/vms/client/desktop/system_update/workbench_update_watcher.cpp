@@ -6,16 +6,17 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <client/client_settings.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
@@ -33,6 +34,7 @@
 
 using namespace std::chrono;
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
@@ -203,7 +205,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // User is not interested in this update.
-    if (qnSettings->ignoredUpdateVersion() >= targetVersion)
+    if (systemContext()->localSettings()->ignoredUpdateVersion() >= targetVersion)
         return;
 
     // Administrator disabled update notifications globally.
@@ -220,7 +222,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
     // Maximum days for release delivery.
     const int releaseDeliveryDays = contents.info.releaseDeliveryDays;
 
-    const UpdateDeliveryInfo oldUpdateInfo = qnSettings->updateDeliveryInfo();
+    const UpdateDeliveryInfo oldUpdateInfo = systemContext()->localSettings()->updateDeliveryInfo();
     if (nx::utils::SoftwareVersion(oldUpdateInfo.version) != targetVersion
         || oldUpdateInfo.releaseDateMs != releaseDate
         || oldUpdateInfo.releaseDeliveryDays != releaseDeliveryDays)
@@ -236,13 +238,12 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         constexpr int kHoursPerDay = 24;
         const milliseconds timeToDeliver = hours{
             nx::utils::random::number(0, releaseDeliveryDays * kHoursPerDay)};
-        qnSettings->setUpdateDeliveryDate((releaseDate + timeToDeliver).count());
+        systemContext()->localSettings()->updateDeliveryDate = (releaseDate + timeToDeliver).count();
     }
-    qnSettings->setUpdateDeliveryInfo(contents.getUpdateDeliveryInfo());
-    qnSettings->save();
+    systemContext()->localSettings()->updateDeliveryInfo = contents.getUpdateDeliveryInfo();
 
     auto currentTimeFromEpoch = QDateTime::currentMSecsSinceEpoch();
-    auto updateDeliveryDate = qnSettings->updateDeliveryDate();
+    auto updateDeliveryDate = systemContext()->localSettings()->updateDeliveryDate();
     // Update is postponed
     if (updateDeliveryDate > currentTimeFromEpoch)
         return;
@@ -311,8 +312,7 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
 
     if (messageBox.isChecked())
     {
-        qnSettings->setIgnoredUpdateVersion(targetVersion);
-        qnSettings->save();
+        systemContext()->localSettings()->ignoredUpdateVersion = targetVersion;
     }
 
     if (result != QDialogButtonBox::Cancel)

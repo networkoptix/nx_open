@@ -10,7 +10,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QString>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/common/update/update_information.h>
 
@@ -26,9 +26,8 @@ struct UpdateDeliveryInfo
 
     bool operator==(const UpdateDeliveryInfo& other) const = default;
 };
-
 #define UpdateDeliveryInfo_Fields (version)(releaseDateMs)(releaseDeliveryDays)
-QN_FUSION_DECLARE_FUNCTIONS(UpdateDeliveryInfo, (json))
+NX_REFLECTION_INSTRUMENT(UpdateDeliveryInfo, UpdateDeliveryInfo_Fields)
 
 /**
  * Source type for update information.

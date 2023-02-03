@@ -17,13 +17,11 @@
 #include <nx/utils/qset.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
-#include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <utils/common/property_storage.h>
 
@@ -59,15 +57,6 @@ public:
         LAST_USED_CONNECTION,
 
         LOCALE,
-
-        /** Latest known update info. */
-        UPDATE_DELIVERY_INFO,
-
-        /** Estimated update delivery date (in msecs since epoch). */
-        UPDATE_DELIVERY_DATE,
-
-        /** Do not show update notification for the selected version. */
-        IGNORED_UPDATE_VERSION,
 
         TOUR_CYCLE_TIME,
 
@@ -258,15 +247,6 @@ private:
             QString())
 
         QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, nx::branding::defaultLocale())
-
-        /* Updates-related settings */
-        QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
-        QN_DECLARE_RW_PROPERTY(nx::vms::client::desktop::UpdateDeliveryInfo,
-            updateDeliveryInfo,
-            setUpdateDeliveryInfo,
-            UPDATE_DELIVERY_INFO,
-            nx::vms::client::desktop::UpdateDeliveryInfo())
-        QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
 

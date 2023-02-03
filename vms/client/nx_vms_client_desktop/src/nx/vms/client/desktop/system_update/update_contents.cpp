@@ -2,8 +2,6 @@
 
 #include "update_contents.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx::vms::client::desktop {
 
 void UpdateContents::resetVerification()
@@ -79,7 +77,5 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
 
     return other.info.version >= info.version;
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateDeliveryInfo, (json), UpdateDeliveryInfo_Fields)
 
 } // namespace nx::vms::client::desktop
