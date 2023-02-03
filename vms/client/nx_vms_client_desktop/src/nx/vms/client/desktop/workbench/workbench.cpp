@@ -258,6 +258,10 @@ Workbench::Workbench(QObject* parent):
 Workbench::~Workbench()
 {
     QSignalBlocker blocker(this);
+
+    // Avoid processing current layout signals while it is destroyed.
+    setCurrentLayout(nullptr);
+
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
     delete d->dummyLayout;
     d->dummyLayout = nullptr;
