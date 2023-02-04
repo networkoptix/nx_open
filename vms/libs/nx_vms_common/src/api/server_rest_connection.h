@@ -824,6 +824,14 @@ public:
         Result<ErrorOrEmpty>::type callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
+    Handle postRest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const QByteArray& body,
+        Result<ErrorOrEmpty>::type callback,
+        nx::utils::AsyncHandlerExecutor executor = {});
+
     Handle getUbJsonResult(
         const QString& action,
         nx::network::rest::Params params,
