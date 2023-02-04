@@ -423,6 +423,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->manualDownloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
     ui->manualDownloadButton->setForegroundRole(QPalette::WindowText);
 
+    ui->checkAgainButton->hide();
+    ui->checkAgainButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->checkAgainButton->setForegroundRole(QPalette::WindowText);
+
     ui->tryAgainButton->hide();
     ui->tryAgainButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     ui->tryAgainButton->setForegroundRole(QPalette::WindowText);
@@ -527,6 +531,15 @@ void MultiServerUpdatesWidget::initDownloadActions()
                 ui->manualDownloadButton->rect().bottomLeft() + QPoint(0, 1)));
 
             ui->manualDownloadButton->update();
+        });
+
+    connect(ui->checkAgainButton, &QPushButton::clicked, this,
+        [this]()
+        {
+            if (m_updateSourceMode == UpdateSourceType::internet)
+                checkForInternetUpdates();
+            else if (m_updateSourceMode == UpdateSourceType::internetSpecific)
+                recheckSpecificBuild();
         });
 
     connect(ui->tryAgainButton, &QPushButton::clicked, this,
@@ -2456,6 +2469,13 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         && m_updateInfo.error != common::update::InformationError::httpError;
 
     ui->manualDownloadButton->setVisible(showDownloadButton || ini().alwaysShowGetUpdateFileButton);
+
+    const bool showCheckAgainButton = !isChecking
+        && m_updateSourceMode != UpdateSourceType::file
+        && (m_widgetState == WidgetUpdateState::ready
+            || m_widgetState == WidgetUpdateState::initial)
+        && m_updateInfo.info.version.isNull();
+    ui->checkAgainButton->setVisible(showCheckAgainButton);
 
     const bool showTryAgainButton =
         showDownloadButton && m_widgetState != WidgetUpdateState::ready;
