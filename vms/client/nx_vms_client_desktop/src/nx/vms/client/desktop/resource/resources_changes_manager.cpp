@@ -727,12 +727,25 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         body.id = user->getId();
         body.name = user->getName();
         body.email = user->getEmail();
+        body.type = user->userType();
         body.fullName = user->fullName();
         body.permissions = user->getRawPermissions();
         body.isEnabled = user->isEnabled();
-        body.isHttpDigestEnabled =
-            (user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub);
-        body.password = user->getPassword();
+        body.isOwner = user->isOwner();
+        switch (digestSupport)
+        {
+            case QnUserResource::DigestSupport::enable:
+                body.isHttpDigestEnabled = true;
+                break;
+            case QnUserResource::DigestSupport::disable:
+                body.isHttpDigestEnabled = false;
+                break;
+            default:
+                body.isHttpDigestEnabled =
+                    user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub;
+        }
+        if (const auto password = user->getPassword(); !password.isEmpty())
+            body.password = password;
         body.userGroupIds = user->userRoleIds();
         body.resourceAccessRights =
             sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(user));
@@ -814,9 +827,23 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
             body.fullName = user->fullName();
             body.permissions = user->getRawPermissions();
             body.isEnabled = user->isEnabled();
-            body.isHttpDigestEnabled =
-                (user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub);
-            body.password = user->getPassword();
+            body.isOwner = user->isOwner();
+
+            switch (digestSupport)
+            {
+                case QnUserResource::DigestSupport::enable:
+                    body.isHttpDigestEnabled = true;
+                    break;
+                case QnUserResource::DigestSupport::disable:
+                    body.isHttpDigestEnabled = false;
+                    break;
+                default:
+                    body.isHttpDigestEnabled =
+                        user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub;
+            }
+
+            if (const auto password = user->getPassword(); !password.isEmpty())
+                body.password = password;
             body.userGroupIds = user->userRoleIds();
             body.resourceAccessRights =
                 sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(user));
@@ -945,6 +972,25 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
         {
             nx::vms::api::UserModelV3 body;
             body.id = subject.id();
+
+            const auto user = resourcePool->getResourceById<QnUserResource>(body.id);
+            if (NX_ASSERT(user))
+            {
+                body.name = user->getName();
+                body.email = user->getEmail();
+                body.type = user->userType();
+                body.fullName = user->fullName();
+                body.permissions = user->getRawPermissions();
+                body.isEnabled = user->isEnabled();
+                body.isOwner = user->isOwner();
+                // Set isHttpDigestEnabled to false (default) for Cloud users so the server can
+                // ignore this value.
+                body.isHttpDigestEnabled =
+                    user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub
+                    && user->userType() != nx::vms::api::UserType::cloud;
+                body.userGroupIds = user->userRoleIds();
+            }
+
             body.resourceAccessRights->insert(
                 accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd());
             const auto tokenHelper = helper

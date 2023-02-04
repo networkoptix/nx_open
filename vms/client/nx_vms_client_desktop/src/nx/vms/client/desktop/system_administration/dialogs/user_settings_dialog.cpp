@@ -318,7 +318,9 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     ResourcesChangesManager::UserChangesFunction applyChangesFunction = nx::utils::guarded(this,
         [this, state](const QnUserResourcePtr& /*user*/)
         {
-            d->user->setName(state.login);
+            d->user->setName(d->user->userType() == nx::vms::api::UserType::cloud
+                ? state.email
+                : state.login);
             d->user->setEmail(state.email);
             d->user->setEnabled(state.userEnabled);
             d->user->setFullName(state.fullName);
@@ -358,14 +360,18 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             : nx::vms::api::UserType::cloud,
             /*externalId*/ {}));
         d->user->setRawPermissions(state.globalPermissions);
-        d->user->setName(state.login);
-        d->user->setIdUnsafe(state.userId);
+        d->user->setName(d->user->userType() == nx::vms::api::UserType::cloud
+            ? state.email
+            : state.login);
+        d->user->setIdUnsafe(d->user->userType() == nx::vms::api::UserType::cloud
+            ? QnUuid::fromArbitraryData(state.email)
+            : state.userId);
     }
 
     QnUserResource::DigestSupport digestSupport =
         originalState().allowInsecure == state.allowInsecure && d->dialogType != createUser
             ? QnUserResource::DigestSupport::keep
-            : state.allowInsecure
+            : (state.allowInsecure && d->user->userType() != nx::vms::api::UserType::cloud)
                 ? QnUserResource::DigestSupport::enable
                 : QnUserResource::DigestSupport::disable;
 
