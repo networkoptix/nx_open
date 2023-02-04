@@ -1502,6 +1502,26 @@ Handle ServerConnection::patchRest(nx::vms::common::SessionTokenHelperPtr helper
     return handle;
 }
 
+Handle ServerConnection::postRest(nx::vms::common::SessionTokenHelperPtr helper,
+    const QString& action,
+    const nx::network::rest::Params& params,
+    const QByteArray& body,
+    Result<ErrorOrEmpty>::type callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto request = prepareRequest(nx::network::http::Method::post,
+        prepareUrl(action, params),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        body);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle =
+        request.isValid() ? executeRequest(request, std::move(wrapper), executor) : Handle();
+
+    return handle;
+}
+
 Handle ServerConnection::getUbJsonResult(
     const QString& path,
     nx::network::rest::Params params,

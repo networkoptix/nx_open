@@ -962,6 +962,12 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
         {
             nx::vms::api::UserGroupModel body;
             body.id = subject.id();
+            // These fields are not std::optional, so the PATCH request will always overwrite them.
+            const auto group = userRolesManager()->userRole(body.id);
+            body.name = group.name;
+            body.description = group.description;
+            body.parentGroupIds = group.parentRoleIds;
+            body.permissions = group.permissions;
             body.resourceAccessRights->insert(
                 accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd());
             const auto tokenHelper = helper
@@ -1064,6 +1070,8 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
         auto backup = userRolesManager()->userRole(role.id);
         userRolesManager()->addOrUpdateUserRole(role);
 
+        const bool isNewGroup = backup.id.isNull();
+
         auto handler =
             [this, backup, role, callback](bool success,
                 rest::Handle /*requestId*/,
@@ -1081,18 +1089,34 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
             };
         nx::vms::api::UserGroupModel body;
         body.id = role.id;
+        body.name = role.name;
+        body.description = role.description;
+        body.parentGroupIds = role.parentRoleIds;
+        body.permissions = role.permissions;
         body.resourceAccessRights =
             sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(role));
         const auto tokenHelper = helper
             ? helper
             : systemContext->restApiHelper()->getSessionTokenHelper();
 
-        api->patchRest(tokenHelper,
-            QString("/rest/v3/userGroups/%1").arg(body.id.toString()),
-            network::rest::Params{},
-            QJson::serialized(body),
-            handler,
-            thread());
+        if (isNewGroup)
+        {
+            api->postRest(tokenHelper,
+                QString("/rest/v3/userGroups"),
+                network::rest::Params{},
+                QJson::serialized(body),
+                handler,
+                thread());
+        }
+        else
+        {
+            api->patchRest(tokenHelper,
+                QString("/rest/v3/userGroups/%1").arg(body.id.toString()),
+                network::rest::Params{},
+                QJson::serialized(body),
+                handler,
+                thread());
+        }
     }
     else
     {
