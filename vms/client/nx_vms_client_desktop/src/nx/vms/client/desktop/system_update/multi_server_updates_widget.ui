@@ -486,7 +486,17 @@ border-style: solid;
           <item>
            <widget class="QPushButton" name="manualDownloadButton">
             <property name="text">
-             <string notr="true">Get Update File</string>
+             <string>Get Update File</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="checkAgainButton">
+            <property name="text">
+             <string>Check Again</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -496,7 +506,7 @@ border-style: solid;
           <item>
            <widget class="QPushButton" name="tryAgainButton">
             <property name="text">
-             <string notr="true">Try Again</string>
+             <string>Try Again</string>
             </property>
             <property name="flat">
              <bool>true</bool>
