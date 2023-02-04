@@ -433,6 +433,27 @@ TEST_F(ResourceAccessManagerTest, checkParentChanged)
 }
 
 //-------------------------------------------------------------------------------------------------
+// Checking intercom layouts
+
+TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissions)
+{
+    loginAsCustom(GlobalPermission::none);
+
+    auto intercomLayout = addIntercom();
+    const auto intercomId = intercomLayout->getParentId();
+    setAccessRights(m_currentUser->getId(), {{intercomId, AccessRight::view}});
+
+    // Access to intercom grants access to its layout.
+    checkPermissions(intercomLayout, Qn::ReadPermission, {});
+
+    auto camera = addCamera();
+    addToLayout(intercomLayout, camera);
+
+    // Access to intercom layout doesn't grant access to its items.
+    checkPermissions(camera, Qn::NoPermissions, {});
+}
+
+//-------------------------------------------------------------------------------------------------
 // Checking videowall-based layouts
 
 /** Admin can do anything with layout on videowall. */

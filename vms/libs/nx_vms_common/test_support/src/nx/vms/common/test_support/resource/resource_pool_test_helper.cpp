@@ -11,6 +11,7 @@
 #include <core/resource/webpage_resource.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/common/intercom/utils.h>
 
 #include "storage_resource_stub.h"
 
@@ -109,6 +110,38 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addDesktopCamera(
     auto camera = createDesktopCamera(user);
     resourcePool()->addResource(camera);
     return camera;
+}
+
+nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
+{
+    const auto camera = createCamera();
+
+    static const QString kOpenDoorPortName = QString::fromStdString(
+        nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
+
+    QnIOPortData intercomFeaturePort;
+    intercomFeaturePort.outputName = kOpenDoorPortName;
+
+    camera->setIoPortDescriptions({intercomFeaturePort}, false);
+    resourcePool()->addResource(camera);
+    return camera;
+}
+
+QnLayoutResourcePtr QnResourcePoolTestHelper::addIntercomLayout(
+    const QnVirtualCameraResourcePtr& intercomCamera)
+{
+    if (!NX_ASSERT(intercomCamera && nx::vms::common::isIntercom(intercomCamera)))
+        return {};
+
+    const auto intercomId = intercomCamera->getId();
+
+    const auto layout = createLayout();
+    layout->setIdUnsafe(nx::vms::common::calculateIntercomLayoutId(intercomId));
+    layout->setParentId(intercomId);
+
+    resourcePool()->addResource(layout);
+    NX_ASSERT(nx::vms::common::isIntercomLayout(layout));
+    return layout;
 }
 
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
