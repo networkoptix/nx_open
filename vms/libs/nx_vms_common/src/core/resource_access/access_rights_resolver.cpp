@@ -10,6 +10,7 @@
 
 #include "abstract_access_rights_manager.h"
 #include "resolvers/inherited_resource_access_resolver.h"
+#include "resolvers/intercom_layout_access_resolver.h"
 #include "resolvers/layout_item_access_resolver.h"
 #include "resolvers/own_resource_access_resolver.h"
 #include "resolvers/videowall_item_access_resolver.h"
@@ -24,6 +25,7 @@ struct AccessRightsResolver::Private
     std::unique_ptr<OwnResourceAccessResolver> ownResourceAccessResolver;
     std::unique_ptr<VideowallItemAccessResolver> videowallItemAccessResolver;
     std::unique_ptr<LayoutItemAccessResolver> layoutItemAccessResolver;
+    std::unique_ptr<IntercomLayoutAccessResolver> intercomLayoutAccessResolver;
     std::unique_ptr<InheritedResourceAccessResolver> inheritedResourceAccessResolver;
 
     explicit Private(
@@ -39,8 +41,10 @@ struct AccessRightsResolver::Private
             ownResourceAccessResolver.get(), resourcePool)),
         layoutItemAccessResolver(new LayoutItemAccessResolver(
             videowallItemAccessResolver.get(), resourcePool, subjectEditingMode)),
+        intercomLayoutAccessResolver(new IntercomLayoutAccessResolver(
+            layoutItemAccessResolver.get(), resourcePool)),
         inheritedResourceAccessResolver(new InheritedResourceAccessResolver(
-            layoutItemAccessResolver.get(), subjectHierarchy))
+            intercomLayoutAccessResolver.get(), subjectHierarchy))
     {
     }
 };

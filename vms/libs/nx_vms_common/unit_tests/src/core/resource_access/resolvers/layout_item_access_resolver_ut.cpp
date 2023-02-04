@@ -22,15 +22,6 @@ namespace test {
 
 using namespace nx::vms::api;
 
-namespace {
-
-AccessRights videowallItemAccessRights(AccessRights videowallAccessRights)
-{
-    return videowallAccessRights;
-}
-
-} // namespace
-
 class LayoutItemAccessResolverTest: public ResourceAccessResolverTestFixture
 {
 public:
@@ -39,7 +30,7 @@ public:
         const auto ownResolver = new OwnResourceAccessResolver(
             manager.get(), systemContext()->globalPermissionsWatcher(), /*parent*/ manager.get());
         const auto videowallResolver = new VideowallItemAccessResolver(
-            ownResolver, resourcePool(), /*parent*/ ownResolver);
+            ownResolver, resourcePool(), /*parent*/ manager.get());
         return new LayoutItemAccessResolver(videowallResolver, resourcePool());
     }
 };
@@ -47,14 +38,14 @@ public:
 TEST_F(LayoutItemAccessResolverTest, noAccess)
 {
     const auto camera = createCamera();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, notApplicableResource)
 {
     const auto user = createUser(GlobalPermission::admin);
     manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, layoutAccess)
@@ -74,18 +65,25 @@ TEST_F(LayoutItemAccessResolverTest, noPrivateLayoutAccess)
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), AccessRight::view}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, noVideowallLayoutDirectAccess)
 {
     const auto videowall = addVideoWall();
     const auto layout = addLayoutForVideoWall(videowall);
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), AccessRight::view}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), kFullAccessRights}});
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, videowall), kNoAccessRights);
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kNoAccessRights);
+
+    manager->setOwnResourceAccessMap(kTestSubjectId,
+        {{layout->getId(), kFullAccessRights}, {videowall->getId(), kViewAccessRights}});
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, videowall), kViewAccessRights);
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kViewAccessRights);
 }
 
-TEST_F(LayoutItemAccessResolverTest, itemAccessViaLayout)
+TEST_F(LayoutItemAccessResolverTest, itemAccessViaSharedLayout)
 {
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
@@ -99,11 +97,10 @@ TEST_F(LayoutItemAccessResolverTest, itemAccessViaLayout)
     auto healthMonitor = addServer();
     addToLayout(layout, healthMonitor);
 
-    const AccessRights testRights = AccessRight::view;
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), testRights}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), testRights);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), testRights);
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), kFullAccessRights}});
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), kViewAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kViewAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, itemAccessViaVideowall)
@@ -120,15 +117,10 @@ TEST_F(LayoutItemAccessResolverTest, itemAccessViaVideowall)
     auto healthMonitor = addServer();
     addToLayout(layout, healthMonitor);
 
-    const AccessRights testRights = AccessRight::view;
-
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage),
-        videowallItemAccessRights(testRights));
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor),
-        videowallItemAccessRights(testRights));
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), kFullAccessRights}});
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), kViewAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kViewAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, resolvedAccessIsAccumulated)
@@ -186,9 +178,9 @@ TEST_F(LayoutItemAccessResolverTest, noItemAccessViaPrivateLayout)
 
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), testRights}});
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), kNoAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, basicNotificationSignals)
@@ -204,7 +196,7 @@ TEST_F(LayoutItemAccessResolverTest, basicNotificationSignals)
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     // Remove.
-    manager->removeSubjects({ kTestSubjectId });
+    manager->removeSubjects({kTestSubjectId});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     // Clear.
@@ -227,7 +219,7 @@ TEST_F(LayoutItemAccessResolverTest, layoutSharingStarted)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     layout->setParentId({});
     ASSERT_TRUE(layout->isShared());
@@ -252,7 +244,7 @@ TEST_F(LayoutItemAccessResolverTest, layoutSharingStopped)
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, sharedLayoutItemAdded)
@@ -264,7 +256,7 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutItemAdded)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     addToLayout(layout, camera);
 
@@ -287,7 +279,7 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutItemRemoved)
 
     layout->removeItem(itemId);
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, noAccessToDesktopCameraOnSharedLayout)
@@ -304,8 +296,8 @@ TEST_F(LayoutItemAccessResolverTest, noAccessToDesktopCameraOnSharedLayout)
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera1), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera2), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera1), kNoAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera2), kNoAccessRights);
 
     const auto map1 = resolver->resourceAccessMap(kTestSubjectId);
     ASSERT_FALSE(map1.contains(desktopCamera1->getId()));
@@ -314,8 +306,8 @@ TEST_F(LayoutItemAccessResolverTest, noAccessToDesktopCameraOnSharedLayout)
     resourcePool()->addResource(desktopCamera2);
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera1), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera2), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera1), kNoAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera2), kNoAccessRights);
 
     const auto map2 = resolver->resourceAccessMap(kTestSubjectId);
     ASSERT_FALSE(map2.contains(desktopCamera1->getId()));
@@ -331,13 +323,12 @@ TEST_F(LayoutItemAccessResolverTest, videowallLayoutItemAdded)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     addToLayout(layout, camera);
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, videowallLayoutItemRemoved)
@@ -351,12 +342,11 @@ TEST_F(LayoutItemAccessResolverTest, videowallLayoutItemRemoved)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 
     layout->removeItem(itemId);
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, layoutWithCameraAddedToVideowall)
@@ -374,16 +364,15 @@ TEST_F(LayoutItemAccessResolverTest, layoutWithCameraAddedToVideowall)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     resourcePool()->addResource(layout);
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
-TEST_F(LayoutItemAccessResolverTest, cameraAddedOnVideowallLayout)
+TEST_F(LayoutItemAccessResolverTest, cameraAddedToVideowallLayout)
 {
     auto videowall = addVideoWall();
     auto camera = addCamera();
@@ -392,17 +381,16 @@ TEST_F(LayoutItemAccessResolverTest, cameraAddedOnVideowallLayout)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     addToLayout(layout, camera);
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, pushMyScreen)
-// Effectively the same as `cameraAddedOnVideowallLayout`, but for a desktop camera.
+// Effectively the same as `cameraAddedToVideowallLayout`, but for a desktop camera.
 {
     auto user = addUser(GlobalPermission::admin);
     auto videowall = addVideoWall();
@@ -413,7 +401,7 @@ TEST_F(LayoutItemAccessResolverTest, pushMyScreen)
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), testRights);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, desktopCamera), kNoAccessRights);
 
     addToLayout(layout, desktopCamera);
 
@@ -437,7 +425,7 @@ TEST_F(LayoutItemAccessResolverTest, cameraDroppedOnVideoWall_3_0)
     addToLayout(layout, camera);
     resourcePool()->addResource(layout);
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     QnVideoWallItem vwitem;
     vwitem.layout = layout->getId();
@@ -446,8 +434,7 @@ TEST_F(LayoutItemAccessResolverTest, cameraDroppedOnVideoWall_3_0)
 
     layout->setParentId(videowall->getId());
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, cameraDroppedOnVideoWall_3_1)
@@ -469,15 +456,14 @@ TEST_F(LayoutItemAccessResolverTest, cameraDroppedOnVideoWall_3_1)
     layout->setParentId(videowall->getId());
     resourcePool()->addResource(layout);
 
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
 
     vwitem.layout = layout->getId();
     videowall->items()->updateItem(vwitem);
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, parentlessLayoutBecomesVideowallLayout)
@@ -497,18 +483,17 @@ TEST_F(LayoutItemAccessResolverTest, parentlessLayoutBecomesVideowallLayout)
     const AccessRights testRights = AccessRight::view;
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), testRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     resourcePool()->addResource(layout);
 
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
 
     layout->setParentId(videowall->getId());
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera),
-        videowallItemAccessRights(testRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, sharedLayoutAdded)
@@ -528,8 +513,8 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutAdded)
 
     // Layout is not in the pool yet, its changes are not tracked.
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, webPage), kNoAccessRights);
 
     resourcePool()->addResource(layout);
 
@@ -567,13 +552,13 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutRemoved)
     resourcePool()->removeResource(layout);
 
     NX_ASSERT_TEST_SUBJECT_CHANGED();
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 
     // Layout changes are not tracked now.
     auto healthMonitor = addServer();
     addToLayout(layout, healthMonitor);
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kNoAccessRights);
 }
 
 TEST_F(LayoutItemAccessResolverTest, noSignalsForPrivateLayoutChanges)

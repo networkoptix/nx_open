@@ -28,10 +28,11 @@ public:
     explicit Private(
         LayoutItemAccessResolver* q,
         AbstractResourceAccessResolver* baseResolver,
-        QnResourcePool* resourcePool, 
+        QnResourcePool* resourcePool,
         bool subjectEditingMode);
 
     ResourceAccessMap ensureAccessMap(const QnUuid& subjectId) const;
+    bool isRelevantLayout(const QnLayoutResourcePtr& layout) const;
     bool isVideowallLayout(const QnLayoutResourcePtr& layout) const;
     bool isSharedLayout(const QnLayoutResourcePtr& layout) const;
 
@@ -61,6 +62,8 @@ private:
     void notifyResolutionChanged(const QnLayoutResourcePtr& layout,
         const QSet<QnUuid>& knownAffectedSubjectIds,
         bool fromLayoutItem);
+
+    QString layoutType(const QnLayoutResourcePtr& layout) const; //< For logging.
 
 public:
     const QPointer<AbstractResourceAccessResolver> baseResolver;
@@ -158,12 +161,11 @@ ResourceAccessDetails LayoutItemAccessResolver::accessDetails(
     lk.unlock();
 
     for (const auto& layout: nx::utils::keyRange(resourceLayouts))
-    // After the `accessRights` call, `subjectLayouts` are guaranteed valid.
     {
         if (accessRights(subjectId, layout).testFlag(accessRight))
         {
-            const QnResourcePtr videowall = d->videowallWatcher->layoutVideowall(layout);
-            details[subjectId].insert(videowall ? videowall : (QnResourcePtr) layout);
+            const auto parentResource = layout->getParentResource();
+            details[subjectId].insert(parentResource ? parentResource : (QnResourcePtr) layout);
         }
     }
 
@@ -253,8 +255,7 @@ ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUui
     ResourceAccessMap accessMap;
     for (const auto& layout: layouts)
     {
-        const bool videowallLayout = isVideowallLayout(layout);
-        if (!videowallLayout && !isSharedLayout(layout))
+        if (!isRelevantLayout(layout))
         {
             cachedAccessMapRef.remove(layout->getId());
             continue;
@@ -265,7 +266,7 @@ ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUui
 
         const auto accessRights = baseAccessMap.value(layout->getId());
         const auto layoutItems = layout->getItems();
-        const bool allowDesktopCameras = videowallLayout;
+        const bool allowDesktopCameras = isVideowallLayout(layout);
 
         for (const auto& item: layoutItems)
         {
@@ -284,6 +285,11 @@ ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUui
     NX_VERBOSE(q, cachedAccessMapRef);
 
     return cachedAccessMapRef;
+}
+
+bool LayoutItemAccessResolver::Private::isRelevantLayout(const QnLayoutResourcePtr& layout) const
+{
+    return isSharedLayout(layout) || isVideowallLayout(layout);
 }
 
 bool LayoutItemAccessResolver::Private::isVideowallLayout(const QnLayoutResourcePtr& layout) const
@@ -379,30 +385,38 @@ void LayoutItemAccessResolver::Private::handleReset()
     q->notifyAccessReset();
 }
 
+QString LayoutItemAccessResolver::Private::layoutType(const QnLayoutResourcePtr& layout) const
+{
+    if (!NX_ASSERT(layout))
+        return {};
+
+    if (isSharedLayout(layout))
+        return "shared";
+
+    if (isVideowallLayout(layout))
+        return "videowall";
+
+    return "private";
+}
+
 void LayoutItemAccessResolver::Private::handleLayoutAdded(const QnLayoutResourcePtr& layout)
 {
-    const bool isShared = isSharedLayout(layout);
-    const bool isVideowall = !isShared && isVideowallLayout(layout);
-
-    NX_VERBOSE(q, "Layout %1 added, shared=%2, videowall=%3", layout, isShared, isVideowall);
+    NX_VERBOSE(q, "Layout %1 added, type=%2", layout, layoutType(layout));
 
     connect(layout.get(), &QnResource::parentIdChanged,
         this, &Private::handleLayoutParentChanged, Qt::DirectConnection);
 
-    if (isShared || isVideowall)
+    if (isRelevantLayout(layout))
         handleLayoutShared(layout);
 }
 
 void LayoutItemAccessResolver::Private::handleLayoutRemoved(const QnLayoutResourcePtr& layout)
 {
-    const bool isShared = isSharedLayout(layout);
-    const bool isVideowall = !isShared && isVideowallLayout(layout);
-
-    NX_VERBOSE(q, "Layout %1 removed, shared=%2, videowall=%3", layout, isShared, isVideowall);
+    NX_VERBOSE(q, "Layout %1 removed, type=%2", layout, layoutType(layout));
 
     layout->disconnect(this);
 
-    if (isShared || isVideowall)
+    if (isRelevantLayout(layout))
         handleLayoutUnshared(layout);
 }
 
@@ -438,7 +452,7 @@ void LayoutItemAccessResolver::Private::handleVideowallLayoutAddedOrRemoved(
 void LayoutItemAccessResolver::Private::handleLayoutSharingMaybeChanged(
     const QnLayoutResourcePtr& layout)
 {
-    if (isSharedLayout(layout) || isVideowallLayout(layout))
+    if (isRelevantLayout(layout))
         handleLayoutShared(layout);
     else if (sharedLayoutItemsWatcher.isWatched(layout))
         handleLayoutUnshared(layout);
@@ -549,7 +563,7 @@ void LayoutItemAccessResolver::Private::handleCameraRemoved(const QnVirtualCamer
 void LayoutItemAccessResolver::Private::handleLayoutItemAddedOrRemoved(
     const QnUuid& /*resourceId*/, const QnLayoutResourcePtr& layout)
 {
-    if (!NX_ASSERT(isSharedLayout(layout) || isVideowallLayout(layout)))
+    if (!NX_ASSERT(isRelevantLayout(layout)))
         return;
 
     const auto invalidateLayoutSubjects =

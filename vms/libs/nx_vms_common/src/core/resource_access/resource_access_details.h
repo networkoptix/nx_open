@@ -13,7 +13,7 @@ using ResourceAccessDetails = QHash<
     QnUuid /** Id of the subject the access is gained in. */,
     QSet<QnResourcePtr> /** Indirect providers, the resource itself if it's accessed directly. */>;
 
-/** Merges two resource access maps. */
+/** Merges two resource access detail sets. */
 NX_VMS_COMMON_API ResourceAccessDetails& operator+=(
     ResourceAccessDetails& destination, const ResourceAccessDetails& source);
 
