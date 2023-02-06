@@ -192,39 +192,59 @@ Item
 
                 target: context
 
-                function onOpenTile(systemId, errorMessage, isLoginError)
+                function findTile(systemId)
                 {
-                    tileGrid.lockInterface(false)
-
-                    var tilesNumber = systemTilesStorage.items.length
-
                     if (systemId.length !== 0)
                     {
+                        var tilesNumber = systemTilesStorage.items.length
+
                         for (var i = 0; i < tilesNumber; ++i)
                         {
                             var item = systemTilesStorage.items[i]
                             if (item.systemId === systemId)
-                            {
-                                var isConnecting = item.isConnecting
-                                item.setErrorMessage(errorMessage, isLoginError)
+                                return item
+                        }
+                    }
 
-                                if (isConnecting
-                                    && !item.cloud
-                                    && !item.isFactorySystem
-                                    && !item.isExpanded
-                                    && !item.incompatible
-                                    && item.online)
-                                {
-                                    item.expand()
-                                }
+                    return null
+                }
+
+                function onOpenTile(systemId, errorMessage, isLoginError)
+                {
+                    tileGrid.lockInterface(false)
+
+                    if (systemId.length !== 0)
+                    {
+                        var item = findTile(systemId)
+                        if (item)
+                        {
+                            var isConnecting = item.isConnecting
+                            item.setErrorMessage(errorMessage, isLoginError)
+
+                            if (isConnecting
+                                && !item.cloud
+                                && !item.isFactorySystem
+                                && !item.isExpanded
+                                && !item.incompatible
+                                && item.online)
+                            {
+                                item.expand()
                             }
                         }
                     }
                     else
                     {
+                        var tilesNumber = systemTilesStorage.items.length
                         for (var i = 0; i < tilesNumber; ++i)
                             systemTilesStorage.items[i].setErrorMessage("", isLoginError)
                     }
+                }
+
+                function onCloseTile(systemId)
+                {
+                    var item = findTile(systemId)
+                    if (item && item.isExpanded)
+                        item.shrinkAndStopConnecting()
                 }
             }
 
