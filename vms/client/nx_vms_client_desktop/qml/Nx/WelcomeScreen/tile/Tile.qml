@@ -79,6 +79,13 @@ Button
             forgetSavedPassword()
     }
 
+    function shrinkAndStopConnecting()
+    {
+        if (isExpanded)
+            shrink()
+        tile.isConnecting = false
+    }
+
     function deleteSystem()
     {
         context.deleteSystem(systemId, localId)

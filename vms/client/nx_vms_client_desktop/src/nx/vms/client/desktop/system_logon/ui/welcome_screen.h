@@ -64,6 +64,8 @@ public:
     WelcomeScreen(QWidget* parent = nullptr);
     virtual ~WelcomeScreen() override;
 
+    void connectionToSystemEstablished(const QnUuid& systemId);
+
 public: // Properties
     QObject* systemModel();
 
@@ -191,6 +193,8 @@ signals:
 
     void openTile(const QString& systemId, const QString& errorMessage = "",
         bool isLoginError = false);
+
+    void closeTile(const QString& systemId);
 
     void switchPage(int pageIndex);
 
