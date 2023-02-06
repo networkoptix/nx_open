@@ -615,6 +615,41 @@ bool QnVirtualCameraResource::hasDualStreamingInternal() const
     return base_type::hasDualStreamingInternal();
 }
 
+bool QnVirtualCameraResource::isWebPageSupported() const
+{
+    if (hasFlags(Qn::virtual_camera))
+        return false;
+
+    const bool isNetworkLink = hasCameraCapabilities(
+        nx::vms::api::DeviceCapabilities(nx::vms::api::DeviceCapability::customMediaUrl)
+            | nx::vms::api::DeviceCapability::fixedQuality);
+    if (isNetworkLink)
+        return false;
+
+    const bool isUsbDevice = getVendor() == "usb_cam"
+        && getMAC().isNull()
+        && sourceUrl(Qn::CR_LiveVideo).isEmpty()
+        && sourceUrl(Qn::CR_SecondaryLiveVideo).isEmpty();
+    if (isUsbDevice)
+        return false;
+
+    return true;
+}
+
+int QnVirtualCameraResource::customWebPagePort() const
+{
+    return getProperty(QnVirtualCameraResource::kHttpPortParameterName).toInt();
+}
+
+void QnVirtualCameraResource::setCustomWebPagePort(int value)
+{
+    if (!NX_ASSERT(value >= 0 && value < 65536, "Port number is invalid"))
+        return;
+
+    const QString propertyValue = value > 0 ? QString::number(value) : QString();
+    setProperty(QnVirtualCameraResource::kHttpPortParameterName, propertyValue);
+}
+
 Qn::RecordingState QnVirtualCameraResource::recordingState() const
 {
     if (!isScheduleEnabled())

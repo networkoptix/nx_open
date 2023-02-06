@@ -169,6 +169,18 @@ public:
 
     virtual bool hasDualStreamingInternal() const override;
 
+    /** Whether this camera supports web page. */
+    bool isWebPageSupported() const;
+
+    /**
+     * Customized user-provided port for Camera Web Page.
+     * @return positive value if custom port is set; 0 if default port should be used.
+     */
+    int customWebPagePort() const;
+
+    /** Set custom port for Camera Web Page. Pass 0 to reset custom value. */
+    void setCustomWebPagePort(int value);
+
     Qn::RecordingState recordingState() const;
 
     /**

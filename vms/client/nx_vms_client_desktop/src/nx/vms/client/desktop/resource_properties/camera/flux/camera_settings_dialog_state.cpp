@@ -116,9 +116,7 @@ bool CameraSettingsDialogState::canForceZoomCapability() const
 
 bool CameraSettingsDialogState::canShowWebPage() const
 {
-    return isSingleCamera() && !singleCameraProperties.networkLink
-        && !singleCameraProperties.usbDevice
-        && devicesDescription.isVirtualCamera == CombinedValue::None;
+    return isSingleCamera() && devicesDescription.supportsWebPage == CombinedValue::All;
 }
 
 bool CameraSettingsDialogState::canAdjustPtzSensitivity() const

@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 using namespace std::chrono;
@@ -750,6 +751,118 @@ TEST_F(CameraSettingsDialogStateReducerTest, qualityLimitsChangeKeepsBrush)
     EXPECT_EQ(minFpsState.recording.minRelevantQuality, nx::vms::api::StreamQuality::highest);
     EXPECT_EQ(minFpsState.recording.brush.streamQuality, nx::vms::api::StreamQuality::highest);
 }
+
+//-------------------------------------------------------------------------------------------------
+// Web Page
+
+// Camera web page address is basically a camera API url without query and path. Also there are
+// some options that affect it:
+// - System Settings -> useHttpsOnlyCameras option forces using https protocol
+// - http_port property defines custom port (high priority)
+// - http_port query parameter defines custom port (low priority)
+// - default ports (80 for http and 443 for https) are omitted
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddress)
+{
+    auto camera = createCamera();
+    camera->setUrl("https://example.com:777/path?query=true");
+    State state = Reducer::loadCameras({}, {camera});
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com:777/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressDefaultPortHttps)
+{
+    auto camera = createCamera();
+    camera->setUrl("https://example.com:443/path?query=true");
+    State state = Reducer::loadCameras({}, {camera});
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressDefaultPortHttp)
+{
+    auto camera = createCamera();
+    camera->setUrl("http://example.com:80/path?query=true");
+    State state = Reducer::loadCameras({}, {camera});
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("http://example.com/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageForceHttpsSubstitution)
+{
+    auto camera = createCamera();
+    camera->systemContext()->globalSettings()->setUseHttpsOnlyCameras(true);
+    camera->setUrl("http://example.com:443/path?query=true");
+    State state = Reducer::loadCameras({}, {camera});
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressQueryCustomPort)
+{
+    auto camera = createCamera();
+    camera->setUrl("https://example.com/path?query=true&http_port=277");
+    State state = Reducer::loadCameras({}, {camera});
+    EXPECT_TRUE(state.expert.customWebPagePort.equals(0));
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com:277/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressPropertyCustomPort)
+{
+    auto camera = createCamera();
+    camera->setUrl("https://example.com/path?query=true&http_port=277");
+    camera->setCustomWebPagePort(555);
+    State state = Reducer::loadCameras({}, {camera});
+    EXPECT_TRUE(state.expert.customWebPagePort.equals(555));
+    EXPECT_FALSE(state.isDefaultExpertSettings);
+    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com:555/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageSetCustomPort)
+{
+    auto camera = createCamera();
+
+    camera->setUrl("https://example.com:777");
+    State state = Reducer::loadCameras({}, {camera});
+    EXPECT_TRUE(state.isDefaultExpertSettings);
+    State changed = Reducer::setCustomWebPagePort(std::move(state), 555);
+    EXPECT_TRUE(changed.expert.customWebPagePort.equals(555));
+    EXPECT_FALSE(changed.isDefaultExpertSettings);
+    ASSERT_EQ(changed.singleCameraProperties.settingsUrl, QString("https://example.com:555/"));
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageApplyCustomPort)
+{
+    auto camera = createCamera();
+    State state = Reducer::loadCameras({}, {camera});
+    State changed = Reducer::setCustomWebPagePort(std::move(state), 555);
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(changed, {camera});
+    ASSERT_EQ(camera->customWebPagePort(), 555);
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressCleanCustomPort)
+{
+    auto camera = createCamera();
+    camera->setUrl("https://example.com:777/");
+    camera->setCustomWebPagePort(555);
+    State state = Reducer::loadCameras({}, {camera});
+    State changed = Reducer::setCustomWebPagePort(std::move(state), 0);
+    EXPECT_TRUE(changed.expert.customWebPagePort.equals(0));
+    ASSERT_EQ(changed.singleCameraProperties.settingsUrl, QString("https://example.com:777/"));
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(changed, {camera});
+    ASSERT_EQ(camera->customWebPagePort(), 0);
+}
+
+TEST_F(CameraSettingsDialogStateReducerTest, webPageMultipleCamerasCustomPort)
+{
+    auto camera1 = createCamera();
+    camera1->setCustomWebPagePort(555);
+    auto camera2 = createCamera();
+    QnVirtualCameraResourceList cameras{camera1, camera2};
+    State state = Reducer::loadCameras({}, cameras);
+    EXPECT_FALSE(state.expert.customWebPagePort.hasValue());
+    State changed = Reducer::setCustomWebPagePort(std::move(state), 80);
+    EXPECT_TRUE(changed.expert.customWebPagePort.equals(80));
+}
+
+//-------------------------------------------------------------------------------------------------
+// Rotation
 
 TEST_F(CameraSettingsDialogStateReducerTest, cameraRotationSaveLoad)
 {

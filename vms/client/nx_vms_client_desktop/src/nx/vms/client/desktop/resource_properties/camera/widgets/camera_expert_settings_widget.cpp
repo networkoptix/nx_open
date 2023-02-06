@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include <core/ptz/ptz_constants.h>
+#include <nx/network/http/http_types.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
@@ -203,6 +204,15 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomMediaPort);
+
+    connect(ui->useAutoWebPagePortCheckBox, &QCheckBox::clicked, this,
+        [this, store](bool checked)
+        {
+            store->setCustomWebPagePort(checked ? 0 : nx::network::http::DEFAULT_HTTP_PORT);
+        });
+
+    connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged,
+        store, &CameraSettingsDialogStore::setCustomWebPagePort);
 
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
@@ -508,6 +518,38 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->comboBoxSecondaryProfile, /*isPrimary*/ false);
 
     ::setReadOnly(ui->comboBoxTransport, state.readOnly);
+
+    ui->groupBoxWebPage->setVisible(
+        state.devicesDescription.supportsWebPage == CombinedValue::All);
+    if (state.expert.customWebPagePort.hasValue())
+    {
+        const bool customWebPagePortUsed = state.expert.customWebPagePort() > 0;
+        ui->useAutoWebPagePortCheckBox->setTristate(false);
+        ui->useAutoWebPagePortCheckBox->setChecked(!customWebPagePortUsed);
+        ui->customWebPagePortSpinBox->setEnabled(customWebPagePortUsed);
+
+        if (customWebPagePortUsed)
+        {
+            ui->customWebPagePortSpinBox->setMinimum(1);
+            ui->customWebPagePortSpinBox->setValue(state.expert.customWebPagePort());
+        }
+        else
+        {
+            ui->customWebPagePortSpinBox->setMinimum(0);
+            ui->customWebPagePortSpinBox->setValue(0);
+        }
+    }
+    else
+    {
+        ui->useAutoWebPagePortCheckBox->setTristate(true);
+        ui->useAutoWebPagePortCheckBox->setCheckState(Qt::PartiallyChecked);
+        ui->customWebPagePortSpinBox->setEnabled(false);
+        ui->customWebPagePortSpinBox->setMinimum(0);
+        ui->customWebPagePortSpinBox->setValue(0);
+    }
+    ::setReadOnly(ui->useAutoWebPagePortCheckBox, state.readOnly);
+    ::setReadOnly(ui->customWebPagePortSpinBox, state.readOnly);
+
     if (state.expert.customMediaPort.hasValue())
     {
         ui->customMediaPortSpinBox->setValue(
