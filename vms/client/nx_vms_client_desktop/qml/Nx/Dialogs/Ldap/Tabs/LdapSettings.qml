@@ -368,7 +368,10 @@ Rectangle
                             height: 20
 
                             hoverEnabled: true
-                            visible: !modified && control.online && !control.checkingStatus
+                            visible: !modified
+                                && control.online
+                                && !control.checkingStatus
+                                && !control.continuousSync
 
                             icon.source: "image://svg/skin/user_settings/sync_ldap.svg"
                             icon.width: width
