@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -151,6 +152,11 @@ WelcomeScreen::~WelcomeScreen()
     for (auto request: m_runningRequests)
         request->pleaseStopSync();
     m_runningRequests.clear();
+}
+
+void WelcomeScreen::connectionToSystemEstablished(const QnUuid& systemId)
+{
+    emit closeTile(systemId.toString());
 }
 
 QObject* WelcomeScreen::systemModel()
