@@ -118,11 +118,10 @@ CombinedValue combinedValue(const Cameras& cameras, std::function<bool(const Cam
 }
 
 /** Get camera webpage address as http(s)://host[:port] */
-QString getWebpageAddress(const Camera& camera)
+nx::utils::Url getBaseCameraUrl(const Camera& camera)
 {
-    NX_ASSERT(camera);
-    if (!camera)
-        return QString();
+    if (!NX_ASSERT(camera))
+        return {};
 
     auto url = nx::utils::Url::fromUserInput(camera->getUrl());
     if (!url.isValid())
@@ -135,6 +134,7 @@ QString getWebpageAddress(const Camera& camera)
         url.setPort(-1);
 
     // Force HTTP or HTTPS protocol for a webpage.
+    // TODO: #sivanov Update protocol on global settings change.
     const bool useSecureScheme = camera->commonModule()->globalSettings()->useHttpsOnlyCameras()
         || (nx::utils::stricmp(scheme, nx::network::http::kSecureUrlSchemeName) == 0);
 
@@ -147,11 +147,7 @@ QString getWebpageAddress(const Camera& camera)
     if (port > 0)
         url.setPort(port);
 
-    // Omit default port number for selected scheme.
-    if (nx::network::http::defaultPortForScheme(url.scheme().toStdString()) == url.port())
-        url.setPort(-1);
-
-    return url.toString(QUrl::RemovePath | QUrl::RemoveQuery);
+    return url;
 }
 
 bool isMotionDetectionEnabled(const Camera& camera)
@@ -262,17 +258,38 @@ State loadStreamUrls(State state, const Camera& camera)
     return state;
 }
 
+State updateCameraWebPage(State state)
+{
+    auto url = state.singleCameraProperties.baseCameraUrl;
+
+    // Omit default port number for selected scheme.
+    if (nx::network::http::defaultPortForScheme(url.scheme().toStdString()) == url.port())
+        url.setPort(-1);
+
+    if (state.expert.customWebPagePort.valueOr(0) > 0)
+        url.setPort(state.expert.customWebPagePort());
+
+    const auto schemeHostPort = url.toString(QUrl::RemovePath | QUrl::RemoveQuery);
+    state.singleCameraProperties.webPageLabelText =
+        nx::format("<a href=\"%1\">%1</a>", schemeHostPort);
+    state.singleCameraProperties.settingsUrl = schemeHostPort + "/" +
+        state.singleCameraProperties.settingsUrlPath;
+
+    return state;
+}
+
 State loadNetworkInfo(State state, const Camera& camera)
 {
     NX_ASSERT(camera);
     if (!camera)
         return state;
 
-    const auto schemeHostPort = getWebpageAddress(camera);
+    state.singleCameraProperties.baseCameraUrl = getBaseCameraUrl(camera);
+    state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
+
+    state = updateCameraWebPage(std::move(state));
+
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
-    state.singleCameraProperties.webPageLabelText =
-        nx::format("<a href=\"%1\">%1</a>", schemeHostPort);
-    state.singleCameraProperties.settingsUrl = schemeHostPort + "/" + settingsUrlPath(camera);
     state.singleCameraProperties.overrideXmlHttpRequestTimeout =
         camera->resourceData().value<int>("overrideXmlHttpRequestTimeout", 0);
     state.singleCameraProperties.overrideHttpUserAgent =
@@ -467,6 +484,9 @@ bool isDefaultExpertSettings(const State& state)
     }
 
     if (state.canForcePanTiltCapabilities() && state.expert.forcedPtzZoomCapability.valueOr(true))
+        return false;
+
+    if (!state.expert.customWebPagePort.equals(0))
         return false;
 
     if (state.devicesDescription.hasCustomMediaPortCapability == CombinedValue::All
@@ -1105,6 +1125,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->hasVideo(); });
     state.devicesDescription.supportsAudio = combinedValue(cameras,
         [](const Camera& camera) { return camera->isAudioSupported(); });
+    state.devicesDescription.supportsWebPage = combinedValue(cameras,
+        [](const Camera& camera) { return camera->isWebPageSupported(); });
     state.devicesDescription.isAudioForced = combinedValue(cameras,
         [](const Camera& camera) { return camera->isAudioForced(); });
     state.devicesDescription.supportsAudioOutput = combinedValue(cameras,
@@ -1227,6 +1249,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     fetchFromCameras<bool>(state.expert.remoteMotionDetectionEnabled, cameras,
         [](const Camera& camera) { return camera->isRemoteArchiveMotionDetectionEnabled(); });
+
+    fetchFromCameras<int>(state.expert.customWebPagePort, cameras,
+        [](const Camera& camera) { return camera->customWebPagePort(); });
 
     fetchFromCameras<int>(state.expert.customMediaPort, cameras,
         [](const Camera& camera) { return camera->mediaPort(); });
@@ -2343,6 +2368,18 @@ State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int valu
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setCustomWebPagePort(State state, int value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    const bool enable = value > 0;
+    state.expert.customWebPagePort.setUser(enable ? value : 0);
+    state = updateCameraWebPage(std::move(state));
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setTrustCameraTime(State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
@@ -2418,6 +2455,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setRemoteArchiveAutoImportEnabled(std::move(state), false);
+    state = setCustomWebPagePort(std::move(state), 0);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);
     state = setLogicalId(std::move(state), {});

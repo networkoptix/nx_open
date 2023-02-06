@@ -113,4 +113,6 @@ NX_REFLECTION_ENUM_CLASS(CombinedValue,
     All
 );
 
+NX_VMS_CLIENT_DESKTOP_API void PrintTo(CombinedValue value, ::std::ostream* os);
+
 } // namespace nx::vms::client::desktop

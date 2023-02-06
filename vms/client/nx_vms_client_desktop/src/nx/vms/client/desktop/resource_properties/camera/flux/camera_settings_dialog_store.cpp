@@ -602,6 +602,12 @@ void CameraSettingsDialogStore::setCustomMediaPort(int value)
         [&](State state) { return Reducer::setCustomMediaPort(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setCustomWebPagePort(int value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCustomWebPagePort(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setTrustCameraTime(bool value)
 {
     d->executeAction(

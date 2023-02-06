@@ -165,6 +165,7 @@ public:
     void setAutoMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
     void setCustomMediaPort(int value);
+    void setCustomWebPagePort(int value);
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();

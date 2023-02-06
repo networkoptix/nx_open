@@ -503,6 +503,12 @@ void setCustomMediaPort(int value, const Cameras& cameras)
         camera->setMediaPort(value);
 }
 
+void setCustomWebPagePort(int value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setCustomWebPagePort(value);
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -709,6 +715,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             state.expert.remoteArchiveAutoImportEnabled(),
             cameras);
     }
+
+    if (state.expert.customWebPagePort.hasValue())
+        setCustomWebPagePort(state.expert.customWebPagePort(), cameras);
 
     if (state.expert.customMediaPort.hasValue())
         setCustomMediaPort(state.expert.customMediaPort(), cameras);

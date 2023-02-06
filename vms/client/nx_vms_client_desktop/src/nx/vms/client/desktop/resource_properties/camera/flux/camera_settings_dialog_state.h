@@ -17,6 +17,7 @@
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/url.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/types/rtp_types.h>
@@ -46,6 +47,8 @@ struct SingleCameraProperties
     QString vendor;
     QString macAddress;
     QString ipAddress;
+    nx::utils::Url baseCameraUrl;
+    QString settingsUrlPath;
     QString webPageLabelText;
     QString settingsUrl;
     int overrideXmlHttpRequestTimeout = 0;
@@ -69,7 +72,8 @@ struct SingleCameraProperties
 };
 
 NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
-    (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(webPageLabelText)(settingsUrl)
+    (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(baseCameraUrl)(settingsUrlPath)
+    (webPageLabelText)(settingsUrl)
     (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
     (editableStreamUrls)(networkLink)(usbDevice)(maxFpsWithoutMotion)(primaryStreamResolution)
     (secondaryStreamResolution))
@@ -82,6 +86,7 @@ struct CombinedProperties
     CombinedValue isArecontCamera = CombinedValue::None;
     CombinedValue supportsAudio = CombinedValue::None;
     CombinedValue supportsVideo = CombinedValue::None;
+    CombinedValue supportsWebPage = CombinedValue::None;
     CombinedValue isAudioForced = CombinedValue::None;
     CombinedValue supportsAudioOutput = CombinedValue::None;
     CombinedValue hasMotion = CombinedValue::None;
@@ -102,6 +107,7 @@ struct CombinedProperties
 };
 NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isDtsBased)(isVirtualCamera)(isIoModule)(isArecontCamera)(supportsAudio)(supportsVideo)
+    (supportsWebPage)
     (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
     (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
     (canForceZoomCapability)(canAdjustPtzSensitivity)(hasCustomMediaPortCapability)
@@ -287,6 +293,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
         UserEditableMultiple<bool> remoteMotionDetectionEnabled;
         PtzSensitivity ptzSensitivity;
+
+        UserEditableMultiple<int> customWebPagePort;
 
         static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;
