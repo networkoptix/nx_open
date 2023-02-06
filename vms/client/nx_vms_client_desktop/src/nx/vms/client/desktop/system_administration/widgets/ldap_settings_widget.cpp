@@ -197,7 +197,11 @@ struct LdapSettingsWidget::Private
     int getLdapGroupCount() const
     {
         const auto groups = q->systemContext()->userRolesManager()->userRoles();
-        return std::count_if(groups.begin(), groups.end(), [](auto g) { return g.isLdap; });
+        return std::count_if(groups.begin(), groups.end(),
+            [](auto g)
+            {
+                return g.isLdap && g.id != nx::vms::api::UserRoleData::kLdapDefaultId;
+            });
     }
 };
 
@@ -594,7 +598,7 @@ void LdapSettingsWidget::removeExisting()
 
     for (auto group: rolesManager->userRoles())
     {
-        if (group.isLdap)
+        if (group.isLdap && group.id != nx::vms::api::UserRoleData::kLdapDefaultId)
             ldapGroupIds.insert(group.id);
     }
 
