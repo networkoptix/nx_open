@@ -149,6 +149,7 @@ public:
     static State setRemoteArchiveSyncronizationAuto(State state);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
+    static State setCustomWebPagePort(State state, int value);
     static State setTrustCameraTime(State state, bool value);
     static State setLogicalId(State state, int value);
     static State generateLogicalId(State state);
