@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/rules/action_executor.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchLayout;
@@ -13,14 +14,16 @@ class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop {
 
-class AlarmLayoutHandler: public QObject, public QnWorkbenchContextAware
+class AlarmLayoutHandler:
+    public nx::vms::rules::ActionExecutor,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = nx::vms::rules::ActionExecutor;
 
 public:
     AlarmLayoutHandler(QObject* parent = nullptr);
-    virtual ~AlarmLayoutHandler();
+    virtual ~AlarmLayoutHandler() override;
 
 private:
     void openCamerasInAlarmLayout(
@@ -36,6 +39,8 @@ private:
         QnWorkbenchLayout* layout,
         QnWorkbenchItem* item,
         qint64 positionUs);
+
+    virtual void execute(const nx::vms::rules::ActionPtr& action) override;
 
     /**
      *  Check if current client instance is the main one.

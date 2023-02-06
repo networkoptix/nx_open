@@ -57,6 +57,7 @@ void Initializer::registerActions() const
     registerAction<PlaySoundAction>();
     registerAction<RepeatSoundAction>();
     registerAction<SendEmailAction>();
+    registerAction<ShowOnAlarmLayoutAction>();
     registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();
 }

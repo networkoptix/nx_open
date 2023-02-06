@@ -17,6 +17,7 @@ namespace nx::vms::rules {
 class NotificationActionBase;
 class NotificationAction;
 class RepeatSoundAction;
+class ShowOnAlarmLayoutAction;
 
 } // namespace nx::vms::rules
 
@@ -46,6 +47,9 @@ private:
 
     void onRepeatSoundAction(
         const QSharedPointer<nx::vms::rules::RepeatSoundAction>& action);
+
+    void onAlarmLayoutAction(
+        const QSharedPointer<nx::vms::rules::ShowOnAlarmLayoutAction>& action);
 
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);

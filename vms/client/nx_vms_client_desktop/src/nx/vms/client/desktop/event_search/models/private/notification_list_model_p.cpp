@@ -33,6 +33,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/repeat_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/utils/type.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
@@ -93,6 +94,28 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
             else
                 player->deleteLater();
         });
+}
+
+QnVirtualCameraResourceList getAlarmCameras(
+    const nx::vms::event::AbstractAction* action,
+    const nx::vms::client::desktop::SystemContext* context)
+{
+    const auto resourcePool = context->resourcePool();
+    auto alarmCameras = resourcePool->getResourcesByIds<QnVirtualCameraResource>(
+        action->getResources());
+
+    if (action->getParams().useSource)
+    {
+        const auto sourceResourceIds = action->getSourceResources(resourcePool);
+        alarmCameras.append(resourcePool->getResourcesByIds<QnVirtualCameraResource>(
+            sourceResourceIds));
+    }
+
+    std::sort(alarmCameras.begin(), alarmCameras.end());
+    alarmCameras.erase(std::unique(alarmCameras.begin(), alarmCameras.end()), alarmCameras.end());
+    alarmCameras = context->accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+
+    return alarmCameras;
 }
 
 QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
@@ -306,6 +329,10 @@ void NotificationListModel::Private::onNotificationActionBase(
         onNotificationAction(action.dynamicCast<NotificationAction>(), {});
     else if (actionType == rules::utils::type<RepeatSoundAction>())
         onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
+    else if (actionType == rules::utils::type<RepeatSoundAction>())
+        onAlarmLayoutAction(action.dynamicCast<ShowOnAlarmLayoutAction>());
+    else
+        NX_ASSERT(false, "Unexpected action type: %1", actionType);
 }
 
 void NotificationListModel::Private::onNotificationAction(
@@ -373,20 +400,39 @@ void NotificationListModel::Private::onRepeatSoundAction(
     }
     else if (action->state() == nx::vms::rules::State::stopped)
     {
-        if (auto it = m_uuidHashes.find(action->ruleId()); it != m_uuidHashes.end())
-        {
-            QnUuidSet itemsToRemove;
-            for (const auto& idSet: *it)
-                itemsToRemove.unite(idSet);
-
-            for (const auto id: itemsToRemove)
-                q->removeEvent(id);
-        }
+        removeAllItems(action->ruleId());
     }
     else
     {
         NX_ASSERT(this, "Unexpected action state: %1", action->state());
     }
+}
+
+void NotificationListModel::Private::onAlarmLayoutAction(
+    const QSharedPointer<nx::vms::rules::ShowOnAlarmLayoutAction>& action)
+{
+    NX_ASSERT(action->state() != nx::vms::rules::State::stopped,
+        "Unexpected alarm action state: %1", action->state());
+
+    EventData eventData;
+    eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
+    eventData.icon = qnSkin->pixmap("events/alarm.png");
+    eventData.sourceName = action->sourceName();
+    eventData.previewCamera =
+        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
+            .value(0);
+    eventData.cameras =
+        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->deviceIds());
+    eventData.actionId = action::OpenInAlarmLayoutAction;
+    eventData.actionParameters = eventData.cameras;
+
+    fillEventData(action.get(), eventData);
+
+    if (!this->q->addEvent(eventData))
+        return;
+
+    // TODO: #amalov Check the need of using m_uuidHashes for this action.
+    truncateToMaximumCount();
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
@@ -414,17 +460,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     auto title = caption(params, camera);
     const microseconds timestamp(params.eventTimestampUsec);
 
-    auto alarmCameras =
-        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->getResources());
-    if (action->getParams().useSource)
-    {
-        const auto sourceResourceIds = action->getSourceResources(resourcePool());
-        alarmCameras.append(resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            sourceResourceIds));
-    }
-    std::sort(alarmCameras.begin(), alarmCameras.end());
-    alarmCameras.erase(std::unique(alarmCameras.begin(), alarmCameras.end()), alarmCameras.end());
-    alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+    auto alarmCameras = getAlarmCameras(action.get(), systemContext());
 
     if (actionType == ActionType::showOnAlarmLayoutAction)
     {
@@ -665,19 +701,13 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
     if (action->actionType() == ActionType::showIntercomInformer)
         return;
 
-    const auto actionId = action->getParams().actionId;
-    if (!actionId.isNull())
+    if (const auto actionId = action->getParams().actionId; !actionId.isNull())
     {
         q->removeEvent(actionId);
         return;
     }
 
     const auto ruleId = action->getRuleId();
-    const auto iter = m_uuidHashes.find(ruleId);
-    if (iter == m_uuidHashes.end())
-        return;
-
-    auto& itemsByResource = *iter;
 
     if (action->actionType() == ActionType::playSoundAction)
     {
@@ -685,8 +715,13 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
         return;
     }
 
+    const auto iter = m_uuidHashes.find(ruleId);
+    if (iter == m_uuidHashes.end())
+        return;
+
     const auto resourceId = action->getRuntimeParams().eventResourceId;
-    for (const auto id: itemsByResource.value(resourceId)) //< Must iterate a copy of the list.
+
+    for (const auto id: iter->value(resourceId)) //< Must iterate a copy of the list.
         q->removeEvent(id);
 }
 

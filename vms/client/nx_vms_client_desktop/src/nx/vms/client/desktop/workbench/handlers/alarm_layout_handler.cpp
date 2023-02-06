@@ -13,7 +13,6 @@
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -25,11 +24,15 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -40,9 +43,12 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
 
-namespace {
+namespace nx::vms::client::desktop {
 
+using namespace nx::vms::rules;
 using namespace std::chrono;
+
+namespace {
 
 /* Processing actions are cleaned by this timeout. */
 constexpr auto kProcessingActionTimeout = 5s;
@@ -59,8 +65,6 @@ QnVirtualCameraResourceList sortedCameras(QnVirtualCameraResourceList cameraList
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 struct ActionKey
 {
@@ -154,8 +158,6 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 kProcessingActionTimeout,
                 this);
 
-            using namespace std::chrono;
-
             bool switchToLayoutNeeded = params.forced;
             int rewindForMs = params.recordBeforeMs;
             auto camerasPositionUs = (rewindForMs == 0)
@@ -167,10 +169,47 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
             if ((params.forced && currentInstanceIsMain()) || alarmLayoutExists())
                 openCamerasInAlarmLayout(targetCameras, switchToLayoutNeeded, camerasPositionUs);
         });
+
+    auto engine = systemContext()->vmsRulesEngine();
+    engine->addActionExecutor(rules::utils::type<ShowOnAlarmLayoutAction>(), this);
 }
 
 AlarmLayoutHandler::~AlarmLayoutHandler()
 {
+}
+
+void AlarmLayoutHandler::execute(const nx::vms::rules::ActionPtr& abstractAction)
+{
+    auto action = abstractAction.dynamicCast<ShowOnAlarmLayoutAction>();
+    if (!NX_ASSERT(action, "Unexpected action type: %1", abstractAction->type()))
+        return;
+
+    if (!context()->user())
+        return;
+
+    const auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        action->deviceIds());
+
+    if (targetCameras.isEmpty())
+        return;
+
+    ActionKey key{action->ruleId(), action->timestamp().count()};
+    if (d->processingActions.contains(key))
+        return; /* See d->processingActions comment. */
+
+    d->processingActions.append(key);
+    executeDelayedParented(
+        [this, key] { d->processingActions.removeOne(key); },
+        kProcessingActionTimeout,
+        this);
+
+    const auto rewindFor = action->playbackTime();
+    const auto camerasPositionUs = (rewindFor.count() <= 0)
+        ? DATETIME_NOW
+        : (action->timestamp() - rewindFor).count();
+
+    if ((action->forceOpen() && currentInstanceIsMain()) || alarmLayoutExists())
+        openCamerasInAlarmLayout(targetCameras, action->forceOpen(), camerasPositionUs);
 }
 
 void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)
@@ -293,8 +332,6 @@ void AlarmLayoutHandler::setCameraItemPosition(
     NX_ASSERT(layout && item, "Objects must exist here");
     if (!item)
         return;
-
-    using namespace std::chrono;
 
     auto positionMs = (positionUs == DATETIME_NOW)
         ? DATETIME_NOW

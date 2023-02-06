@@ -281,7 +281,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     //testActionRegistration<PushNotificationAction>();
     testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();
-    //testActionRegistration<ShowOnAlarmLayoutAction>();
+    testActionRegistration<ShowOnAlarmLayoutAction>();
     testActionRegistration<SpeakAction>();
     testActionRegistration<TextOverlayAction>();
     //testActionRegistration<WriteToLogAction>();
