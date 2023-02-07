@@ -271,7 +271,7 @@ void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     }
     else
     {
-        NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
+        NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName(packetIndex)
             << " has unknown type.";
         packetName = "Unknown";
     }
