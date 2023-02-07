@@ -37,6 +37,7 @@
 namespace {
 
 static const QUrl kLdapSettingsQmlComponentUrl("qrc:/qml/Nx/Dialogs/Ldap/Tabs/LdapSettings.qml");
+static const auto kStatusUpdateInterval = std::chrono::seconds(10);
 
 } // namespace
 
@@ -63,9 +64,14 @@ struct LdapSettingsWidget::Private
 
     QmlProperty<bool> modified;
 
+    const QmlProperty<bool> hasConfig;
+
     nx::vms::api::LdapSettings initialSettings;
 
     rest::Handle currentHandle = 0;
+    rest::Handle statusHandle = 0;
+
+    QTimer statusUpdateTimer;
 
     Private(LdapSettingsWidget* parent):
         q(parent),
@@ -78,7 +84,8 @@ struct LdapSettingsWidget::Private
         groupCount(quickWidget, "groupCount"),
         checkingStatus(quickWidget, "checkingStatus"),
         online(quickWidget, "online"),
-        modified(quickWidget, "modified")
+        modified(quickWidget, "modified"),
+        hasConfig(quickWidget, "hasConfig")
     {
         connect(quickWidget, &QQuickWidget::statusChanged,
             [this](QQuickWidget::Status status)
@@ -119,6 +126,16 @@ struct LdapSettingsWidget::Private
 
         modified.connectNotifySignal(q, [this]{ emit q->hasChangesChanged(); });
         self = parent;
+
+        statusUpdateTimer.setInterval(kStatusUpdateInterval);
+        statusUpdateTimer.setSingleShot(false);
+
+        q->connect(&statusUpdateTimer, &QTimer::timeout,
+            [this]
+            {
+                if (hasConfig && !modified)
+                    q->checkStatus();
+            });
     }
 
     void setState(const nx::vms::api::LdapSettings& settings)
@@ -221,10 +238,18 @@ LdapSettingsWidget::~LdapSettingsWidget()
 
 void LdapSettingsWidget::discardChanges()
 {
+    d->statusUpdateTimer.stop();
+
     if (d->currentHandle)
     {
         connectedServerApi()->cancelRequest(d->currentHandle);
         d->currentHandle = 0;
+    }
+
+    if (d->statusHandle)
+    {
+        connectedServerApi()->cancelRequest(d->statusHandle);
+        d->statusHandle = 0;
     }
 
     d->setState(d->initialSettings);
@@ -232,17 +257,12 @@ void LdapSettingsWidget::discardChanges()
 
 void LdapSettingsWidget::checkStatus()
 {
-    d->checkingStatus = true;
-
     const auto statusCallback = nx::utils::guarded(this,
         [this](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
         {
-            if (handle == d->currentHandle)
-            {
-                d->currentHandle = 0;
-                d->checkingStatus = false;
-            }
+            if (handle == d->statusHandle)
+                d->statusHandle = 0;
 
             if (auto status = std::get_if<nx::vms::api::LdapStatus>(&errorOrData))
             {
@@ -273,18 +293,13 @@ void LdapSettingsWidget::checkStatus()
             else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
             {
                 d->online = false;
-                showError(error->errorString);
-            }
-            else
-            {
-                showError(tr("Connection failed"));
             }
         });
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
+    if (d->statusHandle)
+        connectedServerApi()->cancelRequest(d->statusHandle);
 
-    d->currentHandle = connectedServerApi()->getLdapStatusAsync(
+    d->statusHandle = connectedServerApi()->getLdapStatusAsync(
         statusCallback,
         thread());
 }
@@ -683,6 +698,16 @@ void LdapSettingsWidget::cancelCurrentRequest()
         connectedServerApi()->cancelRequest(d->currentHandle);
         d->currentHandle = 0;
     }
+}
+
+void LdapSettingsWidget::showEvent(QShowEvent* event)
+{
+    d->statusUpdateTimer.start();
+}
+
+void LdapSettingsWidget::hideEvent(QHideEvent* event)
+{
+    d->statusUpdateTimer.stop();
 }
 
 } // namespace nx::vms::client::desktop

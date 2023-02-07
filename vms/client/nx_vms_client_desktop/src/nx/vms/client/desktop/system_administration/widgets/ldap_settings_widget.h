@@ -50,6 +50,10 @@ public:
 
     Q_INVOKABLE void requestSync();
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
+
 private:
     void checkStatus();
     void removeExisting();
