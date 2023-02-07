@@ -641,6 +641,11 @@ void AsyncClient::onRequestSent(SystemError::ErrorCode errorCode)
     {
         NX_VERBOSE(this, "Error configuring connection to %1. %2",
             m_contentLocationUrl, SystemError::getLastOSErrorText());
+        if (!reconnectIfAppropriate())
+        {
+            m_state = State::sFailed;
+            emitDone();
+        }
         return;
     }
 
