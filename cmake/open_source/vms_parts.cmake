@@ -44,5 +44,6 @@ unset(_withSdk)
 unset(_withUnitTestsArchive)
 
 if(withUnitTestsArchive AND NOT withTests)
-    message(FATAL_ERROR "Unit tests archive cannot be built if tests are not built.")
+    message(WARNING "-DwithTests is OFF. Accordingly, switching OFF -DwithUnitTestsArchive option.")
+    set(withUnitTestsArchive OFF)
 endif()
