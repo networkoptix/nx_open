@@ -72,6 +72,8 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
             return ResultCode::noContent;
         case nx::network::http::StatusCode::unauthorized:
             return ResultCode::notAuthorized;
+        case nx::network::http::StatusCode::proxyAuthenticationRequired:
+            return ResultCode::notAuthorized;
         case nx::network::http::StatusCode::forbidden:
             return ResultCode::forbidden;
         case nx::network::http::StatusCode::notFound:
