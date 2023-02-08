@@ -5,13 +5,10 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_access/access_rights_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/helpers/layout_item_aggregator.h>
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/common/system_context.h>
 
 namespace {
@@ -59,10 +56,10 @@ VideoWallItemAccessProvider::VideoWallItemAccessProvider(
     {
         m_itemAggregator.reset(new QnLayoutItemAggregator());
 
-        connect(systemContext()->accessRightsManager(),
-            &AbstractAccessRightsManager::ownAccessRightsChanged,
+        connect(m_context->globalPermissionsManager(),
+            &QnGlobalPermissionsManager::globalPermissionsChanged,
             this,
-            &VideoWallItemAccessProvider::handleOwnAccessRightsChanged,
+            &VideoWallItemAccessProvider::updateAccessBySubject,
             Qt::DirectConnection);
 
         connect(m_itemAggregator.get(), &QnLayoutItemAggregator::itemAdded,
@@ -82,15 +79,12 @@ Source VideoWallItemAccessProvider::baseSource() const
     return Source::videowall;
 }
 
-bool VideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool VideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& /*subject*/,
     const QnResourcePtr& resource,
     GlobalPermissions globalPermissions) const
 {
-    if (!m_context->resourceAccessManager()->commonAccessRights(subject).testFlag(
-        nx::vms::api::AccessRight::controlVideowall))
-    {
+    if (!globalPermissions.testFlag(GlobalPermission::controlVideowall))
         return false;
-    }
 
     if (mode() == Mode::direct)
     {
@@ -147,8 +141,8 @@ void VideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!m_context->resourceAccessManager()->commonAccessRights(subject).testFlag(
-        nx::vms::api::AccessRight::controlVideowall))
+    if (!m_context->globalPermissionsManager()->hasGlobalPermission(
+            subject, GlobalPermission::controlVideowall))
     {
         return;
     }
@@ -232,7 +226,7 @@ void VideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& resou
             [this, layout]
             {
                 updateAccessToLayout(layout);
-            }, Qt::DirectConnection);
+            });
 
         if (!isUpdating())
             updateAccessToLayout(layout);
@@ -343,11 +337,11 @@ void VideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResource
     }
 
     connect(videoWall.get(), &QnVideoWallResource::itemAdded, this,
-        &VideoWallItemAccessProvider::handleVideowallItemAdded, Qt::DirectConnection);
+        &VideoWallItemAccessProvider::handleVideowallItemAdded);
     connect(videoWall.get(), &QnVideoWallResource::itemChanged, this,
-        &VideoWallItemAccessProvider::handleVideowallItemChanged, Qt::DirectConnection);
+        &VideoWallItemAccessProvider::handleVideowallItemChanged);
     connect(videoWall.get(), &QnVideoWallResource::itemRemoved, this,
-        &VideoWallItemAccessProvider::handleVideowallItemRemoved, Qt::DirectConnection);
+        &VideoWallItemAccessProvider::handleVideowallItemRemoved);
 }
 
 void VideoWallItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
@@ -381,22 +375,6 @@ void VideoWallItemAccessProvider::handleItemRemoved(const QnUuid& resourceId)
     const auto resourcePool = m_context->resourcePool();
     if (auto resource = resourcePool->getResourceById(resourceId))
         updateAccessToResource(resource);
-}
-
-void VideoWallItemAccessProvider::handleOwnAccessRightsChanged(const QSet<QnUuid>& subjectIds)
-{
-    for (const auto& id: subjectIds)
-    {
-        QnResourceAccessSubject subject;
-        if (auto user = resourcePool()->getResourceById<QnUserResource>(id))
-            subject = user;
-        else if (auto role = userRolesManager()->userRole(id); !role.id.isNull())
-            subject = role;
-        else
-            return;
-
-        updateAccessBySubject(subject);
-    }
 }
 
 } // namespace nx::core::access

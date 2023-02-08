@@ -892,6 +892,9 @@ bool LayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
 void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     const LayoutChange& change)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     NX_ASSERT(user);
     if (!user)
         return;

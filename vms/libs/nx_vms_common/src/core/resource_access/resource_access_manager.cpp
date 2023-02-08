@@ -138,6 +138,14 @@ AccessRights QnResourceAccessManager::accessRights(
         : AccessRights{};
 }
 
+AccessRights QnResourceAccessManager::accessRights(
+    const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId) const
+{
+    return subject.isValid() && (subject.isRole() || subject.user()->isEnabled())
+        ? m_accessRightsResolver->accessRights(subject.id(), resourceGroupId)
+        : AccessRights{};
+}
+
 bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource, AccessRights requiredAccessRights) const
 {
@@ -145,12 +153,11 @@ bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& sub
         || (accessRights(subject, resource) & requiredAccessRights) == requiredAccessRights;
 }
 
-AccessRights QnResourceAccessManager::commonAccessRights(
-    const QnResourceAccessSubject& subject) const
+bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& subject,
+    const QnUuid& resourceGroupId, AccessRights requiredAccessRights) const
 {
-    return subject.isValid() && (subject.isRole() || subject.user()->isEnabled())
-        ? m_accessRightsResolver->commonAccessRights(subject.id())
-        : AccessRights{};
+    return requiredAccessRights == AccessRights{}
+        || accessRights(subject, resourceGroupId).testFlags(requiredAccessRights);
 }
 
 GlobalPermissions QnResourceAccessManager::globalPermissions(
@@ -468,7 +475,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnVideoWallResourcePtr& videoWall) const
 {
-    if (!hasAccessRights(subject, videoWall, AccessRight::controlVideowall))
+    if (!hasAccessRights(subject, videoWall, AccessRight::view))
         return Qn::NoPermissions;
 
     Qn::Permissions result =
@@ -568,7 +575,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 // Videowall layout.
                 // TODO: #vkutin
                 // We shouldn't need to do this check.
-                return hasAccessRights(subject, videowall, AccessRight::controlVideowall)
+                return hasAccessRights(subject, videowall, AccessRight::view)
                     ? Qn::FullLayoutPermissions
                     : Qn::NoPermissions;
             }
@@ -712,9 +719,9 @@ bool QnResourceAccessManager::canCreateLayout(
     if (data.parentId.isNull())
         return hasAdminPermissions(subject);
 
-    // Video wall admins can create layouts on video wall.
+    // Users with access to video walls can create layouts on them.
     if (const auto videoWall = resourcePool->getResourceById<QnVideoWallResource>(data.parentId))
-        return hasAccessRights(subject, videoWall, AccessRight::controlVideowall);
+        return hasAccessRights(subject, videoWall, AccessRight::view);
 
     // Tour owner can create layouts in it.
     const auto tour = m_context->showreelManager()->tour(data.parentId);

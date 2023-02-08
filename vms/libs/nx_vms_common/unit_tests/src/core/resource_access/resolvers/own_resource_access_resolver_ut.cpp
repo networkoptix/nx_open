@@ -96,7 +96,7 @@ TEST_F(OwnResourceAccessResolverTest, adminAccessToCamera)
 {
     const auto admin = addUser(GlobalPermission::admin);
     const auto camera = addCamera();
-    ASSERT_EQ(resolver->accessRights(admin->getId(), camera), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(admin->getId(), camera), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, noAdminAccessToDesktopCamera)
@@ -111,14 +111,14 @@ TEST_F(OwnResourceAccessResolverTest, adminAccessToWebPage)
 {
     const auto admin = addUser(GlobalPermission::admin);
     const auto webPage = addWebPage();
-    ASSERT_EQ(resolver->accessRights(admin->getId(), webPage), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(admin->getId(), webPage), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToVideowall)
 {
     const auto admin = addUser(GlobalPermission::admin);
     const auto videowall = addVideoWall();
-    ASSERT_EQ(resolver->accessRights(admin->getId(), videowall), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(admin->getId(), videowall), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToSharedLayout)
@@ -126,7 +126,7 @@ TEST_F(OwnResourceAccessResolverTest, adminAccessToSharedLayout)
     const auto admin = addUser(GlobalPermission::admin);
     const auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(admin->getId(), layout), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(admin->getId(), layout), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToPrivateLayout)
@@ -138,7 +138,7 @@ TEST_F(OwnResourceAccessResolverTest, adminAccessToPrivateLayout)
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
 
-    ASSERT_EQ(resolver->accessRights(admin->getId(), layout), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(admin->getId(), layout), kFullAccessRights);
 }
 
 } // namespace test

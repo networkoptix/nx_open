@@ -93,11 +93,11 @@ public:
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
     /** Save accessible resources for the given user. */
-    void saveAccessibleResources(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& accessibleResources,
-        GlobalPermissions permissions,
-        SystemContext* systemContext,
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
+    void saveAccessibleResources(const QnResourceAccessSubject&,
+        const QSet<QnUuid>&,
+        GlobalPermissions,
+        SystemContext*,
+        const nx::vms::common::SessionTokenHelperPtr& = nullptr);
 
     /** Save accessible rights for the given subject. */
     void saveAccessRights(const QnResourceAccessSubject& subject,

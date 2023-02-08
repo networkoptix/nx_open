@@ -7,6 +7,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
 
+class QnResourcePool;
+
 namespace nx::core::access {
 
 using AccessRight = nx::vms::api::AccessRight;
@@ -18,5 +20,9 @@ using ResourceAccessMap = QHash<QnUuid /*resourceId*/, AccessRights>;
 NX_VMS_COMMON_API ResourceAccessMap& operator+=(
     ResourceAccessMap& destination, const ResourceAccessMap& source);
 
-} // namespace nx::core::access
+extern NX_VMS_COMMON_API ResourceAccessMap kAdminResourceAccessMap;
 
+NX_VMS_COMMON_API QString toString(const ResourceAccessMap& accessMap,
+    QnResourcePool* resourcePool = nullptr, bool multiLine = false);
+
+} // namespace nx::core::access

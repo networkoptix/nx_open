@@ -9,7 +9,7 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
-
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include <api/runtime_info_manager.h>
@@ -152,18 +152,36 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     addLayoutTour("showreel", userId);
 
     // Reference data.
-    std::vector<QString> referenceSequence = {
-        kSystemName,
-        kUserName,
-        "",
-        kServerName,
-        "Layouts",
-        "Showreels",
-        kVideowallName,
-        "Web Pages",
-        "Users",
-        "Other Systems",
-        "Local Files"};
+    std::vector<QString> referenceSequence;
+    if (ini().enableNewUserSettings)
+    {
+        referenceSequence = {
+            kSystemName,
+            kUserName,
+            "",
+            kServerName,
+            "Layouts",
+            "Showreels",
+            kVideowallName,
+            "Web Pages",
+            "Other Systems",
+            "Local Files"};
+    }
+    else
+    {
+        referenceSequence = {
+            kSystemName,
+            kUserName,
+            "",
+            kServerName,
+            "Layouts",
+            "Showreels",
+            kVideowallName,
+            "Web Pages",
+            "Users",
+            "Other Systems",
+            "Local Files"};
+    }
 
     // Check tree.
     ASSERT_EQ(transformToDisplayStrings(allMatchingIndexes(topLevelNode())), referenceSequence);

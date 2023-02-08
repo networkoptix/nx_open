@@ -39,7 +39,7 @@ enum class GlobalPermission
      */
     editCameras = 0x00000002,
 
-    // Will be superseded by AccessRight::controlVideowall.
+    // Will be superseded by AccessRight::view for particular videowall resources.
     /**%apidoc
      * Can control all video-walls in the system.
      * %caption GlobalControlVideoWallPermission
@@ -93,7 +93,7 @@ enum class GlobalPermission
 
     /* Resources access permissions. */
 
-    // Will be superseded by AccessRight::view for any resource.
+    // Will be superseded by AccessRight::view for kAllDevicesGroupId, kAllWebPagesGroupId and kAllServersGroupId.
     /**%apidoc
      * Has access to all media Resources (cameras and web pages).
      * %caption GlobalAccessAllMediaPermission
@@ -233,11 +233,6 @@ NX_REFLECTION_ENUM_CLASS(AccessRight,
     manageBookmarks = 0x0020,
 
     /**%apidoc
-     * Can control a video-wall.
-     */
-    controlVideowall = 0x0040,
-
-    /**%apidoc
      * Can change the camera PTZ state, use 2-way audio and I/O buttons.
      */
     userInput = 0x0080,
@@ -254,7 +249,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(AccessRights)
 static constexpr AccessRights kNoAccessRights{};
 static constexpr AccessRights kViewAccessRights{AccessRight::view};
 
-static constexpr AccessRights kFullMediaAccessRights{
+static constexpr AccessRights kFullAccessRights{
     AccessRight::view
     | AccessRight::viewArchive
     | AccessRight::exportArchive
@@ -263,29 +258,11 @@ static constexpr AccessRights kFullMediaAccessRights{
     | AccessRight::userInput
     | AccessRight::edit};
 
-static constexpr AccessRights kFullAccessRights = kFullMediaAccessRights
-    | AccessRight::controlVideowall;
-
-static constexpr AccessRights kAdminAccessRights = kFullAccessRights;
-
-inline AccessRights globalPermissionsToAccessRights(GlobalPermissions permissions)
-{
-    AccessRights result = AccessRight::view;
-    if (permissions.testFlag(GlobalPermission::editCameras))
-        result |= AccessRight::edit;
-    if (permissions.testFlag(GlobalPermission::controlVideowall))
-        result |= AccessRight::controlVideowall;
-    if (permissions.testFlag(GlobalPermission::viewArchive))
-        result |= AccessRight::viewArchive;
-    if (permissions.testFlag(GlobalPermission::exportArchive))
-        result |= AccessRight::exportArchive;
-    if (permissions.testFlag(GlobalPermission::viewBookmarks))
-        result |= AccessRight::viewBookmarks;
-    if (permissions.testFlag(GlobalPermission::manageBookmarks))
-        result |= AccessRight::manageBookmarks;
-    if (permissions.testFlag(GlobalPermission::userInput))
-        result |= AccessRight::userInput;
-    return result;
-}
+NX_REFLECTION_ENUM_CLASS(SpecialResourceGroup,
+    allDevices,
+    allWebPages,
+    allServers,
+    allVideowalls
+)
 
 } // namespace nx::vms::api

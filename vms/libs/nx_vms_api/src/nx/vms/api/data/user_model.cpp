@@ -2,8 +2,9 @@
 
 #include "user_model.h"
 
-#include <nx/utils/std/algorithm.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/access_rights_data.h>
 
 namespace nx::vms::api {
 
@@ -84,9 +85,8 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     {
         AccessRightsData data;
         data.userId = user.id;
-        const auto resourceAccessRights = globalPermissionsToAccessRights(user.permissions);
-        for (auto& id: *accessibleResources)
-            data.resourceRights[std::move(id)] = resourceAccessRights;
+        data.resourceRights = nx::vms::api::migrateAccessRights(
+            user.permissions, *accessibleResources);
         data.checkResourceExists = (user.isAdmin || user.userRoleIds.empty())
             ? CheckResourceExists::no
             : CheckResourceExists::customRole;

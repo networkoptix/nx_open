@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/access_rights_data.h>
 
 using namespace nx::vms::api;
 
@@ -19,14 +20,9 @@ namespace nx::core::access {
 
 namespace {
 
-AccessRights cameraAccessRights(AccessRights accessRights)
-{
-    return accessRights & ~(AccessRights(AccessRight::controlVideowall));
-}
-
 AccessRights viewOnlyAccessRights(AccessRights accessRights)
 {
-    return accessRights & AccessRights(AccessRight::view);
+    return accessRights & kViewAccessRights;
 }
 
 } // namespace
@@ -55,32 +51,33 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     const bool isDesktopCamera = resource->hasFlags(Qn::desktop_camera);
 
     if (hasAdminAccessRights(subjectId) && !isDesktopCamera)
-        return kAdminAccessRights;
+        return kFullAccessRights;
 
     const auto accessMap = resourceAccessMap(subjectId);
 
-    const auto anyResourceAccessRights = isDesktopCamera
-        ? AccessRights{}
-        : accessMap.value(AbstractAccessRightsManager::kAnyResourceId);
+    if (isDesktopCamera)
+        return accessMap.value(resource->getId());
 
-    if (resource.objectCast<QnSecurityCamResource>())
-        return cameraAccessRights(accessMap.value(resource->getId()) | anyResourceAccessRights);
+    if (const auto camera = resource.objectCast<QnSecurityCamResource>())
+        return accessMap.value(camera->getId()) | accessMap.value(kAllDevicesGroupId);
 
-    if (resource.objectCast<QnLayoutResource>())
-        return cameraAccessRights(accessMap.value(resource->getId()));
+    if (const auto layout = resource.objectCast<QnLayoutResource>())
+        return accessMap.value(layout->getId());
 
-    if (resource.objectCast<QnWebPageResource>() || resource.objectCast<QnMediaServerResource>())
-        return viewOnlyAccessRights(accessMap.value(resource->getId()) | anyResourceAccessRights);
-
-    if (resource.objectCast<QnVideoWallResource>())
+    if (const auto webPage = resource.objectCast<QnWebPageResource>())
     {
-        const auto anyVideoWallAccessRights =
-            anyResourceAccessRights.testFlag(AccessRight::controlVideowall)
-                ? anyResourceAccessRights
-                : AccessRights();
-
-        return accessMap.value(resource->getId()) | anyVideoWallAccessRights;
+        return viewOnlyAccessRights(
+            accessMap.value(webPage->getId()) | accessMap.value(kAllWebPagesGroupId));
     }
+
+    if (const auto server = resource.objectCast<QnMediaServerResource>())
+    {
+        return viewOnlyAccessRights(
+            accessMap.value(server->getId()) | accessMap.value(kAllServersGroupId));
+    }
+
+    if (const auto videowall = resource.objectCast<QnVideoWallResource>())
+        return accessMap.value(videowall->getId()) | accessMap.value(kAllVideowallsGroupId);
 
     return {};
 }

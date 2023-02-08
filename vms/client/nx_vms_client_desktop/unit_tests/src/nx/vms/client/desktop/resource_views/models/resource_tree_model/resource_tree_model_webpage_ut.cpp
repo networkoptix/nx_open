@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 #include <client/client_globals.h>
@@ -274,6 +275,9 @@ TEST_F(ResourceTreeModelTest, webPageEnableProxyThroughServer)
 
 TEST_F(ResourceTreeModelTest, proxiedWebPageSharedWithCustomUser)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When custom user with unique name is added to the resource pool.
     const auto customUser = addUser(kUniqueUserName, GlobalPermission::customUser);
 

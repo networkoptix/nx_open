@@ -2,6 +2,7 @@
 
 #include "utils.h"
 
+#include <QtQuick/QQuickWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QComboBox>
@@ -197,6 +198,13 @@ QVariantList findAllObjects(QJSValue properties)
         auto widgets = qApp->topLevelWidgets();
         for (QWidget* w: widgets)
             containers << QVariant::fromValue(w);
+
+        auto windows = qApp->topLevelWindows();
+        for (QWindow* window: windows)
+        {
+            if (auto quickWindow = qobject_cast<QQuickWindow*>(window))
+                containers << QVariant::fromValue(quickWindow);
+        }
     }
 
     // Search only in containers.

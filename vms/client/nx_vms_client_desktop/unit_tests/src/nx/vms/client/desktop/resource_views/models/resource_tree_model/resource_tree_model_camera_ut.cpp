@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <client/client_globals.h>
 
@@ -469,6 +470,9 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByAdvancedViewer)
 
 TEST_F(ResourceTreeModelTest, recorderIsGroupedInCustomUserAccessibleCamerasList)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When advanced viewer is logged in.
     loginAsAdmin("admin");
 

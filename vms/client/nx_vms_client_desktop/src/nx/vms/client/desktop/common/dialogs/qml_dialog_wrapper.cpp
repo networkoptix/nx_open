@@ -73,6 +73,8 @@ void QmlDialogWrapper::Private::handleStatusChanged(QQmlComponent::Status status
         return;
     }
 
+    window->setProperty("qmlDialogWrapper_sourceUrl", source.toString()); //< For autotesting.
+
     if (object->metaObject()->indexOfSignal("accepted()") >= 0)
         connect(object, SIGNAL(accepted()), q, SLOT(accept()));
     if (object->metaObject()->indexOfSignal("rejected()") >= 0)

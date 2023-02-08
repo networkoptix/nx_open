@@ -58,30 +58,28 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
     return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
 }
 
-bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, const char* details)
+bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery* query, const char* details)
 {
     NX_ASSERT_HEAVY_CONDITION(validateParams(*query));
-    if (!query->exec())
-    {
-        auto error = query->lastError();
-        NX_ASSERT(error.type() != QSqlError::StatementError,
-            nx::format("Unable to execute SQL query in %1: %2\n%3")
-                .args(details, error.text(), query->lastQuery()));
+    if (query->exec())
+        return true;
 
-        return false;
+    auto error = query->lastError();
+    // Assert only on statement error type as other errors are not our code responsibility.
+    if (!NX_ASSERT(error.type() != QSqlError::StatementError,
+        "%1 to execute SQL query in %2: %3", error, details, query->lastQuery()))
+    {
+        NX_DEBUG(
+            NX_SCOPE_TAG, "%1 to execute SQL query in %2: %3", error, details, query->lastQuery());
     }
-    return true;
+    return false;
 }
 
-bool SqlQueryExecutionHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details)
+bool SqlQueryExecutionHelper::prepareSQLQuery(
+    QSqlQuery* query, const QString& queryStr, const char* details)
 {
-    if (!query->prepare(queryStr))
-    {
-        NX_ASSERT(false, nx::format("Unable to prepare SQL query in %1: %2\n%3")
-            .args(details, query->lastError().text(), queryStr));
-        return false;
-    }
-    return true;
+    return NX_ASSERT(query->prepare(queryStr),
+        "%1 to prepare SQL query in %2: %3", query->lastError(), details, query->lastQuery());
 }
 
 bool SqlQueryExecutionHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database)

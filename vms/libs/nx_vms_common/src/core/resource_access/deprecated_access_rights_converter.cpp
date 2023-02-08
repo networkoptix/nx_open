@@ -197,23 +197,37 @@ void DeprecatedAccessRightsConverter::Private::updateSubject(const QnUuid& subje
     const auto globalPermissions = this->globalPermissions.value(subjectId);
     if (globalPermissions.testFlag(GlobalPermission::admin))
     {
-        accessRightsManager->setOwnResourceAccessMap(subjectId,
-            {{AccessRightsManager::kAnyResourceId, kAdminAccessRights}});
+        accessRightsManager->setOwnResourceAccessMap(subjectId, kAdminResourceAccessMap);
         return;
     }
 
-    ResourceAccessMap accessMap;
-    const auto accessRights = globalPermissionsToAccessRights(globalPermissions).setFlag(
-        AccessRight::view, globalPermissions.testFlag(GlobalPermission::accessAllMedia));
-    accessMap[AccessRightsManager::kAnyResourceId] = accessRights;
+    const std::vector<QnUuid> sharedResourceIds(
+        sharedResourceRights.keyBegin(),  sharedResourceRights.keyEnd());
 
-    // For much simpler logic we don't separate access rights flags per resource type here.
-    // Not applicable permissions will be filtered out by resource access resolvers.
+    const auto apiAccessMap = migrateAccessRights(globalPermissions, sharedResourceIds);
+    ResourceAccessMap accessMap(apiAccessMap.begin(), apiAccessMap.end());
 
     for (const auto& [resourceId, sharedRights]: sharedResourceRights.value(subjectId))
-        accessMap[resourceId] = accessRights | sharedRights;
+        accessMap[resourceId] |= sharedRights;
 
     accessRightsManager->setOwnResourceAccessMap(subjectId, accessMap);
+
+    const auto subjectName =
+        [this](const QnUuid& subjectId)
+        {
+            if (const auto user = resourcePool->getResourceById<QnUserResource>(subjectId))
+                return nx::format("User \"%1\"", user->getName());
+
+            if (const auto group = userGroupsManager->userRole(subjectId); !group.id.isNull())
+                return nx::format("Group \"%1\"", group.name);
+
+            return nx::format("Subject \"%1\"", subjectId.toSimpleString());
+    };
+
+    NX_VERBOSE(this, "%1 is being updated, global permissions: %2, access rights: %3",
+        subjectName(subjectId),
+        globalPermissions,
+        toString(accessMap, resourcePool, /*multiLine*/ true));
 }
 
 } // namespace nx::core::access

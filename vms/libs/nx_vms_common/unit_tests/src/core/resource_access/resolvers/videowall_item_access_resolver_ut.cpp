@@ -8,6 +8,7 @@
 #include <core/resource_access/resolvers/videowall_item_access_resolver.h>
 #include <core/resource_access/resolvers/own_resource_access_resolver.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
@@ -22,7 +23,7 @@ namespace {
 
 AccessRights videowallItemAccessRights(AccessRights videowallAccessRights)
 {
-    return videowallAccessRights & ~int(AccessRight::controlVideowall);
+    return videowallAccessRights;
 }
 
 } // namespace
@@ -38,7 +39,7 @@ public:
     }
 
     const AccessRights kTestAccessRights =
-        AccessRight::view | AccessRight::viewArchive | AccessRight::controlVideowall;
+        AccessRight::view | AccessRight::viewArchive;
 };
 
 TEST_F(VideowallItemAccessResolverTest, noAccess)
@@ -112,8 +113,7 @@ TEST_F(VideowallItemAccessResolverTest, layoutAccessViaVideowall)
 
 TEST_F(VideowallItemAccessResolverTest, layoutAddedBeforeVideowall)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = createVideoWall();
@@ -133,8 +133,7 @@ TEST_F(VideowallItemAccessResolverTest, layoutAddedBeforeVideowall)
 
 TEST_F(VideowallItemAccessResolverTest, layoutAddedBeforeVideowallItem)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = addVideoWall();
@@ -157,8 +156,7 @@ TEST_F(VideowallItemAccessResolverTest, layoutAddedBeforeVideowallItem)
 
 TEST_F(VideowallItemAccessResolverTest, layoutAddedAfterVideowallItem)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = addVideoWall();
@@ -185,8 +183,7 @@ TEST_F(VideowallItemAccessResolverTest, layoutAddedAfterVideowallItem)
 
 TEST_F(VideowallItemAccessResolverTest, layoutRemovedFromVideowallItems)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = addVideoWall();
@@ -209,8 +206,7 @@ TEST_F(VideowallItemAccessResolverTest, layoutRemovedFromVideowallItems)
 TEST_F(VideowallItemAccessResolverTest, videowallLayoutBecomesParentless)
 // Not a standard scenario, but should work nonetheless.
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = addVideoWall();
@@ -234,22 +230,17 @@ TEST_F(VideowallItemAccessResolverTest, dynamicAccessRightsChange)
     auto videowall = addVideoWall();
     auto layout = addLayoutForVideoWall(videowall);
 
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), AccessRights());
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
-    NX_ASSERT_TEST_SUBJECT_CHANGED();
 
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), kTestAccessRights);
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout),
         videowallItemAccessRights(kTestAccessRights));
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     const auto testAccessRights2 = kTestAccessRights | AccessRight::userInput;
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, testAccessRights2}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, testAccessRights2}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), testAccessRights2);
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout),
         videowallItemAccessRights(testAccessRights2));
@@ -258,8 +249,7 @@ TEST_F(VideowallItemAccessResolverTest, dynamicAccessRightsChange)
 
 TEST_F(VideowallItemAccessResolverTest, videowallAdded)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = createVideoWall();
@@ -281,8 +271,7 @@ TEST_F(VideowallItemAccessResolverTest, videowallAdded)
 
 TEST_F(VideowallItemAccessResolverTest, videowallRemoved)
 {
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{AccessRightsManager::kAnyResourceId, kTestAccessRights}});
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideowallsGroupId, kTestAccessRights}});
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = addVideoWall();

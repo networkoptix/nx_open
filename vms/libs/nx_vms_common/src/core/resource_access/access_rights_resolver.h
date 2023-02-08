@@ -55,10 +55,11 @@ public:
         const QnResourcePtr& resource) const;
 
     /**
-     * Returns common access rights of the specified subject, i.e. rights to
-     * access any applicable (for each right) resource.
+     * Returns access rights of the specified subject to the specified resource group.
+     * Currently only special resource groups (such as all devices or all videowalls) are supported.
      */
-    nx::vms::api::AccessRights commonAccessRights(const QnUuid& subjectId) const;
+    nx::vms::api::AccessRights accessRights(const QnUuid& subjectId,
+        const QnUuid& resourceGroupId) const;
 
     /** Returns subject global permissions. */
     nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const;
