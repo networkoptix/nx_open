@@ -17,6 +17,7 @@ RemoteConnectionProcess::RemoteConnectionProcess():
 RemoteConnectionProcess::~RemoteConnectionProcess()
 {
     // Reset the context first to speed up an early return of async connection func.
+    context->terminated = true;
     context.reset();
 }
 

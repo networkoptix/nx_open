@@ -30,6 +30,9 @@ class CertificateCache;
  */
 struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
 {
+    /** Whether connection process was terminated. */
+    std::atomic_bool terminated = false;
+
     /** Initial data, describing where to connect and what to expect. */
     LogonData logonData;
 

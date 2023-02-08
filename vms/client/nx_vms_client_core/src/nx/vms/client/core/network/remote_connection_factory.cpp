@@ -190,6 +190,8 @@ struct RemoteConnectionFactory::Private
         ContextPtr context,
         std::function<bool(AbstractRemoteConnectionUserInteractionDelegate* delegate)> handler)
     {
+        using namespace std::chrono_literals;
+
         std::promise<bool> isAccepted;
         auto delegate = context->customUserInteractionDelegate
             ? context->customUserInteractionDelegate.get()
@@ -199,7 +201,17 @@ struct RemoteConnectionFactory::Private
             {
                 isAccepted.set_value(handler(delegate));
             });
-        return isAccepted.get_future().get();
+
+        std::future<bool> future = isAccepted.get_future();
+        std::future_status status;
+        do {
+            status = future.wait_for(100ms);
+            if (context->terminated)
+                return false;
+
+        } while (status != std::future_status::ready);
+
+        return future.get();
     }
 
     void logInitialInfo(ContextPtr context)
