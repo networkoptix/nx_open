@@ -475,7 +475,11 @@ std::vector<RemoteConnectionFactoryRequestsManager::ServerCertificatesInfo>
     NX_DEBUG(this, "Pulling server certificates from %1", context);
 
     // Request full servers data, since /servers/*/info returns only online servers information.
-    const auto url = makeUrl(context->info.address, "/rest/v1/servers");
+    auto url = makeUrl(context->info.address, "/rest/v1/servers");
+    url.setQuery(nx::format(
+        "_with=id,name,url,status,parameters.%1,parameters.%2",
+        ResourcePropertyKey::Server::kCertificate,
+        ResourcePropertyKey::Server::kUserProvidedCertificate));
     auto request = d->makeRequestWithCertificateValidation(publicKey(context->certificateChain));
     request->setCredentials(context->info.credentials);
     auto list = d->doGet<std::vector<nx::vms::api::ServerModel>>(
