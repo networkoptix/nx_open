@@ -36,19 +36,6 @@ enum class UsageStatus
     used
 };
 
-class UsageWatcher:
-    public QObject,
-    public /*mixin*/ common::SystemContextAware
-{
-    Q_OBJECT
-    using base_type = QObject;
-public:
-    UsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
-
-signals:
-    void licenseUsageChanged();
-};
-
 typedef std::array<int, Qn::LC_Count> licensesArray;
 
 class UsageHelper:
@@ -153,18 +140,6 @@ private:
     nx::network::aio::RepetitiveTimer m_invalidateTimer;
 };
 
-class CamLicenseUsageWatcher: public UsageWatcher
-{
-    Q_OBJECT
-    using base_type = UsageWatcher;
-public:
-    CamLicenseUsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
-    CamLicenseUsageWatcher(
-        const QnVirtualCameraResourcePtr& camera,
-        common::SystemContext* context,
-        QObject* parent = nullptr);
-};
-
 class CamLicenseUsageHelper: public UsageHelper
 {
     Q_OBJECT
@@ -204,7 +179,6 @@ protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    CamLicenseUsageWatcher* m_watcher{nullptr};
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
@@ -228,14 +202,6 @@ signals:
 private:
     const QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<CamLicenseUsageHelper> m_helper;
-};
-
-class VideoWallLicenseUsageWatcher: public UsageWatcher
-{
-    Q_OBJECT
-    using base_type = UsageWatcher;
-public:
-    VideoWallLicenseUsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
 };
 
 class VideoWallLicenseUsageHelper: public UsageHelper

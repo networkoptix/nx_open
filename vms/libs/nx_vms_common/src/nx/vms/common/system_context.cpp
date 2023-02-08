@@ -28,6 +28,7 @@
 #include <licensing/license.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -63,6 +64,8 @@ struct SystemContext::Private
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
+    std::unique_ptr<DeviceLicenseUsageWatcher> deviceLicenseUsageWatcher;
+    std::unique_ptr<VideoWallLicenseUsageWatcher> videoWallLicenseUsageWatcher;
 
     QPointer<AbstractCertificateVerifier> certificateVerifier;
     QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
@@ -128,6 +131,18 @@ SystemContext::SystemContext(
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
         d->analyticsDescriptorContainer.get());
+
+    switch (mode)
+    {
+        case Mode::default_:
+            d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
+            d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
+            break;
+        case Mode::unitTests:
+            d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
+            d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
+            break;
+    }
 }
 
 SystemContext::~SystemContext()
@@ -207,6 +222,16 @@ void SystemContext::deleteMessageProcessor()
 QnLicensePool* SystemContext::licensePool() const
 {
     return d->licensePool.get();
+}
+
+DeviceLicenseUsageWatcher* SystemContext::deviceLicenseUsageWatcher() const
+{
+    return d->deviceLicenseUsageWatcher.get();
+}
+
+VideoWallLicenseUsageWatcher* SystemContext::videoWallLicenseUsageWatcher() const
+{
+    return d->videoWallLicenseUsageWatcher.get();
 }
 
 QnResourcePool* SystemContext::resourcePool() const
