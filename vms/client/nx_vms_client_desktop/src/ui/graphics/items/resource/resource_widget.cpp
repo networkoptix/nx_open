@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/animation/opacity_animator.h>
@@ -214,11 +215,10 @@ QnResourceWidget::QnResourceWidget(
             updateStatusOverlay(animate);
         };
 
-    using namespace nx::vms::license;
-    auto videoWallLicenseUsageWatcher = new VideoWallLicenseUsageWatcher(
-        m_resource->systemContext(),
-        this);
-    connect(videoWallLicenseUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateOverlay);
+    connect(m_resource->systemContext()->videoWallLicenseUsageWatcher(),
+        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
+        this,
+        updateOverlay);
 
     if (qnRuntime->isVideoWallMode())
     {

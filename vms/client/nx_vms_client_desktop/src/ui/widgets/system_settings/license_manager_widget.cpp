@@ -40,6 +40,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/license/validator.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -227,20 +228,20 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
     connect(ui->licenseWidget, &QnLicenseWidget::stateChanged, this,
         &LicenseManagerWidget::handleWidgetStateChange);
 
-    auto updateLicensesIfNeeded = [this]
-    {
-        if (!isVisible())
-            return;
+    auto updateLicensesIfNeeded =
+        [this]
+        {
+            if (!isVisible())
+                return;
 
-        updateLicenses();
-    };
+            updateLicenses();
+        };
 
-    auto camerasUsageWatcher = new CamLicenseUsageWatcher(systemContext(), this);
-    auto videowallUsageWatcher = new VideoWallLicenseUsageWatcher(systemContext(), this);
-    connect(camerasUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
-    connect(
-        videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
-    connect(licensePool(), &QnLicensePool::licensesChanged, this, updateLicensesIfNeeded);
+    using namespace nx::vms::common;
+    connect(systemContext()->deviceLicenseUsageWatcher(),
+        &LicenseUsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
+    connect(systemContext()->videoWallLicenseUsageWatcher(),
+        &LicenseUsageWatcher::licenseUsageChanged, this, updateLicensesIfNeeded);
 
     connect(context(),
         &QnWorkbenchContext::userChanged,
