@@ -354,15 +354,17 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
     const auto url =
         [context]()
         {
-            if (!NX_ASSERT(context->expectedServerVersion())
-                || *context->expectedServerVersion() < kServersInfoV2Supported)
-            {
-                return makeUrl(context->address(), "/rest/v1/servers/*/info");
-            }
-
-            auto url = makeUrl(context->address(), "/rest/v2/servers/*/info");
             QUrlQuery query;
-            query.addQueryItem("onlyFreshInfo", "false");
+            query.addQueryItem("_with",
+                nx::format("id,name,url,status,parameters.%1,parameters.%2",
+                    ResourcePropertyKey::Server::kCertificate,
+                    ResourcePropertyKey::Server::kUserProvidedCertificate));
+            if (NX_ASSERT(context->expectedServerVersion())
+                && *context->expectedServerVersion() >= kServersInfoV2Supported)
+            {
+                query.addQueryItem("onlyFreshInfo", "false");
+            }
+            auto url = makeUrl(context->address(), "/rest/v2/servers/*/info");
             url.setQuery(query);
             return url;
         }();
