@@ -45,6 +45,12 @@ File::File(Settings settings):
     archiveLeftOvers(&lock);
 }
 
+File::~File()
+{
+    if (m_archive.valid())
+        m_archive.wait();
+}
+
 void File::setSettings(const Settings& settings)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
