@@ -258,6 +258,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
+    testActionFieldRegistration<TargetServerField>();
     testActionFieldRegistration<TargetUserField>(systemContext());
     testActionFieldRegistration<TextFormatter>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
@@ -268,6 +269,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
 
     // TODO: #amalov Uncomment all types after manifest definition.
     testActionRegistration<BookmarkAction>();
+    testActionRegistration<BuzzerAction>();
     testActionRegistration<DeviceOutputAction>();
     testActionRegistration<DeviceRecordingAction>();
     testActionRegistration<EnterFullscreenAction>();

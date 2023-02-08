@@ -3,6 +3,7 @@
 #pragma once
 
 #include "bookmark_action.h"
+#include "buzzer_action.h"
 #include "device_output_action.h"
 #include "device_recording_action.h"
 #include "enter_fullscreen_action.h"

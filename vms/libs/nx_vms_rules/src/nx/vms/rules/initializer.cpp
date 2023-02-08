@@ -46,6 +46,7 @@ void Initializer::registerEvents() const
 void Initializer::registerActions() const
 {
     // Register built-in actions.
+    registerAction<BuzzerAction>();
     registerAction<BookmarkAction>();
     registerAction<DeviceOutputAction>();
     registerAction<DeviceRecordingAction>();
@@ -109,6 +110,7 @@ void Initializer::registerFields() const
     registerActionField<SoundField>();
     registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();
+    registerActionField<TargetServerField>();
     m_engine->registerActionField(
         fieldMetatype<TargetUserField>(),
         [this] { return new TargetUserField(this->m_context); });
