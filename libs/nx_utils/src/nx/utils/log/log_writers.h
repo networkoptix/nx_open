@@ -63,6 +63,7 @@ public:
     };
 
     File(Settings settings);
+    virtual ~File();
     virtual void write(Level level, const QString& message) override;
     QString getFileName(size_t backupNumber = 0) const;
 
