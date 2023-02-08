@@ -11,6 +11,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -64,9 +65,9 @@ public:
         NX_ASSERT(m_store);
         connect(m_store, &CameraSettingsDialogStore::stateChanged, this, &Private::updateText);
 
-        using namespace nx::vms::license;
-        const auto watcher = new CamLicenseUsageWatcher(q->systemContext(), this);
-        connect(watcher, &UsageWatcher::licenseUsageChanged, this, &Private::updateText);
+        using namespace nx::vms::common;
+        connect(q->systemContext()->deviceLicenseUsageWatcher(),
+            &LicenseUsageWatcher::licenseUsageChanged, this, &Private::updateText);
     }
 
     LicenseUsageProvider* licenseUsageProvider() const

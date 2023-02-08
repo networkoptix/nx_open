@@ -32,6 +32,8 @@ namespace nx::vms::rules { class Engine; }
 namespace nx::vms::common {
 
 class AbstractCertificateVerifier;
+class DeviceLicenseUsageWatcher;
+class VideoWallLicenseUsageWatcher;
 class SystemSettings;
 
 /**
@@ -151,6 +153,12 @@ public:
      * List of all licenses, installed in the System.
      */
     QnLicensePool* licensePool() const;
+
+    /** Watches and notifies when Device license usage is changed in the System. */
+    DeviceLicenseUsageWatcher* deviceLicenseUsageWatcher() const;
+
+    /** Watches and notifies when Video Wall license usage is changed in the System. */
+    VideoWallLicenseUsageWatcher* videoWallLicenseUsageWatcher() const;
 
     /**
      * List of all Resources in the System. Some data is stored in the external dictionaries.
