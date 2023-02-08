@@ -43,7 +43,6 @@ private:
         Skin* skin,
         const QString& name,
         const QString& checkedName,
-        const QnIcon::Suffixes* suffixes,
         const SvgIconColorer::IconSubstitutions& substitutions);
 
 private:

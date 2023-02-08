@@ -27,6 +27,7 @@ const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
 const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
 const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
 const char* Properties::kGroupBoxContentTopMargin = "_qn_groupBoxContentTopMargin";
+const char* Properties::kIsCloseTabButton = "_qn_isCloseTabButton";
 
 bool isDark(const QColor& color)
 {

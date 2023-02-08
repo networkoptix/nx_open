@@ -23,6 +23,8 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -49,12 +51,15 @@ const int kTitleBarHeight = 24;
 const QSize kControlButtonSize(36, kTitleBarHeight);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
 
-QFrame* newVLine()
+QFrame* newVLine(int verticalMargin = 0, const QString& colorName = "")
 {
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Plain);
     line->setFixedWidth(1);
+    line->setContentsMargins(0, verticalMargin, 0, verticalMargin);
+    if (!colorName.isEmpty())
+        setPaletteColor(line, QPalette::Shadow, colorTheme()->color(colorName));
     return line;
 }
 
@@ -150,16 +155,16 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setFocusPolicy(Qt::NoFocus);
     setAutoFillBackground(true);
     setAcceptDrops(true);
-    setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
-
+    const QColor windowColor = colorTheme()->color("dark7");
+    setPaletteColor(this, QPalette::Base, windowColor);
     // Workaround for behavior change Qt5 -> Qt6.
     // Force QPalette detach to prevent inheritance of parent brush, see QTBUG-98762.
-    const QColor windowColor = colorTheme()->color("dark7");
     setPaletteColor(this, QPalette::Window, QColor::fromRgb(~windowColor.rgba()));
     setPaletteColor(this, QPalette::Window, windowColor);
 
     d->mainMenuButton = newActionButton(
         action::MainMenuAction,
+        qnSkin->icon("titlebar/main_menu.svg", "", nullptr, Style::kTitleBarSubstitutions),
         Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
@@ -349,6 +354,26 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
+ToolButton *QnMainWindowTitleBarWidget::newActionButton(
+    action::IDType actionId,
+    const QIcon& icon,
+    int helpTopicId)
+{
+    auto button = new ToolButton(this);
+
+    button->setDefaultAction(action(actionId));
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setIcon(icon);
+    button->adjustIconSize();
+    button->setFixedSize(qnSkin->maximumSize(icon));
+    button->setAutoRaise(true);
+
+    if (helpTopicId != Qn::Empty_Help)
+        setHelpTopic(button, helpTopicId);
+
+    return button;
+}
+
 ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     action::IDType actionId,
     int helpTopicId,
@@ -386,15 +411,22 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    QHBoxLayout* systemLayout = new QHBoxLayout(this);
-    QHBoxLayout* tabLayout = new QHBoxLayout(this);
+    QHBoxLayout* systemLayout = new QHBoxLayout();
+    QHBoxLayout* tabLayout = new QHBoxLayout();
+    tabLayout->setContentsMargins(0, 0, 0, 0);
+    tabLayout->setSpacing(0);
+
+    auto tabPlaceholder = new QWidget(this);
+    tabPlaceholder->setAutoFillBackground(true);
+    setPaletteColor(tabPlaceholder, QPalette::Window, colorTheme()->color("dark10"));
+
     mainLayout->addLayout(systemLayout);
-    mainLayout->addLayout(tabLayout);
+    mainLayout->addWidget(tabPlaceholder);
+    tabPlaceholder->setLayout(tabLayout);
 
     systemLayout->addWidget(d->mainMenuButton);
-    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(newVLine(0, "dark8"));
     systemLayout->addWidget(d->systemBar);
-    systemLayout->addWidget(newVLine());
     systemLayout->addStretch(1);
     systemLayout->addSpacing(80);
     systemLayout->addWidget(newVLine());
@@ -416,10 +448,10 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
         kControlButtonSize));
 
     tabLayout->addWidget(d->tabBar);
-    tabLayout->addWidget(newVLine());
-
     tabLayout->addWidget(d->newTabButton);
+    tabLayout->addWidget(newVLine(5, "dark12"));
     tabLayout->addWidget(d->currentLayoutsButton);
+    tabLayout->addWidget(newVLine(5, "dark12"));
     tabLayout->addStretch(1);
 }
 

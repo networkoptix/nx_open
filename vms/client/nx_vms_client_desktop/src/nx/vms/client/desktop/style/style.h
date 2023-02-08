@@ -4,6 +4,8 @@
 
 #include <QtWidgets/QCommonStyle>
 
+#include "svg_icon_colorer.h"
+
 class QGroupBox;
 
 namespace nx::vms::client::desktop {
@@ -17,6 +19,8 @@ class Style: public QCommonStyle
     using base_type = QCommonStyle;
 
 public:
+    static const SvgIconColorer::IconSubstitutions kTitleBarSubstitutions;
+
     Style();
     virtual ~Style() override;
 

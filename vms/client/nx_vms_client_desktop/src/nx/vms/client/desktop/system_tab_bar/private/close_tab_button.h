@@ -11,6 +11,7 @@ class CloseTabButton: public QAbstractButton
 public:
     explicit CloseTabButton(QWidget* parent = 0);
     virtual void paintEvent(QPaintEvent* event) override;
+    virtual QSize sizeHint() const override;
 };
 
 } // namespace nx::vms::client::desktop

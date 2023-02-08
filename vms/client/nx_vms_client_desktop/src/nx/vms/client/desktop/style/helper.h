@@ -222,6 +222,12 @@ struct Properties
 
     /** Name of a property to hold group box top content margins without header (int). */
     static const char* kGroupBoxContentTopMargin;
+
+    /**
+     *  Name of a property to determine if object belongs to CloseTabButton class or its
+     *  descendant.
+    */
+    static const char* kIsCloseTabButton;
 };
 
 /** Flags of additional slider features */
