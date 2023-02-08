@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop {
 
-struct Ini: nx::kit::IniConfig
+struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("desktop_client.ini") { reload(); }
 
@@ -253,10 +253,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, enableCameraReplacementFeature,
         "[Feature] Makes Camera Replacement feature available in the client.");
 
-    // VMS-16938
-    NX_INI_FLAG(false, enableNewUserSettings,
-        "[Feature] Makes new User Settings with LDAP groups support available in the client.");
-
     // VMS-32543
     NX_INI_FLAG(false, allowConfigureCloudServiceToSendEmail,
         "[Feature] Makes the option to send emails via cloud service available in the\n"
@@ -349,8 +345,14 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_STRING("", clientExecutableName,
         "[SQ] Special executable name to launch 'New Window' or Video Wall.");
+
+    // ---------------------------------------------------------------------------------------------
+    // Obsolete, no longer editable flags.
+
+    // VMS-37866.
+    const bool enableNewUserSettings = true;
 };
 
-Ini& ini();
+NX_VMS_CLIENT_DESKTOP_API Ini& ini();
 
 } // namespace nx::vms::client::desktop

@@ -23,9 +23,7 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
     {
         AccessRightsData data;
         data.userId = userRole.id;
-        const auto resourceAccessRights = globalPermissionsToAccessRights(userRole.permissions);
-        for (auto& id: *accessibleResources)
-            data.resourceRights[std::move(id)] = resourceAccessRights;
+        data.resourceRights = migrateAccessRights(userRole.permissions, *accessibleResources);
         data.checkResourceExists = CheckResourceExists::no;
         accessRights = std::move(data);
     }

@@ -19,6 +19,7 @@ import "Tabs"
 DialogWithState
 {
     id: dialog
+    objectName: "groupCreateDialog" //< For autotesting.
 
     modality: Qt.ApplicationModal
 

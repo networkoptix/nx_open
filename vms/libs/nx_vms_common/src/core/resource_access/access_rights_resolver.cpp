@@ -6,6 +6,8 @@
 
 #include <QtCore/QPointer>
 
+#include <nx/vms/api/data/access_rights_data.h>
+
 #include "abstract_access_rights_manager.h"
 #include "resolvers/inherited_resource_access_resolver.h"
 #include "resolvers/layout_item_access_resolver.h"
@@ -77,14 +79,17 @@ nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subj
     return d->inheritedResourceAccessResolver->accessRights(subjectId, resource);
 }
 
-nx::vms::api::AccessRights AccessRightsResolver::commonAccessRights(
-    const QnUuid& subjectId) const
+nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subjectId,
+    const QnUuid& resourceGroupId) const
 {
-    return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId).value(
-        AbstractAccessRightsManager::kAnyResourceId);
+    if (!NX_ASSERT(nx::vms::api::specialResourceGroup(resourceGroupId)))
+        return {};
+
+    return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId).value(resourceGroupId);
 }
 
-nx::vms::api::GlobalPermissions AccessRightsResolver::globalPermissions(const QnUuid& subjectId) const
+nx::vms::api::GlobalPermissions AccessRightsResolver::globalPermissions(
+    const QnUuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->globalPermissions(subjectId);
 }

@@ -194,11 +194,9 @@ bool QnUserRolesDialog::hasChanges() const
         }
         else
         {
-            std::map<QnUuid, nx::vms::api::AccessRights> resourceAccessRights;
-            const auto accessRights =
-                nx::vms::api::globalPermissionsToAccessRights(userRole.permissions);
-            for (const auto& id: m_model->accessibleResources(userRole))
-                resourceAccessRights[id] = accessRights;
+            const auto accessibleResources = m_model->accessibleResources(userRole);
+            const auto resourceAccessRights = nx::vms::api::migrateAccessRights(
+                userRole.permissions, {accessibleResources.cbegin(), accessibleResources.cend()});
             if (sharedResourcesManager()->sharedResourceRights(userRole) != resourceAccessRights)
                 return true;
         }

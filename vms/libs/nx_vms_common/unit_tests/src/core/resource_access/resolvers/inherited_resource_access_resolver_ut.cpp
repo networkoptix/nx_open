@@ -18,6 +18,7 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
@@ -325,8 +326,7 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
         {{camera1->getId(), AccessRight::view | AccessRight::viewArchive},
-        {AccessRightsManager::kAnyResourceId,
-            AccessRight::view | AccessRight::exportArchive}});
+        {kAllDevicesGroupId, AccessRight::view | AccessRight::exportArchive}});
 
     manager->setOwnResourceAccessMap(subjects->id("Group 2"),
         {{camera1->getId(), AccessRight::view | AccessRight::userInput}});
@@ -415,7 +415,7 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
     addToLayout(layout, camera);
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
-        {{videowall->getId(), AccessRight::view | AccessRight::controlVideowall}});
+        {{videowall->getId(), AccessRight::view}});
 
     const AccessRights expectedRights = AccessRight::view;
 
@@ -441,10 +441,10 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedAdminAccessRights)
 
     auto camera = addCamera();
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), camera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(subjects->id("Admin Group"), camera), kAdminAccessRights);
-    ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), camera), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(subjects->id("Admin Group"), camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 3"), camera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(subjects->id("User 1"), camera), kAdminAccessRights);
+    ASSERT_EQ(resolver->accessRights(subjects->id("User 1"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("User 2"), camera), AccessRights());
 
     auto user = addUser(GlobalPermission::admin);

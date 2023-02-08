@@ -1287,47 +1287,41 @@ static Result userHasGlobalAccess(
 static Result userHasAccess(
     QnCommonModule* commonModule,
     const Qn::UserAccessData& accessData,
-    const QnUuid& targetResourceId,
+    const QnUuid& targetResourceOrGroupId,
     nx::vms::api::AccessRights requiredAccess)
 {
     if (hasSystemAccess(accessData))
         return Result();
     const auto& resPool = commonModule->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    auto targetResource = resPool->getResourceById(targetResourceId);
-    if (!targetResource)
-    {
-        return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-            "Resource %1 does not exist."), targetResourceId));
-    }
-    if (!commonModule->resourceAccessManager()->hasAccessRights(
-        userResource, targetResource, requiredAccess))
-    {
-        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-            "User %1 does not have %2 access to %3."),
-            userResource ? userResource->getName() : accessData.userId.toString(),
-            requiredAccess, targetResourceId));
-    }
 
-    return Result();
-}
-
-static Result userHasCommonAccess(
-    QnCommonModule* commonModule,
-    const Qn::UserAccessData& accessData,
-    nx::vms::api::AccessRights requiredAccess)
-{
-    if (hasSystemAccess(accessData))
-        return Result();
-    const auto& resPool = commonModule->resourcePool();
-    auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (!(commonModule->resourceAccessManager()->commonAccessRights(userResource)
-        & requiredAccess))
+    if (auto group = nx::vms::api::specialResourceGroup(targetResourceOrGroupId))
     {
-        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-            "User %1 does not have common %2 access."),
-            userResource ? userResource->getName() : accessData.userId.toString(),
-            requiredAccess));
+        if (!commonModule->resourceAccessManager()->hasAccessRights(
+            userResource, targetResourceOrGroupId, requiredAccess))
+        {
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User %1 does not have %2 access to %3."),
+                userResource ? userResource->getName() : accessData.userId.toString(),
+                requiredAccess, *group));
+        }
+    }
+    else
+    {
+        auto targetResource = resPool->getResourceById(targetResourceOrGroupId);
+        if (!targetResource)
+        {
+            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "Resource %1 does not exist."), targetResourceOrGroupId));
+        }
+        if (!commonModule->resourceAccessManager()->hasAccessRights(
+            userResource, targetResource, requiredAccess))
+        {
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User %1 does not have %2 access to %3."),
+                userResource ? userResource->getName() : accessData.userId.toString(),
+                requiredAccess, targetResourceOrGroupId));
+        }
     }
 
     return Result();
@@ -1340,8 +1334,8 @@ struct UserInputAccess
         QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Event& event)
     {
         // TODO: Check if this requirenment is not too strict.
-        return userHasCommonAccess(
-            commonModule, accessData, nx::vms::api::AccessRight::userInput);
+        return userHasAccess(commonModule, accessData, nx::vms::api::kAllDevicesGroupId,
+            nx::vms::api::AccessRight::userInput);
     }
 };
 
@@ -1514,7 +1508,7 @@ struct VideoWallControlAccess
         const nx::vms::api::VideowallControlMessageData& data)
     {
         return userHasAccess(commonModule, accessData, data.videowallGuid,
-            nx::vms::api::AccessRight::controlVideowall);
+            nx::vms::api::AccessRight::view);
     }
 };
 

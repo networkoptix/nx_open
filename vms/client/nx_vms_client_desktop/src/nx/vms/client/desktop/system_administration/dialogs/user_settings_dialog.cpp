@@ -307,7 +307,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
         user->getId());
 
-    state.globalPermissions = user->getRawPermissions();
+    state.globalPermissions =
+        user->getRawPermissions() & nx::vms::api::nonDeprecatedGlobalPermissions();
 
     return state;
 }

@@ -208,8 +208,7 @@ ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
         videowallSubjects[videowall].insert(subjectId);
         subjectVideowalls[subjectId].insert(videowall);
 
-        const auto layoutAccessRights = (accessRights & ~int(AccessRight::controlVideowall))
-            | AccessRight::view;
+        const auto layoutAccessRights = accessRights | AccessRight::view;
 
         const auto layouts = resourcePool->getResourcesByIds<QnLayoutResource>(
             nx::utils::keyRange(videowallLayoutIds));

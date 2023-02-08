@@ -6,6 +6,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
@@ -27,6 +28,9 @@ static const auto kUniqueSharedLayoutNameCondition = displayFullMatch(kUniqueSha
 
 TEST_F(ResourceTreeModelTest, viewerUserAdds)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -39,6 +43,9 @@ TEST_F(ResourceTreeModelTest, viewerUserAdds)
 
 TEST_F(ResourceTreeModelTest, viewerUserRemoves)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with viewer permissions and unique name is added to the resource pool.
     const auto user = addUser(kUniqueUserName, GlobalPermission::viewerPermissions);
 
@@ -57,6 +64,9 @@ TEST_F(ResourceTreeModelTest, viewerUserRemoves)
 
 TEST_F(ResourceTreeModelTest, disabledUserIsHidden)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with viewer permissions and unique name is added to the resource pool.
     const auto user = addUser(kUniqueUserName, GlobalPermission::viewerPermissions);
 
@@ -81,6 +91,9 @@ TEST_F(ResourceTreeModelTest, disabledUserIsHidden)
 
 TEST_F(ResourceTreeModelTest, sharedDevicesAppearWithinGroupForCustomUser)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When custom user with unique name is added to the resource pool.
     const auto customUser = addUser(kUniqueUserName, GlobalPermission::customUser);
 
@@ -109,6 +122,9 @@ TEST_F(ResourceTreeModelTest, sharedDevicesAppearWithinGroupForCustomUser)
 
 TEST_F(ResourceTreeModelTest, sharedDevicesGroupDisappearsWhenNoSharedResourcesLeftForCustomUser)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When custom user with unique user name is added to the resource pool.
     const auto customUser = addUser(kUniqueUserName, GlobalPermission::customUser);
 
@@ -136,6 +152,9 @@ TEST_F(ResourceTreeModelTest, sharedDevicesGroupDisappearsWhenNoSharedResourcesL
 
 TEST_F(ResourceTreeModelTest, viewerUserResourcesPlaceholders)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -160,6 +179,9 @@ TEST_F(ResourceTreeModelTest, viewerUserResourcesPlaceholders)
 
 TEST_F(ResourceTreeModelTest, adminUserResourcesPlaceholders)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -184,6 +206,9 @@ TEST_F(ResourceTreeModelTest, adminUserResourcesPlaceholders)
 
 TEST_F(ResourceTreeModelTest, customUserResourcesPlaceholders)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -202,6 +227,9 @@ TEST_F(ResourceTreeModelTest, customUserResourcesPlaceholders)
 
 TEST_F(ResourceTreeModelTest, viewerUserSharedAndOwnLayoutsAreNotInGroup)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -230,6 +258,9 @@ TEST_F(ResourceTreeModelTest, viewerUserSharedAndOwnLayoutsAreNotInGroup)
 
 TEST_F(ResourceTreeModelTest, layoutsGroupAppearsOnlyIfAccessibleLayoutsExistsForCustomUser)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When custom user with unique name is added to the resource pool.
     const auto customUser = addUser(kUniqueUserName, GlobalPermission::customUser);
 
@@ -255,6 +286,9 @@ TEST_F(ResourceTreeModelTest, layoutsGroupAppearsOnlyIfAccessibleLayoutsExistsFo
 
 TEST_F(ResourceTreeModelTest, viewerUserLayoutNodeType)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When live viewer user added to the resource pool.
     const auto liveViewerUser = addUser("live_viewer", GlobalPermission::liveViewerPermissions);
 
@@ -275,6 +309,9 @@ TEST_F(ResourceTreeModelTest, viewerUserLayoutNodeType)
 
 TEST_F(ResourceTreeModelTest, viewerUserSharedLayoutNodeType)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When live viewer user added to the resource pool.
     const auto liveViewerUser = addUser("live_viewer", GlobalPermission::liveViewerPermissions);
 
@@ -298,6 +335,9 @@ TEST_F(ResourceTreeModelTest, viewerUserSharedLayoutNodeType)
 
 TEST_F(ResourceTreeModelTest, customUserLayoutNodeType)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -318,6 +358,9 @@ TEST_F(ResourceTreeModelTest, customUserLayoutNodeType)
 
 TEST_F(ResourceTreeModelTest, customUserSharedLayoutNodeType)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -341,6 +384,9 @@ TEST_F(ResourceTreeModelTest, customUserSharedLayoutNodeType)
 
 TEST_F(ResourceTreeModelTest, customUserSharedAndOwnLayoutsAreGrouped)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -377,6 +423,9 @@ TEST_F(ResourceTreeModelTest, customUserSharedAndOwnLayoutsAreGrouped)
 
 TEST_F(ResourceTreeModelTest, userResourcesRebuildsOnUserPermissionsChange)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 

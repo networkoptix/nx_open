@@ -38,6 +38,8 @@ Window
 
     property var result: undefined
 
+    property bool enabled: true //< Required for GUI autotesting.
+
     Instrument
     {
         item: rootItem
@@ -66,6 +68,7 @@ Window
         contentItem.y = Qt.binding(() => topPadding)
         contentItem.width = Qt.binding(() => availableWidth)
         contentItem.height = Qt.binding(() => availableHeight)
+        contentItem.enabled = Qt.binding(() => enabled)
         contentItem.focus = true
     }
 

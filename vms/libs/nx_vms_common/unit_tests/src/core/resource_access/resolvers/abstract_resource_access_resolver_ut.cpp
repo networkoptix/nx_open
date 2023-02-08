@@ -10,6 +10,7 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resolvers/abstract_resource_access_resolver.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 
@@ -57,18 +58,19 @@ public:
 TEST_F(AbstractResourceAccessResolverTest, notApplicableResourceAccess)
 {
     const auto user = addUser(GlobalPermission::admin);
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap[user->getId()] = kFullAccessRights;
     ASSERT_EQ(accessRights({}, user), AccessRights());
 }
 
 TEST_F(AbstractResourceAccessResolverTest, notResourceAccessOutOfPool)
 {
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap = kAdminResourceAccessMap;
 
     const auto camera = createCamera();
     ASSERT_EQ(accessRights({}, camera), AccessRights());
 
     const auto layout = createLayout();
+    testAccessMap[layout->getId()] = kFullAccessRights;
     ASSERT_EQ(accessRights({}, layout), AccessRights());
 
     const auto videowall = createVideoWall();
@@ -83,32 +85,21 @@ TEST_F(AbstractResourceAccessResolverTest, notResourceAccessOutOfPool)
 
 TEST_F(AbstractResourceAccessResolverTest, resolveMediaAccess)
 {
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap[kAllDevicesGroupId] = kFullAccessRights;
 
     const auto camera = addCamera();
-    ASSERT_EQ(accessRights({}, camera), kFullMediaAccessRights);
+    ASSERT_EQ(accessRights({}, camera), kFullAccessRights);
 
     const auto layout = addLayout();
     testAccessMap[layout->getId()] = kFullAccessRights; //< Layout access rights must be explicit.
 
     ASSERT_TRUE(layout->isShared());
-    ASSERT_EQ(accessRights({}, layout), kFullMediaAccessRights);
-}
-
-TEST_F(AbstractResourceAccessResolverTest, noPrivateLayoutAccess)
-{
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
-
-    const auto layout = addLayout();
-    const auto user = addUser(GlobalPermission::admin);
-    layout->setParentId(user->getId());
-    ASSERT_FALSE(layout->isShared());
-    ASSERT_EQ(accessRights({}, layout), AccessRights());
+    ASSERT_EQ(accessRights({}, layout), kFullAccessRights);
 }
 
 TEST_F(AbstractResourceAccessResolverTest, noDesktopCameraAccess)
 {
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap[kAllDevicesGroupId] = kFullAccessRights;
 
     const auto user = createUser(GlobalPermission::admin);
     const auto camera = addDesktopCamera(user);
@@ -117,7 +108,8 @@ TEST_F(AbstractResourceAccessResolverTest, noDesktopCameraAccess)
 
 TEST_F(AbstractResourceAccessResolverTest, resolveViewOnlyAccess)
 {
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap[kAllWebPagesGroupId] = kFullAccessRights;
+    testAccessMap[kAllServersGroupId] = kFullAccessRights;
 
     const auto webPage = addWebPage();
     ASSERT_EQ(accessRights({}, webPage), kViewAccessRights);
@@ -128,7 +120,7 @@ TEST_F(AbstractResourceAccessResolverTest, resolveViewOnlyAccess)
 
 TEST_F(AbstractResourceAccessResolverTest, resolveVideoWallAccess)
 {
-    testAccessMap[AccessRightsManager::kAnyResourceId] = kFullAccessRights;
+    testAccessMap[kAllVideowallsGroupId] = kFullAccessRights;
 
     const auto videoWall = addVideoWall();
     ASSERT_EQ(accessRights({}, videoWall), kFullAccessRights);

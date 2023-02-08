@@ -4,8 +4,6 @@
 
 namespace nx::core::access {
 
-const QnUuid AbstractAccessRightsManager::kAnyResourceId = QnUuid{};
-
 nx::vms::api::AccessRights AbstractAccessRightsManager::ownAccessRights(
     const QnUuid& subjectId, const QnUuid& targetId) const
 {

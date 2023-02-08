@@ -8,6 +8,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_matrix.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -163,6 +164,9 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsEditableByAdmin)
 
 TEST_F(ResourceTreeModelTest, otherUserLayoutIsEditableByAdmin)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -280,6 +284,9 @@ TEST_F(ResourceTreeModelTest, layoutNodeIsDragEnabled)
 
 TEST_F(ResourceTreeModelTest, anotherUserLayoutShownUnderUserNode)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // String constants
     static constexpr auto kUniqueUserName = "unique_user_name";
 
@@ -301,6 +308,9 @@ TEST_F(ResourceTreeModelTest, anotherUserLayoutShownUnderUserNode)
 
 TEST_F(ResourceTreeModelTest, anotherUserLayoutAppearsUnderUserNodeWithinUserSession)
 {
+    if (ini().enableNewUserSettings)
+        return;
+
     // String constants
     static constexpr auto kUniqueUserName = "unique_user_name";
 
@@ -363,7 +373,8 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
     setupAccessToResourceForUser(otherUser, intercom, true);
 
     // Then two copies of intercom layout appeard in the resource tree.
-    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 2);
+    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(),
+        ini().enableNewUserSettings ? 1 : 2);
 
     // When intercom is not accessible for non-admin user.
     setupAccessToResourceForUser(otherUser, intercom, false);

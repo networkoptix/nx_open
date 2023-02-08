@@ -19,6 +19,7 @@ import "Tabs"
 DialogWithState
 {
     id: dialog
+    objectName: "userEditDialog" //< For autotesting.
 
     modality: Qt.NonModal
 

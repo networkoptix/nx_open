@@ -870,104 +870,14 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
     }
 }
 
-void ResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& accessibleResources,
-    GlobalPermissions permissions,
-    SystemContext* systemContext,
-    const nx::vms::common::SessionTokenHelperPtr& helper)
+void ResourcesChangesManager::saveAccessibleResources(
+    const QnResourceAccessSubject&,
+    const QSet<QnUuid>&,
+    GlobalPermissions,
+    SystemContext*,
+	const nx::vms::common::SessionTokenHelperPtr&)
 {
-    if (systemContext->restApiHelper()->restApiEnabled())
-    {
-        auto api = connectedServerApi();
-        if (!api)
-            return;
-
-        vms::api::AccessRightsData accessRights;
-        accessRights.userId = subject.id();
-        const auto resourceRights = nx::vms::api::globalPermissionsToAccessRights(permissions);
-        for (const auto& id: accessibleResources)
-            accessRights.resourceRights[id] = resourceRights;
-
-        auto backup = sharedResourcesManager()->sharedResourceRights(subject);
-        if (backup == accessRights.resourceRights)
-            return;
-
-        sharedResourcesManager()->setSharedResourceRights(subject, accessRights.resourceRights);
-
-        auto handler =
-            [this, subject, backup](bool success,
-            rest::Handle /*requestId*/,
-            rest::ServerConnection::ErrorOrEmpty /*result*/)
-            {
-                if (!success)
-                    sharedResourcesManager()->setSharedResourceRights(subject, backup);
-            };
-
-
-        if (subject.isUser())
-        {
-            nx::vms::api::UserModelV3 body;
-            body.id = accessRights.userId;
-            body.resourceAccessRights = accessRights.resourceRights;
-            const auto tokenHelper = helper
-                ? helper
-                : systemContext->restApiHelper()->getSessionTokenHelper();
-
-            api->patchRest(tokenHelper,
-                QString("/rest/v3/users/%1").arg(accessRights.userId.toString()),
-                network::rest::Params{},
-                QJson::serialized(body),
-                handler,
-                thread());
-        }
-        else
-        {
-            nx::vms::api::UserGroupModel body;
-            body.id = accessRights.userId;
-            body.resourceAccessRights = accessRights.resourceRights;
-            const auto tokenHelper = helper
-                ? helper
-                : systemContext->restApiHelper()->getSessionTokenHelper();
-
-            api->patchRest(tokenHelper,
-                QString("/rest/v3/userGroups/%1").arg(accessRights.userId.toString()),
-                network::rest::Params{},
-                QJson::serialized(body),
-                handler,
-                thread());
-        }
-    }
-    else
-    {
-        auto connection = messageBusConnection();
-        if (!connection)
-            return;
-
-        vms::api::AccessRightsData accessRights;
-        accessRights.userId = subject.id();
-        const auto resourceRights = nx::vms::api::globalPermissionsToAccessRights(permissions);
-        for (const auto& id: accessibleResources)
-            accessRights.resourceRights[id] = resourceRights;
-
-        auto backup = sharedResourcesManager()->sharedResourceRights(subject);
-        if (backup == accessRights.resourceRights)
-            return;
-
-        sharedResourcesManager()->setSharedResourceRights(subject, accessRights.resourceRights);
-
-        auto handler =
-            [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
-            {
-                const bool success = errorCode == ec2::ErrorCode::ok;
-                // Ignore setSharedResources() constraints here since we are just reverting the
-                // change.
-                if (!success)
-                    sharedResourcesManager()->setSharedResourceRights(subject, backup);
-            };
-
-        connection->getUserManager(Qn::kSystemAccess)
-            ->setAccessRights(accessRights, makeReplyProcessor(this, handler), this);
-    }
+    NX_ASSERT(false, "This method is no longer supported.");
 }
 
 void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& subject,

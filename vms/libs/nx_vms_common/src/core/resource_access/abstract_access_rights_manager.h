@@ -28,9 +28,6 @@ signals:
 
     /** Emitted when all subjects' access maps are reset. */
     void accessRightsReset();
-
-public:
-    static const QnUuid kAnyResourceId;
 };
 
 } // namespace nx::core::access

@@ -47,14 +47,19 @@ public:
     bool hasAdminPermissions(const Qn::UserAccessData& accessData) const;
     bool hasAdminPermissions(const QnResourceAccessSubject& subject) const;
 
+    // TODO: #vkutin
+    // Think whether we need these two versions or one `accessRights(subject, resourceOrGroupId)`
     nx::vms::api::AccessRights accessRights(
         const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const;
+
+    nx::vms::api::AccessRights accessRights(
+        const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId) const;
 
     bool hasAccessRights(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         nx::vms::api::AccessRights requiredAccessRights) const;
 
-    nx::vms::api::AccessRights commonAccessRights(
-        const QnResourceAccessSubject& subject) const;
+    bool hasAccessRights(const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId,
+        nx::vms::api::AccessRights requiredAccessRights) const;
 
     /**
      * @param subject User or role to get global permissions for.

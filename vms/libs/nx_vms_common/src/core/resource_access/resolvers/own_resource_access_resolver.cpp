@@ -52,7 +52,7 @@ ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const QnUuid& sub
         return {};
 
     if (hasAdminAccessRights(subjectId))
-        return {{AbstractAccessRightsManager::kAnyResourceId, nx::vms::api::kAdminAccessRights}};
+        return kAdminResourceAccessMap;
 
     return d->accessRightsManager->ownResourceAccessMap(subjectId);
 }

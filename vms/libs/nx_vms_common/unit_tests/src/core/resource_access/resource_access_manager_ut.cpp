@@ -455,8 +455,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 {
     loginAsCustom(GlobalPermission::none);
 
-    setAccessRights(m_currentUser->getId(),
-        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
+    setAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -487,8 +486,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
     const auto group = createRole("Group", GlobalPermission::none);
     loginAsMember(group.id);
 
-    setAccessRights(group.id,
-        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
+    setAccessRights(group.id, {{kAllVideowallsGroupId, AccessRight::view}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, true, videowall->getId());
@@ -508,8 +506,7 @@ TEST_F(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
     const auto group = addLiveViewers();
     loginAsMember(group.id);
 
-    setAccessRights(group.id,
-        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
+    setAccessRights(group.id, {{kAllVideowallsGroupId, AccessRight::view}});
 
     auto camera = addDesktopCamera(m_currentUser);
 
@@ -562,8 +559,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
     const auto group = addViewers();
     loginAsMember(group.id);
 
-    setAccessRights(group.id,
-        {{AccessRightsManager::kAnyResourceId, AccessRight::controlVideowall}});
+    setAccessRights(group.id, {{kAllVideowallsGroupId, AccessRight::view}});
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
