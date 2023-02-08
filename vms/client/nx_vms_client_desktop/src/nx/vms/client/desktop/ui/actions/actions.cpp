@@ -296,8 +296,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Main Menu")) //< To be displayed on button tooltip
         .shortcut(QString("Alt+Space"), Builder::Mac, true)
-        .condition(!condition::tourIsRunning())
-        .icon(qnSkin->icon("titlebar/main_menu.png"));
+        .condition(!condition::tourIsRunning());
 
     factory(OpenLoginDialogAction)
         .flags(Main | GlobalHotkey)

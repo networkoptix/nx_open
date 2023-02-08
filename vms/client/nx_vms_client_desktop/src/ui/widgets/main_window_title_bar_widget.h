@@ -51,6 +51,11 @@ protected:
 private:
     nx::vms::client::desktop::ToolButton* newActionButton(
         nx::vms::client::desktop::ui::action::IDType actionId,
+        const QIcon& icon,
+        int helpTopicId = Qn::Empty_Help);
+
+    nx::vms::client::desktop::ToolButton* newActionButton(
+        nx::vms::client::desktop::ui::action::IDType actionId,
         int helpTopicId = Qn::Empty_Help,
         const QSize& fixedSize = QSize());
 

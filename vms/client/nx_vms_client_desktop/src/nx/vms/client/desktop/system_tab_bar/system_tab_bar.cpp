@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/widgets/main_window.h>
@@ -23,7 +24,7 @@
 
 namespace {
 static const int kFixedTabSizeHeight = 32;
-static const int kFixedHomeIconWidth = 30;
+static const int kFixedHomeIconWidth = 32;
 static const int kFixedWideHomeIconWidth = 52;
 } // namespace
 
@@ -41,6 +42,27 @@ SystemTabBar::SystemTabBar(QWidget *parent):
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
     setFixedHeight(kFixedTabSizeHeight);
+    setContentsMargins(1, 0, 1, 0);
+
+    // Set palette colors for tabs:
+    // - QPalette::Text - text;
+    // - QPalette::Base - background;
+    // - QPalette::Dark - right margin;
+    // - QPalette::Light - left margin.
+    auto p = palette();
+
+    // Active tab:
+    p.setColor(QPalette::Active, QPalette::Text, colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, colorTheme()->color("dark10"));
+    p.setColor(QPalette::Active, QPalette::Light, colorTheme()->color("dark4"));
+    p.setColor(QPalette::Active, QPalette::Dark, colorTheme()->color("dark4"));
+
+    // Inactive tab:
+    p.setColor(QPalette::Inactive, QPalette::Text, colorTheme()->color("light16"));
+    p.setColor(QPalette::Inactive, QPalette::Base, colorTheme()->color("dark7"));
+    p.setColor(QPalette::Inactive, QPalette::Light, colorTheme()->color("dark6"));
+    p.setColor(QPalette::Inactive, QPalette::Dark, colorTheme()->color("dark8"));
+    setPalette(p);
 
     connect(workbench()->windowContext()->systemTabBarModel(),
         &SystemTabBarModel::dataChanged,
@@ -107,19 +129,22 @@ void SystemTabBar::activatePreviousTab()
 
 QSize SystemTabBar::tabSizeHint(int index) const
 {
-    auto result = base_type::tabSizeHint(index);
+    int width;
     if (isHomeTab(index))
     {
         if (count() == 1 || !isHomeTab(currentIndex()))
-            result.setWidth(kFixedHomeIconWidth);
+            width = kFixedHomeIconWidth;
         else
-            result.setWidth(kFixedWideHomeIconWidth);
+            width = kFixedWideHomeIconWidth;
     }
-    else if (result.width() < kFixedHomeIconWidth)
+    else
     {
-        result.setWidth(kFixedHomeIconWidth);
+        auto size = base_type::tabSizeHint(index);
+        width = size.width();
+        if (width < kFixedHomeIconWidth)
+            width = kFixedHomeIconWidth;
     }
-    return result;
+    return QSize(width, kFixedTabSizeHeight);
 }
 
 void SystemTabBar::at_currentTabChanged(int index)
@@ -183,7 +208,7 @@ void SystemTabBar::addClosableTab(const QString& text,
     insertTab(index, text);
     setTabData(index, QVariant::fromValue(systemDescription));
 
-    QAbstractButton *closeButton = new CloseTabButton(this);
+    QAbstractButton* closeButton = new CloseTabButton(this);
     connect(closeButton, &CloseTabButton::clicked,
         [this, systemDescription, index]()
         {

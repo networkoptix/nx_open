@@ -38,7 +38,7 @@ public:
     {
     }
 
-    void addSvg(const SvgIconColorer& colorer, QIcon::Mode mode)
+    void addSvg(const SvgIconColorer& colorer, QIcon::Mode mode, QIcon::State state)
     {
         const QByteArray data = colorer.makeIcon(mode);
         QSvgRenderer renderer;
@@ -54,7 +54,7 @@ public:
         pixmap.fill(Qt::transparent);
         QPainter p(&pixmap);
         renderer.render(&p);
-        add(pixmap, mode, QnIcon::Off);
+        add(pixmap, mode, state);
     }
 
     void add(const QPixmap& pixmap, QIcon::State state)
@@ -224,7 +224,7 @@ QIcon IconLoader::load(const QString& name,
             "Color substitutions cannot be specified for non-SVG icons.");
 
         const QIcon icon = isSvg
-            ? loadSvgIconInternal(qnSkin, name, checkedName, suffixes, svgColorSubstitutions)
+            ? loadSvgIconInternal(qnSkin, name, checkedName, svgColorSubstitutions)
             : loadPixmapIconInternal(qnSkin,  name, checkedName, suffixes);
 
         m_iconByKey.insert(key, icon);
@@ -254,30 +254,38 @@ QIcon IconLoader::loadSvgIconInternal(
     Skin* skin,
     const QString& name,
     const QString& checkedName,
-    const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& substitutions)
 {
-    const auto basePath = skin->path(name);
-    QFile source(basePath);
-    if (!source.open(QIODevice::ReadOnly))
-    {
-        NX_ASSERT(false, "Cannot load svg icon");
-        return QIcon();
-    }
-
-    const QByteArray baseData = source.readAll();
-
-    const SvgIconColorer colorer(baseData, name, substitutions);
     IconBuilder builder(Skin::isHiDpi());
-
-    builder.addSvg(colorer, QnIcon::Normal);
-    for (auto modeSubstitutions = substitutions.begin();
-        modeSubstitutions != substitutions.end(); ++modeSubstitutions)
     {
-        builder.addSvg(colorer, modeSubstitutions.key());
+        const auto basePath = skin->path(name);
+        QFile source(basePath);
+        if (!source.open(QIODevice::ReadOnly))
+        {
+            NX_ASSERT(false, "Cannot load icon %1", name);
+            return QIcon();
+        }
+
+        const QByteArray baseData = source.readAll();
+        const SvgIconColorer colorer(baseData, name, substitutions);
+        builder.addSvg(colorer, QnIcon::Normal, QIcon::Off);
+        for (const auto& modeSubstitutions: substitutions.keys())
+            builder.addSvg(colorer, modeSubstitutions, QIcon::Off);
     }
 
-    loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
+    if (!checkedName.isEmpty())
+    {
+        const auto checkedPath = skin->path(checkedName);
+        QFile source(checkedPath);
+        if (NX_ASSERT(source.open(QIODevice::ReadOnly), "Cannot load icon %1", checkedName))
+        {
+            const QByteArray checkedData = source.readAll();
+            const SvgIconColorer colorer(checkedData, checkedName, substitutions);
+            builder.addSvg(colorer, QnIcon::Normal, QIcon::On);
+            for (const auto& modeSubstitutions: substitutions.keys())
+                builder.addSvg(colorer, modeSubstitutions, QIcon::On);
+        }
+    }
 
     return builder.createIcon();
 }

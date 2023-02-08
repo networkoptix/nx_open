@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
@@ -54,6 +55,26 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     setElideMode(Qt::ElideRight);
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
+    setContentsMargins(0, 4, 1, 4);
+
+    // Set palette colors for tabs:
+    // - QPalette::Text - text;
+    // - QPalette::Base - background;
+    // - QPalette::Dark - right margin;
+    // - QPalette::Light - left margin.
+    auto p = palette();
+
+    // Active tab:
+    p.setColor(QPalette::Active, QPalette::Text, colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, colorTheme()->color("dark10"));
+
+    // Inactive tab:
+    p.setColor(QPalette::Inactive, QPalette::Text, colorTheme()->color("light10"));
+    p.setColor(QPalette::Inactive, QPalette::Base, colorTheme()->color("dark10"));
+
+    // Common
+    p.setColor(QPalette::Dark, colorTheme()->color("dark12"));
+    setPalette(p);
 
     connect(this, &QTabBar::currentChanged, this, &QnLayoutTabBar::at_currentChanged);
     connect(this, &QTabBar::tabMoved, this, &QnLayoutTabBar::at_tabMoved);
