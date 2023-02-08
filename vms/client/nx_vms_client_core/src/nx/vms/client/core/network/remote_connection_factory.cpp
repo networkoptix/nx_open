@@ -698,8 +698,16 @@ struct RemoteConnectionFactory::Private
                 const bool validated = context->logonData.userInteractionAllowed
                     && executeInUiThreadSync(context, validate);
 
-                if (!validated)
+                if (validated)
+                {
+                    context->logonData.credentials.authToken =
+                        nx::network::http::BearerAuthToken(response.access_token);
+                    context->sessionTokenExpirationTime = response.expires_at;
+                }
+                else
+                {
                     context->setError(RemoteConnectionErrorCode::unauthorized);
+                }
             }
             else if (*response.error
                 == nx::cloud::db::api::OauthManager::k2faDisabledForUserError)
