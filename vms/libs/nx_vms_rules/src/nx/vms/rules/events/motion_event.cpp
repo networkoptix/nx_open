@@ -44,7 +44,11 @@ const ItemDescriptor& MotionEvent::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(tr("State")),
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                tr("Camera"),
+                {},
+                {{"acceptAll", true}}),
         },
         .permissions = {
             .resourcePermissions = {

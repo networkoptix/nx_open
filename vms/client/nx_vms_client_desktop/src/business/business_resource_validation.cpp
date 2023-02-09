@@ -128,6 +128,16 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
 }
 
 //-------------------------------------------------------------------------------------------------
+// QnAllowAnyCameraPolicy
+//-------------------------------------------------------------------------------------------------
+
+QString QnAllowAnyCameraPolicy::getText(const QnResourceList& resources, const bool detailed)
+{
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    return genericCameraText<QnAllowAnyCameraPolicy>(cameras, detailed, "", /* invalid */ 0);
+}
+
+//-------------------------------------------------------------------------------------------------
 // QnCameraInputPolicy
 //-------------------------------------------------------------------------------------------------
 
@@ -269,6 +279,9 @@ bool QnFullscreenCameraPolicy::isResourceValid(const QnVirtualCameraResourcePtr&
 QString QnFullscreenCameraPolicy::getText(const QnResourceList& resources, const bool /*detailed*/)
 {
     const auto cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.empty())
+        return QnBusinessResourceValidationStrings::selectCamera();
+
     if (cameras.size() != 1)
         return tr("Select exactly one camera");
 
@@ -944,6 +957,47 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     }
 
     return QString();
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnUserWithEmailValidationPolicy
+
+QnUserWithEmailValidationPolicy::QnUserWithEmailValidationPolicy(
+    nx::vms::client::desktop::SystemContext* systemContext)
+    :
+    m_resourceAccessSubjectsCache(systemContext->resourceAccessSubjectsCache())
+{
+}
+
+QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const QnUuid& roleId) const
+{
+    bool hasValid{false};
+    bool hasInvalid{false};
+    for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allUsersInRole(roleId))
+    {
+        if (userValidity(subject.user()))
+        {
+            hasValid = true;
+        }
+        else
+        {
+            if (hasValid)
+                return QValidator::State::Intermediate;
+
+            hasInvalid = true;
+        }
+    }
+
+    return hasInvalid ? QValidator::State::Invalid : QValidator::State::Acceptable;
+}
+
+bool QnUserWithEmailValidationPolicy::userValidity(const QnUserResourcePtr& user) const
+{
+    // Disabled users are just not displayed.
+    if (!user->isEnabled())
+        return true;
+
+    return nx::email::isValidAddress(user->getEmail());
 }
 
 bool QnBuzzerPolicy::isServerValid(const QnMediaServerResourcePtr& server)

@@ -34,7 +34,7 @@ public:
 protected:
     PICKER_WIDGET_COMMON_USINGS
 
-    D* m_comboBox{};
+    D* m_comboBox{nullptr};
 
     virtual void onCurrentIndexChanged() = 0;
 };

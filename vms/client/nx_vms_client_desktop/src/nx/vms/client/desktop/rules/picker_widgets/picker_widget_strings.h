@@ -54,4 +54,23 @@ public:
     static QString intervalOfActionHint(bool isInstant);
 };
 
+class CameraPickerStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(CameraPickerStrings)
+
+public:
+    static QString sourceCameraString(size_t otherCameraCount = 0);
+};
+
+class ServerPickerStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(ServerPickerStrings)
+
+public:
+    static QString anyServerString();
+    static QString multipleServersString(size_t count);
+    static QString selectServerString();
+    static QString sourceServerString(size_t otherServersCount);
+};
+
 } // namespace nx::vms::client::desktop::rules

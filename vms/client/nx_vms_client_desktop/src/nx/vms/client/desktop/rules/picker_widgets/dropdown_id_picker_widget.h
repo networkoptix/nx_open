@@ -51,7 +51,7 @@ public:
 protected:
     PICKER_WIDGET_COMMON_USINGS
 
-    D* m_comboBox{};
+    D* m_comboBox{nullptr};
     nx::utils::ScopedConnections m_scopedConnections;
 
     virtual void onCurrentIndexChanged() = 0;

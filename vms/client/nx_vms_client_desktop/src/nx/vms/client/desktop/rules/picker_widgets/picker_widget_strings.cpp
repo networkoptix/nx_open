@@ -76,4 +76,35 @@ QString DurationPickerWidgetStrings::intervalOfActionHint(bool isInstant)
         : tr("Interval of action: No more than once per");
 }
 
+QString CameraPickerStrings::sourceCameraString(size_t otherCameraCount)
+{
+    if (otherCameraCount == 0)
+        return tr("Source Camera");
+
+    return tr("Source and %n more Cameras", "", otherCameraCount);
+}
+
+QString ServerPickerStrings::anyServerString()
+{
+    return QString{"<%n>"}.arg(tr("Any Server"));
+}
+
+QString ServerPickerStrings::multipleServersString(size_t count)
+{
+    return tr("%n Servers", "", count);
+}
+
+QString ServerPickerStrings::selectServerString()
+{
+    return tr("Select Server");
+}
+
+QString ServerPickerStrings::sourceServerString(size_t otherServersCount)
+{
+    if (otherServersCount == 0)
+        return tr("Source Server");
+
+    return tr("Source Server and %n Servers", "", otherServersCount);
+}
+
 } // namespace nx::vms::client::desktop::rules

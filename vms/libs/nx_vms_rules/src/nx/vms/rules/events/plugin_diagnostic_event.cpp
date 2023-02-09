@@ -98,7 +98,11 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
         .displayName = tr("Plugin Diagnostic Event"),
         .description = {},
         .fields = {
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                tr("Camera"),
+                {},
+                {{"acceptAll", true}}),
             makeFieldDescriptor<AnalyticsEngineField>(
                 "engineId", tr("Source"), {}, {}, {utils::kCameraIdFieldName}),
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),

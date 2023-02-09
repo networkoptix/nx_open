@@ -98,7 +98,11 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             makeFieldDescriptor<UniqueIdField>("triggerId", "Invisible"),
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Cameras")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                tr("Cameras"),
+                {},
+                {{"acceptAll", true}}),
             makeFieldDescriptor<SourceUserField>("userId", tr("Users")),
             makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
             makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),

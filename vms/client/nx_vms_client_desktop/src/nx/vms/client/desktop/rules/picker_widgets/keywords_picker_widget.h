@@ -31,7 +31,7 @@ protected:
         m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
     }
 
-    void updateValue() override
+    void updateUi() override
     {
         const QSignalBlocker blocker{m_lineEdit};
         m_lineEdit->setText(m_field->string());

@@ -37,9 +37,9 @@ public:
 protected:
     PICKER_WIDGET_COMMON_USINGS
 
-    QSpinBox* m_spinBox{};
+    QSpinBox* m_spinBox{nullptr};
 
-    void updateValue() override
+    void updateUi() override
     {
         QSignalBlocker blocker{m_spinBox};
         m_spinBox->setValue(m_field->value());
