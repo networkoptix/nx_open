@@ -5,6 +5,8 @@
 #include <memory>
 #include <future>
 
+#include <nx/utils/log/log.h>
+
 #include "../ec_api_common.h"
 
 namespace ec2::detail {
@@ -21,7 +23,19 @@ Result callSync(Initiator initiate, Results*... outResults)
             ((*outResults = results), ...);
             promise->set_value(errorCode);
         });
-    return future.get();
+
+    /* future_error should only happen in unit-tests, never in stand-alone server */
+    try
+    {
+        return future.get();
+    }
+    catch(const std::future_error& e)
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Thread pool was cleared before executing the handler %1: %2",
+            typeid(initiate), e.what());
+        return ErrorCode::asyncRaceError;
+    }
 }
 
 } // namespace ec2::detail
