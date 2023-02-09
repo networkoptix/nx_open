@@ -272,6 +272,7 @@ private:
     void assign(const QnCompressedObjectMetadataPacket* other);
 };
 using QnCompressedObjectMetadataPacketPtr = std::shared_ptr<QnCompressedObjectMetadataPacket>;
+using QnConstCompressedObjectMetadataPacketPtr = std::shared_ptr<const QnCompressedObjectMetadataPacket>;
 
 NX_VMS_COMMON_API ObjectMetadataPacketPtr fromCompressedMetadataPacket(
     const QnConstCompressedMetadataPtr&);

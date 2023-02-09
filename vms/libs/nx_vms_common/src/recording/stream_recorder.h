@@ -23,6 +23,8 @@
 #include <recording/stream_recorder_data.h>
 #include <utils/color_space/image_correction.h>
 
+namespace nx::common::metadata { struct QnCompressedObjectMetadataPacket; }
+
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,
     // Public, because private breaks clang build.
@@ -71,6 +73,8 @@ protected:
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
+    virtual bool saveAnalyticsMetadata(const std::shared_ptr<const 
+        nx::common::metadata::QnCompressedObjectMetadataPacket>& metadata);
 
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const = 0;
