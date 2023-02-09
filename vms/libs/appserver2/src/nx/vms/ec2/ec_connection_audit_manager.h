@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include <api/model/audit/auth_session.h>
 #include <common/common_module_aware.h>
 #include <nx_ec/abstract_ec_connection.h>
-
-#include "transaction/transaction.h"
-#include "api/model/audit/auth_session.h"
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

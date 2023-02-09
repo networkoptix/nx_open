@@ -4,29 +4,30 @@
 
 #include <memory>
 
+#include <QtCore/QUrlQuery>
+
 #include <core/resource_management/resource_pool.h>
-#include <ec_connection_notification_manager.h>
-#include <ec_connection_audit_manager.h>
-#include <managers/event_rules_manager.h>
-#include <managers/vms_rules_manager.h>
+#include <managers/analytics_manager.h>
 #include <managers/camera_manager.h>
+#include <managers/discovery_manager.h>
+#include <managers/event_rules_manager.h>
 #include <managers/layout_manager.h>
 #include <managers/layout_tour_manager.h>
 #include <managers/license_manager.h>
-#include <managers/stored_file_manager.h>
 #include <managers/media_server_manager.h>
+#include <managers/misc_manager.h>
 #include <managers/resource_manager.h>
+#include <managers/stored_file_manager.h>
 #include <managers/user_manager.h>
 #include <managers/videowall_manager.h>
+#include <managers/vms_rules_manager.h>
 #include <managers/webpage_manager.h>
-#include <managers/misc_manager.h>
-#include <managers/discovery_manager.h>
-#include <managers/analytics_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
 
-#include <QtCore/QUrlQuery>
+#include "ec_connection_audit_manager.h"
+#include "ec_connection_notification_manager.h"
 
 class QnCommonModule;
 

@@ -4,7 +4,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <ec2_thread_pool.h>
 #include <nx/build_info.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -17,6 +16,8 @@
 #include <nx/vms/statistics/settings.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
+
+#include "ec2_thread_pool.h"
 
 static const QString DATE_FORMAT("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND("crashserver/api/report");

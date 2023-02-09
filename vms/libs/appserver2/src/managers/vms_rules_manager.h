@@ -2,14 +2,11 @@
 
 #pragma once
 
-#include <nx_ec/managers/abstract_vms_rules_manager.h>
-
-#include <nx/utils/concurrent.h>
-
-#include <ec2_thread_pool.h>
-
-#include <transaction/transaction.h>
 #include <core/resource_access/user_access_data.h>
+#include <nx/utils/concurrent.h>
+#include <nx/vms/ec2/ec2_thread_pool.h>
+#include <nx_ec/managers/abstract_vms_rules_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 
