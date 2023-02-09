@@ -2,6 +2,7 @@
 
 #include "stream_recorder.h"
 
+#include <analytics/common/object_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/media_resource.h>
@@ -305,10 +306,16 @@ void QnStreamRecorder::setPreciseStartDateTime(int64_t startTimeUs)
 
 bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
+    using namespace nx::common::metadata;
     if (auto motionPacket = std::dynamic_pointer_cast<const QnMetaDataV1>(md))
     {
         NX_VERBOSE(this, "QnStreamRecorder::saveData(): Motion, timestamp %1 us", md->timestamp);
         saveMotion(motionPacket);
+    }
+    else if (auto metadata = std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(md))
+    {
+        NX_VERBOSE(this, "QnStreamRecorder::saveData(): Analytics, timestamp %1 us", md->timestamp);
+        saveAnalyticsMetadata(metadata);
     }
 
     if (m_startDateTimeUs != (int64_t) AV_NOPTS_VALUE
@@ -467,6 +474,11 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     }
 
+    return true;
+}
+
+bool QnStreamRecorder::saveAnalyticsMetadata(const nx::common::metadata::QnConstCompressedObjectMetadataPacketPtr& metadata)
+{
     return true;
 }
 
