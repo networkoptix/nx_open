@@ -37,7 +37,7 @@ public:
 private:
     PICKER_WIDGET_COMMON_USINGS
 
-    QCheckBox* m_checkBox{};
+    QCheckBox* m_checkBox{nullptr};
 
     virtual void onDescriptorSet() override
     {

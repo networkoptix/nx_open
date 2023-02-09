@@ -71,7 +71,7 @@ protected:
     PICKER_WIDGET_COMMON_USINGS
     using OnelineTextPickerWidgetBase<F>::m_lineEdit;
 
-    void updateValue() override
+    void updateUi() override
     {
         const QSignalBlocker blocker{m_lineEdit};
         m_lineEdit->setText(m_field->value());

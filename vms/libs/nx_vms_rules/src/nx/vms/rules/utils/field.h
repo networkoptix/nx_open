@@ -10,9 +10,11 @@
 
 namespace nx::vms::rules::utils {
 
+static constexpr auto kAcknowledgeFieldName = "acknowledge";
 static constexpr auto kCameraIdFieldName = "cameraId";
 static constexpr auto kDeviceIdsFieldName = "deviceIds";
 static constexpr auto kDurationFieldName = "duration";
+static constexpr auto kEmailsFieldName = "emails";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";

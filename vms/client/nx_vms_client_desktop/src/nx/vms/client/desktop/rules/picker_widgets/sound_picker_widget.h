@@ -17,8 +17,8 @@ public:
     SoundPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
 private:
-    QComboBox* m_comboBox{};
-    QPushButton* m_pushButton{};
+    QComboBox* m_comboBox{nullptr};
+    QPushButton* m_pushButton{nullptr};
 };
 
 } // namespace nx::vms::client::desktop::rules

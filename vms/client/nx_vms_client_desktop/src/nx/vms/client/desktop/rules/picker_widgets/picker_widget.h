@@ -56,8 +56,8 @@ protected:
 
     CommonParamsWidget* parentParamsWidget() const;
 
-    WidgetWithHint<QnElidedLabel>* m_label{};
-    QWidget* m_contentWidget{};
+    WidgetWithHint<QnElidedLabel>* m_label{nullptr};
+    QWidget* m_contentWidget{nullptr};
     std::optional<vms::rules::FieldDescriptor> m_fieldDescriptor;
 };
 
@@ -125,7 +125,7 @@ public:
     using FieldPickerWidget<F>::FieldPickerWidget;
 
 protected:
-    virtual void updateValue() = 0;
+    virtual void updateUi() = 0;
 
     void onActionBuilderChanged() override
     {
@@ -143,7 +143,7 @@ private:
     template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::ActionBuilderField, T>::value, void>::type* = nullptr>
     void onActionBuilderChangedImpl()
     {
-        updateValue();
+        updateUi();
     }
 
     template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
@@ -159,7 +159,7 @@ private:
     template<typename T = F, typename std::enable_if<std::is_base_of<vms::rules::EventFilterField, T>::value, void>::type* = nullptr>
     void onEventFilterChangedImpl()
     {
-        updateValue();
+        updateUi();
     }
 };
 

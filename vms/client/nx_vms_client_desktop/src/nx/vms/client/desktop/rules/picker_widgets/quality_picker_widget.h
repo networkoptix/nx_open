@@ -16,7 +16,7 @@ public:
     QualityPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
 private:
-    QComboBox* m_comboBox{};
+    QComboBox* m_comboBox{nullptr};
 };
 
 } // namespace nx::vms::client::desktop::rules

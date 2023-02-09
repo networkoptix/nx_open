@@ -91,7 +91,11 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .displayName = tr("Device Disconnected"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Device ID")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                tr("Device ID"),
+                {},
+                {{"acceptAll", true}}),
         },
         .permissions = {
             .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}

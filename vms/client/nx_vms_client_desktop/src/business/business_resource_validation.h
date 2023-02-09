@@ -24,6 +24,18 @@ bool actionAllowedForUser(
 
 } // namespace QnBusiness
 
+struct QnAllowAnyCameraPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnAllowAnyCameraPolicy)
+public:
+    typedef QnVirtualCameraResource resource_type;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr&) { return true; }
+    static QString getText(const QnResourceList&, const bool detailed = true);
+    static bool emptyListIsValid() { return true; }
+    static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
+};
+
 class QnCameraInputPolicy
 {
     Q_DECLARE_TR_FUNCTIONS(QnCameraInputPolicy)
@@ -256,9 +268,21 @@ public:
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
     virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
+};
+
+class QnUserWithEmailValidationPolicy: public QnSubjectValidationPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnUsersWithEmailValidationPolicy)
+    using base_type = QnSubjectValidationPolicy;
+
+public:
+    QnUserWithEmailValidationPolicy(nx::vms::client::desktop::SystemContext* systemContext);
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual bool userValidity(const QnUserResourcePtr& user) const override;
 
 private:
-
+    QnResourceAccessSubjectsCache* m_resourceAccessSubjectsCache{nullptr};
 };
 
 class QnBuzzerPolicy

@@ -71,7 +71,11 @@ const ItemDescriptor& CameraInputEvent::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(tr("State")),
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
+            makeFieldDescriptor<SourceCameraField>(
+                utils::kCameraIdFieldName,
+                tr("Camera"),
+                {},
+                {{"acceptAll", true}}),
             makeFieldDescriptor<InputPortField>(
                 "inputPortId",
                 tr("Input ID"),
