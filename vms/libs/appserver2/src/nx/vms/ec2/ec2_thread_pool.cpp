@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "ec2_thread_pool.h"
+
 #include <nx/utils/log/assert.h>
 
 namespace ec2

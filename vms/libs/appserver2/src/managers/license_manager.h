@@ -4,10 +4,10 @@
 
 #include <QtCore/QObject>
 
-#include <transaction/transaction.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
 #include <nx/vms/api/data/license_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_license_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2
 {

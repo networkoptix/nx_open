@@ -6,17 +6,17 @@
 
 #include <QtCore/QObject>
 
-#include <crash_reporter.h>
-#include <nx/reflect/enum_string_conversion.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/scope_guard.h>
+#include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/network/remote_connection_fwd.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
+#include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
+#include <nx/vms/ec2/crash_reporter.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 

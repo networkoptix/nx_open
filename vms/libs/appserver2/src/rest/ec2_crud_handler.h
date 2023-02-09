@@ -4,12 +4,12 @@
 
 #include <tuple>
 
-#include <nx/network/rest/params.h>
-#include <nx/network/rest/request.h>
-#include <transaction/transaction.h>
-#include <base_ec2_connection.h> // TODO: Add direct includes instead.
 #include <core/resource/resource_type.h>
 #include <database/db_manager.h>
+#include <nx/network/rest/params.h>
+#include <nx/network/rest/request.h>
+#include <nx/vms/ec2/base_ec2_connection.h> // TODO: Add direct includes instead.
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

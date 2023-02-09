@@ -8,6 +8,11 @@
 #include <QtCore/QCryptographicHash>
 
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_property_key.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -15,22 +20,17 @@
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_property_key.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/user_resource.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_fwd.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <nx/vms/license/usage_helper.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/data/api_fwd.h>
 
 #include "amend_transaction_data.h"
-#include "ec_connection_notification_manager.h"
 
 using namespace nx::vms;
 

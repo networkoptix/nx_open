@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include <nx_ec/managers/abstract_event_rules_manager.h>
-
 #include <nx/utils/concurrent.h>
-
-#include <ec2_thread_pool.h>
-
+#include <nx/vms/ec2/ec2_thread_pool.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <transaction/transaction.h>
 
 namespace ec2 {

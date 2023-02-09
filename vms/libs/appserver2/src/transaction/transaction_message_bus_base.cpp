@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "transaction_message_bus_base.h"
+
 #include <common/common_module.h>
+#include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
-#include <ec_connection_notification_manager.h>
 
 using namespace nx::vms;
 

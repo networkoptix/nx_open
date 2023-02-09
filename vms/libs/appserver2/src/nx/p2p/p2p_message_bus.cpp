@@ -2,7 +2,6 @@
 
 #include "p2p_message_bus.h"
 
-#include "ec_connection_notification_manager.h"
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -18,6 +17,7 @@
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/transaction_message_bus_priv.h>
 #include <transaction/ubjson_transaction_serializer.h>
@@ -107,9 +107,9 @@ MessageBus::MessageBus(
             }
             m_timer->start(500);
         });
-    connect(m_thread, &QThread::finished, 
-        [this]() 
-        { 
+    connect(m_thread, &QThread::finished,
+        [this]()
+        {
             m_timer->stop();
             onThreadStopped();
         });
