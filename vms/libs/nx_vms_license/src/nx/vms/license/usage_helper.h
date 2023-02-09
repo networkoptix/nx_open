@@ -172,7 +172,10 @@ public:
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-    CamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
+    CamLicenseUsageHelper(
+        QnCommonModule* commonModule, 
+        QObject* parent = nullptr, 
+        bool watchCameraChanges = true);
 
     CamLicenseUsageHelper(
         const QnVirtualCameraResourceList &proposedCameras,

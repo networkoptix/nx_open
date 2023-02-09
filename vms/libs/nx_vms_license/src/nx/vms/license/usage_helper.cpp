@@ -436,16 +436,24 @@ CamLicenseUsageWatcher::CamLicenseUsageWatcher(
 /************************************************************************/
 /* CamLicenseUsageHelper                                              */
 /************************************************************************/
-CamLicenseUsageHelper::CamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent):
-    base_type(commonModule, parent),
-    m_watcher(new CamLicenseUsageWatcher(commonModule, this))
+CamLicenseUsageHelper::CamLicenseUsageHelper(
+    QnCommonModule* commonModule, 
+    QObject* parent,
+    bool watchCameraChanges)
+    :
+    base_type(commonModule, parent)
 {
-    connect(m_watcher, &CamLicenseUsageWatcher::licenseUsageChanged, this,
-        [this]()
-        {
-            invalidate();
-            emit licenseUsageChanged();
-        });
+
+    if (watchCameraChanges)
+    {
+        m_watcher = new CamLicenseUsageWatcher(commonModule, this);
+        connect(m_watcher, &CamLicenseUsageWatcher::licenseUsageChanged, this,
+            [this]()
+            {
+                invalidate();
+                emit licenseUsageChanged();
+            });
+    }
 }
 
 CamLicenseUsageHelper::CamLicenseUsageHelper(
