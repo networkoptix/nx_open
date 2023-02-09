@@ -16,6 +16,7 @@ enum class ErrorCode
     failure,
     ioError,
     serverError,
+    asyncRaceError,
     unsupported,
     unauthorized,
 
