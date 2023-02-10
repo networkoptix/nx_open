@@ -72,7 +72,7 @@ QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds(
     if (!NX_ASSERT(camera))
         return {};
 
-    const auto hotspots = camera->getCameraHotspots();
+    const auto hotspots = camera->cameraHotspots();
     QnUuidSet hospotsCamerasIds;
     for (const auto& hotspot: hotspots)
         hospotsCamerasIds.insert(hotspot.cameraId);
@@ -88,7 +88,11 @@ void CameraHotspotsOverlayWidget::Private::initHotspots()
     if (!workbenchContext() || !resourceWidgetCamera())
         return;
 
-    const auto hotspotsData = resourceWidgetCamera()->getCameraHotspots();
+    const auto camera = resourceWidgetCamera();
+    if (!camera->cameraHotspotsEnabled())
+        return;
+
+    const auto hotspotsData = resourceWidgetCamera()->cameraHotspots();
     for (const auto& hotspotData: hotspotsData)
     {
         const auto hotspotCamera =
@@ -113,6 +117,9 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
 
     if (!NX_ASSERT(camera))
         return;
+
+    connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsEnabledChanged, this,
+        [this] { d->initHotspots(); });
 
     connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsChanged, this,
         [this] { d->initHotspots(); });

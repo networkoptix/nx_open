@@ -251,6 +251,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         QnUuid audioInputDeviceId;
         QnUuid audioOutputDeviceId;
 
+        UserEditable<bool> cameraHotspotsEnabled;
         nx::vms::common::CameraHotspotDataList cameraHotspots;
 
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.

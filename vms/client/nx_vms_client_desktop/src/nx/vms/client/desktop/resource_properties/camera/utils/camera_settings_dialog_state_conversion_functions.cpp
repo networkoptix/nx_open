@@ -592,7 +592,14 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setAudioOutputDeviceId(state.singleCameraSettings.audioOutputDeviceId, camera);
 
         if (state.singleCameraProperties.supportsCameraHotspots)
+        {
+            if (state.singleCameraSettings.cameraHotspotsEnabled.hasUser())
+            {
+                camera->setCameraHotspotsEnabled(
+                    state.singleCameraSettings.cameraHotspotsEnabled());
+            }
             setCameraHotspots(state.singleCameraSettings.cameraHotspots, camera);
+        }
     }
 
     if (state.devicesDescription.isVirtualCamera == CombinedValue::All)

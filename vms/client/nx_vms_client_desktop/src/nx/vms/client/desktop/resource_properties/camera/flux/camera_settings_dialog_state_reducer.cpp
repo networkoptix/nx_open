@@ -938,7 +938,11 @@ State loadSingleCameraProperties(
     state.singleCameraSettings.audioOutputDeviceId = singleCamera->audioOutputDeviceId();
 
     if (state.singleCameraProperties.supportsCameraHotspots)
-        state.singleCameraSettings.cameraHotspots = singleCamera->getCameraHotspots();
+    {
+        state.singleCameraSettings.cameraHotspotsEnabled.setBase(
+            singleCamera->cameraHotspotsEnabled());
+        state.singleCameraSettings.cameraHotspots = singleCamera->cameraHotspots();
+    }
 
     return state;
 }
@@ -2098,6 +2102,20 @@ State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, cons
         return state;
 
     state.singleCameraSettings.audioOutputDeviceId = deviceId;
+    state.hasChanges = true;
+    return state;
+}
+
+CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setCameraHotspotsEnabled(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (!NX_ASSERT(state.isSingleCamera()))
+        return state;
+
+    state.singleCameraSettings.cameraHotspotsEnabled.setUser(value);
     state.hasChanges = true;
     return state;
 }

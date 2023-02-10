@@ -33,6 +33,7 @@ struct CameraHotspotDisplayOption
         none,
         hovered,
         selected,
+        disabled,
     };
     State state = State::none;
 

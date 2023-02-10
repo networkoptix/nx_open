@@ -407,6 +407,12 @@ void CameraSettingsDialogStore::setAudioOutputDeviceId(const QnUuid& deviceId)
         [&](State state) { return Reducer::setAudioOutputDeviceId(std::move(state), deviceId); });
 }
 
+void CameraSettingsDialogStore::setCameraHotspotsEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setCameraHotspotsEnabled(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setCameraHotspotsData(
     const nx::vms::common::CameraHotspotDataList & cameraHotspots)
 {
