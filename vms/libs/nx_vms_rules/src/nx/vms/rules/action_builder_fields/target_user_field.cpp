@@ -6,6 +6,7 @@
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/qset.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::vms::rules {
@@ -28,16 +29,16 @@ QnUserResourceList TargetUserField::users() const
     if (roles.empty())
         return users;
 
-    QnUserResourceSet usersInRoles;
+    QnUserResourceSet targetUsers = nx::utils::toQSet(users);
     for (const auto& role: roles)
     {
         for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allUsersInRole(role))
-            usersInRoles.insert(subject.user());
+            targetUsers.insert(subject.user());
     }
 
-    usersInRoles += QnUserResourceSet{users.cbegin(), users.cend()};
+    erase_if(targetUsers, [](const auto& user) { return !user->isEnabled(); });
 
-    return usersInRoles.values();
+    return targetUsers.values();
 }
 
 } // namespace nx::vms::rules
