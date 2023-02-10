@@ -33,7 +33,7 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-const auto kDefaultWidgetMargins = QMargins(0, 36, 0, 0);
+const auto kDefaultWidgetMargins = QMargins(1, 36, 1, 1);
 
 } // namespace
 
