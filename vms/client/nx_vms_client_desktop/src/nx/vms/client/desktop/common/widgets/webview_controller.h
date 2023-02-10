@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
+#include <QtQml/QJSValue>
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <nx/utils/impl_ptr.h>
@@ -192,7 +193,7 @@ public:
      * Requests a dialog for providing authentication credentials required by proxies or
      * HTTP servers.
      */
-    Q_INVOKABLE void requestAuthenticationDialog(QObject* request);
+    Q_INVOKABLE void requestAuthenticationDialog(QJSValue request);
 
     /**
      * Requests a dialog for letting the user choose a (new or existing) file or directory.
