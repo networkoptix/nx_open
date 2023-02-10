@@ -56,6 +56,7 @@ void Initializer::registerActions() const
     registerAction<NotificationAction>();
     registerAction<PanicRecordingAction>();
     registerAction<PlaySoundAction>();
+    registerAction<PushNotificationAction>();
     registerAction<RepeatSoundAction>();
     registerAction<SendEmailAction>();
     registerAction<ShowOnAlarmLayoutAction>();

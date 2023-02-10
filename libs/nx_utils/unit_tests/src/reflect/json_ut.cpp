@@ -14,6 +14,7 @@ struct Foo
     int num = 0;
     QJsonValue qJson;
 
+    bool operator==(const Foo& other) const = default;
 };
 
 NX_REFLECTION_INSTRUMENT(Foo, (num)(qJson))
@@ -21,19 +22,20 @@ NX_REFLECTION_INSTRUMENT(Foo, (num)(qJson))
 class Json: public ::testing::Test
 {
 public:
+    template<class T>
     void thenDeserializedCorrect(
-        const nx::reflect::DeserializationResult& result, const Foo& expected, const Foo& obtained)
+        const nx::reflect::DeserializationResult& result, const T& expected, const T& obtained)
     {
         ASSERT_TRUE(result.success);
-        ASSERT_EQ(expected.num, obtained.num);
-        ASSERT_EQ(expected.qJson, obtained.qJson);
+        ASSERT_EQ(expected, obtained);
     }
 
-    void checkSerializationDeserealization(const Foo& obj, const std::string& strRepresentation)
+    template<class T>
+    void checkSerializationDeserealization(const T& obj, const std::string& strRepresentation)
     {
         auto str = nx::reflect::json::serialize(obj);
         ASSERT_EQ(strRepresentation, str);
-        Foo resultObj;
+        T resultObj;
         auto result = nx::reflect::json::deserialize(str, &resultObj);
         thenDeserializedCorrect(result, obj, resultObj);
     }
@@ -69,6 +71,25 @@ TEST_F(Json, qjson_bool_support)
 {
     Foo f{12, QJsonValue(false)};
     checkSerializationDeserealization(f, R"({"num":12,"qJson":false})");
+}
+
+TEST_F(Json, qjson_value_support)
+{
+    QJsonArray arr;
+    arr.push_back(42);
+    arr.push_back("bar");
+    arr.push_back(1.23);
+
+    QJsonObject obj;
+    obj["num"] = 3;
+    obj["str"] = "foo";
+    obj["arr"] = arr;
+    obj["void"] = QJsonValue();
+
+    QJsonValue val = obj;
+    std::string rep = R"({"arr":[42,"bar",1.23],"num":3,"str":"foo","void":null})";
+
+    checkSerializationDeserealization(val, rep);
 }
 
 } // namespace test

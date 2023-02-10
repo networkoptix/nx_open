@@ -9,7 +9,6 @@
 
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/json/deserializer.h>
-#include <nx/utils/log/assert.h>
 
 namespace nx::reflect::json_detail {
 
@@ -60,53 +59,10 @@ DeserializationResult deserialize(
 
 } // namespace nx::reflect::json_detail
 
-
-void serialize(
+NX_UTILS_API void serialize(
     nx::reflect::json::SerializationContext* ctx,
-    const QJsonValue& data)
-{
-    if (data.isArray())
-    {
-        ctx->composer.startArray();
-        const auto& arr = data.toArray();
-        for (const auto& item: arr)
-            nx::reflect::json::serialize(ctx, item);
-        ctx->composer.endArray();
-        return;
-    }
-    if (data.isObject())
-    {
-        ctx->composer.writeRawString(
-            QJsonDocument(data.toObject()).toJson(QJsonDocument::Compact).toStdString());
-        return;
-    }
-    if (data.isString())
-    {
-        ctx->composer.writeString(data.toString().toStdString());
-        return;
-    }
-    if (data.isBool())
-    {
-        ctx->composer.writeBool(data.toBool());
-        return;
-    }
-    if (data.isDouble())
-    {
-        ctx->composer.writeFloat(data.toDouble());
-        return;
-    }
-    if (data.isNull())
-    {
-        ctx->composer.writeNull();
-        return;
-    }
-    NX_ASSERT(false);
-    return;
-}
+    const QJsonValue& data);
 
-void serialize(
+NX_UTILS_API void serialize(
     nx::reflect::json::SerializationContext* ctx,
-    const QJsonValueConstRef& data)
-{
-    serialize(ctx, (QJsonValue) data);
-}
+    const QJsonValueConstRef& data);

@@ -280,7 +280,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<PanicRecordingAction>();
     testActionRegistration<PlaySoundAction>();
     //testActionRegistration<PtzPresetAction>();
-    //testActionRegistration<PushNotificationAction>();
+    testActionRegistration<PushNotificationAction>();
     testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();
     testActionRegistration<ShowOnAlarmLayoutAction>();
