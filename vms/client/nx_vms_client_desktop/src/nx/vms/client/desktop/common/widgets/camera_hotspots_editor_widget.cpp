@@ -324,6 +324,8 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
     QPainter painter(this);
 
     painter.fillRect(d->thumbnailRect(), colorTheme()->color("dark4"));
+    if (!isEnabled())
+        painter.setOpacity(nx::style::Hints::kDisabledItemOpacity);
 
     if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::loading)
         return;
@@ -359,6 +361,9 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
             else
                 option.iconKey = QnResourceIconCache::key(camera);
         }
+
+        if (!isEnabled())
+            option.state = CameraHotspotDisplayOption::State::disabled;
 
         paintHotspot(&painter, hotspot, option);
     }

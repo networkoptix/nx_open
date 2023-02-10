@@ -326,9 +326,19 @@ public:
     nx::vms::api::CameraBackupQuality getActualBackupQualities() const;
 
     /**
+     * @return Whether camera hotspots enabled or not.
+     */
+    bool cameraHotspotsEnabled() const;
+
+    /**
+     * Sets whether camera hotspots enabled or not.
+     */
+    void setCameraHotspotsEnabled(bool enabled);
+
+    /**
      * @return List of camera hotspots description data structures.
      */
-    nx::vms::common::CameraHotspotDataList getCameraHotspots();
+    nx::vms::common::CameraHotspotDataList cameraHotspots() const;
 
     /**
      * Sets camera hotspots descriptions to the resource as is. Data validity is the responsibility
@@ -609,6 +619,7 @@ signals:
     void backupContentTypeChanged(const QnResourcePtr& resource);
     void backupPolicyChanged(const QnResourcePtr& resource);
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
+    void cameraHotspotsEnabledChanged(const QnSecurityCamResourcePtr& camera);
     void cameraHotspotsChanged(const QnSecurityCamResourcePtr& camera);
     void recordingActionChanged(const QnResourcePtr& resource);
 

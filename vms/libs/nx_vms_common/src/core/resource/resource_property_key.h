@@ -104,6 +104,7 @@ NX_VMS_COMMON_API extern const QString kForcedLicenseType;
 NX_VMS_COMMON_API extern const QString kTwoWayAudioEnabled;
 NX_VMS_COMMON_API extern const QString kAudioInputDeviceId;
 NX_VMS_COMMON_API extern const QString kAudioOutputDeviceId;
+NX_VMS_COMMON_API extern const QString kCameraHotspotsEnabled;
 NX_VMS_COMMON_API extern const QString kCameraHotspotsData;
 
 /**

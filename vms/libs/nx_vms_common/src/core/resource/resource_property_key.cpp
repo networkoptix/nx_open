@@ -73,6 +73,7 @@ const QString kForcedLicenseType("forcedLicenseType");
 const QString kTwoWayAudioEnabled("twoWayAudioEnabled");
 const QString kAudioInputDeviceId("audioInputDeviceId");
 const QString kAudioOutputDeviceId("audioOutputDeviceId");
+const QString kCameraHotspotsEnabled("cameraHotspotsEnabled");
 const QString kCameraHotspotsData("cameraHotspotsData");
 
 const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");

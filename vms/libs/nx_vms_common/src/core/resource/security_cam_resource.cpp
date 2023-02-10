@@ -242,6 +242,10 @@ QnSecurityCamResource::QnSecurityCamResource():
                 m_cachedCameraMediaCapabilities.reset();
                 emit mediaCapabilitiesChanged(toSharedPointer(this));
             }
+            else if (key == ResourcePropertyKey::kCameraHotspotsEnabled)
+            {
+                emit cameraHotspotsEnabledChanged(toSharedPointer(this));
+            }
             else if (key == ResourcePropertyKey::kCameraHotspotsData)
             {
                 emit cameraHotspotsChanged(toSharedPointer(this));
@@ -1431,7 +1435,22 @@ nx::vms::api::CameraBackupQuality QnSecurityCamResource::getActualBackupQualitie
     return systemContext()->globalSettings()->backupSettings().quality;
 }
 
-nx::vms::common::CameraHotspotDataList QnSecurityCamResource::getCameraHotspots()
+bool QnSecurityCamResource::cameraHotspotsEnabled() const
+{
+    const auto propertyValue = getProperty(ResourcePropertyKey::kCameraHotspotsEnabled);
+    if (propertyValue.isEmpty())
+        return false;
+
+    return QnLexical::deserialized(propertyValue, false);
+}
+
+void QnSecurityCamResource::setCameraHotspotsEnabled(bool enabled)
+{
+    if (enabled != cameraHotspotsEnabled())
+        setProperty(ResourcePropertyKey::kCameraHotspotsEnabled, QnLexical::serialized(enabled));
+}
+
+nx::vms::common::CameraHotspotDataList QnSecurityCamResource::cameraHotspots() const
 {
     const auto hotspotsPropertyValue = getProperty(ResourcePropertyKey::kCameraHotspotsData);
     if (hotspotsPropertyValue.isEmpty())

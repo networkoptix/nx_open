@@ -109,6 +109,7 @@ public:
     static State setAudioInputDeviceId(State state, const QnUuid& deviceId);
     static State setTwoWayAudioEnabled(State state, bool value);
     static State setAudioOutputDeviceId(State state, const QnUuid& deviceId);
+    static State setCameraHotspotsEnabled(State state, bool value);
     static State setCameraHotspotsData(State state,
         const nx::vms::common::CameraHotspotDataList& cameraHotspots);
 

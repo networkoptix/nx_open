@@ -73,6 +73,9 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     setPaletteColor(ui->hotspotEditControlsPanel, QPalette::Window, colorTheme()->color("dark8"));
     ui->hotspotEditControlsPanel->setAutoFillBackground(true);
 
+    ui->enableHotspotsCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
+    ui->enableHotspotsCheckBox->setForegroundRole(QPalette::ButtonText);
+
     ui->addHotspotButton->setIcon(qnSkin->icon("buttons/plus.png"));
     ui->deleteHotspotButton->setIcon(qnSkin->icon("text_buttons/trash.png"));
 
@@ -201,10 +204,17 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         [this](const CameraSettingsDialogState& state)
         {
+            const bool hotspotsEnabled = state.singleCameraSettings.cameraHotspotsEnabled();
+
+            d->ui->enableHotspotsCheckBox->setChecked(hotspotsEnabled);
             d->ui->hotspotsEditorWidget->setHotspots(state.isSingleCamera()
                 ? state.singleCameraSettings.cameraHotspots
                 : nx::vms::common::CameraHotspotDataList());
             d->singleCameraId = state.singleCameraId();
+            d->ui->hotspotsEditorWidget->setEnabled(hotspotsEnabled);
+            d->ui->addHotspotButton->setEnabled(hotspotsEnabled);
+            if (!hotspotsEnabled)
+                d->ui->hotspotsEditorWidget->setSelectedHotspotIndex({});            
         });
 
     connect(d->ui->addHotspotButton, &QPushButton::clicked, this,
@@ -250,6 +260,9 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             d->ui->hotspotsEditorWidget->setSelectedHotspotIndex(index);
             d->selectCameraForHotspot(index);
         });
+
+    connect(d->ui->enableHotspotsCheckBox, &QCheckBox::clicked, store,
+        &CameraSettingsDialogStore::setCameraHotspotsEnabled);
 }
 
 CameraHotspotsSettingsWidget::~CameraHotspotsSettingsWidget()
