@@ -28,7 +28,7 @@ DropdownMenu
 
     onOpened:
     {
-        for (var i = 0; i < count; ++i)
+        for (let i = 0; i < count; ++i)
         {
             if (itemAt(i).checked)
                 itemAt(i).forceActiveFocus()

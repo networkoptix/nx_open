@@ -361,6 +361,7 @@ void WelcomeScreen::showSystemWentToOfflineNotification() const
         {
             QnMessageBox::critical(parentWidget(),
                 tr("Unable to connect to the system because it has become offline"));
+            dropConnectingState();
         });
 }
 

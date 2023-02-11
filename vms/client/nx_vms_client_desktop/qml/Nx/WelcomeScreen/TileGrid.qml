@@ -46,6 +46,19 @@ Item
 
     signal tileClicked()
     signal lockInterface(bool locked)
+    signal openedTileModalityInterfaceLock()
+
+    function closeOpenedTile()
+    {
+        for (let item of systemTilesStorage.items)
+        {
+            if (item.isExpanded)
+            {
+                item.shrinkAndStopConnecting()
+                return
+            }
+        }
+    }
 
     Item
     {
@@ -115,13 +128,15 @@ Item
 
                         onStartExpanding:
                         {
-                            var tilesNumber = systemTilesStorage.items.length
-                            for (var i = 0; i < tilesNumber; ++i)
+                            for (let item of systemTilesStorage.items)
                             {
-                                var item = systemTilesStorage.items[i]
                                 if (item.systemId !== systemId && item.isExpanded)
+                                {
                                     item.shrink()
+                                    return
+                                }
                             }
+                            tileGrid.openedTileModalityInterfaceLock()
                         }
 
                         visibilityMenuModel: model
@@ -173,13 +188,14 @@ Item
 
                 function addItem(item)
                 {
+                    console.assert(item, "Unexpected null tile");
                     if (items.indexOf(item) === -1)
                         items.push(item)
                 }
 
                 function removeItem(item)
                 {
-                    var index = items.indexOf(item)
+                    const index = items.indexOf(item)
                     if (index > -1)
                         items.splice(index, 1) //< Removes element.
                 }
@@ -196,11 +212,8 @@ Item
                 {
                     if (systemId.length !== 0)
                     {
-                        var tilesNumber = systemTilesStorage.items.length
-
-                        for (var i = 0; i < tilesNumber; ++i)
+                        for (let item of systemTilesStorage.items)
                         {
-                            var item = systemTilesStorage.items[i]
                             if (item.systemId === systemId)
                                 return item
                         }
@@ -215,10 +228,10 @@ Item
 
                     if (systemId.length !== 0)
                     {
-                        var item = findTile(systemId)
+                        let item = findTile(systemId)
                         if (item)
                         {
-                            var isConnecting = item.isConnecting
+                            const isConnecting = item.isConnecting
                             item.setErrorMessage(errorMessage, isLoginError)
 
                             if (isConnecting
@@ -234,15 +247,15 @@ Item
                     }
                     else
                     {
-                        var tilesNumber = systemTilesStorage.items.length
-                        for (var i = 0; i < tilesNumber; ++i)
-                            systemTilesStorage.items[i].setErrorMessage("", isLoginError)
+                        const tilesNumber = systemTilesStorage.items.length
+                        for (let item of systemTilesStorage.items)
+                            item.setErrorMessage("", isLoginError)
                     }
                 }
 
                 function onCloseTile(systemId)
                 {
-                    var item = findTile(systemId)
+                    let item = findTile(systemId)
                     if (item && item.isExpanded)
                         item.shrinkAndStopConnecting()
                 }
