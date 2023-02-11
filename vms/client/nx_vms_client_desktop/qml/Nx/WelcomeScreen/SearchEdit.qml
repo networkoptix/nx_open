@@ -15,7 +15,7 @@ TextField
 
     readonly property bool active:
     {
-        var result = control.focus || control.text
+        const result = control.focus || control.text
         behaviorTimer.stop()
         if (result)
             xAnimation.enabled = result

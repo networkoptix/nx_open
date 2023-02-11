@@ -439,15 +439,15 @@ Item
 
         function updatePasswordData()
         {
-            var index = loginChooseItem.editIndex
-            var credentials = authDataAccessor.getData(index, "credentials")
+            const index = loginChooseItem.editIndex
+            const credentials = authDataAccessor.getData(index, "credentials")
 
-            var isPasswordSaved = context.saveCredentialsAllowed
+            const isPasswordSaved = context.saveCredentialsAllowed
                 && credentials !== undefined
                 && credentials.isPasswordSaved
                 && credentials.user.toLowerCase() === loginChooseItem.editText.toLowerCase()
 
-            var isSavedPasswordChanged = isPasswordSaved != openedTileItem.isPasswordSaved
+            const isSavedPasswordChanged = isPasswordSaved != openedTileItem.isPasswordSaved
             if (isSavedPasswordChanged)
             {
                 openedTileItem.isPasswordSaved = isPasswordSaved
