@@ -1,65 +1,93 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 option(runConanAutomatically "Run Conan automatically when configuring the project." ON)
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
-
-find_program(CONAN_EXECUTABLE NAMES conan NO_CMAKE_SYSTEM_PATH NO_CMAKE_PATH)
-if(NOT CONAN_EXECUTABLE)
-    message(FATAL_ERROR "Conan executable is not found.")
-endif()
-
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
-if(customConanHome)
-    message(STATUS "Using custom CONAN_USER_HOME: ${customConanHome}")
-    set(ENV{CONAN_USER_HOME} ${customConanHome})
-else()
-    message(STATUS "Using local CONAN_USER_HOME: ${CMAKE_BINARY_DIR}")
-    set(ENV{CONAN_USER_HOME} ${CMAKE_BINARY_DIR})
-endif()
 
-if(NOT customConanHome)
-    # Sometimes Conan cannot update this file even if it was not modified. A simple solution is
-    # just to delete it and let Conan regenerate it.
-    file(REMOVE ${CMAKE_BINARY_DIR}/.conan/settings.yml)
-endif()
+set(CONAN_DOWNLOAD_TIMEOUT_S 3)
 
-# Install config if it's not installed yet. For non-developer builds config installation is forced
-# by default to ensure that CI runs on the most recent config.
-option(forceConanConfigInstallation
-    "Force Conan to refresh config on each run."
-    ${nonDeveloperBuild})
-set(config_needs_to_be_installed TRUE)
-if(NOT forceConanConfigInstallation)
-    nx_execute_process_or_fail(
-        COMMAND ${CONAN_EXECUTABLE} config install --list
-        OUTPUT_VARIABLE conan_config_list_output
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_MESSAGE "Cannot obtain conan config.")
-    message(STATUS "Conan config install list: ${conan_config_list_output}")
-    string(REGEX MATCH "${conanConfigUrl}" result "${conan_config_list_output}")
-    if(NOT "${result}" STREQUAL "")
-        set(config_needs_to_be_installed FALSE)
+function(nx_init_conan)
+    find_program(CONAN_EXECUTABLE NAMES conan NO_CMAKE_SYSTEM_PATH NO_CMAKE_PATH)
+    if(NOT CONAN_EXECUTABLE)
+        message(FATAL_ERROR "Conan executable is not found.")
     endif()
-endif()
 
-if(config_needs_to_be_installed)
-    message(STATUS "Conan is not configured yet. Running conan config install.")
+    if(customConanHome)
+        message(STATUS "Using custom CONAN_USER_HOME: ${customConanHome}")
+        set(ENV{CONAN_USER_HOME} ${customConanHome})
+    else()
+        message(STATUS "Using local CONAN_USER_HOME: ${CMAKE_BINARY_DIR}")
+        set(ENV{CONAN_USER_HOME} ${CMAKE_BINARY_DIR})
+    endif()
+
+    if(NOT customConanHome)
+        # Sometimes Conan cannot update this file even if it was not modified. A simple solution is
+        # just to delete it and let Conan regenerate it.
+        file(REMOVE ${CMAKE_BINARY_DIR}/.conan/settings.yml)
+    endif()
+
+    _configure_conan()
+
+    if(DEFINED "ENV{NX_CONAN_DOWNLOAD_CACHE}")
+        message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
+        execute_process(
+            COMMAND ${CONAN_EXECUTABLE} config set
+                storage.download_cache=$ENV{NX_CONAN_DOWNLOAD_CACHE})
+    endif()
+endfunction()
+
+function(_configure_conan)
+    if(NOT customConanHome)
+        set(conan_installed_config_list_file "$ENV{CONAN_USER_HOME}/.conan/config_install.json")
+        file(REMOVE ${conan_installed_config_list_file})
+        set(repo_conan_config "${open_source_root}/conan_config")
+        nx_execute_process_or_fail(
+            COMMAND ${CONAN_EXECUTABLE} config install ${repo_conan_config}
+            ERROR_MESSAGE "Can not apply Conan configuration from ${repo_conan_config}."
+        )
+    endif()
+
+    # Check if "nx" remote is already added.
+    set(conan_remotes_file "$ENV{CONAN_USER_HOME}/.conan/remotes.json")
+    if(EXISTS ${conan_remotes_file})
+        file(READ ${conan_remotes_file} conan_remotes)
+        string(JSON conan_remotes_count LENGTH ${conan_remotes} "remotes")
+        math(EXPR last_conan_remote_index "${conan_remotes_count} - 1")
+        foreach(remote_index RANGE 0 ${last_conan_remote_index})
+            string(JSON remote_url GET ${conan_remotes} "remotes" ${remote_index} "url")
+            string(JSON remote_name GET ${conan_remotes} "remotes" ${remote_index} "name")
+            if("${remote_name}" STREQUAL "nx" AND "${remote_url}" STREQUAL "${conanNxRemote}")
+                return()
+            endif()
+        endforeach()
+    endif()
+
     nx_execute_process_or_fail(
-        COMMAND ${CONAN_EXECUTABLE} config install ${conanConfigUrl}
-        ERROR_MESSAGE "Could not apply conan configuration from ${conanConfigUrl}.")
-endif()
-
-if(DEFINED "ENV{NX_CONAN_DOWNLOAD_CACHE}")
-    message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
-    execute_process(
-        COMMAND ${CONAN_EXECUTABLE} config set
-            storage.download_cache=$ENV{NX_CONAN_DOWNLOAD_CACHE})
-endif()
+        COMMAND ${CONAN_EXECUTABLE} remote add nx ${conanNxRemote} True --force
+        ERROR_MESSAGE "Can not add Nx Conan remote."
+    )
+endfunction()
 
 function(nx_run_conan)
     cmake_parse_arguments(CONAN "" "BUILD_TYPE;PROFILE;HOME_DIR" "FLAGS" ${ARGN})
 
     set(flags)
+
+    if(NOT offline)
+        file(
+            DOWNLOAD ${conanNxRemote}
+            STATUS accessibility_status
+            TIMEOUT ${CONAN_DOWNLOAD_TIMEOUT_S}
+        )
+        list(GET accessibility_status 0 status_code)
+        if(NOT status_code STREQUAL "0")
+            message(WARNING "Conan remote URL ${conanNxRemote} is not accessible.")
+        else()
+            list(APPEND flags "--update")
+        endif()
+    endif()
 
     if(CONAN_BUILD_TYPE)
         list(APPEND flags "-s build_type=${CONAN_BUILD_TYPE}")
@@ -82,7 +110,6 @@ function(nx_run_conan)
         "    COMMAND"
         "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
         "        --install-folder ${CMAKE_BINARY_DIR}"
-        "        --update"
         ${flags}
         "    RESULT_VARIABLE result"
         ")"
@@ -111,3 +138,5 @@ function(nx_run_conan)
             "`cmake -P ${run_conan_script}`")
     endif()
 endfunction()
+
+nx_init_conan()
