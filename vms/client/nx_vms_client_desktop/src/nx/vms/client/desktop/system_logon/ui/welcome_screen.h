@@ -198,7 +198,7 @@ signals:
 
     void switchPage(int pageIndex);
 
-    void dropConnectingState();
+    void dropConnectingState() const;
 
 private:
     bool isLoggedInToCloud() const;

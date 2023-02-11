@@ -590,7 +590,7 @@ Button
 
             function updateUserAndPassword(currentItemIndex)
             {
-                var credentials = getData(currentItemIndex, "credentials")
+                const credentials = getData(currentItemIndex, "credentials")
 
                 logicImpl.user = (credentials && credentials.user)
                 logicImpl.isPasswordSaved = context.saveCredentialsAllowed

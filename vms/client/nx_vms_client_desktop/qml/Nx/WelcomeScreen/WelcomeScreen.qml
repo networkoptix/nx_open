@@ -258,10 +258,10 @@ Rectangle
         // Do not decrease rows number, for saving max grid height for all visibility modes.
         function updateMaxVisibleRowCount()
         {
-            var freeHeight = welcomeScreen.height - footer.height
+            let freeHeight = welcomeScreen.height - footer.height
             if (welcomeScreen.complexVisibilityMode)
                 freeHeight -= searchArea.height
-            var newMaxVisibleRowCount = grid.calculateVisibleMaxRowsCount(freeHeight - logoArea.maxHeight)
+            let newMaxVisibleRowCount = grid.calculateVisibleMaxRowsCount(freeHeight - logoArea.maxHeight)
             if (newMaxVisibleRowCount <= 0 || newMaxVisibleRowCount < maxRowCount)
                 newMaxVisibleRowCount = grid.calculateVisibleMaxRowsCount(freeHeight - logoArea.minHeight)
 
@@ -292,6 +292,7 @@ Rectangle
         hideActionEnabled: welcomeScreen.complexVisibilityMode
         onTileClicked: context.setGlobalPreloaderEnabled(false)
         onLockInterface: globalInterfaceLock.enabled = locked
+        onOpenedTileModalityInterfaceLock: openedTileModalityInterfaceLock.enabled = true
 
         TileGridPlaceholder
         {
@@ -441,6 +442,23 @@ Rectangle
         function onDropConnectingState()
         {
             globalInterfaceLock.enabled = false
+        }
+    }
+
+    MouseArea
+    {
+        id: openedTileModalityInterfaceLock
+
+        anchors.fill: parent
+
+        enabled: false
+        hoverEnabled: enabled
+        acceptedButtons: Qt.LeftButton
+        onWheel: wheel.accepted = true
+        onClicked:
+        {
+            grid.closeOpenedTile()
+            enabled = false
         }
     }
 
