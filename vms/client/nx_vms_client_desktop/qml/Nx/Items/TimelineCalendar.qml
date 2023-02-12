@@ -124,7 +124,7 @@ Control
                     ? ColorTheme.brightText : ColorTheme.text
                 text: monthPickerVisible
                     ? visibleYear
-                    : `${locale.monthName(visibleMonth)} ${visibleYear}`
+                    : `${locale.standaloneMonthName(visibleMonth)} ${visibleYear}`
                 verticalAlignment: Text.AlignVCenter
 
                 MouseArea

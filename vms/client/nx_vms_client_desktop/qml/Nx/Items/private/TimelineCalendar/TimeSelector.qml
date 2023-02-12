@@ -30,7 +30,7 @@ Item
     DayHoursModel
     {
         id: dayHoursModel
-        amPmTime: !!locale.amText
+        amPmTime: !!locale.timeFormat(Locale.LongFormat).match(/[aA]/) //< Find AM/PM indicator.
     }
 
     Column
