@@ -577,12 +577,12 @@ Handle ServerConnection::unbindSystemFromCloud(
 
 Handle ServerConnection::dumpDatabase(
     nx::vms::common::SessionTokenHelperPtr helper,
-    Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+    Result<ErrorOrData<QByteArray>>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
-        prepareUrl("/rest/v1/system/database", /*params*/ {}));
+        prepareUrl("/rest/v2/system/database", /*params*/ {}));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -596,15 +596,15 @@ Handle ServerConnection::dumpDatabase(
 
 Handle ServerConnection::restoreDatabase(
     nx::vms::common::SessionTokenHelperPtr helper,
-    const nx::vms::api::DatabaseDumpData& data,
+    const QByteArray& data,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/database", /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        nx::reflect::json::serialize(data));
+        prepareUrl("/rest/v2/system/database", /*params*/ {}),
+        nx::network::http::header::ContentType::kBinary.value,
+        data);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 

@@ -261,12 +261,12 @@ public:
 
     Handle dumpDatabase(
         nx::vms::common::SessionTokenHelperPtr helper,
-        Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+        Result<ErrorOrData<QByteArray>>::type callback,
         QThread* targetThread);
 
     Handle restoreDatabase(
         nx::vms::common::SessionTokenHelperPtr helper,
-        const nx::vms::api::DatabaseDumpData& data,
+        const QByteArray& data,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
 

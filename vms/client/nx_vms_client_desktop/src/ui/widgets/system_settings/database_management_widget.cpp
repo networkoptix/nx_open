@@ -93,14 +93,13 @@ void QnDatabaseManagementWidget::backupDb()
         [this, fileName](
             bool success,
             rest::Handle,
-            rest::ErrorOrData<nx::vms::api::DatabaseDumpData> errorOrData)
+            rest::ErrorOrData<QByteArray> errorOrData)
         {
             success = false;
-            if (auto data = std::get_if<nx::vms::api::DatabaseDumpData>(&errorOrData))
+            if (auto data = std::get_if<QByteArray>(&errorOrData))
             {
                 QFile file(fileName);
-                success = file.open(QIODevice::WriteOnly)
-                    && file.write(data->data) == data->data.size();
+                success = file.open(QIODevice::WriteOnly) && file.write(*data) == data->size();
             }
 
             if (success)
@@ -189,8 +188,7 @@ void QnDatabaseManagementWidget::restoreDb()
     if (button != QDialogButtonBox::Ok)
         return;
 
-    nx::vms::api::DatabaseDumpData data;
-    data.data = file.readAll();
+    auto data = file.readAll();
     file.close();
 
     resetStyle(ui->labelMessage);
