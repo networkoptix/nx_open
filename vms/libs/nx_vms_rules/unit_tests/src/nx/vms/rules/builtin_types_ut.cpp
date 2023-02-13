@@ -251,9 +251,11 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<FpsField>();
     testActionFieldRegistration<HttpAuthTypeField>();
     testActionFieldRegistration<HttpMethodField>();
+    testActionFieldRegistration<LayoutField>();
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<OutputPortField>();
     testActionFieldRegistration<PasswordField>();
+    testActionFieldRegistration<PtzPresetField>();
     testActionFieldRegistration<SoundField>();
     testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<Substitution>();
@@ -276,10 +278,10 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<ExitFullscreenAction>();
     testActionRegistration<HttpAction>();
     testActionRegistration<NotificationAction>();
-    //testActionRegistration<OpenLayoutAction>();
+    testActionRegistration<OpenLayoutAction>();
     testActionRegistration<PanicRecordingAction>();
     testActionRegistration<PlaySoundAction>();
-    //testActionRegistration<PtzPresetAction>();
+    testActionRegistration<PtzPresetAction>();
     testActionRegistration<PushNotificationAction>();
     testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();

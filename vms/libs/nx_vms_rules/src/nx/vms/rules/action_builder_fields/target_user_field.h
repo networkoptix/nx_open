@@ -19,7 +19,7 @@ class NX_VMS_RULES_API TargetUserField:
 public:
     TargetUserField(common::SystemContext* context);
 
-    QnUserResourceList users() const;
+    QnUserResourceSet users() const;
 };
 
 } // namespace nx::vms::rules

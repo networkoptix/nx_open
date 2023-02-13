@@ -54,8 +54,10 @@ void Initializer::registerActions() const
     registerAction<ExitFullscreenAction>();
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
+    registerAction<OpenLayoutAction>();
     registerAction<PanicRecordingAction>();
     registerAction<PlaySoundAction>();
+    registerAction<PtzPresetAction>();
     registerAction<PushNotificationAction>();
     registerAction<RepeatSoundAction>();
     registerAction<SendEmailAction>();
@@ -105,9 +107,11 @@ void Initializer::registerFields() const
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpMethodField>();
+    registerActionField<LayoutField>();
     registerActionField<OptionalTimeField>();
     registerActionField<OutputPortField>();
     registerActionField<PasswordField>();
+    registerActionField<PtzPresetField>();
     registerActionField<SoundField>();
     registerActionField<StreamQualityField>();
     registerActionField<TargetDeviceField>();

@@ -16,29 +16,36 @@ TargetUserField::TargetUserField(common::SystemContext* context):
 {
 }
 
-QnUserResourceList TargetUserField::users() const
+QnUserResourceSet TargetUserField::users() const
 {
+    QnUserResourceSet result;
+
     if (acceptAll())
-        return resourcePool()->getResources<QnUserResource>();
-
-    QnUserResourceList users;
-    QList<QnUuid> roles;
-
-    systemContext()->userRolesManager()->usersAndRoles(ids(), users, roles);
-
-    if (roles.empty())
-        return users;
-
-    QnUserResourceSet targetUsers = nx::utils::toQSet(users);
-    for (const auto& role: roles)
     {
-        for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allUsersInRole(role))
-            targetUsers.insert(subject.user());
+        result = nx::utils::toQSet(resourcePool()->getResources<QnUserResource>());
+    }
+    else
+    {
+        QnUserResourceList users;
+        QnUuidList roles;
+
+        systemContext()->userRolesManager()->usersAndRoles(ids(), users, roles);
+
+        result = nx::utils::toQSet(users);
+
+        for (const auto& role: roles)
+        {
+            for (const auto& subject:
+                systemContext()->resourceAccessSubjectsCache()->allUsersInRole(role))
+            {
+                result.insert(subject.user());
+            }
+        }
     }
 
-    erase_if(targetUsers, [](const auto& user) { return !user->isEnabled(); });
+    erase_if(result, [](const auto& user) { return !user || !user->isEnabled(); });
 
-    return targetUsers.values();
+    return result;
 }
 
 } // namespace nx::vms::rules
