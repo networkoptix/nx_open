@@ -268,6 +268,8 @@ public:
 
     bool animationAllowed() const;
 
+    QTimer* playbackPositionBlinkTimer() const;
+
 public slots:
     void fitInView(bool animate);
 
@@ -447,4 +449,6 @@ private:
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
+
+    QTimer* m_playbackPositionBlinkTimer = nullptr;
 };

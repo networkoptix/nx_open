@@ -5,11 +5,13 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsWidget>
 
-#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
+
+using namespace nx::vms::client::desktop;
 
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     base_type(),
@@ -17,7 +19,7 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     titleHolder(new QnViewportBoundWidget(main)),
     title(new QnResourceTitleItem(titleHolder)),
     bottomHolder(new QnViewportBoundWidget(main)),
-    bottom(new nx::vms::client::desktop::ResourceBottomItem(bottomHolder)),
+    playbackPositionItem(new PlaybackPositionItem(main->windowContext(), bottomHolder)),
     content(new QnViewportBoundWidget(main)),
     details(new QnHtmlTextItem()),
     left(new QGraphicsWidget(content)),
@@ -52,8 +54,8 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     titleLayout->addStretch();
 
     auto bottomLayout = new QGraphicsLinearLayout(Qt::Vertical, bottomHolder);
-    bottomLayout->addItem(bottom);
-    bottomLayout->setAlignment(bottom, Qt::AlignRight | Qt::AlignBottom);
+    bottomLayout->addItem(playbackPositionItem);
+    bottomLayout->setAlignment(playbackPositionItem, Qt::AlignRight | Qt::AlignBottom);
 
     connect(main, &QGraphicsWidget::geometryChanged,
         this, &QnHudOverlayWidgetPrivate::updateLayout);

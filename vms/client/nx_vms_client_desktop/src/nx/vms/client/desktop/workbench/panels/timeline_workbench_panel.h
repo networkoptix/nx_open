@@ -4,13 +4,11 @@
 
 #include "abstract_workbench_panel.h"
 
-class ActivityListenerInstrument;
 class QnNavigationItem;
 class QnResizerWidget;
 class QGraphicsWidget;
 class HoverFocusProcessor;
 class VariantAnimator;
-class QnBlinkingImageButtonWidget;
 class QnImageButtonWidget;
 class AnimatorGroup;
 class QTimer;
@@ -75,11 +73,9 @@ public:
 
 private:
     void setShowButtonUsed(bool used);
-    void setShowButtonVisible(bool visible);
     void updateResizerGeometry();
     void updateControlsGeometry();
     void updateTooltipVisibility();
-    void updateShowButtonVisibility();
 
     qreal minimumHeight() const;
 
@@ -101,37 +97,35 @@ private:
 
     int m_autoHideHeight;
 
-    workbench::timeline::NavigationWidget* m_navigationWidget;
-    workbench::timeline::ControlWidget* m_controlWidget;
+    workbench::timeline::NavigationWidget* m_navigationWidget = nullptr;
+    workbench::timeline::ControlWidget* m_controlWidget = nullptr;
 
     QPointer<CalendarWorkbenchPanel> m_calendar;
 
-    QnImageButtonWidget* m_pinButton;
-    QnBlinkingImageButtonWidget* m_showButton;
+    QnImageButtonWidget* m_pinButton = nullptr;
+    QnImageButtonWidget* m_showButton = nullptr;
 
     QnResizerWidget* m_resizerWidget;
 
     /** Special widget to show by hover. */
-    QGraphicsWidget* m_showWidget;
+    QGraphicsWidget* m_showWidget = nullptr;
 
     QTimer* m_autoHideTimer;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
-    HoverFocusProcessor* m_hidingProcessor;
+    HoverFocusProcessor* m_hidingProcessor = nullptr;
 
     /** Hover processor that is used to show the panel when the mouse hovers over show button. */
-    HoverFocusProcessor* m_showingProcessor;
+    HoverFocusProcessor* m_showingProcessor = nullptr;
 
     /** Hover processor that is used to change panel opacity when mouse hovers over it. */
-    HoverFocusProcessor* m_opacityProcessor;
+    HoverFocusProcessor* m_opacityProcessor = nullptr;
 
     /** Animator group for panel's opacity. */
-    AnimatorGroup* m_opacityAnimatorGroup;
+    AnimatorGroup* m_opacityAnimatorGroup = nullptr;
 
     /** Animator for y position. */
-    VariantAnimator* m_yAnimator;
-
-    ActivityListenerInstrument* m_widgetActivityInstrument;
+    VariantAnimator* m_yAnimator = nullptr;
 };
 
 } //namespace nx::vms::client::desktop

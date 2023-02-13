@@ -9,8 +9,9 @@
 
 using namespace nx::vms::client::desktop;
 
-QnHudOverlayWidget::QnHudOverlayWidget(QGraphicsItem* parent):
+QnHudOverlayWidget::QnHudOverlayWidget(WindowContext* windowContext, QGraphicsItem* parent):
     base_type(parent),
+    nx::vms::client::desktop::WindowContextAware(windowContext),
     d_ptr(new QnHudOverlayWidgetPrivate(this))
 {
     setAcceptedMouseButtons(Qt::NoButton);
@@ -27,10 +28,10 @@ QnResourceTitleItem* QnHudOverlayWidget::title() const
     return d->title;
 }
 
-nx::vms::client::desktop::ResourceBottomItem* QnHudOverlayWidget::bottom() const
+nx::vms::client::desktop::PlaybackPositionItem* QnHudOverlayWidget::playbackPositionItem() const
 {
     Q_D(const QnHudOverlayWidget);
-    return d->bottom;
+    return d->playbackPositionItem;
 }
 
 QnViewportBoundWidget* QnHudOverlayWidget::content() const

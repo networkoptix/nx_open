@@ -2,6 +2,8 @@
 
 #include "window_context.h"
 
+#include <memory>
+
 #include <QtCore/QPointer>
 
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
