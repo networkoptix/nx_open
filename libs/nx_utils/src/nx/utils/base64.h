@@ -48,6 +48,8 @@ NX_UTILS_API int fromBase64Url(
     const char* data, int size,
     void* outBuf, int outBufCapacity);
 
+NX_UTILS_API int estimateBase64DecodedLen(const char* encoded, int size);
+
 inline std::string toBase64(const std::string_view& str)
 {
     std::string result;

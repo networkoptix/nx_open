@@ -47,12 +47,10 @@ int toBase64Url(
     return toBase64Internal(data, size, outBuf, outBufCapacity, true);
 }
 
-namespace {
-
-int estimateDecodedLen(const char* encoded, int size)
+int estimateBase64DecodedLen(const char* encoded, int size)
 {
     // Removing padding if present.
-    while (size > 0 && encoded[size-1] == '=')
+    while (size > 0 && encoded[size - 1] == '=')
         --size;
 
     // one byte is encoded to 2 characters, 2 bytes are encoded to 3 characters.
@@ -62,11 +60,13 @@ int estimateDecodedLen(const char* encoded, int size)
         + kRemainderLenToDataLen[size % 4];
 }
 
+namespace {
+
 int fromBase64UrlInternal(
     const char* data, int size,
     void* outBuf, int outBufCapacity, bool isUrl)
 {
-    const auto decodedLength = estimateDecodedLen(data, size);
+    const auto decodedLength = estimateBase64DecodedLen(data, size);
 
     if (outBuf == nullptr)
         return decodedLength;
