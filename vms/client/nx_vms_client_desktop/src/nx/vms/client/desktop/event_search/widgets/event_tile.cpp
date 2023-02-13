@@ -224,13 +224,11 @@ struct EventTile::Private
             QString text = list.join(nx::vms::common::html::kLineBreak);
             if (andMore > 0)
             {
-                static constexpr int kQssFontWeightMultiplier = 8;
-
                 text += nx::format("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
                     .args(
                         q->palette().color(QPalette::WindowText).name(),
                         kAndMoreFontPixelSize,
-                        kAndMoreFontWeight * kQssFontWeightMultiplier,
+                        (int) kAndMoreFontWeight,
                         kAndMoreTopMargin,
                         tr("...and %n more", "", andMore));
             }
