@@ -260,11 +260,11 @@ public:
 
     Handle dumpDatabase(
         const std::string& ownerSessionToken,
-        Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+        Result<ErrorOrData<QByteArray>>::type callback,
         QThread* targetThread);
 
     Handle restoreDatabase(
-        const nx::vms::api::DatabaseDumpData& data,
+        const QByteArray& data,
         const std::string& ownerSessionToken,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread);
