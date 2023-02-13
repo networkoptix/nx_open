@@ -17,6 +17,8 @@ Item
     property alias selectionMode: mainDelegate.selectionMode
     property alias showResourceStatus: mainDelegate.showResourceStatus
 
+    property alias accessRightsList: accessRightsModel.accessRightsList
+
     required property real columnWidth
 
     required property var editingContext
@@ -28,24 +30,6 @@ Item
 
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
-    readonly property var collapsedNodes: tree ? tree.collapsedNodes : []
-
-    readonly property var kOnlyLiveNodes:
-    [
-        ResourceTree.NodeType.webPages,
-        ResourceTree.NodeType.servers
-    ]
-
-    readonly property bool onlyLive: isCollapsed()
-        ? kOnlyLiveNodes.includes(0 + nodeType)
-        : (resource
-            && ((resource.flags & NxGlobals.ServerResourceFlag)
-                || (resource.flags == NxGlobals.WebPageResourceFlag)))
-
-    function isCollapsed()
-    {
-        return Array.prototype.includes.call(delegateRoot.collapsedNodes, delegateRoot.nodeType)
-    }
 
     implicitWidth: mainDelegate.implicitWidth
     implicitHeight: 28
@@ -57,83 +41,18 @@ Item
         width: delegateRoot.width - cellsRow.width
         height: delegateRoot.height
 
-        highlighted: delegateRoot.rowHovered || delegateRoot.hoveredCell || allCheckBox.hovered
+        highlighted: delegateRoot.enabled && (delegateRoot.rowHovered || delegateRoot.hoveredCell)
         customSelectionIndicator: true
         wholeRowToggleable: false
-
-        MouseArea
-        {
-            id: allAccessRightsMouseArea
-            anchors.fill: parent
-
-            onClicked:
-            {
-                infoProvider.toggleAll()
-            }
-        }
-
-        Row
-        {
-            anchors.right: parent.right
-            anchors.rightMargin: 2
-            anchors.baseline: parent.baseline
-
-            visible: delegateRoot.nodeType != -1
-
-            spacing: 6
-
-            baselineOffset: allCheckBoxText.baselineOffset
-
-            Text
-            {
-                id: allCheckBoxText
-
-                text: qsTr("All")
-
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: mainDelegate.highlighted
-                    ? ColorTheme.colors.light10
-                    : ColorTheme.colors.light16
-            }
-
-            CheckBox
-            {
-                id: allCheckBox
-
-                checked: delegateRoot.isCollapsed()
-
-                nextCheckState: () =>
-                {
-                    const nodeTypes = tree.collapsedNodes
-
-                    if (checkState === Qt.Unchecked)
-                    {
-                        nodeTypes.push(delegateRoot.nodeType)
-                        tree.collapsedNodes = nodeTypes
-                        return Qt.Checked
-                    }
-
-                    const index = nodeTypes.indexOf(delegateRoot.nodeType)
-                    if (index !== -1)
-                        nodeTypes.splice(index, 1)
-
-                    tree.collapsedNodes = nodeTypes
-
-                    return Qt.Unchecked
-                }
-            }
-        }
     }
 
-    ResourceAccessInfoProvider
+    ResourceAccessRightsModel
     {
-        id: infoProvider
+        id: accessRightsModel
 
         context: delegateRoot.editingContext
         resource: delegateRoot.resource
         nodeType: delegateRoot.nodeType
-        accessRightsList: Array.prototype.map.call(AccessRightsList.items, item => item.accessRight)
-        collapsed: delegateRoot.isCollapsed()
     }
 
     Row
@@ -144,7 +63,7 @@ Item
 
         Repeater
         {
-            model: infoProvider
+            model: accessRightsModel
 
             delegate: Component
             {
@@ -156,15 +75,22 @@ Item
                     height: delegateRoot.height
 
                     hoverEnabled: true
-                    acceptedButtons: Qt.LeftButton
 
-                    readonly property int accessRight: infoProvider.accessRightsList[index]
+                    acceptedButtons: delegateRoot.enabled && toggleable
+                        ? Qt.LeftButton
+                        : Qt.NoButton
 
                     GlobalToolTip.text: model.toolTip
 
-                    readonly property bool highlighted: containsMouse
+                    readonly property bool toggleable:
+                        (accessRightsModel.resource || accessRightsModel.isResourceGroup)
+                        && model.editable
+
+                    readonly property int accessRight: model.accessRight
+
+                    readonly property bool highlighted: delegateRoot.enabled && (containsMouse
                         || delegateRoot.rowHovered
-                        || delegateRoot.hoveredAccessRight == accessRight
+                        || delegateRoot.hoveredAccessRight == accessRight)
 
                     onContainsMouseChanged:
                     {
@@ -176,15 +102,14 @@ Item
 
                     onClicked:
                     {
-                        model.isOwn = !model.isOwn
+                        accessRightsModel.toggle(index)
                     }
 
                     Item
                     {
                         anchors.fill: cell
 
-                        visible: (!!delegateRoot.resource || delegateRoot.isCollapsed())
-                            && (!delegateRoot.onlyLive || index == 0)
+                        visible: cell.toggleable
 
                         Rectangle
                         {
@@ -217,7 +142,7 @@ Item
                                     case ResourceAccessInfo.ProvidedVia.videowall:
                                         return "image://svg/skin/user_settings/sharing/videowall.svg"
 
-                                    case ResourceAccessInfo.ProvidedVia.parent:
+                                    case ResourceAccessInfo.ProvidedVia.parentUserGroup:
                                         return "image://svg/skin/user_settings/sharing/group.svg"
 
                                     default:
@@ -228,6 +153,21 @@ Item
                             color: model.providedVia == ResourceAccessInfo.ProvidedVia.own
                                 ? ColorTheme.colors.brand_core
                                 : ColorTheme.colors.light10
+
+                            Text
+                            {
+                                id: checkedChildResourceCounter
+
+                                anchors.fill: parent
+                                visible: accessRightsModel.isResourceGroup
+                                    && model.providedVia != ResourceAccessInfo.ProvidedVia.own
+                                    && model.checkedChildCount
+
+                                color: ColorTheme.colors.brand_core
+                                horizontalAlignment: Qt.AlignHCenter
+                                verticalAlignment: Qt.AlignVCenter
+                                text: model.checkedChildCount
+                            }
                         }
                     }
                 }

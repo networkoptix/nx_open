@@ -42,9 +42,9 @@
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_properties/fisheye/fisheye_calibrator.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
+#include <nx/vms/client/desktop/resource_properties/user/models/resource_access_rights_model.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/parent_groups_provider.h>
-#include <nx/vms/client/desktop/resource_properties/user/utils/resource_access_info_provider.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
@@ -241,7 +241,7 @@ void QnClientMetaTypes::registerQmlTypes()
     ListNavigationHelper::registerQmlType();
     ItemGrabber::registerQmlType();
     DragAndDrop::registerQmlType();
-    ResourceAccessInfoProvider::registerQmlTypes();
+    ResourceAccessRightsModel::registerQmlTypes();
     CustomAccessSummaryModel::registerQmlTypes();
     ParentGroupsProvider::registerQmlTypes();
     GlobalPermissionsModel::registerQmlTypes();

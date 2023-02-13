@@ -24,11 +24,9 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceSelection selectionMode
         READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QString filterText READ filterText WRITE setFilterText NOTIFY filterTextChanged)
+    Q_PROPERTY(nx::vms::common::ResourceFilter resourceFilter READ resourceFilter
+        WRITE setResourceFilter NOTIFY resourceFilterChanged)
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
-    Q_PROPERTY(QSet<nx::vms::client::desktop::ResourceTree::NodeType> collapsedNodes
-        READ collapsedNodes
-        WRITE setCollapsedNodes
-        NOTIFY collapsedNodesChanged)
 
     using base_type = ScopedModelOperations<FilterProxyModel>;
 
@@ -48,8 +46,8 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    void setCollapsedNodes(const QSet<ResourceTree::NodeType>& nodeTypes);
-    QSet<ResourceTree::NodeType> collapsedNodes() const;
+    nx::vms::common::ResourceFilter resourceFilter() const;
+    void setResourceFilter(nx::vms::common::ResourceFilter value);
 
     bool isExtraInfoRequired() const;
 
@@ -71,11 +69,14 @@ public:
 signals:
     void contextChanged();
     void filterTextChanged();
-    void collapsedNodesChanged();
+    void resourceFilterChanged();
     void resourceTypesChanged();
     void selectionModeChanged();
     void extraInfoRequiredChanged();
     void selectedResourcesChanged();
+
+protected:
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
     struct Private;

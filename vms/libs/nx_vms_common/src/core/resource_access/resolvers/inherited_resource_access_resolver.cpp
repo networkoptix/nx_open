@@ -12,6 +12,8 @@
 
 namespace nx::core::access {
 
+using namespace nx::vms::api;
+
 class InheritedResourceAccessResolver::Private: public QObject
 {
     InheritedResourceAccessResolver* const q;
@@ -26,12 +28,18 @@ public:
     const QPointer<SubjectHierarchy> subjectHierarchy;
     QSet<QnUuid> watchedSubjectParents;
 
-    ResourceAccessMap resourceAccessMapUnsafe(
+    struct ResourceAccessData
+    {
+        ResourceAccessMap accessMap;
+        std::optional<AccessRights> availableAccessRights;
+    };
+
+    ResourceAccessData ensureResourceAccessDataUnsafe(
         const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const;
 
     QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
 
-    mutable QHash<QnUuid, ResourceAccessMap> cachedAccessMaps;
+    mutable QHash<QnUuid, ResourceAccessData> cachedAccessData;
     mutable nx::Mutex mutex;
     mutable nx::Mutex watchedParentsMutex;
 
@@ -66,7 +74,7 @@ InheritedResourceAccessResolver::~InheritedResourceAccessResolver()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-nx::vms::api::GlobalPermissions InheritedResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
+GlobalPermissions InheritedResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
 {
     auto result = d->baseResolver
         ? d->baseResolver->globalPermissions(subjectId)
@@ -81,6 +89,31 @@ nx::vms::api::GlobalPermissions InheritedResourceAccessResolver::globalPermissio
     return result;
 }
 
+AccessRights InheritedResourceAccessResolver::availableAccessRights(const QnUuid& subjectId) const
+{
+    if (!d->subjectHierarchy || !d->baseResolver)
+        return {};
+
+    NX_MUTEX_LOCKER lk(&d->mutex);
+
+    QSet<QnUuid> visitedSubjectIds;
+    const auto data = d->ensureResourceAccessDataUnsafe(subjectId, visitedSubjectIds);
+
+    if (data.availableAccessRights)
+        return *data.availableAccessRights;
+
+    const auto result = std::accumulate(
+        data.accessMap.constKeyValueBegin(), data.accessMap.constKeyValueEnd(),
+        AccessRights{},
+        [](AccessRights sum, const std::pair<QnUuid, AccessRights>& item)
+        {
+            return sum | item.second;
+        });
+
+    d->cachedAccessData[subjectId].availableAccessRights = result;
+    return result;
+}
+
 ResourceAccessMap InheritedResourceAccessResolver::resourceAccessMap(const QnUuid& subjectId) const
 {
     if (!d->subjectHierarchy || !d->baseResolver)
@@ -89,7 +122,7 @@ ResourceAccessMap InheritedResourceAccessResolver::resourceAccessMap(const QnUui
     NX_MUTEX_LOCKER lk(&d->mutex);
 
     QSet<QnUuid> visitedSubjectIds;
-    return d->resourceAccessMapUnsafe(subjectId, visitedSubjectIds);
+    return d->ensureResourceAccessDataUnsafe(subjectId, visitedSubjectIds).accessMap;
 }
 
 ResourceAccessDetails InheritedResourceAccessResolver::accessDetails(
@@ -144,43 +177,46 @@ InheritedResourceAccessResolver::Private::Private(
         this, &Private::handleSubjectHierarchyChanged, Qt::DirectConnection);
 }
 
-ResourceAccessMap InheritedResourceAccessResolver::Private::resourceAccessMapUnsafe(
-    const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const
+InheritedResourceAccessResolver::Private::ResourceAccessData
+    InheritedResourceAccessResolver::Private::ensureResourceAccessDataUnsafe(
+        const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const
 {
     // Both optimization and circular dependency protection.
     if (visitedSubjectIds.contains(subjectId))
-        return cachedAccessMaps.value(subjectId);
+        return cachedAccessData.value(subjectId);
 
     visitedSubjectIds.insert(subjectId);
 
-    if (cachedAccessMaps.contains(subjectId))
-        return cachedAccessMaps.value(subjectId);
+    if (cachedAccessData.contains(subjectId))
+        return cachedAccessData.value(subjectId);
 
-    ResourceAccessMap& cachedAccessMapRef = cachedAccessMaps[subjectId];
-    cachedAccessMapRef = baseResolver->resourceAccessMap(subjectId);
+    ResourceAccessData& cachedAccessDataRef = cachedAccessData[subjectId];
+    cachedAccessDataRef.accessMap = baseResolver->resourceAccessMap(subjectId);
 
     ResourceAccessMap inheritedAccessMap;
     const auto parents = subjectHierarchy->directParents(subjectId);
 
     for (const auto& parent: parents)
-        inheritedAccessMap += resourceAccessMapUnsafe(parent, visitedSubjectIds);
+        inheritedAccessMap += ensureResourceAccessDataUnsafe(parent, visitedSubjectIds).accessMap;
 
     baseResolver->notifier()->subscribeSubjects({subjectId});
-    cachedAccessMapRef += inheritedAccessMap;
+    cachedAccessDataRef.accessMap += inheritedAccessMap;
+
+    cachedAccessDataRef.accessMap.remove(QnUuid{}); //< For compatibility with intermediate version.
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
-    NX_VERBOSE(q, cachedAccessMapRef);
+    NX_VERBOSE(q, cachedAccessDataRef.accessMap);
 
-    return cachedAccessMapRef;
+    return cachedAccessDataRef;
 }
 
 QSet<QnUuid> InheritedResourceAccessResolver::Private::invalidateCache()
 {
     NX_MUTEX_LOCKER lk(&mutex);
     const auto cachedSubjectIds = QSet<QnUuid>(
-        cachedAccessMaps.keyBegin(), cachedAccessMaps.keyEnd());
+        cachedAccessData.keyBegin(), cachedAccessData.keyEnd());
 
-    cachedAccessMaps.clear();
+    cachedAccessData.clear();
     return cachedSubjectIds;
 }
 
@@ -193,7 +229,7 @@ void InheritedResourceAccessResolver::Private::handleBaseAccessChanged(
     {
         NX_MUTEX_LOCKER lk(&mutex);
 
-        for (const auto& cachedSubjectId: nx::utils::keyRange(cachedAccessMaps))
+        for (const auto& cachedSubjectId: nx::utils::keyRange(cachedAccessData))
         {
             if (subjectIds.contains(cachedSubjectId)
                 || subjectHierarchy->isRecursiveMember(cachedSubjectId, subjectIds))
@@ -203,7 +239,7 @@ void InheritedResourceAccessResolver::Private::handleBaseAccessChanged(
         }
 
         for (const auto& subjectId: affectedCachedSubjectIds)
-            cachedAccessMaps.remove(subjectId);
+            cachedAccessData.remove(subjectId);
     }
 
     NX_DEBUG(q, "Cache invalidated for %1 subjects: %2",

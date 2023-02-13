@@ -66,6 +66,7 @@ SimpleColumn 1.0 SimpleColumn.qml
 Slider 1.0 Slider.qml
 SpinBox 1.0 SpinBox.qml
 Stack 1.0 Stack.qml
+Switch 1.0 Switch.qml
 SwitchButton 1.0 SwitchButton.qml
 SwitchIcon 1.0 SwitchIcon.qml
 Tab 1.0 Tab.qml

@@ -34,7 +34,7 @@ struct ResourceSelectionModelAdapter::Private
     ResourceTree::ResourceFilters resourceTypes;
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
-    QSet<ResourceTree::NodeType> collapsedNodes;
+    nx::vms::common::ResourceFilter resourceFilter;
 
     Private(ResourceSelectionModelAdapter* q):
         q(q),
@@ -82,29 +82,30 @@ struct ResourceSelectionModelAdapter::Private
 
     bool isRowAccepted(int sourceRow, const QModelIndex& sourceParent) const
     {
-        if (!collapsedNodes.isEmpty())
-        {
-            const auto sourceIndex = q->sourceModel()->index(sourceRow, 0, sourceParent);
+        const auto sourceModel = q->sourceModel();
+        if (!NX_ASSERT(sourceModel))
+            return false;
 
-            // Find root node type.
-            auto rootIndex = sourceIndex;
-            while (rootIndex.parent().isValid())
-                rootIndex = rootIndex.parent();
-
-            const auto rootNodeType = q->sourceModel()->data(rootIndex, Qn::NodeTypeRole)
-                .value<ResourceTree::NodeType>();
-
-            // Show only root nodes for collapsed node types.
-            if (collapsedNodes.contains(rootNodeType))
-                return rootIndex == sourceIndex;
-        }
-
-        if (filterText.isEmpty())
+        if (filterText.isEmpty() && !resourceFilter)
             return true;
 
-        const auto text = q->sourceModel()->data(
-            q->sourceModel()->index(sourceRow, 0, sourceParent)).toString();
+        const auto sourceIndex = sourceModel->index(sourceRow, 0, sourceParent);
 
+        const int childCount = sourceModel->rowCount(sourceIndex);
+        for (int i = 0; i < childCount; i++)
+        {
+            if (isRowAccepted(i, sourceIndex))
+                return true;
+        }
+
+        if (resourceFilter)
+        {
+            const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resourceFilter(resource))
+                return false;
+        }
+
+        const auto text = sourceModel->data(sourceIndex, Qt::DisplayRole).toString();
         return text.contains(filterText, Qt::CaseInsensitive);
     }
 };
@@ -113,12 +114,6 @@ ResourceSelectionModelAdapter::ResourceSelectionModelAdapter(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-    setFilter(
-        [this](int sourceRow, const QModelIndex& sourceParent)
-        {
-            return d->isRowAccepted(sourceRow, sourceParent);
-        });
-
     connect(qnSettings, &QnClientSettings::valueChanged, this,
         [this](int id)
         {
@@ -221,21 +216,17 @@ void ResourceSelectionModelAdapter::setFilterText(const QString& value)
     invalidateFilter();
 }
 
-void ResourceSelectionModelAdapter::setCollapsedNodes(
-    const QSet<ResourceTree::NodeType>& nodeTypes)
+nx::vms::common::ResourceFilter ResourceSelectionModelAdapter::resourceFilter() const
 {
-    if (d->collapsedNodes == nodeTypes)
-        return;
-
-    d->collapsedNodes = nodeTypes;
-    emit collapsedNodesChanged();
-
-    invalidateFilter();
+    return d->resourceFilter;
 }
 
-QSet<ResourceTree::NodeType> ResourceSelectionModelAdapter::collapsedNodes() const
+void ResourceSelectionModelAdapter::setResourceFilter(nx::vms::common::ResourceFilter value)
 {
-    return d->collapsedNodes;
+    d->resourceFilter = std::move(value);
+    emit resourceFilterChanged();
+
+    invalidateFilter();
 }
 
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const
@@ -319,10 +310,17 @@ QHash<int, QByteArray> ResourceSelectionModelAdapter::roleNames() const
     return roleNames;
 }
 
+bool ResourceSelectionModelAdapter::filterAcceptsRow(
+    int sourceRow, const QModelIndex& sourceParent) const
+{
+    return d->isRowAccepted(sourceRow, sourceParent);
+}
+
 void ResourceSelectionModelAdapter::registerQmlType()
 {
     qmlRegisterType<ResourceSelectionModelAdapter>(
         "nx.vms.client.desktop", 1, 0, "ResourceSelectionModel");
+    qRegisterMetaType<IsRowAccepted>();
     qRegisterMetaType<QSet<nx::vms::client::desktop::ResourceTree::NodeType>>();
 }
 

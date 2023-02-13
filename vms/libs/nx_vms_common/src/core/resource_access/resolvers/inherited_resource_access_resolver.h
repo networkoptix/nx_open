@@ -31,6 +31,8 @@ public:
 
     virtual nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const override;
 
+    nx::vms::api::AccessRights availableAccessRights(const QnUuid& subjectId) const;
+
     /**
      * Returns all ways in which the specified subject gains specified access right to
      * the specified resource, directly and indirectly.

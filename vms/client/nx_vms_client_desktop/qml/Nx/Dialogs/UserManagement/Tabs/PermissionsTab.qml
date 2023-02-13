@@ -18,10 +18,12 @@ Item
 
     required property AccessSubjectEditingContext editingContext
 
-    readonly property int columnCount: AccessRightsList.items.length
+    readonly property int columnCount: availableAccessRightDescriptors.length
     readonly property int kColumnWidth: 48
 
     property var buttonBox
+
+    property alias editingEnabled: editingEnabledSwitch.checked
 
     readonly property var kAllNodes: [
         ResourceTree.NodeType.videoWalls,
@@ -30,11 +32,24 @@ Item
         ResourceTree.NodeType.webPages,
         ResourceTree.NodeType.servers]
 
+    readonly property var availableAccessRightDescriptors:
+    {
+        if (control.editingEnabled || !control.editingContext)
+            return AccessRightsList.items
+
+        return Array.prototype.filter.call(AccessRightsList.items,
+            item => (item.accessRight & control.editingContext.availableAccessRights) !== 0)
+    }
+
+    readonly property var availableAccessRights:
+        Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
+
     Item
     {
         id: accessRightsHeader
 
-        anchors.right: tree.right
+        anchors.right: control.right
+        anchors.rightMargin: 8
 
         height: 64
         width: control.columnCount * control.kColumnWidth
@@ -51,7 +66,7 @@ Item
         {
             Repeater
             {
-                model: AccessRightsList.items
+                model: control.availableAccessRightDescriptors
 
                 AccessRightsHeaderItem
                 {
@@ -65,7 +80,7 @@ Item
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
 
-                    enabled: !allPermissionsAndResourcesSwitch.checked
+                    enabled: control.editingEnabled
 
                     GlobalToolTip.text: modelData.description
 
@@ -78,14 +93,6 @@ Item
                             accessRightsHeader.hoveredHeader = accessRightItem
                         else if (accessRightsHeader.hoveredHeader == accessRightItem)
                             accessRightsHeader.hoveredHeader = null
-                    }
-
-                    onClicked:
-                    {
-                        const prev = control.editingContext.hasOwnAccessRight(
-                            NxGlobals.uuid(""), modelData.accessRight)
-                        control.editingContext.setOwnAccessRight(
-                            NxGlobals.uuid(""), modelData.accessRight, !prev)
                     }
                 }
             }
@@ -119,14 +126,14 @@ Item
         property var hoveredRow: null
         property var hoveredCell: hoveredRow ? hoveredRow.hoveredCell : null
 
+        readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
+
         anchors.fill: parent
         anchors.topMargin: accessRightsHeader.height
-        anchors.rightMargin: 8
+        anchors.rightMargin: 8 - scrollBarWidth
         anchors.leftMargin: 16
 
-        enabled: !allPermissionsAndResourcesSwitch.checked
-        collapsedNodes: allPermissionsAndResourcesSwitch.checked ? control.kAllNodes : []
-
+        expandsOnDoubleClick: false
         hoverHighlightColor: "transparent"
         showResourceStatus: false
         topMargin: 0
@@ -137,22 +144,37 @@ Item
             | ResourceTree.ResourceFilter.healthMonitors
             | ResourceTree.ResourceFilter.videoWalls
 
-        filterText: allPermissionsAndResourcesSwitch.checked ? "" : searchField.text
+        filterText: searchField.text
+
+        Binding
+        {
+            target: tree.model
+            property: "resourceFilter"
+            value: control.editingContext && control.editingContext.accessibleResourcesFilter
+            when: control.editingContext && !control.editingEnabled
+        }
 
         delegate: ResourceAccessDelegate
         {
             id: rowAccess
 
             editingContext: control.editingContext
+
             showExtraInfo: tree.model.extraInfoRequired
                 || tree.model.isExtraInfoForced(resource)
+
             selectionMode: tree.selectionMode
             showResourceStatus: tree.showResourceStatus
             columnWidth: control.kColumnWidth
+            rowHovered: tree.hoveredItem === this
+            enabled: control.editingEnabled
+
+            accessRightsList: control.availableAccessRights
+
             hoveredAccessRight: accessRightsHeader.hoveredHeader
                 ? accessRightsHeader.hoveredAccessRight
                 : 0
-            rowHovered: tree.hoveredItem === this
+
             onHoveredCellChanged:
             {
                 if (hoveredCell)
@@ -205,44 +227,15 @@ Item
         height: control.buttonBox.height
         width: parent.width
 
-        SwitchWithText
+        Switch
         {
-            id: allPermissionsAndResourcesSwitch
+            id: editingEnabledSwitch
 
             anchors.left: parent.left
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
 
-            text: qsTr("All permissions & resources")
-            color: ColorTheme.colors.light10
-
-            checked: control.editingContext
-                && Array.prototype.every.call(AccessRightsList.items,
-                    item => control.editingContext.hasOwnAccessRight(
-                        NxGlobals.uuid(""), item.accessRight))
-
-            onClicked:
-            {
-                const newValue = !checked
-                Array.prototype.map.call(AccessRightsList.items,
-                    item => control.editingContext.setOwnAccessRight(
-                        NxGlobals.uuid(""), item.accessRight, newValue))
-
-                tree.collapsedNodes = checked ? control.kAllNodes : []
-            }
-        }
-
-        Connections
-        {
-            target: control.editingContext
-
-            function onResourceAccessChanged()
-            {
-                allPermissionsAndResourcesSwitch.checked =
-                    Array.prototype.every.call(AccessRightsList.items,
-                        item => control.editingContext.hasOwnAccessRight(
-                            NxGlobals.uuid(""), item.accessRight))
-            }
+            text: editingEnabledSwitch.checked ? qsTr("Editing enabled") : qsTr("Editing disabled")
         }
     }
 }

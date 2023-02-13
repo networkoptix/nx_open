@@ -27,8 +27,6 @@ TreeView
     property int selectionMode: { return ResourceTree.ResourceSelection.multiple }
     property string filterText
 
-    property alias collapsedNodes: resourceSelectionModel.collapsedNodes
-
     topMargin: 8
     leftMargin: 0
     indentation: 20

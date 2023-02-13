@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <licensing/license_fwd.h>
@@ -114,5 +115,10 @@ class AnalyticsEngineResource;
 using AnalyticsEngineResourcePtr = QnSharedResourcePointer<AnalyticsEngineResource>;
 using AnalyticsEngineResourceList =
     QnSharedResourcePointerList<AnalyticsEngineResource>;
+
+using ResourceFilter = std::function<bool(const QnResourcePtr& resource)>;
+
+template<class Resource>
+using ResourceClassFilter = std::function<bool(const QnSharedResourcePointer<Resource>&)>;
 
 } // namespace nx::vms::common

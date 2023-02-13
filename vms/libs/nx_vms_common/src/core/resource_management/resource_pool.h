@@ -100,10 +100,10 @@ public:
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
-    using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
+    using ResourceFilter = nx::vms::common::ResourceFilter;
 
     template<class Resource>
-    using ResourceClassFilter = std::function<bool(const QnSharedResourcePointer<Resource>&)>;
+    using ResourceClassFilter = nx::vms::common::ResourceClassFilter<Resource>;
 
     //---------------------------------------------------------------------------------------------
     // Methods to get all resources.

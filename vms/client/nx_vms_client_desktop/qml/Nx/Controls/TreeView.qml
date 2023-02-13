@@ -54,6 +54,11 @@ FocusScope
     property alias topMargin: listView.topMargin
     property alias bottomMargin: listView.bottomMargin
 
+    property alias visibleArea: listView.visibleArea
+
+    property alias scrollBar: listView.scrollBar
+    readonly property bool scrollBarVisible: visibleArea.heightRatio < 1.0
+
     property alias highlight: listView.highlight
 
     property int autoExpandDelayMs:
