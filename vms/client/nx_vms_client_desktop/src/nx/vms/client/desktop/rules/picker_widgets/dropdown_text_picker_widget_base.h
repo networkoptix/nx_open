@@ -14,7 +14,7 @@ template<typename F, typename D = QComboBox>
 class DropdownTextPickerWidgetBase: public FieldPickerWidget<F>
 {
 public:
-    DropdownTextPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
+    DropdownTextPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

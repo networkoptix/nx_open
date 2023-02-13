@@ -289,6 +289,33 @@ void SubjectSelectionDialog::setRoleValidator(RoleValidator roleValidator)
     m_roles->setRoleValidator(roleValidator);
 }
 
+void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* policy)
+{
+    m_policy = policy;
+
+    if (!m_policy)
+        return;
+
+    const auto roleValidator =
+        [this](const QnUuid& roleId) { return m_policy->roleValidity(roleId); };
+
+    const auto userValidator =
+        [this](const QnUserResourcePtr& user) { return m_policy->userValidity(user); };
+
+    setRoleValidator(roleValidator);
+    setUserValidator(userValidator);
+
+    connect(
+        this,
+        &SubjectSelectionDialog::changed,
+        this,
+        [this]
+        {
+            if (m_policy)
+                showAlert(m_policy->calculateAlert(allUsers(), checkedSubjects()));
+        });
+}
+
 void SubjectSelectionDialog::validateAllUsers()
 {
     const auto validationState = m_roles->validateUsers(

@@ -11,19 +11,19 @@
 
 namespace nx::vms::client::desktop::rules {
 
-class VolumePickerWidget: public FieldPickerWidget<vms::rules::VolumeField>
+class VolumePicker: public FieldPickerWidget<vms::rules::VolumeField>
 {
     Q_OBJECT
 
 public:
-    VolumePickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    VolumePicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
 
 private:
     QSlider* m_volumeSlider = nullptr;
     QPushButton* m_testPushButton = nullptr;
     float m_audioDeviceCachedVolume = 0.;
 
-    void onActionBuilderChanged() override;
+    void updateUi() override;
 
     void onVolumeChanged();
     void onTestButtonClicked();

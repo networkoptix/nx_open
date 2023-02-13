@@ -20,8 +20,9 @@ const ItemDescriptor& PlaySoundAction::manifest()
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Play to users")),
-            makeFieldDescriptor<SoundField>("sound", tr("Sound")),
-            makeFieldDescriptor<VolumeField>("volume", tr("Volume")),
+            makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
+            makeFieldDescriptor<VolumeField>(
+                "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
         }
     };
     return kDescriptor;

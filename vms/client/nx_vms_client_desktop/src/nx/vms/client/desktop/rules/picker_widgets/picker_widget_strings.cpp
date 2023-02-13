@@ -86,7 +86,7 @@ QString CameraPickerStrings::sourceCameraString(size_t otherCameraCount)
 
 QString ServerPickerStrings::anyServerString()
 {
-    return QString{"<%n>"}.arg(tr("Any Server"));
+    return QString{"<%1>"}.arg(tr("Any Server"));
 }
 
 QString ServerPickerStrings::multipleServersString(size_t count)

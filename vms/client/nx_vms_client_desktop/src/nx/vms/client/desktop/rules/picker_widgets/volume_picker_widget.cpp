@@ -6,8 +6,11 @@
 
 #include <nx/audio/audiodevice.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/rules/action_builder_fields/sound_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 #include <nx/vms/rules/utils/field.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/media/audio_player.h>
 
 #include "picker_widget_strings.h"
@@ -20,7 +23,7 @@ constexpr auto kOneHundredPercent = 100;
 
 } // namespace
 
-VolumePickerWidget::VolumePickerWidget(SystemContext* context, CommonParamsWidget* parent):
+VolumePicker::VolumePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
     FieldPickerWidget<vms::rules::VolumeField>(context, parent)
 {
     auto contentLayout = new QHBoxLayout;
@@ -41,45 +44,75 @@ VolumePickerWidget::VolumePickerWidget(SystemContext* context, CommonParamsWidge
         m_volumeSlider,
         &QSlider::valueChanged,
         this,
-        &VolumePickerWidget::onVolumeChanged);
+        &VolumePicker::onVolumeChanged);
 
     connect(
         m_testPushButton,
         &QPushButton::clicked,
         this,
-        &VolumePickerWidget::onTestButtonClicked);
+        &VolumePicker::onTestButtonClicked);
 }
 
-void VolumePickerWidget::onActionBuilderChanged()
+void VolumePicker::updateUi()
 {
-    FieldPickerWidget<vms::rules::VolumeField>::onActionBuilderChanged();
-
     QSignalBlocker blocker{m_volumeSlider};
-    m_volumeSlider->setValue(qRound(m_field->value() * kOneHundredPercent));
+    m_volumeSlider->setValue(qRound(theField()->value() * kOneHundredPercent));
 }
 
-void VolumePickerWidget::onVolumeChanged()
+void VolumePicker::onVolumeChanged()
 {
-    m_field->setValue(static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent);
+    theField()->setValue(static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent);
 }
 
-void VolumePickerWidget::onTestButtonClicked()
+void VolumePicker::onTestButtonClicked()
 {
-    auto textField = getActionField<vms::rules::TextWithFields>(vms::rules::utils::kTextFieldName);
-    if (!NX_ASSERT(textField))
+    const auto linkedFields = descriptor()->linkedFields;
+    if (NX_ASSERT(!linkedFields.empty(), "Linked field is not declared"))
         return;
 
-    const auto text = textField->text();
-    if (text.isEmpty())
-        return;
+    if (linkedFields.contains(vms::rules::utils::kTextFieldName))
+    {
+        auto textField =
+            getActionField<vms::rules::TextWithFields>(vms::rules::utils::kTextFieldName);
+        if (!NX_ASSERT(textField))
+            return;
 
-    m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
-    nx::audio::AudioDevice::instance()->setVolume(m_field->value());
-    if (AudioPlayer::sayTextAsync(text, this, [this] { onTextSaid(); }))
-        m_testPushButton->setEnabled(false);
+        const auto text = textField->text();
+        if (text.isEmpty())
+            return;
+
+        m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
+        nx::audio::AudioDevice::instance()->setVolume(theField()->value());
+        if (AudioPlayer::sayTextAsync(text, this, [this] { onTextSaid(); }))
+            m_testPushButton->setEnabled(false);
+    }
+    else if (linkedFields.contains(vms::rules::utils::kSoundFieldName))
+    {
+        auto soundField =
+            getActionField<vms::rules::SoundField>(vms::rules::utils::kSoundFieldName);
+        if (!NX_ASSERT(soundField))
+            return;
+
+        QString soundUrl = soundField->value();
+        if (soundUrl.isEmpty())
+            return;
+
+        QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
+        if (!QFileInfo(filePath).exists())
+            return;
+
+        m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
+        nx::audio::AudioDevice::instance()->setVolume(theField()->value());
+        if (AudioPlayer::playFileAsync(filePath, this, [this] { onTextSaid(); }))
+            m_testPushButton->setEnabled(false);
+    }
+    else
+    {
+        NX_ASSERT(false, "Unsupported linked field type declared");
+    }
 }
 
-void VolumePickerWidget::onTextSaid()
+void VolumePicker::onTextSaid()
 {
     nx::audio::AudioDevice::instance()->setVolume(m_audioDeviceCachedVolume);
     m_testPushButton->setEnabled(true);

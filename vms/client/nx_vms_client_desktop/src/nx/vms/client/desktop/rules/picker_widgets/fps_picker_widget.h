@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/rules/action_builder_fields/fps_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -13,39 +12,18 @@
 
 namespace nx::vms::client::desktop::rules {
 
-class FpsPicker: public NumberPickerWidget<vms::rules::FpsField>
+class FpsPicker: public NumberPicker<vms::rules::FpsField>
 {
 public:
-    using NumberPickerWidget<vms::rules::FpsField>::NumberPickerWidget;
-
-protected:
-    void onActionBuilderChanged() override
-    {
-        NumberPickerWidget<vms::rules::FpsField>::onActionBuilderChanged();
-
-        m_scopedConnections.reset();
-
-        auto targetDeviceField = getActionField<vms::rules::TargetDeviceField>(
-            vms::rules::utils::kDeviceIdsFieldName);
-
-        if (!NX_ASSERT(targetDeviceField))
-            return;
-
-        m_scopedConnections << connect(
-            targetDeviceField,
-            &vms::rules::TargetDeviceField::acceptAllChanged,
-            this,
-            &FpsPicker::updateMinMax);
-
-        m_scopedConnections << connect(
-            targetDeviceField,
-            &vms::rules::TargetDeviceField::idsChanged,
-            this,
-            &FpsPicker::updateMinMax);
-    }
+    using NumberPicker<vms::rules::FpsField>::NumberPicker;
 
 private:
-    nx::utils::ScopedConnections m_scopedConnections;
+    void updateUi() override
+    {
+        NumberPicker<vms::rules::FpsField>::updateUi();
+
+        updateMinMax();
+    }
 
     void updateMinMax()
     {
@@ -68,7 +46,7 @@ private:
         if (m_spinBox->value() == 0 && maxFps > 0)
         {
             m_spinBox->setValue(maxFps);
-            m_field->setValue(maxFps);
+            theField()->setValue(maxFps);
         }
 
         m_spinBox->setMinimum(maxFps > 0 ? 1 : 0);

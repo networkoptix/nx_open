@@ -13,11 +13,11 @@
 namespace nx::vms::client::desktop::rules {
 
 template<typename F>
-class NumberPickerWidget: public SimpleFieldPickerWidget<F>
+class NumberPicker: public FieldPickerWidget<F>
 {
 public:
-    NumberPickerWidget(SystemContext* context, CommonParamsWidget* parent):
-        SimpleFieldPickerWidget<F>(context, parent)
+    NumberPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+        FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -31,7 +31,7 @@ public:
             m_spinBox,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this,
-            &NumberPickerWidget<F>::onValueChanged);
+            &NumberPicker<F>::onValueChanged);
     }
 
 protected:
@@ -42,12 +42,12 @@ protected:
     void updateUi() override
     {
         QSignalBlocker blocker{m_spinBox};
-        m_spinBox->setValue(m_field->value());
+        m_spinBox->setValue(theField()->value());
     }
 
     void onValueChanged(int value)
     {
-        m_field->setValue(value);
+        theField()->setValue(value);
     }
 };
 

@@ -2,7 +2,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/rules/event_filter_fields/input_port_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -20,43 +19,19 @@ public:
     using DropdownTextPickerWidgetBase<vms::rules::InputPortField>::DropdownTextPickerWidgetBase;
 
 protected:
-    void onEventFilterChanged() override
+    void onCurrentIndexChanged() override
     {
-        DropdownTextPickerWidgetBase<vms::rules::InputPortField>::onEventFilterChanged();
+        theField()->setValue(m_comboBox->currentData().toString());
+    }
 
+private:
+    void updateUi() override
+    {
         auto sourceCameraField =
             getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
 
         if (!NX_ASSERT(sourceCameraField))
             return;
-
-        m_scopedConnections << connect(
-            sourceCameraField,
-            &vms::rules::SourceCameraField::acceptAllChanged,
-            this,
-            &InputPortPicker::updateComboBox);
-
-        m_scopedConnections << connect(
-            sourceCameraField,
-            &vms::rules::SourceCameraField::idsChanged,
-            this,
-            &InputPortPicker::updateComboBox);
-
-        updateComboBox();
-    }
-
-    void onCurrentIndexChanged() override
-    {
-        m_field->setValue(m_comboBox->currentData().toString());
-    }
-
-private:
-    utils::ScopedConnections m_scopedConnections;
-
-    void updateComboBox()
-    {
-        auto sourceCameraField =
-            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
 
         QSignalBlocker blocker{m_comboBox};
         m_comboBox->clear();
@@ -118,7 +93,7 @@ private:
         for (const auto& cameraInput: totalInputs)
             m_comboBox->addItem(cameraInput.getName(), cameraInput.id);
 
-        const auto valueIndex = m_comboBox->findData(m_field->value());
+        const auto valueIndex = m_comboBox->findData(theField()->value());
         m_comboBox->setCurrentIndex(valueIndex != -1 ? valueIndex : 0);
     }
 };

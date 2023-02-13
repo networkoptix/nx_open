@@ -7,9 +7,10 @@
 #include <QtCore/QScopedPointer>
 #include <QtGui/QValidator>
 
+#include <business/business_resource_validation.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnUserRolesModel;
 class QnUuid;
@@ -62,6 +63,8 @@ public:
     // Sets role validator. If it's not set, role validity is determined by validities of its users.
     void setRoleValidator(RoleValidator roleValidator);
 
+    void setValidationPolicy(QnSubjectValidationPolicy* policy);
+
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
 
@@ -87,8 +90,6 @@ private:
     void validateAllUsers();
 
 private:
-
-private:
     QScopedPointer<Ui::SubjectSelectionDialog> ui;
 
     subject_selection_dialog_private::RoleListModel* m_roles = nullptr;
@@ -97,6 +98,8 @@ private:
     subject_selection_dialog_private::UserListDelegate* m_userListDelegate = nullptr;
 
     bool m_allUsersSelectorEnabled = true;
+
+    QnSubjectValidationPolicy* m_policy{nullptr};
 };
 
 } // namespace ui

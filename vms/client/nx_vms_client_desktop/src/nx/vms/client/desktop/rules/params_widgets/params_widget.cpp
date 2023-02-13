@@ -13,15 +13,15 @@ using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 using ItemDescriptor = vms::rules::ItemDescriptor;
 
-ParamsWidget::ParamsWidget(SystemContext* context, QWidget* parent):
+ParamsWidget::ParamsWidget(QnWorkbenchContext* context, QWidget* parent):
     QWidget(parent),
-    SystemContextAware(context)
+    QnWorkbenchContextAware(context)
 {
 }
 
 void ParamsWidget::setDescriptor(const ItemDescriptor& value)
 {
-    itemDescriptor = value;
+    m_itemDescriptor = value;
 
     onDescriptorSet();
 
@@ -31,35 +31,33 @@ void ParamsWidget::setDescriptor(const ItemDescriptor& value)
 
 const vms::rules::ItemDescriptor& ParamsWidget::descriptor() const
 {
-    return itemDescriptor;
+    return m_itemDescriptor;
 }
 
-void ParamsWidget::setActionBuilder(vms::rules::ActionBuilder* actionBuilder)
+void ParamsWidget::setRule(const std::shared_ptr<SimplifiedRule>& rule)
 {
-    if (m_actionBuilder == actionBuilder)
-        return;
+    m_rule = rule;
+    updateUi();
+}
 
-    m_actionBuilder = actionBuilder;
-    emit actionBuilderChanged();
+std::optional<vms::rules::ItemDescriptor> ParamsWidget::actionDescriptor() const
+{
+    return m_rule->actionDescriptor();
 }
 
 vms::rules::ActionBuilder* ParamsWidget::actionBuilder() const
 {
-    return m_actionBuilder;
+    return m_rule->actionBuilder();
 }
 
-void ParamsWidget::setEventFilter(vms::rules::EventFilter* eventFilter)
+std::optional<vms::rules::ItemDescriptor> ParamsWidget::eventDescriptor() const
 {
-    if (m_eventFilter == eventFilter)
-        return;
-
-    m_eventFilter = eventFilter;
-    emit eventFilterChanged();
+    return m_rule->actionDescriptor();
 }
 
 vms::rules::EventFilter* ParamsWidget::eventFilter() const
 {
-    return m_eventFilter;
+    return m_rule->eventFilter();
 }
 
 void ParamsWidget::setReadOnly(bool value)
@@ -74,7 +72,7 @@ void ParamsWidget::onDescriptorSet()
 
 std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName)
 {
-    for (const auto& field: itemDescriptor.fields)
+    for (const auto& field: m_itemDescriptor.fields)
     {
         if (field.fieldName == fieldName)
             return field;

@@ -143,9 +143,13 @@ vms::rules::EventFilter* SimplifiedRule::eventFilter() const
 void SimplifiedRule::setEventType(const QString& eventType)
 {
     if (!m_rule->eventFilters().empty())
+    {
+        stopWatchOnEventFilter();
         m_rule->takeEventFilter(0);
+    }
 
     m_rule->addEventFilter(m_engine->buildEventFilter(eventType));
+    startWatchOnEventFilter();
     update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
 }
 
@@ -179,9 +183,13 @@ vms::rules::ActionBuilder* SimplifiedRule::actionBuilder() const
 void SimplifiedRule::setActionType(const QString& actionType)
 {
     if (!m_rule->actionBuilders().empty())
+    {
+        stopWatchOnActionBuilder();
         m_rule->takeActionBuilder(0);
+    }
 
     m_rule->addActionBuilder(m_engine->buildActionBuilder(actionType));
+    startWatchOnActionBuilder();
     update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
 }
 
@@ -247,9 +255,18 @@ void SimplifiedRule::update(const QVector<int>& roles)
 
 void SimplifiedRule::startWatchOnRule() const
 {
+    startWatchOnEventFilter();
+    startWatchOnActionBuilder();
+}
+
+void SimplifiedRule::startWatchOnEventFilter() const
+{
     for (const auto& eventField: eventFields())
         watchOn(eventField);
+}
 
+void SimplifiedRule::startWatchOnActionBuilder() const
+{
     for (const auto& actionField: actionFields())
         watchOn(actionField);
 }
@@ -259,9 +276,18 @@ void SimplifiedRule::stopWatchOnRule() const
     if (m_rule)
         return;
 
+    stopWatchOnEventFilter();
+    stopWatchOnActionBuilder();
+}
+
+void SimplifiedRule::stopWatchOnEventFilter() const
+{
     for(const auto eventField: eventFields())
         eventField->disconnect(this);
+}
 
+void SimplifiedRule::stopWatchOnActionBuilder() const
+{
     for(const auto actionField: actionFields())
         actionField->disconnect(this);
 }

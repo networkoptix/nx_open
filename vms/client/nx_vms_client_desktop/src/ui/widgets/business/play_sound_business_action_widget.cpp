@@ -150,7 +150,7 @@ void QnPlaySoundBusinessActionWidget::at_testButton_clicked()
     if (!QFileInfo(filePath).exists())
         return;
 
-    if (AudioPlayer::playFileAsync(filePath, this, SLOT(enableTestButton())))
+    if (AudioPlayer::playFileAsync(filePath, this, [this]{ enableTestButton(); }))
         ui->testButton->setEnabled(false);
 }
 

@@ -21,6 +21,7 @@ static constexpr auto kLayoutIdsFieldName = "layoutIds";
 static constexpr auto kRecordAfterFieldName = "recordAfter";
 static constexpr auto kRecordBeforeFieldName = "recordBefore";
 static constexpr auto kServerIdFieldName = "serverId";
+static constexpr auto kSoundFieldName = "sound";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kTextFieldName = "text";
 static constexpr auto kUsersFieldName = "users";

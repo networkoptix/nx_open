@@ -56,11 +56,13 @@ public:
     /*!
         Creates \a AudioPlayer object, which is removed on playback finish
         \param target       Signal will be sent to this target on play end (can be null).
-        \param slot         Slot that will be called on play end if target is not null.
+        \param callback     Function that will be called on play end if target is not null.
         \return             True if playback started, false - otherwise
     */
     static bool playFileAsync(
-        const QString& filePath, QObject* target = nullptr, const char* slot = nullptr);
+        const QString& filePath,
+        QObject* target = nullptr,
+        Callback callback = {});
 
     //!Generates wav from \a text and plays it...
     /*!
