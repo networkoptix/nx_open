@@ -439,7 +439,7 @@ struct ApplicationContext::Private
         mainSystemContext = std::make_unique<SystemContext>(
             mode == Mode::unitTests
                 ? SystemContext::Mode::unitTests
-                : SystemContext::Mode::default_,
+                : SystemContext::Mode::client,
             peerId);
         systemContexts.push_back(mainSystemContext.get());
 
