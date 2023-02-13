@@ -342,6 +342,9 @@ Factory::ActionList ShowOnItemsFactory::newActions(const Parameters& parameters,
     if (const auto action = initRoiAction(parameters, parent))
         result.append(action);
 
+    if (const auto action = initHotspotsAction(parameters, parent))
+        result.append(action);
+
     return result;
 }
 
@@ -441,6 +444,45 @@ QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject
             const bool animate = display()->animationAllowed();
             for (QnMediaResourceWidget* widget: actualWidgets)
                 widget->setRoiVisible(checked, animate);
+        });
+
+    return action;
+}
+
+QAction* ShowOnItemsFactory::initHotspotsAction(const Parameters& parameters, QObject* parent)
+{
+    const QnResourceWidgetList widgets = parameters.widgets();
+
+    QList<QnMediaResourceWidget*> widgetsWithHotspots;
+    for (const auto& widget: widgets)
+    {
+        const auto mediaResourceWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+        if (!mediaResourceWidget)
+            continue;
+
+        const auto camera = mediaResourceWidget->resource().dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->cameraHotspotsEnabled())
+            widgetsWithHotspots.append(mediaResourceWidget);
+    }
+
+    if (widgetsWithHotspots.empty())
+        return nullptr;
+
+    const auto action = new QAction(tr("Hotspots"), parent);
+    action->setShortcuts({QKeySequence("H"), QKeySequence("Alt+H")});
+    action->setShortcutVisibleInContextMenu(true);
+    action->setCheckable(true);
+    action->setChecked(std::all_of(widgetsWithHotspots.begin(), widgetsWithHotspots.end(),
+        [](QnMediaResourceWidget* widget) { return widget->hotspotsVisible(); }));
+
+    connect(action, &QAction::triggered, this,
+        [widgetsWithHotspots, parameters](bool checked)
+        {
+            for (QnMediaResourceWidget* widget: widgetsWithHotspots)
+                widget->setHotspotsVisible(checked);
         });
 
     return action;

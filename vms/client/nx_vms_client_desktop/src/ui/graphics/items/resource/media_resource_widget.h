@@ -210,6 +210,11 @@ public:
 
     bool isAnalyticsModeEnabled() const;
 
+    bool hotspotsAvailable() const;
+
+    bool hotspotsVisible() const;
+    void setHotspotsVisible(bool visible);
+
     enum class AreaType
     {
         none,
@@ -353,6 +358,7 @@ private slots:
     void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
+    void atHotspotsButtonToggled(bool checked);
     void processSettingsRequest();
     void processDiagnosticsRequest();
     void processEnableLicenseRequest();
