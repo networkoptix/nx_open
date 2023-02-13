@@ -7,7 +7,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
@@ -31,7 +30,7 @@ template<typename F, typename D>
 class DropdownIdPickerWidgetBase: public FieldPickerWidget<F>
 {
 public:
-    DropdownIdPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
+    DropdownIdPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -52,35 +51,8 @@ protected:
     PICKER_WIDGET_COMMON_USINGS
 
     D* m_comboBox{nullptr};
-    nx::utils::ScopedConnections m_scopedConnections;
 
     virtual void onCurrentIndexChanged() = 0;
-    virtual void onSourceCameraChanged() = 0;
-
-    void onEventFilterChanged() override
-    {
-        FieldPickerWidget<F>::onEventFilterChanged();
-
-        m_scopedConnections.reset();
-
-        auto sourceCameraField =
-            FieldPickerWidget<F>::template getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
-
-        if (!NX_ASSERT(sourceCameraField))
-            return;
-
-        m_scopedConnections << connect(
-            sourceCameraField,
-            &vms::rules::SourceCameraField::acceptAllChanged,
-            this,
-            &DropdownIdPickerWidgetBase<F, D>::onSourceCameraChanged);
-
-        m_scopedConnections << connect(
-            sourceCameraField,
-            &vms::rules::SourceCameraField::idsChanged,
-            this,
-            &DropdownIdPickerWidgetBase<F, D>::onSourceCameraChanged);
-    }
 
     QnVirtualCameraResourceList getCameras() const
     {
@@ -106,7 +78,7 @@ class AnalyticsEnginePicker:
     public DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>
 {
 public:
-    AnalyticsEnginePicker(SystemContext* context, CommonParamsWidget* parent):
+    AnalyticsEnginePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(context, parent)
     {
         m_pluginDiagnosticEventModel = new ui::PluginDiagnosticEventModel(this);
@@ -118,23 +90,10 @@ public:
     }
 
 protected:
-    void onEventFilterChanged() override
-    {
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField,
-            QnTreeComboBox>::onEventFilterChanged();
-
-        updateUi();
-    }
-
     void onCurrentIndexChanged() override
     {
-        m_field->setValue(
+        theField()->setValue(
             m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>());
-    }
-
-    void onSourceCameraChanged() override
-    {
-        updateUi();
     }
 
     void updateUi()
@@ -148,7 +107,7 @@ protected:
         m_comboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
         m_comboBox->model()->sort(0);
 
-        QnUuid pluginId = m_field->value();
+        QnUuid pluginId = theField()->value();
         if (pluginId.isNull())
         {
             pluginId = m_comboBox->itemData(
@@ -178,7 +137,7 @@ class AnalyticsEventTypePicker: public DropdownIdPickerWidgetBase<vms::rules::An
     Q_OBJECT
 
 public:
-    AnalyticsEventTypePicker(SystemContext* context, CommonParamsWidget* parent):
+    AnalyticsEventTypePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(context, parent)
     {
         m_analyticsSdkEventModel = new ui::AnalyticsSdkEventModel(systemContext() ,this);
@@ -201,25 +160,12 @@ protected:
         setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
     }
 
-    void onEventFilterChanged() override
-    {
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField,
-            QnTreeComboBox>::onEventFilterChanged();
-
-        updateUi();
-    }
-
     void onCurrentIndexChanged() override
     {
-        m_field->setEngineId(
+        theField()->setEngineId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>());
-        m_field->setTypeId(
+        theField()->setTypeId(
             m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
-    }
-
-    void onSourceCameraChanged() override
-    {
-        updateUi();
     }
 
     void updateUi()
@@ -233,8 +179,8 @@ protected:
 
         m_comboBox->setEnabled(m_analyticsSdkEventModel->isValid());
 
-        auto engineId = m_field->engineId();
-        auto typeId = m_field->typeId();
+        auto engineId = theField()->engineId();
+        auto typeId = theField()->typeId();
 
         auto analyticsModel = m_comboBox->model();
 
@@ -300,22 +246,9 @@ protected:
         setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
     }
 
-    void onEventFilterChanged() override
-    {
-        DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField,
-            DetectableObjectTypeComboBox>::onEventFilterChanged();
-
-        updateUi();
-    }
-
     void onCurrentIndexChanged() override
     {
-        m_field->setValue(m_comboBox->selectedMainObjectTypeId());
-    }
-
-    void onSourceCameraChanged() override
-    {
-        updateUi();
+        theField()->setValue(m_comboBox->selectedMainObjectTypeId());
     }
 
     void updateUi()
@@ -325,7 +258,7 @@ protected:
         const auto ids = getCameras().ids();
         m_comboBox->setDevices(QnUuidSet{ids.begin(), ids.end()});
 
-        m_comboBox->setSelectedMainObjectTypeId(m_field->value());
+        m_comboBox->setSelectedMainObjectTypeId(theField()->value());
     }
 };
 

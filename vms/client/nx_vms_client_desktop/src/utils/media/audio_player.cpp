@@ -68,17 +68,20 @@ bool AudioPlayer::playAsync( QIODevice* dataSource )
     return true;
 }
 
-bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const char *slot)
+bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, Callback callback)
 {
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
     if( !audioPlayer->open( filePath ) )
         return false;
 
-    if (target)
-        connect( audioPlayer.get(), SIGNAL(done()), target, slot);
-    connect( audioPlayer.get(), SIGNAL(done()), audioPlayer.get(), SLOT(deleteLater()) );
-    if( !audioPlayer->playAsync() )
+    if (target && callback)
+        connect(audioPlayer.get(), &AudioPlayer::done, target, callback);
+
+    connect(audioPlayer.get(), &AudioPlayer::done, audioPlayer.get(), &QObject::deleteLater);
+
+    if(!audioPlayer->playAsync())
         return false;
+
     audioPlayer.release();
     return true;
 }

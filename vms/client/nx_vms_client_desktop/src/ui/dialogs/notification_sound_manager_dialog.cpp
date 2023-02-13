@@ -63,7 +63,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked()
     if (!QFileInfo(filePath).exists())
         return;
 
-    bool result = AudioPlayer::playFileAsync(filePath, this, SLOT(enablePlayButton()));
+    bool result = AudioPlayer::playFileAsync(filePath, this, [this] { enablePlayButton(); });
     if (result)
         ui->playButton->setEnabled(false);
 }

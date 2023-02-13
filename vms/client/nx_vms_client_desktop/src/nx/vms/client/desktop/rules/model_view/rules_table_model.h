@@ -66,9 +66,13 @@ private:
 
     /** Starts watching on the builder's and filter's changes of the rule set. */
     void startWatchOnRule() const;
+    void startWatchOnEventFilter() const;
+    void startWatchOnActionBuilder() const;
 
     /** Stops watching on the builder's and filter's changes of the rule set. */
     void stopWatchOnRule() const;
+    void stopWatchOnEventFilter() const;
+    void stopWatchOnActionBuilder() const;
 
     /** Connects all the notify signal of the object to the update() method. */
     void watchOn(QObject* object) const;

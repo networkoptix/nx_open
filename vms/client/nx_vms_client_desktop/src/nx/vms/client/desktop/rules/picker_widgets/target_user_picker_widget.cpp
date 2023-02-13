@@ -2,7 +2,7 @@
 
 #include "target_user_picker_widget.h"
 
-#include <business/business_resource_validation.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
@@ -11,10 +11,13 @@
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/rules/action_builder_fields/event_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/flag_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/actions/open_layout_action.h>
+#include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/actions/send_email_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <utils/email/email.h>
@@ -25,134 +28,64 @@ namespace nx::vms::client::desktop::rules {
 
 void TargetUserPicker::onSelectButtonClicked()
 {
+    auto field = theField();
+
     ui::SubjectSelectionDialog dialog(this);
-    dialog.setCheckedSubjects(m_field->ids());
-    dialog.setAllUsers(m_field->acceptAll());
-
-    if (vms::rules::utils::type<vms::rules::SendEmailAction>()
-        == parentParamsWidget()->descriptor().id)
-    {
-        QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
-            new QnSendEmailActionDelegate(this));
-
-        dialog.setAllUsersSelectorEnabled(false);
-        dialog.setUserValidator(
-            [dialogDelegate](const QnUserResourcePtr& user)
-            {
-                return dialogDelegate->isValid(user->getId());
-            });
-
-        const auto updateAlert =
-            [&dialog, dialogDelegate]
-            {
-                dialog.showAlert(dialogDelegate->validationMessage(
-                    dialog.checkedSubjects()));
-            };
-
-        connect(&dialog, &ui::SubjectSelectionDialog::changed, this, updateAlert);
-        updateAlert();
-    }
+    dialog.setValidationPolicy(m_policy.get());
+    dialog.setCheckedSubjects(field->ids());
+    dialog.setAllUsers(field->acceptAll());
 
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    m_field->setIds(dialog.checkedSubjects());
-    m_field->setAcceptAll(dialog.allUsers());
+    field->setIds(dialog.checkedSubjects());
+    field->setAcceptAll(dialog.allUsers());
 }
 
 void TargetUserPicker::updateUi()
 {
-    static const QnDefaultSubjectValidationPolicy defaultPolicy;
+    auto field = theField();
+    createPolicy();
 
-    if (vms::rules::utils::type<vms::rules::SendEmailAction>()
-        == parentParamsWidget()->descriptor().id)
+    UserPickerHelper helper{
+        systemContext(),
+        field->acceptAll(),
+        field->ids(),
+        m_policy.get()};
+
+    m_selectButton->setText(helper.text());
+    m_selectButton->setIcon(helper.icon());
+}
+
+void TargetUserPicker::createPolicy()
+{
+    const auto actionId = parentParamsWidget()->descriptor().id;
+    if (actionId == vms::rules::utils::type<vms::rules::SendEmailAction>())
     {
-        QnUserWithEmailValidationPolicy userWithEmailValidationPolicy{systemContext()};
-        UserPickerHelper helper{
-            systemContext(),
-            m_field->acceptAll(),
-            m_field->ids(),
-            &userWithEmailValidationPolicy,
-            /*isIntermediateStateValid*/ false};
-
-        const auto additionalEmailsField =
-            parentParamsWidget()->actionBuilder()->fieldByName<vms::rules::ActionTextField>(
-                vms::rules::utils::kEmailsFieldName);
-        m_selectButton->setText(QnSendEmailActionDelegate::getText(
-            m_field->ids(),
-            /*detailed*/ true,
-            NX_ASSERT(additionalEmailsField) ? additionalEmailsField->value() : QString{}));
-        m_selectButton->setIcon(helper.icon());
+        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>(systemContext());
     }
-    else if (vms::rules::utils::type<vms::rules::NotificationAction>()
-        == parentParamsWidget()->descriptor().id)
+    else if (actionId == vms::rules::utils::type<vms::rules::NotificationAction>())
     {
-        const auto acknowledgeField =
-            parentParamsWidget()->actionBuilder()->fieldByName<vms::rules::FlagField>(
-                vms::rules::utils::kAcknowledgeFieldName);
+        auto acknowledgeField =
+            getActionField<vms::rules::FlagField>(vms::rules::utils::kAcknowledgeFieldName);
 
-        QnRequiredPermissionSubjectPolicy acknowledgePolicy(
-            systemContext(), Qn::ManageBookmarksPermission, QString());
-        // TODO: use event cameras for the policy.
-        // acknowledgePolicy.setCameras(
-        //     resourcePool()->getResourcesByIds<QnVirtualCameraResource>(eventDevicesField));
-
-        const QnSubjectValidationPolicy* policy = acknowledgeField->value() == true
-            ? dynamic_cast<const QnSubjectValidationPolicy*>(&acknowledgePolicy)
-            : dynamic_cast<const QnDefaultSubjectValidationPolicy*>(&defaultPolicy);
-
-        UserPickerHelper helper{
-            systemContext(),
-            m_field->acceptAll(),
-            m_field->ids(),
-            policy};
-
-        m_selectButton->setText(helper.text());
-        m_selectButton->setIcon(helper.icon());
+        if (acknowledgeField->value() == true)
+        {
+            m_policy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
+                systemContext(), Qn::ManageBookmarksPermission);
+        }
+        else
+        {
+            m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>();
+        }
     }
-    // else if (vms::rules::utils::type<vms::rules::PushNotificationAction>()
-    //     == parentParamsWidget()->descriptor().id)
-    // {
-    //     static const QnCloudUsersValidationPolicy cloudUsersPolicy;
-    //     UserPickerHelper helper{
-    //         systemContext(),
-    //         m_field->acceptAll(),
-    //         m_field->ids(),
-    //         &cloudUsersPolicy};
-
-    //     m_selectButton->setText(helper.text());
-    //     m_selectButton->setIcon(helper.icon());
-    // }
-    else if (vms::rules::utils::type<vms::rules::OpenLayoutAction>()
-        == parentParamsWidget()->descriptor().id)
+    else if (actionId == vms::rules::utils::type<vms::rules::PushNotificationAction>())
     {
-        // TODO: Uncomment when OpenLayoutAction will be implemented.
-        // const auto targetLayoutField = parentParamsWidget()->actionBuilder()->fieldByName<...>(...);
-        // const auto layout = resourcePool()->getResourceById<QnLayoutResource>(
-        //     targetLayoutField->id());
-
-        // QnLayoutAccessValidationPolicy layoutAccessPolicy(systemContext());
-        // layoutAccessPolicy.setLayout(layout);
-
-        // UserPickerHelper helper{
-        //     systemContext(),
-        //     m_field->acceptAll(),
-        //     m_field->ids(),
-        //     &layoutAccessPolicy};
-
-        // m_selectButton->setText(helper.text());
-        // m_selectButton->setIcon(helper.icon());
+        m_policy = std::make_unique<QnCloudUsersValidationPolicy>();
     }
     else
     {
-        UserPickerHelper helper{
-            systemContext(),
-            m_field->acceptAll(),
-            m_field->ids(),
-            &defaultPolicy};
-
-        m_selectButton->setText(helper.text());
-        m_selectButton->setIcon(helper.icon());
+        m_policy = std::make_unique<QnDefaultSubjectValidationPolicy>();
     }
 }
 

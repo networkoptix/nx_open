@@ -21,10 +21,10 @@ namespace nx::vms::client::desktop::rules {
  * - nx.events.fields.analyticsEventLevel
  */
 template<typename F>
-class FlagsPickerWidget: public FieldPickerWidget<F>
+class FlagsPicker: public FieldPickerWidget<F>
 {
 public:
-    FlagsPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+    FlagsPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto flagsLayout = new QHBoxLayout;
@@ -35,13 +35,13 @@ public:
             checkBox->setText(displayString.toUpper());
             flagsLayout->addWidget(checkBox);
 
-            checkBoxes.insert({checkBox, flag});
+            m_checkBoxes.insert({checkBox, flag});
 
             connect(
                 checkBox,
                 &QCheckBox::toggled,
                 this,
-                &FlagsPickerWidget::onValueChanged);
+                &FlagsPicker::onValueChanged);
         }
 
         m_contentWidget->setLayout(flagsLayout);
@@ -50,26 +50,24 @@ public:
 private:
     PICKER_WIDGET_COMMON_USINGS
 
-    std::map<QCheckBox*, typename F::value_type::enum_type> checkBoxes;
+    std::map<QCheckBox*, typename F::value_type::enum_type> m_checkBoxes;
 
-    void onActionBuilderChanged() override
+    void onValueChanged()
     {
-        FieldPickerWidget<F>::onActionBuilderChanged();
-        if (std::is_base_of<vms::rules::ActionBuilderField, F>())
-            updateValue();
+        typename F::value_type newValue;
+        for (const auto& [checkBox, flag]: m_checkBoxes)
+        {
+            if (checkBox->isChecked())
+                newValue.setFlag(flag);
+        }
+
+        theField()->setValue(newValue);
     }
 
-    void onEventFilterChanged() override
+    void updateUi() override
     {
-        FieldPickerWidget<F>::onEventFilterChanged();
-        if (std::is_base_of<vms::rules::EventFilterField, F>())
-            updateValue();
-    }
-
-    void updateValue()
-    {
-        const auto fieldValue = m_field->value();
-        for (const auto& [checkBox, flag]: checkBoxes)
+        const auto fieldValue = theField()->value();
+        for (const auto& [checkBox, flag]: m_checkBoxes)
         {
             {
                 QSignalBlocker blocker{checkBox};
@@ -78,24 +76,12 @@ private:
         }
     }
 
-    void onValueChanged()
-    {
-        typename F::value_type newValue;
-        for (const auto& [checkBox, flag]: checkBoxes)
-        {
-            if (checkBox->isChecked())
-                newValue.setFlag(flag);
-        }
-
-        m_field->setValue(newValue);
-    }
-
     // Returns map of the flag values and corresponding display string intended for displaying to
     // the user.
     std::map<typename F::value_type::enum_type, /*display string*/ QString> getFlags() const;
 };
 
-using AnalyticsEventLevelPicker = FlagsPickerWidget<vms::rules::AnalyticsEventLevelField>;
+using AnalyticsEventLevelPicker = FlagsPicker<vms::rules::AnalyticsEventLevelField>;
 
 template<>
 std::map<api::EventLevel, QString> AnalyticsEventLevelPicker::getFlags() const

@@ -15,7 +15,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-template<typename F, typename P>
+template<typename F, typename Policy>
 class ServerPickerWidgetBase: public ResourcePickerWidgetBase<F>
 {
 public:
@@ -28,32 +28,33 @@ protected:
 
     void onSelectButtonClicked() override
     {
-        auto selectedServers = m_field->ids();
+        auto field = theField();
+        auto selectedServers = field->ids();
 
         if (ServerSelectionDialog::selectServers(
-            selectedServers, P::isServerValid, P::infoText(), this))
+            selectedServers, Policy::isServerValid, Policy::infoText(), this))
         {
-            m_field->setIds(selectedServers);
+            field->setIds(selectedServers);
             updateUi();
         }
     }
 };
 
-template<typename P>
-class SourceServerPicker: public ServerPickerWidgetBase<vms::rules::SourceServerField, P>
+template<typename Policy>
+class SourceServerPicker: public ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>
 {
 public:
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::ServerPickerWidgetBase;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::ServerPickerWidgetBase;
 
 protected:
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::m_field;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::m_selectButton;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::resourcePool;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::theField;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::m_selectButton;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::resourcePool;
 
     void updateUi() override
     {
         const auto resources =
-            resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
+            resourcePool()->template getResourcesByIds<QnMediaServerResource>(theField()->ids());
 
         QIcon icon;
         if (resources.isEmpty())
@@ -79,37 +80,38 @@ protected:
     }
 };
 
-template<typename P>
-class TargetServerPicker: public ServerPickerWidgetBase<vms::rules::TargetDeviceField, P>
+template<typename Policy>
+class TargetServerPicker: public ServerPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
 {
 public:
-    using ServerPickerWidgetBase<vms::rules::TargetDeviceField, P>::ServerPickerWidgetBase;
+    using ServerPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::ServerPickerWidgetBase;
 
 protected:
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::m_field;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::m_selectButton;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, P>::resourcePool;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::theField;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::m_selectButton;
+    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::resourcePool;
 
     void updateUi() override
     {
+        auto field = theField();
         const auto resources =
-            resourcePool()->template getResourcesByIds<QnMediaServerResource>(m_field->ids());
+            resourcePool()->template getResourcesByIds<QnMediaServerResource>(field->ids());
 
         QIcon icon;
         if (resources.isEmpty())
         {
             icon = icon = qnResIconCache->icon(QnResourceIconCache::Server);
-            m_selectButton->setText(m_field->useSource()
+            m_selectButton->setText(field->useSource()
                 ? ServerPickerStrings::sourceServerString(resources.size())
                 : ServerPickerStrings::selectServerString());
         }
         else
         {
-            m_selectButton->setText(m_field->useSource()
+            m_selectButton->setText(field->useSource()
                 ? ServerPickerStrings::sourceServerString(resources.size())
                 : ServerPickerStrings::multipleServersString(resources.size()));
 
-            icon = (resources.size() > 1 || m_field->useSource())
+            icon = (resources.size() > 1 || field->useSource())
                 ? qnResIconCache->icon(QnResourceIconCache::Servers)
                 : qnResIconCache->icon(QnResourceIconCache::Server);
         }

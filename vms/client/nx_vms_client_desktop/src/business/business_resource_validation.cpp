@@ -138,6 +138,16 @@ QString QnAllowAnyCameraPolicy::getText(const QnResourceList& resources, const b
 }
 
 //-------------------------------------------------------------------------------------------------
+// QnAtleastOneCameraPolicy
+//-------------------------------------------------------------------------------------------------
+
+QString QnRequireCameraPolicy::getText(const QnResourceList& resources, const bool detailed)
+{
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    return genericCameraText<QnRequireCameraPolicy>(cameras, detailed, "", /* invalid */ 0);
+}
+
+//-------------------------------------------------------------------------------------------------
 // QnCameraInputPolicy
 //-------------------------------------------------------------------------------------------------
 

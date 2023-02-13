@@ -14,7 +14,7 @@ class CustomizableIconPicker:
     public DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>
 {
 public:
-    CustomizableIconPicker(SystemContext* context, CommonParamsWidget* parent):
+    CustomizableIconPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>(context, parent)
     {
         constexpr auto kDropdownIconSize = 40;
@@ -29,18 +29,15 @@ public:
     }
 
 protected:
-    void onEventFilterChanged() override
-    {
-        DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField,
-            IconComboBox>::onEventFilterChanged();
-
-        QSignalBlocker blocker{m_comboBox};
-        m_comboBox->setCurrentIcon(SoftwareTriggerPixmaps::effectivePixmapName(m_field->value()));
-    }
-
     void onCurrentIndexChanged() override
     {
-        m_field->setValue(m_comboBox->currentIcon());
+        theField()->setValue(m_comboBox->currentIcon());
+    }
+
+    void updateUi() override
+    {
+        QSignalBlocker blocker{m_comboBox};
+        m_comboBox->setCurrentIcon(SoftwareTriggerPixmaps::effectivePixmapName(theField()->value()));
     }
 };
 

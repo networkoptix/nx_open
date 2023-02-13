@@ -37,8 +37,8 @@ private:
     void updateControlButtons();
     void updateRuleEditorPanel();
     void displayRule();
-    void displayEvent(const SimplifiedRule& rule);
-    void displayAction(const SimplifiedRule& rule);
+    void displayEvent(const std::shared_ptr<SimplifiedRule>& rule);
+    void displayAction(const std::shared_ptr<SimplifiedRule>& rule);
     void createEventEditor(const vms::rules::ItemDescriptor& descriptor);
     void createActionEditor(const vms::rules::ItemDescriptor& descriptor);
     void resetFilter();

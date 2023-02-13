@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <business/business_resource_validation.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
 
 #include "resource_picker_widget_base.h"
@@ -18,6 +19,11 @@ public:
 protected:
     void onSelectButtonClicked() override;
     void updateUi() override;
+
+private:
+    std::unique_ptr<QnSubjectValidationPolicy> m_policy;
+
+    void createPolicy();
 };
 
 } // namespace nx::vms::client::desktop::rules

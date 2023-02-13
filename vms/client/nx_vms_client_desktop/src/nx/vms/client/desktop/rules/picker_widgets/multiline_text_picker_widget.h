@@ -23,7 +23,7 @@ template<typename F>
 class MultilineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    MultilineTextPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+    MultilineTextPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -55,23 +55,16 @@ private:
         m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
-    void onActionBuilderChanged() override
+    void updateUi() override
     {
-        FieldPickerWidget<F>::onActionBuilderChanged();
-
-        {
-            const QSignalBlocker blocker{m_textEdit};
-            m_textEdit->setText(text());
-        }
+        const QSignalBlocker blocker{m_textEdit};
+        m_textEdit->setText(theField()->text());
     }
 
     void onTextChanged()
     {
-        setText(m_textEdit->toPlainText());
+        theField()->setText(m_textEdit->toPlainText());
     }
-
-    QString text();
-    void setText(const QString& text);
 
     QStringList wordsToComplete() const
     {
@@ -80,18 +73,6 @@ private:
 };
 
 using TextWithFieldsPicker = MultilineTextPickerWidget<vms::rules::TextWithFields>;
-
-template<>
-QString TextWithFieldsPicker::text()
-{
-    return m_field->text();
-}
-
-template<>
-void TextWithFieldsPicker::setText(const QString& text)
-{
-    m_field->setText(text);
-}
 
 template<>
 QStringList TextWithFieldsPicker::wordsToComplete() const

@@ -13,9 +13,9 @@ namespace nx::vms::client::desktop::rules {
 using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 
-PickerWidget::PickerWidget(SystemContext* context, CommonParamsWidget* parent):
+PickerWidget::PickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent):
     QWidget(parent),
-    SystemContextAware(context)
+    QnWorkbenchContextAware(context)
 {
     auto mainLayout = new QHBoxLayout;
     mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -33,18 +33,6 @@ PickerWidget::PickerWidget(SystemContext* context, CommonParamsWidget* parent):
     mainLayout->setStretch(1, 5);
 
     setLayout(mainLayout);
-
-    connect(
-        parent,
-        &CommonParamsWidget::actionBuilderChanged,
-        this,
-        &PickerWidget::onActionBuilderChanged);
-
-    connect(
-        parent,
-        &CommonParamsWidget::eventFilterChanged,
-        this,
-        &PickerWidget::onEventFilterChanged);
 }
 
 void PickerWidget::setDescriptor(const FieldDescriptor& descriptor)

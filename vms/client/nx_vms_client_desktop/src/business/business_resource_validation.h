@@ -30,8 +30,20 @@ struct QnAllowAnyCameraPolicy
 public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr&) { return true; }
-    static QString getText(const QnResourceList&, const bool detailed = true);
+    static QString getText(const QnResourceList& resources, const bool detailed = true);
     static bool emptyListIsValid() { return true; }
+    static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
+};
+
+struct QnRequireCameraPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnRequireCameraPolicy)
+public:
+    typedef QnVirtualCameraResource resource_type;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr&) { return true; }
+    static QString getText(const QnResourceList& resources, const bool detailed = true);
+    static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
     static bool showRecordingIndicator() { return false; }
 };

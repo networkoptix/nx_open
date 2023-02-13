@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include <business/business_resource_validation.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
 
 #include "resource_picker_widget_base.h"
-
-class QnSubjectValidationPolicy;
 
 namespace nx::vms::client::desktop::rules {
 
@@ -15,14 +14,15 @@ class SourceUserPicker: public ResourcePickerWidgetBase<vms::rules::SourceUserFi
     Q_OBJECT
 
 public:
-    SourceUserPicker(SystemContext* context, CommonParamsWidget* parent);
+    SourceUserPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
 
 protected:
+    void onDescriptorSet() override;
     void onSelectButtonClicked() override;
     void updateUi() override;
 
 private:
-    QnSubjectValidationPolicy* m_validationPolicy{nullptr};
+    std::unique_ptr<QnSubjectValidationPolicy> m_validationPolicy;
 };
 
 } // namespace nx::vms::client::desktop::rules

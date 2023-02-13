@@ -11,11 +11,11 @@
 namespace nx::vms::client::desktop::rules {
 
 template<typename F>
-class ResourcePickerWidgetBase: public SimpleFieldPickerWidget<F>
+class ResourcePickerWidgetBase: public FieldPickerWidget<F>
 {
 public:
-    explicit ResourcePickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
-        SimpleFieldPickerWidget<F>(context, parent)
+    explicit ResourcePickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
+        FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QVBoxLayout;
 

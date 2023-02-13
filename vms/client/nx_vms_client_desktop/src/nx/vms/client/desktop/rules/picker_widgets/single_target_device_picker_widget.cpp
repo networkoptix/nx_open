@@ -17,7 +17,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SingleTargetDevicePicker::SingleTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent):
+SingleTargetDevicePicker::SingleTargetDevicePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
     ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(context, parent)
 {
     auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
@@ -34,40 +34,21 @@ SingleTargetDevicePicker::SingleTargetDevicePicker(SystemContext* context, Commo
         &SingleTargetDevicePicker::onStateChanged);
 }
 
-void SingleTargetDevicePicker::onActionBuilderChanged()
-{
-    ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onActionBuilderChanged();
-
-    m_scopedConnections.reset();
-
-    m_targetLayoutField = parentParamsWidget()->actionBuilder()->
-        fieldByName<vms::rules::TargetLayoutField>(vms::rules::utils::kLayoutIdsFieldName);
-
-    if (NX_ASSERT(m_targetLayoutField))
-    {
-        m_scopedConnections << connect(
-            m_targetLayoutField,
-            &vms::rules::TargetLayoutField::valueChanged,
-            this,
-            &SingleTargetDevicePicker::updateUi);
-    }
-}
-
 void SingleTargetDevicePicker::onSelectButtonClicked()
 {
-    auto selectedCameras = QnUuidSet{m_field->id()};
+    auto field = theField();
+    auto selectedCameras = QnUuidSet{field->id()};
 
     if (!CameraSelectionDialog::selectCameras<QnFullscreenCameraPolicy>(selectedCameras, this))
         return;
 
-    m_field->setId(*selectedCameras.begin());
-
-    updateUi();
+    field->setId(*selectedCameras.begin());
 }
 
 void SingleTargetDevicePicker::updateUi()
 {
-    if (m_field->useSource())
+    auto field = theField();
+    if (field->useSource())
     {
         m_selectButton->setText(CameraPickerStrings::sourceCameraString());
         m_selectButton->setIcon(Skin::maximumSizePixmap(
@@ -79,7 +60,7 @@ void SingleTargetDevicePicker::updateUi()
     else
     {
         const auto camera =
-            resourcePool()->getResourceById<QnVirtualCameraResource>(m_field->id());
+            resourcePool()->getResourceById<QnVirtualCameraResource>(field->id());
 
         m_selectButton->setText(QnFullscreenCameraPolicy::getText({camera}));
 
@@ -104,13 +85,12 @@ void SingleTargetDevicePicker::updateUi()
     }
 
     const QSignalBlocker blocker{m_checkBox};
-    m_checkBox->setChecked(m_field->useSource());
+    m_checkBox->setChecked(field->useSource());
 }
 
 void SingleTargetDevicePicker::onStateChanged()
 {
-    m_field->setUseSource(m_checkBox->isChecked());
-    updateUi();
+    theField()->setUseSource(m_checkBox->isChecked());
 }
 
 bool SingleTargetDevicePicker::cameraExistOnLayouts(const QnVirtualCameraResourcePtr& camera)

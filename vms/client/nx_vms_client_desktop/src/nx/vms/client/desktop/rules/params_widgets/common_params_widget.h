@@ -2,9 +2,13 @@
 
 #pragma once
 
+#include <vector>
+
 #include "params_widget.h"
 
 namespace nx::vms::client::desktop::rules {
+
+class PickerWidget;
 
 /**
  * Used if no custom editor is provided. Dynamically creates pickers according to the passed
@@ -15,10 +19,13 @@ class CommonParamsWidget: public ParamsWidget
     Q_OBJECT
 
 public:
-    CommonParamsWidget(SystemContext* context, QWidget* parent = nullptr);
+    CommonParamsWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
 
 private:
     virtual void onDescriptorSet() override;
+    virtual void updateUi() override;
+
+    std::vector<PickerWidget*> m_pickers;
 };
 
 } // namespace nx::vms::client::desktop::rules

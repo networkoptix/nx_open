@@ -7,7 +7,7 @@ namespace nx::vms::client::desktop::rules {
 #define PICKER_WIDGET_COMMON_USINGS using FieldPickerWidget<F>::m_label;\
     using FieldPickerWidget<F>::m_contentWidget;\
     using FieldPickerWidget<F>::m_fieldDescriptor;\
-    using FieldPickerWidget<F>::m_field;\
+    using FieldPickerWidget<F>::theField;\
     using FieldPickerWidget<F>::connect;\
     using FieldPickerWidget<F>::resourcePool;\
     using FieldPickerWidget<F>::parentParamsWidget;

@@ -27,13 +27,13 @@ protected:
 
     void onSelectButtonClicked() override
     {
-        auto selectedCameras = m_field->ids();
+        auto field = theField();
+        auto selectedCameras = field->ids();
 
         if (CameraSelectionDialog::selectCameras<Policy>(selectedCameras, this))
         {
-            m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
-            m_field->setIds(selectedCameras);
-            updateUi();
+            field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
+            field->setIds(selectedCameras);
         }
     }
 };
@@ -46,13 +46,13 @@ public:
 
 protected:
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_selectButton;
-    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::m_field;
+    using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::theField;
     using CameraPickerWidgetBase<vms::rules::SourceCameraField, Policy>::resourcePool;
 
     void updateUi() override
     {
         auto resources =
-            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
+            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(theField()->ids());
 
         m_selectButton->setText(Policy::getText(resources, /*detailed*/ true));
         m_selectButton->setIcon(Skin::maximumSizePixmap(resources.size() == 1
@@ -68,7 +68,7 @@ template<typename Policy>
 class TargetCameraPicker: public CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
 {
 public:
-    TargetCameraPicker(SystemContext* context, CommonParamsWidget* parent):
+    TargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>(context, parent)
     {
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
@@ -88,10 +88,11 @@ public:
 protected:
     void updateUi() override
     {
+        auto field = theField();
         auto resources =
-            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(m_field->ids());
+            resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
-        if (m_field->useSource())
+        if (field->useSource())
         {
             m_selectButton->setText(CameraPickerStrings::sourceCameraString(resources.size()));
             m_selectButton->setIcon(Skin::maximumSizePixmap(
@@ -120,11 +121,11 @@ protected:
         }
 
         QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(m_field->useSource());
+        m_checkBox->setChecked(field->useSource());
     }
 
 private:
-    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_field;
+    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::theField;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_contentWidget;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
@@ -134,8 +135,7 @@ private:
 
     void onStateChanged()
     {
-        m_field->setUseSource(m_checkBox->isChecked());
-        updateUi();
+        theField()->setUseSource(m_checkBox->isChecked());
     }
 };
 

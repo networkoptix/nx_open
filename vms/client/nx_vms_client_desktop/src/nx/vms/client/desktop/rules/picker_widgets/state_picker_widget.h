@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -43,51 +42,22 @@ protected:
         }
     }
 
-    void onActionBuilderChanged() override
+    void updateUi() override
     {
-        DropdownTextPickerWidgetBase<vms::rules::StateField>::onActionBuilderChanged();
-
+        const auto state = theField()->value();
         QSignalBlocker blocker{m_comboBox};
+        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(state)));
 
-        auto stateValue = m_comboBox->currentData().value<api::rules::State>();
-        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(stateValue)));
-
-        if (const auto durationField =
-            getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName))
-        {
-            const auto updateState =
-                [this, durationField, stateValue]
-                {
-                    if (durationField->value() == vms::rules::OptionalTimeField::value_type::zero())
-                    {
-                        setVisible(false);
-                        m_comboBox->setCurrentIndex(-1);
-                    }
-                    else
-                    {
-                        m_comboBox->setCurrentIndex(
-                            m_comboBox->findData(QVariant::fromValue(stateValue)));
-                        setVisible(true);
-                    }
-                };
-
-            updateState();
-
-            m_scopedConnections << connect(
-                durationField,
-                &vms::rules::OptionalTimeField::valueChanged,
-                this,
-                updateState);
-        }
+        const auto durationField =
+            getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
+        this->setVisible(!durationField
+            || durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
     }
 
     void onCurrentIndexChanged() override
     {
-        m_field->setValue(m_comboBox->currentData().value<api::rules::State>());
+        theField()->setValue(m_comboBox->currentData().value<api::rules::State>());
     }
-
-private:
-    utils::ScopedConnections m_scopedConnections;
 };
 
 } // namespace nx::vms::client::desktop::rules

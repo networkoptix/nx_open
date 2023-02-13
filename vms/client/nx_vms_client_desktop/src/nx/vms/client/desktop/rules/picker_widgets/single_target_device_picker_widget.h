@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
 
@@ -16,14 +15,12 @@ class SingleTargetDevicePicker:
     Q_OBJECT
 
 public:
-    SingleTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent);
+    SingleTargetDevicePicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
 
 private:
     QCheckBox* m_checkBox{nullptr};
     vms::rules::TargetLayoutField* m_targetLayoutField{nullptr};
-    nx::utils::ScopedConnections m_scopedConnections;
 
-    void onActionBuilderChanged() override;
     void onSelectButtonClicked() override;
     void updateUi() override;
 

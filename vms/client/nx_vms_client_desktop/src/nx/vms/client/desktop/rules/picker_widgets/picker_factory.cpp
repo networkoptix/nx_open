@@ -25,6 +25,7 @@
 #include "oneline_text_picker_widget.h"
 #include "server_picker_widget.h"
 #include "single_target_device_picker_widget.h"
+#include "sound_picker_widget.h"
 #include "source_user_picker_widget.h"
 #include "state_picker_widget.h"
 #include "stream_quality_picker_widget.h"
@@ -36,7 +37,7 @@ namespace nx::vms::client::desktop::rules {
 
 namespace {
 
-PickerWidget* createSourceCameraPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::AnalyticsEvent>())
         return new SourceCameraPicker<QnCameraAnalyticsPolicy>(context, parent);
@@ -53,7 +54,7 @@ PickerWidget* createSourceCameraPicker(SystemContext* context, CommonParamsWidge
     return new SourceCameraPicker<QnAllowAnyCameraPolicy>(context, parent);;
 }
 
-PickerWidget* createSourceServerPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceServerPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PoeOverBudgetEvent>())
         return new SourceServerPicker<QnPoeOverBudgetPolicy>(context, parent);
@@ -65,7 +66,7 @@ PickerWidget* createSourceServerPicker(SystemContext* context, CommonParamsWidge
     return {};
 }
 
-PickerWidget* createTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createTargetDevicePicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BookmarkAction>())
         return new TargetCameraPicker<QnBookmarkActionPolicy>(context, parent);
@@ -86,11 +87,13 @@ PickerWidget* createTargetDevicePicker(SystemContext* context, CommonParamsWidge
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
         return new TargetCameraPicker<QnExecPtzPresetPolicy>(context, parent);
 
-    NX_ASSERT(false, "Must not be here");
-    return {};
+    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>())
+        return new TargetCameraPicker<QnRequireCameraPolicy>(context, parent);
+
+    return new TargetCameraPicker<QnAllowAnyCameraPolicy>(context, parent);
 }
 
-PickerWidget* createSingleTargetCameraPicker(SystemContext* context, CommonParamsWidget* parent)
+PickerWidget* createSingleTargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
         return new SingleTargetDevicePicker(context, parent);
@@ -105,25 +108,34 @@ using nx::vms::rules::fieldMetatype;
 
 PickerWidget* PickerFactory::createWidget(
     const vms::rules::FieldDescriptor& descriptor,
-    SystemContext* context,
+    QnWorkbenchContext* context,
     CommonParamsWidget* parent)
 {
     PickerWidget* pickerWidget{};
 
-    if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
+    // Event field based pickers.
+    if (descriptor.id == fieldMetatype<nx::vms::rules::AnalyticsEventLevelField>())
+        pickerWidget = new FlagsPicker<nx::vms::rules::AnalyticsEventLevelField>(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEventTypeField>())
+        pickerWidget = new AnalyticsEventTypePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEngineField>())
+        pickerWidget = new AnalyticsEnginePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectAttributesField>())
+        pickerWidget = new AnalyticsObjectAttributesPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectTypeField>())
+        pickerWidget = new AnalyticsObjectTypePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
         pickerWidget = new CustomizableTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableIconField>())
         pickerWidget = new CustomizableIconPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
-        pickerWidget = new KeywordsPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
-        pickerWidget = new ActionTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::EventTextField>())
         pickerWidget = new EventTextPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::TextWithFields>())
-        pickerWidget = new TextWithFieldsPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
-        pickerWidget = new FlagPickerWidget<nx::vms::rules::FlagField>(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())
+        pickerWidget = new InputPortPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::IntField>())
+        pickerWidget = new NumberPicker<nx::vms::rules::IntField>(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
+        pickerWidget = new KeywordsPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceCameraField>())
         pickerWidget = createSourceCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())
@@ -132,46 +144,41 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new SourceUserPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::StateField>())
         pickerWidget = new StatePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::IntField>())
-        pickerWidget = new NumberPickerWidget<nx::vms::rules::IntField>(context, parent);
+    // Action field based pickers.
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
+        pickerWidget = new ActionTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ContentTypeField>())
         pickerWidget = new HttpContentTypePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())
-        pickerWidget = new HttpMethodPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
-        pickerWidget = new PasswordPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
-        pickerWidget = new OptionalDurationPickerWidget<nx::vms::rules::OptionalTimeField>(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::TimeField>())
-        pickerWidget = new DurationPickerWidget<nx::vms::rules::TimeField>(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
-        pickerWidget = new TargetUserPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())
-        pickerWidget = new InputPortPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::AnalyticsEventLevelField>())
-        pickerWidget = new FlagsPickerWidget<nx::vms::rules::AnalyticsEventLevelField>(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEngineField>())
-        pickerWidget = new AnalyticsEnginePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsEventTypeField>())
-        pickerWidget = new AnalyticsEventTypePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectTypeField>())
-        pickerWidget = new AnalyticsObjectTypePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectAttributesField>())
-        pickerWidget = new AnalyticsObjectAttributesPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
-        pickerWidget = new VolumePickerWidget(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::TargetDeviceField>())
-        pickerWidget = createTargetDevicePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::TargetSingleDeviceField>())
-        pickerWidget = createSingleTargetCameraPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<vms::rules::StreamQualityField>())
-        pickerWidget = new StreamQualityPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
+        pickerWidget = new FlagPicker<nx::vms::rules::FlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::FpsField>())
         pickerWidget = new FpsPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())
+        pickerWidget = new HttpMethodPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
+        pickerWidget = new OptionalDurationPicker<nx::vms::rules::OptionalTimeField>(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
+        pickerWidget = new PasswordPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::StreamQualityField>())
+        pickerWidget = new StreamQualityPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::TargetDeviceField>())
+        pickerWidget = createTargetDevicePicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetLayoutField>())
         pickerWidget = new TargetLayoutPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::TargetSingleDeviceField>())
+        pickerWidget = createSingleTargetCameraPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::SoundField>())
+        pickerWidget = new SoundPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
+        pickerWidget = new TargetUserPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TextWithFields>())
+        pickerWidget = new TextWithFieldsPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TimeField>())
+        pickerWidget = new DurationPicker<nx::vms::rules::TimeField>(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
+        pickerWidget = new VolumePicker(context, parent);
     else
-        pickerWidget = new BlankPickerWidget(context, parent);
+        pickerWidget = new BlankPicker(context, parent);
 
     pickerWidget->setDescriptor(descriptor);
 

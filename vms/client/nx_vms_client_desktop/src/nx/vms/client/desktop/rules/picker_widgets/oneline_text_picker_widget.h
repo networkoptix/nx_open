@@ -27,11 +27,11 @@ namespace nx::vms::client::desktop::rules {
  */
 
 template<typename F>
-class OnelineTextPickerWidgetBase: public SimpleFieldPickerWidget<F>
+class OnelineTextPickerWidgetBase: public FieldPickerWidget<F>
 {
 public:
-    OnelineTextPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
-        SimpleFieldPickerWidget<F>(context, parent)
+    OnelineTextPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
+        FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -60,7 +60,7 @@ template<typename F>
 class OnelineTextPickerWidgetCommon: public OnelineTextPickerWidgetBase<F>
 {
 public:
-    OnelineTextPickerWidgetCommon(SystemContext* context, CommonParamsWidget* parent):
+    OnelineTextPickerWidgetCommon(QnWorkbenchContext* context, CommonParamsWidget* parent):
         OnelineTextPickerWidgetBase<F>(context, parent)
     {
         if (std::is_same<F, vms::rules::PasswordField>())
@@ -74,12 +74,12 @@ protected:
     void updateUi() override
     {
         const QSignalBlocker blocker{m_lineEdit};
-        m_lineEdit->setText(m_field->value());
+        m_lineEdit->setText(theField()->value());
     }
 
     void onTextChanged(const QString& text) override
     {
-        m_field->setValue(text);
+        theField()->setValue(text);
     }
 };
 

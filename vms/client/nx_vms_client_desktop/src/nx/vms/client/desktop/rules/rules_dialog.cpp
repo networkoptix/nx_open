@@ -264,7 +264,7 @@ void RulesDialog::createEventEditor(const vms::rules::ItemDescriptor& descriptor
     if (eventEditorWidget)
         eventEditorWidget->deleteLater();
 
-    eventEditorWidget = EventEditorFactory::createWidget(descriptor, systemContext());
+    eventEditorWidget = EventEditorFactory::createWidget(descriptor, context());
     if (!NX_ASSERT(eventEditorWidget))
         return;
 
@@ -278,7 +278,7 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
     if (actionEditorWidget)
         actionEditorWidget->deleteLater();
 
-    actionEditorWidget = ActionEditorFactory::createWidget(descriptor, systemContext());
+    actionEditorWidget = ActionEditorFactory::createWidget(descriptor, context());
     if (!NX_ASSERT(actionEditorWidget))
         return;
 
@@ -295,20 +295,20 @@ void RulesDialog::displayRule()
     if (!rule)
         return;
 
-    displayEvent(*rule);
-    displayAction(*rule);
+    displayEvent(rule);
+    displayAction(rule);
 
     ui->footerWidget->setRule(displayedRule);
 }
 
-void RulesDialog::displayEvent(const SimplifiedRule& rule)
+void RulesDialog::displayEvent(const std::shared_ptr<SimplifiedRule>& rule)
 {
     {
         const QSignalBlocker blocker(ui->eventTypePicker);
-        ui->eventTypePicker->setEventType(rule.eventType());
+        ui->eventTypePicker->setEventType(rule->eventType());
     }
 
-    auto eventDescriptor = rule.eventDescriptor();
+    auto eventDescriptor = rule->eventDescriptor();
     if (!NX_ASSERT(eventDescriptor))
         return;
 
@@ -316,20 +316,17 @@ void RulesDialog::displayEvent(const SimplifiedRule& rule)
         createEventEditor(*eventDescriptor);
 
     if (eventEditorWidget)
-    {
-        eventEditorWidget->setActionBuilder(rule.actionBuilder());
-        eventEditorWidget->setEventFilter(rule.eventFilter());
-    }
+        eventEditorWidget->setRule(rule);
 }
 
-void RulesDialog::displayAction(const SimplifiedRule& rule)
+void RulesDialog::displayAction(const std::shared_ptr<SimplifiedRule>& rule)
 {
     {
         const QSignalBlocker blocker(ui->actionTypePicker);
-        ui->actionTypePicker->setActionType(rule.actionType());
+        ui->actionTypePicker->setActionType(rule->actionType());
     }
 
-    auto actionDescriptor = rule.actionDescriptor();
+    auto actionDescriptor = rule->actionDescriptor();
     if (!NX_ASSERT(actionDescriptor))
         return;
 
@@ -337,10 +334,7 @@ void RulesDialog::displayAction(const SimplifiedRule& rule)
         createActionEditor(*actionDescriptor);
 
     if (actionEditorWidget)
-    {
-        actionEditorWidget->setActionBuilder(rule.actionBuilder());
-        actionEditorWidget->setEventFilter(rule.eventFilter());
-    }
+        actionEditorWidget->setRule(rule);
 }
 
 void RulesDialog::resetFilter()
@@ -376,6 +370,12 @@ void RulesDialog::onModelDataChanged(
 
     if (roles.contains(RulesTableModel::FieldRole))
         displayRule();
+
+    if (eventEditorWidget && actionEditorWidget)
+    {
+        eventEditorWidget->updateUi();
+        actionEditorWidget->updateUi();
+    }
 }
 
 void RulesDialog::applyChanges()

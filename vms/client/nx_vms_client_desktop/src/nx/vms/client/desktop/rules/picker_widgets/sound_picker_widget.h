@@ -5,20 +5,30 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QPushButton>
 
+#include <nx/vms/rules/action_builder_fields/sound_field.h>
+
 #include "picker_widget.h"
+
+namespace nx::vms::client::desktop { class ServerNotificationCache; }
 
 namespace nx::vms::client::desktop::rules {
 
-class SoundPickerWidget: public PickerWidget
+class SoundPicker: public FieldPickerWidget<vms::rules::SoundField>
 {
     Q_OBJECT
 
 public:
-    SoundPickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    SoundPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
+
+    void updateUi() override;
 
 private:
+    ServerNotificationCache* m_serverNotificationCache{nullptr};
     QComboBox* m_comboBox{nullptr};
-    QPushButton* m_pushButton{nullptr};
+    QPushButton* m_manageButton{nullptr};
+
+    void onCurrentIndexChanged(int index);
+    void onManageButtonClicked();
 };
 
 } // namespace nx::vms::client::desktop::rules

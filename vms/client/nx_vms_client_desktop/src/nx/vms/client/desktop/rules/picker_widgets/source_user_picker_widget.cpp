@@ -2,7 +2,6 @@
 
 #include "source_user_picker_widget.h"
 
-#include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -10,63 +9,62 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/rules/events/soft_trigger_event.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/widgets/select_resources_button.h>
 
 #include "../utils/user_picker_helper.h"
 
 namespace nx::vms::client::desktop::rules {
 
-SourceUserPicker::SourceUserPicker(SystemContext* context, CommonParamsWidget* parent):
-    ResourcePickerWidgetBase<vms::rules::SourceUserField>(context, parent),
-    m_validationPolicy{new QnRequiredPermissionSubjectPolicy(
-        context,
-        Qn::SoftTriggerPermission,
-        tr("User Input"))}
+SourceUserPicker::SourceUserPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    ResourcePickerWidgetBase<vms::rules::SourceUserField>(context, parent)
 {
+}
+
+void SourceUserPicker::onDescriptorSet()
+{
+    ResourcePickerWidgetBase<vms::rules::SourceUserField>::onDescriptorSet();
+
+    if (nx::vms::rules::utils::type<nx::vms::rules::SoftTriggerEvent>()
+        == parentParamsWidget()->descriptor().id)
+    {
+        m_validationPolicy.reset(new QnRequiredPermissionSubjectPolicy{
+            systemContext(),
+            Qn::SoftTriggerPermission,
+            tr("Soft trigger")});
+    }
+    else
+    {
+        m_validationPolicy.reset(new QnDefaultSubjectValidationPolicy);
+    }
 }
 
 void SourceUserPicker::onSelectButtonClicked()
 {
-    auto selectedUsers = m_field->ids();
-
-    const auto roleValidator =
-        [this](const QnUuid& roleId) { return m_validationPolicy->roleValidity(roleId); };
-
-    const auto userValidator =
-        [this](const QnUserResourcePtr& user) { return m_validationPolicy->userValidity(user); };
+    auto field = theField();
+    auto selectedUsers = field->ids();
 
     ui::SubjectSelectionDialog dialog(this);
-    dialog.setAllUsers(m_field->acceptAll());
+    dialog.setValidationPolicy(m_validationPolicy.get());
+    dialog.setAllUsers(field->acceptAll());
     dialog.setCheckedSubjects(selectedUsers);
-    dialog.setRoleValidator(roleValidator);
-    dialog.setUserValidator(userValidator);
-
-    const auto updateAlert =
-        [this, &dialog]()
-        {
-            dialog.showAlert(m_validationPolicy->calculateAlert(
-                dialog.allUsers(), dialog.checkedSubjects()));
-        };
-
-    connect(&dialog, &ui::SubjectSelectionDialog::changed, this, updateAlert);
-    updateAlert();
 
     if (dialog.exec() == QDialog::Rejected)
         return;
 
-    m_field->setAcceptAll(dialog.allUsers());
-    m_field->setIds(dialog.totalCheckedUsers());
-
-    updateUi();
+    field->setAcceptAll(dialog.allUsers());
+    field->setIds(dialog.totalCheckedUsers());
 }
 
 void SourceUserPicker::updateUi()
 {
+    auto field = theField();
     UserPickerHelper helper{
         systemContext(),
-        m_field->acceptAll(),
-        m_field->ids(),
-        m_validationPolicy,
+        field->acceptAll(),
+        field->ids(),
+        m_validationPolicy.get(),
         /*isIntermediateStateValid*/ false};
 
     m_selectButton->setText(helper.text());

@@ -5,13 +5,19 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
+#include <ui/models/notification_sound_model.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "picker_widget_strings.h"
 
 namespace nx::vms::client::desktop::rules {
 
-SoundPickerWidget::SoundPickerWidget(SystemContext* context, CommonParamsWidget* parent):
-    PickerWidget(context, parent)
+SoundPicker::SoundPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    FieldPickerWidget<vms::rules::SoundField>(context, parent),
+    m_serverNotificationCache{context->instance<ServerNotificationCache>()}
 {
     auto contentLayout = new QHBoxLayout;
 
@@ -19,17 +25,52 @@ SoundPickerWidget::SoundPickerWidget(SystemContext* context, CommonParamsWidget*
     m_comboBox = new QComboBox;
     contentLayout->addWidget(m_comboBox);
 
-    auto buttonLayout = new QHBoxLayout;
-    m_pushButton = new QPushButton;
-    m_pushButton->setText(CommonPickerWidgetStrings::testButtonDisplayText());
-    buttonLayout->addWidget(m_pushButton);
+    m_manageButton = new QPushButton;
+    m_manageButton->setText(tr("Manage"));
 
-    auto horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    buttonLayout->addItem(horizontalSpacer);
+    contentLayout->addWidget(m_manageButton);
 
-    contentLayout->addLayout(buttonLayout);
+    contentLayout->setStretch(0, 1);
 
     m_contentWidget->setLayout(contentLayout);
+
+    auto soundModel = m_serverNotificationCache->persistentGuiModel();
+    m_comboBox->setModel(soundModel);
+
+    connect(
+        m_comboBox,
+        &QComboBox::currentIndexChanged,
+        this,
+        &SoundPicker::onCurrentIndexChanged);
+
+    connect(
+        m_manageButton,
+        &QPushButton::clicked,
+        this,
+        &SoundPicker::onManageButtonClicked);
+}
+
+void SoundPicker::updateUi()
+{
+    auto soundModel = m_serverNotificationCache->persistentGuiModel();
+    QSignalBlocker blocker{m_comboBox};
+    m_comboBox->setCurrentIndex(soundModel->rowByFilename(theField()->value()));
+}
+
+void SoundPicker::onCurrentIndexChanged(int index)
+{
+    auto soundModel = m_serverNotificationCache->persistentGuiModel();
+    theField()->setValue(soundModel->filenameByRow(index));
+}
+
+void SoundPicker::onManageButtonClicked()
+{
+    QnNotificationSoundManagerDialog dialog(this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    auto soundModel = m_serverNotificationCache->persistentGuiModel();
+    m_comboBox->setCurrentIndex(soundModel->rowByFilename(theField()->value()));
 }
 
 } // namespace nx::vms::client::desktop::rules

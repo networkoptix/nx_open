@@ -24,6 +24,7 @@ UserPickerHelper::UserPickerHelper(
     SystemContextAware{context},
     m_acceptAll{acceptAll}
 {
+    userRolesManager()->usersAndRoles(ids, m_users, m_roles);
     const auto validity = policy->validity(acceptAll, ids);
     m_isValid = validity == QValidator::Acceptable
         || (validity == QValidator::Intermediate && isIntermediateStateValid);

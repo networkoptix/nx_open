@@ -7,17 +7,16 @@
 namespace nx::vms::client::desktop::rules {
 
 /** Does nothing. Used for unknown type of fields. */
-class BlankPickerWidget: public PickerWidget
+class BlankPicker: public PickerWidget
 {
     Q_OBJECT
 
 public:
-    BlankPickerWidget(SystemContext* context, CommonParamsWidget* parent);
+    BlankPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
 
 private:
     virtual void onDescriptorSet() override;
-    virtual void onActionBuilderChanged() override;
-    virtual void onEventFilterChanged() override;
+    virtual void updateUi() override;
 };
 
 } // namespace nx::vms::client::desktop::rules

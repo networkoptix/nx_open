@@ -6,9 +6,11 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include "../model_view/rules_table_model.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -16,31 +18,28 @@ namespace nx::vms::client::desktop::rules {
  * Base class for the action and event parameters widgets. Represents a set of data pickers
  * according to the ItemDescriptor.
  */
-class ParamsWidget: public QWidget, public SystemContextAware
+class ParamsWidget: public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
 public:
-    explicit ParamsWidget(SystemContext* context, QWidget* parent = nullptr);
+    explicit ParamsWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
 
     /** Sets descriptor the widget customization is depends on. */
     void setDescriptor(const vms::rules::ItemDescriptor& value);
 
     const vms::rules::ItemDescriptor& descriptor() const;
 
-    void setActionBuilder(vms::rules::ActionBuilder* actionBuilder);
-    vms::rules::ActionBuilder* actionBuilder() const;
+    void setRule(const std::shared_ptr<SimplifiedRule>& rule);
 
-    void setEventFilter(vms::rules::EventFilter* eventFilter);
+    std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;
+    vms::rules::ActionBuilder* actionBuilder() const;
+    std::optional<vms::rules::ItemDescriptor> eventDescriptor() const;
     vms::rules::EventFilter* eventFilter() const;
 
     virtual void setReadOnly(bool value);
 
-signals:
-    void actionBuilderChanged();
-    void eventFilterChanged();
-    void eventFieldsChanged();
-    void actionFieldsChanged();
+    virtual void updateUi() = 0;
 
 protected:
     /**
@@ -55,15 +54,13 @@ protected:
      */
     std::optional<vms::rules::FieldDescriptor> fieldDescriptor(const QString& fieldName);
 
-
 private:
     void setupLineEditsPlaceholderColor();
 
-    vms::rules::ItemDescriptor itemDescriptor;
+    vms::rules::ItemDescriptor m_itemDescriptor;
+    std::shared_ptr<SimplifiedRule> m_rule;
     vms::rules::ActionBuilder* m_actionBuilder{nullptr};
     vms::rules::EventFilter* m_eventFilter{nullptr};
-    QHash<QString, vms::rules::Field*> m_eventFields;
-    QHash<QString, vms::rules::Field*> m_actionFields;
 };
 
 } // namespace nx::vms::client::desktop::rules

@@ -6,10 +6,11 @@
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_factory.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop::rules {
 
-CommonParamsWidget::CommonParamsWidget(SystemContext* context, QWidget* parent):
+CommonParamsWidget::CommonParamsWidget(QnWorkbenchContext* context, QWidget* parent):
     ParamsWidget(context, parent)
 {
 }
@@ -20,9 +21,11 @@ void CommonParamsWidget::onDescriptorSet()
     layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
     layout->setContentsMargins(0, 0, 0, 0);
 
+    m_pickers.clear();
     for (const auto& fieldDescriptor: descriptor().fields)
     {
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, systemContext(), this);
+        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, context(), this);
+        m_pickers.push_back(picker);
         layout->addWidget(picker);
     }
 
@@ -30,6 +33,12 @@ void CommonParamsWidget::onDescriptorSet()
     layout->addItem(verticalSpacer);
 
     setLayout(layout);
+}
+
+void CommonParamsWidget::updateUi()
+{
+    for (auto picker: m_pickers)
+        picker->updateUi();
 }
 
 } // namespace nx::vms::client::desktop::rules

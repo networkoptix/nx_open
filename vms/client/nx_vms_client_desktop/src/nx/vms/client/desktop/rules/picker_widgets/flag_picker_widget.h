@@ -14,10 +14,10 @@ namespace nx::vms::client::desktop::rules {
 
 /** Used for types that could be represented as a boolean value. */
 template<typename F>
-class FlagPickerWidget: public FieldPickerWidget<F>
+class FlagPicker: public FieldPickerWidget<F>
 {
 public:
-    FlagPickerWidget(SystemContext* context, CommonParamsWidget* parent):
+    FlagPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         FieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -31,7 +31,7 @@ public:
             m_checkBox,
             &QCheckBox::stateChanged,
             this,
-            &FlagPickerWidget<F>::onStateChanged);
+            &FlagPicker<F>::onStateChanged);
     }
 
 private:
@@ -41,32 +41,19 @@ private:
 
     virtual void onDescriptorSet() override
     {
+        m_label->setVisible(false);
         m_checkBox->setText(m_fieldDescriptor->displayName);
-    }
-
-    void onActionBuilderChanged() override
-    {
-        FieldPickerWidget<F>::onActionBuilderChanged();
-        if (std::is_base_of<vms::rules::ActionBuilderField, F>())
-            updateValue();
-    }
-
-    void onEventFilterChanged() override
-    {
-        FieldPickerWidget<F>::onEventFilterChanged();
-        if (std::is_base_of<vms::rules::EventFilterField, F>())
-            updateValue();
-    }
-
-    void updateValue()
-    {
-        QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(m_field->value());
     }
 
     void onStateChanged(int state)
     {
-        m_field->setValue(state == Qt::Checked);
+        theField()->setValue(state == Qt::Checked);
+    }
+
+    void updateUi() override
+    {
+        QSignalBlocker blocker{m_checkBox};
+        m_checkBox->setChecked(theField()->value());
     }
 };
 

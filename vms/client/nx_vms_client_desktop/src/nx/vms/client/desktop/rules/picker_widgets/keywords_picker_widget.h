@@ -34,12 +34,12 @@ protected:
     void updateUi() override
     {
         const QSignalBlocker blocker{m_lineEdit};
-        m_lineEdit->setText(m_field->string());
+        m_lineEdit->setText(theField()->string());
     }
 
     void onTextChanged(const QString& text) override
     {
-        m_field->setString(text);
+        theField()->setString(text);
     }
 };
 
