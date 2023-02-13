@@ -49,8 +49,11 @@ public:
     /** Various types of system contexts. Some of them require shortened initialization. */
     enum class Mode
     {
-        /** Generic System Context. */
-        default_,
+        /** Generic System Context for the Desktop or Mobile Client. */
+        client,
+
+        /** Generic System Context for the Server. */
+        server,
 
         /** System Context for the cross-system connection. */
         crossSystem,

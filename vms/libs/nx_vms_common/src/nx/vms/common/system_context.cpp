@@ -134,7 +134,7 @@ SystemContext::SystemContext(
 
     switch (mode)
     {
-        case Mode::default_:
+        case Mode::client:
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;

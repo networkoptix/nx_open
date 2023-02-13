@@ -90,7 +90,7 @@ SystemContext::SystemContext(
 
     switch (mode)
     {
-        case Mode::default_:
+        case Mode::client:
             d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
