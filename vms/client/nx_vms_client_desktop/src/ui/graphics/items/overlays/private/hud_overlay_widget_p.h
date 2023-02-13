@@ -13,7 +13,7 @@ class QGraphicsWidget;
 class QnViewportBoundWidget;
 class QnResourceTitleItem;
 class QnHudOverlayWidget;
-namespace nx::vms::client::desktop { class ResourceBottomItem; }
+namespace nx::vms::client::desktop { class PlaybackPositionItem; }
 
 class QnHudOverlayWidgetPrivate: public QObject
 {
@@ -29,7 +29,7 @@ public:
     QnViewportBoundWidget* const titleHolder;
     QnResourceTitleItem* const title;
     QnViewportBoundWidget* const bottomHolder;
-    nx::vms::client::desktop::ResourceBottomItem* const bottom;
+    nx::vms::client::desktop::PlaybackPositionItem* const playbackPositionItem;
     QnViewportBoundWidget* const content;
     QnHtmlTextItem* const details;
     QGraphicsWidget* const left;

@@ -70,7 +70,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
-#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
@@ -104,7 +104,6 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
-#include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -1615,14 +1614,11 @@ void QnMediaResourceWidget::updateIconButton()
         return;
     }
 
-    const auto iconButton = m_hudOverlay->bottom()->positionAndRecordingStatus();
     if (!d->camera || d->camera->hasFlags(Qn::virtual_camera))
         return;
 
     const auto icon = m_recordingStatusHelper->icon();
-    iconButton->setIcon(icon.pixmap(QSize(12,12)));
-    iconButton->setVisible(true);
-    iconButton->setToolTip(m_recordingStatusHelper->tooltip());
+    m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
 }
 
 void QnMediaResourceWidget::updateRendererEnabled()
@@ -2296,7 +2292,8 @@ QString QnMediaResourceWidget::calculatePositionText() const
         ? tr("LIVE")
         : extractTime(getDisplayTimeUsec()));
 
-    static const int kPositionTextPixelSize = 10;
+    static const int kPositionTextPixelSize = 12;
+
     return html::styledParagraph(
         timeString,
         kPositionTextPixelSize,

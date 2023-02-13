@@ -6,6 +6,7 @@
 #include <cmath> //< For std::fmod.
 
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimer>
 #include <QtCore/QtAlgorithms>
 #include <QtGui/QAction>
 #include <QtGui/QScreen>
@@ -95,6 +96,12 @@ using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionSelection;
 
 namespace {
+
+using namespace std::chrono;
+/**
+ * Show paused timeline notification in fullscreen mode after this inactivity period.
+ */
+static constexpr milliseconds kActivityTimeout = 60s;
 
 QnWorkbenchItem* getWorkbenchItem(QGraphicsItem* item)
 {
@@ -218,7 +225,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_inChangeLayout(false),
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(nullptr),
-    m_curtainAnimator(nullptr)
+    m_curtainAnimator(nullptr),
+    m_playbackPositionBlinkTimer(new QTimer(this))
 {
     m_widgetByRole.fill(nullptr);
 
@@ -330,6 +338,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     connect(AudioDispatcher::instance(), &AudioDispatcher::currentAudioSourceChanged,
         this, &QnWorkbenchDisplay::updateAudioPlayback);
+
+    m_playbackPositionBlinkTimer->start(kActivityTimeout);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
@@ -2541,4 +2551,9 @@ bool QnWorkbenchDisplay::canShowLayoutBackground() const
         return false;
 
     return true;
+}
+
+QTimer* QnWorkbenchDisplay::playbackPositionBlinkTimer() const
+{
+    return m_playbackPositionBlinkTimer;
 }

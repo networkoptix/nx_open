@@ -31,11 +31,6 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem* parent):
     updateToolTip();
 }
 
-void QnBlinkingImageButtonWidget::setParticleVisible(bool visible)
-{
-    m_particle->setVisible(visible);
-}
-
 void QnBlinkingImageButtonWidget::setNotificationCount(int count)
 {
     if (m_count == count)

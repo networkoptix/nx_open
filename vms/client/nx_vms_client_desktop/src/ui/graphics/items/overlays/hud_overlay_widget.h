@@ -6,28 +6,35 @@
 
 #include <qt_graphics_items/graphics_widget.h>
 
+#include <nx/vms/client/desktop/window_context_aware.h>
+
 class QnResourceTitleItem;
 class QnViewportBoundWidget;
 class QnHtmlTextItem;
 class QnImageButtonBar;
 class QnHudOverlayWidgetPrivate;
 
-namespace nx::vms::client::desktop { class ResourceBottomItem; }
+namespace nx::vms::client::desktop {
+class PlaybackPositionItem;
+class WindowContext;
+} // namespace nx::vms::client::desktop
 
-class QnHudOverlayWidget: public GraphicsWidget
+class QnHudOverlayWidget: public GraphicsWidget, nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     using base_type = GraphicsWidget;
 
 public:
-    QnHudOverlayWidget(QGraphicsItem* parent = nullptr);
+    QnHudOverlayWidget(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QGraphicsItem* parent = nullptr);
     virtual ~QnHudOverlayWidget();
 
     /** Resource title bar item. */
     QnResourceTitleItem* title() const;
 
     /** Resource bottom bar item. */
-    nx::vms::client::desktop::ResourceBottomItem* bottom() const;
+    nx::vms::client::desktop::PlaybackPositionItem* playbackPositionItem() const;
 
     /** Everything under title bar. */
     QnViewportBoundWidget* content() const;

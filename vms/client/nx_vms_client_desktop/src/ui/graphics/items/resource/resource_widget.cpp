@@ -27,7 +27,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/scene/resource_widget/overlays/resource_bottom_item.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -137,7 +137,7 @@ QnResourceWidget::QnResourceWidget(
     base_type(parent),
     SystemContextAware(systemContext),
     WindowContextAware(windowContext),
-    m_hudOverlay(new QnHudOverlayWidget(this)),
+    m_hudOverlay(new QnHudOverlayWidget(windowContext, this)),
     m_statusOverlay(new QnStatusOverlayWidget(this)),
     d(new Private(item)),
     m_item(item),
@@ -288,7 +288,7 @@ void QnResourceWidget::setupHud()
     m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate*/ false);
-    setOverlayWidgetVisible(m_hudOverlay->bottom(), true, /*animate*/ false);
+    setOverlayWidgetVisible(m_hudOverlay->playbackPositionItem(), true, /*animate*/ false);
 }
 
 void QnResourceWidget::setupSelectionOverlay()
@@ -654,12 +654,13 @@ QString QnResourceWidget::calculatePositionText() const
 
 void QnResourceWidget::updatePositionText()
 {
-    if (!isOverlayWidgetVisible(m_hudOverlay->bottom()))
+    if (!isOverlayWidgetVisible(m_hudOverlay->playbackPositionItem()))
         return;
 
     const QString text = calculatePositionText();
-    m_hudOverlay->bottom()->positionAndRecordingStatus()->setHtml(text);
-    m_hudOverlay->bottom()->setVisible(!text.isEmpty());
+    m_hudOverlay->playbackPositionItem()->setPositionText(text);
+    m_hudOverlay->playbackPositionItem()->setVisible(!text.isEmpty());
+    updateButtonsVisibility();
 }
 
 QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
@@ -973,7 +974,7 @@ int QnResourceWidget::visibleButtons() const
 {
     return (titleBar()->rightButtonsBar()->visibleButtons()
         | titleBar()->leftButtonsBar()->visibleButtons()
-        | m_hudOverlay->bottom()->visibleButtons());
+        | m_hudOverlay->playbackPositionItem()->visibleButtons());
 }
 
 int QnResourceWidget::calculateButtonsVisibility() const
@@ -1012,7 +1013,7 @@ void QnResourceWidget::updateButtonsVisibility()
 
     titleBar()->rightButtonsBar()->setVisibleButtons(visibleButtons);
     titleBar()->leftButtonsBar()->setVisibleButtons(visibleButtons);
-    m_hudOverlay->bottom()->setVisibleButtons(visibleButtons);
+    m_hudOverlay->playbackPositionItem()->setVisibleButtons(visibleButtons);
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &) const
@@ -1191,8 +1192,8 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
     const bool updatePositionTextRequired =
-        showPosition && !isOverlayWidgetVisible(m_hudOverlay->bottom());
-    setOverlayWidgetVisible(m_hudOverlay->bottom(), showPosition, animate);
+        showPosition && !isOverlayWidgetVisible(m_hudOverlay->playbackPositionItem());
+    setOverlayWidgetVisible(m_hudOverlay->playbackPositionItem(), showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
 
