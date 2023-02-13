@@ -85,6 +85,7 @@ private:
     QAction* initInfoAction(const Parameters& parameters, QObject* parent);
     QAction* initObjectsAction(const Parameters& parameters, QObject* parent);
     QAction* initRoiAction(const Parameters& parameters, QObject* parent);
+    QAction* initHotspotsAction(const Parameters& parameters, QObject* parent);
 };
 
 } // namespace action

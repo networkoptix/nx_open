@@ -920,6 +920,15 @@ void QnMediaResourceWidget::createButtons()
         Qn::ZoomWindowButton, "media_widget_zoom",
         &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
 
+    createActionAndButton(
+        "item/hotspots.svg",
+        /* checked */ true,
+        QKeySequence::fromString("H"),
+        tr("Hotspots"),
+        Qn::Empty_Help,
+        Qn::HotspotsButton, "media_widget_hotspots",
+        &QnMediaResourceWidget::atHotspotsButtonToggled);
+
     m_toggleImageEnhancementAction->setCheckable(true);
     m_toggleImageEnhancementAction->setChecked(item()->imageEnhancement().enabled);
     m_toggleImageEnhancementAction->setShortcut(QStringLiteral("J"));
@@ -2100,7 +2109,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (ptzChanged && options().testFlag(ControlPtz))
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
-        Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+            Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
     }
 
     if (motionSearchChanged || ptzChanged)
@@ -2340,6 +2349,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         if (ResourceAccessManager::hasPermissions(d->resource, requiredPermission))
             result |= Qn::ScreenshotButton;
     }
+
+    if (hotspotsAvailable())
+        result |= Qn::HotspotsButton;
 
     if (isZoomWindow())
     {
@@ -2605,6 +2617,10 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     {
         updateAspectRatio();
     }
+    else if (key == ResourcePropertyKey::kCameraHotspotsEnabled)
+    {
+        updateButtonsVisibility();
+    }
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2662,6 +2678,11 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
     if (qnRuntime->isVideoWallMode())
         updateHud(false);
+}
+
+void QnMediaResourceWidget::atHotspotsButtonToggled(bool checked)
+{
+    m_cameraHotspotsOverlayWidget->setVisible(checked);
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
@@ -3097,6 +3118,28 @@ void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, b
 bool QnMediaResourceWidget::isAnalyticsModeEnabled() const
 {
     return d->isAnalyticsEnabledInStream();
+}
+
+bool QnMediaResourceWidget::hotspotsAvailable() const
+{
+    return ini().enableCameraHotspotsFeature
+        && d->camera
+        && d->camera->cameraHotspotsEnabled()
+        && !tourIsRunning(windowContext()->workbenchContext());
+}
+
+bool QnMediaResourceWidget::hotspotsVisible() const
+{
+    return hotspotsAvailable()
+        && titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->isChecked();
+}
+
+void QnMediaResourceWidget::setHotspotsVisible(bool visible)
+{
+    if (!NX_ASSERT(hotspotsAvailable()))
+        return;
+
+    titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->setChecked(visible);
 }
 
 void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
