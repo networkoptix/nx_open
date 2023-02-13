@@ -94,6 +94,12 @@ nx::vms::api::GlobalPermissions AccessRightsResolver::globalPermissions(
     return d->inheritedResourceAccessResolver->globalPermissions(subjectId);
 }
 
+nx::vms::api::AccessRights AccessRightsResolver::availableAccessRights(
+    const QnUuid& subjectId) const
+{
+    return d->inheritedResourceAccessResolver->availableAccessRights(subjectId);
+}
+
 bool AccessRightsResolver::hasAdminAccessRights(const QnUuid& subjectId) const
 {
     return d->inheritedResourceAccessResolver->hasAdminAccessRights(subjectId);

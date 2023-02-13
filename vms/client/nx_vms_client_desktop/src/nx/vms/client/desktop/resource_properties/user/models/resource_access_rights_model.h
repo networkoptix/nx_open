@@ -31,14 +31,16 @@ public:
         own,
         layout,
         videowall,
-        parent,
+        parentUserGroup,
         unknown
     };
     Q_ENUM(ProvidedVia);
 
     ProvidedVia providedVia{};
-    QVector<QnUuid> providerGroups;
+    QVector<QnUuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
+    int checkedChildCount = 0;
+    int totalChildCount = 0;
 
     bool operator==(const ResourceAccessInfo& other) const;
     bool operator!=(const ResourceAccessInfo& other) const;
@@ -47,7 +49,7 @@ public:
 /**
  * An utility class to obtain information about resource access details in a QML subject editing UI.
  */
-class ResourceAccessInfoProvider: public QAbstractListModel
+class ResourceAccessRightsModel: public QAbstractListModel
 {
     Q_OBJECT
 
@@ -66,20 +68,24 @@ class ResourceAccessInfoProvider: public QAbstractListModel
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::NodeType nodeType READ nodeType
         WRITE setNodeType NOTIFY nodeTypeChanged)
 
-    Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed NOTIFY collapsedChanged)
+    /** Id of a group of interest (all cameras, all web pages etc.) - deduced from node type. */
+    Q_PROPERTY(QnUuid groupId READ groupId NOTIFY nodeTypeChanged)
+    Q_PROPERTY(bool isResourceGroup READ isResourceGroup NOTIFY nodeTypeChanged)
 
     using base_type = QAbstractListModel;
 
 public:
     enum Roles
     {
-        providedVia = Qt::UserRole + 1,
-        isOwn,
+        ProviderRole = Qt::UserRole + 1,
+        CheckedChildCountRole,
+        AccessRightRole,
+        EditableRole
     };
 
 public:
-    explicit ResourceAccessInfoProvider(QObject* parent = nullptr);
-    virtual ~ResourceAccessInfoProvider() override;
+    explicit ResourceAccessRightsModel(QObject* parent = nullptr);
+    virtual ~ResourceAccessRightsModel() override;
 
     AccessSubjectEditingContext* context() const;
     void setContext(AccessSubjectEditingContext* value);
@@ -90,17 +96,15 @@ public:
     QnResource* resource() const;
     void setResource(QnResource* value);
 
+    QnUuid groupId() const;
+    bool isResourceGroup() const { return !groupId().isNull(); }
+
     ResourceTree::NodeType nodeType() const;
     void setNodeType(ResourceTree::NodeType value);
-
-    bool collapsed() const;
-    void setCollapsed(bool value);
 
     QVector<ResourceAccessInfo> info() const;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-
-    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
@@ -109,16 +113,9 @@ public:
     /** @returns ProvidedVia::layout, ProvidedVia::videowall or ProvidedVia::unknown. */
     static Q_INVOKABLE ResourceAccessInfo::ProvidedVia providerType(QnResource* provider);
 
-    Q_INVOKABLE void toggleAll();
+    Q_INVOKABLE void toggle(int index);
 
     static void registerQmlTypes();
-
-private:
-    QString accessDetailsText(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight) const;
-
-    QString accessDetailsText(const ResourceAccessInfo& accessInfo) const;
 
 signals:
     void contextChanged();
@@ -126,7 +123,6 @@ signals:
     void resourceChanged();
     void nodeTypeChanged();
     void collapsedChanged();
-    void infoChanged();
 
 private:
     struct Private;

@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_details.h>
 #include <core/resource_access/resource_access_map.h>
 #include <nx/utils/impl_ptr.h>
@@ -17,6 +18,12 @@ class AccessSubjectEditingContext: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
+
+    Q_PROPERTY(nx::vms::common::ResourceFilter accessibleResourcesFilter
+        READ accessibleResourcesFilter NOTIFY resourceAccessChanged)
+
+    Q_PROPERTY(nx::vms::api::AccessRights availableAccessRights
+        READ availableAccessRights NOTIFY resourceAccessChanged)
 
 public:
     explicit AccessSubjectEditingContext(
@@ -32,11 +39,17 @@ public:
 
     nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
 
+    bool hasOwnAccessRight(
+        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRight accessRight) const;
+
     /** Overrides current subject access rights. */
     void setOwnResourceAccessMap(const nx::core::access::ResourceAccessMap& resourceAccessMap);
 
     /** Reverts current subject access rights editing. */
     void resetOwnResourceAccessMap();
+
+    /** Returns full resolved access rights for a specified resource. */
+    Q_INVOKABLE nx::vms::api::AccessRights accessRights(const QnResourcePtr& resource) const;
 
     /**
      * Returns all ways in which the specified subject gains specified access right to
@@ -45,6 +58,9 @@ public:
     nx::core::access::ResourceAccessDetails accessDetails(
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight) const;
+
+    nx::vms::common::ResourceFilter accessibleResourcesFilter() const;
+    nx::vms::api::AccessRights availableAccessRights() const;
 
     /** Edit current subject relations with other subjects. */
     void setRelations(const QSet<QnUuid>& parents, const QSet<QnUuid>& members);
@@ -61,24 +77,21 @@ public:
     /** Reverts any changes. */
     void revert();
 
-    Q_INVOKABLE bool hasOwnAccessRight(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight) const;
-
-    Q_INVOKABLE void setOwnAccessRight(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight,
-        bool value = true);
-
     nx::vms::api::GlobalPermissions globalPermissions() const;
 
     QSet<QnUuid> globalPermissionSource(nx::vms::api::GlobalPermission perm) const;
+
+    static QnUuid specialResourceGroupFor(const QnResourcePtr& resource);
+
+    static bool isRelevant(
+        nx::vms::api::SpecialResourceGroup group, nx::vms::api::AccessRight accessRight);
 
 signals:
     void subjectChanged();
     void hierarchyChanged();
     void currentSubjectRemoved();
     void resourceAccessChanged();
+    void resourceGroupsChanged(const QSet<QnUuid>& resourceGroupIds);
 
 private:
     class Private;

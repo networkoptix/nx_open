@@ -64,6 +64,13 @@ class NX_VMS_COMMON_API QnResource: public QObject, public QnFromThisToShared<Qn
     using ResourceStatus = nx::vms::api::ResourceStatus;
     Q_OBJECT
 
+    Q_FLAGS(Qn::ResourceFlags)
+    Q_PROPERTY(QnUuid id READ getId CONSTANT)
+    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
+    Q_PROPERTY(nx::vms::api::ResourceStatus status READ getStatus WRITE setStatus
+        NOTIFY statusChanged)
+
 public:
     //---------------------------------------------------------------------------------------------
     // Constructing, copying and updating.

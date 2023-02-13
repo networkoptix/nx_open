@@ -4,14 +4,19 @@
 
 #include <memory>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/system_context.h>
 
 #include "proxy_access_rights_manager.h"
@@ -109,6 +114,53 @@ public:
 
         connect(currentHierarchy.get(), &SubjectHierarchy::reset,
             q, &AccessSubjectEditingContext::hierarchyChanged);
+
+        connect(systemContext->resourcePool(), &QnResourcePool::resourcesAdded,
+            this, &Private::handleResourcesAddedOrRemoved);
+
+        connect(systemContext->resourcePool(), &QnResourcePool::resourcesRemoved,
+            this, &Private::handleResourcesAddedOrRemoved);
+    }
+
+    void handleResourcesAddedOrRemoved(const QnResourceList& resources)
+    {
+        QSet<QnUuid> affectedGroupIds;
+
+        for (const auto& resource: resources)
+        {
+            const auto id = specialResourceGroupFor(resource);
+            if (!id.isNull())
+                affectedGroupIds.insert(id);
+        }
+
+        if (!affectedGroupIds.empty())
+            emit q->resourceGroupsChanged(affectedGroupIds);
+    };
+
+    QnResourceList getGroupResources(const QnUuid& groupId) const
+    {
+        const auto group = specialResourceGroup(groupId);
+        if (!NX_ASSERT(group))
+            return {};
+
+        const auto resourcePool = systemContext->resourcePool();
+        switch (*group)
+        {
+            case SpecialResourceGroup::allDevices:
+                return resourcePool->getAllCameras(QnUuid{}, true);
+
+            case SpecialResourceGroup::allServers:
+                return resourcePool->servers();
+
+            case SpecialResourceGroup::allWebPages:
+                return resourcePool->getResources<QnWebPageResource>();
+
+            case SpecialResourceGroup::allVideowalls:
+                return resourcePool->getResources<QnVideoWallResource>();
+        }
+
+        NX_ASSERT(false, "Unhandled special resource group type");
+        return {};
     }
 };
 
@@ -152,6 +204,7 @@ void AccessSubjectEditingContext::setCurrentSubjectId(const QnUuid& value)
     resetRelations();
 
     emit subjectChanged();
+    emit resourceAccessChanged();
 }
 
 ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const
@@ -162,36 +215,18 @@ ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const
     return {};
 }
 
+bool AccessSubjectEditingContext::hasOwnAccessRight(
+    const QnUuid& resourceOrGroupId,
+    nx::vms::api::AccessRight accessRight) const
+{
+    return ownResourceAccessMap().value(resourceOrGroupId, {}).testFlag(accessRight);
+}
+
 void AccessSubjectEditingContext::setOwnResourceAccessMap(
     const ResourceAccessMap& resourceAccessMap)
 {
     NX_DEBUG(this, "Setting access map to %1", resourceAccessMap);
     d->accessRightsManager->setOwnResourceAccessMap(resourceAccessMap);
-}
-
-bool AccessSubjectEditingContext::hasOwnAccessRight(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight) const
-{
-    return ownResourceAccessMap().value(resourceId, {}).testFlag(accessRight);
-}
-
-void AccessSubjectEditingContext::setOwnAccessRight(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight,
-        bool value)
-{
-    auto accessMap = ownResourceAccessMap();
-    auto accessRights = accessMap.value(resourceId, {});
-
-    accessRights.setFlag(accessRight, value);
-
-    if (accessRights == 0)
-        accessMap.remove(resourceId);
-    else
-        accessMap[resourceId] = accessRights;
-
-    setOwnResourceAccessMap(accessMap);
 }
 
 nx::vms::api::GlobalPermissions AccessSubjectEditingContext::globalPermissions() const
@@ -221,13 +256,39 @@ void AccessSubjectEditingContext::resetOwnResourceAccessMap()
     d->accessRightsManager->resetOwnResourceAccessMap();
 }
 
+AccessRights AccessSubjectEditingContext::accessRights(const QnResourcePtr& resource) const
+{
+    return d->currentSubjectId.isNull()
+        ? AccessRights{}
+        : d->accessRightsResolver->accessRights(d->currentSubjectId, resource->toSharedPointer());
+}
+
 ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
     const QnResourcePtr& resource, AccessRight accessRight) const
 {
-    if (NX_ASSERT(!d->currentSubjectId.isNull()))
-        return d->accessRightsResolver->accessDetails(d->currentSubjectId, resource, accessRight);
+    return d->currentSubjectId.isNull()
+        ? ResourceAccessDetails{}
+        : d->accessRightsResolver->accessDetails(d->currentSubjectId, resource, accessRight);
+}
 
-    return {};
+nx::vms::common::ResourceFilter AccessSubjectEditingContext::accessibleResourcesFilter() const
+{
+    const auto resourceFilter =
+        [this, guard = QPointer(this)](const QnResourcePtr& resource) -> bool
+        {
+            return guard
+                && resource
+                && accessRights(resource) != 0;
+        };
+
+    return resourceFilter;
+}
+
+AccessRights AccessSubjectEditingContext::availableAccessRights() const
+{
+    return d->currentSubjectId.isNull()
+        ? AccessRights{}
+        : d->accessRightsResolver->availableAccessRights(d->currentSubjectId);
 }
 
 void AccessSubjectEditingContext::setRelations(
@@ -272,6 +333,40 @@ void AccessSubjectEditingContext::revert()
 {
     resetOwnResourceAccessMap();
     resetRelations();
+}
+
+QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr& resource)
+{
+    if (resource.objectCast<QnVirtualCameraResource>())
+        return kAllDevicesGroupId;
+
+    if (resource.objectCast<QnVideoWallResource>())
+        return kAllVideowallsGroupId;
+
+    if (resource.objectCast<QnWebPageResource>())
+        return kAllWebPagesGroupId;
+
+    if (resource.objectCast<QnMediaServerResource>())
+        return kAllServersGroupId;
+
+    return {};
+}
+
+bool AccessSubjectEditingContext::isRelevant(nx::vms::api::SpecialResourceGroup group,
+    AccessRight accessRight)
+{
+    if (accessRight == AccessRight::view)
+        return true;
+
+    switch (group)
+    {
+        case SpecialResourceGroup::allDevices:
+        case SpecialResourceGroup::allVideowalls:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 } // namespace nx::vms::client::desktop

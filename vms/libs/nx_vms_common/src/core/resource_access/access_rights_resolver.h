@@ -64,6 +64,9 @@ public:
     /** Returns subject global permissions. */
     nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const;
 
+    /** A combination of all access rights of the specified subject. */
+    nx::vms::api::AccessRights availableAccessRights(const QnUuid& subjectId) const;
+
     /** Returns whether the subject has admin access rights. */
     bool hasAdminAccessRights(const QnUuid& subjectId) const;
 
