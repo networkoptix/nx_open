@@ -400,14 +400,16 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 CamLicenseUsageHelper::CamLicenseUsageHelper(common::SystemContext* context, QObject* parent):
     base_type(context, parent)
 {
-    connect(context->deviceLicenseUsageWatcher(),
-        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
-        this,
-        [this]()
-        {
-            invalidate();
-            emit licenseUsageChanged();
-        });
+    // Watcher exists only on the client side.
+    if (auto watcher = context->deviceLicenseUsageWatcher())
+    {
+        connect(watcher, &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged, this,
+            [this]()
+            {
+                invalidate();
+                emit licenseUsageChanged();
+            });
+    }
 }
 
 CamLicenseUsageHelper::CamLicenseUsageHelper(
@@ -619,10 +621,12 @@ VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
     :
     base_type(context, parent)
 {
-    connect(context->videoWallLicenseUsageWatcher(),
-        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
-        this,
-        &UsageHelper::invalidate);
+    // Watcher exists only on the client side.
+    if (auto watcher = context->videoWallLicenseUsageWatcher())
+    {
+        connect(watcher, &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged, this,
+            &UsageHelper::invalidate);
+    }
 }
 
 QList<Qn::LicenseType> VideoWallLicenseUsageHelper::calculateLicenseTypes() const

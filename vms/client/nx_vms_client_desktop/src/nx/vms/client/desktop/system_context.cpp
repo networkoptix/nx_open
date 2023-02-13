@@ -85,7 +85,7 @@ SystemContext::SystemContext(
 
     switch (mode)
     {
-        case Mode::default_:
+        case Mode::client:
             d->initLocalRuntimeInfo();
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
