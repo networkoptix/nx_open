@@ -296,14 +296,14 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
         });
 
     connect(systemContext()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
-        this, &LayoutsHandler::at_openLayoutAction_triggered);
+        this, &LayoutsHandler::at_businessActionReceived);
 }
 
 LayoutsHandler::~LayoutsHandler()
 {
 }
 
-void LayoutsHandler::at_openLayoutAction_triggered(
+void LayoutsHandler::at_businessActionReceived(
     const vms::event::AbstractActionPtr& businessAction)
 {
     if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)

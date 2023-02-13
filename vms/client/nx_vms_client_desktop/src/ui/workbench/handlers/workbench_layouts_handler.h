@@ -40,7 +40,7 @@ private:
     void at_openIntercomLayoutAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
-    void at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction);
+    void at_businessActionReceived(const vms::event::AbstractActionPtr& businessAction);
     void at_forgetLayoutPasswordAction_triggered();
     void at_openInNewTabAction_triggered();
 
