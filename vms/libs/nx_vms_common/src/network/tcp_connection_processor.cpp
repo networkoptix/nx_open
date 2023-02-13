@@ -37,7 +37,7 @@
 #ifdef __arm__
     const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*16;
 #else
-    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*512;
+    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*1024;
 #endif
 
 namespace {
