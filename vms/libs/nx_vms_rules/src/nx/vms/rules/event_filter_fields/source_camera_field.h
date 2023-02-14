@@ -9,7 +9,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API SourceCameraField: public ResourceFilterEventField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.sourceCamera")
+    Q_CLASSINFO("metatype", "nx.events.fields.device")
 };
 
 } // namespace nx::vms::rules

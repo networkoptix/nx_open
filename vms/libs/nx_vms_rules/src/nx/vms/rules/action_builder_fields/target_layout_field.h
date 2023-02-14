@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API TargetLayoutField: public SimpleTypeActionField<QnUuidSet, TargetLayoutField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.targetLayout")
+    Q_CLASSINFO("metatype", "nx.actions.fields.layouts")
 
     Q_PROPERTY(QnUuidSet value READ value WRITE setValue NOTIFY valueChanged)
 

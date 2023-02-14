@@ -9,7 +9,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API SourceServerField: public ResourceFilterEventField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.sourceServer")
+    Q_CLASSINFO("metatype", "nx.events.fields.server")
 };
 
 } // namespace nx::vms::rules
