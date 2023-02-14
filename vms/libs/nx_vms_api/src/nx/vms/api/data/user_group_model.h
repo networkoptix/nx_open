@@ -72,5 +72,6 @@ struct NX_VMS_API UserGroupModel
     (isPredefined) \
     (externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(UserGroupModel, UserGroupModel_Fields)
 
 } // namespace nx::vms::api
