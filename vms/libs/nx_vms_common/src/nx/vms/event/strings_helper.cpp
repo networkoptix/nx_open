@@ -601,8 +601,9 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded, true);
             const auto camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
 
-            const auto deviceType =
-                QnDeviceDependentStrings::calculateDeviceType(resourcePool(), {camera});
+            const auto deviceType = camera
+                ? QnDeviceDependentStrings::calculateDeviceType(resourcePool(), {camera})
+                : QnCameraDeviceType::Mixed;
 
             if (deviceType == QnCameraDeviceType::Camera)
             {
