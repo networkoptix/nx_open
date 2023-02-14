@@ -81,6 +81,13 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
+    /**
+     * Syntax sugar. Same as 'executeSelect'.
+     */
+    void executeUpdateWithoutTran(
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
+
     virtual QueryQueueStats stats() const = 0;
 
     /**

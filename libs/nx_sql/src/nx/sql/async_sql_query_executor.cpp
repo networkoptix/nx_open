@@ -23,6 +23,13 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(const std::string& sqlStateme
         });
 }
 
+void AbstractAsyncSqlQueryExecutor::executeUpdateWithoutTran(
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+{
+    executeSelect(std::move(dbSelectFunc), std::move(completionHandler));
+}
+
 //-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;

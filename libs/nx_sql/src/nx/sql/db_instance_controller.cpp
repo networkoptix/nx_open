@@ -88,7 +88,7 @@ bool InstanceController::configureDb()
     nx::utils::promise<DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
-    m_queryExecutor->executeUpdate(
+    m_queryExecutor->executeUpdateWithoutTran(
         std::bind(&InstanceController::configureSqliteInstance, this, _1),
         [&](DBResult dbResult)
         {
