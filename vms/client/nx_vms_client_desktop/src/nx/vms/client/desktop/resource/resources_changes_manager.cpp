@@ -757,7 +757,7 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         api->putRest(tokenHelper,
             QString("/rest/v3/users/%1").arg(user->getId().toString()),
             network::rest::Params{},
-            QJson::serialized(body),
+            nx::reflect::json::serialize(body).c_str(),
             replyProcessor,
             thread());
     }
@@ -855,7 +855,7 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
             api->putRest(tokenHelper,
                 QString("/rest/v3/users/%1").arg(user->getId().toString()),
                 network::rest::Params{},
-                QJson::serialized(body),
+                nx::reflect::json::serialize(body).c_str(),
                 replyProcessor,
                 thread());
         }
@@ -990,9 +990,9 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
                     && user->userType() != nx::vms::api::UserType::cloud;
                 body.userGroupIds = user->userRoleIds();
             }
+            body.resourceAccessRights =
+                {{accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd()}};
 
-            body.resourceAccessRights->insert(
-                accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd());
             const auto tokenHelper = helper
                 ? helper
                 : systemContext->restApiHelper()->getSessionTokenHelper();
@@ -1000,7 +1000,7 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
             api->patchRest(tokenHelper,
                 QString("/rest/v3/users/%1").arg(body.id.toString()),
                 network::rest::Params{},
-                QJson::serialized(body),
+                nx::reflect::json::serialize(body).c_str(),
                 handler,
                 thread());
         }
@@ -1014,8 +1014,9 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
             body.description = group.description;
             body.parentGroupIds = group.parentRoleIds;
             body.permissions = group.permissions;
-            body.resourceAccessRights->insert(
-                accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd());
+            body.resourceAccessRights =
+                {{accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd()}};
+
             const auto tokenHelper = helper
                 ? helper
                 : systemContext->restApiHelper()->getSessionTokenHelper();
@@ -1023,7 +1024,7 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
             api->patchRest(tokenHelper,
                 QString("/rest/v3/userGroups/%1").arg(body.id.toString()),
                 network::rest::Params{},
-                QJson::serialized(body),
+                nx::reflect::json::serialize(body).c_str(),
                 handler,
                 thread());
         }
@@ -1145,12 +1146,16 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
             ? helper
             : systemContext->restApiHelper()->getSessionTokenHelper();
 
+        body.type = role.isLdap
+            ? nx::vms::api::UserType::ldap
+            : nx::vms::api::UserType::local;
+
         if (isNewGroup)
         {
             api->postRest(tokenHelper,
                 QString("/rest/v3/userGroups"),
                 network::rest::Params{},
-                QJson::serialized(body),
+                nx::reflect::json::serialize(body).c_str(),
                 handler,
                 thread());
         }
@@ -1159,7 +1164,7 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
             api->patchRest(tokenHelper,
                 QString("/rest/v3/userGroups/%1").arg(body.id.toString()),
                 network::rest::Params{},
-                QJson::serialized(body),
+                nx::reflect::json::serialize(body).c_str(),
                 handler,
                 thread());
         }

@@ -88,6 +88,7 @@ struct NX_VMS_API UserModelBase
     (cryptSha512Hash) \
     (realm)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(UserModelBase, UserModelBase_Fields)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -154,6 +155,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
 #define UserModelV3_Fields UserModelBase_Fields(userGroupIds)(externalId)(resourceAccessRights)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)
 
 using UserModel = UserModelV3;
 
