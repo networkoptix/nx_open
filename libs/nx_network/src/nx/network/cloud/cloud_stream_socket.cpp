@@ -101,10 +101,14 @@ bool CloudStreamSocket::isClosed() const
 
 bool CloudStreamSocket::shutdown()
 {
-    m_isTerminated = true;
+    if (m_isTerminated.exchange(true))
+        return true;
 
     if (auto promisePtr = m_connectPromisePtr.exchange(nullptr))
         promisePtr->set_value(std::make_pair(SystemError::interrupted, 0));
+
+    if (!m_isStopped.exchange(true))
+        m_aioThreadBinder.pleaseStop([this]() { stopWhileInAioThread(); });
 
     if (m_socketDelegate)
         return m_socketDelegate->shutdown();
