@@ -79,9 +79,11 @@ QString NetworkIssueEvent::reason(common::SystemContext* context) const
         }
         case EventReason::networkConnectionClosed:
         {
-            const auto deviceType = QnDeviceDependentStrings::calculateDeviceType(
-                context->resourcePool(),
-                {context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId())});
+            const auto device = context->resourcePool()
+                ->getResourceById<QnVirtualCameraResource>(cameraId());
+            const auto deviceType = device
+                ? QnDeviceDependentStrings::calculateDeviceType(context->resourcePool(), {device})
+                : QnCameraDeviceType::Mixed;
 
             if (deviceType == QnCameraDeviceType::Camera)
             {
