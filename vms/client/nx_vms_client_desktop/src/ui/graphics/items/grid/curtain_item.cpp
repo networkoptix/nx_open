@@ -8,11 +8,10 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-
-#include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <opengl_renderer.h>
+#include <ui/workaround/gl_native_painting.h>
 
 using namespace nx::vms::client::desktop;
 

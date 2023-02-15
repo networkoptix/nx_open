@@ -4,26 +4,26 @@
 
 #include <cmath>
 
-#include "figure.h"
-#include "polyline.h"
-#include "open_shape_figure.h"
-
 #include <QtCore/qmath.h>
+#include <QtGui/QOpenGLContext>
 #include <QtGui/QPainter>
 #include <QtOpenGL/QOpenGLBuffer>
-#include <QtGui/QOpenGLContext>
 #include <QtOpenGL/QOpenGLVertexArrayObject>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
-#include <opengl_renderer.h>
-#include <ui/graphics/shaders/base_shader_program.h>
-#include <ui/graphics/shaders/color_shader_program.h>
-#include <ui/graphics/shaders/color_line_shader_program.h>
-#include <ui/workaround/gl_native_painting.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/decorations_helper.h>
+#include <ui/graphics/shaders/base_shader_program.h>
+#include <ui/graphics/shaders/color_line_shader_program.h>
+#include <ui/graphics/shaders/color_shader_program.h>
+#include <ui/workaround/gl_native_painting.h>
+
+#include "figure.h"
+#include "open_shape_figure.h"
+#include "polyline.h"
 
 namespace {
 

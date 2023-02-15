@@ -5,19 +5,14 @@
 #include <QtCore/QTimer>
 #include <QtGui/QScreen>
 
-#include <camera/resource_display.h>
 #include <camera/cam_display.h>
-
+#include <camera/resource_display.h>
 #include <core/resource/media_resource.h>
-
-#include <ui/graphics/items/resource/resource_widget_renderer.h>
-
 #include <nx/streaming/abstract_archive_stream_reader.h>
-
 #include <nx/vms/client/core/utils/geometry.h>
-
-#include "ui/graphics/opengl/gl_shortcuts.h"
-#include "opengl_renderer.h"
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
 
 using nx::vms::client::core::Geometry;
 

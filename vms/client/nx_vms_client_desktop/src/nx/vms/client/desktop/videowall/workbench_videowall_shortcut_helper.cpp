@@ -5,7 +5,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 
-#include <app_icons.h>
 #include <client/client_installations_manager.h>
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
@@ -13,6 +12,7 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/vms/client/desktop/app_icons.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <platform/platform_abstraction.h>
