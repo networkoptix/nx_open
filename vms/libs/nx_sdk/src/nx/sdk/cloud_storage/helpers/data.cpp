@@ -647,7 +647,12 @@ Rect::Rect(double x, double y, double w, double h):
 
 bool Rect::operator==(const Rect& other) const
 {
-    return other.h == h && other.w == w && other.x == x && other.y == y;
+    auto comparator = [](double l, double r)
+    {
+        return abs(l - r) < 1.0e-06;
+    };
+    return comparator(other.h, h) && comparator(other.w, w) && comparator(other.x, x)
+        && comparator(other.y, y);
 }
 
 bool Rect::isInside(double x, double y) const
