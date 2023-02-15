@@ -1,38 +1,34 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "image_button_widget.h"
-#include "image_button_widget_p.h"
 
-#include <cassert>
-
-#include <QtGui/QPainter>
-#include <QtGui/QIcon>
 #include <QtGui/QAction>
-#include <QtWidgets/QStyle>
+#include <QtGui/QIcon>
+#include <QtGui/QPainter>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
-#include <QtOpenGLWidgets/QOpenGLWidget>
-
-#include <ui/workaround/gl_native_painting.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
-#include <ui/animation/variant_animator.h>
-#include <nx/vms/client/desktop/style/icon.h>
-
-#include <ui/graphics/shaders/texture_transition_shader_program.h>
-
-#include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_buffer_stream.h>
-#include <nx/vms/client/desktop/common/utils/accessor.h>
-#include <ui/common/palette.h>
+#include <QtWidgets/QStyle>
 
 #include <nx/vms/client/core/utils/geometry.h>
-#include <utils/common/scoped_painter_rollback.h>
+#include <nx/vms/client/desktop/common/utils/accessor.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
+#include <nx/vms/client/desktop/style/icon.h>
+#include <ui/animation/variant_animator.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/shaders/texture_transition_shader_program.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/event_processors.h>
-#include <utils/math/linear_combination.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include "opengl_renderer.h"
+#include <utils/math/linear_combination.h>
+
+#include "image_button_widget_p.h"
 
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 

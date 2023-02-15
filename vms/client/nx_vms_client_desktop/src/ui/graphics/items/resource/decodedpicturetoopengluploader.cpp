@@ -5,36 +5,31 @@
 #include <algorithm>
 #include <memory>
 
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
+extern "C" {
+#include <libavcodec/avcodec.h>
 }
 
 #include <QtCore/QRunnable>
 #include <QtWidgets/QApplication>
 
-#include <utils/common/util.h> /* For random. */
+#include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/streaming/config.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/app_info.h>
-#include <utils/math/math.h>
-#include <utils/color_space/yuvconvert.h>
-#include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
-#include "opengl_renderer.h"
-#include <transcoding/transcoding_utils.h>
-
-#include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
-
-#include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
+#include <transcoding/transcoding_utils.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <utils/color_space/yuvconvert.h>
+#include <utils/common/util.h> /* For random. */
+#include <utils/math/math.h>
 
 #ifdef __QSV_SUPPORTED__
-#include <nx/media/quick_sync/quick_sync_video_frame.h>
 #include <nx/media/nvidia/nvidia_renderer.h>
+#include <nx/media/quick_sync/quick_sync_video_frame.h>
 #endif //__QSV_SUPPORTED__
-
-
 
 namespace
 {

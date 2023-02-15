@@ -7,6 +7,9 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withDesktopClient)
+    set(app_icons_include_path
+        ${open_source_root}/vms/client/nx_vms_client_desktop/src/nx/vms/client/desktop/app_icons.h)
+
     if(WINDOWS)
         add_subdirectory(nov_file_launcher)
         if(withMiniLauncher)

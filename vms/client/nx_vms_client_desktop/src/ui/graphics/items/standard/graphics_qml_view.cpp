@@ -31,7 +31,7 @@
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/log/log.h>
-#include <opengl_renderer.h>
+#include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
