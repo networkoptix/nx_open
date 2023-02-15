@@ -51,6 +51,7 @@ class NX_VMS_COMMON_API VideoStreamParser: public StreamParser
 
 public:
     VideoStreamParser();
+    virtual ~VideoStreamParser() = default;
     virtual QnAbstractMediaDataPtr nextData() override;
 
 protected:
