@@ -28,7 +28,6 @@ QnUserResourceSet TargetUserField::users() const
     {
         QnUserResourceList users;
         QnUuidList roles;
-
         systemContext()->userRolesManager()->usersAndRoles(ids(), users, roles);
 
         result = nx::utils::toQSet(users);

@@ -82,6 +82,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return false; }
     static bool showRecordingIndicator() { return false; }
+    static bool canUseSourceCamera() { return false; }
 };
 
 class QnCameraMotionPolicy
@@ -144,6 +145,7 @@ public:
     static bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return false; }
     static bool showRecordingIndicator() { return false; }
+    static bool canUseSourceCamera() { return true; }
 };
 
 template<typename CheckingPolicy>

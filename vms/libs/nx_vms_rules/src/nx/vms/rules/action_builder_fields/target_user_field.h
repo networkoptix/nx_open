@@ -17,7 +17,7 @@ class NX_VMS_RULES_API TargetUserField:
     Q_CLASSINFO("metatype", "nx.actions.fields.users")
 
 public:
-    TargetUserField(common::SystemContext* context);
+    explicit TargetUserField(common::SystemContext* context);
 
     QnUserResourceSet users() const;
 };
