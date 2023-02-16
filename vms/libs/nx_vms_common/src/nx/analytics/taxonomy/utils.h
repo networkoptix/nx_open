@@ -20,17 +20,17 @@ bool contains(const Container& container, const Item& item)
 
 struct AttributeSupportInfoTree
 {
-    std::map<QnUuid, std::set<QnUuid>> ownSupportInfo;
+    std::set<QnUuid> ownSupportInfo;
     std::map<QString, AttributeSupportInfoTree> nestedAttributeSupportInfo;
 };
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo);
+    std::map<QString, std::set<QnUuid>> supportInfo);
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo);
+    std::map<QString, std::set<QnUuid>> supportInfo);
 
 AbstractAttribute::Type fromDescriptorAttributeType(
     nx::vms::api::analytics::AttributeType attributeType);

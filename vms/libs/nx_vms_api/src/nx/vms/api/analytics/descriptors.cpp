@@ -100,30 +100,16 @@ void mergeDescriptors(Descriptor* first, Descriptor* second)
 
     if constexpr (HasAttributeSupportInfo<Descriptor>::value)
     {
-        for (auto& [attributeId, attributeSupportInfo]: first->attributeSupportInfo)
+        for (auto& [attributeId, engines]: first->attributeSupportInfo)
         {
-            for (auto& [engineId, deviceIds]: attributeSupportInfo)
-            {
-                second->attributeSupportInfo[attributeId][engineId].insert(
-                    std::make_move_iterator(deviceIds.begin()),
-                    std::make_move_iterator(deviceIds.end()));
-            }
+            second->attributeSupportInfo[attributeId].insert(
+                std::make_move_iterator(engines.begin()),
+                std::make_move_iterator(engines.end()));
         }
     }
 
     for (auto& scope: first->scopes)
-    {
-        if (auto it = second->scopes.find(scope); it != second->scopes.end())
-        {
-            it->deviceIds.insert(
-                std::make_move_iterator(scope.deviceIds.begin()),
-                std::make_move_iterator(scope.deviceIds.end()));
-        }
-        else
-        {
-            second->scopes.insert(std::move(scope));
-        }
-    }
+        second->scopes.insert(std::move(scope));
 
     *first = std::move(*second);
 }

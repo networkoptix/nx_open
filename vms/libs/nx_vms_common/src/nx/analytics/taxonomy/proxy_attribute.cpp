@@ -104,33 +104,9 @@ QVariant ProxyAttribute::maxValue() const
     return QVariant();
 }
 
-bool ProxyAttribute::isSupported(QnUuid engineId, QnUuid deviceId) const
+bool ProxyAttribute::hasEverBeenSupported() const
 {
-    if (engineId.isNull())
-    {
-        for (const auto& [engineId, deviceIds]: m_ownSupportInfo)
-        {
-            if (deviceId.isNull())
-                return true;
-
-            if (deviceIds.contains(deviceId))
-                return true;
-        }
-
-        return false;
-    }
-
-    const auto it = m_ownSupportInfo.find(engineId);
-    if (it == m_ownSupportInfo.cend())
-        return false;
-
-    if (deviceId.isNull())
-        return true;
-
-    if (it->second.contains(deviceId))
-        return true;
-
-    return false;
+    return !m_ownSupportInfo.empty();
 }
 
 } // namespace nx::analytics::taxonomy

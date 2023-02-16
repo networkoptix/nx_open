@@ -156,7 +156,7 @@ public:
         std::vector<AbstractAttribute*> result;
         for (const AttributeContext& context: m_attributes)
         {
-            if (context.attribute->isSupported(/*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
+            if (context.attribute->hasEverBeenSupported())
                 result.push_back(context.attribute);
         }
 
@@ -168,11 +168,8 @@ public:
         std::vector<AbstractAttribute*> result;
         for (const AttributeContext& context: m_attributes)
         {
-            if (context.isOwn && context.attribute->isSupported(
-                /*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
-            {
+            if (context.isOwn && context.attribute->hasEverBeenSupported())
                 result.push_back(context.attribute);
-            }
         }
 
         return result;
@@ -280,9 +277,6 @@ public:
             }
 
             taxonomyScope->setProvider(scope.provider);
-            taxonomyScope->setDeviceIds(
-                std::vector<QnUuid>{scope.deviceIds.begin(), scope.deviceIds.end()});
-
             if (!taxonomyScope->isEmpty())
             {
                 scopes.insert(scope);

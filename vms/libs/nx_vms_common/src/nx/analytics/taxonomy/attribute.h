@@ -49,7 +49,7 @@ public:
 
     virtual QVariant maxValue() const override;
 
-    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+    virtual bool hasEverBeenSupported() const override;
 
     void setBaseAttribute(AbstractAttribute* attribute);
 

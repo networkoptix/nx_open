@@ -40,12 +40,12 @@ public:
 
     virtual QVariant maxValue() const override;
 
-    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+    virtual bool hasEverBeenSupported() const override;
 
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
     AbstractObjectType* m_proxyObjectType = nullptr;
-    std::map<QnUuid, std::set<QnUuid>> m_ownSupportInfo;
+    std::set<QnUuid> m_ownSupportInfo;
 };
 
 } // namespace nx::analytics::taxonomy

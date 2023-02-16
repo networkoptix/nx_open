@@ -44,7 +44,7 @@ AttributeType toDescriptorAttributeType(AbstractAttribute::Type attributeType)
     }
 }
 
-std::map<QnUuid, std::set<QnUuid>> propagateOwnSupport(
+std::set<QnUuid> propagateOwnSupport(
     AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
 {
     if (inOutAttributeSupportInfoTree->nestedAttributeSupportInfo.empty())
@@ -53,12 +53,8 @@ std::map<QnUuid, std::set<QnUuid>> propagateOwnSupport(
     for (auto& [nestedAttributeName, nestedAttributeSupportInfoTree]:
         inOutAttributeSupportInfoTree->nestedAttributeSupportInfo)
     {
-        for (auto& [engineId, deviceIds]:
-            propagateOwnSupport(&nestedAttributeSupportInfoTree))
-        {
-            inOutAttributeSupportInfoTree->ownSupportInfo[engineId]
-                .insert(deviceIds.begin(), deviceIds.end());
-        }
+        for (const QnUuid& engineId: propagateOwnSupport(&nestedAttributeSupportInfoTree))
+            inOutAttributeSupportInfoTree->ownSupportInfo.insert(engineId);
     }
 
     return inOutAttributeSupportInfoTree->ownSupportInfo;
@@ -66,7 +62,7 @@ std::map<QnUuid, std::set<QnUuid>> propagateOwnSupport(
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
+    std::map<QString, std::set<QnUuid>> supportInfo)
 {
     std::map<QString, AttributeSupportInfoTree> result;
 
@@ -95,7 +91,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
         const QString prefix = objectTypeAttribute->name() + ".";
         auto lowerBoundIt = supportInfo.lower_bound(prefix);
 
-        std::map<QString, std::map<QnUuid, std::set<QnUuid>>> nestedSupportInfo;
+        std::map<QString, std::set<QnUuid>> nestedSupportInfo;
         while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.startsWith(prefix))
         {
             nestedSupportInfo[lowerBoundIt->first.mid(prefix.length())] =
@@ -118,7 +114,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
+    std::map<QString, std::set<QnUuid>> supportInfo)
 {
     std::map<QString, AttributeSupportInfoTree> supportInfoTree =
         buildAttributeSupportInfoTree(attributes, std::move(supportInfo));

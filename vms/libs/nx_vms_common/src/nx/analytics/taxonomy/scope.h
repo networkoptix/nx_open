@@ -20,8 +20,6 @@ public:
 
     virtual QString provider() const override;
 
-    virtual std::vector<QnUuid> deviceIds() const override;
-
     virtual bool isEmpty() const override;
 
     void setEngine(Engine* engine);
@@ -30,13 +28,10 @@ public:
 
     void setProvider(const QString& provider);
 
-    void setDeviceIds(std::vector<QnUuid> deviceIds);
-
 private:
     Engine* m_engine = nullptr;
     Group* m_group = nullptr;
     QString m_provider;
-    std::vector<QnUuid> m_deviceIds;
 
 };
 

@@ -24,6 +24,7 @@ class NX_VMS_COMMON_API AbstractAttribute: public QObject
     Q_PROPERTY(QString unit READ unit CONSTANT)
     Q_PROPERTY(QVariant minValue READ minValue CONSTANT)
     Q_PROPERTY(QVariant maxValue READ maxValue CONSTANT)
+    Q_PROPERTY(bool hasEverBeenSupported READ hasEverBeenSupported CONSTANT)
 
 public:
     enum class Type
@@ -64,7 +65,8 @@ public:
 
     virtual QVariant maxValue() const = 0;
 
-    Q_INVOKABLE virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const = 0;
+    virtual bool hasEverBeenSupported() const = 0;
+
 };
 
 } // namespace nx::analytics::taxonomy
