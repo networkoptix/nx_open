@@ -80,14 +80,6 @@ public:
     virtual bool canStoreAnalytics() const;
 
 signals:
-    /*
-     * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
-     * @param newStartTime - new archive start time point
-     * @param newEndTime - Not used now, reserved for future use
-     */
-    void archiveRangeChanged(const QnStorageResourcePtr& resource, qint64 newStartTimeMs,
-        qint64 newEndTimeMs);
-
     void isUsedForWritingChanged(const QnResourcePtr& resource);
     void isBackupChanged(const QnResourcePtr& resource);
     void spaceLimitChanged(const QnResourcePtr& resource);
