@@ -2,23 +2,22 @@
 
 #pragma once
 
-#include <managers/license_notification_manager.h>
-#include <managers/resource_notification_manager.h>
-#include <managers/media_server_notification_manager.h>
-#include <managers/camera_notification_manager.h>
-#include <managers/user_notification_manager.h>
-#include <managers/event_rules_notification_manager.h>
-#include <managers/vms_rules_notification_manager.h>
-#include <managers/layout_notification_manager.h>
-#include <managers/layout_tour_notification_manager.h>
-#include <managers/videowall_notification_manager.h>
-#include <managers/webpage_notification_manager.h>
-#include <managers/stored_file_notification_manager.h>
-#include <managers/misc_notification_manager.h>
-#include <managers/discovery_notification_manager.h>
-#include <managers/time_notification_manager.h>
 #include <managers/analytics_notification_manager.h>
-
+#include <managers/camera_notification_manager.h>
+#include <managers/discovery_notification_manager.h>
+#include <managers/event_rules_notification_manager.h>
+#include <managers/layout_notification_manager.h>
+#include <managers/license_notification_manager.h>
+#include <managers/media_server_notification_manager.h>
+#include <managers/misc_notification_manager.h>
+#include <managers/resource_notification_manager.h>
+#include <managers/showreel_notification_manager.h>
+#include <managers/stored_file_notification_manager.h>
+#include <managers/time_notification_manager.h>
+#include <managers/user_notification_manager.h>
+#include <managers/videowall_notification_manager.h>
+#include <managers/vms_rules_notification_manager.h>
+#include <managers/webpage_notification_manager.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
@@ -39,7 +38,7 @@ public:
         QnBusinessEventNotificationManager* businessEventManager,
         VmsRulesNotificationManager* vmsRulesManager,
         QnLayoutNotificationManager* layoutManager,
-        QnLayoutTourNotificationManager* showreelManager,
+        ShowreelNotificationManager* showreelManager,
         QnVideowallNotificationManager* videowallManager,
         QnWebPageNotificationManager* webPageManager,
         QnStoredFileNotificationManager* storedFileManager,
@@ -90,7 +89,7 @@ private:
     QnBusinessEventNotificationManager* m_businessEventManager;
     VmsRulesNotificationManager* m_vmsRulesManager;
     QnLayoutNotificationManager* m_layoutManager;
-    QnLayoutTourNotificationManager* m_showreelManager;
+    ShowreelNotificationManager* m_showreelManager;
     QnVideowallNotificationManager* m_videowallManager;
     QnWebPageNotificationManager* m_webPageManager;
     QnStoredFileNotificationManager* m_storedFileManager;

@@ -58,11 +58,11 @@ public:
     virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
-class LayoutTourSettingsFactory: public Factory
+class ShowreelSettingsFactory: public Factory
 {
     Q_OBJECT
 public:
-    LayoutTourSettingsFactory(QObject* parent);
+    ShowreelSettingsFactory(QObject* parent);
     virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 

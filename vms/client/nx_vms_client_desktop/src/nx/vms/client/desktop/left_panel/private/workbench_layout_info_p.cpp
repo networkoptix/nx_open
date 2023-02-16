@@ -99,7 +99,7 @@ AbstractResourceContainer* WorkbenchLayoutInfo::resources() const
 
 QnUuid WorkbenchLayoutInfo::reviewedShowreelId() const
 {
-    return workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
 }
 
 QnVideoWallResource* WorkbenchLayoutInfo::reviewedVideoWall() const

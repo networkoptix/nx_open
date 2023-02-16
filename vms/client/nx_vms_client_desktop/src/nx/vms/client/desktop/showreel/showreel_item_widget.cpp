@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "layout_tour_item_widget.h"
+#include "showreel_item_widget.h"
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QGuiApplication>
@@ -36,8 +36,6 @@
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace workbench {
 
 namespace {
 
@@ -58,7 +56,7 @@ public:
 class LayoutPreviewWidget: public QGraphicsWidget
 {
 public:
-    LayoutPreviewWidget(QSharedPointer<LayoutPreviewPainter> previewPainter):
+    LayoutPreviewWidget(QSharedPointer<ui::LayoutPreviewPainter> previewPainter):
         m_previewPainter(previewPainter)
     {
         setAcceptedMouseButtons(Qt::NoButton);
@@ -72,7 +70,7 @@ public:
     }
 
 private:
-    QWeakPointer<LayoutPreviewPainter> m_previewPainter;
+    QWeakPointer<ui::LayoutPreviewPainter> m_previewPainter;
 };
 
 static const int kMargin = 8; //< Pixels.
@@ -82,14 +80,14 @@ static constexpr int kMaxTitleLength = 30; //< symbols
 
 } // namespace
 
-LayoutTourItemWidget::LayoutTourItemWidget(
+ShowreelItemWidget::ShowreelItemWidget(
     SystemContext* systemContext,
     WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
     :
     base_type(systemContext, windowContext, item, parent),
-    m_previewPainter(new LayoutPreviewPainter())
+    m_previewPainter(new ui::LayoutPreviewPainter())
 {
     setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
     setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark17"));
@@ -116,21 +114,21 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     initOverlay();
 }
 
-LayoutTourItemWidget::~LayoutTourItemWidget()
+ShowreelItemWidget::~ShowreelItemWidget()
 {
 }
 
-Qn::ResourceStatusOverlay LayoutTourItemWidget::calculateStatusOverlay() const
+Qn::ResourceStatusOverlay ShowreelItemWidget::calculateStatusOverlay() const
 {
     return Qn::EmptyOverlay;
 }
 
-int LayoutTourItemWidget::calculateButtonsVisibility() const
+int ShowreelItemWidget::calculateButtonsVisibility() const
 {
     return Qn::CloseButton;
 }
 
-void LayoutTourItemWidget::initOverlay()
+void ShowreelItemWidget::initOverlay()
 {
     auto font = this->font();
     font.setPixelSize(14);
@@ -193,13 +191,13 @@ void LayoutTourItemWidget::initOverlay()
     auto updateOrder =
         [this, orderLabel](Qn::ItemDataRole role)
         {
-            if (role != Qn::LayoutTourItemOrderRole)
+            if (role != Qn::ShowreelItemOrderRole)
                 return;
 
             const int order = item()->data(role).toInt();
             orderLabel->setText(QString::number(order));
         };
-    updateOrder(Qn::LayoutTourItemOrderRole);
+    updateOrder(Qn::ShowreelItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
     auto updateLightText =
@@ -221,7 +219,7 @@ void LayoutTourItemWidget::initOverlay()
         [this, delayHintLabel]
         {
             const bool isManual = item()->layout()
-                && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
+                && item()->layout()->data(Qn::ShowreelIsManualRole).toBool();
             QColor textColor = palette().color(QPalette::Dark);
             QString text = isManual
                 ? tr("Switch by", "Arrows will follow")
@@ -253,7 +251,7 @@ void LayoutTourItemWidget::initOverlay()
     delayEdit->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     delayEdit->setMinimum(1);
     delayEdit->setMaximum(99);
-    const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
+    const auto delayMs = item()->data(Qn::ShowreelItemDelayMsRole).toInt();
     delayEdit->setValue(delayMs / 1000);
 
     connect(delayEdit, QnSpinboxIntValueChanged, this,
@@ -263,10 +261,10 @@ void LayoutTourItemWidget::initOverlay()
                 return;
 
             QScopedValueRollback<bool> guard(m_updating, true);
-            item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+            item()->setData(Qn::ShowreelItemDelayMsRole, value * 1000);
 
             // Store visual data to the tour and then add it to the save queue.
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
+            menu()->trigger(ui::action::SaveCurrentShowreelAction);
         });
 
     connect(layoutResource().get(),
@@ -274,7 +272,7 @@ void LayoutTourItemWidget::initOverlay()
         this,
         [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
         {
-            if (m_updating || role != Qn::LayoutTourItemDelayMsRole || id != item()->uuid())
+            if (m_updating || role != Qn::ShowreelItemDelayMsRole || id != item()->uuid())
                 return;
 
             QScopedValueRollback<bool> guard(m_updating, true);
@@ -299,14 +297,14 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateManualMode = [this, delayWidget]
         {
-            const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
+            const bool isManual = item()->layout()->data(Qn::ShowreelIsManualRole).toBool();
             delayWidget->setVisible(!isManual);
         };
 
     connect(item()->layout(), &QnWorkbenchLayout::dataChanged, this,
         [updateManualMode, updateHint](int role)
         {
-            if (role == Qn::LayoutTourIsManualRole)
+            if (role == Qn::ShowreelIsManualRole)
             {
                 updateManualMode();
                 updateHint();
@@ -332,6 +330,4 @@ void LayoutTourItemWidget::initOverlay()
     addOverlayWidget(overlayWidget, Visible);
 }
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

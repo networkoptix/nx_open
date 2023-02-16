@@ -1,19 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "layout_tour_actions.h"
+#include "showreel_actions.h"
 
 #include <QtGui/QAction>
 
-#include <core/resource_management/layout_tour_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
+
+#include "showreel_actions_handler.h"
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -22,39 +23,39 @@ namespace action {
 namespace
 {
 
-QnUuid tourId(const Parameters& parameters)
+QnUuid showreelId(const Parameters& parameters)
 {
     return parameters.argument(Qn::UuidRole).value<QnUuid>();
 }
 
-bool tourIsRunning(QnWorkbenchContext* context)
+bool showreelIsRunning(QnWorkbenchContext* context)
 {
-    return context->action(ToggleLayoutTourModeAction)->isChecked();
+    return context->action(ToggleShowreelModeAction)->isChecked();
 }
 
-class TourIsRunningCondition: public Condition
+class ShowreelIsRunningCondition: public Condition
 {
 public:
-    TourIsRunningCondition()
+    ShowreelIsRunningCondition()
     {
     }
 
     virtual ActionVisibility check(const Parameters& /*parameters*/,
         QnWorkbenchContext* context) override
     {
-        return tourIsRunning(context)
+        return showreelIsRunning(context)
             ? EnabledAction
             : InvisibleAction;
     }
 };
 
-class CanToggleTourCondition: public Condition
+class CanToggleShowreelCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const Parameters& parameters,
         QnWorkbenchContext* context) override
     {
-        const auto id = tourId(parameters);
+        const auto id = showreelId(parameters);
         if (id.isNull())
         {
             if (context->workbench()->currentLayout()->items().size() > 1)
@@ -62,8 +63,8 @@ public:
         }
         else
         {
-            const auto tour = context->systemContext()->showreelManager()->tour(id);
-            if (tour.isValid() && tour.items.size() > 0)
+            const auto showreel = context->systemContext()->showreelManager()->showreel(id);
+            if (showreel.isValid() && showreel.items.size() > 0)
                 return EnabledAction;
         }
 
@@ -73,28 +74,28 @@ public:
 
 } // namespace
 
-LayoutTourTextFactory::LayoutTourTextFactory(QObject* parent):
+ShowreelTextFactory::ShowreelTextFactory(QObject* parent):
     base_type(parent)
 {
 }
 
-QString LayoutTourTextFactory::text(const Parameters& parameters,
+QString ShowreelTextFactory::text(const Parameters& parameters,
     QnWorkbenchContext* context) const
 {
-    if (tourIsRunning(context))
+    if (showreelIsRunning(context))
     {
-        auto runningTourId = context->instance<workbench::LayoutToursHandler>()->runningTour();
+        auto runningTourId = context->instance<ShowreelActionsHandler>()->runningShowreel();
         if (runningTourId.isNull())
             return tr("Stop Tour");
         return tr("Stop Showreel");
     }
 
-    auto id = tourId(parameters);
+    auto id = showreelId(parameters);
     if (id.isNull())
     {
         // TODO: #sivanov Code duplication.
         const auto reviewTourId = context->workbench()->currentLayout()->data(
-            Qn::LayoutTourUuidRole).value<QnUuid>();
+            Qn::ShowreelUuidRole).value<QnUuid>();
 
         if (reviewTourId.isNull())
             return tr("Start Tour");
@@ -106,14 +107,14 @@ QString LayoutTourTextFactory::text(const Parameters& parameters,
 namespace condition
 {
 
-ConditionWrapper tourIsRunning()
+ConditionWrapper showreelIsRunning()
 {
-    return new TourIsRunningCondition();
+    return new ShowreelIsRunningCondition();
 }
 
-ConditionWrapper canStartTour()
+ConditionWrapper canStartShowreel()
 {
-    return new CanToggleTourCondition();
+    return new CanToggleShowreelCondition();
 }
 
 } // namespace condition

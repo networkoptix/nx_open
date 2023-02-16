@@ -39,8 +39,8 @@ public:
         IntercomLayout,
         Layouts,
         SharedLayouts,
-        LayoutTour,
-        LayoutTours,
+        Showreel,
+        Showreels,
 
         Camera,
         VirtualCamera,

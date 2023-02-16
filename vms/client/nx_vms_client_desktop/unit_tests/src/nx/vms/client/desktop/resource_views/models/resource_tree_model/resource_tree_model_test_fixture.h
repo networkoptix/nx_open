@@ -7,7 +7,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
@@ -72,7 +72,7 @@ protected:
         const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallMatrix& matrix) const;
 
-    nx::vms::api::LayoutTourData addLayoutTour(const QString& name,
+    nx::vms::api::ShowreelData addShowreel(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
     QnVirtualCameraResourcePtr addCamera(
         const QString& name,

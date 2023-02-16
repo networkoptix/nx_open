@@ -227,7 +227,7 @@ bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &o
 
 bool tourIsRunning(QnWorkbenchContext* context)
 {
-    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+    return context->action(action::ToggleShowreelModeAction)->isChecked();
 }
 
 void drawCrosshair(QPainter* painter, const QRectF& rect)
@@ -412,8 +412,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         this,
         &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
-    // Update buttons for single layout tour start/stop
-    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    // Update buttons for single Showreel start/stop.
+    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
 
     m_recordingStatusHelper->setCamera(d->camera);
@@ -1994,7 +1994,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
                 && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
         };
 
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleShowreelModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
@@ -3308,7 +3308,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                 if (success && handler)
                     handler();
 
-                menu()->triggerIfPossible(action::SuspendCurrentTourAction);
+                menu()->triggerIfPossible(action::SuspendCurrentShowreelAction);
             });
 
         connect(button, &SoftwareTriggerButton::released, this,
@@ -3325,7 +3325,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                     ? SoftwareTriggerButton::State::Default
                     : SoftwareTriggerButton::State::Failure);
 
-                menu()->triggerIfPossible(action::ResumeCurrentTourAction);
+                menu()->triggerIfPossible(action::ResumeCurrentShowreelAction);
             });
     }
     else

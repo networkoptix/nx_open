@@ -18,6 +18,3 @@ using QnClientCameraResourceList = QnSharedResourcePointerList<QnClientCameraRes
 class QnFileLayoutResource;
 using QnFileLayoutResourcePtr = QnSharedResourcePointer<QnFileLayoutResource>;
 using QnFileLayoutResourceList = QnSharedResourcePointerList<QnFileLayoutResource>;
-
-struct QnLayoutTourItem;
-using QnLayoutTourItemList = std::vector<QnLayoutTourItem>;

@@ -16,7 +16,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/app_info.h>
@@ -31,6 +30,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/widgets/cloud_status_panel.h>
@@ -342,9 +342,9 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     if (d->mimeData->isEmpty())
         return;
 
-    const auto layoutTours = systemContext()->showreelManager()->tours(d->mimeData->entities());
-    for (const auto& tour: layoutTours)
-        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
+    const auto showreels = systemContext()->showreelManager()->showreels(d->mimeData->entities());
+    for (const auto& showreel: showreels)
+        menu()->trigger(action::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
 
     resourcePool()->addNewResources(d->mimeData->resources());
 

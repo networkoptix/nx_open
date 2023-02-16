@@ -74,10 +74,14 @@ namespace Qn
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
-        LayoutTourUuidRole,                         /**< Role for layout tour review layouts. */
-        LayoutTourItemDelayMsRole,                  /**< Role for layout tour item delay. */
-        LayoutTourItemOrderRole,                    /**< Role for layout tour item delay. */
-        LayoutTourIsManualRole,                     /**< Role for layout tour review layout in manual mode. */
+        /** Id role for Showreel review layout. */
+        ShowreelUuidRole,
+        /** Item delay role for Showreel review layout. */
+        ShowreelItemDelayMsRole,
+        /** Item order role for Showreel review layout. */
+        ShowreelItemOrderRole,
+        /** Whether item swithing is manual role for Showreel review layout. */
+        ShowreelIsManualRole,
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */

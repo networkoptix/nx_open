@@ -32,7 +32,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     servers, //< Root node for servers.
     camerasAndDevices, //< Root node for devices when representation without servers is turned on.
     layouts, //< Root node for current user's layouts and shared layouts.
-    layoutTours, //< Root node for the layout tours.
+    showreels, //< Root node for the Showreels.
     videoWalls, //< Never visible root node which represents videowalls group.
     webPages, //< Root node for web pages.
     users, //< Root node for user resources.
@@ -58,7 +58,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     resource, //< Generic resource, most of physical device. Has only resource.
     layoutItem, //< Layout item. Has both guid and resource.
     edge, //< EDGE server with a camera in a collapsed state, displayed as single camera.
-    layoutTour, //< Layout tour (Showreel). Has a guid.
+    showreel, //< Showreel. Has a guid.
     videoWallItem, //< Videowall item (screen). Has a guid and can have resource.
     videoWallMatrix, //< Videowall saved matrix. Has a guid.
 

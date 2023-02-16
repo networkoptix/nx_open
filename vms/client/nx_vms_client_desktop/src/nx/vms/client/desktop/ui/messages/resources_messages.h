@@ -19,7 +19,7 @@ public:
     static void layoutAlreadyExists(QWidget* parent);
 
     static bool overrideLayout(QWidget* parent);
-    static bool overrideLayoutTour(QWidget* parent);
+    static bool overrideShowreel(QWidget* parent);
 
     static bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
     static bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);
@@ -31,7 +31,7 @@ public:
         const QnResourceList& personalLayouts);
 
     static bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
-    static bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources);
+    static bool removeItemsFromShowreel(QWidget* parent, const QnResourceList& resources);
 
     static bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 

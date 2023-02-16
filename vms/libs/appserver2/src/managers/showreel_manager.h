@@ -4,24 +4,24 @@
 
 #include <transaction/transaction.h>
 
-#include <nx/vms/api/data/layout_tour_data.h>
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
+#include <nx/vms/api/data/showreel_data.h>
+#include <nx_ec/managers/abstract_showreel_manager.h>
 #include <core/resource_access/user_access_data.h>
 
 namespace ec2 {
 
 template<class QueryProcessorType>
-class QnLayoutTourManager: public AbstractLayoutTourManager
+class ShowreelManager: public AbstractShowreelManager
 {
 public:
-    QnLayoutTourManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
+    ShowreelManager(QueryProcessorType* queryProcessor, const Qn::UserSession& userSession);
 
-    virtual int getLayoutTours(
-        Handler<nx::vms::api::LayoutTourDataList> handler,
+    virtual int getShowreels(
+        Handler<nx::vms::api::ShowreelDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int save(
-        const nx::vms::api::LayoutTourData& data,
+        const nx::vms::api::ShowreelData& data,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -39,7 +39,7 @@ private:
 };
 
 template<typename QueryProcessorType>
-QnLayoutTourManager<QueryProcessorType>::QnLayoutTourManager(
+ShowreelManager<QueryProcessorType>::ShowreelManager(
     QueryProcessorType* queryProcessor, const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
@@ -48,36 +48,36 @@ QnLayoutTourManager<QueryProcessorType>::QnLayoutTourManager(
 }
 
 template<class QueryProcessorType>
-int QnLayoutTourManager<QueryProcessorType>::getLayoutTours(
-    Handler<nx::vms::api::LayoutTourDataList> handler,
+int ShowreelManager<QueryProcessorType>::getShowreels(
+    Handler<nx::vms::api::ShowreelDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<const QnUuid&, nx::vms::api::LayoutTourDataList>(
-        ApiCommand::getLayoutTours,
+    processor().template processQueryAsync<const QnUuid&, nx::vms::api::ShowreelDataList>(
+        ApiCommand::getShowreels,
         QnUuid(),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
 }
 
 template<class QueryProcessorType>
-int QnLayoutTourManager<QueryProcessorType>::save(
-    const nx::vms::api::LayoutTourData& data,
+int ShowreelManager<QueryProcessorType>::save(
+    const nx::vms::api::ShowreelData& data,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::saveLayoutTour,
+        ApiCommand::saveShowreel,
         data,
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
 }
 
 template<class QueryProcessorType>
-int QnLayoutTourManager<QueryProcessorType>::remove(
+int ShowreelManager<QueryProcessorType>::remove(
     const QnUuid& tourId,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -85,7 +85,7 @@ int QnLayoutTourManager<QueryProcessorType>::remove(
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::removeLayoutTour,
+        ApiCommand::removeShowreel,
         nx::vms::api::IdData(tourId),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;

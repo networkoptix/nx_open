@@ -15,7 +15,7 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
     QnBusinessEventNotificationManager* businessEventManager,
     VmsRulesNotificationManager* vmsRulesManager,
     QnLayoutNotificationManager* layoutManager,
-    QnLayoutTourNotificationManager* showreelManager,
+    ShowreelNotificationManager* showreelManager,
     QnVideowallNotificationManager* videowallManager,
     QnWebPageNotificationManager* webPageManager,
     QnStoredFileNotificationManager* storedFileManager,

@@ -2,8 +2,8 @@
 
 #include "showreel_state_manager.h"
 
-#include <core/resource_management/layout_tour_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -12,7 +12,7 @@ ShowreelStateManager::ShowreelStateManager(SystemContext* systemContext, QObject
     SystemContextAware(systemContext)
 {
     connect(systemContext->showreelManager(),
-        &QnLayoutTourManager::tourRemoved,
+        &common::ShowreelManager::showreelRemoved,
         this,
         &core::SaveStateManager::clean);
 }

@@ -115,7 +115,7 @@ enum ActionFlag
 
 
     /** Action can appear in main menu. */
-    Main = MainScope | NoTarget,
+    Main = MainScope | (int) NoTarget,
 
     /** Action can appear in scene context menu. */
     Scene = SceneScope | (int) WidgetTarget,

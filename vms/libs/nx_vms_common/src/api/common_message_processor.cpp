@@ -19,7 +19,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/user_access_data.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -38,6 +37,7 @@
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
@@ -49,11 +49,11 @@
 #include <nx_ec/managers/abstract_discovery_manager.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <nx_ec/managers/abstract_license_manager.h>
 #include <nx_ec/managers/abstract_media_server_manager.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
+#include <nx_ec/managers/abstract_showreel_manager.h>
 #include <nx_ec/managers/abstract_stored_file_manager.h>
 #include <nx_ec/managers/abstract_time_manager.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -66,6 +66,7 @@
 
 using namespace nx;
 using namespace nx::vms::api;
+using namespace nx::vms::common;
 
 struct QnCommonMessageProcessor::Private
 {
@@ -469,18 +470,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::discoveredServerChanged,
         connectionType);
 
-    const auto showreelNotificationManager = connection->layoutTourNotificationManager().get();
+    const auto showreelNotificationManager = connection->showreelNotificationManager().get();
     connect(
         showreelNotificationManager,
-        &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
+        &ec2::AbstractShowreelNotificationManager::addedOrUpdated,
         this,
         &QnCommonMessageProcessor::handleTourAddedOrUpdated,
         connectionType);
     connect(
         showreelNotificationManager,
-        &ec2::AbstractLayoutTourNotificationManager::removed,
+        &ec2::AbstractShowreelNotificationManager::removed,
         m_context->showreelManager(),
-        &QnLayoutTourManager::removeTour,
+        &ShowreelManager::removeShowreel,
         connectionType);
 
     const auto analyticsManager = connection->analyticsNotificationManager();
@@ -524,9 +525,9 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->storedFileNotificationManager()->disconnect(this);
     connection->discoveryNotificationManager()->disconnect(this);
     connection->miscNotificationManager()->disconnect(this);
-    connection->layoutTourNotificationManager()->disconnect(this);
+    connection->showreelNotificationManager()->disconnect(this);
 
-    m_context->showreelManager()->resetTours();
+    m_context->showreelManager()->resetShowreels();
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
@@ -815,9 +816,10 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction(const nx::vms::event::
     emit businessActionReceived(action);
 }
 
-void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(
+    const nx::vms::api::ShowreelData& showreel)
 {
-    m_context->showreelManager()->addOrUpdateTour(tour);
+    m_context->showreelManager()->addOrUpdateShowreel(showreel);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
@@ -1022,7 +1024,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetAccessRights(fullData.accessRights);
     resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
-    m_context->showreelManager()->resetTours(fullData.layoutTours);
+    m_context->showreelManager()->resetShowreels(fullData.showreels);
 
     m_context->resourceAccessProvider()->endUpdate();
     m_context->resourceAccessManager()->endUpdate();

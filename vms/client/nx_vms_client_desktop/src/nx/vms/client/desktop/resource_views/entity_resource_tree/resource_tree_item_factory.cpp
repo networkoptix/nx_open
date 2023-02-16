@@ -425,8 +425,8 @@ AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Showreels"))
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::LayoutTours))
-        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::layoutTours))
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Showreels))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::showreels))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::Showreel_Help));
 }
 

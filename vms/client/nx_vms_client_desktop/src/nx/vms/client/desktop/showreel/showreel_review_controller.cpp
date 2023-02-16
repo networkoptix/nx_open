@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "workbench_layout_tour_review_controller.h"
+#include "showreel_review_controller.h"
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
@@ -9,22 +9,21 @@
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
@@ -35,12 +34,15 @@
 #include <ui/workbench/workbench_utility.h>
 #include <utils/common/delayed.h>
 
+#include "showreel_drop_placeholder.h"
+#include "showreel_state_manager.h"
+
 namespace {
 
 static constexpr int kDefaultDelayMs = 5000;
 
-// Save layout tour no more often than once in 5 seconds.
-static constexpr int kSaveTourIntervalMs = 5000;
+// Save showreel no more often than once in 5 seconds.
+static constexpr int kSaveShowreelIntervalMs = 5000;
 
 // Update items layout no more often than once in a second.
 static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
@@ -69,94 +71,92 @@ QRect createItemGrid(int itemCount)
 } // namespace
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace workbench {
 
-LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
+namespace action = ui::action;
+
+ShowreelReviewController::ShowreelReviewController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    auto saveQueuedTours = [this]
+    auto saveQueuedShowreels =
+        [this]
         {
-            for (const auto& id: m_saveToursQueue)
-                menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
-            m_saveToursQueue.clear();
+            for (const auto& id: m_saveShowreelsQueue)
+                menu()->trigger(action::SaveShowreelAction, {Qn::UuidRole, id});
+            m_saveShowreelsQueue.clear();
         };
-    m_saveToursOperation =
-        new nx::utils::PendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
+    m_saveShowreelsOperation =
+        new nx::utils::PendingOperation(saveQueuedShowreels, kSaveShowreelIntervalMs, this);
 
-    auto updateItemsLayout = [this]
-        {
-            this->updateItemsLayout();
-        };
+    auto updateItemsLayout = [this] { this->updateItemsLayout(); };
     m_updateItemsLayoutOperation =
         new nx::utils::PendingOperation(updateItemsLayout, kUpdateItemsLayoutIntervalMs, this);
 
-    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourChanged, this,
-        &LayoutTourReviewController::handleTourChanged);
+    connect(systemContext()->showreelManager(), &common::ShowreelManager::showreelChanged, this,
+        &ShowreelReviewController::handleShowreelChanged);
 
-    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourRemoved, this,
-        &LayoutTourReviewController::handleTourRemoved);
+    connect(systemContext()->showreelManager(), &common::ShowreelManager::showreelRemoved, this,
+        &ShowreelReviewController::handleShowreelRemoved);
 
-    connect(action(action::ReviewLayoutTourAction), &QAction::triggered, this,
-        &LayoutTourReviewController::at_reviewLayoutTourAction_triggered);
+    connect(action(action::ReviewShowreelAction), &QAction::triggered, this,
+        &ShowreelReviewController::at_reviewShowreelAction_triggered);
 
     connect(action(action::DropResourcesAction), &QAction::triggered, this,
-        &LayoutTourReviewController::at_dropResourcesAction_triggered);
+        &ShowreelReviewController::at_dropResourcesAction_triggered);
 
-    connect(action(action::StartCurrentLayoutTourAction), &QAction::triggered, this,
-        &LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered);
+    connect(action(action::StartCurrentShowreelAction), &QAction::triggered, this,
+        &ShowreelReviewController::at_startCurrentShowreelAction_triggered);
 
-    connect(action(action::SaveCurrentLayoutTourAction), &QAction::triggered, this,
-        &LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered);
+    connect(action(action::SaveCurrentShowreelAction), &QAction::triggered, this,
+        &ShowreelReviewController::at_saveCurrentShowreelAction_triggered);
 
-    connect(action(action::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
-        &LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered);
+    connect(action(action::RemoveCurrentShowreelAction), &QAction::triggered, this,
+        &ShowreelReviewController::at_removeCurrentShowreelAction_triggered);
 
     connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
-        &LayoutTourReviewController::stopListeningLayout);
+        &ShowreelReviewController::stopListeningLayout);
 
     connect(workbench(), &Workbench::currentLayoutChanged, this,
-        &LayoutTourReviewController::startListeningLayout);
+        &ShowreelReviewController::startListeningLayout);
 }
 
-LayoutTourReviewController::~LayoutTourReviewController()
+ShowreelReviewController::~ShowreelReviewController()
 {
     stopListeningLayout();
 }
 
-void LayoutTourReviewController::handleTourChanged(const nx::vms::api::LayoutTourData& tour)
+void ShowreelReviewController::handleShowreelChanged(const nx::vms::api::ShowreelData& showreel)
 {
-    // Handle only tours we are currently reviewing.
-    auto reviewLayout = m_reviewLayouts.value(tour.id);
+    // Handle only Showreels we are currently reviewing.
+    auto reviewLayout = m_reviewLayouts.value(showreel.id);
     if (!reviewLayout)
         return;
 
-    reviewLayout->setName(tour.name);
-    reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
+    reviewLayout->setName(showreel.name);
+    reviewLayout->setData(Qn::ShowreelIsManualRole, showreel.settings.manual);
     auto wbLayout = workbench()->layout(reviewLayout);
     if (wbLayout)
-        wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
+        wbLayout->setData(Qn::ShowreelIsManualRole, showreel.settings.manual);
 
     // If layout is not current, simply overwrite it.
     if (workbench()->currentLayout() != wbLayout)
     {
-        resetReviewLayout(reviewLayout, tour.items);
+        resetReviewLayout(reviewLayout, showreel.items);
         return;
     }
     m_updateItemsLayoutOperation->requestOperation();
     updateButtons(reviewLayout);
 }
 
-void LayoutTourReviewController::handleTourRemoved(const QnUuid& tourId)
+void ShowreelReviewController::handleShowreelRemoved(const QnUuid& showreelId)
 {
-    m_saveToursQueue.remove(tourId);
+    m_saveShowreelsQueue.remove(showreelId);
 
-    if (currentTourId() == tourId)
+    if (currentShowreelId() == showreelId)
         stopListeningLayout();
 
-    // Handle only tours we are currently reviewing.
-    if (auto reviewLayout = m_reviewLayouts.take(tourId))
+    // Handle only Showreels we are currently reviewing.
+    if (auto reviewLayout = m_reviewLayouts.take(showreelId))
     {
         workbench()->removeLayout(reviewLayout);
         if (workbench()->layouts().empty())
@@ -164,9 +164,9 @@ void LayoutTourReviewController::handleTourRemoved(const QnUuid& tourId)
     }
 }
 
-void LayoutTourReviewController::startListeningLayout()
+void ShowreelReviewController::startListeningLayout()
 {
-    if (!isLayoutTourReviewMode())
+    if (!isShowreelReviewMode())
         return;
 
     NX_ASSERT(m_reviewLayouts.values().contains(workbench()->currentLayoutResource()));
@@ -177,35 +177,35 @@ void LayoutTourReviewController::startListeningLayout()
     updatePlaceholders();
 }
 
-void LayoutTourReviewController::stopListeningLayout()
+void ShowreelReviewController::stopListeningLayout()
 {
     m_connections = {};
     m_dropPlaceholders.clear();
 }
 
-void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTourData& tour)
+void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& showreel)
 {
-    if (!tour.isValid())
+    if (!showreel.isValid())
         return;
 
-    if (auto layout = m_reviewLayouts.value(tour.id))
+    if (auto layout = m_reviewLayouts.value(showreel.id))
     {
         menu()->trigger(action::OpenInNewTabAction, layout);
         updateItemsLayout();
         return;
     }
 
-    const QList<action::IDType> actions{action::StartCurrentLayoutTourAction};
+    const QList<action::IDType> actions{action::StartCurrentShowreelAction};
 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = LayoutResourcePtr(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->addFlags(Qn::local);
-    layout->setParentId(tour.id);
-    layout->setName(tour.name);
+    layout->setParentId(showreel.id);
+    layout->setName(showreel.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
-    layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::LayoutTour));
+    layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::Showreel));
     layout->setData(Qn::LayoutFlagsRole, QVariant::fromValue(QnLayoutFlag::FixedViewport
         | QnLayoutFlag::NoResize
         | QnLayoutFlag::NoTimeline
@@ -215,38 +215,38 @@ void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTour
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
         | Qn::AddRemoveItemsPermission));
-    layout->setData(Qn::LayoutTourUuidRole, QVariant::fromValue(tour.id));
-    layout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
+    layout->setData(Qn::ShowreelUuidRole, QVariant::fromValue(showreel.id));
+    layout->setData(Qn::ShowreelIsManualRole, showreel.settings.manual);
     layout->setCellAspectRatio(kCellAspectRatio);
-    m_reviewLayouts.insert(tour.id, layout);
+    m_reviewLayouts.insert(showreel.id, layout);
 
-    resetReviewLayout(layout, tour.items);
+    resetReviewLayout(layout, showreel.items);
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 }
 
-QnUuid LayoutTourReviewController::currentTourId() const
+QnUuid ShowreelReviewController::currentShowreelId() const
 {
-    return workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+    return workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
 }
 
-bool LayoutTourReviewController::isLayoutTourReviewMode() const
+bool ShowreelReviewController::isShowreelReviewMode() const
 {
-    return !currentTourId().isNull();
+    return !currentShowreelId().isNull();
 }
 
-void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
+void ShowreelReviewController::connectToLayout(QnWorkbenchLayout* layout)
 {
     if (!NX_ASSERT(layout->resource()))
        return;
 
     auto saveAndUpdateLayout = [this]
         {
-            if (!isLayoutTourReviewMode())
+            if (!isShowreelReviewMode())
                 return;
 
             // Saving must go before layout updating to make sure item order will be correct.
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
+            menu()->trigger(action::SaveCurrentShowreelAction);
             m_updateItemsLayoutOperation->requestOperation();
         };
 
@@ -259,39 +259,41 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
         Qt::QueuedConnection);
 
     m_connections << connect(layout->resource().get(), &LayoutResource::itemDataChanged, this,
-        &LayoutTourReviewController::handleItemDataChanged);
+        &ShowreelReviewController::handleItemDataChanged);
 }
 
-void LayoutTourReviewController::updateOrder()
+void ShowreelReviewController::updateOrder()
 {
-    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
+    NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
 
     auto items = workbench()->currentLayout()->items().values();
     QnWorkbenchItem::sortByGeometryAndName(items);
 
     int index = 0;
     for (auto item: items)
-        item->setData(Qn::LayoutTourItemOrderRole, ++index);
+        item->setData(Qn::ShowreelItemOrderRole, ++index);
 }
 
-void LayoutTourReviewController::updateButtons(const LayoutResourcePtr& layout)
+void ShowreelReviewController::updateButtons(const LayoutResourcePtr& layout)
 {
     NX_ASSERT(layout);
     if (!layout)
         return;
 
     // Using he fact that dataChanged will be sent even if action list was not changed.
-    const QList<action::IDType> actions{action::StartCurrentLayoutTourAction};
+    const QList<action::IDType> actions{action::StartCurrentShowreelAction};
     layout->setData(Qn::CustomPanelActionsRole, QVariant::fromValue(actions));
 }
 
-void LayoutTourReviewController::updatePlaceholders()
+void ShowreelReviewController::updatePlaceholders()
 {
-    auto createPlaceholder = [this, mapper = workbench()->mapper()](const QPoint& cell)
+    auto createPlaceholder =
+        [this, mapper = workbench()->mapper()](const QPoint& cell)
         {
             const QRectF geometry = mapper->mapFromGrid({cell, kCellSize});
 
-            QSharedPointer<LayoutTourDropPlaceholder> result(new LayoutTourDropPlaceholder());
+            QSharedPointer<ShowreelDropPlaceholder> result(
+                new ShowreelDropPlaceholder());
             result->setRect(geometry);
             display()->setLayer(result.data(), QnWorkbenchDisplay::BackLayer);
             mainWindow()->scene()->addItem(result.data());
@@ -357,18 +359,18 @@ void LayoutTourReviewController::updatePlaceholders()
     display()->fitInView(animate);
 }
 
-void LayoutTourReviewController::updateItemsLayout()
+void ShowreelReviewController::updateItemsLayout()
 {
-    if (!isLayoutTourReviewMode())
+    if (!isShowreelReviewMode())
         return;
 
     const auto wbLayout = workbench()->currentLayout();
-    const auto tourId = currentTourId();
-    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
+    const auto showreelId = currentShowreelId();
+    const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
     const auto reviewLayout = wbLayout->resource();
-    NX_ASSERT(reviewLayout == m_reviewLayouts.value(tourId));
+    NX_ASSERT(reviewLayout == m_reviewLayouts.value(showreelId));
 
-    nx::vms::api::LayoutTourDataList currentItems;
+    nx::vms::api::ShowreelDataList currentItems;
 
     auto layoutItems = wbLayout->items().values();
     QnWorkbenchItem::sortByGeometryAndName(layoutItems);
@@ -379,12 +381,12 @@ void LayoutTourReviewController::updateItemsLayout()
         NX_ASSERT(unpinned);
     }
 
-    const auto itemGrid = createItemGrid((int)tour.items.size());
+    const auto itemGrid = createItemGrid((int)showreel.items.size());
     core::GridWalker walker(itemGrid);
 
 
     // Dynamically reorder existing items to match new order (if something was added or removed).
-    for (const auto& item: tour.items)
+    for (const auto& item: showreel.items)
     {
         // Find first existing item that match the resource.
         auto existing = std::find_if(layoutItems.begin(), layoutItems.end(),
@@ -404,7 +406,7 @@ void LayoutTourReviewController::updateItemsLayout()
             NX_ASSERT(pinned);
             reviewLayout->setItemData(
                 layoutItem->uuid(),
-                Qn::LayoutTourItemDelayMsRole,
+                Qn::ShowreelItemDelayMsRole,
                 item.delayMs);
             layoutItems.erase(existing);
         }
@@ -425,9 +427,9 @@ void LayoutTourReviewController::updateItemsLayout()
     updateOrder();
 }
 
-void LayoutTourReviewController::resetReviewLayout(
+void ShowreelReviewController::resetReviewLayout(
     const LayoutResourcePtr& layout,
-    const nx::vms::api::LayoutTourItemDataList& items)
+    const nx::vms::api::ShowreelItemDataList& items)
 {
     layout->cleanupItemData();
     layout->setItems(QnLayoutItemDataList());
@@ -447,9 +449,9 @@ void LayoutTourReviewController::resetReviewLayout(
     updateButtons(layout);
 }
 
-void LayoutTourReviewController::addItemToReviewLayout(
+void ShowreelReviewController::addItemToReviewLayout(
     const LayoutResourcePtr& layout,
-    const nx::vms::api::LayoutTourItemData& item,
+    const nx::vms::api::ShowreelItemData& item,
     const QPointF& position,
     bool pinItem)
 {
@@ -463,12 +465,12 @@ void LayoutTourReviewController::addItemToReviewLayout(
         itemData.flags = Qn::Pinned;
     itemData.resource.id = item.resourceId;
     layout->setItemData(itemData.uuid,
-        Qn::LayoutTourItemDelayMsRole,
+        Qn::ShowreelItemDelayMsRole,
         item.delayMs);
     layout->addItem(itemData);
 }
 
-void LayoutTourReviewController::addResourcesToReviewLayout(
+void ShowreelReviewController::addResourcesToReviewLayout(
     const LayoutResourcePtr& layout,
     const QnResourceList& resources,
     const QPointF& position)
@@ -491,7 +493,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
         addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 
-bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataList* items)
+bool ShowreelReviewController::fillShowreelItems(nx::vms::api::ShowreelItemDataList* items)
 {
     NX_ASSERT(items);
     if (!items)
@@ -506,23 +508,23 @@ bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataL
         if (!resource)
             continue;
 
-        const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
+        const auto delayMs = item->data(Qn::ShowreelItemDelayMsRole).toInt();
         items->emplace_back(resource->getId(), delayMs);
     }
 
     return true;
 }
 
-void LayoutTourReviewController::handleItemDataChanged(
+void ShowreelReviewController::handleItemDataChanged(
     const QnUuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
-    if (role != Qn::LayoutTourItemDelayMsRole)
+    if (role != Qn::ShowreelItemDelayMsRole)
         return;
 
     // We can get here while changing layout.
-    if (!isLayoutTourReviewMode())
+    if (!isShowreelReviewMode())
         return;
 
     const auto item = workbench()->currentLayout()->item(id);
@@ -546,68 +548,67 @@ void LayoutTourReviewController::handleItemDataChanged(
         layout->setItemData(itemId, role, data);
 }
 
-void LayoutTourReviewController::at_reviewLayoutTourAction_triggered()
+void ShowreelReviewController::at_reviewShowreelAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-    reviewLayoutTour(systemContext()->showreelManager()->tour(id));
+    reviewShowreel(systemContext()->showreelManager()->showreel(id));
 }
 
-void LayoutTourReviewController::at_dropResourcesAction_triggered()
+void ShowreelReviewController::at_dropResourcesAction_triggered()
 {
-    if (!isLayoutTourReviewMode())
+    if (!isShowreelReviewMode())
         return;
 
     const auto reviewLayout = workbench()->currentLayoutResource();
     const auto parameters = menu()->currentParameters(sender());
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
     addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
-    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
-    menu()->trigger(action::SaveCurrentLayoutTourAction);
+    const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
+    menu()->trigger(action::SaveCurrentShowreelAction);
 }
 
-void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
+void ShowreelReviewController::at_startCurrentShowreelAction_triggered()
 {
-    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
-    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
-    NX_ASSERT(tour.isValid());
-    const auto startTourAction = action(action::ToggleLayoutTourModeAction);
+    NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
+    const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
+    NX_ASSERT(showreel.isValid());
+    const auto startTourAction = action(action::ToggleShowreelModeAction);
     NX_ASSERT(!startTourAction->isChecked());
     if (!startTourAction->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, tour.id});
+        menu()->trigger(action::ToggleShowreelModeAction, {Qn::UuidRole, showreel.id});
 }
 
-void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
+void ShowreelReviewController::at_saveCurrentShowreelAction_triggered()
 {
     if (m_updating)
         return;
 
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
-    const auto id = currentTourId();
-    auto tour = systemContext()->showreelManager()->tour(id);
-    NX_ASSERT(tour.isValid());
+    NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
+    const auto id = currentShowreelId();
+    auto showreel = systemContext()->showreelManager()->showreel(id);
+    NX_ASSERT(showreel.isValid());
 
     const auto reviewLayout = m_reviewLayouts.value(id);
     NX_ASSERT(reviewLayout);
 
-    tour.items.clear();
-    fillTourItems(&tour.items);
-    tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
-    systemContext()->showreelManager()->addOrUpdateTour(tour);
-    systemContext()->showreelStateManager()->markChanged(tour.id, true);
+    showreel.items.clear();
+    fillShowreelItems(&showreel.items);
+    showreel.settings.manual =
+        workbench()->currentLayout()->data(Qn::ShowreelIsManualRole).toBool();
+    systemContext()->showreelManager()->addOrUpdateShowreel(showreel);
+    systemContext()->showreelStateManager()->markChanged(showreel.id, true);
 
-    m_saveToursQueue.insert(tour.id);
-    m_saveToursOperation->requestOperation();
+    m_saveShowreelsQueue.insert(showreel.id);
+    m_saveShowreelsOperation->requestOperation();
 }
 
-void LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered()
+void ShowreelReviewController::at_removeCurrentShowreelAction_triggered()
 {
-    NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
-    menu()->trigger(action::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
+    NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
+    menu()->trigger(action::RemoveShowreelAction, {Qn::UuidRole, currentShowreelId()});
 }
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

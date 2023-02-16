@@ -59,7 +59,7 @@ public:
      */
     static QnWorkbenchLayout* instance(const LayoutResourcePtr& resource);
 
-    // TODO: #sivanov Reimplement the same way as layout tour reviews are implemented.
+    // TODO: #sivanov Reimplement the same way as Showreel reviews are implemented.
     /**
      * @return Layout associated with the given resource, if any.
      */

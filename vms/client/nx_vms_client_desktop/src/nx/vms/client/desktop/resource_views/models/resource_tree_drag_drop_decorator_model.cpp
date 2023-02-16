@@ -181,7 +181,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
                 break;
             }
             case NodeType::videoWallItem:
-            case NodeType::layoutTour:
+            case NodeType::showreel:
                 entities.insert(index.data(Qn::UuidRole).value<QnUuid>());
                 break;
 

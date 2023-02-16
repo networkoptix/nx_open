@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "layout_tour_data.h"
+#include "showreel_data.h"
 
 #include <QtCore/QString>
 
@@ -12,16 +12,16 @@ namespace nx::vms::api {
  * %param name
  *     %example Showreel 1
  */
-struct NX_VMS_API ShowreelModel: LayoutTourData
+struct NX_VMS_API ShowreelModel: ShowreelData
 {
-    using DbReadTypes = std::tuple<LayoutTourData>;
-    using DbUpdateTypes = std::tuple<LayoutTourData>;
-    using DbListTypes = std::tuple<LayoutTourDataList>;
+    using DbReadTypes = std::tuple<ShowreelData>;
+    using DbUpdateTypes = std::tuple<ShowreelData>;
+    using DbListTypes = std::tuple<ShowreelDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<ShowreelModel> fromDbTypes(DbListTypes data);
 };
-#define ShowreelModel_Fields LayoutTourData_Fields
+#define ShowreelModel_Fields ShowreelData_Fields
 QN_FUSION_DECLARE_FUNCTIONS(ShowreelModel, (json), NX_VMS_API)
 
 } // namespace nx::vms::api

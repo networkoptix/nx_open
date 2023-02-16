@@ -27,7 +27,6 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
@@ -64,6 +63,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/rules/engine.h>
@@ -874,7 +874,7 @@ ActionVisibility SaveLayoutCondition::check(
     if (layout->data().contains(Qn::VideoWallResourceRole))
         return InvisibleAction;
 
-    if (layout->data().contains(Qn::LayoutTourUuidRole))
+    if (layout->data().contains(Qn::ShowreelUuidRole))
         return InvisibleAction;
 
     auto systemContext = SystemContext::fromResource(layout);
@@ -1060,12 +1060,14 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
     return EnabledAction;
 }
 
-ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility StartCurrentShowreelCondition::check(
+    const Parameters& /*parameters*/,
+    QnWorkbenchContext* context)
 {
-    const auto tourId = context->workbench()->currentLayoutResource()->data()
-        .value(Qn::LayoutTourUuidRole).value<QnUuid>();
-    const auto tour = context->systemContext()->showreelManager()->tour(tourId);
-    if (tour.isValid() && tour.items.size() > 0)
+    const auto showreelId = context->workbench()->currentLayoutResource()->data()
+        .value(Qn::ShowreelUuidRole).value<QnUuid>();
+    const auto showreel = context->systemContext()->showreelManager()->showreel(showreelId);
+    if (showreel.isValid() && showreel.items.size() > 0)
         return EnabledAction;
     return DisabledAction;
 }
@@ -2081,7 +2083,7 @@ ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types)
         });
 }
 
-ConditionWrapper isLayoutTourReviewMode()
+ConditionWrapper isShowreelReviewMode()
 {
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)

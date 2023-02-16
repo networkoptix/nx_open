@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/layout_tour_data.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -18,35 +19,39 @@ class QGraphicsWidget;
 
 namespace nx::utils { class PendingOperation; }
 
+namespace nx::vms::api {
+struct ShowreelData;
+struct ShowreelItemData;
+using ShowreelItemDataList = std::vector<ShowreelItemData>;
+} // namespace nx::vms::api
+
 namespace nx::vms::client::desktop {
-namespace ui {
 
-class LayoutTourDropPlaceholder;
+class ShowreelDropPlaceholder;
 
-namespace workbench {
-
-class LayoutTourReviewController: public QObject, public QnWorkbenchContextAware
+class ShowreelReviewController: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    LayoutTourReviewController(QObject* parent = nullptr);
-    virtual ~LayoutTourReviewController() override;
+    ShowreelReviewController(QObject* parent = nullptr);
+    virtual ~ShowreelReviewController() override;
 
 private:
-    void handleTourChanged(const nx::vms::api::LayoutTourData& tour);
-    void handleTourRemoved(const QnUuid& tourId);
+    void handleShowreelChanged(const nx::vms::api::ShowreelData& showreel);
+    void handleShowreelRemoved(const QnUuid& showreelId);
 
-    /** Handle current layout changes to update the tour review. */
+    /** Handle current layout changes to update the Showreel review. */
     void startListeningLayout();
+
     /** Stop handling current layout changes. */
     void stopListeningLayout();
 
-    void reviewLayoutTour(const nx::vms::api::LayoutTourData& tour);
+    void reviewShowreel(const nx::vms::api::ShowreelData& showreel);
 
-    QnUuid currentTourId() const;
-    bool isLayoutTourReviewMode() const;
+    QnUuid currentShowreelId() const;
+    bool isShowreelReviewMode() const;
 
     void connectToLayout(QnWorkbenchLayout* layout);
 
@@ -56,11 +61,11 @@ private:
     void updateItemsLayout();
 
     void resetReviewLayout(const LayoutResourcePtr& layout,
-        const nx::vms::api::LayoutTourItemDataList& items);
+        const nx::vms::api::ShowreelItemDataList& items);
 
     void addItemToReviewLayout(
         const LayoutResourcePtr& layout,
-        const nx::vms::api::LayoutTourItemData& item,
+        const nx::vms::api::ShowreelItemData& item,
         const QPointF& position,
         bool pinItem);
     void addResourcesToReviewLayout(
@@ -69,28 +74,26 @@ private:
         const QPointF& position);
 
     /** Calculate items from the review layout. */
-    bool fillTourItems(nx::vms::api::LayoutTourItemDataList* items);
+    bool fillShowreelItems(nx::vms::api::ShowreelItemDataList* items);
 
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
 // Actions handlers
 private:
-    void at_reviewLayoutTourAction_triggered();
+    void at_reviewShowreelAction_triggered();
     void at_dropResourcesAction_triggered();
-    void at_startCurrentLayoutTourAction_triggered();
-    void at_saveCurrentLayoutTourAction_triggered();
-    void at_removeCurrentLayoutTourAction_triggered();
+    void at_startCurrentShowreelAction_triggered();
+    void at_saveCurrentShowreelAction_triggered();
+    void at_removeCurrentShowreelAction_triggered();
 
 private:
     nx::utils::ScopedConnections m_connections;
     QHash<QnUuid, LayoutResourcePtr> m_reviewLayouts;
-    QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
-    QSet<QnUuid> m_saveToursQueue;
-    nx::utils::PendingOperation* m_saveToursOperation = nullptr;
+    QHash<QPoint, QSharedPointer<ShowreelDropPlaceholder>> m_dropPlaceholders;
+    QSet<QnUuid> m_saveShowreelsQueue;
+    nx::utils::PendingOperation* m_saveShowreelsOperation = nullptr;
     nx::utils::PendingOperation* m_updateItemsLayoutOperation = nullptr;
     bool m_updating = false;
 };
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

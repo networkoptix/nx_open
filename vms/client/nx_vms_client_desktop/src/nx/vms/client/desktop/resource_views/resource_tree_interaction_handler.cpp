@@ -459,7 +459,7 @@ void ResourceTreeInteractionHandler::showContextMenu(
     static const QSet<ui::action::IDType> renameActions = {
         ui::action::RenameResourceAction,
         ui::action::RenameVideowallEntityAction,
-        ui::action::RenameLayoutTourAction,
+        ui::action::RenameShowreelAction,
         ui::action::RenameCustomGroupAction};
 
     for (auto id: renameActions)
@@ -542,9 +542,9 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             break;
         }
 
-        case ResourceTree::NodeType::layoutTour:
+        case ResourceTree::NodeType::showreel:
         {
-            menu()->triggerIfPossible(ui::action::ReviewLayoutTourAction,
+            menu()->triggerIfPossible(ui::action::ReviewShowreelAction,
                 {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
             break;
         }
@@ -614,7 +614,7 @@ void ResourceTreeInteractionHandler::activateSearchResults(
     for (const auto& index: indexes)
     {
         const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
-        if (nodeType == ResourceTree::NodeType::layoutTour)
+        if (nodeType == ResourceTree::NodeType::showreel)
         {
             const auto showreelId = index.data(Qn::UuidRole).value<QnUuid>();
             showreels.push_back(showreelId);
@@ -653,7 +653,7 @@ void ResourceTreeInteractionHandler::activateSearchResults(
         menu()->triggerIfPossible(ui::action::OpenVideoWallReviewAction, videowallResource);
 
     for (const auto& showreelId: showreels)
-        menu()->triggerIfPossible(ui::action::ReviewLayoutTourAction, {Qn::UuidRole, showreelId});
+        menu()->triggerIfPossible(ui::action::ReviewShowreelAction, {Qn::UuidRole, showreelId});
 }
 
 } // namespace nx::vms::client::desktop

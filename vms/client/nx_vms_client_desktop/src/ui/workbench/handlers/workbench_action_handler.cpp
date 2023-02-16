@@ -8,7 +8,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGroupBox>
@@ -47,7 +46,6 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -121,6 +119,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <platform/environment.h>
@@ -171,7 +170,7 @@
 #include <utils/unity_launcher_workaround.h>
 
 #if defined(Q_OS_MACX)
-    #include <utils/mac_utils.h>
+#include <utils/mac_utils.h>
 #endif
 
 // TODO: #sivanov remove this include
@@ -305,8 +304,8 @@ ActionHandler::ActionHandler(QObject *parent) :
         this, SLOT(at_openNewWindowAction_triggered()));
     connect(action(action::OpenWelcomeScreenAction), &QAction::triggered,
         this, &ActionHandler::at_openWelcomeScreenAction_triggered);
-    connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
-        &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
+    connect(action(action::ReviewShowreelInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_reviewShowreelInNewWindowAction_triggered);
 
     connect(action(action::ChangeDefaultCameraPasswordAction), &QAction::triggered,
         this, &ActionHandler::at_changeDefaultCameraPassword_triggered);
@@ -679,7 +678,7 @@ void ActionHandler::at_workbench_cellSpacingChanged()
 
 void ActionHandler::at_nextLayoutAction_triggered()
 {
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleShowreelModeAction)->isChecked())
         return;
 
     const auto total = workbench()->layouts().size();
@@ -691,7 +690,7 @@ void ActionHandler::at_nextLayoutAction_triggered()
 
 void ActionHandler::at_previousLayoutAction_triggered()
 {
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleShowreelModeAction)->isChecked())
         return;
 
     const auto total = workbench()->layouts().size();
@@ -1114,7 +1113,7 @@ void ActionHandler::at_openWelcomeScreenAction_triggered()
     appContext()->clientStateHandler()->createNewWindow();
 }
 
-void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
+void ActionHandler::at_reviewShowreelInNewWindowAction_triggered()
 {
     auto connection = this->connection();
     if (!NX_ASSERT(connection, "Client must be logged in"))
@@ -1449,7 +1448,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
 
 void ActionHandler::at_dropResourcesAction_triggered()
 {
-    // Layout Tour Handler will process this action itself
+    // Showreel Handler will process this action itself.
     if (context()->workbench()->currentLayout()->isShowreelReviewLayout())
         return;
 

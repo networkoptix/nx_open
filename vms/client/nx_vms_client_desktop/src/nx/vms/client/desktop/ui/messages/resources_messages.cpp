@@ -41,6 +41,9 @@ static const QString kRemoveFromRoleLocalLayoutOnceKey("RemoveFromRoleLocalLayou
 /* Removing multiple items from layout. */
 static const QString kRemoveItemsFromLayoutShowOnceKey("RemoveItemsFromLayout");
 
+/** Remove multiple items from Showreel. */
+static const QString kRemoveItemsFromShowreelShowOnceKey("RemoveItemsFromShowreel");
+
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey("DeleteResources");
 
@@ -118,7 +121,7 @@ bool Resources::overrideLayout(QWidget* parent)
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
-bool Resources::overrideLayoutTour(QWidget* parent)
+bool Resources::overrideShowreel(QWidget* parent)
 {
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
@@ -190,11 +193,11 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
 
     if (!sharedLayouts.empty())
     {
-        if (personalLayouts.size() == 0) 
+        if (personalLayouts.size() == 0)
         {
             messageBox.setInformativeText(
                 tr("These layouts are shared with other users, so they will be deleted for their accounts as well.",
-                    "Numerical form depends on layouts count", 
+                    "Numerical form depends on layouts count",
                     sharedLayouts.size()));
         }
         else
@@ -245,10 +248,10 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     return result != QDialogButtonBox::Cancel;
 }
 
-bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources)
+bool Resources::removeItemsFromShowreel(QWidget* parent, const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
-    if (qnClientShowOnce->testFlag(kRemoveItemsFromLayoutShowOnceKey))
+    if (qnClientShowOnce->testFlag(kRemoveItemsFromShowreelShowOnceKey))
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -260,7 +263,7 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kRemoveItemsFromLayoutShowOnceKey);
+        qnClientShowOnce->setFlag(kRemoveItemsFromShowreelShowOnceKey);
 
     return result != QDialogButtonBox::Cancel;
 }

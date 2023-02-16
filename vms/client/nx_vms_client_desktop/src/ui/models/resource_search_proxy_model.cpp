@@ -137,7 +137,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
     static const auto searchGroupNodes = QSet<NodeType>({
         NodeType::servers,
         NodeType::layouts,
-        NodeType::layoutTours,
+        NodeType::showreels,
         NodeType::videoWalls,
         NodeType::webPages,
         NodeType::analyticsEngines,
@@ -187,7 +187,7 @@ bool QnResourceSearchProxyModel::isAcceptedIndex(
             return resourceFlags.testFlag(Qn::layout)
                 && (!resourceFlags.testFlag(Qn::local)
                     || resourceFlags.testFlag(Qn::local_intercom_layout));
-        case NodeType::layoutTours:
+        case NodeType::showreels:
             return true;
         case NodeType::videoWalls:
             return resourceFlags.testFlag(Qn::videowall);
@@ -221,7 +221,7 @@ bool QnResourceSearchProxyModel::isRejectedNodeType(
         case NodeType::recorder:
             return allowedNodeType == NodeType::servers; //< Filter non-resource server children.
         case NodeType::resource:
-            return allowedNodeType == NodeType::layoutTours;
+            return allowedNodeType == NodeType::showreels;
         default:
             return false;
     }

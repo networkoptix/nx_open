@@ -4,9 +4,9 @@
 
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 
-class QnLayoutTourManager;
+namespace nx::vms::common { class ShowreelManager; }
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -16,7 +16,7 @@ class ShowreelItem: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
-    ShowreelItem(const QnLayoutTourManager* showreelManager, const QnUuid& id);
+    ShowreelItem(const common::ShowreelManager* showreelManager, const QnUuid& id);
 
     /**
      * Implements AbstractItem::data().
@@ -35,9 +35,9 @@ public:
     virtual Qt::ItemFlags flags() const override;
 
 private:
-    void onLayoutTourChanged(const nx::vms::api::LayoutTourData& tourData);
+    void onShowreelChanged(const nx::vms::api::ShowreelData& showreel);
 
-    nx::vms::api::LayoutTourData m_tourData;
+    nx::vms::api::ShowreelData m_showreel;
     nx::utils::ScopedConnections m_connectionsGuard;
 };
 

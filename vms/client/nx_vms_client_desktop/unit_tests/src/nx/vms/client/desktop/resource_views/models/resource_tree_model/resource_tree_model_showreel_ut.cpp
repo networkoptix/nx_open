@@ -2,11 +2,11 @@
 
 #include <client/client_globals.h>
 #include <common/common_module.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/help/help_topics.h>
 
 #include "resource_tree_model_test_fixture.h"
@@ -28,7 +28,7 @@ TEST_F(ResourceTreeModelTest, showreelAdds)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueShowreelName)));
@@ -40,13 +40,13 @@ TEST_F(ResourceTreeModelTest, showreelRemoves)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    const auto showreel = addLayoutTour(kUniqueShowreelName);
+    const auto showreel = addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueShowreelName)));
 
     // When previously added showreel is removed.
-    systemContext()->showreelManager()->removeTour(showreel.id);
+    systemContext()->showreelManager()->removeShowreel(showreel.id);
 
     // Then no more nodes with corresponding display text found in the resource tree.
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueShowreelName)));
@@ -58,13 +58,13 @@ TEST_F(ResourceTreeModelTest, showreelIconType)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    const auto showreel = addLayoutTour(kUniqueShowreelName);
+    const auto showreel = addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
 
     // And it have showreel icon type.
-    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::LayoutTour)(showreelIndex));
+    ASSERT_TRUE(iconTypeMatch(QnResourceIconCache::Showreel)(showreelIndex));
 }
 
 TEST_F(ResourceTreeModelTest, showreelIsChildrenOfCorrespondingTopLevelNode)
@@ -73,7 +73,7 @@ TEST_F(ResourceTreeModelTest, showreelIsChildrenOfCorrespondingTopLevelNode)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
@@ -85,7 +85,7 @@ TEST_F(ResourceTreeModelTest, showreelIsChildrenOfCorrespondingTopLevelNode)
 TEST_F(ResourceTreeModelTest, showreelIsNotDisplayedIfNotLoggedIn)
 {
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // When user is logged in.
     loginAsAdmin("admin");
@@ -100,7 +100,7 @@ TEST_F(ResourceTreeModelTest, showreelIsNotDisplayedIfNotLoggedIn)
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueShowreelName)));
 
     // Then no more nodes with showreel icon type found in the resource tree.
-    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::LayoutTour)));
+    ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::Showreel)));
 }
 
 TEST_F(ResourceTreeModelTest, showreelTooltip)
@@ -109,7 +109,7 @@ TEST_F(ResourceTreeModelTest, showreelTooltip)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
@@ -121,7 +121,7 @@ TEST_F(ResourceTreeModelTest, showreelTooltip)
 TEST_F(ResourceTreeModelTest, showreelDisplayNameMapping)
 {
     // When showreel with certain unique name is added.
-    auto showreel = addLayoutTour(kUniqueShowreelName);
+    auto showreel = addShowreel(kUniqueShowreelName);
 
     // When user is logged in.
     loginAsAdmin("admin");
@@ -139,7 +139,7 @@ TEST_F(ResourceTreeModelTest, showreelItemIsDragEnabled)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
@@ -154,7 +154,7 @@ TEST_F(ResourceTreeModelTest, showreelHasItemNeverHasChildrenFlag)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);
@@ -169,7 +169,7 @@ TEST_F(ResourceTreeModelTest, showreelItemIsNotDropEnabled)
     loginAsAdmin("admin");
 
     // When showreel with certain unique name is added.
-    addLayoutTour(kUniqueShowreelName);
+    addShowreel(kUniqueShowreelName);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto showreelIndex = uniqueMatchingIndex(kUniqueShowreelNameCondition);

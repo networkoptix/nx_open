@@ -2,22 +2,22 @@
 
 #pragma once
 
-#include <ui/graphics/items/overlays/overlayed.h>
 #include <qt_graphics_items/graphics_widget.h>
+
 #include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/graphics/items/overlays/overlayed.h>
 
 class QnViewportBoundWidget;
 
 namespace nx::vms::client::desktop {
-namespace ui {
 
-class LayoutTourDropPlaceholder: public Overlayed<QnFramedWidget>
+class ShowreelDropPlaceholder: public Overlayed<QnFramedWidget>
 {
     Q_OBJECT
     using base_type = Overlayed<QnFramedWidget>;
 
 public:
-    LayoutTourDropPlaceholder(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {});
+    ShowreelDropPlaceholder(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {});
 
     const QRectF& rect() const;
     void setRect(const QRectF& rect);
@@ -30,5 +30,4 @@ private:
     QnViewportBoundWidget* m_widget;
 };
 
-} // namespace ui
 } // namespace nx::vms::client::desktop

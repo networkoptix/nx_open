@@ -15,13 +15,13 @@ ShowreelModel::DbUpdateTypes ShowreelModel::toDbTypes() &&
 
 std::vector<ShowreelModel> ShowreelModel::fromDbTypes(DbListTypes all)
 {
-    auto& baseList = std::get<LayoutTourDataList>(all);
+    auto& baseList = std::get<ShowreelDataList>(all);
     std::vector<ShowreelModel> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
         ShowreelModel model;
-        model.LayoutTourData::operator=(std::move(baseData));
+        model.ShowreelData::operator=(std::move(baseData));
         result.emplace_back(std::move(model));
     }
     return result;

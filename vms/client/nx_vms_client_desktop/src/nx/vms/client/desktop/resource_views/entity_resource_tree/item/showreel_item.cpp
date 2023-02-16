@@ -4,23 +4,23 @@
 
 #include <QtCore/QVariant>
 
-#include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <client/client_globals.h>
-#include <core/resource_management/layout_tour_manager.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
+#include <ui/help/help_topics.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 using namespace nx::vms::api;
 
-ShowreelItem::ShowreelItem(const QnLayoutTourManager* showreelManager, const QnUuid& id):
+ShowreelItem::ShowreelItem(const common::ShowreelManager* showreelManager, const QnUuid& id):
     base_type()
 {
-    m_tourData = showreelManager->tour(id);
+    m_showreel = showreelManager->showreel(id);
     m_connectionsGuard.add(
-        QObject::connect(showreelManager, &QnLayoutTourManager::tourChanged,
-        [this](const LayoutTourData& tour) { onLayoutTourChanged(tour); }));
+        QObject::connect(showreelManager, &common::ShowreelManager::showreelChanged,
+        [this](const ShowreelData& tour) { onShowreelChanged(tour); }));
 }
 
 QVariant ShowreelItem::data(int role) const
@@ -30,16 +30,16 @@ QVariant ShowreelItem::data(int role) const
         case Qt::DisplayRole:
         case Qt::ToolTipRole:
         case Qt::EditRole:
-            return m_tourData.name;
+            return m_showreel.name;
 
         case Qn::ResourceIconKeyRole:
-            return QVariant::fromValue<int>(QnResourceIconCache::LayoutTour);
+            return QVariant::fromValue<int>(QnResourceIconCache::Showreel);
 
         case Qn::NodeTypeRole:
-            return QVariant::fromValue(ResourceTree::NodeType::layoutTour);
+            return QVariant::fromValue(ResourceTree::NodeType::showreel);
 
         case Qn::UuidRole:
-            return QVariant::fromValue(m_tourData.id);
+            return QVariant::fromValue(m_showreel.id);
 
         case Qn::HelpTopicIdRole:
             return QVariant::fromValue<int>(Qn::Showreel_Help);
@@ -53,13 +53,13 @@ Qt::ItemFlags ShowreelItem::flags() const
         Qt::ItemNeverHasChildren};
 }
 
-void ShowreelItem::onLayoutTourChanged(const LayoutTourData& tourData)
+void ShowreelItem::onShowreelChanged(const ShowreelData& showreel)
 {
-    if (tourData.id != m_tourData.id)
+    if (showreel.id != m_showreel.id)
         return;
 
-    const bool nameChanged = tourData.name != m_tourData.name;
-    m_tourData = tourData;
+    const bool nameChanged = showreel.name != m_showreel.name;
+    m_showreel = showreel;
 
     if (nameChanged)
         notifyDataChanged({Qt::DisplayRole, Qt::ToolTipRole, Qt::EditRole});

@@ -11,8 +11,8 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
-#include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
+#include <nx/vms/client/desktop/showreel/showreel_actions.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
@@ -123,12 +123,12 @@ void initialize(Manager* manager, Action* root)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
         .shortcut("F11")
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(FullscreenResourceAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(ShowTimeLineOnVideowallAction)
         .flags(NoTarget)
@@ -148,7 +148,7 @@ void initialize(Manager* manager, Action* root)
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system,
                 MatchMode::any)
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(OpenBusinessLogAction)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -156,7 +156,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
         .shortcut("Ctrl+L")
-        .condition(!condition::tourIsRunning())
+        .condition(!condition::showreelIsRunning())
         .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
 
     factory(OpenBusinessRulesAction)
@@ -271,21 +271,13 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Advanced..."));
 
-    factory(SuspendCurrentTourAction)
-        .flags(NoTarget)
-        .condition(condition::tourIsRunning());
-
-    factory(ResumeCurrentTourAction)
-        .flags(NoTarget)
-        .condition(condition::tourIsRunning());
-
     /* Context menu actions. */
 
     factory(FitInViewAction)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Fit in View"))
-        .condition(!condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+        .condition(!condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory()
         .flags(Scene)
@@ -296,7 +288,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Main Menu")) //< To be displayed on button tooltip
         .shortcut(QString("Alt+Space"), Builder::Mac, true)
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(OpenLoginDialogAction)
         .flags(Main | GlobalHotkey)
@@ -305,7 +297,7 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(ContextMenu::tr("Connect to Another Server..."),
             condition::isLoggedIn())
         .shortcut("Ctrl+Shift+C")
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(DisconnectAction)
         .flags(NoTarget)
@@ -341,7 +333,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Tab"))
             .pulledText(ContextMenu::tr("New Tab"))
             .shortcut("Ctrl+T")
-            .condition(!condition::tourIsRunning())
+            .condition(!condition::showreelIsRunning())
             .icon(qnSkin->icon("titlebar/new_layout.png"));
 
         factory(OpenNewWindowAction)
@@ -402,7 +394,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree | Scene)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open"))
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory.beginSubMenu();
     {
@@ -412,12 +404,12 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
             .text(ContextMenu::tr("Files..."))
             .shortcut("Ctrl+O")
-            .condition(!condition::tourIsRunning());
+            .condition(!condition::showreelIsRunning());
 
         factory(OpenFolderAction)
             .flags(Main | Scene)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            .condition(!condition::tourIsRunning())
+            .condition(!condition::showreelIsRunning())
             .text(ContextMenu::tr("Folder..."));
 
         factory().separator()
@@ -433,10 +425,10 @@ void initialize(Manager* manager, Action* root)
 
     } factory.endSubMenu();
 
-    factory(SaveCurrentLayoutTourAction)
+    factory(SaveCurrentShowreelAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .condition(condition::isLayoutTourReviewMode());
+        .condition(condition::isShowreelReviewMode());
 
     factory(SaveCurrentLayoutAction)
         .mode(DesktopMode)
@@ -445,8 +437,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Current Layout"))
         .shortcut("Ctrl+S")
         .condition(ConditionWrapper(new SaveLayoutCondition(true))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory(SaveCurrentLayoutAsAction)
         .mode(DesktopMode)
@@ -457,8 +449,8 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::isLoggedIn()
             && condition::applyToCurrentLayout(condition::canSaveLayoutAs())
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory(SaveCurrentLayoutAsCloudAction)
         .mode(DesktopMode)
@@ -470,8 +462,8 @@ void initialize(Manager* manager, Action* root)
             && condition::applyToCurrentLayout(
                 condition::canSaveLayoutAs()
                 && condition::hasFlags(Qn::cross_system, MatchMode::none))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory(ShareLayoutAction)
         .mode(DesktopMode)
@@ -588,7 +580,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(SystemUpdateAction)
         .flags(NoTarget)
@@ -632,7 +624,7 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Ctrl+B")
         .condition(
             condition::hasPermissionsForResources(Qn::ViewBookmarksPermission)
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(LoginToCloud)
         .flags(NoTarget)
@@ -683,7 +675,7 @@ void initialize(Manager* manager, Action* root)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Event Rules..."))
         .shortcut("Ctrl+E")
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(CameraListAction)
         .flags(GlobalHotkey)
@@ -695,7 +687,7 @@ void initialize(Manager* manager, Action* root)
             ContextMenu::tr("Cameras List")
         ))
         .shortcut("Ctrl+M")
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory()
         .flags(Main | Tree)
@@ -731,12 +723,12 @@ void initialize(Manager* manager, Action* root)
                 condition::treeNodeType(ResourceTree::NodeType::webPages)
             );
 
-        factory(NewLayoutTourAction)
+        factory(NewShowreelAction)
             .flags(Main | Tree)
             .text(ContextMenu::tr("Showreel..."))
             .pulledText(ContextMenu::tr("Add Showreel..."))
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType(ResourceTree::NodeType::layoutTours)
+                && condition::treeNodeType(ResourceTree::NodeType::showreels)
             );
 
         factory(MainMenuAddVirtualCameraAction)
@@ -767,7 +759,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
-            && !condition::tourIsRunning()).action();
+            && !condition::showreelIsRunning()).action();
 
     QObject::connect(systemAdministrationAlias, &QAction::triggered,
         systemAdministrationAction, &QAction::trigger);
@@ -783,7 +775,7 @@ void initialize(Manager* manager, Action* root)
         .shortcut("F1")
         .shortcutContext(Qt::ApplicationShortcut)
         .role(QAction::AboutRole)
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory()
         .flags(Main)
@@ -1008,7 +1000,7 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(Qn::server, MatchMode::all))
         .condition(
             ConditionWrapper(new OpenInCurrentLayoutCondition())
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory(OpenInNewTabAction)
         .mode(DesktopMode)
@@ -1129,7 +1121,7 @@ void initialize(Manager* manager, Action* root)
     factory(ForgetLayoutPasswordAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Forget password"))
-        .condition(condition::canForgetPassword() && !condition::isLayoutTourReviewMode());
+        .condition(condition::canForgetPassword() && !condition::isShowreelReviewMode());
 
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
@@ -1162,7 +1154,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::isLoggedIn()
             && condition::canSaveLayoutAs()
-            && !condition::isLayoutTourReviewMode()
+            && !condition::isShowreelReviewMode()
         );
 
     factory(SaveLayoutAsCloudAction)
@@ -1178,7 +1170,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree)
         .separator();
 
-    factory(MakeLayoutTourAction)
+    factory(MakeShowreelAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
         .condition(condition::canMakeShowreel());
@@ -1200,8 +1192,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Enter")
         .shortcut("Return")
         .condition(ConditionWrapper(new ItemZoomedCondition(false))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory(UnmaximizeItemAction)
         .flags(Scene | SingleTarget)
@@ -1209,8 +1201,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Enter")
         .shortcut("Return")
         .condition(ConditionWrapper(new ItemZoomedCondition(true))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
@@ -1229,7 +1221,7 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Alt+I")
         .autoRepeat(true)
         .condition(ConditionWrapper(new DisplayInfoCondition())
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory()
         .flags(Scene | SingleTarget)
@@ -1254,7 +1246,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Manage..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
             .condition(ConditionWrapper(new PtzCondition(Ptz::ToursPtzCapability, false))
-                && !condition::tourIsRunning());
+                && !condition::showreelIsRunning());
 
     } factory.endSubMenu();
 
@@ -1263,7 +1255,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Show Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Show Motion"), new NoArchiveCondition())
         .condition(ConditionWrapper(new SmartSearchCondition(false))
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with .checked state!
     factory(StopSmartSearchAction)
@@ -1271,29 +1263,29 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Hide Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Hide Motion"), new NoArchiveCondition())
         .condition(ConditionWrapper(new SmartSearchCondition(true))
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory(ClearMotionSelectionAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Clear Motion Selection"))
         .condition(ConditionWrapper(new ClearMotionSelectionCondition())
-            && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && !condition::showreelIsRunning()
+            && !condition::isShowreelReviewMode());
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut("Alt+G")
         .autoRepeat(true)
         .condition(ConditionWrapper(new SmartSearchCondition())
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory(CheckFileSignatureAction)
         .flags(Scene | SingleTarget)
         .text(ContextMenu::tr("Check File Watermark"))
         .shortcut("Alt+C")
         .condition(condition::hasFlags(Qn::local_video, MatchMode::any)
-            && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && !condition::showreelIsRunning()
+            && !condition::isShowreelReviewMode());
 
     factory(TakeScreenshotAction)
         .flags(Scene | SingleTarget | HotkeyOnly)
@@ -1305,12 +1297,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Image Enhancement..."))
         .shortcut("Alt+J")
         .condition(ConditionWrapper(new AdjustVideoCondition())
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)
         .condition(ConditionWrapper(new CreateZoomWindowCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(RotateToAction)
         .flags(Scene | SingleTarget | MultiTarget)
@@ -1324,7 +1316,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Resolution..."))
         .childFactory(new RadassActionFactory(manager))
         .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode());
+            && !condition::isShowreelReviewMode());
 
     factory(CreateNewCustomGroupAction)
         .mode(DesktopMode)
@@ -1388,11 +1380,11 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove from Layout"))
         .conditionalText(ContextMenu::tr("Remove from Showreel"),
-            condition::isLayoutTourReviewMode())
+            condition::isShowreelReviewMode())
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(ConditionWrapper(new LayoutItemRemovalCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(RemoveFromServerAction)
         .flags(Tree | Table | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
@@ -1442,7 +1434,7 @@ void initialize(Manager* manager, Action* root)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Web Page Settings..."))
         .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne)
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(DeleteFromDiskAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1456,7 +1448,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Set as Layout Background"))
         .condition(ConditionWrapper(new SetAsBackgroundCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && condition::applyToCurrentLayout(
                 condition::hasFlags(Qn::cross_system, MatchMode::none)
             ));
@@ -1507,7 +1499,7 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new ReplaceCameraCondition())
             && condition::isTrue(ini().enableCameraReplacementFeature)
             && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
+                !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
     factory(UndoReplaceCameraAction)
@@ -1530,9 +1522,9 @@ void initialize(Manager* manager, Action* root)
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system | Qn::virtual_camera,
                 MatchMode::all)
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
+                !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
     factory(CameraBusinessRulesAction)
@@ -1550,9 +1542,9 @@ void initialize(Manager* manager, Action* root)
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system | Qn::virtual_camera,
                 MatchMode::any)
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
+                !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
     factory(CameraSettingsAction)
@@ -1572,9 +1564,9 @@ void initialize(Manager* manager, Action* root)
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system,
                 MatchMode::all)
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
+                !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
     factory(CopyRecordingScheduleAction)
@@ -1587,9 +1579,9 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("File Settings..."))
         .condition(condition::hasFlags(Qn::local_media, MatchMode::any)
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && condition::scoped(SceneScope,
-                !condition::isLayoutTourReviewMode()
+                !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
     factory(LayoutSettingsAction)
@@ -1598,7 +1590,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Layout Settings..."))
         .requiredTargetPermissions(Qn::EditLayoutSettingsPermission)
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(VideowallSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
@@ -1653,8 +1645,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && !condition::showreelIsRunning()
+            && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
     factory(PingAction)
         .flags(NoTarget);
@@ -1665,8 +1657,8 @@ void initialize(Manager* manager, Action* root)
         .requiredAdminPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
+            && !condition::showreelIsRunning()
+            && condition::scoped(SceneScope, !condition::isShowreelReviewMode())
             && ConditionWrapper(new ResourceStatusCondition(
                 nx::vms::api::ResourceStatus::online,
                 true /* all */)));
@@ -1677,8 +1669,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && !condition::showreelIsRunning()
+            && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
     factory(WebAdminAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1687,8 +1679,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !ConditionWrapper(new CloudServerCondition(MatchMode::any))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && !condition::showreelIsRunning()
+            && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
     factory(ServerSettingsAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1700,8 +1692,8 @@ void initialize(Manager* manager, Action* root)
                 /*exclude*/ Qn::cross_system,
                 MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && !condition::showreelIsRunning()
+            && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
     factory(ConnectToCurrentSystem)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
@@ -1719,16 +1711,16 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Cell Aspect Ratio..."))
         .condition(!ConditionWrapper(new VideoWallReviewModeCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     factory()
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Cell Spacing"))
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isShowreelReviewMode()
+            && !condition::showreelIsRunning());
 
     // TODO: #sivanov Move to childFactory, reduce actions number.
     factory.beginSubMenu();
@@ -1770,98 +1762,104 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene)
         .separator();
 
-#pragma region Layout Tours
+#pragma region Showreels
 
-    factory(ReviewLayoutTourAction)
+    factory(ReviewShowreelAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Tab"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
 
-    factory(ReviewLayoutTourInNewWindowAction)
+    factory(ReviewShowreelInNewWindowAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Window"))
-        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
 
     factory().flags(Tree).separator().condition(
-        condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        condition::treeNodeType(ResourceTree::NodeType::showreel));
 
-    factory(ToggleLayoutTourModeAction)
+    factory(ToggleShowreelModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
         .mode(DesktopMode)
-        .dynamicText(new LayoutTourTextFactory(manager))
+        .dynamicText(new ShowreelTextFactory(manager))
         .shortcut("Alt+T")
         .checkable()
         .condition(
-            condition::tourIsRunning()
-            || (condition::treeNodeType(ResourceTree::NodeType::layoutTour) && condition::
-                canStartTour()));
+            condition::showreelIsRunning()
+            || (condition::treeNodeType(ResourceTree::NodeType::showreel)
+                && condition::canStartShowreel()));
 
-    factory(StartCurrentLayoutTourAction)
+    factory(StartCurrentShowreelAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .text(LayoutTourTextFactory::tr("Start Showreel")) //< To be displayed on the button
+        .text(ShowreelTextFactory::tr("Start Showreel")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
         .icon(qnSkin->icon("buttons/play.png"))
         .condition(
-            condition::isLayoutTourReviewMode()
-            && ConditionWrapper(new StartCurrentLayoutTourCondition())
+            condition::isShowreelReviewMode()
+            && ConditionWrapper(new StartCurrentShowreelCondition())
         );
 
     factory().flags(Tree).separator().condition(
-        condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        condition::treeNodeType(ResourceTree::NodeType::showreel));
 
-    factory(RemoveLayoutTourAction)
+    factory(RemoveShowreelAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Delete"))
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
 
     factory().flags(Tree).separator().condition(
-        condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+        condition::treeNodeType(ResourceTree::NodeType::showreel));
 
-    factory(RenameLayoutTourAction)
+    factory(RenameShowreelAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
         .shortcut("F2")
-        .condition(
-            condition::treeNodeType(ResourceTree::NodeType::layoutTour)
-        );
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
 
-    factory(SaveLayoutTourAction)
+    factory(SaveShowreelAction)
         .flags(NoTarget)
         .mode(DesktopMode);
 
-    factory(RemoveCurrentLayoutTourAction)
+    factory(RemoveCurrentShowreelAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .condition(condition::isLayoutTourReviewMode());
+        .condition(condition::isShowreelReviewMode());
 
-    factory().flags(Tree).separator().condition(
-        condition::treeNodeType(ResourceTree::NodeType::layoutTour));
+    factory(SuspendCurrentShowreelAction)
+        .flags(NoTarget)
+        .condition(condition::showreelIsRunning());
 
-    factory(LayoutTourSettingsAction)
+    factory(ResumeCurrentShowreelAction)
+        .flags(NoTarget)
+        .condition(condition::showreelIsRunning());
+
+    factory()
+        .flags(Tree)
+        .separator()
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel));
+
+    factory(ShowreelSettingsAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Settings"))
-        .condition(
-            condition::treeNodeType(ResourceTree::NodeType::layoutTour)
-        )
-        .childFactory(new LayoutTourSettingsFactory(manager));
+        .condition(condition::treeNodeType(ResourceTree::NodeType::showreel))
+        .childFactory(new ShowreelSettingsFactory(manager));
 
     factory()
         .flags(Scene)
         .separator();
 
-    factory(CurrentLayoutTourSettingsAction)
+    factory(CurrentShowreelSettingsAction)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Settings"))
-        .condition(condition::isLayoutTourReviewMode())
-        .childFactory(new LayoutTourSettingsFactory(manager));
+        .condition(condition::isShowreelReviewMode())
+        .childFactory(new ShowreelSettingsFactory(manager));
 
-#pragma endregion Layout Tours
+#pragma endregion Showreels
 
     factory(CurrentLayoutSettingsAction)
         .flags(Scene | NoTarget)
@@ -1870,7 +1868,7 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(ContextMenu::tr("Screen Settings..."),
             condition::currentLayoutIsVideowallScreen())
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     /* Tab bar actions. */
     factory()
@@ -1882,7 +1880,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Close"))
         .shortcut("Ctrl+W")
-        .condition(!condition::tourIsRunning());
+        .condition(!condition::showreelIsRunning());
 
     factory(CloseAllButThisLayoutAction)
         .flags(TitleBar | SingleTarget)
@@ -1914,7 +1912,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Play"))
         .toggledText(ContextMenu::tr("Pause"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(PreviousFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1922,7 +1920,7 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(true)
         .text(ContextMenu::tr("Previous Frame"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(NextFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1930,21 +1928,21 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(true)
         .text(ContextMenu::tr("Next Frame"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(JumpToStartAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut("Z")
         .text(ContextMenu::tr("To Start"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(JumpToEndAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut("X")
         .text(ContextMenu::tr("To End"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::showreelIsRunning());
 
     factory(VolumeUpAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1979,7 +1977,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning()
+            && !condition::showreelIsRunning()
             && !condition::syncIsForced());
 
     factory(JumpToTimeAction)
@@ -2060,7 +2058,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(GoToLayoutItemAction)
         .flags(SingleTarget | ResourceTarget | NoTarget)
-        .condition(!condition::isLayoutTourReviewMode() && !condition::tourIsRunning());
+        .condition(!condition::isShowreelReviewMode() && !condition::showreelIsRunning());
 
     factory(ToggleCurrentItemMaximizationStateAction)
         .flags(NoTarget);
@@ -2138,7 +2136,7 @@ void initialize(Manager* manager, Action* root)
             .requiredAdminPermissions()
             .text("New Event Rules...")
             .shortcut("Ctrl+Alt+E")
-            .condition(!condition::tourIsRunning()
+            .condition(!condition::showreelIsRunning()
                 && condition::hasNewEventRulesEngine());
 
         factory(ShowDebugOverlayAction)

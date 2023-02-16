@@ -33,8 +33,8 @@ using AbstractUserManagerPtr = std::shared_ptr<AbstractUserManager>;
 class AbstractLayoutManager;
 using AbstractLayoutManagerPtr = std::shared_ptr<AbstractLayoutManager>;
 
-class AbstractLayoutTourManager;
-using AbstractLayoutTourManagerPtr = std::shared_ptr<AbstractLayoutTourManager>;
+class AbstractShowreelManager;
+using AbstractShowreelManagerPtr = std::shared_ptr<AbstractShowreelManager>;
 
 class AbstractVideowallManager;
 using AbstractVideowallManagerPtr = std::shared_ptr<AbstractVideowallManager>;
@@ -67,8 +67,8 @@ using AbstractCameraNotificationManagerPtr = std::shared_ptr<AbstractCameraNotif
 class AbstractLayoutNotificationManager;
 using AbstractLayoutNotificationManagerPtr = std::shared_ptr<AbstractLayoutNotificationManager>;
 
-class AbstractLayoutTourNotificationManager;
-using AbstractLayoutTourNotificationManagerPtr = std::shared_ptr<AbstractLayoutTourNotificationManager>;
+class AbstractShowreelNotificationManager;
+using AbstractShowreelNotificationManagerPtr = std::shared_ptr<AbstractShowreelNotificationManager>;
 
 class AbstractVideowallNotificationManager;
 using AbstractVideowallNotificationManagerPtr = std::shared_ptr<AbstractVideowallNotificationManager>;

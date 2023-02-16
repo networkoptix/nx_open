@@ -9,13 +9,13 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace action {
 
-class LayoutTourTextFactory: public TextFactory
+class ShowreelTextFactory: public TextFactory
 {
     Q_OBJECT
     using base_type = TextFactory;
 
 public:
-    explicit LayoutTourTextFactory(QObject* parent = nullptr);
+    explicit ShowreelTextFactory(QObject* parent = nullptr);
 
     virtual QString text(const Parameters& parameters,
         QnWorkbenchContext* context) const override;
@@ -24,11 +24,11 @@ public:
 namespace condition
 {
 
-/** Layout tour is running. */
-ConditionWrapper tourIsRunning();
+/** Showreel is running. */
+ConditionWrapper showreelIsRunning();
 
-/** Layout tour is running. */
-ConditionWrapper canStartTour();
+/** Can start Showreel. */
+ConditionWrapper canStartShowreel();
 
 } // namespace condition
 

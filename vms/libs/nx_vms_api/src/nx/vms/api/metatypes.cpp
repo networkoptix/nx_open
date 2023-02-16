@@ -24,7 +24,6 @@
 #include "data/full_info_data.h"
 #include "data/image_correction_data.h"
 #include "data/layout_data.h"
-#include "data/layout_tour_data.h"
 #include "data/ldap.h"
 #include "data/license_data.h"
 #include "data/license_overflow_data.h"
@@ -42,6 +41,7 @@
 #include "data/reverse_connection_data.h"
 #include "data/runtime_data.h"
 #include "data/server_runtime_event_data.h"
+#include "data/showreel_data.h"
 #include "data/software_version.h"
 #include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
@@ -110,7 +110,7 @@ void Metatypes::initialize()
     qRegisterMetaType<ImageCorrectionData>();
     qRegisterMetaType<LayoutData>();
     qRegisterMetaType<LayoutItemData>();
-    qRegisterMetaType<LayoutTourData>();
+    qRegisterMetaType<ShowreelData>();
     qRegisterMetaType<LicenseData>();
     qRegisterMetaType<LicenseOverflowData>();
     qRegisterMetaType<LockData>();

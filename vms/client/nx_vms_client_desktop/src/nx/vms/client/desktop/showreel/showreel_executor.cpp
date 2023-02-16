@@ -1,13 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "workbench_layout_tour_executor.h"
+#include "showreel_executor.h"
 
 #include <QtCore/QTimerEvent>
 
 #include <client/client_settings.h>
-#include <core/resource/layout_tour_item.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
@@ -32,124 +31,122 @@ static constexpr auto kHintTimeout = 3s;
 } // namespace
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace workbench {
 
-LayoutTourExecutor::LayoutTourExecutor(QObject* parent):
+ShowreelExecutor::ShowreelExecutor(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
 }
 
-LayoutTourExecutor::~LayoutTourExecutor()
+ShowreelExecutor::~ShowreelExecutor()
 {
 }
 
-void LayoutTourExecutor::startTour(const nx::vms::api::LayoutTourData& tour)
+void ShowreelExecutor::startShowreel(const nx::vms::api::ShowreelData& showreel)
 {
-    if (m_mode != Mode::Stopped)
-        stopCurrentTour();
+    if (m_mode != Mode::stopped)
+        stopCurrentShowreel();
 
-    if (!tour.isValid())
+    if (!showreel.isValid())
         return;
 
-    NX_ASSERT(m_tour.items.empty());
-    resetTourItems(tour.items);
-    if (tour.items.empty())
+    NX_ASSERT(m_showreel.items.empty());
+    resetShowreelItems(showreel.items);
+    if (showreel.items.empty())
         return;
 
-    m_mode = Mode::MultipleLayouts;
-    m_tour.id = tour.id;
-    m_tour.currentIndex = -1;
+    m_mode = Mode::multipleLayouts;
+    m_showreel.id = showreel.id;
+    m_showreel.currentIndex = -1;
 
-    // Here we saving actual workbench state, which will be restored after the tour stop.
+    // Here we saving actual workbench state, which will be restored after the showreel stop.
     clearWorkbenchState();
 
-    startTourInternal();
-    if (!tour.settings.manual)
+    startShowreelInternal();
+    if (!showreel.settings.manual)
         startTimer();
 
     appContext()->clientStateHandler()->storeSystemSpecificState();
 }
 
-void LayoutTourExecutor::updateTour(const nx::vms::api::LayoutTourData& tour)
+void ShowreelExecutor::updateShowreel(const nx::vms::api::ShowreelData& showreel)
 {
-    if (m_mode != Mode::MultipleLayouts)
+    if (m_mode != Mode::multipleLayouts)
         return;
 
-    if (tour.id != m_tour.id)
+    if (showreel.id != m_showreel.id)
         return;
 
-    NX_ASSERT(tour.isValid());
+    NX_ASSERT(showreel.isValid());
 
     // Start/stop timer before items check.
-    const bool isTourManual = !isTimerRunning();
-    if (isTourManual != tour.settings.manual)
+    const bool isShowreelManual = !isTimerRunning();
+    if (isShowreelManual != showreel.settings.manual)
     {
-        if (tour.settings.manual)
+        if (showreel.settings.manual)
             stopTimer();
         else
             startTimer();
     }
 
-    resetTourItems(tour.items);
-    if (m_tour.items.empty())
-        stopCurrentTour();
-    else if (m_tour.currentIndex >= tour.items.size())
-        m_tour.currentIndex = 0;
+    resetShowreelItems(showreel.items);
+    if (m_showreel.items.empty())
+        stopCurrentShowreel();
+    else if (m_showreel.currentIndex >= showreel.items.size())
+        m_showreel.currentIndex = 0;
 }
 
-void LayoutTourExecutor::stopTour(const QnUuid& id)
+void ShowreelExecutor::stopShowreel(const QnUuid& id)
 {
-    if (m_mode == Mode::MultipleLayouts && m_tour.id == id)
+    if (m_mode == Mode::multipleLayouts && m_showreel.id == id)
     {
-        stopCurrentTour();
+        stopCurrentShowreel();
         appContext()->clientStateHandler()->storeSystemSpecificState();
     }
 }
 
-void LayoutTourExecutor::startSingleLayoutTour()
+void ShowreelExecutor::startSingleLayoutShowreel()
 {
-    m_mode = Mode::SingleLayout;
-    startTourInternal();
+    m_mode = Mode::singleLayout;
+    startShowreelInternal();
     startTimer();
 }
 
-QnUuid LayoutTourExecutor::runningTour() const
+QnUuid ShowreelExecutor::runningShowreel() const
 {
-    if (m_mode == Mode::MultipleLayouts)
-        return m_tour.id;
+    if (m_mode == Mode::multipleLayouts)
+        return m_showreel.id;
     return QnUuid();
 }
 
-void LayoutTourExecutor::prevTourStep()
+void ShowreelExecutor::prevShowreelStep()
 {
     setHintVisible(false);
-    processTourStepInternal(false, true);
+    processShowreelStepInternal(/*forward*/ false, /*force*/ true);
 }
 
-void LayoutTourExecutor::nextTourStep()
+void ShowreelExecutor::nextShowreelStep()
 {
     setHintVisible(false);
-    processTourStepInternal(true, true);
+    processShowreelStepInternal(/*forward*/ true, /*force*/ true);
 }
 
-void LayoutTourExecutor::timerEvent(QTimerEvent* event)
+void ShowreelExecutor::timerEvent(QTimerEvent* event)
 {
-    if (event->timerId() == m_tour.timerId)
-        processTourStepInternal(true, false);
+    if (event->timerId() == m_showreel.timerId)
+        processShowreelStepInternal(/*forward*/ true, /*force*/ false);
     base_type::timerEvent(event);
 }
 
-void LayoutTourExecutor::stopCurrentTour()
+void ShowreelExecutor::stopCurrentShowreel()
 {
     // We can recursively get here from restoreWorkbenchState() call
     const auto mode = m_mode;
-    m_mode = Mode::Stopped;
+    m_mode = Mode::stopped;
 
     switch (mode)
     {
-        case Mode::SingleLayout:
+        case Mode::singleLayout:
         {
             stopTimer();
             setHintVisible(false);
@@ -157,18 +154,18 @@ void LayoutTourExecutor::stopCurrentTour()
             break;
         }
 
-        case Mode::MultipleLayouts:
+        case Mode::multipleLayouts:
         {
             stopTimer();
             setHintVisible(false);
-            m_tour.currentIndex = 0;
-            NX_ASSERT(!m_tour.id.isNull());
-            QnUuid tourId = m_tour.id;
-            m_tour.id = QnUuid();
-            // We don't want to restart tour cyclically.
+            m_showreel.currentIndex = 0;
+            NX_ASSERT(!m_showreel.id.isNull());
+            const QnUuid showreelId = m_showreel.id;
+            m_showreel.id = QnUuid();
+            // We don't want to restart Showreel cyclically.
             m_lastState.runningTourId = QnUuid();
-            resetTourItems({});
-            restoreWorkbenchState(tourId);
+            resetShowreelItems({});
+            restoreWorkbenchState(showreelId);
             break;
         }
 
@@ -177,23 +174,23 @@ void LayoutTourExecutor::stopCurrentTour()
     }
 }
 
-void LayoutTourExecutor::suspendCurrentTour()
+void ShowreelExecutor::suspendCurrentShowreel()
 {
     if (isTimerRunning())
         stopTimer();
 }
 
-void LayoutTourExecutor::resumeCurrentTour()
+void ShowreelExecutor::resumeCurrentShowreel()
 {
     if (!isTimerRunning())
         startTimer();
 }
 
-void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataList& items)
+void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataList& items)
 {
     const auto radassManager = context()->instance<RadassResourceManager>();
 
-    m_tour.items.clear();
+    m_showreel.items.clear();
 
     for (const auto& item: items)
     {
@@ -233,13 +230,14 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
         ));
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 
-        m_tour.items.push_back(QnLayoutTourItem(layout, item.delayMs));
+        m_showreel.items.push_back(Item{layout, item.delayMs});
     }
 }
 
-void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
+void ShowreelExecutor::processShowreelStepInternal(bool forward, bool force)
 {
-    auto nextIndex = [forward](int current, int size)
+    auto nextIndex =
+        [forward](int current, int size)
         {
             NX_ASSERT(size > 0);
             if (current < 0 || size <= 0)
@@ -251,13 +249,13 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
 
     switch (m_mode)
     {
-        case Mode::SingleLayout:
+        case Mode::singleLayout:
         {
             const auto item = workbench()->item(Qn::ZoomedRole);
             if (!force
                 && item
                 && isTimerRunning()
-                && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+                && !m_showreel.elapsed.hasExpired(qnSettings->tourCycleTime()))
             {
                 return;
             }
@@ -265,7 +263,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
             auto items = workbench()->currentLayout()->items().values();
             if (items.empty())
             {
-                stopCurrentTour();
+                stopCurrentShowreel();
                 return;
             }
 
@@ -273,41 +271,43 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
             const int index = item ? items.indexOf(item) : -1;
             workbench()->setItem(Qn::ZoomedRole, items[nextIndex(index, items.size())]);
             if (isTimerRunning())
-                m_tour.elapsed.restart();
+                m_showreel.elapsed.restart();
             break;
         }
-        case Mode::MultipleLayouts:
+        case Mode::multipleLayouts:
         {
-            NX_ASSERT(!m_tour.id.isNull());
-            const bool hasItems = !m_tour.items.empty();
+            NX_ASSERT(!m_showreel.id.isNull());
+            const bool hasItems = !m_showreel.items.empty();
             NX_ASSERT(hasItems);
             if (!hasItems)
             {
-                stopCurrentTour();
+                stopCurrentShowreel();
                 return;
             }
 
             const bool isRunning = isTimerRunning()
-                && qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
+                && qBetween(0, m_showreel.currentIndex, (int) m_showreel.items.size());
 
             if (isRunning && !force)
             {
                 // No need to switch the only item.
-                if (m_tour.items.size() < 2)
+                if (m_showreel.items.size() < 2)
                     return;
 
-                const auto& item = m_tour.items[m_tour.currentIndex];
-                if (!m_tour.elapsed.hasExpired(item.delayMs))
+                const auto& item = m_showreel.items[m_showreel.currentIndex];
+                if (!m_showreel.elapsed.hasExpired(item.delayMs))
                     return;
             }
 
-            m_tour.currentIndex = nextIndex(m_tour.currentIndex, (int) m_tour.items.size());
-            const auto& next = m_tour.items[m_tour.currentIndex];
+            m_showreel.currentIndex = nextIndex(
+                m_showreel.currentIndex,
+                (int) m_showreel.items.size());
+            const auto& next = m_showreel.items[m_showreel.currentIndex];
 
             auto layout = next.layout;
             if (!layout)
             {
-                stopCurrentTour();
+                stopCurrentShowreel();
                 return;
             }
 
@@ -316,7 +316,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
                 wbLayout = workbench()->addLayout(layout);
 
             if (isTimerRunning())
-                m_tour.elapsed.restart();
+                m_showreel.elapsed.restart();
             workbench()->setCurrentLayout(wbLayout);
             break;
         }
@@ -325,14 +325,14 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
     }
 }
 
-void LayoutTourExecutor::clearWorkbenchState()
+void ShowreelExecutor::clearWorkbenchState()
 {
     m_lastState = QnWorkbenchState();
     workbench()->submit(m_lastState);
     workbench()->clear();
 }
 
-void LayoutTourExecutor::restoreWorkbenchState(const QnUuid& tourId)
+void ShowreelExecutor::restoreWorkbenchState(const QnUuid& tourId)
 {
     workbench()->clear();
 
@@ -347,14 +347,14 @@ void LayoutTourExecutor::restoreWorkbenchState(const QnUuid& tourId)
         && workbench()->currentLayout()->resource();
     NX_ASSERT(validState);
     if (!validState)
-        menu()->trigger(action::OpenNewTabAction);
+        menu()->trigger(ui::action::OpenNewTabAction);
 }
 
-void LayoutTourExecutor::setHintVisible(bool visible)
+void ShowreelExecutor::setHintVisible(bool visible)
 {
     if (visible)
     {
-        const auto hint = m_mode == Mode::MultipleLayouts
+        const auto hint = m_mode == Mode::multipleLayouts
             ? tr("Use keyboard arrows to switch layouts. To exit the showreel press Esc.")
             : tr("Press Esc to stop the tour.");
 
@@ -367,38 +367,36 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     }
 }
 
-void LayoutTourExecutor::startTimer()
+void ShowreelExecutor::startTimer()
 {
-    NX_ASSERT(m_tour.timerId == 0);
-    if (m_tour.timerId == 0)
-        m_tour.timerId = QObject::startTimer(kTimerPrecision);
-    NX_ASSERT(!m_tour.elapsed.isValid());
-    m_tour.elapsed.start();
+    NX_ASSERT(m_showreel.timerId == 0);
+    if (m_showreel.timerId == 0)
+        m_showreel.timerId = QObject::startTimer(kTimerPrecision);
+    NX_ASSERT(!m_showreel.elapsed.isValid());
+    m_showreel.elapsed.start();
 }
 
-void LayoutTourExecutor::stopTimer()
+void ShowreelExecutor::stopTimer()
 {
     if (!isTimerRunning())
         return;
 
-    NX_ASSERT(m_tour.timerId != 0);
-    killTimer(m_tour.timerId);
-    m_tour.timerId = 0;
-    NX_ASSERT(m_tour.elapsed.isValid());
-    m_tour.elapsed.invalidate();
+    NX_ASSERT(m_showreel.timerId != 0);
+    killTimer(m_showreel.timerId);
+    m_showreel.timerId = 0;
+    NX_ASSERT(m_showreel.elapsed.isValid());
+    m_showreel.elapsed.invalidate();
 }
 
-void LayoutTourExecutor::startTourInternal()
+void ShowreelExecutor::startShowreelInternal()
 {
     setHintVisible(true);
-    processTourStepInternal(true, true);
+    processShowreelStepInternal(/*forward*/ true, /*force*/ true);
 }
 
-bool LayoutTourExecutor::isTimerRunning() const
+bool ShowreelExecutor::isTimerRunning() const
 {
-    return m_tour.elapsed.isValid();
+    return m_showreel.elapsed.isValid();
 }
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

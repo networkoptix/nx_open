@@ -9,10 +9,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/showreel/showreel_item_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/workbench/resource/layout_tour_item_widget.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <ui/graphics/items/resource/cross_system_camera_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -68,7 +68,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     auto layout = item->layout();
     const bool isShowreelReviewLayout = layout && layout->isShowreelReviewLayout();
     if (isShowreelReviewLayout)
-        return new LayoutTourItemWidget(systemContext, windowContext, item);
+        return new ShowreelItemWidget(systemContext, windowContext, item);
 
     if (resource->hasFlags(Qn::server))
         return new QnServerResourceWidget(systemContext, windowContext, item);

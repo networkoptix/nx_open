@@ -566,7 +566,7 @@ void WorkbenchUi::updateControlsVisibility(bool animate)
     const bool timelineVisible =
         (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
 
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleShowreelModeAction)->isChecked())
     {
         setTimelineVisible(false, animate);
         setLeftPanelVisible(false, animate);
@@ -1573,7 +1573,7 @@ void WorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     m_connections << connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    m_connections << connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    m_connections << connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1582,7 +1582,7 @@ void WorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindowWidget()->setFocus();
         });
 
-    m_connections << connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    m_connections << connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](){ updateControlsVisibility(false); });
 }
 

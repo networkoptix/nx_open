@@ -11,10 +11,10 @@
 #include "discovery_data.h"
 #include "event_rule_data.h"
 #include "layout_data.h"
-#include "layout_tour_data.h"
 #include "license_data.h"
 #include "media_server_data.h"
 #include "resource_type_data.h"
+#include "showreel_data.h"
 #include "user_data.h"
 #include "user_role_data.h"
 #include "videowall_data.h"
@@ -26,6 +26,8 @@ namespace api {
 
 struct NX_VMS_API FullInfoData
 {
+    static DeprecatedFieldNames* getDeprecatedFieldNames();
+
     ResourceTypeDataList resourceTypes;
     MediaServerDataList servers;
     MediaServerUserAttributesDataList serversUserAttributesList;
@@ -45,7 +47,7 @@ struct NX_VMS_API FullInfoData
     StorageDataList storages;
     ResourceStatusDataList resStatusList;
     WebPageDataList webPages;
-    LayoutTourDataList layoutTours;
+    ShowreelDataList showreels;
     AnalyticsPluginDataList analyticsPlugins;
     AnalyticsEngineDataList analyticsEngines;
 };
@@ -69,7 +71,7 @@ struct NX_VMS_API FullInfoData
     (webPages) \
     (accessRights) \
     (userRoles) \
-    (layoutTours) \
+    (showreels) \
     (analyticsPlugins) \
     (analyticsEngines)
 NX_VMS_API_DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))

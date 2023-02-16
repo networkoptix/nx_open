@@ -1,21 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "layout_tour_drop_placeholder.h"
+#include "showreel_drop_placeholder.h"
 
 #include <QtGui/QPainter>
-
-#include <QtWidgets/QGraphicsScale>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsScale>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 
-#include <ui/common/palette.h>
-#include <ui/graphics/items/generic/viewport_bound_widget.h>
-#include <ui/graphics/items/generic/masked_proxy_widget.h>
-
-#include <utils/math/color_transformations.h>
-
 #include <nx/utils/math/fuzzy.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
 
@@ -49,9 +46,8 @@ QColor calculateFrameColor(const QPalette& palette)
 } // namespace
 
 namespace nx::vms::client::desktop {
-namespace ui {
 
-LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
+ShowreelDropPlaceholder::ShowreelDropPlaceholder(
     QGraphicsItem* parent,
     Qt::WindowFlags windowFlags)
     :
@@ -94,12 +90,12 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     addOverlayWidget(m_widget, ::detail::OverlayParams(Visible));
 }
 
-const QRectF& LayoutTourDropPlaceholder::rect() const
+const QRectF& ShowreelDropPlaceholder::rect() const
 {
     return m_rect;
 }
 
-void LayoutTourDropPlaceholder::setRect(const QRectF& rect)
+void ShowreelDropPlaceholder::setRect(const QRectF& rect)
 {
     if (qFuzzyEquals(m_rect, rect))
         return;
@@ -109,7 +105,7 @@ void LayoutTourDropPlaceholder::setRect(const QRectF& rect)
     setGeometry(rect);
 }
 
-void LayoutTourDropPlaceholder::changeEvent(QEvent* event)
+void ShowreelDropPlaceholder::changeEvent(QEvent* event)
 {
     base_type::changeEvent(event);
 
@@ -117,5 +113,4 @@ void LayoutTourDropPlaceholder::changeEvent(QEvent* event)
         setFrameBrush(calculateFrameColor(palette()));
 }
 
-} // namespace ui
 } // namespace nx::vms::client::desktop
