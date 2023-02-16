@@ -126,7 +126,7 @@ void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
 void ResourceTreeModelSortingGroupingTest::createShowreels(const QnUuid& parentUserId) const
 {
     for (const auto showreelName: sortingSignificantStrings())
-        addLayoutTour(showreelName, parentUserId);
+        addShowreel(showreelName, parentUserId);
 }
 
 void ResourceTreeModelSortingGroupingTest::createVideoWallsWithScreensAndMatrices() const

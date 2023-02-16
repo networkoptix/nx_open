@@ -90,7 +90,7 @@ public:
         const Qn::UserSession& userSession) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(
         const Qn::UserSession& userSession) = 0;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(
+    virtual AbstractShowreelManagerPtr getShowreelManager(
         const Qn::UserSession& userSession) = 0;
     virtual AbstractVideowallManagerPtr getVideowallManager(
         const Qn::UserSession& userSession) = 0;
@@ -109,7 +109,7 @@ public:
     virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;
     virtual AbstractCameraNotificationManagerPtr cameraNotificationManager() = 0;
     virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() = 0;
-    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() = 0;
+    virtual AbstractShowreelNotificationManagerPtr showreelNotificationManager() = 0;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() = 0;
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() = 0;
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() = 0;

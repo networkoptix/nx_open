@@ -173,7 +173,7 @@ bool LayoutResource::isPreviewSearchLayout() const
 bool LayoutResource::isShowreelReviewLayout() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_data.contains(Qn::LayoutTourUuidRole);
+    return m_data.contains(Qn::ShowreelUuidRole);
 }
 
 bool LayoutResource::isVideoWallReviewLayout() const

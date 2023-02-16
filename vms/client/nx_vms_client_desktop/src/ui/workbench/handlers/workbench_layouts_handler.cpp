@@ -734,7 +734,7 @@ void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool au
         const auto resources = action::ParameterTypes::resources(items);
 
         const bool confirm = isShowreel
-            ? ui::messages::Resources::removeItemsFromLayoutTour(mainWindowWidget(), resources)
+            ? ui::messages::Resources::removeItemsFromShowreel(mainWindowWidget(), resources)
             : ui::messages::Resources::removeItemsFromLayout(mainWindowWidget(), resources);
 
         if (!confirm)
@@ -1224,8 +1224,8 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     // from parameters to avoid AV.
     const auto resources = parameters.resources();
     parameters.setResources(resources);
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction);
+    if (action(action::ToggleShowreelModeAction)->isChecked())
+        menu()->trigger(action::ToggleShowreelModeAction);
 
     const auto layouts = resources.filtered<LayoutResource>();
     if (!layouts.empty())

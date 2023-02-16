@@ -416,7 +416,7 @@ void QnWorkbenchNavigator::initialize()
         this,
         &QnWorkbenchNavigator::updateAutoPaused);
 
-    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
         &QnWorkbenchNavigator::updateAutoPaused);
 
     updateLines();
@@ -2192,7 +2192,7 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
 void QnWorkbenchNavigator::updateAutoPaused()
 {
     const bool noActivity = context()->instance<QnWorkbenchUserInactivityWatcher>()->state();
-    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+    const bool isTourRunning = action(action::ToggleShowreelModeAction)->isChecked();
 
     const bool autoPaused = noActivity && !isTourRunning;
 

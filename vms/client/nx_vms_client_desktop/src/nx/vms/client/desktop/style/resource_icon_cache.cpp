@@ -140,8 +140,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
     m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
     m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.svg"));
-    m_cache.insert(LayoutTour, loadIcon("tree/layout_tour.png"));
-    m_cache.insert(LayoutTours, loadIcon("tree/layout_tours.png"));
+    m_cache.insert(Showreel, loadIcon("tree/showreel.png"));
+    m_cache.insert(Showreels, loadIcon("tree/showreels.png"));
 
     // Cameras.
     m_cache.insert(Cameras, loadIcon("tree/cameras.png"));

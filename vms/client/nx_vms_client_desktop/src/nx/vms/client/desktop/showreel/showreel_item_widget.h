@@ -5,24 +5,21 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 
 namespace nx::vms::client::desktop {
-namespace ui {
 
-class LayoutPreviewPainter;
+namespace ui { class LayoutPreviewPainter; }
 
-namespace workbench {
-
-class LayoutTourItemWidget: public QnResourceWidget
+class ShowreelItemWidget: public QnResourceWidget
 {
     Q_OBJECT
     using base_type = QnResourceWidget;
 
 public:
-    LayoutTourItemWidget(
+    ShowreelItemWidget(
         nx::vms::client::desktop::SystemContext* systemContext,
         nx::vms::client::desktop::WindowContext* windowContext,
         QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
-    virtual ~LayoutTourItemWidget() override;
+    virtual ~ShowreelItemWidget() override;
 
 protected:
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
@@ -32,10 +29,8 @@ private:
     void initOverlay();
 
 private:
-    QSharedPointer<LayoutPreviewPainter> m_previewPainter;
+    QSharedPointer<ui::LayoutPreviewPainter> m_previewPainter;
     bool m_updating{false};
 };
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

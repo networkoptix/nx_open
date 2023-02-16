@@ -3,12 +3,12 @@
 #include "desktop_client_message_processor.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
+#include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -55,7 +55,7 @@ void QnDesktopClientMessageProcessor::updateResource(
 }
 
 void QnDesktopClientMessageProcessor::handleTourAddedOrUpdated(
-    const nx::vms::api::LayoutTourData& tour)
+    const nx::vms::api::ShowreelData& tour)
 {
     auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
 

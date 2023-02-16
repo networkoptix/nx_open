@@ -472,8 +472,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
         case ResourceTree::NodeType::videoWallItem:
             return itemStateForVideoWallItem(index);
 
-        case ResourceTree::NodeType::layoutTour:
-            return itemStateForLayoutTour(index);
+        case ResourceTree::NodeType::showreel:
+            return itemStateForShowreel(index);
 
         default:
             break;
@@ -640,13 +640,17 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     return ItemState::selected;
 }
 
-QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutTour(
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForShowreel(
     const QModelIndex& index) const
 {
-    /* Layout Tours are Selected when they are opened on the scene. */
-    const QnUuid currentTourId = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
-    if (!currentTourId.isNull() && index.data(Qn::UuidRole).value<QnUuid>() == currentTourId)
+    /* Showreels are Selected when they are opened on the scene. */
+    const QnUuid currentShowreelId = workbench()->currentLayout()->data(Qn::ShowreelUuidRole)
+        .value<QnUuid>();
+    if (!currentShowreelId.isNull()
+        && index.data(Qn::UuidRole).value<QnUuid>() == currentShowreelId)
+    {
         return ItemState::selected;
+    }
     return ItemState::normal;
 }
 

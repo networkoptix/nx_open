@@ -296,7 +296,7 @@ Condition showreelsNodeCondition()
 {
     return allOf(
         displayFullMatch("Showreels"),
-        iconFullMatch(QnResourceIconCache::LayoutTours),
+        iconFullMatch(QnResourceIconCache::Showreels),
         topLevelNode());
 }
 

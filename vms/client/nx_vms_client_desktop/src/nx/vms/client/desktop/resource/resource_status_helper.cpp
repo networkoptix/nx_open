@@ -170,7 +170,7 @@ void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
             this,
             &Private::updateStatus);
 
-        m_contextConnections << connect(m_context->action(ui::action::ToggleLayoutTourModeAction),
+        m_contextConnections << connect(m_context->action(ui::action::ToggleShowreelModeAction),
             &QAction::toggled,
             this,
             &Private::updateStatus);
@@ -283,7 +283,7 @@ void ResourceStatusHelper::Private::updateStatus()
                 Qn::SavePermission | Qn::WritePermission));
 
         status.setFlag(StatusFlag::canInvokeDiagnostics, m_camera->hasFlags(Qn::live_cam)
-            && !m_context->action(ui::action::ToggleLayoutTourModeAction)->isChecked());
+            && !m_context->action(ui::action::ToggleShowreelModeAction)->isChecked());
 
         status.setFlag(StatusFlag::dts, m_camera->isDtsBased());
 

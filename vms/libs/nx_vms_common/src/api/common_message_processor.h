@@ -14,7 +14,7 @@
 #include <nx_ec/ec_api_fwd.h>
 
 Q_MOC_INCLUDE(<nx/vms/api/data/discovery_data.h>)
-Q_MOC_INCLUDE(<nx/vms/api/data/layout_tour_data.h>)
+Q_MOC_INCLUDE(<nx/vms/api/data/showreel_data.h>)
 Q_MOC_INCLUDE(<nx/vms/api/rules/rule.h>)
 
 class QnResourceFactory;
@@ -126,7 +126,7 @@ protected:
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source) = 0;
 
-    virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour);
+    virtual void handleTourAddedOrUpdated(const nx::vms::api::ShowreelData& tour);
 
     void resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes);
     void resetResources(const nx::vms::api::FullInfoData& fullData);

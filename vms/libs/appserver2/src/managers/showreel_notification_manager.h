@@ -2,25 +2,23 @@
 
 #pragma once
 
+#include <nx/vms/api/data/showreel_data.h>
+#include <nx_ec/managers/abstract_showreel_manager.h>
 #include <transaction/transaction.h>
-
-#include <nx/vms/api/data/layout_tour_data.h>
-
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
 
 namespace ec2 {
 
-class QnLayoutTourNotificationManager: public AbstractLayoutTourNotificationManager
+class ShowreelNotificationManager: public AbstractShowreelNotificationManager
 {
 public:
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::LayoutTourData>& tran,
+        const QnTransaction<nx::vms::api::ShowreelData>& tran,
         NotificationSource source);
 };
 
-typedef std::shared_ptr<QnLayoutTourNotificationManager> QnLayoutTourNotificationManagerPtr;
+typedef std::shared_ptr<ShowreelNotificationManager> ShowreelNotificationManagerPtr;
 
 } // namespace ec2

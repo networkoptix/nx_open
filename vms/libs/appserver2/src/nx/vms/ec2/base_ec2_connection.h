@@ -12,11 +12,11 @@
 #include <managers/discovery_manager.h>
 #include <managers/event_rules_manager.h>
 #include <managers/layout_manager.h>
-#include <managers/layout_tour_manager.h>
 #include <managers/license_manager.h>
 #include <managers/media_server_manager.h>
 #include <managers/misc_manager.h>
 #include <managers/resource_manager.h>
+#include <managers/showreel_manager.h>
 #include <managers/stored_file_manager.h>
 #include <managers/user_manager.h>
 #include <managers/videowall_manager.h>
@@ -53,7 +53,7 @@ public:
     virtual AbstractVmsRulesManagerPtr getVmsRulesManager(const Qn::UserSession& userSession) override;
     virtual AbstractUserManagerPtr getUserManager(const Qn::UserSession& userSession) override;
     virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserSession& userSession) override;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserSession& userSession) override;
+    virtual AbstractShowreelManagerPtr getShowreelManager(const Qn::UserSession& userSession) override;
     virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserSession& userSession) override;
     virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserSession& userSession) override;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserSession& userSession) override;
@@ -71,7 +71,7 @@ public:
     virtual AbstractVmsRulesNotificationManagerPtr vmsRulesNotificationManager() override;
     virtual AbstractUserNotificationManagerPtr userNotificationManager() override;
     virtual AbstractLayoutNotificationManagerPtr layoutNotificationManager() override;
-    virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() override;
+    virtual AbstractShowreelNotificationManagerPtr showreelNotificationManager() override;
     virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
     virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
@@ -124,7 +124,7 @@ protected:
     QnBusinessEventNotificationManagerPtr m_businessEventNotificationManager;
     VmsRulesNotificationManagerPtr m_vmsRulesNotificationManager;
     QnLayoutNotificationManagerPtr m_layoutNotificationManager;
-    QnLayoutTourNotificationManagerPtr m_layoutTourNotificationManager;
+    ShowreelNotificationManagerPtr m_showreelNotificationManager;
     QnVideowallNotificationManagerPtr m_videowallNotificationManager;
     QnWebPageNotificationManagerPtr m_webPageNotificationManager;
     QnStoredFileNotificationManagerPtr m_storedFileNotificationManager;
@@ -160,7 +160,7 @@ void BaseEc2Connection<QueryProcessorType>::init(
     m_businessEventNotificationManager = std::make_shared<QnBusinessEventNotificationManager>();
     m_vmsRulesNotificationManager = std::make_shared<VmsRulesNotificationManager>();
     m_layoutNotificationManager = std::make_shared<QnLayoutNotificationManager>();
-    m_layoutTourNotificationManager = std::make_shared<QnLayoutTourNotificationManager>();
+    m_showreelNotificationManager = std::make_shared<ShowreelNotificationManager>();
     m_videowallNotificationManager = std::make_shared<QnVideowallNotificationManager>();
     m_webPageNotificationManager = std::make_shared<QnWebPageNotificationManager>();
     m_storedFileNotificationManager = std::make_shared<QnStoredFileNotificationManager>();
@@ -180,7 +180,7 @@ void BaseEc2Connection<QueryProcessorType>::init(
         m_businessEventNotificationManager.get(),
         m_vmsRulesNotificationManager.get(),
         m_layoutNotificationManager.get(),
-        m_layoutTourNotificationManager.get(),
+        m_showreelNotificationManager.get(),
         m_videowallNotificationManager.get(),
         m_webPageNotificationManager.get(),
         m_storedFileNotificationManager.get(),
@@ -326,10 +326,10 @@ AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager
 }
 
 template<class QueryProcessorType>
-AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTourManager(
+AbstractShowreelManagerPtr BaseEc2Connection<QueryProcessorType>::getShowreelManager(
     const Qn::UserSession& userSession)
 {
-    return std::make_shared<QnLayoutTourManager<QueryProcessorType>>(m_queryProcessor, userSession);
+    return std::make_shared<ShowreelManager<QueryProcessorType>>(m_queryProcessor, userSession);
 }
 
 template<class QueryProcessorType>
@@ -340,10 +340,10 @@ AbstractLayoutNotificationManagerPtr
 }
 
 template<class QueryProcessorType>
-AbstractLayoutTourNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::layoutTourNotificationManager()
+AbstractShowreelNotificationManagerPtr
+    BaseEc2Connection<QueryProcessorType>::showreelNotificationManager()
 {
-    return m_layoutTourNotificationManager;
+    return m_showreelNotificationManager;
 }
 
 template<class QueryProcessorType>

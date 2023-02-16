@@ -21,15 +21,15 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
@@ -247,16 +247,16 @@ void ResourceTreeModelTest::updateVideoWallMatrix(
         videoWall->matrices()->addOrUpdateItem(matrix);
 }
 
-LayoutTourData ResourceTreeModelTest::addLayoutTour(
+ShowreelData ResourceTreeModelTest::addShowreel(
     const QString& name,
     const QnUuid& parentId) const
 {
-    LayoutTourData tourData;
-    tourData.id = QnUuid::createUuid();
-    tourData.parentId = parentId;
-    tourData.name = name;
-    systemContext()->showreelManager()->addOrUpdateTour(tourData);
-    return tourData;
+    ShowreelData showreel;
+    showreel.id = QnUuid::createUuid();
+    showreel.parentId = parentId;
+    showreel.name = name;
+    systemContext()->showreelManager()->addOrUpdateShowreel(showreel);
+    return showreel;
 }
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addCamera(

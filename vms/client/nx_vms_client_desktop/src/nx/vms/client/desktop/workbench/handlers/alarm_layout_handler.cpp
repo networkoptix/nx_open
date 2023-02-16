@@ -245,8 +245,8 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
     // stopping clears all existing workbench layouts.
     if (switchToLayoutNeeded)
     {
-        if (action(ui::action::ToggleLayoutTourModeAction)->isChecked())
-            menu()->trigger(ui::action::ToggleLayoutTourModeAction);
+        if (action(ui::action::ToggleShowreelModeAction)->isChecked())
+            menu()->trigger(ui::action::ToggleShowreelModeAction);
     }
 
     auto alarmLayout = findOrCreateAlarmLayout();

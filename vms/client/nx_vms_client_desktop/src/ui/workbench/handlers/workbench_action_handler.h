@@ -161,7 +161,7 @@ protected slots:
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
     void at_openWelcomeScreenAction_triggered();
-    void at_reviewLayoutTourInNewWindowAction_triggered();
+    void at_reviewShowreelInNewWindowAction_triggered();
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();

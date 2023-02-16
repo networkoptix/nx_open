@@ -89,7 +89,7 @@ SystemSettings* SystemContextAware::systemSettings() const
     return systemContext()->globalSettings();
 }
 
-QnLayoutTourManager* SystemContextAware::showreelManager() const
+ShowreelManager* SystemContextAware::showreelManager() const
 {
     return systemContext()->showreelManager();
 }

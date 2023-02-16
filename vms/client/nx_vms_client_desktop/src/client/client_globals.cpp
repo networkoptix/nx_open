@@ -45,10 +45,10 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(VideoWallItemGuidRole),
         IDR_ITEM(VideoWallItemIndicesRole),
 
-        IDR_ITEM(LayoutTourUuidRole),
-        IDR_ITEM(LayoutTourItemDelayMsRole),
-        IDR_ITEM(LayoutTourItemOrderRole),
-        IDR_ITEM(LayoutTourIsManualRole),
+        IDR_ITEM(ShowreelUuidRole),
+        IDR_ITEM(ShowreelItemDelayMsRole),
+        IDR_ITEM(ShowreelItemOrderRole),
+        IDR_ITEM(ShowreelIsManualRole),
 
         // Layout-based.
         IDR_ITEM(LayoutCellSpacingRole),

@@ -19,13 +19,13 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/workaround/mac_utils.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_grid_mapper.h>
@@ -178,12 +178,12 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
 
     event->acceptProposedAction();
 
-    const auto layoutTours =
-        systemContext()->showreelManager()->tours(localMimeData->entities());
-    if (!layoutTours.empty())
+    const auto showreels =
+        systemContext()->showreelManager()->showreels(localMimeData->entities());
+    if (!showreels.empty())
     {
-        for (const auto& tour : layoutTours)
-            delayedTriggerIfPossible(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
+        for (const auto& showreel: showreels)
+            delayedTriggerIfPossible(action::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
 
         // If tour was opened, ignore other items.
         return true;

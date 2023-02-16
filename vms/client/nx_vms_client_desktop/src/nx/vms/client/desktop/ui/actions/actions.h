@@ -143,7 +143,7 @@ enum IDType
     SelectionChangeAction,
 
     /**
-     * Select newly created item (webpage, layout tour, user, videowall) in the resource tree. Open
+     * Select newly created item (webpage, showreel, user, videowall) in the resource tree. Open
      * on the scene if possible.
      */
     SelectNewItemAction,
@@ -1107,24 +1107,30 @@ enum IDType
     SetCurrentLayoutItemSpacingLargeAction,
 
     /**
-     * Toggles layout tour mode.
+     * Toggles Showreel mode.
      */
-    ToggleLayoutTourModeAction,
+    ToggleShowreelModeAction,
 
-    NewLayoutTourAction,
-    MakeLayoutTourAction,
-    RenameLayoutTourAction,
-    SaveLayoutTourAction,
-    ReviewLayoutTourAction,
-    ReviewLayoutTourInNewWindowAction,
-    RemoveLayoutTourAction,
+    NewShowreelAction,
+    MakeShowreelAction,
+    RenameShowreelAction,
+    SaveShowreelAction,
+    ReviewShowreelAction,
+    ReviewShowreelInNewWindowAction,
+    RemoveShowreelAction,
 
-    StartCurrentLayoutTourAction,
-    SaveCurrentLayoutTourAction,
-    RemoveCurrentLayoutTourAction,
+    StartCurrentShowreelAction,
+    SaveCurrentShowreelAction,
+    RemoveCurrentShowreelAction,
 
-    LayoutTourSettingsAction,
-    CurrentLayoutTourSettingsAction,
+    /** Suspend Showreel cycling. */
+    SuspendCurrentShowreelAction,
+
+    /** Resume Showreel cycling. */
+    ResumeCurrentShowreelAction,
+
+    ShowreelSettingsAction,
+    CurrentShowreelSettingsAction,
 
     AddVirtualCameraAction,
     MainMenuAddVirtualCameraAction,
@@ -1447,16 +1453,6 @@ enum IDType
      * Opens a dialog for analytics object search.
      */
     OpenAdvancedSearchDialog,
-
-    /**
-     * Suspend tour cycling
-     */
-    SuspendCurrentTourAction,
-
-    /**
-     * Resume tour cycling
-     */
-    ResumeCurrentTourAction,
 
     /**
      * Setup chunks filter.

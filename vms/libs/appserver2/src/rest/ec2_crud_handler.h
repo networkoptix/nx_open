@@ -262,7 +262,7 @@ private:
             std::is_same_v<T, nx::vms::api::UserDataList> ||
             std::is_same_v<T, nx::vms::api::UserRoleDataList> ||
             std::is_same_v<T, nx::vms::api::LayoutDataList> ||
-            std::is_same_v<T, nx::vms::api::LayoutTourDataList> ||
+            std::is_same_v<T, nx::vms::api::ShowreelDataList> ||
             std::is_same_v<T, nx::vms::api::VideowallDataList> ||
             std::is_same_v<T, nx::vms::api::LicenseDataList> ||
             std::is_same_v<T, nx::vms::api::CameraDataList> ||
@@ -286,8 +286,8 @@ private:
             return ApiCommand::Value::getUserRoles;
         else if constexpr(std::is_same_v<T, nx::vms::api::LayoutDataList>)
             return ApiCommand::Value::getLayouts;
-        else if constexpr(std::is_same_v<T, nx::vms::api::LayoutTourDataList>)
-            return ApiCommand::Value::getLayoutTours;
+        else if constexpr(std::is_same_v<T, nx::vms::api::ShowreelDataList>)
+            return ApiCommand::Value::getShowreels;
         else if constexpr(std::is_same_v<T, nx::vms::api::VideowallDataList>)
             return ApiCommand::Value::getVideowalls;
         else if constexpr(std::is_same_v<T, nx::vms::api::LicenseDataList>)
@@ -327,7 +327,7 @@ private:
             std::is_same_v<T, nx::vms::api::UserRoleData> ||
             std::is_same_v<T, nx::vms::api::UserDataEx> ||
             std::is_same_v<T, nx::vms::api::LayoutData> ||
-            std::is_same_v<T, nx::vms::api::LayoutTourData> ||
+            std::is_same_v<T, nx::vms::api::ShowreelData> ||
             std::is_same_v<T, nx::vms::api::VideowallData> ||
             std::is_same_v<T, nx::vms::api::LicenseData> ||
             std::is_same_v<T, nx::vms::api::CameraData> ||
@@ -351,8 +351,8 @@ private:
             return ApiCommand::Value::saveUserRole;
         else if constexpr (std::is_same_v<T, nx::vms::api::LayoutData>)
             return ApiCommand::Value::saveLayout;
-        else if constexpr (std::is_same_v<T, nx::vms::api::LayoutTourData>)
-            return ApiCommand::Value::saveLayoutTour;
+        else if constexpr (std::is_same_v<T, nx::vms::api::ShowreelData>)
+            return ApiCommand::Value::saveShowreel;
         else if constexpr (std::is_same_v<T, nx::vms::api::VideowallData>)
             return ApiCommand::Value::saveVideowall;
         else if constexpr (std::is_same_v<T, nx::vms::api::LicenseData>)

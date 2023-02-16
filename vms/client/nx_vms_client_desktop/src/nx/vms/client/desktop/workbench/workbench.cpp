@@ -11,7 +11,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -25,6 +24,7 @@
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
+#include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -45,7 +46,6 @@
 #include <utils/common/util.h>
 #include <utils/web_downloader.h>
 
-#include "handlers/layout_tours_handler.h"
 #include "layouts/special_layout.h"
 
 namespace nx::vms::client::desktop {
@@ -744,10 +744,10 @@ void Workbench::update(const QnWorkbenchState& state)
             continue;
         }
 
-        const auto tour = systemContext()->showreelManager()->tour(id);
-        if (tour.isValid())
+        const auto showreel = systemContext()->showreelManager()->showreel(id);
+        if (showreel.isValid())
         {
-            menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, id});
+            menu()->trigger(action::ReviewShowreelAction, {Qn::UuidRole, id});
             continue;
         }
     }
@@ -844,7 +844,7 @@ void Workbench::update(const QnWorkbenchState& state)
 
     if (!state.runningTourId.isNull())
     {
-        menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, state.runningTourId});
+        menu()->trigger(action::ToggleShowreelModeAction, {Qn::UuidRole, state.runningTourId});
     }
 }
 
@@ -878,7 +878,7 @@ void Workbench::submit(QnWorkbenchState& state)
             return videoWall->getId();
         }
 
-        const auto tourId = layout->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+        const auto tourId = layout->data(Qn::ShowreelUuidRole).value<QnUuid>();
         return tourId.isNull() ? layout->getId() : tourId;
     };
 
@@ -918,7 +918,7 @@ void Workbench::submit(QnWorkbenchState& state)
         }
     }
 
-    state.runningTourId = context()->instance<LayoutToursHandler>()->runningTour();
+    state.runningTourId = context()->instance<ShowreelActionsHandler>()->runningShowreel();
 }
 
 void Workbench::applyLoadedState()

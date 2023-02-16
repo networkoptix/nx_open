@@ -2,9 +2,9 @@
 
 #include "showreels_list_entity.h"
 
-#include <core/resource_management/layout_tour_manager.h>
-#include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -13,25 +13,25 @@ using namespace nx::vms::api;
 
 ShowreelsListEntity::ShowreelsListEntity(
     const ShowreelItemCreator& showreelItemCreator,
-    const QnLayoutTourManager* showreelManager)
+    const common::ShowreelManager* showreelManager)
     :
     base_type(showreelItemCreator, entity_item_model::numericOrder())
 {
-    const auto showreels = showreelManager->tours();
+    const auto showreels = showreelManager->showreels();
 
-    QVector<QnUuid> tourIds;
-    std::transform(std::cbegin(showreels), std::cend(showreels), std::back_inserter(tourIds),
-        [](const auto& tourData) { return tourData.id; });
+    QVector<QnUuid> showreelIds;
+    for (const auto& showreel: showreels)
+        showreelIds.push_back(showreel.id);
 
-    setItems(tourIds);
-
-    m_connectionsGuard.add(
-        showreelManager->connect(showreelManager, &QnLayoutTourManager::tourAdded,
-        [this](const LayoutTourData& tour) { addItem(tour.id); }));
+    setItems(showreelIds);
 
     m_connectionsGuard.add(
-        showreelManager->connect(showreelManager, &QnLayoutTourManager::tourRemoved,
-        [this](const QnUuid& tourId) { removeItem(tourId); }));
+        showreelManager->connect(showreelManager, &common::ShowreelManager::showreelAdded,
+        [this](const ShowreelData& showreel) { addItem(showreel.id); }));
+
+    m_connectionsGuard.add(
+        showreelManager->connect(showreelManager, &common::ShowreelManager::showreelRemoved,
+        [this](const QnUuid& showreelId) { removeItem(showreelId); }));
 }
 
 } // namespace entity_resource_tree

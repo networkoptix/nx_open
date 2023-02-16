@@ -22,7 +22,6 @@
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -34,6 +33,7 @@
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>
@@ -69,7 +69,7 @@ struct SystemContext::Private
     std::unique_ptr<DeprecatedAccessRightsConverter> deprecatedAccessRightsConverter;
     std::unique_ptr<ResourceAccessProvider> resourceAccessProvider;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
-    std::unique_ptr<QnLayoutTourManager> showreelManager;
+    std::unique_ptr<ShowreelManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
@@ -152,7 +152,7 @@ SystemContext::SystemContext(
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(this);
 
-    d->showreelManager = std::make_unique<QnLayoutTourManager>();
+    d->showreelManager = std::make_unique<ShowreelManager>();
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
@@ -350,7 +350,7 @@ ResourceAccessProvider* SystemContext::resourceAccessProvider() const
     return d->resourceAccessProvider.get();
 }
 
-QnLayoutTourManager* SystemContext::showreelManager() const
+ShowreelManager* SystemContext::showreelManager() const
 {
     return d->showreelManager.get();
 }

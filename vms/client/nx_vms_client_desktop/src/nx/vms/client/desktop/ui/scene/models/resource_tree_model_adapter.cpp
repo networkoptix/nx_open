@@ -65,7 +65,7 @@ ResourceTree::NodeType filterNodeType(ResourceTree::FilterType filterType)
             return NodeType::layouts;
 
         case FilterType::showreels:
-            return NodeType::layoutTours;
+            return NodeType::showreels;
 
         case FilterType::videowalls:
             return NodeType::videoWalls;
@@ -242,7 +242,7 @@ struct ResourceTreeModelAdapter::Private
                         break;
 
                     if (index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>()
-                        == ResourceTree::NodeType::layoutTour)
+                        == ResourceTree::NodeType::showreel)
                     {
                         hasLayoutEntities = true;
                         continue;

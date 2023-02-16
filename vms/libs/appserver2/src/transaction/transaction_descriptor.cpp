@@ -17,12 +17,12 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/user_access_data.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
@@ -205,8 +205,8 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.layoutNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::removeLayoutTour:
-            return notificationParams.layoutTourNotificationManager->triggerNotification(
+        case ApiCommand::removeShowreel:
+            return notificationParams.showreelNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
         case ApiCommand::removeVideowall:
@@ -325,12 +325,12 @@ struct LayoutNotificationManagerHelper
     }
 };
 
-struct LayoutTourNotificationManagerHelper
+struct ShowreelNotificationManagerHelper
 {
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
+        notificationParams.showreelNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -1512,37 +1512,38 @@ struct VideoWallControlAccess
     }
 };
 
-struct LayoutTourAccess
+struct ShowreelAccess
 {
     Result operator()(
         QnCommonModule* /*commonModule*/,
         const Qn::UserAccessData& accessData,
-        const nx::vms::api::LayoutTourData& tour)
+        const nx::vms::api::ShowreelData& showreel)
     {
         if (hasSystemAccess(accessData)
-            || tour.parentId.isNull()
-            || accessData.userId == tour.parentId)
+            || showreel.parentId.isNull()
+            || accessData.userId == showreel.parentId)
         {
             return Result();
         }
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-            "User %1 is not allowed to modify the Layout Tour with parentId %2."),
+            "User %1 is not allowed to modify the Showreel with parentId %2."),
             accessData.userId,
-            tour.parentId));
+            showreel.parentId));
     }
 };
 
-struct LayoutTourAccessById
+struct ShowreelAccessById
 {
     Result operator()(
         QnCommonModule* commonModule,
         const Qn::UserAccessData& accessData,
-        const nx::vms::api::IdData& tourId)
+        const nx::vms::api::IdData& showreelId)
     {
-        const auto tour = commonModule->systemContext()->showreelManager()->tour(tourId.id);
-        if (!tour.isValid())
+        const auto showreel = commonModule->systemContext()->showreelManager()->showreel(
+            showreelId.id);
+        if (!showreel.isValid())
             return Result(); //< Allow everyone to work with tours which are already deleted.
-        return LayoutTourAccess()(commonModule, accessData, tour);
+        return ShowreelAccess()(commonModule, accessData, showreel);
     }
 };
 

@@ -2,9 +2,9 @@
 
 #include "action_factories.h"
 
-#include <QtQuick/QQuickItem>
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
+#include <QtQuick/QQuickItem>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 
@@ -15,7 +15,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
@@ -29,6 +28,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
@@ -258,31 +258,31 @@ Factory::ActionList AspectRatioFactory::newActions(const Parameters& /*parameter
     return actionGroup->actions();
 }
 
-LayoutTourSettingsFactory::LayoutTourSettingsFactory(QObject* parent):
+ShowreelSettingsFactory::ShowreelSettingsFactory(QObject* parent):
     Factory(parent)
 {
 }
 
-Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& parameters,
+Factory::ActionList ShowreelSettingsFactory::newActions(
+    const Parameters& parameters,
     QObject* parent)
 {
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-    const bool isCurrentTour = id.isNull();
-    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isShowreelReviewLayout());
+    const bool isCurrentShowreel = id.isNull();
+    NX_ASSERT(!isCurrentShowreel || workbench()->currentLayout()->isShowreelReviewLayout());
 
-    if (isCurrentTour)
-        id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+    if (isCurrentShowreel)
+        id = workbench()->currentLayout()->data(Qn::ShowreelUuidRole).value<QnUuid>();
 
     auto showreelManager = systemContext()->showreelManager();
-    const auto tour = showreelManager->tour(id);
-    NX_ASSERT(tour.isValid());
-    if (!tour.isValid())
+    const auto showreel = showreelManager->showreel(id);
+    if (!NX_ASSERT(showreel.isValid()))
         return actionGroup->actions();
 
-    const auto isManual = tour.settings.manual;
+    const auto isManual = showreel.settings.manual;
     for (auto manual: {false, true})
     {
         auto action = new QAction(parent);
@@ -294,20 +294,18 @@ Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& para
         connect(action, &QAction::triggered, this,
             [this, showreelManager, id, manual]
             {
-                auto tour = showreelManager->tour(id);
-                NX_ASSERT(tour.isValid());
-                if (!tour.isValid())
+                auto showreel = showreelManager->showreel(id);
+                if (!NX_ASSERT(showreel.isValid()))
                     return;
 
-                tour.settings.manual = manual;
-                showreelManager->addOrUpdateTour(tour);
-                menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
+                showreel.settings.manual = manual;
+                showreelManager->addOrUpdateShowreel(showreel);
+                menu()->trigger(action::SaveShowreelAction, {Qn::UuidRole, id});
             });
         actionGroup->addAction(action);
     }
     return actionGroup->actions();
 }
-
 
 WebPageFactory::WebPageFactory(QObject* parent):
     Factory(parent)

@@ -17,9 +17,8 @@
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
-#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
@@ -39,6 +38,7 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/scoped_timer.h>
@@ -598,10 +598,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     const auto owner = resourcePool()->getResourceById<QnUserResource>(ownerId);
                     if (!owner)
                     {
-                        const auto tour = m_context->showreelManager()->tour(ownerId);
-                        if (tour.isValid())
+                        const auto showreel = m_context->showreelManager()->showreel(ownerId);
+                        if (showreel.isValid())
                         {
-                            return tour.parentId == user->getId()
+                            return showreel.parentId == user->getId()
                                 ? Qn::FullLayoutPermissions
                                 : Qn::NoPermissions;
                         }
@@ -723,10 +723,10 @@ bool QnResourceAccessManager::canCreateLayout(
     if (const auto videoWall = resourcePool->getResourceById<QnVideoWallResource>(data.parentId))
         return hasAccessRights(subject, videoWall, AccessRight::view);
 
-    // Tour owner can create layouts in it.
-    const auto tour = m_context->showreelManager()->tour(data.parentId);
-    if (tour.isValid())
-        return tour.parentId == subject.id();
+    // Showreel owner can create layouts in it.
+    const auto showreel = m_context->showreelManager()->showreel(data.parentId);
+    if (showreel.isValid())
+        return showreel.parentId == subject.id();
 
     const auto ownerResource = resourcePool->getResourceById(data.parentId);
 

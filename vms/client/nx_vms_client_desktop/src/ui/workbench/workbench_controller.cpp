@@ -120,7 +120,7 @@ const qreal raisedGeometryThreshold = 0.002;
 
 bool tourIsRunning(QnWorkbenchContext* context)
 {
-    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+    return context->action(action::ToggleShowreelModeAction)->isChecked();
 }
 
 bool inViewportPtzMode(QnResourceWidget* resourceWidget, Qt::KeyboardModifiers keyboardModifiers)
@@ -422,7 +422,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(action::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(action::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
-    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](bool on)
         {
             m_motionSelectionInstrument->setEnabled(!on);
@@ -1354,10 +1354,10 @@ void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *wi
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if (zoomedItem == workbenchItem)
     {
-        // Stop single layout tour if it is running.
+        // Stop single Showreel if it is running.
         if (tourIsRunning(context()))
         {
-            menu()->trigger(action::ToggleLayoutTourModeAction);
+            menu()->trigger(action::ToggleShowreelModeAction);
             return;
         }
 

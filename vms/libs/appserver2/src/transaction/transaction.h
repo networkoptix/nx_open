@@ -39,8 +39,8 @@ struct NotDefinedApiData
  *
  * APPLY(                   -- macro header
  * 604,                     -- integer enum id
- * getLayoutTours,          -- transaction name
- * LayoutTourDataList,      -- passed data structure
+ * getShowreels,            -- transaction name
+ * ShowreelDataList,        -- passed data structure
  * false,                   -- transaction is not persistent (does not save anything to database)
  * false,                   -- transaction is not system (handled common way)
  * InvalidGetHashHelper(),  -- Calculates hash for persistent transaction.
@@ -58,7 +58,7 @@ struct NotDefinedApiData
  *                             Warning below MUST be fullfilled.
  * InvalidFilterFunc(),     -- actual only for persistent transactions with element list.
  *                             Warning below MUST be fullfilled.
- * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker.
+ * FilterListByAccess<ShowreelAccess>(), -- filtering requested list by the passed checker.
  *                             Warning below MUST be fullfilled.
  * AllowForAllAccessOut(),  -- Actual only for persistent transactions
  *                             Desides if remote peer has enough rights to receive this transaction
@@ -68,17 +68,17 @@ struct NotDefinedApiData
  *
  * APPLY(                   -- macro header
  * 605,                     -- integer enum id
- * saveLayoutTour,          -- transaction name
- * LayoutTourData,          -- passed data structure
+ * saveShowreel,            -- transaction name
+ * ShowreelData,            -- passed data structure
  * true,                    -- transaction is persistent
  * false,                   -- transaction is not system (handled common way)
  * CreateHashByIdHelper(),  -- id is enough to generate hash
- * LayoutTourNotificationManagerHelper(), -- notify other users that we have changed the tour
- * LayoutTourAccess(),      -- check access to save
- * LayoutTourAccess(),      -- check access to read
+ * ShowreelNotificationManagerHelper(), -- notify other users that we have changed the tour
+ * ShowreelAccess(),      -- check access to save
+ * ShowreelAccess(),      -- check access to read
  * InvalidFilterFunc(),     -- actual only for list transactions
  * InvalidFilterFunc(),     -- actual only for list transactions
- * AccessOut<LayoutTourAccess>(),  -- resending persistent transactions
+ * AccessOut<ShowreelAccess>(),  -- resending persistent transactions
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *
@@ -833,7 +833,7 @@ APPLY(603, removeLayout, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(604, getLayoutTours, nx::vms::api::LayoutTourDataList, \
+APPLY(604, getShowreels, nx::vms::api::ShowreelDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        false, /*isRemoveOperation*/ \
@@ -842,29 +842,29 @@ APPLY(604, getLayoutTours, nx::vms::api::LayoutTourDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), \
-                       FilterListByAccess<LayoutTourAccess>(), \
+                       FilterListByAccess<ShowreelAccess>(), \
                        AllowForAllAccessOut(), /* not actual for non-persistent */ \
                        RegularTransactionType()) \
-APPLY(605, saveLayoutTour, nx::vms::api::LayoutTourData, \
+APPLY(605, saveShowreel, nx::vms::api::ShowreelData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       LayoutTourNotificationManagerHelper(), /* trigger notification*/ \
-                       LayoutTourAccess(), /* save permission checker */ \
-                       LayoutTourAccess(), /* read permission checker */ \
+                       ShowreelNotificationManagerHelper(), /* trigger notification*/ \
+                       ShowreelAccess(), /* save permission checker */ \
+                       ShowreelAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AccessOut<LayoutTourAccess>(), \
+                       AccessOut<ShowreelAccess>(), \
                        RegularTransactionType()) \
-APPLY(606, removeLayoutTour, nx::vms::api::IdData, \
+APPLY(606, removeShowreel, nx::vms::api::IdData, \
                        true, \
                        false, \
                        true, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       LayoutTourAccessById(), /* save permission checker */ \
-                       LayoutTourAccessById(), /* read permission checker */ \
+                       ShowreelAccessById(), /* save permission checker */ \
+                       ShowreelAccessById(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \

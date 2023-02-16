@@ -56,8 +56,8 @@ ActionId getActionId(NodeType nodeType)
         case NodeType::customResourceGroup:
             return ActionId::RenameCustomGroupAction;
 
-        case NodeType::layoutTour:
-            return ActionId::RenameLayoutTourAction;
+        case NodeType::showreel:
+            return ActionId::RenameShowreelAction;
 
         default:
             break;
@@ -129,7 +129,7 @@ ActionParameters getActionParameters(
         }
     }
 
-    if (nodeType == NodeType::layoutTour)
+    if (nodeType == NodeType::showreel)
         return ActionParameters(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>());
 
     return ActionParameters();

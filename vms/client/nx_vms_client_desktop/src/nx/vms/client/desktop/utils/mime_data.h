@@ -17,7 +17,7 @@ namespace nx::vms::client::desktop {
 
 /**
  * Utility class to handle in-app and between-app drag-n-drop. Stores list of dragged resources
- * and other entities (e.g. layout tours or videowall items).
+ * and other entities (e.g. Showreels or videowall items).
  * This class can convert to and from QMimeData to support standard mechanisms. During conversion
  * all resources and entities are placed into two lists: list of ids and an additional list of
  * urls to handle local files drag-n-drop.
@@ -52,7 +52,7 @@ public:
     void setResources(const QnResourceList& resources);
 
     /**
-     * Get list of dragged entities (not resources), e.g. layout tours or videowall items.
+     * Get list of dragged entities (not resources), e.g. Showreels or videowall items.
      */
     QList<QnUuid> entities() const;
     void setEntities(const QList<QnUuid>& ids);

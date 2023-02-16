@@ -311,7 +311,7 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class StartCurrentLayoutTourCondition: public Condition
+class StartCurrentShowreelCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
@@ -651,8 +651,8 @@ inline ConditionWrapper treeNodeType(ResourceTree::NodeType type)
     return treeNodeType(QSet<ResourceTree::NodeType>{type});
 }
 
-/** Visible in layout tour preview mode only. */
-ConditionWrapper isLayoutTourReviewMode();
+/** Visible in Showreel preview mode only. */
+ConditionWrapper isShowreelReviewMode();
 
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();

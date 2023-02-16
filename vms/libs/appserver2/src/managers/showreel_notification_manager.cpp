@@ -1,22 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "layout_tour_notification_manager.h"
+#include "showreel_notification_manager.h"
 
 namespace ec2 {
 
-void QnLayoutTourNotificationManager::triggerNotification(
+void ShowreelNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::removeLayoutTour);
+    NX_ASSERT(tran.command == ApiCommand::removeShowreel);
     emit removed(QnUuid(tran.params.id));
 }
 
-void QnLayoutTourNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::LayoutTourData>& tran,
+void ShowreelNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::ShowreelData>& tran,
     NotificationSource source)
 {
-    NX_ASSERT(tran.command == ApiCommand::saveLayoutTour);
+    NX_ASSERT(tran.command == ApiCommand::saveShowreel);
     emit addedOrUpdated(tran.params, source);
 }
 

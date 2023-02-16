@@ -92,7 +92,7 @@ private:
     ItemState itemStateForLayoutItem(const QModelIndex& index) const;
     ItemState itemStateForVideoWall(const QModelIndex& index) const;
     ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
-    ItemState itemStateForLayoutTour(const QModelIndex& index) const;
+    ItemState itemStateForShowreel(const QModelIndex& index) const;
 
     QVariant rowCheckState(const QModelIndex& index) const;
 

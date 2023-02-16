@@ -6,8 +6,8 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtQml/QQmlEngine>
 #include <QtGui/QAction>
+#include <QtQml/QQmlEngine>
 
 #include <api/helpers/layout_id_helper.h>
 #include <client/client_module.h>
@@ -20,7 +20,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
 #include <nx/network/address_resolver.h>
@@ -48,6 +47,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
@@ -257,8 +257,6 @@ void StartupActionsHandler::submitDelayedDrops()
     QScopedValueRollback<bool> guard(d->delayedDropGuard, true);
 
     QnResourceList resources;
-    nx::vms::api::LayoutTourDataList tours;
-
     if (const auto layoutRef = d->delayedDrops.layoutRef; !layoutRef.isEmpty())
     {
         auto layout = layout_id_helper::findLayoutByFlexibleId(resourcePool(), layoutRef);
@@ -283,8 +281,9 @@ void StartupActionsHandler::submitDelayedDrops()
 
     const MimeData mimeData(d->delayedDrops.raw, createResourceCallback);
 
-    for (const auto& tour: systemContext()->showreelManager()->tours(mimeData.entities()))
-        tours.push_back(tour);
+    nx::vms::api::ShowreelDataList showreels;
+    for (const auto& showreel: systemContext()->showreelManager()->showreels(mimeData.entities()))
+        showreels.push_back(showreel);
 
     resources.append(mimeData.resources());
     if (!resources.isEmpty())
@@ -295,7 +294,7 @@ void StartupActionsHandler::submitDelayedDrops()
 
     d->delayedDrops = {};
 
-    if (resources.empty() && tours.empty())
+    if (resources.empty() && showreels.empty())
         return;
 
     workbench()->clear();
@@ -314,8 +313,8 @@ void StartupActionsHandler::submitDelayedDrops()
         menu()->trigger(OpenInNewTabAction, parameters);
     }
 
-    for (const auto& tour: tours)
-        menu()->trigger(ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
+    for (const auto& showreel: showreels)
+        menu()->trigger(ReviewShowreelAction, {Qn::UuidRole, showreel.id});
 }
 
 void StartupActionsHandler::handleStartupParameters()

@@ -19,10 +19,10 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/layout_data.h>
-#include <nx/vms/api/data/layout_tour_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/api/rules/rule.h>

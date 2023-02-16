@@ -120,12 +120,12 @@ void CameraButtonController::createTwoWayAudioButton()
         connect(m_twoWayAudioWidget, &QnTwoWayAudioWidget::pressed, this,
             [this]
             {
-                menu()->triggerIfPossible(ui::action::SuspendCurrentTourAction);
+                menu()->triggerIfPossible(ui::action::SuspendCurrentShowreelAction);
             });
         connect(m_twoWayAudioWidget, &QnTwoWayAudioWidget::released, this,
             [this]
             {
-                menu()->triggerIfPossible(ui::action::ResumeCurrentTourAction);
+                menu()->triggerIfPossible(ui::action::ResumeCurrentShowreelAction);
             });
 
         m_twoWayAudioWidgetId = m_buttonsContainer->addItem(m_twoWayAudioWidget);

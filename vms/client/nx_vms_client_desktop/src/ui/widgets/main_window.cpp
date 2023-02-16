@@ -34,6 +34,7 @@
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
+#include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -45,7 +46,6 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
-#include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
@@ -96,14 +96,15 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
+
 #include "nx/utils/guarded_callback.h"
 
 #ifdef Q_OS_WIN
-    #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
+#include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
 #endif
 
 #ifdef Q_OS_MACX
-    #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #include "layout_tab_bar.h"
@@ -230,7 +231,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             }
             updateHelpTopic();
         });
-    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
+    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data(), this));
@@ -285,7 +286,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<CloudActionsHandler>();
     context->instance<QnWorkbenchVirtualCameraHandler>();
-    context->instance<ui::workbench::LayoutToursHandler>();
+    context->instance<ShowreelActionsHandler>();
     context->instance<RadassActionHandler>();
     context->instance<StartupActionsHandler>();
     context->instance<ui::workbench::ResourceGroupingActionHandler>();
@@ -359,12 +360,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::StopSharingLayoutAction));
     addAction(action(action::DeleteVideoWallItemAction));
     addAction(action(action::DeleteVideowallMatrixAction));
-    addAction(action(action::RemoveLayoutTourAction));
+    addAction(action(action::RemoveShowreelAction));
     addAction(action(action::SelectAllAction));
     addAction(action(action::CheckFileSignatureAction));
     addAction(action(action::TakeScreenshotAction));
     addAction(action(action::AdjustVideoAction));
-    addAction(action(action::ToggleLayoutTourModeAction));
+    addAction(action(action::ToggleShowreelModeAction));
     addAction(action(action::DebugIncrementCounterAction));
     addAction(action(action::DebugDecrementCounterAction));
     addAction(action(action::DebugControlPanelAction));
@@ -667,7 +668,7 @@ void MainWindow::updateScreenInfo()
 
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
 {
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleShowreelModeAction)->isChecked())
         return {Qn::MainWindow_Scene_TourInProgress_Help, true};
 
     if (auto layout = workbench()->currentLayout())
@@ -759,7 +760,7 @@ bool MainWindow::handleKeyPress(int key)
     if (key == Qt::Key_Alt || key == Qt::Key_Control || key == Qt::Key_Shift)
         return false;
 
-    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+    const bool isTourRunning = action(action::ToggleShowreelModeAction)->isChecked();
 
     if (!isTourRunning)
     {
@@ -793,8 +794,8 @@ bool MainWindow::handleKeyPress(int key)
             break;
 
         case Qt::Key_Escape:
-            // Stop layout tour if it is running.
-            menu()->trigger(action::ToggleLayoutTourModeAction);
+            // Stop Showreel if it is running.
+            menu()->trigger(action::ToggleShowreelModeAction);
             break;
     }
     return true;

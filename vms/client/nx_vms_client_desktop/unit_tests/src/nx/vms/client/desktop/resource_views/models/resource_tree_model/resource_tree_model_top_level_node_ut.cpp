@@ -122,7 +122,7 @@ TEST_F(ResourceTreeModelTest, showreelsNodeIsDisplayedOnlyIfShowreelsExist)
     ASSERT_TRUE(noneMatches(showreelsNodeCondition()));
 
     // When showreel is added.
-    addLayoutTour("showreel", user->getId());
+    addShowreel("showreel", user->getId());
 
     // Then there is single "Showreels" node in the tree.
     const auto showreelsIndex = uniqueMatchingIndex(showreelsNodeCondition());
@@ -149,7 +149,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     addFakeServer(kFakeServerName);
     addLayout("layout", userId);
     addVideoWall(kVideowallName);
-    addLayoutTour("showreel", userId);
+    addShowreel("showreel", userId);
 
     // Reference data.
     std::vector<QString> referenceSequence;

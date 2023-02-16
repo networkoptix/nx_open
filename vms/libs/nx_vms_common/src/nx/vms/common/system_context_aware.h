@@ -9,7 +9,6 @@
 class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
 class QnGlobalPermissionsManager;
-class QnLayoutTourManager;
 class QnResourceAccessManager;
 class QnResourcePool;
 class QnRuntimeInfoManager;
@@ -21,6 +20,7 @@ namespace nx::core::access { class ResourceAccessProvider; }
 
 namespace nx::vms::common {
 
+class ShowreelManager;
 class SystemContext;
 class SystemSettings;
 
@@ -90,7 +90,7 @@ public:
     /**
      * Manages Showreels.
      */
-    QnLayoutTourManager* showreelManager() const;
+    ShowreelManager* showreelManager() const;
 
     /**
      * List of all peers, connected to the System.
