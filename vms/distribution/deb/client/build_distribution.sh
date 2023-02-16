@@ -70,7 +70,7 @@ copyHelpFiles()
     echo "Copying Quick Start Guide"
     cp "$QUICK_START_GUIDE_FILE" "$STAGE_MODULE"
 
-    if [[ "${CUSTOMIZATION_MOBILE_CLIENT_ENABLED}" == "true" ]]
+    if [[ "${CUSTOMIZATION_MOBILE_CLIENT_ENABLED,,}" == "true" ]]
     then
         echo "Copying Mobile Help"
         cp "$MOBILE_HELP_FILE" "$STAGE_MODULE"
