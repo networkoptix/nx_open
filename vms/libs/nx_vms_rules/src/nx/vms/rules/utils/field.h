@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "../basic_event.h"
 #include "../manifest.h"
 #include "../rules_fwd.h"
 
@@ -18,6 +17,7 @@ static constexpr auto kEmailsFieldName = "emails";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
+static constexpr auto kPlaybackTimeFieldName = "playbackTime";
 static constexpr auto kRecordAfterFieldName = "recordAfter";
 static constexpr auto kRecordBeforeFieldName = "recordBefore";
 static constexpr auto kServerIdFieldName = "serverId";

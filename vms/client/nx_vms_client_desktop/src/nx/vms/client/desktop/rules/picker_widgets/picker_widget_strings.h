@@ -52,6 +52,7 @@ class DurationPickerWidgetStrings
 
 public:
     static QString intervalOfActionHint(bool isInstant);
+    static QString playbackTimeHint(bool isLive);
 };
 
 class CameraPickerStrings

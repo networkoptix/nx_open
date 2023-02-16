@@ -23,8 +23,10 @@
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
+#include "ptz_preset_picker_widget.h"
 #include "server_picker_widget.h"
 #include "single_target_device_picker_widget.h"
+#include "single_target_layout_picker_widget.h"
 #include "sound_picker_widget.h"
 #include "source_user_picker_widget.h"
 #include "state_picker_widget.h"
@@ -96,7 +98,10 @@ PickerWidget* createTargetDevicePicker(QnWorkbenchContext* context, CommonParams
 PickerWidget* createSingleTargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
-        return new SingleTargetDevicePicker(context, parent);
+        return new SingleTargetDevicePicker<QnFullscreenCameraPolicy>(context, parent);
+
+    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PtzPresetAction>())
+        return new SingleTargetDevicePicker<QnExecPtzPresetPolicy>(context, parent);
 
     NX_ASSERT(false, "Must not be here.");
     return {};
@@ -155,10 +160,14 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new FpsPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())
         pickerWidget = new HttpMethodPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::LayoutField>())
+        pickerWidget = new SingleTargetLayoutPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
         pickerWidget = new OptionalDurationPicker<nx::vms::rules::OptionalTimeField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
         pickerWidget = new PasswordPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::PtzPresetField>())
+        pickerWidget = new PtzPresetPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::StreamQualityField>())
         pickerWidget = new StreamQualityPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetDeviceField>())

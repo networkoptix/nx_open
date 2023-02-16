@@ -115,10 +115,7 @@ private:
     {
         DurationPicker<F>::onDescriptorSet();
 
-        m_isDurationField = m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName;
-
-        if (m_isDurationField)
-            m_checkBox->setText(m_fieldDescriptor->displayName);
+        m_checkBox->setText(m_fieldDescriptor->displayName);
     }
 
     void updateUi() override
@@ -131,15 +128,28 @@ private:
             m_checkBox->setChecked(!isZero);
         }
 
-        if (m_isDurationField)
+        if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName
+            || m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
         {
-            m_timeDurationWidget->setEnabled(m_checkBox->isChecked());
+            m_timeDurationWidget->setVisible(m_checkBox->isChecked());
+
+            QString hint;
+            if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+            {
+                hint = DurationPickerWidgetStrings::intervalOfActionHint(
+                    /*isInstant*/ !m_checkBox->isChecked());
+            }
+            else
+            {
+                hint = DurationPickerWidgetStrings::playbackTimeHint(
+                    /*isLive*/ !m_checkBox->isChecked());
+            }
+
+            m_checkBox->setText(QString{"%1: %2"}.arg(m_fieldDescriptor->displayName).arg(hint));
         }
         else
         {
-            m_timeDurationWidget->setVisible(m_checkBox->isChecked());
-            m_checkBox->setText(DurationPickerWidgetStrings::intervalOfActionHint(
-                /*isInstant*/ !m_checkBox->isChecked()));
+            m_timeDurationWidget->setEnabled(m_checkBox->isChecked());
         }
     }
 
@@ -152,7 +162,7 @@ private:
             constexpr auto kDefaultValue = std::chrono::seconds(60);
 
             theField()->setValue(kDefaultValue);
-            if (m_isDurationField)
+            if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
             {
                 auto stateField = FieldPickerWidget<F>::template getEventField<vms::rules::StateField>(
                     vms::rules::utils::kStateFieldName);
@@ -171,7 +181,7 @@ private:
         {
             theField()->setValue(F::value_type::zero());
 
-            if (m_isDurationField)
+            if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
             {
                 auto stateField = FieldPickerWidget<F>::template getEventField<vms::rules::StateField>(
                     vms::rules::utils::kStateFieldName);

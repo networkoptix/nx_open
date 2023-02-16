@@ -71,9 +71,12 @@ QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventL
 
 QString DurationPickerWidgetStrings::intervalOfActionHint(bool isInstant)
 {
-    return isInstant
-        ? tr("Interval of action: Instant")
-        : tr("Interval of action: No more than once per");
+    return isInstant ? tr("Instant") : tr("No more than once per");
+}
+
+QString DurationPickerWidgetStrings::playbackTimeHint(bool isLive)
+{
+    return isLive ? tr("Live") : tr("Rewind for");
 }
 
 QString CameraPickerStrings::sourceCameraString(size_t otherCameraCount)

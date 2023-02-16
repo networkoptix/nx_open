@@ -8,13 +8,13 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/assert.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/manifest.h>
-#include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include "../params_widgets/common_params_widget.h"
 

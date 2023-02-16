@@ -71,9 +71,9 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
     if (m_ptzController)
         m_ptzController->disconnect(this);
 
-    QnPtzControllerPtr fisheyeController;
-    fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
-    fisheyeController.reset(new QnPresetPtzController(fisheyeController));
+    auto fisheyeController =
+        QSharedPointer<QnPresetPtzController>::create(QSharedPointer<QnFisheyePtzController>(
+            new QnFisheyePtzController(camera), &QObject::deleteLater));
 
     auto systemContext = SystemContext::fromResource(camera);
     auto ptzPool = systemContext->ptzControllerPool();

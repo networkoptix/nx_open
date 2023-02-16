@@ -17,7 +17,8 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .displayName = tr("Set to fullscreen"),
         .flags = ItemFlag::instant,
         .fields = {
-            makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("Camera")),
+            makeFieldDescriptor<TargetSingleDeviceField>(
+                utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
             makeFieldDescriptor<OptionalTimeField>("playbackTime", tr("Playback Time")),
         }
