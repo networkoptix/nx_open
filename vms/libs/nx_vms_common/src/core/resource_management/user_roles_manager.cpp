@@ -98,19 +98,24 @@ QString QnPredefinedUserRoles::description(Qn::UserRole userRole)
     switch (userRole)
     {
         case Qn::UserRole::owner:
-            return tr("Has access to whole System and can do everything.");
+            return tr("This user has unlimited System privileges and cannot be deleted."
+                " Can create and modify Administrators, and can merge Systems and link"
+                " or unlink to Nx Cloud accounts.");
 
         case Qn::UserRole::administrator:
-            return tr("Has access to whole System and can manage it. Can create users.");
+            return tr("Has full control of System configuration, but cannot change any Owner"
+                " settings, cannot delete or change their own role, and cannot create or edit"
+                " other Administrators.");
 
         case Qn::UserRole::advancedViewer:
-            return tr("Can manage all cameras and bookmarks.");
+            return tr("Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate"
+                " I/O Module buttons, create and edit Bookmarks, and view the Event Log.");
 
         case Qn::UserRole::viewer:
-            return tr("Can view all cameras and export video.");
+            return tr("Can view and export archive and Bookmarks.");
 
         case Qn::UserRole::liveViewer:
-            return tr("Can view live video from all cameras.");
+            return tr("Can view live videos, I/O modules and web pages.");
 
         case Qn::UserRole::customUserRole:
             return tr("Custom user role.");
