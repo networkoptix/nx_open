@@ -3,8 +3,6 @@
 #include "button_controller.h"
 
 #include <api/server_rest_connection.h>
-#include <camera/iomodule/iomodule_monitor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
@@ -29,16 +27,14 @@ ButtonController::ButtonController(QnMediaResourceWidget* mediaResourceWidget):
     for (const QnIOPortData& portData: m_camera->ioPortDescriptions())
         m_outputNameToId[portData.outputName] = portData.id;
 
-    m_ioModuleMonitor.reset(new QnIOModuleMonitor(m_camera));
+    m_ioModuleMonitor = mediaResourceWidget->getIOModuleMonitor();
 
-    connect(
-        m_ioModuleMonitor.get(),
-        &QnIOModuleMonitor::ioStateChanged,
-        this,
-        [this](const QnIOStateData& value) { handleChangedIOState(value); },
-        Qt::QueuedConnection);
-
-    m_ioModuleMonitor->open();
+    if (m_ioModuleMonitor)
+    {
+        connect(m_ioModuleMonitor.get(), &QnIOModuleMonitor::ioStateChanged,
+            this, [this](const QnIOStateData& value) { handleChangedIOState(value); },
+            Qt::QueuedConnection);
+    }
 }
 
 ButtonController::~ButtonController()
@@ -136,6 +132,12 @@ QString ButtonController::getOutputId(nx::vms::api::ExtendedCameraOutput outputT
     }
 
     return "";
+}
+
+void ButtonController::openIoModuleConnection()
+{
+    if (!m_ioModuleMonitor->connectionIsOpened())
+        m_ioModuleMonitor->open();
 }
 
 } // namespace nx::vms::client::desktop

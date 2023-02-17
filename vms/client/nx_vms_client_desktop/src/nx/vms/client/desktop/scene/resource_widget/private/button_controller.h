@@ -6,12 +6,12 @@
 
 #include <api/model/api_ioport_data.h>
 #include <api/server_rest_connection_fwd.h>
+#include <camera/iomodule/iomodule_monitor.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class GraphicsWidget;
-class QnIOModuleMonitor;
 class QnMediaResourceWidget;
 class QnScrollableItemsWidget;
 
@@ -58,18 +58,20 @@ protected:
 
     QString getOutputId(nx::vms::api::ExtendedCameraOutput outputType) const;
 
+    void openIoModuleConnection();
+
 protected:
     QnMediaResourceWidget* m_parentWidget = nullptr;
     QnScrollableItemsWidget* m_buttonsContainer = nullptr;
 
     QnVirtualCameraResourcePtr m_camera;
 
-    std::unique_ptr<QnIOModuleMonitor> m_ioModuleMonitor;
-
     QMap<nx::vms::api::ExtendedCameraOutput, QnUuid> m_outputTypeToButtonId;
 
 private:
     QMap<QString, QString> m_outputNameToId;
+
+    QnIOModuleMonitorPtr m_ioModuleMonitor;
 };
 
 } // namespace nx::vms::client::desktop

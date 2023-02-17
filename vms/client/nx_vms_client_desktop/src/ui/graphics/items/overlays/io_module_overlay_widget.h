@@ -3,6 +3,7 @@
 #pragma once
 
 #include <api/model/api_ioport_data.h>
+#include <camera/iomodule/iomodule_monitor.h>
 #include <core/resource/resource_fwd.h>
 #include <qt_graphics_items/graphics_widget.h>
 
@@ -31,6 +32,8 @@ public:
     /** Whether user is allowed to toggle output ports: */
     bool userInputEnabled() const;
     void setUserInputEnabled(bool value);
+
+    QnIOModuleMonitorPtr getIOModuleMonitor() const;
 
 private:
     QScopedPointer<QnIoModuleOverlayWidgetPrivate> const d_ptr;

@@ -60,7 +60,6 @@ public:
 
     QnVirtualCameraResourcePtr module;
     QnIOModuleMonitorPtr monitor;
-    bool connectionOpened = false;
     bool userInputEnabled = false;
 
     struct StateData
@@ -220,7 +219,7 @@ void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
         item.state.id = port.id;
     }
 
-    if (monitor && !connectionOpened)
+    if (monitor && !monitor->connectionIsOpened())
         openConnection();
 
     contents->portsChanged(ports, userInputEnabled);
@@ -268,7 +267,6 @@ void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePt
 void QnIoModuleOverlayWidgetPrivate::at_connectionOpened()
 {
     Q_Q(QnIoModuleOverlayWidget);
-    connectionOpened = true;
     q->setEnabled(true);
 }
 
@@ -277,7 +275,6 @@ void QnIoModuleOverlayWidgetPrivate::at_connectionClosed()
     Q_Q(QnIoModuleOverlayWidget);
 
     q->setEnabled(false);
-    connectionOpened = false;
 
     // Resets states since server initially sends only active states after restart.
     for (auto& item: states)
@@ -428,6 +425,11 @@ void QnIoModuleOverlayWidget::setUserInputEnabled(bool value)
 
     d->userInputEnabled = value;
     d->updateContents();
+}
+
+QnIOModuleMonitorPtr QnIoModuleOverlayWidget::getIOModuleMonitor() const
+{
+    return d_ptr->monitor;
 }
 
 /*

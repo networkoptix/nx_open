@@ -2201,6 +2201,14 @@ double QnMediaResourceWidget::speed() const
         : reader->getSpeed();
 }
 
+QnIOModuleMonitorPtr QnMediaResourceWidget::getIOModuleMonitor() const
+{
+    if (m_ioModuleOverlayWidget)
+        return m_ioModuleOverlayWidget->getIOModuleMonitor();
+
+    return {};
+}
+
 void QnMediaResourceWidget::updateCurrentUtcPosMs()
 {
     const qint64 usec = getUtcCurrentTimeUsec();
