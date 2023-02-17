@@ -357,7 +357,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(context, &QnWorkbenchContext::userChanged,
         this, &QnMediaResourceWidget::resetTriggers);
 
-    updateDisplay();
     updateDewarpingParams();
     updateAspectRatio();
     updatePtzController();
