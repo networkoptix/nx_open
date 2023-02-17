@@ -581,12 +581,12 @@ void CloudStatusWatcher::Private::issueAccessToken()
     IssueTokenRequest request;
     if (!m_authData.refreshToken.empty())
     {
-        request.grant_type = GrantType::refreshToken;
+        request.grant_type = GrantType::refresh_token;
         request.refresh_token = m_authData.refreshToken;
     }
     else if (!m_authData.authorizationCode.empty())
     {
-        request.grant_type = GrantType::authorizationCode;
+        request.grant_type = GrantType::authorization_code;
         request.code = m_authData.authorizationCode;
     }
     else

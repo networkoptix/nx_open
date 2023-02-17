@@ -525,7 +525,7 @@ std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
     }
 
     IssueTokenRequest request;
-    request.grant_type = GrantType::refreshToken;
+    request.grant_type = GrantType::refresh_token;
     request.scope =
         nx::format("cloudSystemId=%1", cloudSystemId).toStdString();
     request.refresh_token = context->credentials().authToken.value;

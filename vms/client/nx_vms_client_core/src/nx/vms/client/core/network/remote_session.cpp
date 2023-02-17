@@ -509,7 +509,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
         return;
 
     IssueTokenRequest request;
-    request.grant_type = GrantType::refreshToken;
+    request.grant_type = GrantType::refresh_token;
     request.scope =
         nx::format("cloudSystemId=%1", connection->moduleInformation().cloudSystemId).toStdString();
     request.refresh_token = qnCloudStatusWatcher->remoteConnectionCredentials().authToken.value;
