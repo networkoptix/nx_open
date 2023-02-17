@@ -373,7 +373,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             });
     }
 
-    updateDisplay();
     updateDewarpingParams();
     updateAspectRatio();
     updatePtzController();
