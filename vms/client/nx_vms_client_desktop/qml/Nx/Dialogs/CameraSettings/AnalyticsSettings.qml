@@ -225,6 +225,8 @@ Item
             header: qsTr("This plugin has no settings for this camera.")
             description:
                 qsTr("Check System Administration settings to configure this plugin.")
+
+            visible: !analyticsSettings.loading
         }
     }
 
