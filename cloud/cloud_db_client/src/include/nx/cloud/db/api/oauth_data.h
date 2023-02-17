@@ -8,11 +8,13 @@
 
 namespace nx::cloud::db::api {
 
+// Code style violated in fields names to match RFC 
+// and support correct API documentation generation
 enum class GrantType
 {
     password,
-    refreshToken,
-    authorizationCode,
+    refresh_token,
+    authorization_code,
 };
 
 enum class ResponseType

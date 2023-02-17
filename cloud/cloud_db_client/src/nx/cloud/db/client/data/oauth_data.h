@@ -8,17 +8,11 @@
 
 namespace nx::cloud::db::api {
 
-template<typename Visitor>
-constexpr auto nxReflectVisitAllEnumItems(GrantType*, Visitor&& visitor)
-{
-    using GrantType = GrantType;
-    using Item = nx::reflect::enumeration::Item<GrantType>;
-    return visitor(
-        Item{GrantType::authorizationCode, "authorization_code"},
-        Item{GrantType::password, "password"},
-        Item{GrantType::refreshToken, "refresh_token"}
-    );
-}
+NX_REFLECTION_INSTRUMENT_ENUM(GrantType,
+    authorization_code,
+    password,
+    refresh_token
+)
 
 NX_REFLECTION_INSTRUMENT_ENUM(ResponseType,
     token,

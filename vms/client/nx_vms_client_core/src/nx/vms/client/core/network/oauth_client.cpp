@@ -96,7 +96,7 @@ void OauthClient::Private::issueAccessToken()
         });
 
     IssueTokenRequest request;
-    request.grant_type = GrantType::authorizationCode;
+    request.grant_type = GrantType::authorization_code;
     request.code = authData.authorizationCode;
     if (refreshTokenLifetime.count())
         request.refresh_token_lifetime = refreshTokenLifetime;
