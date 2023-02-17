@@ -95,7 +95,8 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
     result.insert(kTimeParam,
         nx::api::CameraImageRequest::isSpecialTimeValue(request.timestampUs)
             ? kLatestTimeValue
-            : QString::number(request.timestampUs.count()));
+            : QString::number(std::chrono::duration_cast<std::chrono::milliseconds>(
+                request.timestampUs).count()));
     if (request.ignoreExternalArchive)
         result.insert(kIgnoreExternalArchiveParam, "");
     if (request.tolerant)

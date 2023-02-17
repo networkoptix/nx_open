@@ -338,7 +338,9 @@ struct LayoutThumbnailLoader::Private
         pixmap.setDevicePixelRatio(outputImage.devicePixelRatio());
         pixmap.fill(Qt::transparent);
 
-        auto noDataStatusWidget = isOnline ? noDataWidget.get() : offlineWidget.get();
+        auto noDataStatusWidget = isOnline || msecSinceEpoch != DATETIME_NOW
+            ? noDataWidget.get()
+            : offlineWidget.get();
 
         switch (status)
         {
