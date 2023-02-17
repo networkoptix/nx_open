@@ -376,7 +376,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(action(action::ToggleSyncAction), &QAction::triggered, this,
         &QnMediaResourceWidget::handleSyncStateChanged);
 
-    updateDisplay();
     updateDewarpingParams();
     updateAspectRatio();
     updatePtzController();
