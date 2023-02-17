@@ -13,8 +13,10 @@ TimeBasedNonceProvider::TimeBasedNonceProvider(
     std::chrono::milliseconds steadyExpirationPeriod)
 :
     m_maxServerTimeDifference(maxServerTimeDifference),
-    m_steadyExpirationPeriod(steadyExpirationPeriod)
+    m_steadyExpirationPeriod(steadyExpirationPeriod),
+    m_nonceCleanupInterval(steadyExpirationPeriod / 100)
 {
+    m_nonceCleanupTimer.restart();
     NX_DEBUG(this, nx::format("Server time difference %1, steady expiration period %2").args(
         m_maxServerTimeDifference, m_steadyExpirationPeriod));
 }
@@ -47,12 +49,16 @@ bool TimeBasedNonceProvider::isNonceValid(const nx::String& nonce) const
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     const auto steadyTime = std::chrono::steady_clock::now();
-    for (auto it = m_nonceCache.begin(); it != m_nonceCache.end(); )
+    if (m_nonceCleanupTimer.hasExpired(m_nonceCleanupInterval))
     {
-        if (it->second + m_steadyExpirationPeriod < steadyTime)
-            it = m_nonceCache.erase(it);
-        else
-            ++it;
+        m_nonceCleanupTimer.restart();
+        for (auto it = m_nonceCache.begin(); it != m_nonceCache.end(); )
+        {
+            if (it->second + m_steadyExpirationPeriod < steadyTime)
+                it = m_nonceCache.erase(it);
+            else
+                ++it;
+        }
     }
 
     const auto cacheRecord = m_nonceCache.find(nonceTime);
