@@ -2351,24 +2351,10 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->hasVideo
         && d->camera
         && !workbench()->currentLayout()->resource()->hasFlags(Qn::cross_system)
-        && d->taxonomyManager
-        && ResourceAccessManager::hasPermissions(d->camera, Qn::ViewFootagePermission)
-        && !d->taxonomyManager->relevantEngines().empty()
-        && !d->camera->compatibleAnalyticsEngines().empty())
+        && d->isAnalyticsSupported
+        && ResourceAccessManager::hasPermissions(d->camera, Qn::ViewFootagePermission))
     {
-        const auto taxonomy = d->taxonomyManager->currentTaxonomy();
-        for (const auto engineId: d->camera->compatibleAnalyticsEngines())
-        {
-            auto engine = taxonomy->engineById(engineId.toString());
-            if (!engine) //< Can be absent for cross-system Cameras.
-                continue;
-
-            if (d->taxonomyManager->isEngineRelevant(engine))
-            {
-                result |= Qn::ObjectSearchButton;
-                break;
-            }
-        }
+        result |= Qn::ObjectSearchButton;
     }
 
     if (d->supportsBasicPtz())
