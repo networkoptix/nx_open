@@ -59,7 +59,6 @@ protected:
     virtual void endOfRun() override;
 
     void setPrebufferingUsec(int value);
-    void flushPrebuffer();
     void markNeedKeyData();
     int getPrebufferingUsec() const;
     void setPreciseStartDateTime(int64_t startTimeUs);
@@ -73,7 +72,7 @@ protected:
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
-    virtual bool saveAnalyticsMetadata(const std::shared_ptr<const 
+    virtual bool saveAnalyticsMetadata(const std::shared_ptr<const
         nx::common::metadata::QnCompressedObjectMetadataPacket>& metadata);
 
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);

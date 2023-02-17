@@ -79,22 +79,6 @@ void QnStreamRecorder::markNeedKeyData()
         m_gotKeyFrame[i] = false;
 }
 
-void QnStreamRecorder::flushPrebuffer()
-{
-    NX_VERBOSE(this, "Flushing prebuffer for resource %1", m_resource);
-
-    while (!m_prebuffer.isEmpty())
-    {
-        QnConstAbstractMediaDataPtr d;
-        m_prebuffer.pop(d);
-        if (needSaveData(d))
-            saveData(d);
-        else
-            markNeedKeyData();
-    }
-    m_nextIFrameTime = AV_NOPTS_VALUE;
-}
-
 qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 {
     for (int i = 0; i < m_prebuffer.size(); ++i)

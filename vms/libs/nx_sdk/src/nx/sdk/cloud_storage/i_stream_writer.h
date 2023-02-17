@@ -46,7 +46,12 @@ public:
      * This function will be called just before destruction of the StreamWriter object and no
      * other calls (except destructor) will follow.
      */
-    virtual void close(int64_t durationMs) = 0;
+    virtual ErrorCode close(int64_t durationMs) = 0;
+
+    /**
+     * Total size of written data so far.
+     */
+    virtual int size() const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage
