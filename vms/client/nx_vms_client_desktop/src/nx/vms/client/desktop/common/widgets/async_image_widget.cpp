@@ -469,14 +469,14 @@ void AsyncImageWidget::updateSizeHint() const
     if (m_imageProvider)
     {
         perfectSize = m_imageProvider->image().size(); //< Take image size if possible.
-        if (perfectSize.isNull())
+        if (perfectSize.isEmpty())
             perfectSize = m_imageProvider->sizeHint(); //< Take sizeHint if possible.
     }
 
-    if (perfectSize.isNull())
+    if (perfectSize.isEmpty())
         perfectSize = minimumSize(); //< Take minimumSize if possible.
 
-    if (perfectSize.isNull())
+    if (perfectSize.isEmpty())
         perfectSize = kDefaultThumbnailSize; //< Take a constant.
 
     m_cachedSizeHint = perfectSize;
