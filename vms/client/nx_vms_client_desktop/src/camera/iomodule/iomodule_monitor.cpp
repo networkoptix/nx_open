@@ -113,6 +113,11 @@ bool QnIOModuleMonitor::open()
     return true;
 }
 
+bool QnIOModuleMonitor::connectionIsOpened() const
+{
+    return m_connectionIsOpened;
+}
+
 void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_MUTEX_LOCKER lk( &m_mutex );
@@ -138,6 +143,9 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttp
     }
 
     lk.unlock();
+
+    m_connectionIsOpened = true;
+
     emit connectionOpened();
 }
 
@@ -161,6 +169,8 @@ void QnIOModuleMonitor::at_MonitorConnectionClosed( nx::network::http::AsyncHttp
         m_multipartContentParser->flush();
         m_httpClient.reset();
     }
+
+    m_connectionIsOpened = false;
 
     emit connectionClosed();
 }
