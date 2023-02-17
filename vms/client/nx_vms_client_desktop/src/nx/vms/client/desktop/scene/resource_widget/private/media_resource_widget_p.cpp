@@ -184,7 +184,6 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 
         updateAccess();
         updateIsAnalyticsSupported();
-        requestAnalyticsObjectsExistence();
 
         const QString debugAnalyticsLogFile = ini().debugAnalyticsVideoOverlayFromLogFile;
         if (!debugAnalyticsLogFile.isEmpty())
@@ -454,21 +453,18 @@ void MediaResourceWidgetPrivate::setHasAccess(bool value)
 
 bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 {
-    // If we found some analytics objects in the archive, that's enough.
-    if (m_analyticsObjectsFound)
-        return true;
-
-    // Analytics stream should be enabled only for cameras with enabled analytics engine and only
-    // if at least one of these engines has the objects support.
-    if (!camera || !analyticsMetadataProvider)
+    // Quick check if there are no objects-supporting Analytics Engines in the System.
+    if (taxonomyManager->relevantEngines().empty())
         return false;
 
-    const auto supportedObjectTypes = camera->supportedObjectTypes();
-    return std::any_of(supportedObjectTypes.cbegin(), supportedObjectTypes.cend(),
-        [](const auto& objectTypesByEngineId)
+    // Check whether at least one Analytics Engine in the System supports this Camera and also
+    // supports objects.
+    const auto taxonomy = taxonomyManager->currentTaxonomy();
+    const auto compatibleEngines = camera->compatibleAnalyticsEngines();
+    return std::any_of(compatibleEngines.cbegin(), compatibleEngines.cend(),
+        [&](const QnUuid& engineId)
         {
-            const auto& objectTypes = objectTypesByEngineId.second;
-            return !objectTypes.empty();
+            return taxonomyManager->isEngineRelevant(taxonomy->engineById(engineId.toString()));
         });
 }
 
@@ -478,52 +474,8 @@ void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
     if (this->isAnalyticsSupported == isAnalyticsSupported)
         return;
 
-    // If user opened camera before any analytics objects are found, flag is not set. If enable and
-    // then disable an analytics engine, objects won't be displayed until camera reopening as we do
-    // not have this information anymore. Re-request it when disabling working analytics.
-    if (!isAnalyticsSupported)
-        requestAnalyticsObjectsExistence();
-
     this->isAnalyticsSupported = isAnalyticsSupported;
     emit analyticsSupportChanged();
-}
-
-void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
-{
-    if (!NX_ASSERT(camera) || !connection())
-        return;
-
-    nx::analytics::db::Filter filter;
-    filter.deviceIds.insert(camera->getId());
-    filter.maxObjectTracksToSelect = 1;
-    filter.timePeriod = {QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue};
-    filter.withBestShotOnly = true;
-
-    auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle /*handle*/, nx::analytics::db::LookupResult&& result)
-        {
-            if (m_analyticsObjectsFound)
-                return;
-
-            m_analyticsObjectsFound = success && !result.empty();
-            if (m_analyticsObjectsFound)
-                updateIsAnalyticsSupported();
-
-            if (!success)
-            {
-                static const auto kRetryTimeout = 5s;
-                NX_VERBOSE(this, "Analytics request failed, try again in %1", kRetryTimeout);
-                executeDelayedParented(
-                    [this]{ requestAnalyticsObjectsExistence(); }, kRetryTimeout, this);
-            }
-        });
-    NX_VERBOSE(this, "Request analytics objects existance for camera %1", camera);
-    connectedServerApi()->lookupObjectTracks(
-        filter,
-        /*isLocal*/ false,
-        callback,
-        this->thread(),
-        camera->getParentId());
 }
 
 void MediaResourceWidgetPrivate::setStreamDataFilter(StreamDataFilter filter, bool on)

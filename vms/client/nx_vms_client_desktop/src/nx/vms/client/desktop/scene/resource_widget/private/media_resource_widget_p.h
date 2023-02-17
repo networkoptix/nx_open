@@ -124,9 +124,6 @@ private:
     bool calculateIsAnalyticsSupported() const;
     void updateIsAnalyticsSupported();
 
-    /** Request analytics objects once to check if they exist in the archive. */
-    void requestAnalyticsObjectsExistence();
-
     void setStreamDataFilter(nx::vms::api::StreamDataFilter filter, bool on);
     void setStreamDataFilters(nx::vms::api::StreamDataFilters filters);
 
@@ -142,7 +139,6 @@ private:
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
     bool m_hasAccess = true;
-    bool m_analyticsObjectsFound = false;
     bool m_forceDisabledAnalytics = false;
 
     /** Cache of motion skip masks by channel. */

@@ -2288,20 +2288,10 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->hasVideo
         && d->camera
-        && d->taxonomyManager
-        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
-        && !d->taxonomyManager->relevantEngines().empty()
-        && !d->camera->compatibleAnalyticsEngines().empty())
+        && d->isAnalyticsSupported
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
     {
-        const auto taxonomy = d->taxonomyManager->currentTaxonomy();
-        for (const auto engineId: d->camera->compatibleAnalyticsEngines())
-        {
-            if (d->taxonomyManager->isEngineRelevant(taxonomy->engineById(engineId.toString())))
-            {
-                result |= Qn::ObjectSearchButton;
-                break;
-            }
-        }
+        result |= Qn::ObjectSearchButton;
     }
 
     if (d->supportsBasicPtz())
