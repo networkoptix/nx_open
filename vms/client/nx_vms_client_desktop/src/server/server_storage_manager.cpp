@@ -377,14 +377,17 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
         return false;
 
     nx::network::rest::Params params;
-    params.insert("action", action);
+    if (action != Qn::RebuildAction::RebuildAction_ShowProgress)
+        params.insert("action", action);
     params.insert("mainPool", pool == QnServerStoragesPool::Main);
 
-    const auto handle = connectedServerApi()->getJsonResult(
+    const auto handle = connectedServerApi()->postJsonResult(
         "/api/rebuildArchive",
         params,
+        {},
         methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply),
         thread(),
+        {},
         server->getId());
 
     NX_VERBOSE(this, "Send request %1 to rebuild pool %2 of %3 (action %4)",
