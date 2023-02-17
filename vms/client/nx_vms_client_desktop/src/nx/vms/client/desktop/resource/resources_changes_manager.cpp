@@ -709,6 +709,8 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
             return;
         }
 
+        const bool isNewUser = user->resourcePool() == nullptr;
+
         auto replyProcessor =
             makeSaveResourceReplyProcessorRest<QnUserResource, vms::api::UserData>(
                 this, user, callback);
@@ -754,12 +756,26 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
             ? helper
             : systemContext->restApiHelper()->getSessionTokenHelper();
 
-        api->putRest(tokenHelper,
-            QString("/rest/v3/users/%1").arg(user->getId().toString()),
-            network::rest::Params{},
-            nx::reflect::json::serialize(body).c_str(),
-            replyProcessor,
-            thread());
+        if (isNewUser)
+        {
+            NX_ASSERT(body.password.has_value());
+
+            api->putRest(tokenHelper,
+                QString("/rest/v3/users/%1").arg(user->getId().toString()),
+                network::rest::Params{},
+                nx::reflect::json::serialize(body).c_str(),
+                replyProcessor,
+                thread());
+        }
+        else
+        {
+            api->patchRest(tokenHelper,
+                QString("/rest/v3/users/%1").arg(user->getId().toString()),
+                network::rest::Params{},
+                nx::reflect::json::serialize(body).c_str(),
+                replyProcessor,
+                thread());
+        }
     }
     else
     {
@@ -804,6 +820,10 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
 
         const auto newUsers = users.filtered(
             [](const QnResourcePtr& resource) { return resource->resourcePool() == nullptr; });
+
+        std::set<QnUuid> newUsersSet;
+        for (const auto& user: newUsers)
+            newUsersSet.insert(user->getId());
 
         resourcePool()->addNewResources(users);
 
@@ -852,12 +872,26 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
                 ? helper
                 : systemContext->restApiHelper()->getSessionTokenHelper();
 
-            api->putRest(tokenHelper,
-                QString("/rest/v3/users/%1").arg(user->getId().toString()),
-                network::rest::Params{},
-                nx::reflect::json::serialize(body).c_str(),
-                replyProcessor,
-                thread());
+            if (newUsersSet.contains(user->getId()))
+            {
+                NX_ASSERT(body.password.has_value());
+
+                api->putRest(tokenHelper,
+                    QString("/rest/v3/users/%1").arg(user->getId().toString()),
+                    network::rest::Params{},
+                    nx::reflect::json::serialize(body).c_str(),
+                    replyProcessor,
+                    thread());
+            }
+            else
+            {
+                api->patchRest(tokenHelper,
+                    QString("/rest/v3/users/%1").arg(user->getId().toString()),
+                    network::rest::Params{},
+                    nx::reflect::json::serialize(body).c_str(),
+                    replyProcessor,
+                    thread());
+            }
         }
     }
     else
