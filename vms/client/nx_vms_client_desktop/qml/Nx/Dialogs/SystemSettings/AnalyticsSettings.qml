@@ -70,6 +70,7 @@ Item
         {
             header: qsTr("This plugin has no settings at the System level.")
             description: qsTr("Check Camera Settings to configure this plugin.")
+            visible: !!store && !store.loading
         }
 
         onValuesEdited: function(activeItem)
