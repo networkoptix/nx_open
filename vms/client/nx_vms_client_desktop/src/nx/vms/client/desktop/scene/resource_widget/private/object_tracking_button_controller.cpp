@@ -2,7 +2,6 @@
 
 #include "object_tracking_button_controller.h"
 
-#include <camera/iomodule/iomodule_monitor.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/api/types/event_rule_types.h>
@@ -19,6 +18,21 @@ namespace {
 
 static constexpr int kTriggerButtonHeight = 40;
 
+const QString kAutoTrackingPortName =
+    QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::autoTracking));
+
+bool cameraHasObjectTracking(const QnVirtualCameraResourcePtr& camera)
+{
+    NX_ASSERT(camera);
+
+    const auto portDescriptions = camera->ioPortDescriptions();
+    return std::any_of(portDescriptions.begin(), portDescriptions.end(),
+        [](const auto& portData)
+        {
+            return portData.outputName == kAutoTrackingPortName;
+        });
+}
+
 } // namespace
 
 ObjectTrackingButtonController::ObjectTrackingButtonController(
@@ -29,20 +43,15 @@ ObjectTrackingButtonController::ObjectTrackingButtonController(
     if (m_camera.isNull())
         return;
 
-    m_ioModuleMonitor.reset(new QnIOModuleMonitor(m_camera));
+    if (cameraHasObjectTracking(m_camera))
+        openIoModuleConnection();
 
-    connect(m_ioModuleMonitor.get(), &QnIOModuleMonitor::ioStateChanged, this,
-        [this](const QnIOStateData& value)
+    connect(m_camera.get(), &QnVirtualCameraResource::propertyChanged,
+        this, [this](const QnResourcePtr& /*resource*/, const QString& key)
         {
-            if (value.id == getOutputId(ExtendedCameraOutput::autoTracking))
-            {
-                m_objectTrackingIsActive = value.isActive;
-                emit requestButtonCreation();
-            }
-        },
-        Qt::QueuedConnection);
-
-    m_ioModuleMonitor->open();
+            if (key == ResourcePropertyKey::kIoSettings && cameraHasObjectTracking(m_camera))
+                openIoModuleConnection();
+        });
 }
 
 ObjectTrackingButtonController::~ObjectTrackingButtonController()
@@ -97,7 +106,10 @@ void ObjectTrackingButtonController::removeButtons()
 void ObjectTrackingButtonController::handleChangedIOState(const QnIOStateData& value)
 {
     if (value.id == getOutputId(ExtendedCameraOutput::autoTracking))
+    {
         m_objectTrackingIsActive = value.isActive;
+        emit requestButtonCreation();
+    }
 
     emit ioStateChanged(value);
 }

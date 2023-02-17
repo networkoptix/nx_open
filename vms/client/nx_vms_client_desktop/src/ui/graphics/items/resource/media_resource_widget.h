@@ -10,6 +10,7 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
+#include <camera/iomodule/iomodule_monitor.h>
 #include <client/client_globals.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -237,6 +238,8 @@ public:
 
     void setSpeed(double value);
     double speed() const;
+
+    QnIOModuleMonitorPtr getIOModuleMonitor() const;
 
 signals:
     void speedChanged();

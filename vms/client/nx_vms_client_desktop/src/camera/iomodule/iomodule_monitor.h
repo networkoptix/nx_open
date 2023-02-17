@@ -20,6 +20,8 @@ public:
     QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera);
     virtual ~QnIOModuleMonitor() override;
     bool open();
+    bool connectionIsOpened() const;
+
 signals:
     void connectionClosed();
     void connectionOpened();
@@ -33,6 +35,7 @@ private:
     QnSecurityCamResourcePtr m_camera;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
+    std::atomic_bool m_connectionIsOpened = false;
 };
 
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;
