@@ -19,43 +19,10 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include "../globals/user_settings_global.h"
+#include "core/resource/resource_fwd.h"
+
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-// Return sorted list if predefined groups.
-static const QList<QnUuid> predefinedGroupIds()
-{
-    QList<QnUuid> result;
-    for (auto role: QnPredefinedUserRoles::enumValues())
-        result << QnPredefinedUserRoles::id(role);
-    return result;
-}
-
-static const QSet<QnUuid> predefinedGroupIdsSet()
-{
-    QSet<QnUuid> result;
-    for (auto role: QnPredefinedUserRoles::enumValues())
-        result << QnPredefinedUserRoles::id(role);
-    return result;
-}
-
-std::pair<QString, bool> getIdInfo(nx::vms::common::SystemContext* systemContext, const QnUuid& id)
-{
-    const auto groupsManager = systemContext->userRolesManager();
-    if (const auto group = groupsManager->userRole(id); !group.id.isNull())
-    {
-        return {group.name, group.isLdap};
-    }
-    const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id);
-    if (!user)
-        return {{}, false};
-
-    return {user->getName(), user->isLdap()};
-}
-
-} // namespace
 
 MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const QnUuid& id)
 {
@@ -81,132 +48,259 @@ MembersModel::MembersModel():
 
 MembersModel::~MembersModel() {}
 
-bool MembersModel::isPredefined(const QnUuid& groupId)
-{
-    static const auto predefinedIds = predefinedGroupIdsSet();
-    return predefinedIds.contains(groupId);
-}
-
-void MembersModel::sortSubjects(
-    QList<QnUuid>& subjects,
-    nx::vms::common::SystemContext* systemContext)
-{
-    std::sort(subjects.begin(), subjects.end(),
-        [systemContext](const QnUuid& l, const QnUuid& r)
-        {
-            const bool leftIsGroup = systemContext->userRolesManager()->hasRole(l);
-            const bool rightIsGroup = systemContext->userRolesManager()->hasRole(r);
-
-            // Users go first.
-            if (leftIsGroup != rightIsGroup)
-                return rightIsGroup;
-
-            // Predefined groups go first.
-            const auto predefinedLeft = isPredefined(l);
-            const auto predefinedRight = isPredefined(r);
-            if (predefinedLeft != predefinedRight)
-            {
-                return predefinedLeft;
-            }
-            else if(predefinedLeft)
-            {
-                const auto predefList = predefinedGroupIds();
-                return predefList.indexOf(l) < predefList.indexOf(r);
-            }
-
-            const auto [leftName, leftIsLdap] = getIdInfo(systemContext, l);
-            const auto [rightName, rightIsLdap] = getIdInfo(systemContext, r);
-
-            // LDAP groups go last.
-            if (leftIsLdap != rightIsLdap)
-                return rightIsLdap;
-
-            // Case Insensitive sort.
-            return nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive) < 0;
-        });
-}
-
-std::pair<QList<QnUuid>, QList<QnUuid>> MembersModel::sortedSubjects(
-    const QSet<QnUuid>& subjectSet) const
-{
-    QList<QnUuid> subjects = subjectSet.values();
-    const auto groupsManager = systemContext()->userRolesManager();
-
-    QList<QnUuid> users;
-    QList<QnUuid> groups;
-
-    for (const auto& id: subjects)
-        (groupsManager->hasRole(id) ? groups : users) << id;
-
-    sortSubjects(users, systemContext());
-    sortSubjects(groups, systemContext());
-
-    return {users, groups};
-}
-
 int MembersModel::customGroupCount() const
 {
-    return m_customGroupCount;
+    if (!m_cache)
+        return 0;
+
+    const auto result =
+        m_cache->sorted().groups.size() - QnPredefinedUserRoles::enumValues().size();
+
+    return result < 0 ? 0 : result;
 }
 
 void MembersModel::loadModelData()
 {
-    auto rolesManager = systemContext()->userRolesManager();
+    beginResetModel();
+    m_cache->loadInfo(systemContext());
+    m_cache->sorted(m_subjectId); //< Force storage to report changes for current subject.
+    endResetModel();
 
-    m_allUsers.clear();
-    m_allGroups.clear();
-
-    // Built-in groups.
-    for (const auto& role: QnPredefinedUserRoles::enumValues())
-    {
-        const auto id = QnPredefinedUserRoles::id(role);
-        m_allGroups << id;
-    }
-
-    int newCustomGroupCount = 0;
-    const auto customGroups = rolesManager->userRoles();
-    for (const auto& group: customGroups)
-    {
-        if (isPredefined(group.id))
-            continue;
-
-        m_allGroups << group.id;
-        ++newCustomGroupCount;
-    }
-
-    if (m_customGroupCount != newCustomGroupCount)
-    {
-        m_customGroupCount = newCustomGroupCount;
-        emit customGroupCountChanged();
-    }
-
-    // Cache list of users in each group.
-    const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
-    for (const auto& user: allUsers)
-        m_allUsers << user->getId();
-
-    sortSubjects(m_allUsers, systemContext());
-    sortSubjects(m_allGroups, systemContext());
+    emit customGroupCountChanged();
 
     emit parentGroupsChanged();
     emit usersChanged();
     emit groupsChanged();
     emit globalPermissionsChanged();
     emit sharedResourcesChanged();
+}
 
-    rebuildModel();
+void addToSorted(QList<QnUuid>& list, const QnUuid& id)
+{
+    auto it = std::lower_bound(list.begin(), list.end(), id);
+    if (it != list.end() && *it == id)
+        return;
+
+    list.insert(it, id);
+}
+
+void removeFromSorted(QList<QnUuid>& list, const QnUuid& id)
+{
+    auto it = std::lower_bound(list.begin(), list.end(), id);
+
+    if (it == list.end() || *it != id)
+        return;
+
+    list.erase(it);
+}
+
+void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
+{
+    const auto updateUser =
+        [this](const QnUuid& id)
+        {
+            m_cache->modify({id}, {id}, {}, {});
+        };
+
+    connect(user.get(), &QnResource::nameChanged, this,
+        [updateUser](const QnResourcePtr& resource)
+        {
+            updateUser(resource->getId());
+        });
+
+    connect(user.get(), &QnUserResource::userRolesChanged, this,
+        [updateUser](
+            const QnUserResourcePtr& user,
+            const std::vector<QnUuid>&)
+        {
+            updateUser(user->getId());
+        });
 }
 
 void MembersModel::readUsersAndGroups()
 {
-    if (m_subjectContext.isNull())
+    if (m_subjectContext.isNull() && !m_subjectId.isNull())
     {
         m_subjectContext.reset(new AccessSubjectEditingContext(systemContext()));
         m_subjectContext->setCurrentSubjectId(m_subjectId);
         emit editingContextChanged();
 
+        m_cache.reset(new MembersCache());
+        m_cache->setContext(m_subjectContext.get());
+        emit membersCacheChanged();
+
+        connect(m_cache.get(), &MembersCache::beginInsert, this,
+            [this](int at, const QnUuid& id, const QnUuid& parentId)
+            {
+                if (!parentId.isNull())
+                    return; //< TODO Update allowed parents/members.
+
+                const int row = m_cache->info(id).isGroup
+                    ? m_cache->sorted().users.size() + at
+                    : at;
+
+                this->beginInsertRows({}, row, row);
+            });
+
+        connect(m_cache.get(), &MembersCache::endInsert, this,
+            [this](int, const QnUuid& id, const QnUuid& parentId)
+            {
+                if (parentId.isNull())
+                {
+                    this->endInsertRows();
+                    return;
+                }
+
+                if (parentId == m_subjectId)
+                {
+                    const bool isGroup = m_cache->info(id).isGroup;
+                    const auto& members = isGroup
+                        ? m_cache->sorted().groups
+                        : m_cache->sorted().users;
+
+                    const auto row = m_cache->indexIn(members, id)
+                        + (isGroup ? m_cache->sorted().users.size() : 0);
+
+                    emit dataChanged(index(row, 0), index(row, 0));
+
+                    addToSorted(isGroup ? m_subjectMembers.groups : m_subjectMembers.users, id);
+                    if (isGroup)
+                        emit groupsChanged();
+                    else
+                        emit usersChanged();
+                }
+                // TODO Update allowed parents/members.
+            });
+
+        connect(m_cache.get(), &MembersCache::beginRemove, this,
+            [this](int at, const QnUuid& id, const QnUuid& parentId)
+            {
+                if (!parentId.isNull())
+                    return; //< TODO Update allowed parents/members.
+
+                const int row = m_cache->info(id).isGroup
+                    ? m_cache->sorted().users.size() + at
+                    : at;
+
+                this->beginRemoveRows({}, row, row);
+            });
+
+        connect(m_cache.get(), &MembersCache::endRemove, this,
+            [this](int, const QnUuid& id, const QnUuid& parentId)
+            {
+                if (parentId.isNull())
+                {
+                    this->endRemoveRows();
+                    return;
+                }
+
+                if (parentId == m_subjectId)
+                {
+                    const bool isGroup = m_cache->info(id).isGroup;
+                    const auto& members = isGroup
+                        ? m_cache->sorted().groups
+                        : m_cache->sorted().users;
+
+                    const auto row = m_cache->indexIn(members, id)
+                        + (isGroup ? m_cache->sorted().users.size() : 0);
+
+                    emit dataChanged(index(row, 0), index(row, 0));
+
+                    removeFromSorted(isGroup ? m_subjectMembers.groups : m_subjectMembers.users, id);
+                    if (isGroup)
+                        emit groupsChanged();
+                    else
+                        emit usersChanged();
+                }
+                // TODO Update allowed parents/members.
+            });
+
+        auto userRolesManager = systemContext()->userRolesManager();
+
+        connect(userRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+            [this](const nx::vms::api::UserRoleData& userGroup)
+            {
+                if (!m_cache)
+                    return;
+
+                // Removal happens before addition, this way we can update the cache.
+                m_cache->modify(
+                    /*removed*/ {userGroup.id}, /*added*/ {userGroup.id}, {}, {});
+
+                emit customGroupCountChanged();
+            });
+
+        connect(userRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+            [this](const nx::vms::api::UserRoleData& userGroup)
+            {
+                if (!m_cache)
+                    return;
+
+                const QSet<QnUuid> groupsWithChangedMembers =
+                    {userGroup.parentRoleIds.begin(), userGroup.parentRoleIds.end()};
+
+                m_cache->modify({}, {userGroup.id}, groupsWithChangedMembers, {});
+
+                emit customGroupCountChanged();
+            });
+
+        auto resourcePool = systemContext()->resourcePool();
+
+        const auto allUsers = resourcePool->getResources<QnUserResource>();
+        for (const auto& user: allUsers)
+            subscribeToUser(user);
+
+        connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+            [this](const QnResourceList &resources)
+            {
+                if (m_subjectId.isNull())
+                    return;
+
+                const QnUserResourceList users = resources.filtered<QnUserResource>();
+
+                QSet<QnUuid> addedIds;
+                QSet<QnUuid> modifiedGroups;
+
+                for (const auto& user: users)
+                {
+                    addedIds.insert(user->getId());
+                    const auto groupIds = user->userRoleIds();
+                    modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
+
+                    subscribeToUser(user);
+                }
+
+                m_cache->modify(addedIds, {}, modifiedGroups, {});
+            });
+
+        connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+            [this](const QnResourceList &resources)
+            {
+                if (m_subjectId.isNull())
+                    return;
+
+                const QnUserResourceList users = resources.filtered<QnUserResource>();
+
+                QSet<QnUuid> removedIds;
+                QSet<QnUuid> modifiedGroups;
+
+                for (const auto& user: users)
+                {
+                    disconnect(user.get());
+                    removedIds.insert(user->getId());
+                    const auto groupIds = user->userRoleIds();
+                    modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
+                }
+
+                m_cache->modify({}, removedIds, modifiedGroups, {});
+            });
+
         connect(m_subjectContext.get(), &AccessSubjectEditingContext::hierarchyChanged,
-            this, [this] { loadModelData(); });
+            this,
+            [this]
+            {
+                // TODO Update allowed parents/members.
+            });
 
         connect(m_subjectContext->subjectHierarchy(), &nx::core::access::SubjectHierarchy::changed,
             this, [this](
@@ -215,62 +309,75 @@ void MembersModel::readUsersAndGroups()
                 const QSet<QnUuid>& groupsWithChangedMembers,
                 const QSet<QnUuid>& subjectsWithChangedParents)
             {
+                if (!m_cache)
+                    return;
+
                 if (subjectsWithChangedParents.contains(m_subjectId))
-                    emit parentGroupsChanged();
-
-                bool groupsNotified = false;
-                bool usersNotified = false;
-                for (const auto& id: subjectsWithChangedParents)
                 {
-                    if (id == m_subjectId)
-                        continue;
-
-                    if (systemContext()->userRolesManager()->hasRole(id) && !groupsNotified)
+                    if (!m_cache->sorted().groups.empty())
                     {
-                        emit groupsChanged();
-                        groupsNotified = true;
+                        const auto groupsStart = m_cache->sorted().users.size();
+                        emit dataChanged(
+                            this->index(groupsStart),
+                            this->index(groupsStart + m_cache->sorted().groups.size() - 1));
                     }
-                    else if (!usersNotified)
-                    {
-                        emit usersChanged();
-                        usersNotified = true;
-                    }
-
-                    if (groupsNotified && usersNotified)
-                        break;
+                    emit parentGroupsChanged();
                 }
 
-                loadModelData();
+                m_cache->modify(
+                    added,
+                    removed,
+                    groupsWithChangedMembers,
+                    subjectsWithChangedParents);
             });
 
         connect(m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
             this, &MembersModel::sharedResourcesChanged);
+    }
+    else if (m_subjectId.isNull())
+    {
+        beginResetModel();
+        m_subjectMembers = {};
+        m_cache.reset();
+        endResetModel();
+
+        disconnect(systemContext()->userRolesManager());
+        disconnect(systemContext()->resourcePool());
+        m_subjectContext.reset(nullptr);
+        emit editingContextChanged();
+
+        emit parentGroupsChanged();
+        emit usersChanged();
+        emit groupsChanged();
+        emit globalPermissionsChanged();
+        emit sharedResourcesChanged();
+
+        return;
     }
     else
     {
         m_subjectContext->setCurrentSubjectId(m_subjectId);
     }
 
+    const auto userRolesManager = systemContext()->userRolesManager();
+
+    m_subjectMembers = {};
+    auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
+
+    for (const auto& id: members)
+        (userRolesManager->hasRole(id) ? m_subjectMembers.groups : m_subjectMembers.users) << id;
+
+    std::sort(m_subjectMembers.users.begin(), m_subjectMembers.users.end());
+    std::sort(m_subjectMembers.groups.begin(), m_subjectMembers.groups.end());
+
     loadModelData();
-}
-
-MembersModel::MemberInfo MembersModel::info(const QnUuid& id) const
-{
-    const auto groupsManager = systemContext()->userRolesManager();
-
-    if (const auto data = QnPredefinedUserRoles::get(id))
-        return {data->name, data->description, /*isGroup*/ true, data->isLdap};
-    if (const auto group = groupsManager->userRole(id); !group.id.isNull())
-        return {group.name, group.description, /*isGroup*/ true, group.isLdap};
-
-    if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
-        return {user->getName(), user->fullName(), /*isGroup*/ false, user->isLdap()};
-
-    return {};
 }
 
 void MembersModel::setOwnSharedResources(const nx::core::access::ResourceAccessMap& resources)
 {
+    if (m_subjectContext.isNull())
+        return;
+
     m_subjectContext->setOwnResourceAccessMap(resources);
 }
 
@@ -287,13 +394,14 @@ QList<QnUuid> MembersModel::users() const
     if (m_subjectContext.isNull())
         return {};
 
-    auto directMembers = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
-    const auto [users, groups] = sortedSubjects(directMembers);
-    return users;
+    return m_subjectMembers.users;
 }
 
 void MembersModel::setUsers(const QList<QnUuid>& users)
 {
+    if (m_subjectContext.isNull())
+        return;
+
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
@@ -318,13 +426,14 @@ QList<QnUuid> MembersModel::groups() const
     if (m_subjectContext.isNull())
         return {};
 
-    auto directMembers = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
-    const auto [users, groups] = sortedSubjects(directMembers);
-    return groups;
+    return m_subjectMembers.groups;
 }
 
 void MembersModel::setGroups(const QList<QnUuid>& groups)
 {
+    if (m_subjectContext.isNull())
+        return;
+
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
@@ -342,94 +451,6 @@ void MembersModel::setGroups(const QList<QnUuid>& groups)
         newMembers.insert(id);
 
     m_subjectContext->setRelations(parents, members);
-}
-
-bool MembersModel::rebuildModel()
-{
-    int itemCount = m_allUsers.size();
-    QHash<QnUuid, int> totalSubItems;
-
-    static constexpr int kCycleGuardValue = -1;
-    static constexpr int kEmptyValue = -2;
-
-    const std::function<int(QnUuid)> subItemsCount =
-        [this, &totalSubItems, &subItemsCount](QnUuid id) -> int
-        {
-            const int visitedSubItems = totalSubItems.value(id, kEmptyValue);
-            if (visitedSubItems == kCycleGuardValue)
-                return kCycleGuardValue;
-
-            if (visitedSubItems >= 0)
-                return visitedSubItems;
-
-            totalSubItems[id] = kCycleGuardValue;
-
-            const auto members = m_subjectContext->subjectHierarchy()->directMembers(id);
-            const auto groupsManager = systemContext()->userRolesManager();
-
-            int total = 0;
-            for (const auto& subGroupId: members)
-            {
-                // User adds 1 row.
-                if (!groupsManager->hasRole(subGroupId))
-                {
-                    total += 1;
-                    continue;
-                }
-
-                const int subSize = subItemsCount(subGroupId);
-                if (subSize == kCycleGuardValue)
-                {
-                    return kCycleGuardValue; // Found a cycle, the configuration is invalid.
-                }
-
-                total += 1 + subSize;
-            }
-
-            totalSubItems[id] = total;
-
-            return total;
-        };
-
-    for (const auto& groupId: m_allGroups)
-    {
-        const int addCount = subItemsCount(groupId);
-
-        if (addCount == kCycleGuardValue)
-            return false;
-
-        itemCount += 1 + addCount;
-    }
-
-    const int diff = itemCount - m_itemCount;
-
-    if (diff > 0)
-    {
-        beginInsertRows({}, m_itemCount, m_itemCount + diff - 1);
-        m_itemCount = itemCount;
-        m_totalSubItems = totalSubItems;
-        endInsertRows();
-    }
-    else if (diff < 0)
-    {
-        beginRemoveRows({}, m_itemCount + diff, m_itemCount - 1);
-        m_itemCount = itemCount;
-        m_totalSubItems = totalSubItems;
-        endRemoveRows();
-    }
-    else
-    {
-        m_totalSubItems = totalSubItems;
-    }
-
-    if (m_itemCount > 0)
-    {
-        emit dataChanged(
-            this->index(0, 0),
-            this->index(m_itemCount - 1, 0));
-    }
-
-    return true;
 }
 
 void MembersModel::addParent(const QnUuid& groupId)
@@ -453,6 +474,7 @@ void MembersModel::addMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.insert(memberId);
+//    m_membersCache.remove(m_subjectId);
     m_subjectContext->setRelations(parents, members);
 }
 
@@ -461,6 +483,7 @@ void MembersModel::removeMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.remove(memberId);
+//    m_membersCache.remove(m_subjectId);
     m_subjectContext->setRelations(parents, members);
 }
 
@@ -481,103 +504,12 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     return roles;
 }
 
-QVariant MembersModel::getGroupData(int offset, const QnUuid& groupId, int role) const
-{
-    switch (role)
-    {
-        case Qt::DisplayRole:
-            return info(groupId).name;
-        case DescriptionRole:
-            return info(groupId).description;
-        case IsUserRole:
-            return false;
-        case OffsetRole:
-            return offset;
-        case IsTopLevelRole:
-            return offset == 0;
-        case IdRole:
-            return QVariant::fromValue(groupId);
-        case MemberSectionRole:
-            return UserSettingsGlobal::kGroupsSection;
-        case GroupSectionRole:
-            return isPredefined(groupId)
-                ? UserSettingsGlobal::kBuiltInGroupsSection
-                : UserSettingsGlobal::kCustomGroupsSection;
-        case IsLdap:
-            return info(groupId).isLdap;
-    }
-    return {};
-}
-
-QVariant MembersModel::getUserData(int offset, const QnUuid& userId, int role) const
-{
-    switch (role)
-    {
-        case Qt::DisplayRole:
-            return info(userId).name;
-        case DescriptionRole:
-            return info(userId).description;
-        case IsUserRole:
-            return true;
-        case OffsetRole:
-            return offset;
-        case IsTopLevelRole:
-            return offset == 0;
-        case IdRole:
-            return QVariant::fromValue(userId);
-        case MemberSectionRole:
-            // Users under groups should go into 'Groups' section.
-            return offset > 0
-                ? UserSettingsGlobal::kGroupsSection
-                : UserSettingsGlobal::kUsersSection;
-        case IsLdap:
-            return info(userId).isLdap;
-    }
-    return {};
-}
-
-std::pair<QnUuid, int> MembersModel::findGroupRow(const QList<QnUuid>& groups, int row) const
-{
-    int currentRow = 0;
-
-    for (const QnUuid& groupId: groups)
-    {
-        const int itemsInGroup = 1 + m_totalSubItems.value(groupId, 0);
-        const int rowOffsetInGroup = row - currentRow;
-
-        if (rowOffsetInGroup >= 0 && rowOffsetInGroup < itemsInGroup)
-            return {groupId, rowOffsetInGroup};
-
-        currentRow += itemsInGroup;
-    }
-
-    return {{}, -1};
-}
-
-QVariant MembersModel::getData(int offset, const QnUuid& groupId, int row, int role) const
-{
-    if (row == 0)
-        return getGroupData(offset, groupId, role);
-
-    const auto [users, groups] =
-        sortedSubjects(m_subjectContext->subjectHierarchy()->directMembers(groupId));
-
-    if (row > 0 && (size_t) row <= users.size())
-        return getUserData(offset + 1, users[row - 1], role);
-
-    const int groupRow = row - users.size() - 1;
-
-    const auto [subGroupId, subGroupRow] = findGroupRow(groups, groupRow);
-
-    return getData(offset + 1, subGroupId, subGroupRow, role);
-}
-
 bool MembersModel::isAllowedMember(const QnUuid& groupId) const
 {
     if (groupId == m_subjectId)
         return false;
 
-    if (isPredefined(groupId))
+    if (MembersCache::isPredefined(groupId))
         return false;
 
     return !m_subjectContext->subjectHierarchy()->isRecursiveMember(m_subjectId, {groupId});
@@ -588,7 +520,7 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
     if (groupId == m_subjectId)
         return false;
 
-    if (isPredefined(m_subjectId))
+    if (MembersCache::isPredefined(m_subjectId))
         return false;
 
     if (const auto user = systemContext()->accessController()->user(); user && !user->isOwner())
@@ -603,69 +535,65 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() >= rowCount())
+    if (index.row() < 0 || index.row() >= rowCount() || m_subjectContext.isNull())
         return {};
 
-    if (index.row() < m_allUsers.size())
-    {
-        // Top level user.
-
-        const auto userId = m_allUsers.at(index.row());
-
-        switch (role)
-        {
-            case IsMemberRole:
-                return !m_subjectIsUser
-                    && m_subjectContext->subjectHierarchy()->directMembers(m_subjectId)
-                        .contains(userId);
-
-            case IsParentRole:
-                return false;
-
-            case IsTopLevelRole:
-                return true;
-
-            case IsAllowedMember:
-                return !m_subjectIsUser;
-
-            case IsAllowedParent:
-                return false;
-
-            default:
-                return getUserData(0, userId, role);
-        }
-    }
-
-    const auto [topLevelGroupId, rowInGroup] =
-        findGroupRow(m_allGroups, index.row() - m_allUsers.size());
-
-    if (rowInGroup == -1)
-        return {};
+    const bool isUser = index.row() < m_cache->sorted().users.size();
+    const auto id = isUser
+        ? m_cache->sorted().users.at(index.row())
+        : m_cache->sorted().groups.at(index.row() - m_cache->sorted().users.size());
 
     switch (role)
     {
         case IsMemberRole:
-            return m_subjectContext->subjectHierarchy()->directMembers(m_subjectId)
-                .contains(topLevelGroupId);
+            return !m_subjectIsUser
+                && m_subjectContext->subjectHierarchy()->directMembers(m_subjectId)
+                    .contains(id);
 
         case IsParentRole:
-            return m_subjectContext->subjectHierarchy()->directMembers(topLevelGroupId)
-                .contains(m_subjectId);
-
-        case IsTopLevelRole:
-            return rowInGroup == 0;
+            return m_cache->info(id).isGroup
+                && m_subjectContext->subjectHierarchy()->directMembers(id).contains(m_subjectId);
 
         case IsAllowedMember:
             return !m_subjectIsUser
-                && !isPredefined(topLevelGroupId)
-                && isAllowedMember(topLevelGroupId)
-                && !info(topLevelGroupId).isLdap;
+                && !MembersCache::isPredefined(id)
+                && isAllowedMember(id);
 
         case IsAllowedParent:
-            return isAllowedParent(topLevelGroupId) && !info(topLevelGroupId).isLdap;
+            return m_cache->info(id).isGroup
+                && isAllowedParent(id)
+                && !m_cache->info(id).isLdap;
+
+        case Qt::DisplayRole:
+            return m_cache->info(id).name;
+
+        case DescriptionRole:
+            return m_cache->info(id).description;
+
+        case IsUserRole:
+            return !m_cache->info(id).isGroup;
+
+        case OffsetRole:
+            return 0;
+
+        case IdRole:
+            return QVariant::fromValue(id);
+
+        case MemberSectionRole:
+            return m_cache->info(id).isGroup
+                ? UserSettingsGlobal::kGroupsSection
+                : UserSettingsGlobal::kUsersSection;
+
+        case GroupSectionRole:
+            return MembersCache::isPredefined(id)
+                ? UserSettingsGlobal::kBuiltInGroupsSection
+                : UserSettingsGlobal::kCustomGroupsSection;
+
+        case IsLdap:
+            return m_cache->info(id).isLdap;
 
         default:
-            return getData(0, topLevelGroupId, rowInGroup, role);
+            return {};
     }
 }
 
@@ -716,38 +644,19 @@ bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int 
 
 int MembersModel::rowCount(const QModelIndex&) const
 {
-    return m_itemCount;
-}
+    if (!m_cache)
+        return 0;
 
-QVariant MembersModel::getParentsTree(const QnUuid& groupId) const
-{
-    QVariantList result;
-    const std::function<void(QnUuid, int)> visit =
-        [&result, &visit, this](QnUuid id, int offset)
-        {
-            const auto& parentIds = m_subjectContext->subjectHierarchy()->directParents(id);
-
-            for (const auto& parentId: parentIds)
-            {
-                QVariantMap item;
-                item["text"] = info(parentId).name;
-                item["offset"] = offset;
-                result << item;
-                visit(parentId, offset + 1);
-            }
-        };
-
-    visit(groupId, 1);
-    return result;
+    return m_cache->sorted().users.size() + m_cache->sorted().groups.size();
 }
 
 QList<MembersModelGroup> MembersModel::parentGroups() const
 {
-    if (m_subjectContext.isNull())
+    if (m_subjectContext.isNull() || m_cache.isNull())
         return {};
 
     auto directParents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId).values();
-    sortSubjects(directParents, systemContext());
+    m_cache->sortSubjects(directParents);
 
     QList<MembersModelGroup> result;
     for (const auto& groupId: directParents)
@@ -816,8 +725,7 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-        return sourceModel()->data(sourceIndex, MembersModel::IsTopLevelRole).toBool()
-            && sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
+        return sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -833,12 +741,6 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-
-        if (!filterRegularExpression().pattern().isEmpty()
-            && !sourceModel()->data(sourceIndex, MembersModel::IsTopLevelRole).toBool())
-        {
-            return false;
-        }
 
         return sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
@@ -856,8 +758,7 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-        return sourceModel()->data(sourceIndex, MembersModel::IsTopLevelRole).toBool()
-            && sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
+        return sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };

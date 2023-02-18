@@ -118,6 +118,7 @@ MembershipSettings
         sourceModel: ParentGroupsProvider
         {
             context: control.model.editingContext
+            membersModel: control.model
         }
     }
 

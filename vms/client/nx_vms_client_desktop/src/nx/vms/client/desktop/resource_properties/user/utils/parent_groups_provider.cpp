@@ -6,6 +6,7 @@
 
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/client/desktop/system_administration/models/members_cache.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -72,7 +73,7 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
             return directParents.contains(m_groups.at(index.row()));
         }
         case isPredefined:
-            return MembersModel::isPredefined(m_groups.at(index.row()));
+            return MembersCache::isPredefined(m_groups.at(index.row()));
 
         default:
             return {};
@@ -131,7 +132,8 @@ void ParentGroupsProvider::updateInfo()
         groups = m_context->subjectHierarchy()->recursiveParents(
                 {m_context->currentSubjectId()}).values();
 
-        MembersModel::sortSubjects(groups, m_context->systemContext());
+        if (!groups.empty() && NX_ASSERT(m_membersModel) && m_membersModel->membersCache())
+            m_membersModel->membersCache()->sortSubjects(groups);
     }
 
     const int diff = (int) groups.size() - m_groups.size();

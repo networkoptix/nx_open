@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 
+#include "members_cache.h"
 
 namespace nx::vms::client::desktop {
 
@@ -63,6 +64,7 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
     Q_PROPERTY(nx::vms::client::desktop::AccessSubjectEditingContext* editingContext
         READ editingContext
         NOTIFY editingContextChanged)
+    Q_PROPERTY(MembersCache* membersCache READ membersCache NOTIFY membersCacheChanged)
 
 public:
     enum Roles
@@ -95,8 +97,6 @@ public:
 
     void readUsersAndGroups();
 
-    Q_INVOKABLE QVariant getParentsTree(const QnUuid& groupId) const;
-
     QList<MembersModelGroup> parentGroups() const;
     void setParentGroups(const QList<MembersModelGroup>& groups);
 
@@ -105,8 +105,6 @@ public:
 
     QnUuid userId() const { return m_subjectIsUser ? m_subjectId : QnUuid{}; }
     void setUserId(const QnUuid& userId);
-
-    static bool isPredefined(const QnUuid& groupId);
 
     void setOwnSharedResources(const nx::core::access::ResourceAccessMap& resources);
     nx::core::access::ResourceAccessMap ownSharedResources() const;
@@ -122,9 +120,9 @@ public:
     AccessSubjectEditingContext* editingContext() const { return m_subjectContext.get(); }
 
     // Sort a list of subjects.
-    static void sortSubjects(
-        QList<QnUuid>& subjects,
-        nx::vms::common::SystemContext* systemContext);
+    void sortSubjects(QList<QnUuid>& subjects) const;
+
+    MembersCache* membersCache() const { return m_cache.get(); }
 
 signals:
     void groupIdChanged();
@@ -136,16 +134,10 @@ signals:
     void sharedResourcesChanged();
     void editingContextChanged();
     void customGroupCountChanged();
+    void membersCacheChanged();
 
 private:
-    bool rebuildModel();
     void loadModelData();
-
-    QVariant getGroupData(int offset, const QnUuid& groupId, int role) const;
-    QVariant getUserData(int offset, const QnUuid& userId, int role) const;
-
-    std::pair<QnUuid, int> findGroupRow(const QList<QnUuid>& groups, int row) const;
-    QVariant getData(int offset, const QnUuid& groupId, int row, int role) const;
 
     bool isAllowedMember(const QnUuid& groupId) const;
     bool isAllowedParent(const QnUuid& groupId) const;
@@ -155,32 +147,19 @@ private:
     void addMember(const QnUuid& memberId);
     void removeMember(const QnUuid& memberId);
 
+    void subscribeToUser(const QnUserResourcePtr& user);
+
 private:
-    struct MemberInfo
-    {
-        QString name;
-        QString description;
-        bool isGroup = false;
-        bool isLdap = false;
-    };
-
-    MemberInfo info(const QnUuid& id) const;
-
-    // Get sorted lists of users and groups from a set of subjects.
-    std::pair<QList<QnUuid>, QList<QnUuid>> sortedSubjects(const QSet<QnUuid>& subjectSet) const;
-
-    QHash<QnUuid, QSet<QnUuid> > m_sharedResources;
     QScopedPointer<AccessSubjectEditingContext> m_subjectContext;
-
-    int m_itemCount = 0;
-    QHash<QnUuid, int> m_totalSubItems;
-    QList<QnUuid> m_allGroups;
-    QList<QnUuid> m_allUsers;
 
     QnUuid m_subjectId;
     bool m_subjectIsUser = false;
 
     int m_customGroupCount = 0;
+
+    MembersCache::Members m_subjectMembers; //< Sorted by id so states can be matched.
+
+    QScopedPointer<MembersCache> m_cache;
 };
 
 } // namespace nx::vms::client::desktop

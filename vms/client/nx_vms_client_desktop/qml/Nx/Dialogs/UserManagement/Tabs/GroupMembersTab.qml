@@ -4,6 +4,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 import Nx 1.0
+import Nx.Controls 1.0
 
 import nx.vms.client.desktop 1.0
 
@@ -56,18 +57,14 @@ MembershipSettings
         }
     }
 
-    // For full tree uncomment
-    //summaryModel: control.model
     summaryModel: MembersSummaryModel
     {
         sourceModel: control.model
     }
 
-    summaryDelegate: MembershipTreeItem
+    component SummaryItem: MembershipTreeItem
     {
-        id: groupTreeHeader
-
-        enabled: control.enabled && !model.isLdap
+        enabled: control.enabled
         offset: model.offset
         iconSource: model.isUser
             ? model.isLdap
@@ -76,7 +73,77 @@ MembershipSettings
             : "image://svg/skin/user_settings/group_custom.svg"
 
         GlobalToolTip.text: model.offset > 0 ? qsTr("Inherits membership in current group") : ""
+    }
+
+    summaryDelegate: SummaryItem
+    {
+        id: groupTreeHeader
 
         onRemoveClicked: model.isMember = false
+
+        height: subTree.visible ? 24 + subTree.height : 24
+        property var currentView: ListView.view
+        property var groupId: model.isUser ? NxGlobals.uuid("") : model.id
+
+        Item
+        {
+            id: subTree
+
+            visible: !model.isUser && !currentSearchRegExp
+
+            width: parent.width
+            height: 24 * itemCount
+            y: 24
+
+            property int itemCount: recursiveMembers.count
+
+            property real viewTop: 0
+            property real viewBottom: 0
+
+            Connections
+            {
+                target: groupTreeHeader.currentView
+                function onContentYChanged()
+                {
+                    subTree.viewTop = (groupTreeHeader.y + subTree.y) - groupTreeHeader.currentView.contentY
+                }
+            }
+
+            ListView
+            {
+                id: subTreeList
+
+                function clamp(min, v, max) { return Math.min(Math.max(v, min), max) }
+
+                y: clamp(0, - parent.viewTop, parent.height)
+                height: clamp(
+                    0,
+                    clamp(
+                        0,
+                        groupTreeHeader.currentView.height - parent.viewTop,
+                        groupTreeHeader.currentView.height),
+                    parent.height - y)
+
+                width: parent ? parent.width : 0
+
+                contentY: y
+
+                model: RecursiveMembersModel
+                {
+                    id: recursiveMembers
+                    membersCache: control.model.membersCache
+                    groupId: groupTreeHeader.groupId
+                }
+
+                interactive: false
+                enabled: false
+
+                clip: true
+
+                hoverHighlightColor: "transparent"
+
+                delegate: SummaryItem {}
+            }
+        }
     }
 }

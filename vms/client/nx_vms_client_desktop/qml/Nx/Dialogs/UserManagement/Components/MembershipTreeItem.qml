@@ -24,7 +24,7 @@ Item
 
     property bool interactive: true
 
-    readonly property bool isTopLevel: treeItem.offset === 0
+    readonly property bool isTopLevel: (treeItem.offset ?? 0) === 0
     readonly property bool hovered: treeItemMouseArea.containsMouse || removeGroupButton.hovered
     readonly property color textColor: (!isTopLevel || !interactive)
         ? ColorTheme.colors.light13
@@ -44,79 +44,90 @@ Item
         anchors.fill: parent
     }
 
-    RowLayout
+    Item
     {
-        id: rowLayout
-        x: treeItem.isTopLevel ? 0 : 20 * (treeItem.offset - 1)
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 4
-
-        Image
+        anchors
         {
-            Layout.alignment: Qt.AlignVCenter
-
-            width: 20
-            height: 20
-
-            source: "image://svg/skin/user_settings/tree_item_linked.svg"
-            sourceSize: Qt.size(width, height)
-
-            visible: !treeItem.isTopLevel
+            left: parent.left
+            top: parent.top
+            right: parent.right
         }
+        height: 24
 
-        Item
+        RowLayout
         {
-            Layout.alignment: Qt.AlignVCenter
-
-            width: groupImage.width
-            height: groupImage.height
+            id: rowLayout
+            x: treeItem.isTopLevel ? 0 : 20 * (treeItem.offset - 1)
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 4
 
             Image
             {
-                id: groupImage
+                Layout.alignment: Qt.AlignVCenter
+
                 width: 20
                 height: 20
 
-                source: treeItem.iconSource
+                source: "image://svg/skin/user_settings/tree_item_linked.svg"
                 sourceSize: Qt.size(width, height)
+
+                visible: !treeItem.isTopLevel
             }
 
-            ColorOverlay
+            Item
             {
-                anchors.fill: groupImage
-                source: groupImage
+                Layout.alignment: Qt.AlignVCenter
+
+                width: groupImage.width
+                height: groupImage.height
+
+                Image
+                {
+                    id: groupImage
+                    width: 20
+                    height: 20
+
+                    source: treeItem.iconSource
+                    sourceSize: Qt.size(width, height)
+                }
+
+                ColorOverlay
+                {
+                    anchors.fill: groupImage
+                    source: groupImage
+                    color: treeItem.textColor
+                }
+            }
+
+            Text
+            {
+                id: itemText
+
+                Layout.alignment: Qt.AlignVCenter
+                text: treeItem.isTopLevel ? highlightMatchingText(model.text) : model.text
+
+                font: Qt.font({pixelSize: 14, weight: Font.Medium})
                 color: treeItem.textColor
             }
-        }
 
-        Text
-        {
-            id: itemText
+            ImageButton
+            {
+                id: removeGroupButton
+                Layout.alignment: Qt.AlignVCenter
+                width: 20
+                height: 20
 
-            Layout.alignment: Qt.AlignVCenter
-            text: treeItem.isTopLevel ? highlightMatchingText(model.text) : model.text
+                visible: treeItem.hovered
+                hoverEnabled: true
 
-            font: Qt.font({pixelSize: 14, weight: Font.Medium})
-            color: treeItem.textColor
-        }
+                icon.source: "image://svg/skin/user_settings/tree_item_remove.svg"
+                icon.width: width
+                icon.height: height
 
-        ImageButton
-        {
-            id: removeGroupButton
-            Layout.alignment: Qt.AlignVCenter
-            width: 20
-            height: 20
+                background: null
 
-            visible: treeItem.hovered
-            hoverEnabled: true
-
-            icon.source: "image://svg/skin/user_settings/tree_item_remove.svg"
-            icon.width: width
-            icon.height: height
-
-            background: null
-
-            onClicked: removeClicked()
+                onClicked: removeClicked()
+            }
         }
     }
 }
