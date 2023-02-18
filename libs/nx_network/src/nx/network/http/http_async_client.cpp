@@ -590,7 +590,8 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 
     if (errorCode == SystemError::noError)
     {
-        NX_VERBOSE(this, "Sending request %1 (url %2)", m_request.requestLine, m_contentLocationUrl);
+        NX_VERBOSE(this, "Sending request \"%1\" with body of %2 bytes to %3",
+            m_request.requestLine, m_request.messageBody.size(), m_contentLocationUrl);
 
         m_remoteEndpointWithProtocol = endpointWithProtocol(m_contentLocationUrl);
         sendRequest();
