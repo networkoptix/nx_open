@@ -52,6 +52,13 @@ UserManagementTabWidget::UserManagementTabWidget(QnUserRolesManager* manager, QW
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(d->tabWidget);
+
+    d->forEachTab(
+        [this](QnAbstractPreferencesWidget* tab)
+        {
+            connect(tab, &QnAbstractPreferencesWidget::hasChangesChanged,
+                this, &QnAbstractPreferencesWidget::hasChangesChanged);
+        });
 }
 
 UserManagementTabWidget::~UserManagementTabWidget()

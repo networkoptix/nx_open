@@ -51,6 +51,7 @@ private:
     QPointer<TimeSynchronizationServerTimeWatcher> m_timeWatcher;
     QPointer<TimeSynchronizationServerStateWatcher> m_stateWatcher;
     QPointer<TimeSynchronizationServersDelegate> m_delegate;
+    bool m_hasChanges = false;
 };
 
 } // namespace nx::vms::client::desktop
