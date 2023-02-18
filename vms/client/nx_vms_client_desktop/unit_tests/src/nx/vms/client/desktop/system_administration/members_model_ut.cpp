@@ -4,60 +4,16 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/test_support/test_context.h>
-#include <nx/vms/client/desktop/system_administration/models/members_model.h>
-#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/system_administration/models/members_model.h>
+#include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 
 
 namespace nx::vms::client::desktop {
 
 namespace test {
-
-static const QStringList kInitialData = {
-    "user1",
-    "user2",
-    "user3",
-    "user4",
-    "user5",
-    "Owner",
-    "Administrator",
-    "Advanced Viewer",
-    "Viewer",
-    "Live Viewer",
-    "group1",
-    "    group3",
-    "        user1",
-    "        user2",
-    "        user3",
-    "        group4",
-    "            user5",
-    "            group5",
-    "        group5",
-    "group2",
-    "    user2",
-    "    user3",
-    "    group3",
-    "        user1",
-    "        user2",
-    "        user3",
-    "        group4",
-    "            user5",
-    "            group5",
-    "        group5",
-    "group3",
-    "    user1",
-    "    user2",
-    "    user3",
-    "    group4",
-    "        user5",
-    "        group5",
-    "    group5",
-    "group4",
-    "    user5",
-    "    group5",
-    "group5"
-};
 
 class MembersModelTest: public nx::vms::client::desktop::test::ContextBasedTest
 {
@@ -74,6 +30,51 @@ public:
 
     void createData()
     {
+        // Build the following structure:
+        //
+        // "user1",
+        // "user2",
+        // "user3",
+        // "user4",
+        // "user5",
+        // "Owner",
+        // "Administrator",
+        // "Advanced Viewer",
+        // "Viewer",
+        // "Live Viewer",
+        // "group1",
+        // "    group3",
+        // "        user1",
+        // "        user2",
+        // "        user3",
+        // "        group4",
+        // "            user5",
+        // "            group5",
+        // "        group5",
+        // "group2",
+        // "    user2",
+        // "    user3",
+        // "    group3",
+        // "        user1",
+        // "        user2",
+        // "        user3",
+        // "        group4",
+        // "            user5",
+        // "            group5",
+        // "        group5",
+        // "group3",
+        // "    user1",
+        // "    user2",
+        // "    user3",
+        // "    group4",
+        // "        user5",
+        // "        group5",
+        // "    group5",
+        // "group4",
+        // "    user5",
+        // "    group5",
+        // "group5",
+
         auto group1 = addGroup("group1", {});
         m_group2 = addGroup("group2", {});
         m_group3 = addGroup("group3", {group1, m_group2});
@@ -82,31 +83,9 @@ public:
 
         addUser("user1", {m_group3});
         m_user2 = addUser("user2", {m_group2, m_group3});
-        addUser("user3", {m_group2, m_group3});
+        m_user3 = addUser("user3", {m_group2, m_group3});
         addUser("user4", {});
-        addUser("user5", {m_group4});
-    }
-
-    QList<MembersModelGroup> parentGroups(const QnUuid& id)
-    {
-        std::vector<QnUuid> parentIds;
-
-        if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
-            parentIds = user->userRoleIds();
-        else
-            parentIds = systemContext()->userRolesManager()->userRole(id).parentRoleIds;
-
-        QList<MembersModelGroup> result;
-
-        for (const auto& groupId: parentIds)
-            result << MembersModelGroup::fromId(systemContext(), groupId);
-
-        return result;
-    }
-
-    void verifyInitialData()
-    {
-        EXPECT_EQ(kInitialData, visualData());
+        m_user5 = addUser("user5", {m_group4});
     }
 
     void verifyRow(int row, const QString& name, int offset)
@@ -137,13 +116,76 @@ public:
         return group.id;
     }
 
-    QStringList visualData()
+    void removeUser(const QnUuid& id)
+    {
+        auto resourcePool = systemContext()->resourcePool();
+        auto resource = resourcePool->getResourceById<QnUserResource>(id);
+        ASSERT_TRUE(!resource.isNull());
+        resourcePool->removeResource(resource);
+    }
+
+    void removeGroup(const QnUuid& id)
+    {
+        const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
+        for (const auto& user: allUsers)
+        {
+            std::vector<QnUuid> ids = user->userRoleIds();
+
+            ids.erase(
+                std::remove_if(
+                    ids.begin(),
+                    ids.end(),
+                    [&user](auto id){ return id == user->getId(); }),
+                ids.end());
+
+            user->setUserRoleIds(ids);
+        }
+
+        for (auto group: systemContext()->userRolesManager()->userRoles())
+        {
+            const auto last = group.parentRoleIds.end();
+            const auto it = group.parentRoleIds.erase(
+                std::remove_if(
+                    group.parentRoleIds.begin(),
+                    last,
+                    [&group](auto id){ return id == group.id; }),
+                last);
+
+            if (it == last) // Nothing was removed.
+                continue;
+
+            systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+        }
+
+        systemContext()->userRolesManager()->removeUserRole(id);
+    }
+
+    void renameGroup(const QnUuid& id, const QString& newName)
+    {
+        auto group = systemContext()->userRolesManager()->userRole(id);
+        ASSERT_EQ(id, group.id);
+        group.name = newName;
+        systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+    }
+
+    void renameUser(const QnUuid& id, const QString& newName)
+    {
+        auto resourcePool = systemContext()->resourcePool();
+        auto resource = resourcePool->getResourceById<QnUserResource>(id);
+        ASSERT_TRUE(!resource.isNull());
+        resource->setName(newName);
+    }
+
+    QStringList visualData(const QAbstractListModel* model, int filterByRole = -1)
     {
         QStringList result;
-        for (int row = 0; row < m_model->rowCount(); row++)
+        for (int row = 0; row < model->rowCount(); row++)
         {
-            auto text = m_model->data(m_model->index(row), Qt::DisplayRole).toString();
-            auto offset = m_model->data(m_model->index(row), MembersModel::OffsetRole).toInt();
+            if (filterByRole != -1 && !model->data(model->index(row), filterByRole).toBool())
+                continue;
+
+            auto text = model->data(model->index(row), Qt::DisplayRole).toString();
+            auto offset = model->data(model->index(row), MembersModel::OffsetRole).toInt();
 
             QString offsetStr(4 * offset, ' ');
             QString line = offsetStr + text;
@@ -155,7 +197,7 @@ public:
     QStringList filterTopLevelByRole(int role)
     {
         QStringList result;
-        const auto data = visualData();
+        const auto data = visualData(m_model.get());
         for (int row = 0; row < data.size(); ++row)
         {
             if (m_model->data(m_model->index(row), MembersModel::OffsetRole).toInt() > 0)
@@ -169,28 +211,28 @@ public:
 
     void addMember(const QString& name)
     {
-        auto topLevelIndex = m_model->index(visualData().indexOf(name));
+        auto topLevelIndex = m_model->index(visualData(m_model.get()).indexOf(name));
         ASSERT_FALSE(m_model->data(topLevelIndex, MembersModel::IsMemberRole).toBool());
         ASSERT_TRUE(m_model->setData(topLevelIndex, true, MembersModel::IsMemberRole));
     }
 
     void removeMember(const QString& name)
     {
-        auto topLevelIndex = m_model->index(visualData().indexOf(name));
+        auto topLevelIndex = m_model->index(visualData(m_model.get()).indexOf(name));
         ASSERT_TRUE(m_model->data(topLevelIndex, MembersModel::IsMemberRole).toBool());
         ASSERT_TRUE(m_model->setData(topLevelIndex, false, MembersModel::IsMemberRole));
     }
 
     void addParent(const QString& name)
     {
-        auto topLevelIndex = m_model->index(visualData().indexOf(name));
+        auto topLevelIndex = m_model->index(visualData(m_model.get()).indexOf(name));
         ASSERT_FALSE(m_model->data(topLevelIndex, MembersModel::IsParentRole).toBool());
         ASSERT_TRUE(m_model->setData(topLevelIndex, true, MembersModel::IsParentRole));
     }
 
     void removeParent(const QString& name)
     {
-        auto topLevelIndex = m_model->index(visualData().indexOf(name));
+        auto topLevelIndex = m_model->index(visualData(m_model.get()).indexOf(name));
         ASSERT_TRUE(m_model->data(topLevelIndex, MembersModel::IsParentRole).toBool());
         ASSERT_TRUE(m_model->setData(topLevelIndex, false, MembersModel::IsParentRole));
     }
@@ -201,6 +243,8 @@ public:
     QnUuid m_group4;
     QnUuid m_group5;
     QnUuid m_user2;
+    QnUuid m_user3;
+    QnUuid m_user5;
 };
 
 TEST_F(MembersModelTest, removeAndAddParentForGroup)
@@ -208,50 +252,24 @@ TEST_F(MembersModelTest, removeAndAddParentForGroup)
     // Remove group4 from group3 and add it back.
     m_model->setGroupId(m_group4);
 
-    verifyInitialData();
+    static const QStringList kGroupInitial = {
+        "group3",
+    };
+
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsParentRole));
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group4);
 
     removeParent("group3");
 
-    static const QStringList kRemovedParentGroup3Data = {
-        "user1",
-        "user2",
-        "user3",
-        "user4",
-        "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
-        "group1",
-        "    group3",
-        "        user1",
-        "        user2",
-        "        user3",
-        "        group5",
-        "group2",
-        "    user2",
-        "    user3",
-        "    group3",
-        "        user1",
-        "        user2",
-        "        user3",
-        "        group5",
-        "group3",
-        "    user1",
-        "    user2",
-        "    user3",
-        "    group5",
-        "group4",
-        "    user5",
-        "    group5",
-        "group5"};
-
-    EXPECT_EQ(kRemovedParentGroup3Data, visualData());
+    EXPECT_TRUE(visualData(m_model.get(), MembersModel::IsParentRole).isEmpty());
+    EXPECT_TRUE(m_model->parentGroups().isEmpty());
 
     addParent("group3");
 
-    EXPECT_EQ(kInitialData, visualData());
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsParentRole));
 }
 
 TEST_F(MembersModelTest, removeAndAddMemberGroup)
@@ -259,56 +277,34 @@ TEST_F(MembersModelTest, removeAndAddMemberGroup)
     // Remove group5 from group3 and add it back.
     m_model->setGroupId(m_group3);
 
-    verifyInitialData();
-
-    removeMember("group5");
-
-    static const QStringList kRemovedMemberGroup5Data = {
+    static const QStringList kGroupInitial = {
         "user1",
         "user2",
         "user3",
-        "user4",
-        "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
-        "group1",
-        "    group3",
-        "        user1",
-        "        user2",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "group2",
-        "    user2",
-        "    user3",
-        "    group3",
-        "        user1",
-        "        user2",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "group3",
-        "    user1",
-        "    user2",
-        "    user3",
-        "    group4",
-        "        user5",
-        "        group5",
         "group4",
-        "    user5",
-        "    group5",
-        "group5"};
+        "group5",
+    };
 
-    EXPECT_EQ(kRemovedMemberGroup5Data, visualData());
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsMemberRole));
 
-    addMember("group5");
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
 
-    EXPECT_EQ(kInitialData, visualData());
+    removeMember("group4");
+
+    static const QStringList kGroupRemoved = {
+        "user1",
+        "user2",
+        "user3",
+        "group5",
+    };
+
+    EXPECT_EQ(kGroupRemoved, visualData(m_model.get(), MembersModel::IsMemberRole));
+
+    addMember("group4");
+
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsMemberRole));
 }
 
 TEST_F(MembersModelTest, removeAndAddMemberUser)
@@ -316,56 +312,34 @@ TEST_F(MembersModelTest, removeAndAddMemberUser)
     // Remove user2 from group3 and add it back.
     m_model->setGroupId(m_group3);
 
-    verifyInitialData();
-
-    removeMember("user2");
-
-    static const QStringList kRemovedMemberUser2Data = {
+    static const QStringList kGroupInitial = {
         "user1",
         "user2",
         "user3",
-        "user4",
-        "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
-        "group1",
-        "    group3",
-        "        user1",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "        group5",
-        "group2",
-        "    user2",
-        "    user3",
-        "    group3",
-        "        user1",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "        group5",
-        "group3",
-        "    user1",
-        "    user3",
-        "    group4",
-        "        user5",
-        "        group5",
-        "    group5",
         "group4",
-        "    user5",
-        "    group5",
-        "group5"};
+        "group5",
+    };
 
-    EXPECT_EQ(kRemovedMemberUser2Data, visualData());
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsMemberRole));
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    removeMember("user2");
+
+    static const QStringList kGroupRemoved = {
+        "user1",
+        "user3",
+        "group4",
+        "group5",
+    };
+
+    EXPECT_EQ(kGroupRemoved, visualData(m_model.get(), MembersModel::IsMemberRole));
 
     addMember("user2");
 
-    EXPECT_EQ(kInitialData, visualData());
+    EXPECT_EQ(kGroupInitial, visualData(m_model.get(), MembersModel::IsMemberRole));
 }
 
 TEST_F(MembersModelTest, removeAndAddParentForUser)
@@ -373,56 +347,24 @@ TEST_F(MembersModelTest, removeAndAddParentForUser)
     // Remove user2 from group3 and add it back.
     m_model->setUserId(m_user2);
 
-    verifyInitialData();
+    static const QStringList kParentsInitial = {
+        "group2",
+        "group3",
+    };
+
+    EXPECT_EQ(kParentsInitial, visualData(m_model.get(), MembersModel::IsParentRole));
 
     removeParent("group3");
 
-    static const QStringList kRemovedParentGroup3Data = {
-        "user1",
-        "user2",
-        "user3",
-        "user4",
-        "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
-        "group1",
-        "    group3",
-        "        user1",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "        group5",
+    static const QStringList kParentRemoved = {
         "group2",
-        "    user2",
-        "    user3",
-        "    group3",
-        "        user1",
-        "        user3",
-        "        group4",
-        "            user5",
-        "            group5",
-        "        group5",
-        "group3",
-        "    user1",
-        "    user3",
-        "    group4",
-        "        user5",
-        "        group5",
-        "    group5",
-        "group4",
-        "    user5",
-        "    group5",
-        "group5"};
+    };
 
-    EXPECT_EQ(kRemovedParentGroup3Data, visualData());
+    EXPECT_EQ(kParentRemoved, visualData(m_model.get(), MembersModel::IsParentRole));
 
     addParent("group3");
 
-    EXPECT_EQ(kInitialData, visualData());
+    EXPECT_EQ(kParentsInitial, visualData(m_model.get(), MembersModel::IsParentRole));
 }
 
 TEST_F(MembersModelTest, allowedMembers)
@@ -494,6 +436,292 @@ TEST_F(MembersModelTest, parents)
     const QStringList parents = filterTopLevelByRole(MembersModel::IsParentRole);
 
     ASSERT_EQ(kDirectParents, parents);
+}
+
+TEST_F(MembersModelTest, recursiveMembers)
+{
+    // Verify recursive members of subgroup group3.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    static const QStringList kRecursiveMembersGroup3 = {
+        "    user1",
+        "    user2",
+        "    user3",
+        "    group4",
+        "        user5",
+        "        group5",
+        "    group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3, visualData(&members));
+}
+
+TEST_F(MembersModelTest, removeUserResource)
+{
+    // Remove user5.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    removeUser(m_user5);
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user2",
+        "user3",
+        "user4",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group5",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterRemove = {
+        "    user1",
+        "    user2",
+        "    user3",
+        "    group4",
+        "        group5",
+        "    group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterRemove, visualData(&members));
+}
+
+TEST_F(MembersModelTest, addUserResource)
+{
+    // Add user2a to both group3 and group5.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    addUser("user2a", {m_group3, m_group5});
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user2",
+        "user2a",
+        "user3",
+        "user4",
+        "user5",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group5",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterAdd = {
+        "    user1",
+        "    user2",
+        "    user2a",
+        "    user3",
+        "    group4",
+        "        user5",
+        "        group5",
+        "            user2a",
+        "    group5",
+        "        user2a",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterAdd, visualData(&members));
+}
+
+TEST_F(MembersModelTest, addGroup)
+{
+    // Add group6 to group4.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    addGroup("group6", {m_group4});
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user2",
+        "user3",
+        "user4",
+        "user5",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group5",
+        "group6",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterAdd = {
+        "    user1",
+        "    user2",
+        "    user3",
+        "    group4",
+        "        user5",
+        "        group5",
+        "        group6",
+        "    group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterAdd, visualData(&members));
+}
+
+TEST_F(MembersModelTest, removeGroup)
+{
+    // Remove m_group4.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    removeGroup(m_group4);
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user2",
+        "user3",
+        "user4",
+        "user5",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group5",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterRemove = {
+        "    user1",
+        "    user2",
+        "    user3",
+        "    group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterRemove, visualData(&members));
+}
+
+TEST_F(MembersModelTest, renameGroup)
+{
+    // Rename m_group4 -> group55.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    renameGroup(m_group4, "group55");
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user2",
+        "user3",
+        "user4",
+        "user5",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group5",
+        "group55",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterRename = {
+        "    user1",
+        "    user2",
+        "    user3",
+        "    group5",
+        "    group55",
+        "        user5",
+        "        group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterRename, visualData(&members));
+}
+
+TEST_F(MembersModelTest, renameUser)
+{
+    // Rename user3 -> user1a.
+    m_model->setGroupId(m_group2);
+
+    RecursiveMembersModel members;
+    members.setMembersCache(m_model->membersCache());
+    members.setGroupId(m_group3);
+
+    renameUser(m_user3, "user1a");
+
+    static const QStringList kAllSubjects = {
+        "user1",
+        "user1a",
+        "user2",
+        "user4",
+        "user5",
+        "Owner",
+        "Administrator",
+        "Advanced Viewer",
+        "Viewer",
+        "Live Viewer",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group5",
+    };
+
+    EXPECT_EQ(kAllSubjects, visualData(m_model.get()));
+
+    static const QStringList kRecursiveMembersGroup3AfterRename = {
+        "    user1",
+        "    user1a",
+        "    user2",
+        "    group4",
+        "        user5",
+        "        group5",
+        "    group5",
+    };
+
+    EXPECT_EQ(kRecursiveMembersGroup3AfterRename, visualData(&members));
 }
 
 } // namespace test

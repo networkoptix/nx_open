@@ -6,6 +6,7 @@
 
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
+#include <nx/vms/client/desktop/system_administration/models/members_model.h>
 
 
 namespace nx::vms::client::desktop {
@@ -24,6 +25,8 @@ class ParentGroupsProvider: public QAbstractListModel
         READ context
         WRITE setContext
         NOTIFY contextChanged)
+
+    Q_PROPERTY(nx::vms::client::desktop::MembersModel* membersModel MEMBER m_membersModel)
 
 public:
     enum Roles
@@ -60,8 +63,9 @@ private:
     void updateInfo();
 
 private:
-    AccessSubjectEditingContext* m_context;
+    AccessSubjectEditingContext* m_context = nullptr;
     nx::utils::ScopedConnections m_contextConnections;
+    nx::vms::client::desktop::MembersModel* m_membersModel = nullptr;
     QList<QnUuid> m_groups;
 };
 

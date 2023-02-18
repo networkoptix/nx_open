@@ -34,9 +34,10 @@ struct DifferencesResult
 };
 
 /** Returns differences between two sets. */
+template <template <typename...> class SortedContainer>
 DifferencesResult differences(
-    const std::set<QnUuid>& original,
-    const std::set<QnUuid>& current)
+    const SortedContainer<QnUuid>& original,
+    const SortedContainer<QnUuid>& current)
 {
     DifferencesResult result;
 
@@ -301,9 +302,11 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         for (const auto& user: systemContext()->resourcePool()->getResources<QnUserResource>())
         {
             const auto groupIds = user->userRoleIds();
+
             if (std::find(groupIds.begin(), groupIds.end(), groupId) != groupIds.end())
-                state.users.insert(user->getId());
+                state.users.append(user->getId());
         }
+        std::sort(state.users.begin(), state.users.end());
 
         for (const auto& group: systemContext()->userRolesManager()->userRoles())
         {
