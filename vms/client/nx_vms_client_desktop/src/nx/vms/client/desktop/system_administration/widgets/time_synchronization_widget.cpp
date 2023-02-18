@@ -383,7 +383,12 @@ void TimeSynchronizationWidget::loadState(const State& state)
 
     m_serversModel->loadState(state);
 
-    emit hasChangesChanged();
+    const bool newHasChanges = hasChanges();
+    if (m_hasChanges != newHasChanges)
+    {
+        m_hasChanges = newHasChanges;
+        emit hasChangesChanged();
+    }
 }
 
 } // namespace nx::vms::client::desktop
