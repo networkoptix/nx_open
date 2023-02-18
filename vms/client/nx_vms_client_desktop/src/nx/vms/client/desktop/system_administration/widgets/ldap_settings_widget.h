@@ -56,7 +56,6 @@ protected:
 
 private:
     void checkStatus();
-    void removeExisting();
     void showError(const QString& errorMessage);
 
 signals:
