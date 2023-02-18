@@ -375,7 +375,6 @@ void LdapSettingsWidget::resetLdap()
                 d->initialSettings = {};
                 d->setState(d->initialSettings);
                 d->modified = false;
-                removeExisting();
                 return;
             }
 
@@ -602,77 +601,6 @@ void LdapSettingsWidget::testOnline(
                 d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
             }),
         thread());
-}
-
-void LdapSettingsWidget::removeExisting()
-{
-    // TODO: Server should do the removal.
-
-    auto rolesManager = systemContext()->userRolesManager();
-    std::unordered_set<QnUuid> ldapGroupIds;
-
-    for (auto group: rolesManager->userRoles())
-    {
-        if (group.isLdap && group.id != nx::vms::api::UserRoleData::kLdapDefaultId)
-            ldapGroupIds.insert(group.id);
-    }
-
-    auto resultsReporter = ResultsReporter::create(
-        nx::utils::guarded(this,
-            [this, ldapGroupIds](bool success)
-            {
-                if (success)
-                {
-                    // Delete LDAP groups.
-                    for (const auto& id: ldapGroupIds)
-                        qnResourcesChangesManager->removeUserRole(id, systemContext());
-                }
-            }));
-
-    // Delete LDAP groups from existing groups.
-
-    auto handleGroupSaved = nx::utils::guarded(this,
-        [resultsReporter](
-            bool roleIsStored,
-            const api::UserRoleData&)
-        {
-            resultsReporter->add(roleIsStored);
-        });
-
-    for (auto group: rolesManager->userRoles())
-    {
-        if (group.isLdap)
-            continue;
-
-        const auto last = group.parentRoleIds.end();
-        const auto it = group.parentRoleIds.erase(
-            std::remove_if(
-                group.parentRoleIds.begin(),
-                last,
-                [&ldapGroupIds](auto id){ return ldapGroupIds.contains(id); }),
-            last);
-
-        if (it == last)
-            continue;
-
-        qnResourcesChangesManager->saveUserRole(group, systemContext(), handleGroupSaved);
-    }
-
-    // Delete LDAP users.
-
-    auto deleteCallback = nx::utils::guarded(this,
-        [resultsReporter](bool success)
-        {
-            resultsReporter->add(success);
-        });
-
-    const auto resourcePool = systemContext()->resourcePool();
-
-    QnSharedResourcePointerList<QnUserResource> ldapUsers =
-        resourcePool->getResources<QnUserResource>(
-            [](const auto& user) { return user->isLdap(); });
-
-    qnResourcesChangesManager->deleteResources(ldapUsers, deleteCallback);
 }
 
 void LdapSettingsWidget::showError(const QString& errorMessage)
