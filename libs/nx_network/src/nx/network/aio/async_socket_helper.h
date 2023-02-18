@@ -98,13 +98,6 @@ public:
         :
         base_type(_socket),
         m_addressResolver(&SocketGlobals::addressResolver()),
-        m_connectSendAsyncCallCounter(0),
-        m_recvBuffer(nullptr),
-        m_recvAsyncCallCounter(0),
-        m_sendBuffer(nullptr),
-        m_registerTimerCallCounter(0),
-        m_asyncSendIssued(false),
-        m_addressResolverIsInUse(false),
         m_ipVersion(_ipVersion),
         m_resolveResultScheduler(_socket->getAioThread())
     {
@@ -124,7 +117,8 @@ public:
 
         this->terminateAsyncIO();
 
-        // Cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack.
+        // Cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered
+        // is down the stack.
         if (this->m_socket->impl()->aioThread->load() == QThread::currentThread())
         {
             stopPollingSocket(aio::etNone);
@@ -301,6 +295,16 @@ public:
         this->dispatch(
             [this]()
             {
+                if (!m_maxSendDataSizeSet)
+                {
+                    // Increasing m_maxSendDataSize if socket send buffer is greater.
+                    unsigned int sendBufSize = 0;
+                    if (this->m_socket->getSendBufferSize(&sendBufSize))
+                        m_maxSendDataSize = std::max<std::size_t>(m_maxSendDataSize, sendBufSize);
+
+                    m_maxSendDataSizeSet = true;
+                }
+
                 ++m_connectSendAsyncCallCounter;
                 this->m_socket->impl()->aioThread->load()->startMonitoring(
                     this->m_socket, aio::etWrite, this);
@@ -377,21 +381,30 @@ private:
     AddressResolver* m_addressResolver;
 
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
-    size_t m_connectSendAsyncCallCounter;
+    size_t m_connectSendAsyncCallCounter = 0;
 
     IoCompletionHandler m_recvHandler;
-    nx::Buffer* m_recvBuffer;
-    size_t m_recvAsyncCallCounter;
+    nx::Buffer* m_recvBuffer = nullptr;
+    size_t m_recvAsyncCallCounter = 0;
 
     IoCompletionHandler m_sendHandler;
-    const nx::Buffer* m_sendBuffer;
+    const nx::Buffer* m_sendBuffer = nullptr;
     std::size_t m_sendBufPos = 0;
 
-    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
-    size_t m_registerTimerCallCounter;
+    /**
+     * Passing not more than this value to each socket->send call to avoid reporting send completion
+     * too early.
+     * So, when send completion is reported there is not more than this amount of data
+     * in the socket's send buffer.
+     */
+    std::size_t m_maxSendDataSize = 128*1024;
+    bool m_maxSendDataSizeSet = false;
 
-    std::atomic<bool> m_asyncSendIssued;
-    std::atomic<bool> m_addressResolverIsInUse;
+    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
+    size_t m_registerTimerCallCounter = 0;
+
+    std::atomic<bool> m_asyncSendIssued{false};
+    std::atomic<bool> m_addressResolverIsInUse{false};
     const int m_ipVersion;
 
     BasicPollable m_resolveResultScheduler;
@@ -611,9 +624,13 @@ private:
                     return;
                 }
 
+                std::size_t dataToSend = std::min<std::size_t>(
+                    m_sendBuffer->size() - m_sendBufPos,
+                    m_maxSendDataSize);
+
                 const int bytesWritten = this->m_socket->send(
                     m_sendBuffer->data() + m_sendBufPos,
-                    m_sendBuffer->size() - m_sendBufPos);
+                    dataToSend);
                 if (bytesWritten == -1)
                 {
                     const auto lastError = SystemError::getLastOSErrorCode();
