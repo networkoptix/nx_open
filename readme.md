@@ -41,14 +41,11 @@ The build can be triggered from the command line of `cmd`, MinGW (Git Bash), or 
 **Linux** host: this guide implies Ubuntu 18.04 or 20.04 - other flavors/versions may require some
 adaptation.
 
-**MacOS** host: for easy installation of the further build prerequisites, install Homebrew:
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew update
-```
+**MacOS** host: the build is tested on **macOS Monterey** version 12.6.3 and Xcode Command
+Line Tools 14.2 - older versions may work but may require some adaptation.
 
 Pre-requisites needed to build all of the Components (the details on installing are given below):
-- Python 3.8+.
+- Python 3.8 (newer versions may work but may require some adaptation).
 - CMake 3.20+.
 - Ninja.
 - Conan 1.46.x.
@@ -57,37 +54,62 @@ Pre-requisites needed to build all of the Components (the details on installing 
     - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branches
         `vms_5.0`, `vms_5.0_patch` and `vms_5.1`, but its support may be dropped in further
         branches like `vms_5.1_patch` and `master`.
-- **MacOS**: Xcode 12.5.
+- **MacOS**: Xcode Command Line Tools 14.2+, Homebrew 3.6.20+.
 
 ### Python
 
-Python 3.8+ should be installed and available on `PATH` either as `python` or `python3`, and for
-**MacOS** - as `python3.<minor>`. In this guide we assume its main command is `python`.
+Python 3.8+ should be installed and available on `PATH` as `python`, and for macOS and Ubuntu also
+as `python3`. A possible installation procedure is described below.
 
-- **Windows**: a Windows-native (non-Cygwin) version of Python should be installed. A Cygwin
-    version of Python may be installed additionally, but must appear on `PATH` as a symlink (this
-    makes it not visible to Windows-native programs including `cmake`).
+- **Windows**:
+    - Disable the Python alias that opens Microsoft Store: go to "Start" ->
+        "Manage app execution aliases" and disable all python-related aliases for App Installer
+        (`python.exe` and `python3.exe`).
+    - Download the Python installer from
+        [python-3.8.10](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe).
+    - In the installer, select "Add Python 3.8 to PATH". Note that the component "tcl/tk and IDLE"
+        is not required.
+    - It is recommended to activate "Disable path length limit" option at the end of the installer.
+
 - **Linux**:
-    - `distutils` and `pip` must be installed explicitly:
+    - **Ubuntu 18**: The default version of Python in the Ubuntu 18 distribution is `python3.6`
+        (Ubuntu 18.04.5 LTS), so it is necessary to upgrade it - some tricks are required. Perform
+        the following steps to install the required Python version and configure it:
         ```
-        sudo apt install python3-distutils python3-pip
+        sudo apt update
+        sudo apt install python3.8 python3-pip -y
+        sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
+        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
+        sudo python -m pip install pip --upgrade
+        find /usr/lib/python3/dist-packages -name "*apt_*.cpython-3?m*" -exec sh -c \
+            "new_name=\$(echo {} | cut -d. -f1); sudo ln -s {} \${new_name}.so" \;
         ```
-    - **Ubuntu 18**: Make sure that the right version of Python is installed. First, check the
-        currently installed version of `python3`:
+
+    - **Ubuntu 20**: Make `python` command equivalent to `python3`:
         ```
-        python3 --version
+        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
         ```
-        If the version is lower than 3.8, update it:
-        ```
-        sudo apt install python3.8
-        sudo rm /usr/bin/python3
-        sudo ln -s /usr/bin/python3.8 /usr/bin/python3
-        ```
+
+    - If you have Python 2 installed on your machine and you need it for some reason, you can run
+        `sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10` and then
+        switch between Python 3 and Python 2 by running `sudo update-alternatives --config python`
+        and selecting the appropriate version of Python. Same for the older version of Python3 -
+        you can add it using
+        `sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python<your_old_version> 10`.
+
 - **MacOS**:
-    ```
-    brew install python3.9
-    python3.9 -m ensurepip
-    ```
+    - Install Homebrew:
+      ```
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      ```
+    - Install and configure Python 3 using `pyenv`:
+      ```
+      brew install pyenv
+      pyenv install 3.8
+      pyenv global 3.8
+      echo 'eval "$(pyenv init -)"' >>~/.zshrc
+      eval "$(pyenv init -)"
+      ```
 
 ### CMake, Ninja, and Conan
 
@@ -112,6 +134,11 @@ they appear on `PATH`) and install the `pyaml` and `conan` Python packages:
 ```
 python -m pip install pyaml conan==1.46.2
 ```
+On **macOS** you also need `dmgbuild` package:
+```
+python -m install dmgbuild==1.3.2
+```
+
 On **Windows**, CMake and Ninja which come with Microsoft Visual Studio are suitable.
 
 ### Conan cache
@@ -136,18 +163,21 @@ directory `conan_cache/` next to the repository root and the build directories.
     - Install the following build and runtime dependencies:
         ```
         sudo apt install -y \
-            chrpath libtinfo5 zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
-            libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
-            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0
+            chrpath libtinfo5 zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev libtool \
+            libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 p7zip-full \
+            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0 \
+            libfreetype6-dev libfontconfig1-dev
         ```
 
 - **MacOS**:
-    - Install the latest Xcode from AppStore.
-    - Install the following build dependencies:
-        ```
-        brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
-            libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
-        ```
+    - Install Homebrew if it is not installed yet (see the description in [Python](#Python)
+        section).
+    - Install the following build and runtime dependencies:
+      ```
+      brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
+        libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
+      ```
+    - NOTE: Xcode Command Line Tools package is installed automatically together with Homebrew.
 
 ---------------------------------------------------------------------------------------------------
 ## Using CMake
