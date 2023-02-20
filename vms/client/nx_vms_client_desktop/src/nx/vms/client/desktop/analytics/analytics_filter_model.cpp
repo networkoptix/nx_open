@@ -112,6 +112,10 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
     rebuild();
 }
 
+AnalyticsFilterModel::~AnalyticsFilterModel()
+{
+}
+
 std::vector<taxonomy::AbstractNode*> AnalyticsFilterModel::objectTypes() const
 {
     return m_objectTypes;
@@ -154,8 +158,8 @@ void AnalyticsFilterModel::update(
         m_devices = devices;
         m_liveTypesExcluded = liveTypesExcluded;
 
-        const auto filter = std::make_unique<Filter>(m_engine, m_devices, m_liveTypesExcluded);
-        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(filter.get());
+        m_filter = std::make_unique<Filter>(m_engine, m_devices, m_liveTypesExcluded);
+        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(m_filter.get());
         setObjectTypes(state->rootNodes());
     }
 }
