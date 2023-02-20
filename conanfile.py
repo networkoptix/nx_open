@@ -100,6 +100,7 @@ class NxOpenConan(ConanFile):
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/11.7" "#78798fb75c85a676d43c9d1a8af4fe18")
+                self.requires("zlib/1.2.12" "#bb959a1d68d4c35d0fba4cc66f5bb25f")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
@@ -131,7 +132,6 @@ class NxOpenConan(ConanFile):
             self.requires("msvc-redist/14.29.30133" "#9f10aa59e4671ce0669d6181e6b0a269")
             self.requires("winsdk-redist/10.0.20348.0" "#bf8bf6131653c35ae84474f399fe5113")
             self.requires("icu-win/70.1" "#1c50009a7165b74563ba149c315737f1")
-            self.requires("zlib/1.2.11" "#64ef9c596106c733055d8551926b4f0c")
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
