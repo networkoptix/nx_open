@@ -173,7 +173,7 @@ FocusScope
                     item.loggingCategory = attributeEditor.loggingCategory
 
                 if (item.hasOwnProperty("container"))
-                    item.container = attributeEditor
+                    item.container = panel
             }
         }
     }
