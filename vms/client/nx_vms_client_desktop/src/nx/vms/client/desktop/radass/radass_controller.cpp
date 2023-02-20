@@ -2,10 +2,13 @@
 
 #include "radass_controller.h"
 
+#include <client/client_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <utils/common/counter_hash.h>
 
 #include <core/resource/media_resource.h>
@@ -72,6 +75,7 @@ enum class LqReason
     performance,
     performanceInFf,
     tooManyItems,
+    cpuUsage,
     manual,
 };
 
@@ -145,6 +149,12 @@ struct RadassController::Private
     // When something actually changed the last time (for performance warning only).
     ElapsedTimerPtr lastModeChangeTimer;
 
+    float lastSystemCpuLoadValue = 0.0;
+    float lastProcessCpuLoadValue = 0.0;
+
+    /** Timer started when overall CPU usage surpasses the limit. Reset when CPU usage drops. */
+    ElapsedTimerPtr cpuIssueTimer;
+
     std::vector<ConsumerInfo> consumers;
     using Consumer = decltype(consumers)::iterator;
 
@@ -155,7 +165,8 @@ struct RadassController::Private
         mainTimer(timerFactory->createTimer()),
         lastAutoSwitchTimer((NX_ASSERT(timerFactory), timerFactory->createElapsedTimer())),
         lastSystemRtspDrop(timerFactory->createElapsedTimer()),
-        lastModeChangeTimer(timerFactory->createElapsedTimer())
+        lastModeChangeTimer(timerFactory->createElapsedTimer()),
+        cpuIssueTimer(timerFactory->createElapsedTimer())
     {
         this->timerFactory = timerFactory;
         lastAutoSwitchTimer->start();
@@ -171,9 +182,29 @@ struct RadassController::Private
             });
     }
 
-    bool isValid(Consumer consumer)
+    bool isValid(Consumer consumer) const
     {
         return consumer != consumers.end();
+    }
+
+    /** Quality cannot be raised as CPU usage will probably overflow the system limit. */
+    bool cpuUsageIsTooHighToRaiseQuality() const
+    {
+        if (!ini().considerOverallCpuUsageInRadass)
+            return false;
+
+        return lastSystemCpuLoadValue > ini().highSystemCpuUsageInRadass
+            || lastProcessCpuLoadValue > ini().highProcessCpuUsageInRadass;
+    }
+
+    /** Overall CPU usage is too high, quality should be lowered. */
+    bool cpuUsageIsCritical() const
+    {
+        if (!ini().considerOverallCpuUsageInRadass)
+            return false;
+
+        return lastSystemCpuLoadValue > ini().criticalSystemCpuUsageInRadass
+            || lastProcessCpuLoadValue > ini().criticalProcessCpuUsageInRadass;
     }
 
     using SearchCondition = std::function<bool(AbstractVideoDisplay*)>;
@@ -259,6 +290,8 @@ struct RadassController::Private
                         return "performanceInFf" + performanceProblem;
                     case LqReason::tooManyItems:
                         return "tooManyItems";
+                    case LqReason::cpuUsage:
+                        return "cpuUsage";
                     case LqReason::manual:
                         return "manual";
                     default:
@@ -378,22 +411,31 @@ struct RadassController::Private
             NX_VERBOSE(this, "Timer check: there is a live camera in LQ");
 
             // There are no a lot of packets in the queue (it is possible if CPU slow).
-            const bool cpuIsOk = display->dataQueueSize() <= (display->maxDataQueueSize() * 0.75);
+            const bool decodingIsOk =
+                display->dataQueueSize() <= (display->maxDataQueueSize() * 0.75);
 
             // No recently slow report by any camera.
-            const bool connectionIsOk = lastSystemRtspDrop->hasExpiredOrInvalid(kQualitySwitchInterval);
+            const bool connectionIsOk =
+                lastSystemRtspDrop->hasExpiredOrInvalid(kQualitySwitchInterval);
 
             // Is big enough item for HQ.
             const bool sizeIsOk = isBigItem(display);
 
-            if (cpuIsOk && connectionIsOk && sizeIsOk)
+            const bool canRaiseQualityByCpu = !cpuUsageIsTooHighToRaiseQuality();
+
+            if (decodingIsOk && connectionIsOk && sizeIsOk && canRaiseQualityByCpu)
             {
                 NX_VERBOSE(this, "%1 can be switched to HQ safely, everything is OK", *consumer);
                 streamBackToNormal(consumer);
             }
             else
             {
-                NX_VERBOSE(this, "CPU: %1, rtsp: %2, size: %3", cpuIsOk, connectionIsOk, sizeIsOk);
+                static constexpr std::array<std::string_view, 2> isOk{"Issue", "OK"};
+                NX_VERBOSE(this, "Decoding: %1, rtsp: %2, size: %3, cpu: %4",
+                    isOk[decodingIsOk],
+                    isOk[connectionIsOk],
+                    isOk[sizeIsOk],
+                    isOk[canRaiseQualityByCpu]);
             }
         }
 
@@ -626,6 +668,61 @@ struct RadassController::Private
         }
     }
 
+    /**
+     * Check whether system or process CPU usage is too high for some time and lower item quality
+     * in this case.
+     */
+    void optimizeItemsQualityByCpuUsage()
+    {
+        if (!ini().considerOverallCpuUsageInRadass)
+            return;
+
+        // If everything is OK, turn off the timer.
+        if (!cpuUsageIsCritical())
+        {
+            if (cpuIssueTimer->isValid())
+                NX_VERBOSE(this, "CPU usage is back to normal");
+            cpuIssueTimer->invalidate();
+            return;
+        }
+
+        // On first issue starting timer.
+        if (!cpuIssueTimer->isValid())
+        {
+            NX_VERBOSE(this, "CPU usage is critical");
+            cpuIssueTimer->restart();
+        }
+
+        if (cpuIssueTimer->hasExpired(milliseconds(ini().criticalRadassCpuUsageTimeMs)))
+        {
+            NX_VERBOSE(this, "CPU usage is critical for some time already, switch item to LQ");
+
+            // Do not go to LQ if recently switch occurred.
+            if (!lastAutoSwitchTimer->hasExpired(kQualitySwitchInterval))
+            {
+                NX_VERBOSE(this, "Quality switch was less than 5 seconds ago");
+                return;
+            }
+
+            // Find the smallest consumer which is in Auto mode and in HQ and switch it to LQ.
+            auto smallestConsumer = findConsumer(
+                FindMethod::Smallest,
+                MEDIA_Quality_High,
+                itemQualityCanBeLowered);
+
+            if (isValid(smallestConsumer))
+            {
+                gotoLowQuality(smallestConsumer, LqReason::cpuUsage);
+                cpuIssueTimer->restart();
+            }
+            else
+            {
+                NX_VERBOSE(this, "Cannot find an item to lower it's quality.");
+            }
+        }
+
+    }
+
     void adaptToConsumerChanges(AbstractVideoDisplay* display)
     {
         auto consumer = findByDisplay(display);
@@ -659,8 +756,20 @@ RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent
 {
     connect(d->mainTimer, &AbstractTimer::timeout, this, &RadassController::onTimer);
     d->mainTimer->start(kTimerInterval);
-}
 
+    if (ini().considerOverallCpuUsageInRadass)
+    {
+        qnClientModule->performanceMonitor()->setEnabled(true);
+        connect(qnClientModule->performanceMonitor(), &PerformanceMonitor::valuesChanged, this,
+            [this](const QVariantMap& values)
+            {
+                const QVariant totalCpuValue = values.value(PerformanceMonitor::kTotalCpu);
+                d->lastSystemCpuLoadValue = totalCpuValue.toFloat();
+                const QVariant processCpuValue = values.value(PerformanceMonitor::kProcessCpu);
+                d->lastProcessCpuLoadValue = processCpuValue.toFloat();
+            });
+    }
+}
 
 RadassController::~RadassController()
 {
@@ -740,6 +849,7 @@ void RadassController::onTimer()
     }
 
     d->optimizeItemsQualityBySize();
+    d->optimizeItemsQualityByCpuUsage();
 
     if (d->lastModeChangeTimer->hasExpired(kPerformanceLossCheckInterval))
     {
@@ -776,7 +886,7 @@ void RadassController::registerConsumer(AbstractVideoDisplay* display)
     d->lastModeChangeTimer->restart();
 
     // Listen to camera changes to make sure second stream will start working as soon as possible.
-    display->setCallbackForStreamChanges(utils::guarded(this,
+    display->setCallbackForStreamChanges(nx::utils::guarded(this,
         [this, display]
         {
             d->adaptToConsumerChanges(display);
