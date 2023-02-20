@@ -52,27 +52,18 @@ bool ScopeStateViewFilter::matches(
     if (d->devices.empty())
         return false;
 
-    const auto scopes = objectType->scopes();
+    if (!objectType->hasEverBeenSupported())
+        return false;
 
-    return std::any_of(scopes.begin(), scopes.end(),
-        [&](const nx::analytics::taxonomy::AbstractScope* scope)
-        {
-            const nx::analytics::taxonomy::AbstractEngine* engine = scope->engine();
-            const bool isEngineMatched = !d->engine || (d->engine->id() == engine->id());
 
-            const auto scopeDeviceList = scope->deviceIds();
-            const std::set<QnUuid> scopeDevices = {scopeDeviceList.begin(), scopeDeviceList.end()};
+    const QnUuid engineId = d->engine ? QnUuid::fromStringSafe(d->engine->id()) : QnUuid();
+    for (const QnUuid& deviceId: d->devices)
+    {
+        if (objectType->isSupported(engineId, deviceId))
+            return true;
+    }
 
-            std::vector<QnUuid> matches;
-            std::set_intersection(
-                scopeDevices.begin(), scopeDevices.end(),
-                d->devices.begin(), d->devices.end(),
-                std::back_inserter(matches));
-
-            const bool isDevicesMatched = !matches.empty();
-
-            return isDevicesMatched && isEngineMatched;
-        });
+    return false;
 }
 
 bool ScopeStateViewFilter::matches(

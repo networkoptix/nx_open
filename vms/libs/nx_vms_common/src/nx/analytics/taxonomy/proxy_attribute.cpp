@@ -8,11 +8,19 @@ namespace nx::analytics::taxonomy {
 
 ProxyAttribute::ProxyAttribute(
     AbstractAttribute* attribute,
-    AttributeSupportInfoTree attributeSupportInfoTree)
+    AttributeSupportInfoTree attributeSupportInfoTree,
+    AbstractResourceSupportProxy* resourceSupportProxy,
+    QString prefix,
+    QString rootParentTypeId,
+    EntityType rootEntityType)
     :
     AbstractAttribute(attribute),
     m_proxiedAttribute(attribute),
-    m_ownSupportInfo(std::move(attributeSupportInfoTree.ownSupportInfo))
+    m_supportByEngine(std::move(attributeSupportInfoTree.supportByEngine)),
+    m_prefix(std::move(prefix)),
+    m_rootParentTypeId(std::move(rootParentTypeId)),
+    m_rootEntityType(rootEntityType),
+    m_resourceSupportProxy(resourceSupportProxy)
 {
     if (!NX_ASSERT(m_proxiedAttribute))
         return;
@@ -21,7 +29,11 @@ ProxyAttribute::ProxyAttribute(
     {
         m_proxyObjectType = new ProxyObjectType(
             m_proxiedAttribute->objectType(),
-            std::move(attributeSupportInfoTree.nestedAttributeSupportInfo));
+            std::move(attributeSupportInfoTree.nestedAttributeSupportInfo),
+            m_resourceSupportProxy,
+            m_prefix + m_proxiedAttribute->name() + ".",
+            m_rootParentTypeId,
+            m_rootEntityType);
     }
 }
 
@@ -106,31 +118,17 @@ QVariant ProxyAttribute::maxValue() const
 
 bool ProxyAttribute::isSupported(QnUuid engineId, QnUuid deviceId) const
 {
+    if (m_supportByEngine.empty())
+        return false;
+
     if (engineId.isNull())
-    {
-        for (const auto& [engineId, deviceIds]: m_ownSupportInfo)
-        {
-            if (deviceId.isNull())
-                return true;
-
-            if (deviceIds.contains(deviceId))
-                return true;
-        }
-
-        return false;
-    }
-
-    const auto it = m_ownSupportInfo.find(engineId);
-    if (it == m_ownSupportInfo.cend())
-        return false;
-
-    if (deviceId.isNull())
         return true;
 
-    if (it->second.contains(deviceId))
-        return true;
+    if (!m_supportByEngine.contains(engineId))
+        return false;
 
-    return false;
+    return m_resourceSupportProxy->isEntityTypeAttributeSupported(
+        m_rootEntityType, m_rootParentTypeId, m_prefix + m_proxiedAttribute->name(), deviceId, engineId);
 }
 
 QString ProxyAttribute::condition() const

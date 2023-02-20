@@ -117,7 +117,8 @@ SystemContext::SystemContext(
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
-        d->analyticsDescriptorContainer.get());
+        d->analyticsDescriptorContainer.get(),
+        d->resourcePool.get());
 
     d->metrics = std::make_shared<nx::metrics::Storage>();
     switch (mode)

@@ -31,7 +31,7 @@ struct DescriptorScope
     QnUuid engineId;
     mutable QString groupId;
     mutable QString provider;
-    mutable std::set<DeviceId> deviceIds;
+    mutable bool hasTypeEverBeenSupportedInThisScope = false;
 
     bool operator==(const DescriptorScope& other) const = default;
 
@@ -45,7 +45,10 @@ struct DescriptorScope
         return engineId.isNull() && groupId.isEmpty() && provider.isEmpty();
     }
 };
-#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)(provider)(deviceIds)
+#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)\
+    (groupId)\
+    (provider)\
+    (hasTypeEverBeenSupportedInThisScope)
 NX_REFLECTION_INSTRUMENT(DescriptorScope, nx_vms_api_analytics_DescriptorScope_Fields);
 
 
@@ -208,7 +211,7 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
     std::optional<QString> base;
     std::vector<QString> omittedBaseAttributes;
     std::vector<AttributeDescription> attributes;
-    std::map<QString, std::map<EngineId, std::set<DeviceId>>> attributeSupportInfo;
+    std::map<QString /*attributeName*/, std::set<EngineId>> attributeSupportInfo;
 };
 #define nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
     nx_vms_api_analytics_BaseScopedDescriptor_Fields \

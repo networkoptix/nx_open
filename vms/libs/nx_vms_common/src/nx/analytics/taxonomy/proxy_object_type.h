@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_object_type.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
@@ -13,7 +14,11 @@ class ProxyObjectType: public AbstractObjectType
 public:
     ProxyObjectType(
         AbstractObjectType* proxiedObjectType,
-        std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree);
+        std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
+        AbstractResourceSupportProxy* resourceSupportProxy,
+        QString prefix,
+        QString rootParentTypeId,
+        EntityType rootEntityType);
 
     virtual QString id() const override;
 
@@ -37,6 +42,8 @@ public:
 
     virtual bool hasEverBeenSupported() const override;
 
+    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+
     virtual bool isReachable() const override;
 
     virtual bool isLiveOnly() const override;
@@ -52,7 +59,10 @@ private:
     mutable std::map<QString, AttributeSupportInfoTree> m_attributeSupportInfoTree;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedAttributes;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedOwnAttributes;
-
+    AbstractResourceSupportProxy* m_resourceSupportProxy;
+    QString m_prefix;
+    QString m_rootParentTypeId;
+    EntityType m_rootEntityType;
 };
 
 } // namespace nx::analytics::taxonomy

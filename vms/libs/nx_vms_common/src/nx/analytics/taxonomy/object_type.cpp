@@ -8,12 +8,17 @@ using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
-ObjectType::ObjectType(ObjectTypeDescriptor objectTypeDescriptor, QObject* parent):
+ObjectType::ObjectType(
+    ObjectTypeDescriptor objectTypeDescriptor,
+    AbstractResourceSupportProxy* resourceSupportProxy,
+    QObject* parent)
+    :
     AbstractObjectType(parent),
     m_impl(std::make_shared<
         BaseObjectEventTypeImpl<ObjectTypeDescriptor, AbstractObjectType, ObjectType>>(
             objectTypeDescriptor,
             kObjectTypeDescriptorTypeName,
+            resourceSupportProxy,
             /*owner*/ this))
 {
 }
@@ -71,6 +76,11 @@ std::vector<AbstractAttribute*> ObjectType::supportedOwnAttributes() const
 bool ObjectType::hasEverBeenSupported() const
 {
     return m_impl->hasEverBeenSupported();
+}
+
+bool ObjectType::isSupported(QnUuid engineId, QnUuid deviceId) const
+{
+    return m_impl->isSupported(engineId, deviceId);
 }
 
 bool ObjectType::isReachable() const

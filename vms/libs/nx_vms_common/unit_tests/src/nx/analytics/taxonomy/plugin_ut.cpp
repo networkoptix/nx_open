@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/support/utils.h>
+#include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 
 #include <nx/fusion/model_functions.h>
@@ -27,7 +28,9 @@ protected:
 
     void afterDescriptorsCompilation()
     {
-        m_result = StateCompiler::compile(m_descriptors);
+        m_result = StateCompiler::compile(
+            m_descriptors,
+            std::make_unique<TestResourceSupportProxy>());
     }
 
     void makeSurePluginsAreCorrect()

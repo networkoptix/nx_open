@@ -12,6 +12,8 @@
 #include <nx/analytics/taxonomy/event_type.h>
 #include <nx/analytics/taxonomy/error_handler.h>
 #include <nx/analytics/taxonomy/attribute_resolver.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
+#include <nx/analytics/taxonomy/entity_type.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -19,11 +21,22 @@ template<typename Descriptor, typename AbstractResolvedType, typename ResolvedTy
 class BaseObjectEventTypeImpl
 {
 public:
-    BaseObjectEventTypeImpl(Descriptor descriptor, QString typeName, ResolvedType* owner):
+    BaseObjectEventTypeImpl(
+        Descriptor descriptor,
+        QString typeName,
+        AbstractResourceSupportProxy* resourceSupportProxy,
+        ResolvedType* owner)
+        :
         m_descriptor(std::move(descriptor)),
         m_owner(owner),
-        m_typeName(std::move(typeName))
+        m_typeName(std::move(typeName)),
+        m_resourceSupportProxy(resourceSupportProxy)
     {
+        if constexpr (std::is_same_v<Descriptor, nx::vms::api::analytics::EventTypeDescriptor>)
+            m_entityType = EntityType::eventType;
+
+        if constexpr (std::is_same_v<Descriptor, nx::vms::api::analytics::ObjectTypeDescriptor>)
+            m_entityType = EntityType::objectType;
     }
 
     QString id() const
@@ -183,6 +196,12 @@ public:
         return m_descriptor.hasEverBeenSupported;
     }
 
+    bool isSupported(QnUuid engineId, QnUuid deviceId) const
+    {
+        return m_resourceSupportProxy->isEntityTypeSupported(
+            m_entityType, m_descriptor.id, deviceId, engineId);
+    }
+
     bool isReachable() const
     {
         return m_isReachable;
@@ -280,8 +299,7 @@ public:
             }
 
             taxonomyScope->setProvider(scope.provider);
-            taxonomyScope->setDeviceIds(
-                std::vector<QnUuid>{scope.deviceIds.begin(), scope.deviceIds.end()});
+            taxonomyScope->setHasTypeEverBeenSupportedInThisScope(scope.hasTypeEverBeenSupportedInThisScope);
 
             if (!taxonomyScope->isEmpty())
             {
@@ -363,7 +381,13 @@ public:
         for (AttributeContext& context: m_attributes)
             attributes.push_back(context.attribute);
 
-        attributes = makeSupportedAttributes(attributes, m_descriptor.attributeSupportInfo);
+        attributes = makeSupportedAttributes(
+            attributes,
+            m_descriptor.attributeSupportInfo,
+            m_resourceSupportProxy,
+            m_descriptor.id,
+            m_entityType);
+
         NX_ASSERT(attributes.size() == m_attributes.size(),
             "The resolved Attribute list size does not equal the Attribute list size, %1: %2",
             m_typeName, m_descriptor.name);
@@ -380,6 +404,7 @@ private:
     ResolvedType* m_base = nullptr;
     ResolvedType* m_owner = nullptr;
     std::vector<AbstractResolvedType*> m_derivedTypes;
+    EntityType m_entityType = EntityType::undefined;
 
     struct AttributeContext
     {
@@ -395,6 +420,8 @@ private:
     bool m_isReachable = false;
     bool m_isResolved = false;
     bool m_areSupportedAttributesResolved = false;
+
+    AbstractResourceSupportProxy* m_resourceSupportProxy;
 };
 
 } // namespace nx::analytics::taxonomy
