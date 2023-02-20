@@ -322,6 +322,30 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, debugDisableQmlTooltips,
         "[Support] Disable tooltips rendered to an offscreen buffer for graphics debugging purposes");
 
+    // VMS-37975.
+    NX_INI_FLAG(false, considerOverallCpuUsageInRadass,
+        "[Support] Consider overall CPU usage in the Radass quality control mechanism.");
+
+    NX_INI_FLOAT(0.7f, highSystemCpuUsageInRadass,
+        "[Support] Radass should not raise item quality if system CPU usage is higher than this "
+        "value. Used only when `considerOverallCpuUsageInRadass` is enabled. Range: [0, 1].");
+
+    NX_INI_FLOAT(0.9f, criticalSystemCpuUsageInRadass,
+        "[Support] Radass should lower one item quality if system CPU usage is higher than this "
+        "value. Used only when `considerOverallCpuUsageInRadass` is enabled. Range: [0, 1].");
+
+    NX_INI_FLOAT(0.6f, highProcessCpuUsageInRadass,
+        "[Support] Radass should not raise item quality if process CPU usage is higher than this "
+        "value. Used only when `considerOverallCpuUsageInRadass` is enabled. Range: [0, 1].");
+
+    NX_INI_FLOAT(0.8f, criticalProcessCpuUsageInRadass,
+        "[Support] Radass should lower one item quality if process CPU usage is higher than this "
+        "value. Used only when `considerOverallCpuUsageInRadass` is enabled. Range: [0, 1].");
+
+    NX_INI_INT(5000, criticalRadassCpuUsageTimeMs,
+        "[Support] Radass should lower item quality if CPU usage is critically high for this "
+        "period of time (in milliseconds).");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
