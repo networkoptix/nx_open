@@ -2,7 +2,6 @@
 
 #include "text_overlay_action.h"
 
-#include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_with_fields.h"

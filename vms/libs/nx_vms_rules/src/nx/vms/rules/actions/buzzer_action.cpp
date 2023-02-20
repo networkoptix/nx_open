@@ -2,7 +2,6 @@
 
 #include "buzzer_action.h"
 
-#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_server_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -13,7 +12,7 @@ const ItemDescriptor& BuzzerAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BuzzerAction>(),
-        .displayName = tr("Camera recording"),
+        .displayName = tr("Buzzer"),
         .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<TargetServerField>("serverIds", tr("Servers")),

@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_server_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 
 #include "picker_widget_strings.h"
@@ -81,15 +82,15 @@ protected:
 };
 
 template<typename Policy>
-class TargetServerPicker: public ServerPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
+class TargetServerPicker: public ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>
 {
 public:
-    using ServerPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::ServerPickerWidgetBase;
+    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::ServerPickerWidgetBase;
 
 protected:
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::theField;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::m_selectButton;
-    using ServerPickerWidgetBase<vms::rules::SourceServerField, Policy>::resourcePool;
+    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::theField;
+    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::m_selectButton;
+    using ServerPickerWidgetBase<vms::rules::TargetServerField, Policy>::resourcePool;
 
     void updateUi() override
     {

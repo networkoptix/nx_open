@@ -23,6 +23,7 @@
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
+#include "output_port_picker_widget.h"
 #include "ptz_preset_picker_widget.h"
 #include "server_picker_widget.h"
 #include "single_target_device_picker_widget.h"
@@ -95,6 +96,15 @@ PickerWidget* createTargetDevicePicker(QnWorkbenchContext* context, CommonParams
     return new TargetCameraPicker<QnAllowAnyCameraPolicy>(context, parent);
 }
 
+PickerWidget* createTargetServerPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+{
+    if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BuzzerAction>())
+        return new TargetServerPicker<QnBuzzerPolicy>(context, parent);
+
+    NX_ASSERT(false, "Must not be here");
+    return {};
+}
+
 PickerWidget* createSingleTargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
@@ -164,6 +174,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new SingleTargetLayoutPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
         pickerWidget = new OptionalDurationPicker<nx::vms::rules::OptionalTimeField>(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::OutputPortField>())
+        pickerWidget = new OutputPortPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
         pickerWidget = new PasswordPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::PtzPresetField>())
@@ -174,6 +186,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = createTargetDevicePicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetLayoutField>())
         pickerWidget = new TargetLayoutPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<vms::rules::TargetServerField>())
+        pickerWidget = createTargetServerPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::TargetSingleDeviceField>())
         pickerWidget = createSingleTargetCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::SoundField>())
