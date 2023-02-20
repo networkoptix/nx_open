@@ -102,6 +102,7 @@ class NxOpenConan(ConanFile):
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/11.7" "#78798fb75c85a676d43c9d1a8af4fe18")
+                self.requires("zlib/1.2.11" "#64ef9c596106c733055d8551926b4f0c")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
