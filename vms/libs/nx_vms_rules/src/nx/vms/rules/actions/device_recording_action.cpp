@@ -3,7 +3,6 @@
 #include "device_recording_action.h"
 
 #include "../action_builder_fields/fps_field.h"
-#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/stream_quality_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/time_field.h"
