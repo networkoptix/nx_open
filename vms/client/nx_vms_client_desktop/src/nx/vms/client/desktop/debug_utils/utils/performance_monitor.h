@@ -20,13 +20,13 @@ public:
     PerformanceMonitor(QObject* parent = nullptr);
     virtual ~PerformanceMonitor();
 
-    QVariantMap values() const;
     bool isVisible() const;
     bool isEnabled() const;
     void setDebugInfoVisible(bool visible);
     bool isDebugInfoVisible() const;
 
-    static const QString kCpu;
+    static const QString kProcessCpu;
+    static const QString kTotalCpu;
     static const QString kGpu;
     static const QString kMemory;
     static const QString kThreads;
