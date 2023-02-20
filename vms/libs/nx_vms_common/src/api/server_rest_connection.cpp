@@ -557,11 +557,33 @@ Handle ServerConnection::dumpDatabase(
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
-        prepareUrl("/rest/v2/system/database", /*params*/ {}));
+        prepareUrl("/rest/v2/system/database", /*params*/ {}),
+        nx::network::http::header::ContentType::kBinary.value);
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
 
+    auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
+    timeouts.responseReadTimeout = std::chrono::minutes(5);
+    timeouts.messageBodyReadTimeout = std::chrono::minutes(5);
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(
+            request,
+            [callback = std::move(callback)](
+                bool success,
+                Handle requestId,
+                QByteArray body,
+                const nx::network::http::HttpHeaders&)
+            {
+                if (success)
+                {
+                    callback(success, requestId, body);
+                    return;
+                }
+                nx::network::rest::Result result;
+                QJson::deserialize(body, &result);
+                callback(success, requestId, result);
+            },
+            targetThread,
+            timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -581,8 +603,11 @@ Handle ServerConnection::restoreDatabase(
         data);
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
 
+    auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
+    timeouts.sendTimeout = std::chrono::minutes(5);
+    timeouts.responseReadTimeout = std::chrono::minutes(5);
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(callback), targetThread, timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
