@@ -174,16 +174,16 @@ void AnalyticsFilterModel::update(
         m_attributeValues = attributeValues;
         m_liveTypesExcluded = liveTypesExcluded;
 
-        const auto liveTypeFilter = std::make_unique<LiveTypeFilter>(m_liveTypesExcluded);
-        const auto scopeFilter = std::make_unique<ScopeStateViewFilter>(m_engine, m_devices);
-        const auto conditionFilter = std::make_unique<AttributeConditionStateViewFilter>(
+        m_liveTypeFilter = std::make_unique<LiveTypeFilter>(m_liveTypesExcluded);
+        m_scopeFilter = std::make_unique<ScopeStateViewFilter>(m_engine, m_devices);
+        m_conditionFilter = std::make_unique<AttributeConditionStateViewFilter>(
             /*baseFilter*/ nullptr, filterAttributes(m_attributeValues));
 
-        const auto filter =
+        m_filter =
             std::make_unique<CompositeFilter>(std::vector<AbstractStateViewFilter*>{
-                liveTypeFilter.get(), scopeFilter.get(), conditionFilter.get()});
+                m_liveTypeFilter.get(), m_scopeFilter.get(), m_conditionFilter.get()});
 
-        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(filter.get());
+        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(m_filter.get());
         setObjectTypes(state->rootNodes());
     }
 }
