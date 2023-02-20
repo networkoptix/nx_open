@@ -79,7 +79,8 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
 
     // Create rich text with all values.
     auto remaining = values;
-    const QVariant cpuValue = remaining.take(PerformanceMonitor::kCpu);
+    const QVariant processCpuValue = remaining.take(PerformanceMonitor::kProcessCpu);
+    const QVariant totalCpuValue = remaining.take(PerformanceMonitor::kTotalCpu);
     const QVariant memoryValue = remaining.take(PerformanceMonitor::kMemory);
     const QVariant gpuValue = remaining.take(PerformanceMonitor::kGpu);
     const QVariant threadsValue = remaining.take(PerformanceMonitor::kThreads);
@@ -103,7 +104,8 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
         .arg(fpsValue, 0, 'f', 1)
         .arg(duration_cast<milliseconds>(frameTime).count());
 
-    counters << QString("CPU: %1%").arg(100.0 * cpuValue.toFloat(), 0, 'f', 1);
+    counters << QString("Process CPU: %1%").arg(100.0 * processCpuValue.toFloat(), 0, 'f', 1);
+    counters << QString("Total CPU: %1%").arg(100.0 * totalCpuValue.toFloat(), 0, 'f', 1);
     counters << QString("Memory: %1").arg(memoryText);
     if (nx::build_info::isWindows() || nx::build_info::isMacOsX())
         counters << QString("GPU: %1%").arg(100.0 * gpuValue.toFloat(), 0, 'f', 1);
