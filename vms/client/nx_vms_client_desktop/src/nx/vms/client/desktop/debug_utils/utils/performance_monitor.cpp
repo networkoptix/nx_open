@@ -10,7 +10,8 @@
 
 namespace nx::vms::client::desktop {
 
-const QString PerformanceMonitor::kCpu = "CPU";
+const QString PerformanceMonitor::kProcessCpu = "CPU";
+const QString PerformanceMonitor::kTotalCpu = "Total CPU";
 const QString PerformanceMonitor::kGpu = "GPU";
 const QString PerformanceMonitor::kMemory = "Memory";
 const QString PerformanceMonitor::kThreads = "Threads";

@@ -34,17 +34,16 @@ void PerformanceWorker::gatherValues()
 {
     // This method works in its own thread!
 
-    const qreal processCpuValue = m_monitor->thisProcessCpuUsage()
-        * std::thread::hardware_concurrency();
-    const qreal totalCpuValue = m_monitor->totalCpuUsage()
-        * std::thread::hardware_concurrency();
+    const qreal processCpuValue = m_monitor->thisProcessCpuUsage();
+    const qreal totalCpuValue = m_monitor->totalCpuUsage();
     const quint64 processMemoryValue = m_monitor->thisProcessRamUsageBytes();
     const quint64 processPrivateMemoryValue = m_monitor->thisProcessPrivateRamUsageBytes();
     const auto threadCount = m_monitor->thisProcessThreads();
     const auto processGpuValue = m_monitor->thisProcessGpuUsage();
 
     QVariantMap values;
-    values[PerformanceMonitor::kCpu] = processCpuValue;
+    values[PerformanceMonitor::kProcessCpu] = processCpuValue;
+    values[PerformanceMonitor::kTotalCpu] = totalCpuValue;
     values[PerformanceMonitor::kMemory] = processMemoryValue;
     values[PerformanceMonitor::kThreads] = threadCount;
     values[PerformanceMonitor::kGpu] = processGpuValue;
