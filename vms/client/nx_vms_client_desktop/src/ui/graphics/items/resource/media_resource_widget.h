@@ -238,7 +238,7 @@ public:
     void setSpeed(double value);
     double speed() const;
 
-    QnIOModuleMonitorPtr getIOModuleMonitor() const;
+    QnIOModuleMonitorPtr getIOModuleMonitor();
 
 signals:
     void speedChanged();
