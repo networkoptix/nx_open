@@ -79,7 +79,16 @@ bool fromString(const String& str, T* result)
     if constexpr (detail::IsQByteArrayAlikeV<T>)
     {
         // Expecting QByteArray-like type here.
-        *result = T::fromBase64(T::fromRawData(str.data(), str.size()));
+        int size = str.size();
+        while (size > 0 && str[size - 1] == '=')
+            --size;
+        constexpr int kBase64Limit = 128 * 1024 * 1024;
+        result->reserve((size / 4) * 3 + ((size % 4) + 1) / 2 + 1);
+        for (int i = 0; i < size; i += kBase64Limit)
+        {
+            result->append(
+                T::fromBase64(T::fromRawData(str.data() + i, std::min(kBase64Limit, size - i))));
+        }
         return true;
     }
     else if constexpr (std::is_integral_v<T>)

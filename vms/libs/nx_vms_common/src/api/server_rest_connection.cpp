@@ -527,8 +527,11 @@ Handle ServerConnection::dumpDatabase(
         prepareUrl("/rest/v1/system/database", /*params*/ {}));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
 
+    auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
+    timeouts.responseReadTimeout = std::chrono::minutes(5);
+    timeouts.messageBodyReadTimeout = std::chrono::minutes(5);
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(callback), targetThread, timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -545,11 +548,14 @@ Handle ServerConnection::restoreDatabase(
         nx::network::http::Method::post,
         prepareUrl("/rest/v1/system/database", /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        nx::reflect::json::serialize(data));
+        "{\"data\":\"" + data.data.toBase64() + "\"}");
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
 
+    auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
+    timeouts.sendTimeout = std::chrono::minutes(5);
+    timeouts.responseReadTimeout = std::chrono::minutes(5);
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(callback), targetThread)
+        ? executeRequest(request, std::move(callback), targetThread, timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);

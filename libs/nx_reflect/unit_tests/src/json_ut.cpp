@@ -134,6 +134,9 @@ struct Base64Convertible
     {
         return s == right.s;
     }
+
+    void append(Base64Convertible value) { s += std::move(value.s); }
+    void reserve(int) {}
 };
 
 } // namespace nx::reflect::test
