@@ -11,6 +11,7 @@ namespace nx::analytics::taxonomy {
 
 struct InternalState;
 class ErrorHandler;
+class AbstractResourceSupportProxy;
 
 template<typename Descriptor, typename AbstractResolvedType, typename ResolvedType>
 class BaseObjectEventTypeImpl;
@@ -20,6 +21,7 @@ class ObjectType: public AbstractObjectType
 public:
     ObjectType(
         nx::vms::api::analytics::ObjectTypeDescriptor objectTypeDescriptor,
+        AbstractResourceSupportProxy* resourceSupportProxy,
         QObject* parent = nullptr);
 
     virtual QString id() const override;
@@ -43,6 +45,8 @@ public:
     virtual std::vector<AbstractAttribute*> supportedOwnAttributes() const override;
 
     virtual bool hasEverBeenSupported() const override;
+
+    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
 
     virtual bool isReachable() const override;
 

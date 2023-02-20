@@ -10,11 +10,19 @@ namespace nx::analytics::taxonomy {
 
 ProxyObjectType::ProxyObjectType(
     AbstractObjectType* proxiedObjectType,
-    std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree)
+    std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
+    AbstractResourceSupportProxy* resourceSupportProxy,
+    QString prefix,
+    QString rootParentTypeId,
+    EntityType rootEntityType)
     :
     AbstractObjectType(proxiedObjectType),
     m_proxiedObjectType(proxiedObjectType),
-    m_attributeSupportInfoTree(std::move(attributeSupportInfoTree))
+    m_attributeSupportInfoTree(std::move(attributeSupportInfoTree)),
+    m_resourceSupportProxy(resourceSupportProxy),
+    m_prefix(std::move(prefix)),
+    m_rootParentTypeId(std::move(rootParentTypeId)),
+    m_rootEntityType(rootEntityType)
 {
 }
 
@@ -65,7 +73,11 @@ std::vector<AbstractAttribute*> ProxyObjectType::supportedAttributes() const
         {
             auto proxyAttribute = new ProxyAttribute(
                 attribute,
-                m_attributeSupportInfoTree[attribute->name()]);
+                m_attributeSupportInfoTree[attribute->name()],
+                m_resourceSupportProxy,
+                m_prefix,
+                m_rootParentTypeId,
+                m_rootEntityType);
 
             m_supportedAttributes->push_back(proxyAttribute);
         }
@@ -86,7 +98,11 @@ std::vector<AbstractAttribute*> ProxyObjectType::supportedOwnAttributes() const
         {
             auto proxyAttribute = new ProxyAttribute(
                 attribute,
-                m_attributeSupportInfoTree[attribute->name()]);
+                m_attributeSupportInfoTree[attribute->name()],
+                m_resourceSupportProxy,
+                m_prefix,
+                m_rootParentTypeId,
+                m_rootEntityType);
 
             m_supportedOwnAttributes->push_back(proxyAttribute);
         }
@@ -103,6 +119,11 @@ std::vector<AbstractAttribute*> ProxyObjectType::attributes() const
 bool ProxyObjectType::hasEverBeenSupported() const
 {
     return m_proxiedObjectType->hasEverBeenSupported();
+}
+
+bool ProxyObjectType::isSupported(QnUuid engineId, QnUuid deviceId) const
+{
+    return m_proxiedObjectType->isSupported(engineId, deviceId);
 }
 
 bool ProxyObjectType::isReachable() const

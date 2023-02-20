@@ -11,6 +11,7 @@ namespace nx::analytics::taxonomy {
 
 struct InternalState;
 class ErrorHandler;
+class AbstractResourceSupportProxy;
 
 template<typename Descriptor, typename AbstractResolvedType, typename ResolvedType>
 class BaseObjectEventTypeImpl;
@@ -20,6 +21,7 @@ class EventType: public AbstractEventType
 public:
     EventType(
         nx::vms::api::analytics::EventTypeDescriptor eventTypeDescriptor,
+        AbstractResourceSupportProxy* resourceSupportProxy,
         QObject* parent = nullptr);
 
     virtual QString id() const override;
@@ -51,6 +53,8 @@ public:
     virtual bool useTrackBestShotAsPreview() const override;
 
     virtual bool hasEverBeenSupported() const override;
+
+    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
 
     virtual bool isReachable() const override;
 

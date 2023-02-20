@@ -8,12 +8,17 @@ using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
-EventType::EventType(EventTypeDescriptor eventTypeDescriptor, QObject* parent):
+EventType::EventType(
+    EventTypeDescriptor eventTypeDescriptor,
+    AbstractResourceSupportProxy* resourceSupportProxy,
+    QObject* parent)
+    :
     AbstractEventType(parent),
     m_impl(std::make_shared<
         BaseObjectEventTypeImpl<EventTypeDescriptor, AbstractEventType, EventType>>(
             eventTypeDescriptor,
             kEventTypeDescriptorTypeName,
+            resourceSupportProxy,
             /*owner*/ this))
 {
 }
@@ -91,6 +96,11 @@ bool EventType::useTrackBestShotAsPreview() const
 bool EventType::hasEverBeenSupported() const
 {
     return m_impl->hasEverBeenSupported();
+}
+
+bool EventType::isSupported(QnUuid engineId, QnUuid deviceId) const
+{
+    return m_impl->isSupported(engineId, deviceId);
 }
 
 bool EventType::isReachable() const

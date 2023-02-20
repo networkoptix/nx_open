@@ -20,7 +20,7 @@ public:
 
     virtual QString provider() const override;
 
-    virtual std::vector<QnUuid> deviceIds() const override;
+    virtual bool hasTypeEverBeenSupportedInThisScope() const override;
 
     virtual bool isEmpty() const override;
 
@@ -30,14 +30,13 @@ public:
 
     void setProvider(const QString& provider);
 
-    void setDeviceIds(std::vector<QnUuid> deviceIds);
+    void setHasTypeEverBeenSupportedInThisScope(bool hasTypeEverBeenSupportedInThisScope);
 
 private:
     Engine* m_engine = nullptr;
     Group* m_group = nullptr;
     QString m_provider;
-    std::vector<QnUuid> m_deviceIds;
-
+    bool m_hasTypeEverBeenSupportedInThisScope = false;
 };
 
 } // namespace nx::analytics::taxonomy

@@ -15,6 +15,7 @@
 #include <nx/analytics/taxonomy/error_handler.h>
 #include <nx/analytics/taxonomy/internal_state.h>
 #include <nx/analytics/taxonomy/state.h>
+#include <nx/analytics/taxonomy/resource_support_proxy.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -42,7 +43,9 @@ void resolveReachability(Map* inOutMap)
         item->resolveReachability();
 }
 
-static InternalState makeInitialInternalState(Descriptors descriptors)
+static InternalState makeInitialInternalState(
+    Descriptors descriptors,
+    AbstractResourceSupportProxy* resourceSupportProxy)
 {
     InternalState internalState;
 
@@ -62,10 +65,16 @@ static InternalState makeInitialInternalState(Descriptors descriptors)
         internalState.colorTypeById[id] = new ColorType(std::move(descriptor));
 
     for (auto& [id, descriptor]: descriptors.eventTypeDescriptors)
-        internalState.eventTypeById[id] = new EventType(std::move(descriptor));
+    {
+        internalState.eventTypeById[id] =
+            new EventType(std::move(descriptor), resourceSupportProxy);
+    }
 
     for (auto& [id, descriptor]: descriptors.objectTypeDescriptors)
-        internalState.objectTypeById[id] = new ObjectType(std::move(descriptor));
+    {
+        internalState.objectTypeById[id] =
+            new ObjectType(std::move(descriptor), resourceSupportProxy);
+    }
 
     for (auto& [id, descriptor]: descriptors.attributeListDescriptors)
     {
@@ -77,12 +86,16 @@ static InternalState makeInitialInternalState(Descriptors descriptors)
 }
 
 /*static*/
-StateCompiler::Result StateCompiler::compile(Descriptors descriptors)
+StateCompiler::Result StateCompiler::compile(
+    Descriptors descriptors,
+    std::unique_ptr<AbstractResourceSupportProxy> resourceSupportProxy)
 {
     ErrorHandler errorHandler;
 
     PrimaryResolver::resolve(&descriptors, &errorHandler);
-    InternalState internalState = makeInitialInternalState(std::move(descriptors));
+
+    InternalState internalState =
+        makeInitialInternalState(std::move(descriptors), resourceSupportProxy.get());
 
     resolveMap(&internalState.engineById, &internalState, &errorHandler);
     resolveMap(&internalState.enumTypeById, &internalState, &errorHandler);
@@ -96,7 +109,10 @@ StateCompiler::Result StateCompiler::compile(Descriptors descriptors)
     resolveReachability(&internalState.eventTypeById);
 
     StateCompiler::Result result;
-    result.state = std::make_shared<State>(std::move(internalState));
+    result.state = std::make_shared<State>(
+        std::move(internalState),
+        std::move(resourceSupportProxy));
+
     result.errors = errorHandler.errors();
 
     return result;

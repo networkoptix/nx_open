@@ -16,6 +16,9 @@
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/test_support/test_resource_support_proxy.h>
+
+using nx::analytics::taxonomy::AbstractResourceSupportProxy;
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
@@ -148,6 +151,8 @@ protected:
 
         m_testCase = itr->second;
         m_descriptors = prepareDescriptors(m_testCase.input, s_testData->descriptors);
+        m_resourceSupportProxy = prepareResourceSupportProxy(
+            m_testCase.input.attributeSupportInfo);
         m_attributeValues = m_testCase.input.attributeValues;
     }
 
@@ -158,12 +163,16 @@ protected:
 
         m_multiengineTestCase = itr->second;
         m_descriptors = prepareDescriptors(m_multiengineTestCase.input, s_multiengineTestData->descriptors);
+        m_resourceSupportProxy = prepareResourceSupportProxy(
+            m_multiengineTestCase.input.attributeSupportInfo);
     }
 
     void afterStateViewIsBuilt()
     {
         const nx::analytics::taxonomy::StateCompiler::Result result =
-            nx::analytics::taxonomy::StateCompiler::compile(m_descriptors);
+            nx::analytics::taxonomy::StateCompiler::compile(
+                m_descriptors,
+                std::move(m_resourceSupportProxy));
 
         m_stateViewBuilder = std::make_unique<StateViewBuilder>(result.state);
     }
@@ -216,6 +225,19 @@ protected:
     }
 
 private:
+    static std::map<QString, std::set<QnUuid>> toDescriptorAttributeSupportInfo(
+        const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
+    {
+        std::map<QString, std::set<QnUuid>> result;
+        for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
+        {
+            for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)
+                result[attributeName].insert(engineId);
+        }
+
+        return result;
+    }
+
     static nx::vms::api::analytics::Descriptors prepareDescriptors(
         const InputData& inputData,
         const nx::vms::api::analytics::Descriptors& commonDescriptors)
@@ -233,7 +255,7 @@ private:
         for (const auto& [objectTypeId, attributeSupportInfo]: inputData.attributeSupportInfo)
         {
             descriptors.objectTypeDescriptors[objectTypeId].attributeSupportInfo =
-                attributeSupportInfo;
+                toDescriptorAttributeSupportInfo(attributeSupportInfo);
 
             if (!attributeSupportInfo.empty())
                 descriptors.objectTypeDescriptors[objectTypeId].hasEverBeenSupported = true;
@@ -241,6 +263,12 @@ private:
 
         return descriptors;
     };
+
+    std::unique_ptr<AbstractResourceSupportProxy> prepareResourceSupportProxy(
+        const std::map<QString, InputData::AttributeSupportInfo>& attributeSupportInfo)
+    {
+        return std::make_unique<TestResourceSupportProxy>(attributeSupportInfo);
+    }
 
     void validateNodes(
         const std::vector<AbstractNode*>& nodes,
@@ -409,6 +437,7 @@ private:
     nx::vms::api::analytics::Descriptors m_descriptors;
     std::optional<std::map<QString, QString>> m_attributeValues;
     std::unique_ptr<AbstractStateViewBuilder> m_stateViewBuilder;
+    std::unique_ptr<AbstractResourceSupportProxy> m_resourceSupportProxy;
 };
 
 TEST_F(StateViewTest, singleHiddenType_noClashingAttributes)

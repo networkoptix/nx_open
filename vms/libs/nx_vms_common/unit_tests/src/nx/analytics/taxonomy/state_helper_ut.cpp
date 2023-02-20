@@ -8,6 +8,7 @@
 
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/state_helper.h>
+#include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/common/test_support/resource/analytics_engine_resource_mock.h>
@@ -112,7 +113,8 @@ struct TestDescriptors
             descriptors.engineDescriptors.emplace(descriptor.id, descriptor);
         }
 
-        return StateCompiler::compile(descriptors).state;
+        return StateCompiler::compile(
+            descriptors, std::make_unique<TestResourceSupportProxy>()).state;
     }
 };
 #define TestDescriptors_Fields \

@@ -16,10 +16,13 @@ static void engineFiltersFromObjectType(
     if (!NX_ASSERT(inOutEngineFilterById))
         return;
 
+    if (!objectType->hasEverBeenSupported())
+        return;
+
     for (const nx::analytics::taxonomy::AbstractScope* scope: objectType->scopes())
     {
         // Skip the Type which is in the Engine scope but has never been supported by any Device Agent.
-        if (scope->deviceIds().empty())
+        if (!scope->hasTypeEverBeenSupportedInThisScope())
             continue;
 
         nx::analytics::taxonomy::AbstractEngine* taxonomyEngine = scope->engine();
