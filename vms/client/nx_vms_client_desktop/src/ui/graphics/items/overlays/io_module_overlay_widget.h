@@ -19,10 +19,11 @@ class QnIoModuleOverlayWidget: public GraphicsWidget
     using base_type = GraphicsWidget;
 
 public:
-    QnIoModuleOverlayWidget(QGraphicsWidget* parent = nullptr);
+    QnIoModuleOverlayWidget(
+        const QnVirtualCameraResourcePtr& module,
+        const QnIOModuleMonitorPtr& monitor,
+        QGraphicsWidget* parent = nullptr);
     virtual ~QnIoModuleOverlayWidget();
-
-    void setIOModule(const QnVirtualCameraResourcePtr& module);
 
     using Style = nx::vms::api::IoModuleVisualStyle;
 
@@ -32,8 +33,6 @@ public:
     /** Whether user is allowed to toggle output ports: */
     bool userInputEnabled() const;
     void setUserInputEnabled(bool value);
-
-    QnIOModuleMonitorPtr getIOModuleMonitor() const;
 
 private:
     QScopedPointer<QnIoModuleOverlayWidgetPrivate> const d_ptr;
