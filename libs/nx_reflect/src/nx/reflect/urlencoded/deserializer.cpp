@@ -69,10 +69,10 @@ NX_REFLECT_API std::tuple<std::vector<std::string_view>, bool> tokenizeRequest(
         ++curPos;
     }
 
-    if (begPos >= request.length())
-        return {requestTokenized, false};
+    // NOTE: Trailing separator is not considered an error.
 
-    requestTokenized.push_back(request.substr(begPos, curPos - begPos));
+    if (curPos > begPos)
+        requestTokenized.push_back(request.substr(begPos, curPos - begPos));
     return {requestTokenized, true};
 }
 
