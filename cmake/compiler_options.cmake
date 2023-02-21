@@ -253,10 +253,15 @@ if(compilerMsvc)
         # Enable most warnings by default.
         /W4
 
-        /wd4290
-        /wd4661
+        # Unreferenced formal parameter.
+        # Suppressed as it produces a lot of false positives in variadic template functions.
         /wd4100
 
+        # Unreachable code.
+        # Suppressed as it produces a lot of false positives in template functions.
+        /wd4702
+
+        # Function is recursive on all control paths, will cause runtime stack overflow.
         /we4717
 
         # Deletion of pointer to incomplete type 'X'; no destructor called.
