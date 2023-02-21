@@ -2,9 +2,18 @@
 
 #include "logger_collection.h"
 
+#include <cstdlib>
+
+#include <QTextCodec>
+
 namespace nx {
 namespace utils {
 namespace log {
+
+static void stopArchivingInstance()
+{
+    LoggerCollection::instance()->stopArchiving();
+}
 
 LoggerCollection::LoggerCollection()
 {
@@ -21,6 +30,14 @@ LoggerCollection::~LoggerCollection()
 LoggerCollection* LoggerCollection::instance()
 {
     static LoggerCollection collection;
+    static const auto atexitRegistration =
+        []()
+        {
+            NX_ASSERT(QTextCodec::codecForLocale()); //< Make sure QT static data is constructed before atexit()
+            std::atexit(stopArchivingInstance);
+            return 0;
+        }();
+    NX_ASSERT(atexitRegistration == 0);
     return &collection;
 }
 
@@ -177,6 +194,23 @@ void LoggerCollection::onLevelChanged()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     updateMaxLevel();
+}
+
+void LoggerCollection::stopArchiving()
+{
+    std::vector<cf::future<cf::unit>> futures;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        for (const auto& element: m_loggersByFilter)
+            futures.push_back(element.second.logger->stopArchivingAsync());
+
+        if (m_mainLogger)
+            futures.push_back(m_mainLogger->stopArchivingAsync());
+    }
+
+    for (auto& future: futures)
+        future.get();
 }
 
 } // namespace nx
