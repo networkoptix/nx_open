@@ -6,6 +6,7 @@
 #include <future>
 
 #include <nx/utils/log/log_level.h>
+#include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <QtCore/QDateTime>
@@ -26,6 +27,7 @@ class NX_UTILS_API AbstractWriter
 public:
     virtual ~AbstractWriter() = default;
     virtual void write(Level level, const QString& message) = 0;
+    virtual cf::future<cf::unit> stopArchivingAsync();
 };
 
 /**
@@ -65,6 +67,7 @@ public:
     File(Settings settings);
     virtual ~File();
     virtual void write(Level level, const QString& message) override;
+    virtual cf::future<cf::unit> stopArchivingAsync() override;
     QString getFileName(size_t backupNumber = 0) const;
 
     void setSettings(const Settings& settings);

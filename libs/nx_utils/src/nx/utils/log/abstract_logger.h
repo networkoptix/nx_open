@@ -6,6 +6,7 @@
 #include <set>
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 #include "log_writers.h"
 
@@ -49,6 +50,8 @@ public:
     virtual void setOnLevelChanged(OnLevelChanged onLevelChanged) = 0;
 
     virtual std::optional<QString> filePath() const = 0;
+
+    virtual cf::future<cf::unit> stopArchivingAsync() = 0;
 
     virtual void writeLogHeader() = 0;
 };
