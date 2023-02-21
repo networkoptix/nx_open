@@ -59,7 +59,7 @@ public:
     QScopedPointer<QnIoModuleOverlayContents> contents;
 
     QnVirtualCameraResourcePtr module;
-    QnIOModuleMonitorPtr monitor;
+    const QnIOModuleMonitorPtr monitor;
     bool userInputEnabled = false;
 
     struct StateData
@@ -75,11 +75,13 @@ public:
     QGraphicsLinearLayout* const layout = nullptr;
     QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
-    QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
+    QnIoModuleOverlayWidgetPrivate(
+        const QnIOModuleMonitorPtr& monitor,
+        QnIoModuleOverlayWidget* widget);
 
     void setContents(QnIoModuleOverlayContents* newContents);
 
-    void setIOModule(const QnVirtualCameraResourcePtr& newModule);
+    void initIOModule(const QnVirtualCameraResourcePtr& newModule);
     void setPorts(const QnIOPortDataList& newPorts);
 
     void updateContents();
@@ -100,9 +102,13 @@ public:
 QnIoModuleOverlayWidgetPrivate
 */
 
-QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget):
+QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(
+    const QnIOModuleMonitorPtr& monitor,
+    QnIoModuleOverlayWidget* widget)
+    :
     base_type(widget),
     q_ptr(widget),
+    monitor(monitor),
     timer(new QTimer(this)),
     layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
 {
@@ -155,7 +161,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     }
 }
 
-void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePtr& newModule)
+void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourcePtr& newModule)
 {
     Q_Q(QnIoModuleOverlayWidget);
     timer->stop();
@@ -174,13 +180,10 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
 
     if (!module)
     {
-        monitor.reset();
         setPorts({});
         q->setEnabled(false);
         return;
     }
-
-    monitor.reset(new QnIOModuleMonitor(module));
 
     connect(monitor, &QnIOModuleMonitor::connectionOpened,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
@@ -388,21 +391,21 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
 QnIoModuleOverlayWidget
 */
 
-QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(QGraphicsWidget* parent):
+QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(
+    const QnVirtualCameraResourcePtr& module,
+    const QnIOModuleMonitorPtr& monitor,
+    QGraphicsWidget* parent)
+    :
     base_type(parent),
-    d_ptr(new QnIoModuleOverlayWidgetPrivate(this))
+    d_ptr(new QnIoModuleOverlayWidgetPrivate(monitor, this))
 {
+    Q_D(QnIoModuleOverlayWidget);
+    d->initIOModule(module);
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
 }
 
 QnIoModuleOverlayWidget::~QnIoModuleOverlayWidget()
 {
-}
-
-void QnIoModuleOverlayWidget::setIOModule(const QnVirtualCameraResourcePtr& module)
-{
-    Q_D(QnIoModuleOverlayWidget);
-    d->setIOModule(module);
 }
 
 QnIoModuleOverlayWidget::Style QnIoModuleOverlayWidget::overlayStyle() const
@@ -425,11 +428,6 @@ void QnIoModuleOverlayWidget::setUserInputEnabled(bool value)
 
     d->userInputEnabled = value;
     d->updateContents();
-}
-
-QnIOModuleMonitorPtr QnIoModuleOverlayWidget::getIOModuleMonitor() const
-{
-    return d_ptr->monitor;
 }
 
 /*

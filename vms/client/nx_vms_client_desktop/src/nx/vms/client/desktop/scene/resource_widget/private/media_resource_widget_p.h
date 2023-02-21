@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <camera/iomodule/iomodule_monitor.h>
 #include <core/ptz/ptz_constants.h>
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/elapsed_timer.h>
@@ -52,6 +53,8 @@ public:
     bool isPreviewSearchLayout = false;
     bool isAnalyticsSupported = false;
     QnUuid twoWayAudioWidgetId;
+
+    QnIOModuleMonitorPtr ioModuleMonitor;
 
     QScopedPointer<nx::vms::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;

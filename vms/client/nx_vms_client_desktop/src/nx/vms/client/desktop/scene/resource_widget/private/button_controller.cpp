@@ -29,7 +29,7 @@ ButtonController::ButtonController(QnMediaResourceWidget* mediaResourceWidget):
 
     m_ioModuleMonitor = mediaResourceWidget->getIOModuleMonitor();
 
-    if (m_ioModuleMonitor)
+    if (NX_ASSERT(m_ioModuleMonitor))
     {
         connect(m_ioModuleMonitor.get(), &QnIOModuleMonitor::ioStateChanged,
             this, [this](const QnIOStateData& value) { handleChangedIOState(value); },
@@ -136,7 +136,7 @@ QString ButtonController::getOutputId(nx::vms::api::ExtendedCameraOutput outputT
 
 void ButtonController::openIoModuleConnection()
 {
-    if (!m_ioModuleMonitor->connectionIsOpened())
+    if (NX_ASSERT(m_ioModuleMonitor) && !m_ioModuleMonitor->connectionIsOpened())
         m_ioModuleMonitor->open();
 }
 

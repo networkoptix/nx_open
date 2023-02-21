@@ -594,8 +594,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
             ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
             : 0.0;
 
-        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
-        m_ioModuleOverlayWidget->setIOModule(d->camera);
+        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget(d->camera, d->ioModuleMonitor);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
             accessController()->hasGlobalPermission(GlobalPermission::userInput));
@@ -2201,12 +2200,9 @@ double QnMediaResourceWidget::speed() const
         : reader->getSpeed();
 }
 
-QnIOModuleMonitorPtr QnMediaResourceWidget::getIOModuleMonitor() const
+QnIOModuleMonitorPtr QnMediaResourceWidget::getIOModuleMonitor()
 {
-    if (m_ioModuleOverlayWidget)
-        return m_ioModuleOverlayWidget->getIOModuleMonitor();
-
-    return {};
+    return d->ioModuleMonitor;
 }
 
 void QnMediaResourceWidget::updateCurrentUtcPosMs()
