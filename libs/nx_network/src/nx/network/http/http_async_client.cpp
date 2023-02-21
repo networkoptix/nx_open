@@ -129,9 +129,15 @@ bool AsyncClient::failed() const
 void AsyncClient::setKeepAlive(const KeepAliveOptions& keepAliveOptions)
 {
     if (m_socket)
-        m_socket->setKeepAlive(keepAliveOptions);
-    else
-        m_keepAliveOptions = keepAliveOptions;
+    {
+        if (!m_socket->setKeepAlive(keepAliveOptions))
+        {
+            NX_DEBUG(this, "URL %1. Error enabling TCP keep-alive: %2",
+                m_contentLocationUrl, SystemError::getLastOSErrorText());
+        }
+    }
+
+    m_keepAliveOptions = keepAliveOptions;
 }
 
 SystemError::ErrorCode AsyncClient::lastSysErrorCode() const
@@ -934,7 +940,13 @@ void AsyncClient::initiateTcpConnection()
             isSecureConnection, nx::network::NatTraversalSupport::enabled, ipVersion);
     m_socket->bindToAioThread(getAioThread());
     if (m_keepAliveOptions)
-        m_socket->setKeepAlive(*m_keepAliveOptions);
+    {
+        if (!m_socket->setKeepAlive(*m_keepAliveOptions))
+        {
+            NX_DEBUG(this, "URL %1. Error enabling TCP keep-alive: %2",
+                m_contentLocationUrl, SystemError::getLastOSErrorText());
+        }
+    }
 
     NX_VERBOSE(this, "Opening connection to %1. url %2, socket %3",
         remoteAddress, m_contentLocationUrl, m_socket->handle());
