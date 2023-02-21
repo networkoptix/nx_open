@@ -42,6 +42,8 @@ public:
 
     virtual std::optional<QString> filePath() const override;
 
+    virtual cf::future<cf::unit> stopArchivingAsync() override;
+
     virtual void writeLogHeader() override;
 
     const std::vector<std::unique_ptr<AbstractLogger>>& loggers() const;

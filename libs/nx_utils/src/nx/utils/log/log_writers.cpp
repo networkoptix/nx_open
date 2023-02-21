@@ -21,6 +21,11 @@ namespace nx {
 namespace utils {
 namespace log {
 
+cf::future<cf::unit> AbstractWriter::stopArchivingAsync()
+{
+    return cf::make_ready_future(cf::unit());
+}
+
 void StdOut::write(Level level, const QString& message)
 {
     writeImpl(level, message);
@@ -336,6 +341,43 @@ bool File::queueToArchive(nx::Locker<nx::Mutex>* lock)
     }
     m_archiveQueue--;
     return m_archiveQueue == 0;
+}
+
+cf::future<cf::unit> File::stopArchivingAsync()
+{
+    auto future = std::async(std::launch::async,
+        [&]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+
+            m_archiveQueue++;
+            while (m_archive.valid())
+            {
+                if (m_archiveQueue == 1)
+                {
+                    nx::Unlocker<nx::Mutex> unlocker(&lock);
+                    m_archive.get();
+                }
+                else
+                {
+                    nx::Unlocker<nx::Mutex> unlocker(&lock);
+                    try
+                    {
+                        m_archive.wait();
+                    }
+                    catch(const std::future_error& e)
+                    {
+                    }
+                }
+            }
+        });
+
+    return cf::initiate(
+        [future = std::move(future)]() mutable
+        {
+            future.get();
+            return cf::unit();
+        });
 }
 
 bool File::isCurrentLimitReached(nx::Locker<nx::Mutex>* /*lock*/)

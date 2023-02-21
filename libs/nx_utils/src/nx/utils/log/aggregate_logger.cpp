@@ -121,6 +121,23 @@ std::optional<QString> AggregateLogger::filePath() const
     return std::nullopt;
 }
 
+cf::future<cf::unit> AggregateLogger::stopArchivingAsync()
+{
+    std::vector<cf::future<cf::unit>> futures;
+    for (auto& logger: m_loggers)
+    {
+        futures.push_back(logger->stopArchivingAsync());
+    }
+
+    return cf::initiate(
+        [futures = std::move(futures)]() mutable
+        {
+            for (auto& future: futures)
+                future.get();
+            return cf::unit();
+        });
+}
+
 void AggregateLogger::writeLogHeader()
 {
     for (auto& logger: m_loggers)

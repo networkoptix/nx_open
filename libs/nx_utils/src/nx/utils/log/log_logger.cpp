@@ -181,6 +181,15 @@ std::optional<QString> Logger::filePath() const
     return std::nullopt;
 }
 
+cf::future<cf::unit> Logger::stopArchivingAsync()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_writer)
+        return m_writer->stopArchivingAsync();
+    else
+        return cf::make_ready_future(cf::unit());
+}
+
 void Logger::writeLogHeader()
 {
     const nx::utils::log::Tag kStart(QLatin1String("START"));
