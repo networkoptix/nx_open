@@ -79,6 +79,8 @@ public:
 
     Level maxLevel() const;
 
+    void stopArchiving();
+
 private:
     void updateMaxLevel();
 

@@ -49,6 +49,8 @@ public:
 
     virtual std::optional<QString> filePath() const override;
 
+    virtual cf::future<cf::unit> stopArchivingAsync() override;
+
     virtual void writeLogHeader() override;
 
     void setApplicationName(const QString& applicationName);
