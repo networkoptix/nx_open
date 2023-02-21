@@ -10,7 +10,7 @@ from itertools import chain
 from pathlib import Path
 
 
-required_conan_version = ">=1.38.0"
+required_conan_version = ">=1.53.0"
 
 
 # Conan does not provide a generator which makes it possible to easily access package folders for
