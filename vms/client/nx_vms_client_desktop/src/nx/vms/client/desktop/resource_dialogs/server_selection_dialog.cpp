@@ -9,7 +9,7 @@
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -69,13 +69,14 @@ QnMediaServerResourceList getAccessibleServers(
     const QnUserResourcePtr& currentUser,
     SystemContext* systemContext)
 {
-    using namespace nx::core::access;
-
     const auto resourcePool = systemContext->resourcePool();
-    const auto accessProvider = systemContext->resourceAccessProvider();
+    const auto accessManager = systemContext->resourceAccessManager();
 
-    return getAccessibleResources(currentUser,
-        resourcePool->getResources<QnMediaServerResource>(), accessProvider);
+    return resourcePool->servers().filtered(
+        [currentUser, accessManager](const QnResourcePtr& resource) -> bool
+        {
+            return accessManager->hasPermission(currentUser, resource, Qn::ViewContentPermission);
+        });
 }
 
 AbstractEntityPtr createServersEntity(

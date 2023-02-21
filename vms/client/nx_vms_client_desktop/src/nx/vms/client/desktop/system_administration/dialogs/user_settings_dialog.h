@@ -93,14 +93,23 @@ class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:
     SystemContextAware
 {
     using base_type = QmlDialogWithState<UserSettingsDialogState, QnUserResourcePtr>;
-
     Q_OBJECT
 
 public:
     enum DialogType
     {
-        createUser,
-        editUser
+        CreateUser,
+        EditUser
+    };
+
+    enum Tab
+    {
+        GeneralTab,
+        GroupsTab,
+        ResourcesTab,
+        GlobalPermissionsTab,
+
+        TabCount
     };
 
 public:
@@ -109,14 +118,13 @@ public:
         nx::vms::common::SystemContext* systemContext,
         QWidget* parent = nullptr);
 
-    ~UserSettingsDialog();
+    virtual ~UserSettingsDialog() override;
 
     void setUser(const QnUserResourcePtr& user);
+    void selectTab(Tab tab);
 
     Q_INVOKABLE QString validateLogin(const QString& login);
-
     Q_INVOKABLE QString validateEmail(const QString& email, bool forCloud = false);
-
     Q_INVOKABLE QString validateCurrentPassword(const QString& password);
 
     Q_INVOKABLE bool isConnectedToCloud() const;

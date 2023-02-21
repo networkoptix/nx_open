@@ -50,7 +50,6 @@ public:
     AbstractEntityPtr createLayoutsGroupEntity() const;
 
     AbstractEntityPtr createShowreelsGroupEntity() const;
-    AbstractEntityPtr createUsersGroupEntity() const;
     AbstractEntityPtr createWebPagesGroupEntity() const;
     AbstractEntityPtr createLocalFilesGroupEntity() const;
     AbstractEntityPtr createLocalOtherSystemsEntity() const;
@@ -80,10 +79,6 @@ public:
     AbstractEntityPtr createServerCamerasEntity(const QnMediaServerResourcePtr& server) const;
     AbstractEntityPtr createVideowallsEntity() const;
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;
-
-    AbstractEntityPtr createSubjectResourcesEntity(const QnResourceAccessSubject& subject) const;
-    AbstractEntityPtr createSubjectDevicesEntity(const QnResourceAccessSubject& subject) const;
-    AbstractEntityPtr createSubjectLayoutsEntity(const QnResourceAccessSubject& subject) const;
 
     AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes) const;
 

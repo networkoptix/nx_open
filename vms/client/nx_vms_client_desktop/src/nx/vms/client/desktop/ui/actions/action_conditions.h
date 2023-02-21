@@ -181,12 +181,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class StopSharingCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 /**
  * Base class for edge-specific action conditions.
  */

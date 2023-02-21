@@ -465,21 +465,6 @@ void initialize(Manager* manager, Action* root)
             && !condition::isShowreelReviewMode()
             && !condition::showreelIsRunning());
 
-    factory(ShareLayoutAction)
-        .mode(DesktopMode)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredAdminPermissions();
-
-    factory(ShareCameraAction)
-        .mode(DesktopMode)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredAdminPermissions();
-
-    factory(ShareWebPageAction)
-        .mode(DesktopMode)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredAdminPermissions();
-
     factory(SaveCurrentVideoWallReviewAction)
         .flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
         .mode(DesktopMode)
@@ -1393,14 +1378,6 @@ void initialize(Manager* manager, Action* root)
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(ConditionWrapper(new ResourceRemovalCondition()));
-
-    factory(StopSharingLayoutAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
-        .requiredAdminPermissions()
-        .text(ContextMenu::tr("Stop Sharing Layout"))
-        .shortcut("Del")
-        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(new StopSharingCondition());
 
     factory()
         .flags(Scene | Tree)

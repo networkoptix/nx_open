@@ -10,23 +10,21 @@ class QnResourcePool;
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
+/**
+ * Source of all non-fake servers in given resource pool.
+ */
 class ServerResourceSource: public AbstractResourceSource
 {
     Q_OBJECT
     using base_type = AbstractResourceSource;
 
 public:
-    ServerResourceSource(const QnResourcePool* resourcePool, bool displayReducedEdgeServers);
+    ServerResourceSource(const QnResourcePool* resourcePool);
 
     virtual QVector<QnResourcePtr> getResources() override;
 
 private:
-    void setupEdgeServerStateTracking(const QnMediaServerResourcePtr& server) const;
-    void updateEdgeServerReducedState(const QnResourcePtr& serverResource);
-
-private:
     const QnResourcePool* m_resourcePool;
-    const bool m_displayReducedEdgeServers;
 };
 
 } // namespace entity_resource_tree

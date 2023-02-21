@@ -19,8 +19,9 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -52,7 +53,8 @@ void ResourceTreeModelTest::SetUp()
 
     m_resourceTreeComposer.reset(new entity_resource_tree::ResourceTreeComposer(
         systemContext(),
-        nullptr));
+        /*resourceTreeSettings*/ nullptr));
+
     m_resourceTreeComposer->attachModel(m_newResourceTreeModel.get());
 }
 
@@ -60,6 +62,9 @@ void ResourceTreeModelTest::TearDown()
 {
     m_resourceTreeComposer.clear();
     m_newResourceTreeModel.clear();
+    logout();
+    systemContext()->accessRightsManager()->resetAccessRights({});
+    resourcePool()->clear();
 }
 
 QnResourcePool* ResourceTreeModelTest::resourcePool() const
@@ -425,17 +430,34 @@ void ResourceTreeModelTest::setupAccessToResourceForUser(
     const QnResourcePtr& resource,
     bool isAccessible) const
 {
-    NX_ASSERT(!user->getRawPermissions().testFlag(GlobalPermission::admin));
+    setupAccessToResourceForUser(user, resource, isAccessible
+        ? kViewAccessRights
+        : kNoAccessRights);
+}
 
-    const auto sharedResourcesManager = commonModule()->sharedResourcesManager();
-    auto sharedResources = sharedResourcesManager->sharedResources(user);
+void ResourceTreeModelTest::setupAccessToResourceForUser(
+    const QnUserResourcePtr& user,
+    const QnResourcePtr& resource,
+    nx::vms::api::AccessRights accessRights) const
+{
+    if (!NX_ASSERT(resource
+        && user
+        && !user->getRawPermissions().testFlag(GlobalPermission::admin)
+        && user->userRoleIds().empty()))
+    {
+        return;
+    }
 
-    if (isAccessible)
-        sharedResources.insert(resource->getId());
+    const auto userId = user->getId();
+    const auto accessRightsManager = commonModule()->systemContext()->accessRightsManager();
+
+    auto accessRightsMap = accessRightsManager->ownResourceAccessMap(userId);
+    if (accessRights != 0)
+        accessRightsMap.emplace(resource->getId(), accessRights);
     else
-        sharedResources.remove(resource->getId());
+        accessRightsMap.remove(resource->getId());
 
-    sharedResourcesManager->setSharedResources(user, sharedResources);
+    accessRightsManager->setOwnResourceAccessMap(userId, accessRightsMap);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsUserWithPermissions(

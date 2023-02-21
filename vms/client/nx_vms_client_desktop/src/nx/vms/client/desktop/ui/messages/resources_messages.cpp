@@ -29,15 +29,6 @@ namespace {
 /* Edit shared layout. */
 static const QString kSharedLayoutEditShowOnceKey("SharedLayoutEdit");
 
-/* Items are removed from user's layout, but access still persist. */
-static const QString kChangeUserLocalLayoutShowOnceKey("ChangeUserLocalLayout");
-
-/* Items are added to roled user's layout. */
-static const QString kAddToRoleLocalLayoutShowOnceKey("AddToRoleLocalLayout");
-
-/* Items are removed from roled user's layout, but access still persist. */
-static const QString kRemoveFromRoleLocalLayoutOnceKey("RemoveFromRoleLocalLayout");
-
 /* Removing multiple items from layout. */
 static const QString kRemoveItemsFromLayoutShowOnceKey("RemoveItemsFromLayout");
 
@@ -133,49 +124,12 @@ bool Resources::overrideShowreel(QWidget* parent)
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
-bool Resources::changeUserLocalLayout(QWidget* parent,
-    const QnResourceList& stillAccessible)
-{
-    return showCompositeDialog(parent, kChangeUserLocalLayoutShowOnceKey,
-        tr("User will still have access to %n removed resources:", "", stillAccessible.size()),
-        tr("To remove access, please go to User Settings."),
-        stillAccessible);
-}
-
-bool Resources::addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare)
-{
-    return showCompositeDialog(parent, kAddToRoleLocalLayoutShowOnceKey,
-        tr("All users with this role will get access to %n resources:", "", toShare.size()),
-        tr("To remove access, please go to Role Settings."),
-        toShare);
-}
-
-bool Resources::removeFromRoleLocalLayout(QWidget* parent,
-    const QnResourceList& stillAccessible)
-{
-    return showCompositeDialog(parent, kRemoveFromRoleLocalLayoutOnceKey,
-        tr("All users with this role will still have access to %n removed resources:",
-            "", stillAccessible.size()),
-        tr("To remove access, please go to Role Settings."),
-        stillAccessible);
-}
-
 bool Resources::sharedLayoutEdit(QWidget* parent)
 {
     return showCompositeDialog(parent, kSharedLayoutEditShowOnceKey,
         tr("Changes will affect other users"),
         tr("This layout is shared with other users, so you change it for them too."),
         QnResourceList(), /*useResources*/ false);
-}
-
-bool Resources::stopSharingLayouts(QWidget* parent,
-    const QnResourceList& resources, const QnResourceAccessSubject& subject)
-{
-    const QString text = (subject.user()
-        ? tr("User will lose access to %n resources:", "", resources.size())
-        : tr("All users with this role will lose access to %n resources:", "", resources.size()));
-
-    return showCompositeDialog(parent, QString(), text, QString(), resources);
 }
 
 bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,

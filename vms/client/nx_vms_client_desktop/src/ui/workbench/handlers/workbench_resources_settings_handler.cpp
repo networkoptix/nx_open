@@ -35,8 +35,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_roles_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -166,39 +164,22 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
-    // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
-    if (m_userSettingsDialog)
-        m_userSettingsDialog->close();
+    // Shows New User dialog as modal.
 
     const auto params = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(params, mainWindowWidget());
 
-    if (ini().enableNewUserSettings)
-    {
-        const QScopedPointer<UserSettingsDialog> dialog(
-            new UserSettingsDialog(UserSettingsDialog::createUser, systemContext(), parent));
-        dialog->setUser({});
-        dialog->exec(Qt::ApplicationModal);
-    }
-    else
-    {
-        const QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(parent));
+    const QScopedPointer<UserSettingsDialog> dialog(
+        new UserSettingsDialog(UserSettingsDialog::CreateUser, systemContext(), parent));
 
-        QnUserResourcePtr user(
-            new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
-        user->setRawPermissions(GlobalPermission::liveViewerPermissions);
-
-        dialog->setUser(user);
-        dialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
-        dialog->forcedUpdate();
-        dialog->exec();
-    }
+    dialog->setUser({});
+    dialog->exec(Qt::ApplicationModal);
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 {
     const auto params = menu()->currentParameters(sender());
-    const QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
+    const auto user = params.resource().dynamicCast<QnUserResource>();
     if (!user || user->hasFlags(Qn::removed))
         return;
 
@@ -209,98 +190,71 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 
     const auto parent = utils::extractParentWidget(params, mainWindowWidget());
 
-    if (ini().enableNewUserSettings)
+    if (!m_userSettingsDialog)
     {
-        if (!m_userSettingsDialog2)
-        {
-            m_userSettingsDialog2 = new UserSettingsDialog(
-                UserSettingsDialog::editUser,
-                systemContext(),
-                parent);
-        }
-
-        m_userSettingsDialog2->setTransientParent(parent);
-
-        m_userSettingsDialog2->setUser(user);
-
-        m_userSettingsDialog2->open();
-        m_userSettingsDialog2->raise();
+        m_userSettingsDialog = new UserSettingsDialog(
+            UserSettingsDialog::EditUser,
+            systemContext(),
+            parent);
     }
-    else
-    {
-        QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(
-            m_userSettingsDialog, parent);
 
-        // Navigating resource tree, we should not take focus. From System Administration - we must.
-        bool force = params.argument(Qn::ForceRole, false);
-        if (!force)
-            dialogConstructor.disableAutoFocus();
+    m_userSettingsDialog->setTransientParent(parent);
+    m_userSettingsDialog->setUser(user);
 
-        m_userSettingsDialog->setUser(user);
-        if (params.hasArgument(Qn::FocusTabRole))
-            m_userSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
-        m_userSettingsDialog->forcedUpdate();
-    }
+    bool hasTab = false;
+    const auto tab = params.argument(Qn::FocusTabRole).toInt(&hasTab);
+    if (hasTab)
+        m_userSettingsDialog->selectTab((UserSettingsDialog::Tab) tab);
+
+    m_userSettingsDialog->open();
+    m_userSettingsDialog->raise();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
+    const auto userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
-
-    if (ini().enableNewUserSettings)
+    // Group creation dialog is always modal.
+    if (userRoleId.isNull())
     {
-        // Group creation dialog is always modal.
-        if (userRoleId.isNull())
-        {
-            const QScopedPointer<GroupSettingsDialog> dialog(
-                new GroupSettingsDialog(
-                    GroupSettingsDialog::createGroup,
-                    dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
-                    parent));
-            dialog->setTransientParent(parent);
-            dialog->setGroup({});
-            dialog->exec(Qt::ApplicationModal);
-            return;
-        }
+        const QScopedPointer<GroupSettingsDialog> dialog(new GroupSettingsDialog(
+            GroupSettingsDialog::createGroup,
+            dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
+            parent));
 
-        if (const auto window = parameters.argument<QPointer<QQuickWindow>>(Qn::ParentWidgetRole))
-        {
-            const QScopedPointer<GroupSettingsDialog> dialog(
-                new GroupSettingsDialog(
-                    GroupSettingsDialog::editGroup,
-                    dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
-                    parent));
-            dialog->setTransientParent(window);
-            dialog->setGroup(userRoleId);
-            dialog->exec(Qt::ApplicationModal);
-            return;
-        }
-
-        if (!m_groupSettingsDialog2)
-        {
-            m_groupSettingsDialog2 =
-                new GroupSettingsDialog(
-                    GroupSettingsDialog::editGroup,
-                    dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
-                    parent);
-        }
-
-        m_groupSettingsDialog2->setTransientParent(parent);
-        m_groupSettingsDialog2->setGroup(userRoleId);
-        m_groupSettingsDialog2->open();
-        m_groupSettingsDialog2->raise();
+        dialog->setTransientParent(parent);
+        dialog->setGroup({});
+        dialog->exec(Qt::ApplicationModal);
+        return;
     }
-    else
+
+    if (const auto window = parameters.argument<QPointer<QQuickWindow>>(Qn::ParentWidgetRole))
     {
-        QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(parent));
-        if (!userRoleId.isNull())
-            dialog->selectUserRole(userRoleId);
+        const QScopedPointer<GroupSettingsDialog> dialog(new GroupSettingsDialog(
+            GroupSettingsDialog::editGroup,
+            dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
+            parent));
 
-        dialog->exec();
+        dialog->setTransientParent(window);
+        dialog->setGroup(userRoleId);
+        dialog->exec(Qt::ApplicationModal);
+        return;
     }
+
+    if (!m_groupSettingsDialog)
+    {
+        m_groupSettingsDialog = new GroupSettingsDialog(
+            GroupSettingsDialog::editGroup,
+            dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
+            parent);
+    }
+
+    m_groupSettingsDialog->setTransientParent(parent);
+    m_groupSettingsDialog->setGroup(userRoleId);
+    m_groupSettingsDialog->open();
+    m_groupSettingsDialog->raise();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()

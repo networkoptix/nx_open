@@ -7,7 +7,6 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <client/client_globals.h>
 
@@ -468,42 +467,6 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByAdvancedViewer)
     ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(recorderIndex));
 }
 
-TEST_F(ResourceTreeModelTest, recorderIsGroupedInCustomUserAccessibleCamerasList)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    // When advanced viewer is logged in.
-    loginAsAdmin("admin");
-
-    // When server is added to the resource pool.
-    const auto server = addServer("server");
-
-    // When recorder camera with unique group name is added to the server.
-    const auto recorderCamera =
-        addRecorderCamera(kUniqueCameraName, kUniqueGroupName, server->getId());
-
-    // When custom user is added to the resource pool.
-    const auto customUser = addUser("custom_user", {GlobalPermission::customUser});
-
-    // And access to that recorder is granted to the custom user.
-    setupAccessToResourceForUser(customUser, recorderCamera, true);
-
-    // Then exactly two indexes matching with recorder camera name found in the tree.
-    const auto cameraIndexes = allMatchingIndexes(kUniqueCameraNameCondition);
-    ASSERT_EQ(cameraIndexes.size(), 2);
-
-    // Then both are children of node with recorder group name.
-    ASSERT_TRUE(directChildOf(displayFullMatch(kUniqueGroupName))(cameraIndexes.first()));
-    ASSERT_TRUE(directChildOf(displayFullMatch(kUniqueGroupName))(cameraIndexes.last()));
-
-    // And access to recorder is taken from the custom user.
-    setupAccessToResourceForUser(customUser, recorderCamera, false);
-
-    // Then exactly one recorder camera node with corresponding display text appears in the tree.
-    const auto recorderIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-}
-
 TEST_F(ResourceTreeModelTest, singleCameraRecorderGroupExtraStatus)
 {
     // When user with administrator permissions is logged in.
@@ -683,7 +646,7 @@ TEST_F(ResourceTreeModelTest, expandedEdgeCameraNodeType)
     // When edge camera with certain unique name is added to the server.
     const auto camera = addEdgeCamera(kUniqueCameraName, server);
 
-    // When redundancy flag set to false.
+    // When redundancy flag set to true.
     server->setRedundancy(true);
 
     // Then exactly one camera node with corresponding display text appears in the resource tree.

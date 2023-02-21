@@ -15,7 +15,6 @@
 #include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/permissions_cache.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
@@ -268,6 +267,12 @@ bool QnResourceAccessManager::hasPermission(
         return false;
 
     return hasPermission(userResource, resource, permissions);
+}
+
+ResourceAccessDetails QnResourceAccessManager::accessDetails(
+    const QnUuid& subjectId, const QnResourcePtr& resource, AccessRight accessRight) const
+{
+    return m_accessRightsResolver->accessDetails(subjectId, resource, accessRight);
 }
 
 QnResourceAccessManager::Notifier* QnResourceAccessManager::createNotifier(QObject* parent)
@@ -584,10 +589,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             const auto camera = resourcePool()->getResourceById<QnResource>(ownerId);
             if (nx::vms::common::isIntercom(camera))
             {
-                if (hasAccessRights(subject, camera, AccessRight::userInput))
+                const auto intercomAccessRights = this->accessRights(subject, camera);
+                if (intercomAccessRights.testFlag(AccessRight::userInput))
                     return Qn::FullLayoutPermissions;
 
-                return Qn::ReadPermission;
+                return intercomAccessRights ? Qn::ReadPermission : Qn::NoPermissions;
             }
 
             // Checking other user's layout. Only users can have access to them.

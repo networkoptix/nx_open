@@ -6,11 +6,10 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
+#include <core/resource/resource_property_key.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -28,134 +27,148 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
+// ------------------------------------------------------------------------------------------------
+// IntercomManager::Private
+
 struct IntercomManager::Private: public QObject
 {
     IntercomManager* const q;
 
-    QnUserResourcePtr currentUser;
-
     Private(IntercomManager* owner):
         q(owner)
     {
-        connect(q->resourceAccessProvider(),
-            &nx::core::access::ResourceAccessProvider::accessChanged,
-            this,
-            [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+        connect(q->accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+            [this](const QnResourcePtr& resource)
             {
-                auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-                if (!camera)
-                    return;
-
-                if (!subject.isUser() || subject.user() != currentUser)
-                    return;
-
-                if (q->resourceAccessProvider()->hasAccess(currentUser, resource))
-                    tryCreateLayouts({camera});
-                else
-                    tryRemoveLayouts({camera}, /*localOnly*/ true);
+                const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+                if (camera && Private::isIntercom(camera))
+                    updateLocalLayouts({camera});
             });
 
-        auto camerasListener = new core::SessionResourcesSignalListener<
+        connect(q->accessController(), &QnWorkbenchAccessController::permissionsReset, this,
+            [this]() { updateLocalLayouts(getAllIntercomCameras()); });
+
+        tryCreateLayouts(getAllIntercomCameras());
+
+        const auto camerasListener = new core::SessionResourcesSignalListener<
             QnVirtualCameraResource>(this);
+
         camerasListener->setOnAddedHandler(
             [this](const QnVirtualCameraResourceList& cameras)
             {
-                tryCreateLayouts(cameras);
+                tryCreateLayouts(getIntercomCameras(cameras));
             });
+
         camerasListener->setOnRemovedHandler(
             [this](const QnVirtualCameraResourceList& cameras)
             {
-                tryRemoveLayouts(cameras);
+                tryRemoveLayouts(getIntercomCameras(cameras), /*localOnly*/ false);
             });
-        camerasListener->addOnSignalHandler(
-            &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
-            [this](const QnVirtualCameraResourcePtr& camera)
+
+        camerasListener->addOnPropertyChangedHandler(
+            [this](const QnVirtualCameraResourcePtr& camera, const QString& key)
             {
-                tryCreateLayouts({camera});
+                if (key == ResourcePropertyKey::kIoSettings && Private::isIntercom(camera))
+                    tryCreateLayouts({camera});
             });
 
         camerasListener->start();
+    }
 
-        const nx::vms::client::core::UserWatcher* userWatcher = q->systemContext()->userWatcher();
-        currentUser = userWatcher->user();
-        connect(userWatcher, &nx::vms::client::core::UserWatcher::userChanged,
-            [this](const QnUserResourcePtr& user)
-            {
-                currentUser = user;
-                if (currentUser)
-                    tryCreateLayouts(currentUser->resourcePool()->getAllCameras());
-            });
-
-        auto currentUserListener = new core::SessionResourcesSignalListener<QnUserResource>(this);
-        currentUserListener->setOnRemovedHandler(
-            [this](const QnUserResourceList& users)
-            {
-                if (currentUser && users.contains(currentUser))
-                    currentUser.reset();
-            });
-        currentUserListener->start();
+    static bool isIntercom(const QnVirtualCameraResourcePtr& camera)
+    {
+        const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
+        return NX_ASSERT(clientCamera) && clientCamera->isIntercom();
     }
 
     QnVirtualCameraResourceList getIntercomCameras(
         const QnVirtualCameraResourceList& cameras) const
     {
-        return cameras.filtered(
-            [](const QnVirtualCameraResourcePtr& camera)
-            {
-                const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
-                return NX_ASSERT(clientCamera) && clientCamera->isIntercom();
-            });
+        return cameras.filtered(&Private::isIntercom);
     }
 
-    void tryCreateLayouts(const QnVirtualCameraResourceList& cameras)
+    QnVirtualCameraResourceList getAllIntercomCameras() const
     {
-        const QnVirtualCameraResourceList intercomCameras = getIntercomCameras(cameras);
+        const auto currentUser = q->accessController()->user();
+        return currentUser
+            ? getIntercomCameras(q->resourcePool()->getAllCameras())
+            : QnVirtualCameraResourceList{};
+    }
 
+    bool hasAccess(const QnVirtualCameraResourcePtr& camera)
+    {
+        return q->accessController()->hasPermissions(camera, Qn::ReadPermission);
+    }
+
+    void tryCreateLayouts(const QnVirtualCameraResourceList& intercomCameras)
+    {
         for (const auto& intercom: intercomCameras)
             tryCreateIntercomLocalLayout(intercom);
     }
 
-    void tryRemoveLayouts(const QnVirtualCameraResourceList& cameras, bool localOnly = false)
+    void tryRemoveLayouts(
+        const QnVirtualCameraResourceList& intercomCameras, bool localOnly)
     {
-        const QnVirtualCameraResourceList intercomCameras = getIntercomCameras(cameras);
-
         for (const auto& intercom: intercomCameras)
             tryRemoveIntercomLayout(intercom, localOnly);
     }
 
-    void tryCreateIntercomLocalLayout(const QnResourcePtr& intercom)
+    void updateLocalLayouts(const QnVirtualCameraResourceList& intercomCameras)
     {
-        if (!q->resourceAccessProvider()->hasAccess(currentUser, intercom))
+        QnVirtualCameraResourceList accessible;
+        QnVirtualCameraResourceList inaccessible;
+
+        for (const auto& intercom: intercomCameras)
+        {
+            auto* target = hasAccess(intercom) ? &accessible : &inaccessible;
+            target->push_back(intercom);
+        }
+
+        tryRemoveLayouts(inaccessible, /*localOnly*/ true);
+        tryCreateLayouts(accessible);
+    }
+
+    void tryCreateIntercomLocalLayout(const QnVirtualCameraResourcePtr& intercomCamera)
+    {
+        if (!NX_ASSERT(Private::isIntercom(intercomCamera)) || !hasAccess(intercomCamera))
             return;
 
-        auto resourcePool = intercom->resourcePool();
+        auto resourcePool = intercomCamera->resourcePool();
+        if (!NX_ASSERT(resourcePool == q->resourcePool()))
+            return;
 
-        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercom);
-        auto layoutResource = resourcePool->getResourceById(intercomLayoutId);
+        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
+        auto layoutResource = q->resourcePool()->getResourceById(intercomLayoutId);
 
         if (!layoutResource)
         {
-            LayoutResourcePtr intercomLayout = layoutFromResource(intercom);
-            intercomLayout->setName(tr("%1 Layout").arg(intercom->getName()));
+            LayoutResourcePtr intercomLayout = layoutFromResource(intercomCamera);
+            intercomLayout->setName(tr("%1 Layout").arg(intercomCamera->getName()));
             intercomLayout->setIdUnsafe(intercomLayoutId);
             intercomLayout->addFlags(Qn::local_intercom_layout);
-            intercomLayout->setParentId(intercom->getId());
+            intercomLayout->setParentId(intercomCamera->getId());
 
             resourcePool->addNewResources({intercomLayout});
         }
     }
 
-    void tryRemoveIntercomLayout(const QnResourcePtr& intercom, bool localOnly)
+    void tryRemoveIntercomLayout(const QnVirtualCameraResourcePtr& intercomCamera, bool localOnly)
     {
-        auto resourcePool = intercom->resourcePool();
+        if (!NX_ASSERT(Private::isIntercom(intercomCamera)))
+            return;
 
-        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercom);
+        auto resourcePool = intercomCamera->resourcePool();
+        if (!NX_ASSERT(resourcePool == q->resourcePool()))
+            return;
+
+        const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
         QnResourcePtr layoutResource = resourcePool->getResourceById(intercomLayoutId);
 
         if (layoutResource && !layoutResource->hasFlags(Qn::removed))
@@ -174,7 +187,10 @@ struct IntercomManager::Private: public QObject
             }
         }
     }
-}; // struct IntercomManager::Private
+};
+
+// ------------------------------------------------------------------------------------------------
+// IntercomManager
 
 IntercomManager::IntercomManager(
     nx::vms::client::desktop::SystemContext* systemContext,

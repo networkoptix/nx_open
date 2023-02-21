@@ -14,7 +14,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -1279,7 +1278,6 @@ void ConnectActionsHandler::clearConnection()
     }
 
     resourceAccessManager()->beginUpdate();
-    resourceAccessProvider()->beginUpdate();
 
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
@@ -1293,7 +1291,6 @@ void ConnectActionsHandler::clearConnection()
     systemContext()->resourceStatusDictionary()->clear(idList);
     systemContext()->licensePool()->reset();
 
-    resourceAccessProvider()->endUpdate();
     resourceAccessManager()->endUpdate();
 }
 

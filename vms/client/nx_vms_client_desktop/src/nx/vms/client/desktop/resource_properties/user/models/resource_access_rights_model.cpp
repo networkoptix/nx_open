@@ -95,10 +95,6 @@ struct ResourceAccessRightsModel::Private
 
     bool isEditable(int index) const;
 
-    QString accessDetailsText(
-        const QnUuid& resourceId,
-        nx::vms::api::AccessRight accessRight) const;
-
     QString accessDetailsText(const ResourceAccessInfo& accessInfo) const;
 };
 
@@ -551,60 +547,6 @@ void ResourceAccessRightsModel::Private::countGroupResources(
         {
             return accessMap.value(resource->getId()).testFlag(accessRight);
         });
-}
-
-QString ResourceAccessRightsModel::Private::accessDetailsText(
-    const QnUuid& resourceId,
-    nx::vms::api::AccessRight accessRight) const
-{
-    using namespace nx::vms::common;
-
-    if (!resource)
-        return {};
-
-    const auto resourcePool = resource->systemContext()->resourcePool();
-    const auto resource = resourcePool->getResourceById(resourceId);
-    if (!resource)
-        return {};
-
-    const auto details = context->accessDetails(resource, accessRight);
-
-    if (details.isEmpty())
-        return {};
-
-    QStringList descriptions;
-
-    for (const auto& id: details.keys())
-    {
-        if (id == context->currentSubjectId())
-        {
-            for (const auto& sharedResource: details.value(id))
-            {
-                if (sharedResource->getId() == resourceId)
-                {
-                    descriptions << tr("Direct access");
-                }
-                else if (auto layout = sharedResource.dynamicCast<QnLayoutResource>())
-                {
-                    descriptions << tr("Access granted by %1 layout").arg(
-                        html::bold(layout->getName()));
-                }
-                else if (auto videoWall = sharedResource.dynamicCast<QnVideoWallResource>())
-                {
-                    descriptions << tr("Access granted by %1 video wall").arg(
-                        html::bold(videoWall->getName()));
-                }
-            }
-        }
-        else if (const auto group = resource->systemContext()->userRolesManager()->userRole(id);
-            !group.name.isEmpty())
-        {
-            descriptions << tr("Access granted by %1 group").arg(
-                html::bold(group.name));
-        }
-    }
-
-    return descriptions.join("<br>");
 }
 
 QString ResourceAccessRightsModel::Private::accessDetailsText(

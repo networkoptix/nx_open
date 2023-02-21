@@ -45,7 +45,6 @@ private:
 private:
     QPointer<nx::vms::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnServerSettingsDialog> m_serverSettingsDialog;
-    QPointer<QnUserSettingsDialog> m_userSettingsDialog;
-    QPointer<nx::vms::client::desktop::UserSettingsDialog> m_userSettingsDialog2;
-    QPointer<nx::vms::client::desktop::GroupSettingsDialog> m_groupSettingsDialog2;
+    QPointer<nx::vms::client::desktop::UserSettingsDialog> m_userSettingsDialog;
+    QPointer<nx::vms::client::desktop::GroupSettingsDialog> m_groupSettingsDialog;
 };

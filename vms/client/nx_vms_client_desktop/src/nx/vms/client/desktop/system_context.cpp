@@ -210,8 +210,13 @@ RestApiHelper* SystemContext::restApiHelper() const
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
+    if (mode() != Mode::client)
+        return;
 
-    auto clientMessageProcessor = static_cast<QnClientMessageProcessor*>(messageProcessor);
+    auto clientMessageProcessor = qobject_cast<QnClientMessageProcessor*>(messageProcessor);
+    if (!NX_ASSERT(clientMessageProcessor, "Invalid message processor type"))
+        return;
+
     d->incompatibleServerWatcher->setMessageProcessor(clientMessageProcessor);
     d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);

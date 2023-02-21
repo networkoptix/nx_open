@@ -109,6 +109,11 @@ protected:
         const QnResourcePtr& resource,
         bool isAccessible) const;
 
+    void setupAccessToResourceForUser(
+        const QnUserResourcePtr& user,
+        const QnResourcePtr& resource,
+        nx::vms::api::AccessRights accessRights) const;
+
     QnUserResourcePtr loginAsUserWithPermissions(const QString& name,
         nx::vms::api::GlobalPermissions permissions,
         bool isOwner = false) const;

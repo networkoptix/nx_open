@@ -121,13 +121,6 @@ QnResourceAccessManager* QnCommonModule::resourceAccessManager() const
         : nullptr;
 }
 
-nx::core::access::ResourceAccessProvider* QnCommonModule::resourceAccessProvider() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->resourceAccessProvider()
-        : nullptr;
-}
-
 QnResourceAccessSubjectsCache* QnCommonModule::resourceAccessSubjectsCache() const
 {
     return NX_ASSERT(d->systemContext)

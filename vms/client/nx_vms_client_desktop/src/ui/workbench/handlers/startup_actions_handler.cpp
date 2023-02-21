@@ -18,7 +18,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
@@ -75,13 +75,13 @@ QnLayoutResourcePtr findAvailableLayoutByName(const QnUserResourcePtr& user, QSt
     if (!NX_ASSERT(user->systemContext()))
         return {};
 
-    const auto accessProvider = user->systemContext()->resourceAccessProvider();
+    const auto accessManager = user->systemContext()->resourceAccessManager();
 
     const auto filter =
         [&](const QnLayoutResourcePtr& layout)
         {
             return layout->getName() == layoutName
-                && accessProvider->hasAccess(user, layout);
+                && accessManager->hasPermission(user, layout, Qn::ReadPermission);
         };
 
     const auto layouts = user->resourcePool()->getResources<QnLayoutResource>(filter);

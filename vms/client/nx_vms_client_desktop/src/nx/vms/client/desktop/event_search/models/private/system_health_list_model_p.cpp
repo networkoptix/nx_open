@@ -30,13 +30,14 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
-// TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
-#include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
-#include <ui/dialogs/system_administration_dialog.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
+
+// TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
+#include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 
 namespace nx::vms::client::desktop {
 
@@ -528,8 +529,9 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
     {
         case QnSystemHealth::EmailIsEmpty:
             return action::Parameters(context()->user())
+                // TODO: Support `FocusElementRole` in the new dialog.
                 .withArgument(Qn::FocusElementRole, lit("email"))
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+                .withArgument(Qn::FocusTabRole, UserSettingsDialog::GeneralTab);
 
         case QnSystemHealth::UsersEmailIsEmpty:
         {
@@ -538,8 +540,9 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
                 return {};
 
             return action::Parameters(users.front())
+                // TODO: Support `FocusElementRole` in the new dialog.
                 .withArgument(Qn::FocusElementRole, lit("email"))
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+                .withArgument(Qn::FocusTabRole, UserSettingsDialog::GeneralTab);
         }
 
         case QnSystemHealth::NoInternetForTimeSync:

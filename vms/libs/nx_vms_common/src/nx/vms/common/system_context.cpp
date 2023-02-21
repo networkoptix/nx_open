@@ -12,12 +12,6 @@
 #include <core/resource_access/deprecated_access_rights_converter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/global_permissions_watcher.h>
-#include <core/resource_access/providers/intercom_layout_access_provider.h>
-#include <core/resource_access/providers/permissions_resource_access_provider.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_access/providers/shared_layout_item_access_provider.h>
-#include <core/resource_access/providers/shared_resource_access_provider.h>
-#include <core/resource_access/providers/videowall_item_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
@@ -67,7 +61,6 @@ struct SystemContext::Private
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
     std::unique_ptr<QnResourceAccessSubjectsCache> resourceAccessSubjectCache;
     std::unique_ptr<DeprecatedAccessRightsConverter> deprecatedAccessRightsConverter;
-    std::unique_ptr<ResourceAccessProvider> resourceAccessProvider;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<ShowreelManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
@@ -133,22 +126,6 @@ SystemContext::SystemContext(
     // Depends on resource pool, roles and global permissions.
     d->resourceAccessSubjectCache = std::make_unique<QnResourceAccessSubjectsCache>(this);
 
-    // Depends on resource pool, roles and shared resources.
-    d->resourceAccessProvider =
-        std::make_unique<ResourceAccessProvider>(resourceAccessMode, this);
-
-    // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
-    d->resourceAccessProvider->addBaseProvider(
-        new PermissionsResourceAccessProvider(resourceAccessMode, this));
-    d->resourceAccessProvider->addBaseProvider(
-        new SharedResourceAccessProvider(resourceAccessMode, this));
-    d->resourceAccessProvider->addBaseProvider(
-        new SharedLayoutItemAccessProvider(resourceAccessMode, this));
-    d->resourceAccessProvider->addBaseProvider(
-        new VideoWallItemAccessProvider(resourceAccessMode, this));
-    d->resourceAccessProvider->addBaseProvider(
-        new core::access::IntercomLayoutAccessProvider(resourceAccessMode, this));
-
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(this);
 
@@ -174,7 +151,6 @@ SystemContext::SystemContext(
 SystemContext::~SystemContext()
 {
     d->resourcePool->threadPool()->waitForDone();
-    d->resourceAccessProvider->clear();
 }
 
 const QnUuid& SystemContext::peerId() const
@@ -343,11 +319,6 @@ QnResourceAccessSubjectsCache* SystemContext::resourceAccessSubjectsCache() cons
 ResourceAccessSubjectHierarchy* SystemContext::accessSubjectHierarchy() const
 {
     return d->accessSubjectHierarchy.get();
-}
-
-ResourceAccessProvider* SystemContext::resourceAccessProvider() const
-{
-    return d->resourceAccessProvider.get();
 }
 
 ShowreelManager* SystemContext::showreelManager() const

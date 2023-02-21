@@ -10,8 +10,6 @@
 
 #include "abstract_resource_source.h"
 
-namespace nx::core::access { class ResourceAccessProvider; }
-
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
@@ -23,7 +21,6 @@ class AccessibleResourceProxySource: public AbstractResourceSource, public Syste
 public:
     AccessibleResourceProxySource(
         SystemContext* systemContext,
-        const nx::core::access::ResourceAccessProvider* accessProvider,
         const QnResourceAccessSubject& accessSubject,
         const std::unique_ptr<AbstractResourceSource> baseResourceSource);
 
@@ -31,7 +28,9 @@ public:
     virtual QVector<QnResourcePtr> getResources() override;
 
 private:
-    const nx::core::access::ResourceAccessProvider* m_accessProvider;
+    bool hasAccess(const QnResourcePtr& resource) const;
+
+private:
     QnResourceAccessSubject m_accessSubject;
     std::unique_ptr<AbstractResourceSource> m_baseResourceSource;
     QSet<QnResourcePtr> m_acceptedResources;

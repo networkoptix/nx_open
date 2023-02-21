@@ -21,9 +21,6 @@ public:
     static bool overrideLayout(QWidget* parent);
     static bool overrideShowreel(QWidget* parent);
 
-    static bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
-    static bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);
-    static bool removeFromRoleLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
     static bool sharedLayoutEdit(QWidget* parent);
     static bool stopSharingLayouts(QWidget* parent, const QnResourceList& mediaResources,
         const QnResourceAccessSubject& subject);

@@ -20,7 +20,6 @@ class SystemContext;
 
 } // namespace nx::vms::common
 
-namespace nx::core::access { class ResourceAccessProvider; }
 namespace nx::metrics { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
@@ -74,7 +73,6 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;

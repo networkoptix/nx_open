@@ -107,9 +107,6 @@ void ResourceTreeComposer::rebuildEntity()
         composition->setSubEntity(videowallsList, m_entityBuilder->createVideowallsEntity());
         composition->setSubEntity(webPagesGroup, m_entityBuilder->createWebPagesGroupEntity());
 
-        if (isAdmin && !ini().enableNewUserSettings)
-            composition->setSubEntity(usersGroup, m_entityBuilder->createUsersGroupEntity());
-
         composition->setSubEntity(
             otherSystemsGroup, m_entityBuilder->createOtherSystemsGroupEntity());
 

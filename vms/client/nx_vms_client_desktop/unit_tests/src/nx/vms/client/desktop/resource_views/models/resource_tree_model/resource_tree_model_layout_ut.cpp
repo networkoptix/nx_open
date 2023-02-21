@@ -162,28 +162,6 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsEditableByAdmin)
     ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
 }
 
-TEST_F(ResourceTreeModelTest, otherUserLayoutIsEditableByAdmin)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
-
-    // When non-admin user is added to the resource pool.
-    const auto liveViewerUser =
-        addUser("live_viever", nx::vms::api::GlobalPermission::liveViewerPermissions);
-
-    // When layout with unique name owned by non-admin user is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, liveViewerUser->getId());
-
-    // Then exactly one node with corresponding display text appears in the resource tree.
-    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
-
-    // And it has editable flag.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
-}
-
 TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByNonAdmin)
 {
     // When user without administrator permissions is logged in.
@@ -280,54 +258,6 @@ TEST_F(ResourceTreeModelTest, layoutNodeIsDragEnabled)
 
     // And that node is draggable.
     ASSERT_TRUE(hasFlag(Qt::ItemIsDragEnabled)(layoutIndex));
-}
-
-TEST_F(ResourceTreeModelTest, anotherUserLayoutShownUnderUserNode)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    // String constants
-    static constexpr auto kUniqueUserName = "unique_user_name";
-
-    // When user with unique name and administrator permissions is added to the resource pool.
-    const auto adminUser = addUser(kUniqueUserName, GlobalPermission::adminPermissions);
-
-    // When owned layout with certain unique name is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, adminUser->getId());
-
-    // When administrator user is logged in (not layout owner).
-    loginAsAdmin("admin");
-
-    // Then exactly one node with corresponding layout display text appears in the resource tree.
-    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
-
-    // And this node is child of user node.
-    ASSERT_TRUE(directChildOf(displayFullMatch(kUniqueUserName))(layoutIndex));
-}
-
-TEST_F(ResourceTreeModelTest, anotherUserLayoutAppearsUnderUserNodeWithinUserSession)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    // String constants
-    static constexpr auto kUniqueUserName = "unique_user_name";
-
-    // When user with unique name and administrator permissions is added to the resource pool.
-    const auto adminUser = addUser(kUniqueUserName, GlobalPermission::adminPermissions);
-
-    // When administrator user is logged in.
-    loginAsAdmin("admin");
-
-    // When layout with certain unique name owned by another user is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, adminUser->getId());
-
-    // Then exactly one node with corresponding layout display text appears in the resource tree.
-    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
-
-    // And this node is child of user node.
-    ASSERT_TRUE(directChildOf(displayFullMatch(kUniqueUserName))(layoutIndex));
 }
 
 TEST_F(ResourceTreeModelTest, dontShowServiceLayoutsWhileInLayoutSearchMode)

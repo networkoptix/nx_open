@@ -82,14 +82,7 @@ private:
     bool confirmLayoutChange(const LayoutChange& change, const QnResourcePtr& layoutOwner);
 
     bool confirmChangeSharedLayout(const LayoutChange& change);
-    bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
     bool confirmChangeVideoWallLayout(const LayoutChange& change);
-
-    /**
-     * If user has custom access rights, he must be given direct access to cameras on changed local
-     * layout.
-     */
-    void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
     bool canRemoveLayouts(const LayoutResourceList& layouts);
 

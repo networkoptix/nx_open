@@ -305,7 +305,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
                 action::RemoveLayoutItemAction,
                 action::RemoveLayoutItemFromSceneAction,
                 action::RemoveFromServerAction,
-                action::StopSharingLayoutAction,
                 action::RemoveShowreelAction})
             {
                 action(actionId)->setEnabled(!isWebView);

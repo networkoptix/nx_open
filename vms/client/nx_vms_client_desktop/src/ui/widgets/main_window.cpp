@@ -70,7 +70,6 @@
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/handlers/workbench_permissions_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_resource_grouping_action_handler.h>
 #include <ui/workbench/handlers/workbench_resources_settings_handler.h>
@@ -273,7 +272,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<WorkbenchExportHandler>();
     context->instance<ui::workbench::LayoutsHandler>();
-    context->instance<PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<DebugActionsHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
@@ -357,7 +355,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::RemoveLayoutItemAction));
     addAction(action(action::RemoveLayoutItemFromSceneAction));
     addAction(action(action::RemoveFromServerAction));
-    addAction(action(action::StopSharingLayoutAction));
     addAction(action(action::DeleteVideoWallItemAction));
     addAction(action(action::DeleteVideowallMatrixAction));
     addAction(action(action::RemoveShowreelAction));
