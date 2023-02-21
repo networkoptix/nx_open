@@ -238,7 +238,13 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
 {
     base_type::setMessageProcessor(messageProcessor);
 
-    auto clientMessageProcessor = static_cast<QnClientMessageProcessor*>(messageProcessor);
+    auto clientMessageProcessor = qobject_cast<QnClientMessageProcessor*>(messageProcessor);
+    if (!NX_ASSERT(clientMessageProcessor, "Invalid message processor type"))
+        return;
+
+    if (!vmsRulesEngine())
+        return;
+
     nx::vms::rules::EngineHolder::connectEngine(
         vmsRulesEngine(),
         clientMessageProcessor,

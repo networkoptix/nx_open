@@ -17,7 +17,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -587,7 +586,6 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
             result += kDelimiter + tr("and %n more...", "", moreCameras);
     }
 
-
     return result;
 }
 
@@ -598,7 +596,8 @@ bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
     NX_ASSERT(camera, "Resource is not a camera");
     if (!camera)
         return false;
-    return resourceAccessProvider()->hasAccess(context()->user(), camera);
+
+    return accessController()->hasPermissions(camera, Qn::ReadPermission);
 }
 
 bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const

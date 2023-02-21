@@ -332,14 +332,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
         serverExpander,
         serversOrder());
 
-    const bool showReducedEdgeServers =
-        user().isNull()
-        || !user()->systemContext()->resourceAccessManager()->hasGlobalPermission(
-            user(),
-            GlobalPermission::customUser);
-
     serversGroupList->installItemSource(
-        m_itemKeySourcePool->serversSource(user(), showReducedEdgeServers));
+        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ true));
 
     return makeFlatteningGroup(
         m_itemFactory->createServersItem(),
@@ -518,7 +512,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableMediaEntity() 
         healthMonitorItemCreator,
         serversOrder());
     healthMonitorsList->installItemSource(
-        m_itemKeySourcePool->serversSource(user(), /*showReducedEdgeServers*/ false));
+        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
     shareableMediaComposition->addSubEntity(std::move(healthMonitorsList));
 
     auto webPagesList = makeKeyList<QnResourcePtr>(
@@ -557,7 +551,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllServersEntity() const
         resourceItemCreator(m_itemFactory.get(), user()), numericOrder());
 
     allServersList->installItemSource(
-        m_itemKeySourcePool->serversSource(user(), /*withEdgeServers*/ true));
+        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ true));
 
     return allServersList;
 }
@@ -762,64 +756,6 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalFilesGroupEntity() const
         std::move(localResourceComposition));
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createUsersGroupEntity() const
-{
-    auto userExpander =
-        [this](const QnResourcePtr& resource)
-        {
-            return createSubjectResourcesEntity(resource.staticCast<QnUserResource>());
-        };
-
-    auto userRoleExpander =
-        [this](const QnUuid& roleId)
-        {
-            auto roleUserExpander =
-                [this](const QnResourcePtr& resource)
-                {
-                    return createSubjectLayoutsEntity(resource.staticCast<QnUserResource>());
-                };
-
-            auto roleUsersList = makeUniqueKeyGroupList<QnResourcePtr>(
-                resourceItemCreator(m_itemFactory.get(), user()),
-                roleUserExpander,
-                numericOrder());
-
-            roleUsersList->installItemSource(m_itemKeySourcePool->roleUsersSource(roleId));
-
-            auto roleUsersResources = createSubjectResourcesEntity(
-                systemContext()->userRolesManager()->userRole(roleId));
-
-            auto roleUsersComposition = std::make_unique<CompositionEntity>();
-            roleUsersComposition->addSubEntity(std::move(roleUsersResources));
-            roleUsersComposition->addSubEntity(std::move(roleUsersList));
-            return roleUsersComposition;
-        };
-
-    auto rolesGroupList = makeUniqueKeyGroupList<QnUuid>(
-        [this](const QnUuid& roleId) { return m_itemFactory->createUserRoleItem(roleId); },
-        userRoleExpander,
-        numericOrder());
-
-    rolesGroupList->installItemSource(m_itemKeySourcePool->userRolesSource());
-
-    auto plainUsersList = makeUniqueKeyGroupList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), user()),
-        userExpander,
-        layoutsOrder(),
-        {Qn::GlobalPermissionsRole});
-
-    plainUsersList->installItemSource(m_itemKeySourcePool->usersSource(user()));
-
-    auto usersComposition = std::make_unique<CompositionEntity>();
-    usersComposition->addSubEntity(std::move(rolesGroupList));
-    usersComposition->addSubEntity(std::move(plainUsersList));
-
-    return makeFlatteningGroup(
-        m_itemFactory->createUsersItem(),
-        std::move(usersComposition),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy);
-}
-
 AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
 {
     auto videowallExpander =
@@ -952,104 +888,6 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() con
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectResourcesEntity(
-    const QnResourceAccessSubject& subject) const
-{
-    auto userResourcesGroupContents = std::make_unique<CompositionEntity>();
-
-    userResourcesGroupContents->addSubEntity(createSubjectDevicesEntity(subject));
-    userResourcesGroupContents->addSubEntity(createSubjectLayoutsEntity(subject));
-
-    return userResourcesGroupContents;
-}
-
-AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectDevicesEntity(
-    const QnResourceAccessSubject& subject) const
-{
-    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
-    using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
-
-    const auto globalPermissionsManager = systemContext()->globalPermissionsManager();
-    if (globalPermissionsManager->hasGlobalPermission(subject, GlobalPermission::accessAllMedia))
-        return makeSingleItemEntity(m_itemFactory->createAllCamerasAndResourcesItem());
-
-    const auto recorderGroupCreator = recorderGroupItemCreator(m_itemFactory.get(),
-        m_recorderItemDataHelper, user());
-
-    const GroupingRule recordersGroupingRule =
-        {recorderCameraGroupIdGetter(),
-        recorderGroupCreator,
-        Qn::CameraGroupIdRole,
-        1, //< Dimension.
-        numericOrder()};
-
-    auto devicesList = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        sharedResourceItemCreator(m_itemFactory.get(), user()),
-        Qn::ResourceRole,
-        layoutItemsOrder(),
-        GroupingRuleStack{recordersGroupingRule});
-
-    devicesList->installItemSource(m_itemKeySourcePool->userAccessibleDevicesSource(subject));
-
-    return makeFlatteningGroup(
-        m_itemFactory->createSharedResourcesItem(),
-        std::move(devicesList),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
-}
-
-AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
-    const QnResourceAccessSubject& subject) const
-{
-    auto layoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
-        subjectLayoutItemCreator(m_itemFactory.get(), user()),
-        [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
-        layoutsOrder());
-
-    if (subject.isRole())
-    {
-        layoutsList->installItemSource(m_itemKeySourcePool->directlySharedLayoutsSource(subject));
-
-        return makeFlatteningGroup(
-            m_itemFactory->createSharedLayoutsItem(/*useRegularAppearance*/ false),
-            std::move(layoutsList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
-    }
-
-    if (!subject.user()->userRoleIds().empty())
-    {
-        layoutsList->installItemSource(m_itemKeySourcePool->userLayoutsSource(subject.user()));
-        return layoutsList;
-    }
-
-    if (subject.user()->userRole() == Qn::UserRole::customPermissions)
-    {
-        layoutsList->installItemSource(
-            m_itemKeySourcePool->sharedAndOwnLayoutsSource(subject));
-
-        return makeFlatteningGroup(
-            m_itemFactory->createSharedLayoutsItem(/*useRegularAppearance*/ true),
-            std::move(layoutsList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
-    }
-
-    const auto globalPermissionsManager = systemContext()->globalPermissionsManager();
-    if (globalPermissionsManager->hasGlobalPermission(subject, GlobalPermission::admin))
-    {
-        layoutsList->installItemSource(m_itemKeySourcePool->userLayoutsSource(subject.user()));
-        auto adminLayoutsComposition = std::make_unique<CompositionEntity>();
-        adminLayoutsComposition->addSubEntity(
-            makeSingleItemEntity(m_itemFactory->createAllSharedLayoutsItem()));
-        adminLayoutsComposition->addSubEntity(std::move(layoutsList));
-
-        return adminLayoutsComposition;
-    }
-
-    layoutsList->installItemSource(
-        m_itemKeySourcePool->sharedAndOwnLayoutsSource(subject));
-
-    return layoutsList;
-}
-
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
     ResourceTree::ResourceFilters resourceTypes) const
 {
@@ -1115,7 +953,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             serversOrder());
 
         healthMonitorsList->installItemSource(
-            m_itemKeySourcePool->serversSource(user(), /*showReducedEdgeServers*/ false));
+            m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
 
         if (resourceTypes == (int) ResourceTree::ResourceFilter::healthMonitors)
             return healthMonitorsList; //< Only health monitors, return without a group element.

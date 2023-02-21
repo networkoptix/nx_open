@@ -32,7 +32,7 @@ public:
      * Provides all non-fake servers in the system.
      */
     UniqueResourceSourcePtr serversSource(const QnResourceAccessSubject& accessSubject,
-        bool withEdgeServers);
+        bool reduceEdgeServers);
 
     using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
 
@@ -77,11 +77,6 @@ public:
     UniqueResourceSourcePtr shareableLayoutsSource(const QnUserResourcePtr& user);
 
     /**
-     * Provides layout resources stored in the resource pool which owned by the given user.
-     */
-    UniqueResourceSourcePtr userLayoutsSource(const QnUserResourcePtr& user);
-
-    /**
      * Provides users resources stored in the resource pool which doesn't belong to any
      * role.
      */
@@ -92,24 +87,6 @@ public:
      * given ID.
      */
     UniqueResourceSourcePtr roleUsersSource(const QnUuid& roleId);
-
-    /**
-     * Provides devices accessible to the subject with given ID. Makes sense only for custom
-     * users, and role user, otherwise it provides no data.
-     */
-    UniqueResourceSourcePtr userAccessibleDevicesSource(const QnResourceAccessSubject& subject);
-
-    /**
-     * @todo Re-implement.
-     */
-    UniqueResourceSourcePtr sharedAndOwnLayoutsSource(
-        const QnResourceAccessSubject& subject);
-
-    /**
-     * Provides layouts accessible to the subject with given ID. Makes sense only for custom
-     * users, and role user, otherwise it provides no data.
-     */
-    UniqueResourceSourcePtr directlySharedLayoutsSource(const QnResourceAccessSubject& subject);
 
     /**
      * Provides web page resources stored in the resource pool.
@@ -153,15 +130,9 @@ public:
      */
     UniqueResourceSourcePtr cloudSystemCamerasSource(const QString& systemId);
 
-    /**
-     * Provides user roles IDs stored in user roles manager.
-     */
-    UniqueUuidSourcePtr userRolesSource();
-
 private:
     const CameraResourceIndex* m_cameraResourceIndex;
     const UserLayoutResourceIndex* m_userLayoutResourceIndex;
-    QScopedPointer<UserRolesProvider> m_userRolesProvider;
     QScopedPointer<WebPageResourceIndex> m_webPageResourceIndex;
 };
 

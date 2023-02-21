@@ -242,9 +242,7 @@ TEST_F(ResourceTreeModelTest, reducedEdgeCameraIsDisplayedForAdvancedViewer)
     ASSERT_TRUE(noneMatches(serverIconTypeCondition()));
 }
 
-// TODO: #vbreus It will be great if general EDGE device representation rules
-// were applicable for custom users either.
-TEST_F(ResourceTreeModelTest, edgeServerIsExpandedForCustomUser)
+TEST_F(ResourceTreeModelTest, reducedEdgeCameraIsDisplayedForCustomUser)
 {
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -262,14 +260,14 @@ TEST_F(ResourceTreeModelTest, edgeServerIsExpandedForCustomUser)
     setupAccessToResourceForUser(customUser, edgeServer, /*isAccessible*/ true);
     setupAccessToResourceForUser(customUser, edgeCamera, /*isAccessible*/ true);
 
-    ASSERT_TRUE(noneMatches(reducedEdgeCameraCondition()));
+    // Then single reduced EDGE camera node found in the resource tree.
+    const auto edgeCameraIndex = uniqueMatchingIndex(reducedEdgeCameraCondition());
 
-    // Then exactly one camera node with corresponding display text founds in the resource tree.
-    const auto cameraIndex = uniqueMatchingIndex(
-        allOf(kUniqueEdgeCameraNameCondition, cameraIconTypeCondition()));
+    // And that node has corresponding display text.
+    ASSERT_TRUE(kUniqueEdgeCameraNameCondition(edgeCameraIndex));
 
-    // And this node is the child of an server node.
-    ASSERT_TRUE(directChildOf(serverIconTypeCondition())(cameraIndex));
+    // And no plain server nodes found in the resource tree.
+    ASSERT_TRUE(noneMatches(serverIconTypeCondition()));
 }
 
 TEST_F(ResourceTreeModelTest, edgeServerIsExpandedIfRedundancySetOn)

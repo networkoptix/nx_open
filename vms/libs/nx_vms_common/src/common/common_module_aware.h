@@ -26,7 +26,6 @@ namespace nx::vms::common { class SystemSettings; }
 namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
-namespace nx::core::access { class ResourceAccessProvider; }
 namespace ec2 { class AbstractECConnection; }
 
 /**
@@ -48,7 +47,6 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;

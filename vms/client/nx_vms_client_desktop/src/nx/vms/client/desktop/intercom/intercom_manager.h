@@ -13,7 +13,7 @@ namespace nx::vms::client::desktop {
 /**
  * Adds event rules for intercom call and door opening.
  */
-class IntercomManager:
+class NX_VMS_CLIENT_DESKTOP_API IntercomManager:
     public QObject,
     public nx::vms::client::desktop::SystemContextAware
 {

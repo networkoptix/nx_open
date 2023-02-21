@@ -2,15 +2,13 @@
 
 #include "workbench_layout_change_validator.h"
 
-#include <core/resource_access/providers/resource_access_provider.h>
-
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
-
+#include <core/resource/videowall_resource.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 QnWorkbenchLayoutsChangeValidator::QnWorkbenchLayoutsChangeValidator(QnWorkbenchContext* context):
     QnWorkbenchContextAware(context)
@@ -21,35 +19,26 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourceList& removedResources) const
 {
-    //just in case
-    if (!context()->user())
+    if (!NX_ASSERT(accessController()->user()) || accessController()->hasAdminPermissions())
         return true;
 
-    //quick check
-    if (accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia))
-        return true;
+    const auto videowall = layout->getParentResource().objectCast<QnVideoWallResource>();
 
     QnResourceList inaccessible = removedResources.filtered(
-        [this, layout](const QnResourcePtr& resource) -> bool
+        [this, videowall](const QnResourcePtr& resource) -> bool
         {
-            QnResourceList providers;
-            const auto accessSource = resourceAccessProvider()->accessibleVia(
-                context()->user(), resource, &providers);
+            // TODO: #vkutin Fix this when videowall sharing behavior is finalized.
 
-            // We need to get only resources which are accessible only by this layout
-            // Possibly we already have no access (if item is removed)
-            switch (accessSource)
+            const auto details = resourceAccessManager()->accessDetails(
+                accessController()->user()->getId(),resource, nx::vms::api::AccessRight::view);
+
+            for (const auto& providers: details)
             {
-                case nx::core::access::Source::videowall:
-                case nx::core::access::Source::none:
-                    break;
-                default:
+                if (providers.size() != 1 || *providers.cbegin() != videowall)
                     return false;
             }
 
-            QnLayoutResourceList layoutProviders = providers.filtered<QnLayoutResource>();
-            layoutProviders.removeOne(layout);
-            return layoutProviders.isEmpty();
+            return true;
         });
 
     if (inaccessible.isEmpty())

@@ -24,11 +24,9 @@
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
-#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
@@ -37,7 +35,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
@@ -261,28 +258,12 @@ void UserListWidget::applyChanges()
     {
         if (messages::Resources::deleteResources(this, usersToDelete))
         {
-            if (systemContext()->restApiHelper()->restApiEnabled())
-            {
-                for (const auto& user: usersToDelete)
+            qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
+                [this](bool /*success*/)
                 {
-                    qnResourcesChangesManager->deleteResource(user,
-                        nx::utils::guarded(this,
-                            [this](bool /*success*/, const QnResourcePtr& /*resource*/)
-                            {
-                                setEnabled(true);
-                                emit hasChangesChanged();
-                            }));
-                }
-            }
-            else
-            {
-                qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-                    [this](bool /*success*/)
-                    {
-                        setEnabled(true);
-                        emit hasChangesChanged();
-                    }));
-            }
+                    setEnabled(true);
+                    emit hasChangesChanged();
+                }));
 
             setEnabled(false);
             emit hasChangesChanged();
@@ -639,7 +620,6 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
         default:
         {
             q->menu()->trigger(action::UserSettingsAction, action::Parameters(user)
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 .withArgument(Qn::ForceRole, true)
                 .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
             break;

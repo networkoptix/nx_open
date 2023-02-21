@@ -3,7 +3,7 @@
 #include "accessible_resource_proxy_source.h"
 
 #include <core/resource/user_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -14,20 +14,18 @@ using namespace nx::core::access;
 
 AccessibleResourceProxySource::AccessibleResourceProxySource(
     SystemContext* systemContext,
-    const ResourceAccessProvider* accessProvider,
     const QnResourceAccessSubject& accessSubject,
     std::unique_ptr<AbstractResourceSource> baseResourceSource)
     :
     base_type(),
     SystemContextAware(systemContext),
-    m_accessProvider(accessProvider),
     m_accessSubject(accessSubject),
     m_baseResourceSource(std::move(baseResourceSource))
 {
     connect(m_baseResourceSource.get(), &AbstractResourceSource::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
-            if (m_accessProvider->hasAccess(m_accessSubject, resource))
+            if (hasAccess(resource))
             {
                 m_acceptedResources.insert(resource);
                 emit resourceAdded(resource);
@@ -41,29 +39,45 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
     connect(m_baseResourceSource.get(), &AbstractResourceSource::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            m_acceptedResources.remove(resource);
             m_deniedResources.remove(resource);
-            emit resourceRemoved(resource);
+
+            if (m_acceptedResources.remove(resource))
+                emit resourceRemoved(resource);
         });
 
-    connect(m_accessProvider, &ResourceAccessProvider::accessChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
-        {
-            if (subject != m_accessSubject || resource->hasFlags(Qn::removed))
-                return;
+    const auto notifier = systemContext->resourceAccessManager()->createNotifier();
+    notifier->setSubjectId(accessSubject.id());
 
-            const bool hasAccess = m_accessProvider->hasAccess(subject, resource);
-            if (hasAccess && m_deniedResources.contains(resource))
+    connect(notifier, &QnResourceAccessManager::Notifier::resourceAccessChanged, this,
+        [this]()
+        {
+            QnResourceList newlyAccepted;
+            QnResourceList newlyDenied;
+
+            for (const auto& resource: m_acceptedResources)
             {
-                m_deniedResources.remove(resource);
-                m_acceptedResources.insert(resource);
-                emit resourceAdded(resource);
+                if (!hasAccess(resource))
+                    newlyDenied.push_back(resource);
             }
-            if (!hasAccess && m_acceptedResources.contains(resource))
+
+            for (const auto& resource: m_deniedResources)
+            {
+                if (hasAccess(resource))
+                    newlyAccepted.push_back(resource);
+            }
+
+            for (const auto& resource: newlyDenied)
             {
                 m_acceptedResources.remove(resource);
                 m_deniedResources.insert(resource);
                 emit resourceRemoved(resource);
+            }
+
+            for (const auto& resource: newlyAccepted)
+            {
+                m_deniedResources.remove(resource);
+                m_acceptedResources.insert(resource);
+                emit resourceAdded(resource);
             }
         });
 
@@ -74,6 +88,7 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
             resourcePool(),
             messageProcessor,
             this);
+
         cachesCleaner->setOnRemovedHandler(
             [this](const QnResourceList& resources)
             {
@@ -86,6 +101,7 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
                     m_deniedResources.remove(resource);
                 }
             });
+
         cachesCleaner->start();
     }
 }
@@ -98,16 +114,26 @@ QVector<QnResourcePtr> AccessibleResourceProxySource::getResources()
 {
     QVector<QnResourcePtr> result(m_baseResourceSource->getResources());
     const auto partitionItr = std::partition(result.begin(), result.end(),
-        [this](const auto& resource)
-        {
-            return m_accessProvider->hasAccess(m_accessSubject, resource);
-        });
+        [this](const auto& resource) { return hasAccess(resource); });
 
     m_acceptedResources = QSet<QnResourcePtr>(result.begin(), partitionItr);
     m_deniedResources = QSet<QnResourcePtr>(partitionItr, result.end());
 
     result.erase(partitionItr, result.end());
     return result;
+}
+
+bool AccessibleResourceProxySource::hasAccess(const QnResourcePtr& resource) const
+{
+    if (!NX_ASSERT(resource && resource->systemContext() == systemContext()))
+        return false;
+
+    const auto requiredPermission = resource->hasFlags(Qn::server)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
+    const auto accessManager = systemContext()->resourceAccessManager();
+    return accessManager->hasPermission(m_accessSubject, resource, requiredPermission);
 }
 
 } // namespace entity_resource_tree

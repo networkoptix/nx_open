@@ -3,19 +3,19 @@
 #include "camera_hotspots_overlay_widget.h"
 
 #include <core/resource/camera_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/ui/graphics/items/camera_hotspot_item.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
 using Geometry = nx::vms::client::core::Geometry;
-using ResourceAccessProvider = nx::core::access::ResourceAccessProvider;
 
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotsOverlayWidget::Private declaration.
@@ -29,8 +29,6 @@ struct CameraHotspotsOverlayWidget::Private
 
     QnResourcePool* resourcePool() const;
     QnWorkbenchContext* workbenchContext() const;
-    ResourceAccessProvider* accessProvider() const;
-    QnResourceAccessSubject accessSubject() const;
 
     QnVirtualCameraResourcePtr resourceWidgetCamera() const;
     QnUuidSet resourceWidgetCameraHotspotsIds() const;
@@ -51,19 +49,9 @@ QnWorkbenchContext* CameraHotspotsOverlayWidget::Private::workbenchContext() con
     return parentMediaResourceWidget->windowContext()->workbenchContext();
 }
 
-ResourceAccessProvider* CameraHotspotsOverlayWidget::Private::accessProvider() const
-{
-    return parentMediaResourceWidget->resourceAccessProvider();
-}
-
 QnVirtualCameraResourcePtr CameraHotspotsOverlayWidget::Private::resourceWidgetCamera() const
 {
     return parentMediaResourceWidget->resource().dynamicCast<QnVirtualCameraResource>();
-}
-
-QnResourceAccessSubject CameraHotspotsOverlayWidget::Private::accessSubject() const
-{
-    return workbenchContext()->user();
 }
 
 QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds() const
@@ -95,14 +83,16 @@ void CameraHotspotsOverlayWidget::Private::initHotspots()
     const auto hotspotsData = resourceWidgetCamera()->cameraHotspots();
     for (const auto& hotspotData: hotspotsData)
     {
-        const auto hotspotCamera =
-            resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
-        if (!hotspotCamera || !accessProvider()->hasAccess(accessSubject(), hotspotCamera))
-            continue;
+        if (const auto hotspotCamera =
+            resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId))
+        {
+            if (!ResourceAccessManager::hasPermissions(hotspotCamera, Qn::ReadPermission))
+                continue;
 
-        CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
-        item->setPos(Geometry::subPoint(q->rect(), hotspotData.pos));
-        hotspotItems.push_back(item);
+            CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
+            item->setPos(Geometry::subPoint(q->rect(), hotspotData.pos));
+            hotspotItems.push_back(item);
+        }
     }
 }
 
@@ -139,23 +129,25 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
     connect(camera->resourcePool(), &QnResourcePool::resourcesRemoved,
         this, initHotspotsOnResourcePoolChange);
 
-    connect(d->accessProvider(), &ResourceAccessProvider::accessChanged, this,
-        [this](const QnResourceAccessSubject& subject,
-            const QnResourcePtr& resource,
-            nx::core::access::Source)
-        {
-            if (d->accessSubject() != subject)
-                return;
+    const auto accessController = ResourceAccessManager::accessController(camera);
+    NX_ASSERT(accessController);
 
+    connect(accessController, &QnWorkbenchAccessController::permissionsChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
             if (d->resourceWidgetCameraHotspotsIds().contains(resource->getId()))
                 d->initHotspots();
         });
+
+    connect(accessController, &QnWorkbenchAccessController::permissionsReset, this,
+        [this] { d->initHotspots(); });
 
     d->initHotspots();
 }
 
 CameraHotspotsOverlayWidget::~CameraHotspotsOverlayWidget()
 {
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 void CameraHotspotsOverlayWidget::resizeEvent(QGraphicsSceneResizeEvent* event)

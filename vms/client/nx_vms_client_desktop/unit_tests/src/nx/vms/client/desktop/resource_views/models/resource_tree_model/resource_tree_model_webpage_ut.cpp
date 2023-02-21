@@ -5,7 +5,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 #include <client/client_globals.h>
@@ -271,37 +270,6 @@ TEST_F(ResourceTreeModelTest, webPageEnableProxyThroughServer)
 
     // And it is the direct child of the server.
     ASSERT_TRUE(directChildOf(serverIndex)(uniqueMatchingIndex(kUniqueWebPageNameCondition)));
-}
-
-TEST_F(ResourceTreeModelTest, proxiedWebPageSharedWithCustomUser)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    // When custom user with unique name is added to the resource pool.
-    const auto customUser = addUser(kUniqueUserName, GlobalPermission::customUser);
-
-    // When user is logged in.
-    loginAsAdmin("admin");
-
-    // When single server resource with certain unique name is added to the resource pool.
-    const auto server = addServer(kUniqueServerName);
-
-    // When web page with certain unique name is added to the resource pool.
-    auto page = addWebPage(kUniqueWebPageName);
-
-    // And web page is proxied through the server.
-    page->setProxyId(server->getId());
-
-    // When proxied web page is shared to the custom user.
-    setupAccessToResourceForUser(customUser, page, true);
-
-    // Then exactly one node with corresponding proxied web page display text appears as child of
-    // user's shared resources group.
-    ASSERT_TRUE(onlyOneMatches(
-        allOf(
-            kUniqueWebPageNameCondition,
-            directChildOf(sharedResourcesNodeCondition()))));
 }
 
 TEST_F(ResourceTreeModelTest, webPageDisableProxy)

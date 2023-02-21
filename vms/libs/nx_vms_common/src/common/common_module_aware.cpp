@@ -58,13 +58,6 @@ QnResourceAccessManager* QnCommonModuleAware::resourceAccessManager() const
         : nullptr;
 }
 
-nx::core::access::ResourceAccessProvider* QnCommonModuleAware::resourceAccessProvider() const
-{
-    return NX_ASSERT(m_commonModule)
-        ? m_commonModule->systemContext()->resourceAccessProvider()
-        : nullptr;
-}
-
 QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
 {
     return m_commonModule

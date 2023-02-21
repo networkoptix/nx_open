@@ -9,6 +9,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/access_rights_resolver.h>
+#include <core/resource_access/resource_access_details.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -113,6 +114,15 @@ public:
         const Qn::UserAccessData& accessData,
         const QnResourcePtr& resource,
         Qn::Permissions permissions) const;
+
+    /**
+     * Returns all ways in which the specified subject gains specified access right to
+     * the specified resource, directly and indirectly.
+     */
+    nx::core::access::ResourceAccessDetails accessDetails(
+        const QnUuid& subjectId,
+        const QnResourcePtr& resource,
+        nx::vms::api::AccessRight accessRight) const;
 
     using Notifier = nx::core::access::AccessRightsResolver::Notifier;
     Notifier* createNotifier(QObject* parent = nullptr);

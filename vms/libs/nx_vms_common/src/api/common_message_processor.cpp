@@ -15,7 +15,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/user_access_data.h>
@@ -1010,7 +1009,6 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
     m_context->resourceAccessManager()->beginUpdate();
-    m_context->resourceAccessProvider()->beginUpdate();
 
     m_context->serverAdditionalAddressesDictionary()->clear();
 
@@ -1026,7 +1024,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetLicenses(fullData.licenses);
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 
-    m_context->resourceAccessProvider()->endUpdate();
     m_context->resourceAccessManager()->endUpdate();
 
     emit initialResourcesReceived();

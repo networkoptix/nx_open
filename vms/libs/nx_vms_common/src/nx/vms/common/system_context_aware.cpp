@@ -64,11 +64,6 @@ QnGlobalPermissionsManager* SystemContextAware::globalPermissionsManager() const
     return systemContext()->globalPermissionsManager();
 }
 
-nx::core::access::ResourceAccessProvider* SystemContextAware::resourceAccessProvider() const
-{
-    return systemContext()->resourceAccessProvider();
-}
-
 QnResourcePool* SystemContextAware::resourcePool() const
 {
     return systemContext()->resourcePool();

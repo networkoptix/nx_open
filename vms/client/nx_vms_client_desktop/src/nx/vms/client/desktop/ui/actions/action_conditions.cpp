@@ -24,7 +24,6 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -723,37 +722,6 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
     return std::any_of(resources.cbegin(), resources.cend(), canBeDeleted)
         ? EnabledAction
         : InvisibleAction;
-}
-
-ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
-{
-    const auto nodeType = parameters.argument<ResourceTree::NodeType>(Qn::NodeTypeRole,
-        ResourceTree::NodeType::resource);
-    if (nodeType != ResourceTree::NodeType::sharedLayout)
-        return InvisibleAction;
-
-    auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = parameters.argument<QnUuid>(Qn::UuidRole);
-    NX_ASSERT(user || !roleId.isNull());
-    if (!user && roleId.isNull())
-        return InvisibleAction;
-
-    QnResourceAccessSubject subject = user
-        ? QnResourceAccessSubject(user)
-        : QnResourceAccessSubject(context->userRolesManager()->userRole(roleId));
-    if (!subject.isValid())
-        return InvisibleAction;
-
-    for (auto resource : parameters.resources())
-    {
-        if (context->resourceAccessProvider()->accessibleVia(subject, resource)
-            == nx::core::access::Source::shared)
-        {
-            return EnabledAction;
-        }
-    }
-
-    return DisabledAction;
 }
 
 ActionVisibility RenameResourceCondition::check(const Parameters& parameters, QnWorkbenchContext* /*context*/)

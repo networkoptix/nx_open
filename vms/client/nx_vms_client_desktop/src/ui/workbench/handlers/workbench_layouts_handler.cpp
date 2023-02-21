@@ -13,7 +13,6 @@
 #include <core/resource/layout_reader.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -124,20 +123,6 @@ LayoutResourceList alreadyExistingLayouts(
         result << existingLayout;
     }
     return result;
-}
-
-QnResourceList calculateResourcesToShare(const QnResourceList& resources,
-    const QnUserResourcePtr& user)
-{
-    auto sharingRequired = [user](const QnResourcePtr& resource)
-        {
-            if (!QnResourceAccessFilter::isShareableMedia(resource))
-                return false;
-
-            auto accessProvider = resource->systemContext()->resourceAccessProvider();
-            return !accessProvider->hasAccess(user, resource);
-        };
-    return resources.filtered(sharingRequired);
 }
 
 QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
@@ -265,33 +250,9 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
                 && !accessController()->hasPermissions(layoutResource, Qn::ReadPermission))
             {
                 workbench()->removeLayout(layoutResource);
-            }
-        });
 
-    connect(resourceAccessProvider(), &nx::core::access::ResourceAccessProvider::accessChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
-        {
-            if (!subject.isUser())
-                return;
-
-            const auto currentUser = context()->user();
-            if (!currentUser)
-                return;
-
-            if (currentUser->getId() != subject.id())
-                return;
-
-            const auto resourceFlags = resource->flags();
-            if (!resourceFlags.testFlag(Qn::layout) || !resourceFlags.testFlag(Qn::remote))
-                return;
-
-            if (resourceFlags.testFlag(Qn::removed))
-                return;
-
-            if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
-                && workbench()->layouts().empty())
-            {
-                menu()->trigger(action::OpenNewTabAction);
+                if (workbench()->layouts().empty())
+                    menu()->trigger(action::OpenNewTabAction);
             }
         });
 
@@ -475,17 +436,9 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
         const auto layoutOwner = layout->getParentResource();
 
         if (confirmLayoutChange(change, layoutOwner))
-        {
-            const auto user = layoutOwner.dynamicCast<QnUserResource>();
-            if (user)
-                grantMissingAccessRights(user, change);
-
             snapshotManager->save(layout);
-        }
         else
-        {
             snapshotManager->restore(layout);
-        }
     }
 }
 
@@ -816,104 +769,39 @@ bool LayoutsHandler::confirmLayoutChange(
     if (!context()->user())
         return false;
 
-    /* Never ask for own layouts. */
+    // Never ask for own layouts.
     if (layoutOwner == context()->user())
         return true;
 
-    /* Ask confirmation if user will lose some of cameras due to videowall layout change. */
+    // Ask confirmation if user will lose some of cameras due to videowall layout change.
     if (layoutOwner && layoutOwner->hasFlags(Qn::videowall))
         return confirmChangeVideoWallLayout(change);
 
-    /* Never ask for auto-generated (e.g. preview search) layouts. */
+    // Never ask for auto-generated (e.g. preview search) layouts.
     if (change.layout->isServiceLayout())
         return true;
 
-    /* Check shared layout */
+    // Check shared layout.
     if (change.layout->isShared())
         return confirmChangeSharedLayout(change);
 
-    /* Never ask for intercom layouts. */
+    // Never ask for intercom layouts.
     if (change.layout->isIntercomLayout())
         return true;
 
-    return confirmChangeLocalLayout(layoutOwner.dynamicCast<QnUserResource>(), change);
+    NX_ASSERT(false, "Editing of private layouts of other users is no longer supported.");
+    return false;
 }
 
 bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
 {
-    /* Checking if custom users have access to this shared layout. */
-    auto allUsers = resourcePool()->getResources<QnUserResource>();
-    auto accessibleToCustomUsers = std::any_of(
-        allUsers.cbegin(), allUsers.cend(),
-        [this, layout = change.layout](const QnUserResourcePtr& user)
-        {
-            return resourceAccessProvider()->accessibleVia(user, layout) ==
-                nx::core::access::Source::shared;
-        });
-
-    /* Do not warn if there are no such users - no side effects in any case. */
-    if (!accessibleToCustomUsers)
-        return true;
-
     return ui::messages::Resources::sharedLayoutEdit(mainWindowWidget());
-}
-
-bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
-    const LayoutChange& change)
-{
-    NX_ASSERT(user);
-    if (!user)
-        return true;
-
-    /* Calculate removed cameras that are still directly accessible. */
-    switch (user->userRole())
-    {
-        case Qn::UserRole::customPermissions:
-            return ui::messages::Resources::changeUserLocalLayout(mainWindowWidget(), change.removed);
-        case Qn::UserRole::customUserRole:
-            return ui::messages::Resources::addToRoleLocalLayout(
-                    mainWindowWidget(),
-                    calculateResourcesToShare(change.added, user))
-                && ui::messages::Resources::removeFromRoleLocalLayout(
-                    mainWindowWidget(),
-                    change.removed);
-        default:
-            break;
-    }
-    return true;
 }
 
 bool LayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
 {
     QnWorkbenchLayoutsChangeValidator validator(context());
     return validator.confirmChangeVideoWallLayout(change.layout, change.removed);
-}
-
-void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
-    const LayoutChange& change)
-{
-    if (ini().enableNewUserSettings)
-        return;
-
-    NX_ASSERT(user);
-    if (!user)
-        return;
-
-    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
-        return;
-
-    QnResourceAccessSubject subject(user);
-    // This is required to keep old behavior when it was not possible to grant access to the user
-    // directly if he has a role.
-    if (const auto roleIds = user->userRoleIds(); !roleIds.empty())
-        subject = nx::vms::api::UserRoleData(roleIds.front(), "");
-
-    auto accessible = sharedResourcesManager()->sharedResources(subject);
-    for (const auto& toShare : calculateResourcesToShare(change.added, user))
-        accessible << toShare->getId();
-
-    qnResourcesChangesManager->saveAccessibleResources(
-        subject, accessible, user->getRawPermissions(), systemContext());
 }
 
 bool LayoutsHandler::canRemoveLayouts(const LayoutResourceList &layouts)

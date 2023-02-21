@@ -83,7 +83,7 @@ UserSettingsDialog::UserSettingsDialog(
     nx::vms::common::SystemContext* systemContext,
     QWidget* parent)
     :
-    base_type(parent, dialogType == editUser
+    base_type(parent, dialogType == EditUser
         ? "qrc:/qml/Nx/Dialogs/UserManagement/UserEditDialog.qml"
         : "qrc:/qml/Nx/Dialogs/UserManagement/UserCreateDialog.qml"),
     SystemContextAware(systemContext),
@@ -107,7 +107,7 @@ UserSettingsDialog::UserSettingsDialog(
             });
     }
 
-    if (dialogType == editUser)
+    if (dialogType == EditUser)
     {
         // It is important to make the connections queued so we would not block inside QML code.
         connect(rootObjectHolder()->object(), SIGNAL(deleteRequested()),
@@ -271,7 +271,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     if (!user)
     {
-        NX_ASSERT(d->dialogType == createUser);
+        NX_ASSERT(d->dialogType == CreateUser);
         // We need non-null uuid to make editingContext happy.
         state.userId = QnUuid::createUuid();
         return state;
@@ -353,7 +353,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                 user, state.sharedResources, saveAccessRightsCallback, systemContext());
         });
 
-    if (d->dialogType == createUser)
+    if (d->dialogType == CreateUser)
     {
         d->user.reset(new QnUserResource(state.userType == UserSettingsGlobal::LocalUser
             ? nx::vms::api::UserType::local
@@ -369,7 +369,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     }
 
     QnUserResource::DigestSupport digestSupport =
-        originalState().allowInsecure == state.allowInsecure && d->dialogType != createUser
+        originalState().allowInsecure == state.allowInsecure && d->dialogType != CreateUser
             ? QnUserResource::DigestSupport::keep
             : (state.allowInsecure && d->user->userType() != nx::vms::api::UserType::cloud)
                 ? QnUserResource::DigestSupport::enable
@@ -384,6 +384,9 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
 void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 {
+    if (d->user == user)
+        return; //< Do not reset state upon setting the same user.
+
     d->tabIndex = 0;
 
     if (d->user)
@@ -401,6 +404,14 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
     }
 
     createStateFrom(d->user);
+}
+
+void UserSettingsDialog::selectTab(Tab tab)
+{
+    if (!NX_ASSERT(tab >= 0 && tab < TabCount))
+        return;
+
+    d->tabIndex = tab;
 }
 
 } // namespace nx::vms::client::desktop

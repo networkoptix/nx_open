@@ -2,7 +2,6 @@
 
 #include "parent_servers_proxy_source.h"
 
-#include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 

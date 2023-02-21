@@ -16,7 +16,6 @@ class QnSharedResourcesManager;
 class QnUserRolesManager;
 
 namespace ec2 { class AbstractECConnection; }
-namespace nx::core::access { class ResourceAccessProvider; }
 
 namespace nx::vms::common {
 
@@ -60,11 +59,6 @@ public:
      * Manages which global permissions each User or Role has.
      */
     QnGlobalPermissionsManager* globalPermissionsManager() const;
-
-    /**
-     * Grants information about resource access status.
-     */
-    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
 
     /**
      * List of all Resources in the System. Some data is stored in the external dictionaries.

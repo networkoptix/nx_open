@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -41,7 +42,6 @@
 #include <ui/common/palette.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/audit/audit_log_detail_model.h>
@@ -797,24 +797,34 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     if (!record)
         return;
 
-    if (record->isPlaybackType())
-        processPlaybackAction(record);
-    else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record,
-            action::UserSettingsAction,
-            QnUserSettingsDialog::SettingsPage);
-    else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record,
-            action::ServerSettingsAction,
-            QnServerSettingsDialog::SettingsPage);
-    else if (record->eventType == Qn::AR_StorageUpdate || record->eventType == Qn::AR_StorageInsert)
-        triggerAction(record,
-            action::ServerSettingsAction,
-            QnServerSettingsDialog::StorageManagmentPage);
-    else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record,
-            action::CameraSettingsAction,
-            static_cast<int>(CameraSettingsTab::general));
+    switch (record->eventType)
+    {
+        case Qn::AR_UserUpdate:
+            triggerAction(record, action::UserSettingsAction, UserSettingsDialog::GeneralTab);
+            break;
+
+        case Qn::AR_ServerUpdate:
+            triggerAction(record, action::ServerSettingsAction,
+                QnServerSettingsDialog::SettingsPage);
+            break;
+
+        case Qn::AR_StorageUpdate:
+        case Qn::AR_StorageInsert:
+            triggerAction(record, action::ServerSettingsAction,
+                QnServerSettingsDialog::StorageManagmentPage);
+            break;
+
+        case Qn::AR_CameraUpdate:
+        case Qn::AR_CameraInsert:
+            triggerAction(record, action::CameraSettingsAction,
+                static_cast<int>(CameraSettingsTab::general));
+            break;
+
+        default:
+            if (record->isPlaybackType())
+                processPlaybackAction(record);
+            break;
+    }
 
     if (isMaximized())
         showNormal();

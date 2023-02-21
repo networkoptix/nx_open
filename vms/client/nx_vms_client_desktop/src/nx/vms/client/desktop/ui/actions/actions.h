@@ -605,43 +605,9 @@ enum IDType
     ForgetLayoutPasswordAction,
 
     /**
-     * Shares selected layout with another user.
-     *
-     * Parameters:
-     * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
-     */
-    ShareLayoutAction,
-
-    /**
-     * Stops sharing selected layout from the selected user.
-     *
-     * Parameters:
-     * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to stop sharing layout with.
-     */
-    StopSharingLayoutAction,
-
-    /**
      * Saves provided layout under another name.
      */
     SaveLayoutAsAction,
-
-    /**
-     * Shares selected camera with another user.
-     *
-     * Parameters:
-     * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share camera with.
-     * <tt>QnUuid UuidRole</tt> --- role id to share camera with.
-     */
-    ShareCameraAction,
-
-    /**
-     * Shares selected web page with another user or role.
-     *
-     * Parameters:
-     * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share web page with.
-     * <tt>QnUuid UuidRole</tt> --- role id to share web page with.
-     */
-    ShareWebPageAction,
 
     /**
      * Performs a fit in view operation.

@@ -28,7 +28,6 @@ namespace nx::core::access {
 class AccessRightsManager;
 class DeprecatedAccessRightsConverter;
 class GlobalPermissionsWatcher;
-class ResourceAccessProvider;
 class ResourceAccessSubjectHierarchy;
 } // namespace nx::core::access
 
@@ -237,11 +236,6 @@ public:
      */
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
-
-    /**
-     * Manages which Resources are accessible to Users and Roles.
-     */
-    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
 
     /**
      * Manages Showreels.

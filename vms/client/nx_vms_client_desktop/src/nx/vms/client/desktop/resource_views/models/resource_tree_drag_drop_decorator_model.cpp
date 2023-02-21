@@ -293,52 +293,6 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
-    // Share resources and layouts with users / user roles.
-    else if (hasNodeType(index, NodeType::role) || hasResourceFlags(index, Qn::user))
-    {
-        int argumentKey = 0;
-        QVariant argumentValue;
-
-        if (hasNodeType(index, NodeType::role))
-        {
-            argumentKey = Qn::UuidRole;
-            argumentValue = index.data(Qn::UuidRole);
-        }
-        else if (hasResourceFlags(index, Qn::user))
-        {
-            argumentKey = Qn::UserResourceRole;
-            const auto indexResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-            argumentValue = QVariant::fromValue(indexResource.dynamicCast<QnUserResource>());
-        }
-
-        const auto layoutsToShare = data.resources().filtered<QnLayoutResource>(
-            [](const QnLayoutResourcePtr& layout)
-            {
-                return !layout->hasFlags(Qn::cross_system) && !layout->isFile();
-            });
-        for (const auto& layout: layoutsToShare)
-        {
-            actionManager()->trigger(ShareLayoutAction,
-                Parameters(layout).withArgument(argumentKey, argumentValue));
-        }
-
-        const auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
-        for (const auto& camera: camerasToShare)
-        {
-            actionManager()->trigger(ShareCameraAction,
-                Parameters(camera).withArgument(argumentKey, argumentValue));
-        }
-
-        const auto webPagesToShare = data.resources().filtered<QnWebPageResource>();
-        for (const auto& webPage: webPagesToShare)
-        {
-            actionManager()->trigger(ShareWebPageAction,
-                Parameters(webPage).withArgument(argumentKey, argumentValue));
-        }
-
-        return true;
-    }
-
     if (hasNodeType(index, NodeType::camerasAndDevices))
     {
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
