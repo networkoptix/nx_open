@@ -376,13 +376,13 @@ QnAbstractEventSignalizer* installEventHandler(
     if (!receiver)
         return nullptr;
 
-    QScopedPointer<QnAbstractEventSignalizer> scopedSignalizer(
+    std::unique_ptr<QnAbstractEventSignalizer> scopedSignalizer(
         createEventSignalizer(events, receiverObject));
 
     if (!scopedSignalizer)
         return nullptr;
 
-    auto signalizer = scopedSignalizer.data();
+    auto signalizer = scopedSignalizer.get();
 
     if (!installEventFilter(watched, signalizer))
         return nullptr;
@@ -398,5 +398,5 @@ QnAbstractEventSignalizer* installEventHandler(
     if (!QObject::connect(receiverObject, &QObject::destroyed, signalizer, disconnectFunctor))
         return nullptr;
 
-    return scopedSignalizer.take(); //< pass scoped ownership to the caller
+    return scopedSignalizer.release(); //< Pass scoped ownership to the caller.
 }
