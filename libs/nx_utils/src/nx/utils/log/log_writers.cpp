@@ -345,38 +345,24 @@ bool File::queueToArchive(nx::Locker<nx::Mutex>* lock)
 
 cf::future<cf::unit> File::stopArchivingAsync()
 {
-    auto future = std::async(std::launch::async,
-        [&]()
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_archiveQueue++;
 
-            m_archiveQueue++;
-            while (m_archive.valid())
-            {
-                if (m_archiveQueue == 1)
-                {
-                    nx::Unlocker<nx::Mutex> unlocker(&lock);
-                    m_archive.get();
-                }
-                else
-                {
-                    nx::Unlocker<nx::Mutex> unlocker(&lock);
-                    try
-                    {
-                        m_archive.wait();
-                    }
-                    catch(const std::future_error& e)
-                    {
-                    }
-                }
-            }
-        });
+    if (!m_archive.valid())
+        return cf::make_ready_future(cf::unit());
 
     return cf::initiate(
-        [future = std::move(future)]() mutable
+        [this]() mutable
         {
-            future.get();
-            return cf::unit();
+            try
+            {
+                m_archive.wait();
+                return cf::unit();
+            }
+            catch (const std::future_error& e)
+            {
+                return cf::unit();
+            }
         });
 }
 
