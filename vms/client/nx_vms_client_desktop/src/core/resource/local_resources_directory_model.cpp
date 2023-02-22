@@ -56,18 +56,35 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     auto resourcePool = qnClientCoreModule->resourcePool();
 
-    connect(resourcePool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource) {
-            const auto path = getResourceFilePath(resource);
-            if (FileTypeSupport::isMovieFileExt(path) || FileTypeSupport::isValidLayoutFile(path))
-                m_fileSystemWatcher.addPath(path);
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+            {
+                if (!resource->hasFlags(Qn::local))
+                    continue;
+
+                const auto path = getResourceFilePath(resource);
+                if (FileTypeSupport::isMovieFileExt(path)
+                    || FileTypeSupport::isValidLayoutFile(path))
+                {
+                    m_fileSystemWatcher.addPath(path);
+                }
+            }
         });
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource) {
-            const auto path = getResourceFilePath(resource);
-            if (!path.isNull())
-                m_fileSystemWatcher.removePath(path);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+            {
+                if (!resource->hasFlags(Qn::local))
+                    continue;
+
+                const auto path = getResourceFilePath(resource);
+                if (!path.isNull())
+                    m_fileSystemWatcher.removePath(path);
+            }
         });
 }
 
