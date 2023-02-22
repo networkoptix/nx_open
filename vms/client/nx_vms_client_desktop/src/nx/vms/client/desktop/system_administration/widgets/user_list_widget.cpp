@@ -8,6 +8,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QKeyEvent>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
@@ -180,6 +181,8 @@ private:
 
     void modelUpdated();
     void updateSelection();
+
+    void setupPlaceholder();
 
     void handleHeaderCheckStateChanged(Qt::CheckState state);
     void handleUsersTableClicked(const QModelIndex& index);
@@ -424,6 +427,29 @@ void UserListWidget::Private::setupUi()
         [this]() { ui->usersTable->unsetCursor(); });
 
     updateSelection();
+
+    setupPlaceholder();
+}
+
+void UserListWidget::Private::setupPlaceholder()
+{
+    const auto placeholderIcon = new QLabel(ui->nothingFoundPlaceholder);
+    placeholderIcon->setPixmap(qnSkin->pixmap("left_panel/placeholders/search.svg"));
+
+    const auto placeholderText = new QLabel(ui->nothingFoundPlaceholder);
+    placeholderText->setText(tr("No users found"));
+    QFont font(placeholderText->font());
+    font.setPixelSize(16);
+    font.setWeight(QFont::Medium);
+    placeholderText->setFont(font);
+
+    const auto descriptionText = new QLabel(ui->nothingFoundPlaceholder);
+    descriptionText->setText(tr("Change search criteria or create a new user"));
+
+    ui->nothingFoundPlaceholderLayout->addWidget(placeholderIcon, /*stretch*/ 0, Qt::AlignHCenter);
+    ui->nothingFoundPlaceholderLayout->addWidget(placeholderText, /*stretch*/ 0, Qt::AlignHCenter);
+    ui->nothingFoundPlaceholderLayout->addSpacing(8);
+    ui->nothingFoundPlaceholderLayout->addWidget(descriptionText, /*stretch*/ 0, Qt::AlignHCenter);
 }
 
 void UserListWidget::Private::modelUpdated()
