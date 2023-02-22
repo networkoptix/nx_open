@@ -3,6 +3,7 @@
 #include "user_settings_dialog.h"
 
 #include <algorithm>
+#include <optional>
 
 #include <QtGui/QGuiApplication>
 
@@ -67,7 +68,7 @@ struct UserSettingsDialog::Private
     DialogType dialogType;
     QmlProperty<int> tabIndex;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
-    QnUserResourcePtr user;
+    std::optional<QnUserResourcePtr> user;
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
@@ -103,7 +104,8 @@ UserSettingsDialog::UserSettingsDialog(
         connect(d->sessionNotifier, &SessionNotifier::forcedUpdateRequested, this,
             [this]
             {
-                updateStateFrom(d->user);
+                if (d->user)
+                    updateStateFrom(*d->user);
             });
     }
 
@@ -112,8 +114,10 @@ UserSettingsDialog::UserSettingsDialog(
         // It is important to make the connections queued so we would not block inside QML code.
         connect(rootObjectHolder()->object(), SIGNAL(deleteRequested()),
             this, SLOT(onDeleteRequested()), Qt::QueuedConnection);
+
         connect(rootObjectHolder()->object(), SIGNAL(auditTrailRequested()),
             this, SLOT(onAuditTrailRequested()), Qt::QueuedConnection);
+
         connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
             this, SLOT(onGroupClicked(QVariant)), Qt::QueuedConnection);
     }
@@ -179,6 +183,9 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
 
 QString UserSettingsDialog::validateLogin(const QString& login)
 {
+    if (!NX_ASSERT(d->user))
+        return {};
+
     TextValidateFunction validateFunction =
         [this](const QString& text) -> ValidationResult
         {
@@ -198,7 +205,7 @@ QString UserSettingsDialog::validateLogin(const QString& login)
                     continue;
 
                 // Allow our own login.
-                if (!d->user.isNull() && d->user->getName() == text)
+                if (!d->user->isNull() && (*d->user)->getName() == text)
                     continue;
 
                 return ValidationResult(tr("User with specified login already exists."));
@@ -221,8 +228,11 @@ void UserSettingsDialog::onGroupClicked(const QVariant& idVariant)
 
 void UserSettingsDialog::onDeleteRequested()
 {
+    if (!NX_ASSERT(d->user))
+        return;
+
     if (!ui::messages::Resources::deleteResources(
-        appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(), {d->user}))
+        appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(), {*d->user}))
     {
         return;
     }
@@ -235,7 +245,7 @@ void UserSettingsDialog::onDeleteRequested()
                 if (success)
                     reject();
             });
-        qnResourcesChangesManager->deleteResource(d->user, callback);
+        qnResourcesChangesManager->deleteResource(*d->user, callback);
     }
     else
     {
@@ -245,7 +255,7 @@ void UserSettingsDialog::onDeleteRequested()
                     if (success)
                         reject();
                 });
-        qnResourcesChangesManager->deleteResources({d->user}, callback);
+        qnResourcesChangesManager->deleteResources({*d->user}, callback);
     }
 }
 
@@ -315,23 +325,27 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
 void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 {
+    if (!NX_ASSERT(d->user))
+        return;
+
     ResourcesChangesManager::UserChangesFunction applyChangesFunction = nx::utils::guarded(this,
-        [this, state](const QnUserResourcePtr& /*user*/)
+        [this, state](const QnUserResourcePtr& user)
         {
-            d->user->setName(d->user->userType() == nx::vms::api::UserType::cloud
+            user->setName(user->userType() == nx::vms::api::UserType::cloud
                 ? state.email
                 : state.login);
-            d->user->setEmail(state.email);
-            d->user->setEnabled(state.userEnabled);
-            d->user->setFullName(state.fullName);
+
+            user->setEmail(state.email);
+            user->setEnabled(state.userEnabled);
+            user->setFullName(state.fullName);
 
             std::vector<QnUuid> groupIds;
             groupIds.reserve(state.parentGroups.size());
             for (const auto& group: state.parentGroups)
                 groupIds.push_back(group.id);
 
-            d->user->setUserRoleIds(groupIds);
-            d->user->setRawPermissions(state.globalPermissions);
+            user->setUserRoleIds(groupIds);
+            user->setRawPermissions(state.globalPermissions);
         });
 
     auto saveAccessRightsCallback = nx::utils::guarded(this,
@@ -355,55 +369,60 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
     if (d->dialogType == CreateUser)
     {
-        d->user.reset(new QnUserResource(state.userType == UserSettingsGlobal::LocalUser
+        QnUserResourcePtr user(new QnUserResource(state.userType == UserSettingsGlobal::LocalUser
             ? nx::vms::api::UserType::local
             : nx::vms::api::UserType::cloud,
             /*externalId*/ {}));
-        d->user->setRawPermissions(state.globalPermissions);
-        d->user->setName(d->user->userType() == nx::vms::api::UserType::cloud
+
+        user->setRawPermissions(state.globalPermissions);
+
+        user->setName(user->userType() == nx::vms::api::UserType::cloud
             ? state.email
             : state.login);
-        d->user->setIdUnsafe(d->user->userType() == nx::vms::api::UserType::cloud
+
+        user->setIdUnsafe(user->userType() == nx::vms::api::UserType::cloud
             ? QnUuid::fromArbitraryData(state.email)
             : state.userId);
+
+        d->user = user;
     }
 
     QnUserResource::DigestSupport digestSupport =
         originalState().allowInsecure == state.allowInsecure && d->dialogType != CreateUser
             ? QnUserResource::DigestSupport::keep
-            : (state.allowInsecure && d->user->userType() != nx::vms::api::UserType::cloud)
+            : (state.allowInsecure && (*d->user)->userType() != nx::vms::api::UserType::cloud)
                 ? QnUserResource::DigestSupport::enable
                 : QnUserResource::DigestSupport::disable;
 
     if (!state.password.isEmpty())
-        d->user->setPasswordAndGenerateHash(state.password, digestSupport);
+        (*d->user)->setPasswordAndGenerateHash(state.password, digestSupport);
 
     qnResourcesChangesManager->saveUser(
-        d->user, digestSupport, applyChangesFunction, systemContext(), callbackFunction);
+        *d->user, digestSupport, applyChangesFunction, systemContext(), callbackFunction);
 }
 
 void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 {
-    if (d->user == user)
+    if (d->user && *d->user == user)
         return; //< Do not reset state upon setting the same user.
 
     d->tabIndex = 0;
 
-    if (d->user)
-        disconnect(d->user.get());
+    if (auto oldUser = d->user.value_or(QnUserResourcePtr{}))
+        disconnect(oldUser.get());
 
     d->user = user;
 
-    if (d->user)
+    if (user)
     {
-        const auto updateState = [this]{ updateStateFrom(d->user); };
+        const auto updateState = [this]() { updateStateFrom(*d->user); };
 
-        connect(d->user.get(), &QnResource::propertyChanged, this, updateState);
-        connect(d->user.get(), &QnUserResource::digestChanged, this, updateState);
-        connect(d->user.get(), &QnUserResource::userRolesChanged, this, updateState);
+        connect(user.get(), &QnResource::propertyChanged, this, updateState);
+        connect(user.get(), &QnUserResource::digestChanged, this, updateState);
+        connect(user.get(), &QnUserResource::userRolesChanged, this, updateState);
     }
 
-    createStateFrom(d->user);
+    createStateFrom(user);
 }
 
 void UserSettingsDialog::selectTab(Tab tab)
