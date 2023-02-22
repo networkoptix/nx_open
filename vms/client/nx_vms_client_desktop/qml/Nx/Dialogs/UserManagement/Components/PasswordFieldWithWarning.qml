@@ -63,6 +63,8 @@ TextFieldWithValidator
         anchors.right: parent.right
         anchors.rightMargin: 5
 
+        focusPolicy: Qt.NoFocus
+
         CursorOverride.shape: Qt.ArrowCursor
         CursorOverride.active: hovered
 

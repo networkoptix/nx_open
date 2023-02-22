@@ -33,6 +33,8 @@ TextFieldBase
             topPadding: 0
             bottomPadding: 0
 
+            focusPolicy: Qt.NoFocus
+
             icon.color: hovered ? ColorTheme.highlight: ColorTheme.buttonText
             icon.source: showPassword.checked
                 ? "image://svg/skin/text_buttons/eye_open.svg"
