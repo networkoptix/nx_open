@@ -260,7 +260,7 @@ def update_persistent_known_files_file(build_dir: Path, directories: Set[str]):
     persistent_known_files = build_dir / PERSISTENT_KNOWN_FILES_FILE_NAME
     if persistent_known_files.is_file():
         with open(persistent_known_files) as f:
-            current_files = [Path(name) for name in f.readlines()]
+            current_files = [Path(name) for name in f.read().splitlines()]
     else:
         current_files = []
 
@@ -270,10 +270,10 @@ def update_persistent_known_files_file(build_dir: Path, directories: Set[str]):
             continue
         unchanged_files.append(file_path)
 
-    print(f"Adding files from directories {directories!r}...")
+    print(f"Adding files from directories {[str(d) for d in directories]!r}...")
     new_files = [f for d in directories for f in d.rglob("*")]
     with open(persistent_known_files, "w") as f:
-        f.writelines([f"{str(f)}\n" for f in unchanged_files + new_files])
+        f.writelines({f"{str(f)}\n" for f in unchanged_files + new_files})
 
     print("Done")
 
