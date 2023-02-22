@@ -234,11 +234,17 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         }
     }
 
+    const bool onlyUsers = removedUsers.size() == removedResources.size();
+
     // After resources removing, we must check if removed layouts left on the videowall items
     // and if the removed cameras / web pages / server left as the layout items.
     // #vbreus Is lookup by flag suitable there?
-    const auto existingVideoWalls = getResourcesUnsafe<QnVideoWallResource>();
-    const auto existingLayouts = getResourcesUnsafe<QnLayoutResource>();
+    const auto existingVideoWalls = onlyUsers
+        ? QnSharedResourcePointerList<QnVideoWallResource>()
+        : getResourcesUnsafe<QnVideoWallResource>();
+    const auto existingLayouts = onlyUsers
+        ? QnSharedResourcePointerList<QnLayoutResource>()
+        : getResourcesUnsafe<QnLayoutResource>();
 
     lk.unlock();
 
