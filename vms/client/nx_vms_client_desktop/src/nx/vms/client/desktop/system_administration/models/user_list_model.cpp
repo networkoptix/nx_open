@@ -2,6 +2,8 @@
 
 #include "user_list_model.h"
 
+#include <boost/container/flat_set.hpp>
+
 #include <client/client_globals.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
@@ -45,7 +47,8 @@ class UserListModel::Private:
     UserListModel* const model;
 
 public:
-    QnUserResourceList users;
+    boost::container::flat_set<QnUserResourcePtr> users;
+    QHash<QString, QSet<QnUuid>> sameNameUsers; //< Used for detection of non-unique user names.
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
@@ -118,10 +121,19 @@ void UserListModel::Private::at_resourcePool_resourceChanged(const QnResourcePtr
 
 void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
 {
-    int row = users.indexOf(user);
-    if (row == -1)
+    const auto it = users.find(user);
+    if (it == users.end())
         return;
 
+    // Update map for non-unique name detection.
+    const auto lowercaseName = user->getName().toLower();
+    auto& usersWithName = sameNameUsers[lowercaseName];
+    usersWithName.remove(user->getId());
+    if (usersWithName.isEmpty())
+        sameNameUsers.remove(lowercaseName);
+    sameNameUsers[lowercaseName].insert(user->getId());
+
+    const auto row = users.index_of(it);
     QModelIndex index = model->index(row);
     emit model->dataChanged(index, index.sibling(row, UserListModel::ColumnCount - 1));
 }
@@ -131,7 +143,7 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
     if (!index.isValid() || index.row() >= users.size())
         return QnUserResourcePtr();
 
-    return users[index.row()];
+    return *users.nth(index.row());
 }
 
 // TODO: #vkutin Move this function to more suitable place. Rewrite it if needed.
@@ -173,16 +185,7 @@ QString UserListModel::Private::permissionsString(const QnUserResourcePtr& user)
 
 bool UserListModel::Private::isUnique(const QnUserResourcePtr& user) const
 {
-    QString userName = user->getName();
-    for (const QnUserResourcePtr& other : users)
-    {
-        if (other == user)
-            continue;
-
-        if (other->getName().compare(userName, Qt::CaseInsensitive) == 0)
-            return false;
-    }
-    return true;
+    return sameNameUsers[user->getName().toLower()].size() <= 1;
 }
 
 Qt::CheckState UserListModel::Private::checkState() const
@@ -219,7 +222,8 @@ void UserListModel::Private::resetUsers(const QnUserResourceList& value)
     model->beginResetModel();
     for (const auto& user: users)
         removeUserInternal(user);
-    users = value;
+    users.clear();
+    users.insert(value.begin(), value.end());
     for (const auto& user: users)
         addUserInternal(user);
     model->endResetModel();
@@ -230,9 +234,10 @@ void UserListModel::Private::addUser(const QnUserResourcePtr& user)
     if (users.contains(user))
         return;
 
-    int row = users.size();
+    const auto row = users.index_of(users.lower_bound(user));
+
     model->beginInsertRows(QModelIndex(), row, row);
-    users.append(user);
+    users.insert(user);
     model->endInsertRows();
 
     addUserInternal(user);
@@ -240,11 +245,12 @@ void UserListModel::Private::addUser(const QnUserResourcePtr& user)
 
 void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 {
-    int row = users.indexOf(user);
-    if (row >= 0)
+    const auto it = users.find(user);
+    if (it != users.end())
     {
+        const auto row = users.index_of(it);
         model->beginRemoveRows(QModelIndex(), row, row);
-        users.removeAt(row);
+        users.erase(user);
         model->endRemoveRows();
     }
 
@@ -253,6 +259,8 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 
 void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
+    sameNameUsers[user->getName().toLower()].insert(user->getId());
+
     connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
     connect(user.get(), &QnUserResource::fullNameChanged, this,
@@ -274,6 +282,12 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 
 void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 {
+    const auto lowercaseName = user->getName().toLower();
+    auto& usersWithName = sameNameUsers[lowercaseName];
+    usersWithName.remove(user->getId());
+    if (usersWithName.isEmpty())
+        sameNameUsers.remove(lowercaseName);
+
     disconnect(user.get(), nullptr, this, nullptr);
     checkedUsers.remove(user);
     enableChangedUsers.remove(user);
@@ -285,9 +299,6 @@ UserListModel::UserListModel(QObject* parent):
     QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
     d(new UserListModel::Private(this))
 {
-    const auto users = resourcePool()->getResources<QnUserResource>();
-    for (const auto& user: users)
-        d->addUser(user);
 }
 
 UserListModel::~UserListModel()
@@ -316,7 +327,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    QnUserResourcePtr user = d->users[index.row()];
+    QnUserResourcePtr user = *d->users.nth(index.row());
 
     switch (role)
     {
@@ -534,10 +545,20 @@ void UserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePtr&
     }
     else
     {
-        auto row = d->users.indexOf(user);
-        if (row >= 0)
+        if (const auto it = d->users.find(user); it != d->users.end())
+        {
+            const auto row = d->users.index_of(it);
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
+        }
     }
+}
+
+int UserListModel::userRow(const QnUserResourcePtr& user) const
+{
+    if (const auto it = d->users.find(user); it != d->users.end())
+        return d->users.index_of(it);
+
+    return -1;
 }
 
 bool UserListModel::isUserEnabled(const QnUserResourcePtr& user) const
@@ -573,7 +594,10 @@ void UserListModel::setDigestEnabled(const QnUserResourcePtr& user, bool enabled
 
 QnUserResourceList UserListModel::users() const
 {
-    return d->users;
+    QnUserResourceList result;
+    for (const auto& user: d->users)
+        result << user;
+    return result;
 }
 
 void UserListModel::resetUsers(const QnUserResourceList& value)
@@ -589,6 +613,11 @@ void UserListModel::addUser(const QnUserResourcePtr& user)
 void UserListModel::removeUser(const QnUserResourcePtr& user)
 {
     d->removeUser(user);
+}
+
+bool UserListModel::contains(const QnUserResourcePtr& user) const
+{
+    return d->users.contains(user);
 }
 
 bool UserListModel::isInteractiveColumn(int column)
