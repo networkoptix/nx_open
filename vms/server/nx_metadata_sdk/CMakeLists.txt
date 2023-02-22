@@ -156,8 +156,7 @@ nx_add_custom_command(OUTPUT ${zip_file}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_sdk_files}
-        # TODO: Commented out to test high mem usage of ninja_tool at CI.
-        #${copied_nx_sdk_analytics_resources_files}
+        ${copied_nx_sdk_analytics_resources_files}
         ${copied_sample_1_files}
         ${copied_sample_2_files}
         ${copied_sample_unit_tests_files}
