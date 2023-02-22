@@ -212,7 +212,7 @@ QString generateUniqueString(
  * your changes will be included under this license, and we will add
  * your name to the list of contributors.
  */
-#define INCBUF() { buffer += curr; ++pos; curr = ( pos < string.length() ) ? string[ pos ] : QChar(); }
+#define INCBUFVIEW() { ++pos; curr = ( pos < string.length() ) ? string[ pos ] : QChar(); }
 
 bool isNumberStart(const QChar &c)
 {
@@ -227,11 +227,18 @@ bool isNumberStart(const QChar &c)
         c.isDigit();
 }
 
-void ExtractToken(QString & buffer, const QString & string, int & pos, bool & isNumber, bool enableFloat)
+void ExtractTokenView(
+    QStringView& buffer,
+    QStringView string,
+    int& pos,
+    bool& isNumber,
+    bool enableFloat)
 {
-    buffer.clear();
+    buffer = {};
     if (string.isNull() || pos >= string.length())
         return;
+
+    int startPos = pos;
 
     isNumber = false;
     QChar curr = string[pos];
@@ -241,26 +248,28 @@ void ExtractToken(QString & buffer, const QString & string, int & pos, bool & is
     {
 #if 0
         if (curr == L'-' || curr == L'+')
-            INCBUF();
+            INCBUFVIEW();
 #endif
 
         if (!curr.isNull() && curr.isDigit())
         {
             isNumber = true;
             while (curr.isDigit())
-                INCBUF();
+                INCBUFVIEW();
 
             if (curr == '.')
             {
                 if (enableFloat)
                 {
-                    INCBUF();
+                    INCBUFVIEW();
                     while (curr.isDigit())
-                        INCBUF();
+                        INCBUFVIEW();
                 }
                 else
                 {
-                             // We are done since we meet first character that is not expected
+                    // We are done since we meet first character that is not expected.
+                    const qsizetype count = std::min((qsizetype) pos, string.size()) - startPos;
+                    buffer = string.sliced(startPos, count);
                     return;
                 }
             }
@@ -271,15 +280,15 @@ void ExtractToken(QString & buffer, const QString & string, int & pos, bool & is
 #if 0
             if (!curr.isNull() && curr.toLower() == L'e')
             {
-                INCBUF();
+                INCBUFVIEW();
                 if (curr == L'-' || curr == L'+')
-                    INCBUF();
+                    INCBUFVIEW();
 
                 if (curr.isNull() || !curr.isDigit())
                     isNumber = false;
                 else
                     while (curr.isDigit())
-                        INCBUF();
+                        INCBUFVIEW();
             }
 #endif
         }
@@ -288,17 +297,24 @@ void ExtractToken(QString & buffer, const QString & string, int & pos, bool & is
     if (!isNumber)
     {
         while (!isNumberStart(curr) && pos < string.length())
-            INCBUF();
+            INCBUFVIEW();
     }
+
+    const qsizetype count = std::min((qsizetype) pos, string.size()) - startPos;
+    buffer = string.sliced(startPos, count);
 }
 
-int naturalStringCompare(const QString & lhs, const QString & rhs, Qt::CaseSensitivity caseSensitive, bool enableFloat)
+int naturalStringCompare(
+    QStringView lhs,
+    QStringView rhs,
+    Qt::CaseSensitivity caseSensitive,
+    bool enableFloat)
 {
     int ii = 0;
     int jj = 0;
 
-    QString lhsBufferQStr;
-    QString rhsBufferQStr;
+    QStringView lhsBufferQStr;
+    QStringView rhsBufferQStr;
 
     int retVal = 0;
 
@@ -313,8 +329,8 @@ int naturalStringCompare(const QString & lhs, const QString & rhs, Qt::CaseSensi
 
     while (retVal == 0 && ii < lhs.length() && jj < rhs.length())
     {
-        ExtractToken(lhsBufferQStr, lhs, ii, lhsNumber, enableFloat);
-        ExtractToken(rhsBufferQStr, rhs, jj, rhsNumber, enableFloat);
+        ExtractTokenView(lhsBufferQStr, lhs, ii, lhsNumber, enableFloat);
+        ExtractTokenView(rhsBufferQStr, rhs, jj, rhsNumber, enableFloat);
 
         if (!lhsNumber && !rhsNumber)
         {
@@ -322,8 +338,8 @@ int naturalStringCompare(const QString & lhs, const QString & rhs, Qt::CaseSensi
             retVal = lhsBufferQStr.compare(rhsBufferQStr, caseSensitive);
 
             int maxLen = qMin(lhsBufferQStr.length(), rhsBufferQStr.length());
-            QString tmpRight = rhsBufferQStr.left(maxLen);
-            QString tmpLeft = lhsBufferQStr.left(maxLen);
+            const auto tmpRight = rhsBufferQStr.left(maxLen);
+            const auto tmpLeft = lhsBufferQStr.left(maxLen);
             if (tmpLeft.compare(tmpRight, caseSensitive) == 0)
             {
                 retVal = lhsBufferQStr.length() - rhsBufferQStr.length();

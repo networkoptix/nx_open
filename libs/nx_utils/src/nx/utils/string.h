@@ -72,7 +72,11 @@ Like QString::toDouble, but throws on failure.
 */
 NX_UTILS_API double parseDouble(const QString& string);
 
-NX_UTILS_API int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive, bool enableFloat = false);
+NX_UTILS_API int naturalStringCompare(
+    QStringView lhs,
+    QStringView rhs,
+    Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive,
+    bool enableFloat = false);
 NX_UTILS_API QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 
 NX_UTILS_API bool naturalStringLess(const QString &lhs, const QString &rhs);
