@@ -13,7 +13,7 @@ P2PWebsocketTransport::P2PWebsocketTransport(
     :
     m_webSocket(new network::WebSocket(std::move(socket), role, frameType, compressionType))
 {
-    BasicPollable::bindToAioThread(m_webSocket->getAioThread());
+    bindToAioThread(m_webSocket->getAioThread());
     m_webSocket->setAliveTimeout(aliveTimeout);
 }
 
@@ -40,6 +40,7 @@ void P2PWebsocketTransport::sendAsync(
 
 void P2PWebsocketTransport::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
+    BasicPollable::bindToAioThread(aioThread);
     m_webSocket->bindToAioThread(aioThread);
 }
 

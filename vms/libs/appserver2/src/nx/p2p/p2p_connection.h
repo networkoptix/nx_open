@@ -36,7 +36,8 @@ public:
         const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject,
-        ConnectionLockGuard connectionLockGuard);
+        ConnectionLockGuard connectionLockGuard,
+        bool pingSupported);
 
     void gotPostConnection(std::unique_ptr<nx::network::AbstractStreamServerSocket> socket);
 
