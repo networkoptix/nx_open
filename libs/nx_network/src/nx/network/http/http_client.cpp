@@ -166,13 +166,13 @@ SystemError::ErrorCode HttpClient::lastSysErrorCode() const
 bool HttpClient::isValid() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return !m_error;
+    return !m_error && !m_terminated;
 }
 
 bool HttpClient::eof() const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    return (m_done && m_msgBodyBuffer.empty()) || m_error;
+    return (m_done && m_msgBodyBuffer.empty()) || m_error || m_terminated;
 }
 
 bool HttpClient::hasRequestSucceeded() const
