@@ -41,9 +41,7 @@ WebSocket::WebSocket(
 
     m_socket->setRecvTimeout(0);
     m_socket->setSendTimeout(0);
-    aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
-    m_pingTimer->bindToAioThread(m_socket->getAioThread());
-    m_pongTimer->bindToAioThread(m_socket->getAioThread());
+    bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(kBufferSize);
 }
 
