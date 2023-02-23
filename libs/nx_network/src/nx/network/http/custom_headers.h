@@ -36,6 +36,7 @@ static constexpr char EC2_SYSTEM_ID_HEADER_NAME[] = "X-Nx-Ec-SYSTEM-Id";
 static constexpr char EC2_CONNECTION_STATE_HEADER_NAME[] = "X-Nx-EC-CONNECTION-STATE";
 static constexpr char EC2_CONNECTION_DIRECTION_HEADER_NAME[] = "X-Nx-Connection-Direction";
 static constexpr char EC2_CONNECTION_GUID_HEADER_NAME[] = "X-Nx-Connection-Guid";
+static constexpr char EC2_PING_ENABLED_HEADER_NAME[] = "X-Nx-Ping-Enabled";
 static constexpr char EC2_CONNECTION_TIMEOUT_HEADER_NAME[] = "X-Nx-Connection-Timeout";
 static constexpr char EC2_GUID_HEADER_NAME[] = "X-guid";
 static constexpr char EC2_CONNECT_STAGE_1[] = "Nx-connect-stage1";

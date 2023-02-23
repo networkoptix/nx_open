@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
 
@@ -79,7 +81,8 @@ public:
         P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
-        std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
+        bool pingSupported);
 
     virtual ~ConnectionBase();
 
@@ -115,7 +118,7 @@ public:
 
             case nx::p2p::FilterResult::deny:
                 // As if the transaction has been sent.
-                m_timer.post([this]() { emit allDataSent(weakPointer()); });
+                m_pingTimer.post([this]() { emit allDataSent(weakPointer()); });
                 return true;
 
             case nx::p2p::FilterResult::deserializedTransactionRequired:
@@ -132,7 +135,7 @@ public:
         if (shouldTransactionBeSentToPeer(tran) != nx::p2p::FilterResult::deny)
             sendMessage(std::forward<Args>(args)...);
         else
-            m_timer.post([this]() { emit allDataSent(weakPointer()); });
+            m_pingTimer.post([this]() { emit allDataSent(weakPointer()); });
     }
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
@@ -170,6 +173,12 @@ public:
 
     void setScopeGuards(std::vector<nx::utils::Guard> guards) { m_scopeGuards = std::move(guards); }
 
+    // For tests.
+    static std::chrono::milliseconds pingTimeout();
+    static void setPingTimeout(std::chrono::milliseconds value);
+    static void setNoPingForTests(bool value);
+    static void setNoPingSupportClientHeader(bool value);
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const nx::Buffer& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -191,6 +200,9 @@ private:
     bool handleMessage(const nx::Buffer& message);
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
+    void initiatePing();
+    void restartPongTimer();
+
 private:
     enum class CredentialsSource
     {
@@ -244,7 +256,7 @@ private:
 
     static SendCounters m_sendCounters;
 
-    network::aio::Timer m_timer;
+    network::aio::Timer m_pingTimer;
     std::chrono::seconds m_keepAliveTimeout;
     std::unique_ptr<QObject> m_opaqueObject;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
@@ -263,6 +275,13 @@ private:
     int64_t m_extraBufferSize = 0;
     size_t m_maxBufferSize = 0;
     std::vector<nx::utils::Guard> m_scopeGuards;
+    bool m_pingSupported = false;
+    nx::network::aio::Timer m_pongTimer;
+
+    // For tests.
+    static std::chrono::milliseconds s_pingTimeout;
+    static bool s_noPingForTests;
+    static bool s_noPingSupportClientHeader;
 };
 
 QString toString(ConnectionBase::State value);

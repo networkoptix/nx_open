@@ -73,6 +73,8 @@ namespace ec2 {
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
 
+        ec2::AbstractTransactionMessageBus* getBus();
+
     public:
         template<class T>
         void sendTransaction(

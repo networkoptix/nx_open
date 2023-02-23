@@ -572,6 +572,8 @@ void MessageBus::at_stateChanged(
 
     NX_VERBOSE(this, "Connection [%1] state changed to [%2]", connection->remotePeer().id, connection->state());
 
+    emit stateChanged(connection->remotePeer().id, toString(connection->state()));
+
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     const auto& remoteId = connection->remotePeer().id;

@@ -35,7 +35,6 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
-    bindToAioThread(m_readHttpClient->getAioThread());
     const auto keepAliveOptions =
         nx::network::KeepAliveOptions(std::chrono::minutes(1), std::chrono::seconds(10), 5);
     m_readHttpClient->setKeepAlive(keepAliveOptions);
@@ -43,7 +42,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_readHttpClient->setAdditionalHeaders(additionalHeaders);
 
-    m_writeHttpClient->bindToAioThread(getAioThread());
+    bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
 }
 
@@ -231,14 +230,27 @@ void P2PHttpClientTransport::startReading()
                     }
                 });
 
-            NX_VERBOSE(this, "startReading: Received response to initial GET request to '%1'", m_url);
-            m_multipartContentParser.setNextFilter(nextFilter);
-            const auto& headers = m_readHttpClient->response()->headers;
-            const auto contentTypeIt = headers.find("Content-Type");
+            const auto statusCode = m_readHttpClient->response()->statusLine.statusCode;
+            NX_VERBOSE(this,
+                "startReading: Received response to initial GET request to '%1', statusCode=%2",
+                m_url, statusCode);
 
-            NX_ASSERT(contentTypeIt != headers.end());
-            if (contentTypeIt == headers.end() ||
-                !m_multipartContentParser.setContentType(contentTypeIt->second))
+            if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+            {
+                m_multipartContentParser.setNextFilter(nextFilter);
+                const auto& headers = m_readHttpClient->response()->headers;
+                const auto contentTypeIt = headers.find("Content-Type");
+
+                NX_ASSERT(contentTypeIt != headers.end());
+                if (contentTypeIt == headers.end() ||
+                    !m_multipartContentParser.setContentType(contentTypeIt->second))
+                {
+                    NX_WARNING(
+                        this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);
+                    m_failed = true;
+                }
+            }
+            else
             {
                 NX_WARNING(
                     this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);

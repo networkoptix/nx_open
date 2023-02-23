@@ -72,6 +72,7 @@ signals:
     void remotePeerUnauthorized(QnUuid id);
     void remotePeerIncompatible(QnUuid id, const QString& message);
     void remotePeerHandshakeError(QnUuid id);
+    void stateChanged(const QnUuid& id, const QString& state);
 
     /** Emitted on a new direct connection to a remote peer has been established */
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
