@@ -35,7 +35,6 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 
     m_readHttpClient->setResponseReadTimeout(0ms);
     m_readHttpClient->setMessageBodyReadTimeout(0ms);
-    bindToAioThread(m_readHttpClient->getAioThread());
     const auto keepAliveOptions =
         nx::network::KeepAliveOptions(std::chrono::minutes(1), std::chrono::seconds(10), 5);
     m_readHttpClient->setKeepAlive(keepAliveOptions);
@@ -43,7 +42,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_readHttpClient->setAdditionalHeaders(additionalHeaders);
 
-    m_writeHttpClient->bindToAioThread(getAioThread());
+    bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
 }
 
@@ -232,7 +231,7 @@ void P2PHttpClientTransport::startReading()
                 });
 
             const auto statusCode = m_readHttpClient->response()->statusLine.statusCode;
-            NX_VERBOSE(this, 
+            NX_VERBOSE(this,
                 "startReading: Received response to initial GET request to '%1', statusCode=%2",
                 m_url, statusCode);
 

@@ -25,6 +25,10 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
+std::chrono::milliseconds ConnectionBase::s_pingTimeout = std::chrono::seconds(60);
+bool ConnectionBase::s_noPingForTests = false;
+bool ConnectionBase::s_noPingSupportClientHeader = false;
+
 #if defined(CHECK_SEQUENCE)
     const int kMessageOffset = 8;
 #else
@@ -83,7 +87,8 @@ ConnectionBase::ConnectionBase(
         m_httpClient->setAuthType(nx::network::http::AuthType::authDigest);
     }
 
-    bindToAioThread(m_timer.getAioThread());
+    m_httpClient->bindToAioThread(m_pingTimer.getAioThread());
+    m_pongTimer.bindToAioThread(m_pingTimer.getAioThread());
 }
 
 ConnectionBase::ConnectionBase(
@@ -92,7 +97,8 @@ ConnectionBase::ConnectionBase(
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
-    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
+    bool pingSupported)
 :
     m_direction(Direction::incoming),
     m_remotePeer(remotePeer),
@@ -100,11 +106,13 @@ ConnectionBase::ConnectionBase(
     m_p2pTransport(std::move(p2pTransport)),
     m_state(State::Connected),
     m_opaqueObject(std::move(opaqueObject)),
-    m_connectionLockGuard(std::move(connectionLockGuard))
+    m_connectionLockGuard(std::move(connectionLockGuard)),
+    m_pingSupported(pingSupported)
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
-    bindToAioThread(m_p2pTransport->getAioThread());
+    m_pingTimer.bindToAioThread(m_p2pTransport->getAioThread());
+    m_pongTimer.bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(
@@ -112,13 +120,16 @@ ConnectionBase::ConnectionBase(
         std::inserter(m_remoteQueryParams, m_remoteQueryParams.end()),
         [](const QPair<QString, QString>& item)
             { return std::make_pair(item.first, item.second); });
+
+    initiatePing();
+    restartPongTimer();
 }
 
 void ConnectionBase::gotPostConnection(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     nx::Buffer requestBody)
 {
-    m_timer.post(
+    m_pingTimer.post(
         [this, socket = std::move(socket), requestBody = std::move(requestBody)]() mutable
         {
             using namespace nx::network;
@@ -136,7 +147,8 @@ void ConnectionBase::gotPostConnection(
 void ConnectionBase::stopWhileInAioThread()
 {
     // All objects in the same AIO thread
-    m_timer.pleaseStopSync();
+    m_pingTimer.pleaseStopSync();
+    m_pongTimer.pleaseStopSync();
     m_p2pTransport.reset();
     m_httpClient.reset();
 }
@@ -149,7 +161,8 @@ void ConnectionBase::pleaseStopSync()
             "Please call pleaseStopSync() in the destructor of the nested class.");
     }
 
-    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    m_pingTimer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    m_pongTimer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()
@@ -324,6 +337,14 @@ void ConnectionBase::onHttpClientDone()
         : websocket::FrameType::binary;
 
     auto compressionType = websocket::compressionType(m_httpClient->response()->headers);
+    const auto pingSupportedHeaderIt = headers.find(Qn::EC2_PING_ENABLED_HEADER_NAME);
+    m_pingSupported =
+        !s_noPingSupportClientHeader
+        && !useWebsocketMode
+        && pingSupportedHeaderIt != headers.cend()
+        && pingSupportedHeaderIt->second == "true";
+
+    initiatePing();
 
     if (useWebsocketMode)
     {
@@ -350,6 +371,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     m_httpClient.reset();
+    m_p2pTransport->bindToAioThread(m_pingTimer.getAioThread());
     m_p2pTransport->start([this](SystemError::ErrorCode errorCode)
         {
             if (errorCode == SystemError::noError)
@@ -367,6 +389,34 @@ void ConnectionBase::onHttpClientDone()
         });
 }
 
+void ConnectionBase::initiatePing()
+{
+    if (!m_pingSupported || s_noPingForTests)
+        return;
+
+    m_pingTimer.start(pingTimeout(), [this]() { sendMessage(MessageType::ping, QByteArray()); });
+}
+
+std::chrono::milliseconds ConnectionBase::pingTimeout()
+{
+    return s_pingTimeout;
+}
+
+void ConnectionBase::setPingTimeout(std::chrono::milliseconds value)
+{
+    s_pingTimeout = value;
+}
+
+void ConnectionBase::setNoPingForTests(bool value)
+{
+    s_noPingForTests = value;
+}
+
+void ConnectionBase::setNoPingSupportClientHeader(bool value)
+{
+    s_noPingSupportClientHeader = value;
+}
+
 void ConnectionBase::startConnection()
 {
     m_startedClassId = typeid(*this).hash_code();
@@ -379,6 +429,9 @@ void ConnectionBase::startConnection()
     }
     m_connectionGuid = QnUuid::createUuid().toByteArray();
     headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
+    if (!s_noPingSupportClientHeader)
+        headers.emplace(Qn::EC2_PING_ENABLED_HEADER_NAME, "true");
+
     m_httpClient->addRequestHeaders(headers);
 
     auto requestUrl = m_remotePeerUrl;
@@ -439,11 +492,14 @@ void ConnectionBase::setState(State state)
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
     if (remotePeer().isClient())
-        NX_ASSERT(messageType == MessageType::pushTransactionData);
+        NX_ASSERT(messageType == MessageType::pushTransactionData
+            || messageType == MessageType::ping);
+
     if (remotePeer().isCloudServer())
     {
         NX_ASSERT(messageType == MessageType::pushTransactionData
-            || messageType == MessageType::subscribeAll);
+            || messageType == MessageType::subscribeAll
+            || messageType == MessageType::ping);
     }
 
     nx::Buffer buffer;
@@ -471,7 +527,7 @@ MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClie
 
 void ConnectionBase::setMaxSendBufferSize(size_t value)
 {
-    m_timer.post(
+    m_pingTimer.post(
         [this, value]()
         {
             m_extraBufferSize = m_dataToSend.dataSize();
@@ -497,7 +553,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
         }
     }
 
-    m_timer.post(
+    m_pingTimer.post(
         [this, data]()
         {
 #ifdef CHECK_SEQUENCE
@@ -550,6 +606,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
         setState(State::Error);
         return;
     }
+
     using namespace std::placeholders;
     m_extraBufferSize = std::max(int64_t(0), m_extraBufferSize - int64_t(m_dataToSend.front().size()));
     m_dataToSend.pop_front();
@@ -566,6 +623,8 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     {
         emit allDataSent(weakPointer());
     }
+
+    initiatePing();
 }
 
 void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
@@ -612,9 +671,34 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
 
     const bool isClient = localPeer().isClient();
     MessageType messageType = getMessageType(message, isClient);
-    emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
+    if (messageType == MessageType::ping)
+    {
+        NX_VERBOSE(this, "Ping received");
+    }
+    else
+    {
+        emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
+    }
+
+    initiatePing();
+    restartPongTimer();
 
     return true;
+}
+
+void ConnectionBase::restartPongTimer()
+{
+    if (!m_pingSupported)
+        return;
+
+    const auto kPongTimeout =
+        std::chrono::milliseconds(static_cast<int64_t>(pingTimeout().count() * 1.5));
+    m_pongTimer.start(
+        kPongTimeout,
+        [this, kPongTimeout]()
+        {
+            cancelConnecting(State::Error, nx::format("No incoming messages for %1", kPongTimeout));
+        });
 }
 
 std::multimap<QString, QString> ConnectionBase::httpQueryParams() const
@@ -629,13 +713,13 @@ QObject* ConnectionBase::opaqueObject()
 
 void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    m_timer.bindToAioThread(aioThread);
+    m_pingTimer.bindToAioThread(aioThread);
     if (m_httpClient)
         m_httpClient->bindToAioThread(aioThread);
+
     if (m_p2pTransport)
         m_p2pTransport->bindToAioThread(aioThread);
 }
-
 
 } // namespace p2p
 } // namespace nx

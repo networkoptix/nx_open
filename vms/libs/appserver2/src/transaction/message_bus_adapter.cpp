@@ -129,4 +129,9 @@ ConnectionGuardSharedState* TransactionMessageBusAdapter::connectionGuardSharedS
     return m_bus->connectionGuardSharedState();
 }
 
+ec2::AbstractTransactionMessageBus* TransactionMessageBusAdapter::getBus()
+{
+    return m_bus.get();
+}
+
 } // namespace ec2
