@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "backup_status_widget.h"
-
 #include "ui_backup_status_widget.h"
 
 #include <api/runtime_info_manager.h>
@@ -234,57 +233,39 @@ void BackupStatusWidget::updateBackupStatus()
     const auto currentTimePoint = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
     const auto resultBackupTimePoint = std::make_shared<milliseconds>(currentTimePoint);
 
-    const auto resourcePool = cameras.first()->resourcePool();
-
     const auto actualPositionCallback = nx::utils::guarded(this,
-        [this, mutex, server = m_server, backupPositionRequestHandles,
-            resultBackupTimePoint, resourcePool]
+        [this, mutex, server = m_server, backupPositionRequestHandles, currentTimePoint,
+            resultBackupTimePoint]
         (bool success, rest::Handle requestId, nx::vms::api::BackupPositionEx actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
             if (auto count = backupPositionRequestHandles->erase(requestId); count > 0 && success)
             {
-                const auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(
-                    actualPosition.deviceId);
-                if (!NX_ASSERT(camera))
-                    return;
-
-                std::vector<milliseconds> backupTimePoints;
-                backupTimePoints.push_back(*resultBackupTimePoint);
-
-                const auto addBackupTimePoint =
-                    [&backupTimePoints](std::chrono::system_clock::time_point timePoint)
+                const auto backupTimePoint =
+                    [currentTimePoint]
+                    (system_clock::time_point backupPosition, milliseconds durationToBackup)
                     {
-                        if (timePoint != nx::vms::api::kDefaultBackupPosition
-                            && timePoint != nx::vms::api::kBackupFailurePosition)
+                        if (backupPosition == nx::vms::api::kBackupFailurePosition)
                         {
-                            backupTimePoints.push_back(
-                                duration_cast<milliseconds>(timePoint.time_since_epoch()));
+                            NX_ASSERT(false,
+                                "An attempt to calculate backup position with no backup storage");
+                            return milliseconds::zero();
                         }
+
+                        if (durationToBackup == milliseconds::zero())
+                            return currentTimePoint;
+
+                        if (backupPosition == nx::vms::api::kDefaultBackupPosition)
+                            return milliseconds::zero();
+
+                        return duration_cast<milliseconds>(backupPosition.time_since_epoch());
                     };
 
-                switch (camera->getActualBackupQualities())
-                {
-                    case nx::vms::api::CameraBackupQuality::CameraBackup_LowQuality:
-                        addBackupTimePoint(actualPosition.positionLowMs);
-                        break;
+                *resultBackupTimePoint = std::min(*resultBackupTimePoint,
+                    backupTimePoint(actualPosition.positionLowMs, actualPosition.toBackupLowMs));
 
-                    case nx::vms::api::CameraBackupQuality::CameraBackup_HighQuality:
-                        addBackupTimePoint(actualPosition.positionHighMs);
-                        break;
-
-                    case nx::vms::api::CameraBackupQuality::CameraBackup_Both:
-                        addBackupTimePoint(actualPosition.positionLowMs);
-                        addBackupTimePoint(actualPosition.positionHighMs);
-                        break;
-
-                    default:
-                        NX_ASSERT(false, "Unexpected backup quality for a camera");
-                        break;
-                }
-
-                std::sort(backupTimePoints.begin(), backupTimePoints.end());
-                *resultBackupTimePoint = backupTimePoints.front();
+                *resultBackupTimePoint = std::min(*resultBackupTimePoint,
+                    backupTimePoint(actualPosition.positionHighMs, actualPosition.toBackupHighMs));
 
                 if (backupPositionRequestHandles->empty())
                 {
@@ -333,6 +314,13 @@ void BackupStatusWidget::onBackupTimePointCalculated(
     {
         ui->descriptionStackedWidget->setCurrentWidget(ui->backupQueuePage);
         ui->skipQueueWidget->setHidden(false);
+    }
+
+    if (backupTimePoint == milliseconds::zero())
+    {
+        ui->backupTimePointLabel->setText(
+            tr("The progress will be displayed once the backup process starts"));
+        return;
     }
 
     const auto backupTimePointLabelText =
