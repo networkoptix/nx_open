@@ -431,16 +431,11 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
     NX_ASSERT(user);
     if (!user)
         return QString();
-    Qn::UserRole userRole = user->userRole();
-    if (userRole == Qn::UserRole::customUserRole)
-    {
-        QStringList names;
-        for (const auto& role: user->userRoleIds())
-            names << this->userRole(role).name;
-        return names.join(", ");
-    }
 
-    return QnPredefinedUserRoles::name(userRole);
+    QStringList names;
+    for (const auto& role: user->userRoleIds())
+        names << this->userRole(role).name;
+    return names.join(", ");
 }
 
 // This function is not thread-safe and should be called under external mutex lock.
