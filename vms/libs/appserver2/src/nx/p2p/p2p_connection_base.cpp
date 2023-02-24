@@ -1,21 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "p2p_connection_base.h"
-#include "p2p_serialization.h"
+
+#include <chrono>
 
 #include <QtCore/QUrlQuery>
 
-#include <nx/utils/log/format.h>
-#include <nx/network/websocket/websocket_handshake.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/fusion/serialization/lexical.h>
 #include <common/static_common_module.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/buffer_source.h>
-#include <transaction/transaction_message_bus_base.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/websocket/websocket_handshake.h>
+#include <nx/p2p/p2p_fwd.h>
+#include <nx/p2p/p2p_serialization.h>
 #include <nx/p2p/transport/p2p_http_client_transport.h>
 #include <nx/p2p/transport/p2p_http_server_transport.h>
 #include <nx/p2p/transport/p2p_websocket_transport.h>
-#include <nx/p2p/transport/p2p_http_client_transport.h>
+#include <nx/utils/log/format.h>
+#include <transaction/transaction_message_bus_base.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -26,7 +28,8 @@ namespace p2p {
 SendCounters ConnectionBase::m_sendCounters = {};
 
 std::chrono::milliseconds ConnectionBase::s_pingTimeout = std::chrono::seconds(60);
-bool ConnectionBase::s_noPingForTests = false;
+bool ConnectionBase::s_noClientPing = false;
+bool ConnectionBase::s_noServerPing = false;
 bool ConnectionBase::s_noPingSupportClientHeader = false;
 
 #if defined(CHECK_SEQUENCE)
@@ -75,7 +78,8 @@ ConnectionBase::ConnectionBase(
     m_remotePeerUrl(remotePeerUrl),
     m_keepAliveTimeout(keepAliveTimeout),
     m_opaqueObject(std::move(opaqueObject)),
-    m_connectionLockGuard(std::move(connectionLockGuard))
+    m_connectionLockGuard(std::move(connectionLockGuard)),
+    m_isClient(true)
 {
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
@@ -89,6 +93,7 @@ ConnectionBase::ConnectionBase(
 
     m_httpClient->bindToAioThread(m_pingTimer.getAioThread());
     m_pongTimer.bindToAioThread(m_pingTimer.getAioThread());
+    NX_DEBUG(this, "Created client p2p connection");
 }
 
 ConnectionBase::ConnectionBase(
@@ -107,7 +112,8 @@ ConnectionBase::ConnectionBase(
     m_state(State::Connected),
     m_opaqueObject(std::move(opaqueObject)),
     m_connectionLockGuard(std::move(connectionLockGuard)),
-    m_pingSupported(pingSupported)
+    m_pingSupported(pingSupported),
+    m_isClient(false)
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
@@ -121,8 +127,8 @@ ConnectionBase::ConnectionBase(
         [](const QPair<QString, QString>& item)
             { return std::make_pair(item.first, item.second); });
 
-    initiatePing();
-    restartPongTimer();
+    initiatePingPong();
+    NX_DEBUG(this, "Created server p2p connection");
 }
 
 void ConnectionBase::gotPostConnection(
@@ -342,7 +348,7 @@ void ConnectionBase::onHttpClientDone()
         && pingSupportedHeaderIt != headers.cend()
         && pingSupportedHeaderIt->second == "true";
 
-    initiatePing();
+    initiatePingPong();
 
     if (useWebsocketMode)
     {
@@ -387,12 +393,31 @@ void ConnectionBase::onHttpClientDone()
         });
 }
 
-void ConnectionBase::initiatePing()
+bool ConnectionBase::isPingPongDisabledForTests() const
 {
-    if (!m_pingSupported || s_noPingForTests)
+    return (m_isClient && s_noClientPing) || (!m_isClient && s_noServerPing);
+}
+
+void ConnectionBase::initiatePingPong()
+{
+    if (!m_pingSupported)
         return;
 
-    m_pingTimer.start(pingTimeout(), [this]() { sendMessage(MessageType::ping, QByteArray()); });
+    if (isPingPongDisabledForTests())
+        return;
+
+    m_pingTimer.start(
+        pingTimeout(),
+        [this]()
+        {
+            sendMessage(MessageType::ping, QByteArray());
+            m_pingTimer.start(
+                pingTimeout() / 2,
+                [this]()
+                {
+                    cancelConnecting(State::Error, "No pong");
+                });
+        });
 }
 
 std::chrono::milliseconds ConnectionBase::pingTimeout()
@@ -405,9 +430,14 @@ void ConnectionBase::setPingTimeout(std::chrono::milliseconds value)
     s_pingTimeout = value;
 }
 
-void ConnectionBase::setNoPingForTests(bool value)
+void ConnectionBase::setNoClientPing(bool value)
 {
-    s_noPingForTests = value;
+    s_noClientPing = value;
+}
+
+void ConnectionBase::setNoServerPing(bool value)
+{
+    s_noServerPing = value;
 }
 
 void ConnectionBase::setNoPingSupportClientHeader(bool value)
@@ -621,8 +651,6 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     {
         emit allDataSent(weakPointer());
     }
-
-    initiatePing();
 }
 
 void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
@@ -671,32 +699,22 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     MessageType messageType = getMessageType(message, isClient);
     if (messageType == MessageType::ping)
     {
-        NX_VERBOSE(this, "Ping received");
+        NX_VERBOSE(this, "Ping received, sending pong");
+        if (!isPingPongDisabledForTests())
+            sendMessage(MessageType::pong, QByteArray());
+    }
+    else if (messageType == MessageType::pong)
+    {
+        NX_VERBOSE(this, "Pong received");
     }
     else
     {
         emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
     }
 
-    initiatePing();
-    restartPongTimer();
+    initiatePingPong();
 
     return true;
-}
-
-void ConnectionBase::restartPongTimer()
-{
-    if (!m_pingSupported)
-        return;
-
-    const auto kPongTimeout =
-        std::chrono::milliseconds(static_cast<int64_t>(pingTimeout().count() * 1.5));
-    m_pongTimer.start(
-        kPongTimeout,
-        [this, kPongTimeout]()
-        {
-            cancelConnecting(State::Error, nx::format("No incoming messages for %1", kPongTimeout));
-        });
 }
 
 std::multimap<QString, QString> ConnectionBase::httpQueryParams() const

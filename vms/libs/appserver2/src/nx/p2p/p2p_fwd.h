@@ -30,6 +30,7 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      */
     subscribeAll,
     ping,
+    pong,
     counter
 )
 
