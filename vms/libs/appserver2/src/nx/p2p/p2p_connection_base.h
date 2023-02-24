@@ -176,7 +176,8 @@ public:
     // For tests.
     static std::chrono::milliseconds pingTimeout();
     static void setPingTimeout(std::chrono::milliseconds value);
-    static void setNoPingForTests(bool value);
+    static void setNoClientPing(bool value);
+    static void setNoServerPing(bool value);
     static void setNoPingSupportClientHeader(bool value);
 
 signals:
@@ -200,8 +201,8 @@ private:
     bool handleMessage(const nx::Buffer& message);
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
-    void initiatePing();
-    void restartPongTimer();
+    void initiatePingPong();
+    bool isPingPongDisabledForTests() const;
 
 private:
     enum class CredentialsSource
@@ -277,10 +278,12 @@ private:
     std::vector<nx::utils::Guard> m_scopeGuards;
     bool m_pingSupported = false;
     nx::network::aio::Timer m_pongTimer;
+    const bool m_isClient;
 
     // For tests.
     static std::chrono::milliseconds s_pingTimeout;
-    static bool s_noPingForTests;
+    static bool s_noClientPing;
+    static bool s_noServerPing;
     static bool s_noPingSupportClientHeader;
 };
 
