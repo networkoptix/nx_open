@@ -442,8 +442,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             // to find new camera and change 'manual' flag from true to false.
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded() 
-                && !existingCamRes->getUrl().isEmpty())
+                && !existingCamRes->getUrl().isEmpty() 
+                && camRes->getHostAddress() == existingCamRes->getHostAddress())
             {
+                NX_VERBOSE(this, "Ignore auto discovered camera %1 because it is added manually", camRes);
                 if (isEdgeServer())
                 {
                     /* Speed optimization for ARM servers. --akolesnikov */
