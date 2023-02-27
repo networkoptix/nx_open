@@ -24,6 +24,10 @@ class NX_VMS_CLIENT_DESKTOP_API AbstractStateViewBuilder: public QObject
 public:
     virtual ~AbstractStateViewBuilder() {};
 
+    /**
+     * Builds a state view using filter. Note that filter must remain valid for the lifetime of
+     * AbstractStateViewBuilder.
+     */
     virtual AbstractStateView* stateView(
         const AbstractStateViewFilter* filter = nullptr) const = 0;
 
