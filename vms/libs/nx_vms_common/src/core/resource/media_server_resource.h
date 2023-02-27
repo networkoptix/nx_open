@@ -35,6 +35,8 @@ public:
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
 
+    bool isEdgeServer() const;
+
     /** Overrides QnResource::getName. Returns server name from
      *  nx::vms::api::MediaServerUserAttributesData.
      * */
@@ -213,7 +215,7 @@ private:
 
     nx::utils::CachedValue<Qn::PanicMode> m_panicModeCache;
 
-    // This extension initialized only for EDGE servers.
+    // This extension is initialized only for Edge Servers.
     nx::core::resource::edge::EdgeServerStateTracker* edgeServerStateTracker();
     QScopedPointer<nx::core::resource::edge::EdgeServerStateTracker> m_edgeServerStateTracker;
 
