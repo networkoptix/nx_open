@@ -189,7 +189,7 @@ void apiIdDataTriggerNotificationHelper(
                 tran,
                 notificationParams.source);
         case ApiCommand::removeUser:
-        case ApiCommand::removeUserRole:
+        case ApiCommand::removeUserGroup:
             return notificationParams.userNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
@@ -729,11 +729,12 @@ struct SaveUserAccess
             }
 
             if (param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
-                && (param.isCloud || existingUser->getDigest() == param.digest)
+                && (param.type == nx::vms::api::UserType::cloud
+                    || existingUser->getDigest() == param.digest)
                 && existingUser->getName() != param.name)
             {
                 return Result(ErrorCode::forbidden,
-                    param.isCloud
+                    (param.type == nx::vms::api::UserType::cloud)
                         ? nx::format(ServerApiErrors::tr(
                             "User '%1' will not be saved because names differ: "
                             "'%1' vs '%2' and changing name is forbidden for %3 users.",
@@ -760,19 +761,19 @@ struct SaveUserAccess
                 "Won't save new user with empty name.")));
         }
 
-        if (!existingUser && param.isAdmin)
+        if (!existingUser && param.isOwner())
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "Creating an owner user is not allowed.")));
         }
 
-        if (!systemContext->userRolesManager()->hasRoles(param.userRoleIds))
+        if (!systemContext->userRolesManager()->hasRoles(param.groupIds))
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "User Role does not exist.")));
         }
 
-        if (param.isCloud
+        if (param.type == nx::vms::api::UserType::cloud
             && ((existingUser && param.fullName != existingUser->fullName())
                 || (!existingUser && !param.fullName.isEmpty())))
         {
@@ -783,6 +784,12 @@ struct SaveUserAccess
 
         auto r = ModifyResourceAccess()(systemContext, accessData, param);
         return r;
+    }
+
+    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
+        const nx::vms::api::UserDataDeprecated& param)
+    {
+        return Result(ErrorCode::badRequest, "Deprecated user structure");
     }
 };
 
@@ -1390,7 +1397,7 @@ struct SaveUserRoleAccess
         }
 
         auto userRoleManager = systemContext->userRolesManager();
-        const auto parentRoles = userRoleManager->userRolesWithParents(param.parentRoleIds);
+        const auto parentRoles = userRoleManager->userRolesWithParents(param.parentGroupIds);
         if (const auto cycledRole =
             nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
         {
@@ -1442,7 +1449,7 @@ struct RemoveUserRoleAccess
 
         for (const auto& role: systemContext->userRolesManager()->userRoles())
         {
-            if (nx::utils::find_if(role.parentRoleIds, [&](const auto& id) { return id == param.id; }))
+            if (nx::utils::find_if(role.parentGroupIds, [&](const auto& id) { return id == param.id; }))
             {
                 return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                     "Removing Role is forbidden because it is still inherited by '%1'."),

@@ -398,14 +398,29 @@ bool QnUserResource::isBuiltInAdmin() const
 
 bool QnUserResource::isOwner() const
 {
-    return m_isOwner;
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return nx::utils::find_if(m_userRoleIds,
+        [](const auto id) { return id == nx::vms::api::UserData::kOwnerGroupId; });
 }
 
-void QnUserResource::setOwner(bool isOwner)
+void QnUserResource::setOwner(bool value)
 {
-    const auto oldValue = m_isOwner.exchange(isOwner);
-    if (oldValue != isOwner)
-        emit permissionsChanged(::toSharedPointer(this));
+    if (value == isOwner())
+        return;
+
+    auto groupIds = userRoleIds();
+    if (value)
+    {
+        groupIds.insert(groupIds.begin(), nx::vms::api::UserData::kOwnerGroupId);
+    }
+    else
+    {
+        nx::utils::erase_if(groupIds,
+            [](const auto id) { return id == nx::vms::api::UserData::kOwnerGroupId; });
+    }
+
+    setUserRoleIds(groupIds);
+    emit permissionsChanged(::toSharedPointer(this));
 }
 
 std::vector<QnUuid> QnUserResource::userRoleIds() const
@@ -637,12 +652,6 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         const bool wasEnabled = m_isEnabled.exchange(isEnabled);
         if (isEnabled != wasEnabled)
             notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
-
-        if (m_isOwner != localOther->m_isOwner)
-        {
-            m_isOwner.store(localOther->m_isOwner.load());
-            notifiers << [r = toSharedPointer(this)] { emit r->permissionsChanged(r); };
-        }
 
         if (m_externalId != localOther->m_externalId)
         {

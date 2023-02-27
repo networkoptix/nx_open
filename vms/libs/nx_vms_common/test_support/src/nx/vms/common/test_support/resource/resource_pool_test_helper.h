@@ -61,10 +61,10 @@ public:
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
     nx::vms::api::UserRoleData createRole(
-        GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds = {});
+        GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds = {});
 
     nx::vms::api::UserRoleData createRole(const QString& name,
-        GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds = {});
+        GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds = {});
 
     void removeRole(const QnUuid& roleId);
 

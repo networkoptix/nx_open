@@ -31,7 +31,7 @@ MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const 
         .id = group.id,
         .text = group.name,
         .description = group.description,
-        .isLdap = group.isLdap,
+        .isLdap = (group.type == nx::vms::api::UserType::ldap),
         .isPredefined = group.isPredefined};
 }
 
@@ -295,7 +295,7 @@ void MembersModel::readUsersAndGroups()
                     return;
 
                 const QSet<QnUuid> groupsWithChangedMembers =
-                    {userGroup.parentRoleIds.begin(), userGroup.parentRoleIds.end()};
+                    {userGroup.parentGroupIds.begin(), userGroup.parentGroupIds.end()};
 
                 m_cache->modify({}, {userGroup.id}, groupsWithChangedMembers, {});
 

@@ -59,7 +59,8 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = data->name,
             .description = data->description,
             .isGroup = true,
-            .isLdap = data->isLdap};
+            .isLdap = (data->type == nx::vms::api::UserType::ldap),
+        };
     }
     if (const auto group = groupsManager->userRole(id); !group.id.isNull())
     {
@@ -67,7 +68,8 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = group.name,
             .description = group.description,
             .isGroup = true,
-            .isLdap = group.isLdap};
+            .isLdap = (group.type == nx::vms::api::UserType::ldap),
+        };
     }
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))

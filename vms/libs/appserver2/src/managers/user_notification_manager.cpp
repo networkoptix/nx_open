@@ -29,7 +29,7 @@ void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::UserRoleData>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::saveUserRole);
+    NX_ASSERT(tran.command == ApiCommand::saveUserGroup);
     emit userRoleAddedOrUpdated(tran.params);
 }
 
@@ -37,11 +37,11 @@ void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource source)
 {
-    NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserRole)
+    NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserGroup)
     ;
     if (tran.command == ApiCommand::removeUser)
         emit removed(tran.params.id, source);
-    else if (tran.command == ApiCommand::removeUserRole)
+    else if (tran.command == ApiCommand::removeUserGroup)
         emit userRoleRemoved(tran.params.id);
 }
 

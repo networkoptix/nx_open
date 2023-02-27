@@ -732,7 +732,6 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         body.fullName = user->fullName();
         body.permissions = user->getRawPermissions();
         body.isEnabled = user->isEnabled();
-        body.isOwner = user->isOwner();
         switch (digestSupport)
         {
             case QnUserResource::DigestSupport::enable:
@@ -748,7 +747,7 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         if (const auto password = user->getPassword(); !password.isEmpty())
             body.password = password;
 
-        body.userGroupIds = user->userRoleIds();
+        body.groupIds = user->userRoleIds();
 
         const auto accessRights = systemContext->accessRightsManager()->ownResourceAccessMap(
             user->getId());
@@ -850,7 +849,6 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
             body.fullName = user->fullName();
             body.permissions = user->getRawPermissions();
             body.isEnabled = user->isEnabled();
-            body.isOwner = user->isOwner();
 
             switch (digestSupport)
             {
@@ -868,7 +866,7 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
             if (const auto password = user->getPassword(); !password.isEmpty())
                 body.password = password;
 
-            body.userGroupIds = user->userRoleIds();
+            body.groupIds = user->userRoleIds();
 
             const auto accessRights = systemContext->accessRightsManager()->ownResourceAccessMap(
                 user->getId());
@@ -1013,13 +1011,12 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
                 body.fullName = user->fullName();
                 body.permissions = user->getRawPermissions();
                 body.isEnabled = user->isEnabled();
-                body.isOwner = user->isOwner();
                 // Set isHttpDigestEnabled to false (default) for Cloud users so the server can
                 // ignore this value.
                 body.isHttpDigestEnabled =
                     user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub
                     && user->userType() != nx::vms::api::UserType::cloud;
-                body.userGroupIds = user->userRoleIds();
+                body.groupIds = user->userRoleIds();
             }
             body.resourceAccessRights =
                 {{accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd()}};
@@ -1043,7 +1040,7 @@ void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& su
             const auto group = userRolesManager()->userRole(body.id);
             body.name = group.name;
             body.description = group.description;
-            body.parentGroupIds = group.parentRoleIds;
+            body.parentGroupIds = group.parentGroupIds;
             body.permissions = group.permissions;
             body.resourceAccessRights =
                 {{accessRights.constKeyValueBegin(), accessRights.constKeyValueEnd()}};
@@ -1173,7 +1170,7 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
         body.id = role.id;
         body.name = role.name;
         body.description = role.description;
-        body.parentGroupIds = role.parentRoleIds;
+        body.parentGroupIds = role.parentGroupIds;
         body.permissions = role.permissions;
         body.resourceAccessRights = {accessRights.keyValueBegin(), accessRights.keyValueEnd()};
 
@@ -1181,9 +1178,7 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
             ? helper
             : systemContext->restApiHelper()->getSessionTokenHelper();
 
-        body.type = role.isLdap
-            ? nx::vms::api::UserType::ldap
-            : nx::vms::api::UserType::local;
+        body.type = role.type;
 
         if (isNewGroup)
         {

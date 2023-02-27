@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/fusion/serialization/csv.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -23,7 +24,7 @@
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/api/data/update_sequence_data.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <nx/vms/api/data/user_data_deprecated.h>
 
 namespace ec2 {
 
@@ -678,12 +679,12 @@ APPLY(500, getUsers, nx::vms::api::UserDataList, \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(501, saveUser, nx::vms::api::UserData, \
+APPLY(501, saveUserDeprecated, nx::vms::api::UserDataDeprecated, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       UserNotificationManagerHelper(), \
+                       InvalidTriggerNotificationHelper(), \
                        SaveUserAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
@@ -738,7 +739,7 @@ APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserRoles, nx::vms::api::UserRoleDataList, \
+APPLY(505, getUserGroups, nx::vms::api::UserRoleDataList, \
                        false, \
                        false, \
                        false, /*isRemoveOperation*/ \
@@ -750,7 +751,7 @@ APPLY(505, getUserRoles, nx::vms::api::UserRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserRole, nx::vms::api::UserRoleData, \
+APPLY(506, saveUserGroup, nx::vms::api::UserRoleData, \
                        true, \
                        false, \
                        false, /*isRemoveOperation*/ \
@@ -762,7 +763,7 @@ APPLY(506, saveUserRole, nx::vms::api::UserRoleData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(507, removeUserRole, nx::vms::api::IdData, \
+APPLY(507, removeUserGroup, nx::vms::api::IdData, \
                        true, \
                        false, \
                        true, /*isRemoveOperation*/ \
@@ -1606,6 +1607,18 @@ APPLY(10500, serverRuntimeEvent, nx::vms::api::ServerRuntimeEventData, \
                         InvalidFilterFunc(), /* Filter read func */ \
                         AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                         RegularTransactionType()) /* regular transaction type */ \
+APPLY(10501, saveUser, nx::vms::api::UserData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       false, /*isRemoveOperation*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       UserNotificationManagerHelper(), \
+                       SaveUserAccess(), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       ReadResourceAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(10600, getLookupLists, nx::vms::api::LookupListDataList, \
     /*persistent*/ false, \
     /*system*/ false, \

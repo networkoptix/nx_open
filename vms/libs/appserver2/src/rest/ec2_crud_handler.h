@@ -284,7 +284,7 @@ private:
         else if constexpr(std::is_same_v<T, nx::vms::api::UserDataList>)
             return ApiCommand::Value::getUsers;
         else if constexpr(std::is_same_v<T, nx::vms::api::UserRoleDataList>)
-            return ApiCommand::Value::getUserRoles;
+            return ApiCommand::Value::getUserGroups;
         else if constexpr(std::is_same_v<T, nx::vms::api::LayoutDataList>)
             return ApiCommand::Value::getLayouts;
         else if constexpr(std::is_same_v<T, nx::vms::api::ShowreelDataList>)
@@ -352,7 +352,7 @@ private:
         else if constexpr (std::is_same_v<T, nx::vms::api::UserDataEx>)
             return ApiCommand::Value::saveUser;
         else if constexpr (std::is_same_v<T, nx::vms::api::UserRoleData>)
-            return ApiCommand::Value::saveUserRole;
+            return ApiCommand::Value::saveUserGroup;
         else if constexpr (std::is_same_v<T, nx::vms::api::LayoutData>)
             return ApiCommand::Value::saveLayout;
         else if constexpr (std::is_same_v<T, nx::vms::api::ShowreelData>)

@@ -28,19 +28,17 @@ Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 {
     if (!userDataEx->password.isEmpty())
     {
-        const auto hashes = PasswordData::calculateHashes(userDataEx->name, userDataEx->password,
-            userDataEx->isLdap);
+        const auto hashes = PasswordData::calculateHashes(
+            userDataEx->name, userDataEx->password,
+            userDataEx->type == nx::vms::api::UserType::ldap);
 
-        userDataEx->realm = hashes.realm;
         userDataEx->hash = hashes.passwordHash;
         userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
         if (userDataEx->digest != nx::vms::api::UserData::kHttpIsDisabledStub)
             userDataEx->digest = hashes.passwordDigest;
     }
-    if (userDataEx->realm.isEmpty())
-        userDataEx->realm = QString::fromStdString(nx::network::AppInfo::realm());
 
-    if (userDataEx->isCloud)
+    if (userDataEx->type == nx::vms::api::UserType::cloud)
     {
         if (userDataEx->name.isEmpty())
             userDataEx->name = userDataEx->email;
@@ -48,9 +46,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
         if (userDataEx->digest.isEmpty())
             userDataEx->digest = nx::vms::api::UserData::kCloudPasswordStub;
     }
-    if (userDataEx->adaptFromDeprecatedApi())
-        return Result();
-    return Result(ErrorCode::badRequest, "Conflict in Deprecated API fields");
+    return Result();
 }
 
 Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)

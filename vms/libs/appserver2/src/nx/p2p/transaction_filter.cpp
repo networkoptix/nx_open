@@ -21,12 +21,25 @@ bool TransactionFilter::parse(const QByteArray& json)
 }
 
 TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
-    const nx::vms::api::UserData& user,
+    const nx::vms::api::UserDataDeprecated& user,
     const std::map<std::string, std::string>& contents) const
 {
     if (auto it = contents.find("isCloud"); it != contents.end())
     {
         if (user.isCloud != (nx::utils::stricmp(it->second, "true") == 0))
+            return MatchResult::notMatched;
+    }
+
+    return MatchResult::matched;
+}
+
+TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
+    const nx::vms::api::UserData& user,
+    const std::map<std::string, std::string>& contents) const
+{
+    if (auto it = contents.find("type"); it != contents.end())
+    {
+        if (toString(user.type) != QString::fromStdString(it->second))
             return MatchResult::notMatched;
     }
 
@@ -58,7 +71,8 @@ TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
  * This filter repressents Cloud filter as of now.
  * 10200: saveSystemMergeHistoryRecord
  * 502: removeUser
- * 501: saveUser
+ * 501: saveUserDeprecated
+ * 10501: saveUser
  * 208: setResourceParam
  * 209: removeResourceParam
  * "99cbc715-539b-4bfe-856f-799b45b69b1e": admin guid
@@ -74,6 +88,12 @@ static constexpr char kCloudFilterJson[] = R"json(
             "ids": [501],
             "contents": {
                 "isCloud": "true"
+            }
+        },
+        {
+            "ids": [10501],
+            "contents": {
+                "type": "cloud"
             }
         },
         {

@@ -585,10 +585,10 @@ namespace Qn {
         customUserRole = -2,
         customPermissions = -1,
         owner = 0,
-        administrator,
-        advancedViewer,
-        viewer,
-        liveViewer
+        administrator = 1,
+        advancedViewer = 2,
+        viewer = 3,
+        liveViewer = 4
     };
     Q_ENUM_NS(UserRole)
     NX_VMS_COMMON_API QString toString(UserRole value);

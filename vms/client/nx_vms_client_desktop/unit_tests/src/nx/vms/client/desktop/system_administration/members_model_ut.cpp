@@ -111,7 +111,7 @@ public:
         api::UserRoleData group;
         group.setId(QnUuid::createUuid());
         group.name = name;
-        group.parentRoleIds = parents;
+        group.parentGroupIds = parents;
         systemContext()->userRolesManager()->addOrUpdateUserRole(group);
         return group.id;
     }
@@ -130,31 +130,15 @@ public:
         for (const auto& user: allUsers)
         {
             std::vector<QnUuid> ids = user->userRoleIds();
-
-            ids.erase(
-                std::remove_if(
-                    ids.begin(),
-                    ids.end(),
-                    [&user](auto id){ return id == user->getId(); }),
-                ids.end());
-
-            user->setUserRoleIds(ids);
+            if (nx::utils::erase_if(ids, [&user](auto id){ return id == user->getId(); }))
+                user->setUserRoleIds(ids);
         }
 
         for (auto group: systemContext()->userRolesManager()->userRoles())
         {
-            const auto last = group.parentRoleIds.end();
-            const auto it = group.parentRoleIds.erase(
-                std::remove_if(
-                    group.parentRoleIds.begin(),
-                    last,
-                    [&group](auto id){ return id == group.id; }),
-                last);
-
-            if (it == last) // Nothing was removed.
-                continue;
-
-            systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+            const auto isTargetGroup = [&group](auto id){ return id == group.id; };
+            if (nx::utils::erase_if(group.parentGroupIds, isTargetGroup))
+                systemContext()->userRolesManager()->addOrUpdateUserRole(group);
         }
 
         systemContext()->userRolesManager()->removeUserRole(id);

@@ -46,15 +46,6 @@ TEST_F(ResourceAccessSubjectsCacheTest, PredefinedRoles)
     EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 2);
     EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 0);
     EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 0);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 0);
-
-    u2->setUserRoleIds({kAdminRoleId});
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 2);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 0);
     EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 0);
@@ -66,62 +57,17 @@ TEST_F(ResourceAccessSubjectsCacheTest, PredefinedRoles)
     EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 0);
     EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 0);
-
-    u3->setUserRoleIds({kViewerRoleId});
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 3);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
 
     const auto u4 = addUser(GlobalPermission::owner, "u4");
     EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 4);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 0);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
-
-    u4->setUserRoleIds({kOwnerRoleId});
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 4);
     EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 1);
     EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
     EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
     EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
-
-    const auto u5 = addUser(GlobalPermission::viewerPermissions | GlobalPermission::customUser, "u5");
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 5);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
-
-    const auto u6 = addUser(GlobalPermission::viewerPermissions, "u6");
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 6);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 1);
-
-    u6->setUserRoleIds({kViewerRoleId});
-    EXPECT_EQ(cache()->allSubjects().size(), predefinedRoleCount() + 6);
-    EXPECT_EQ(cache()->allUsersInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kOwnerRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allSubjectsInRole(kAdminRoleId).size(), 1);
-    EXPECT_EQ(cache()->allUsersInRole(kViewerRoleId).size(), 2);
-    EXPECT_EQ(cache()->allSubjectsInRole(kViewerRoleId).size(), 2);
 }
 
 TEST_F(ResourceAccessSubjectsCacheTest, CustomRoles)

@@ -242,10 +242,10 @@ void GroupSettingsDialog::removeGroups(
 
     for (auto group: systemContext->userRolesManager()->userRoles())
     {
-        const auto last = group.parentRoleIds.end();
-        const auto it = group.parentRoleIds.erase(
+        const auto last = group.parentGroupIds.end();
+        const auto it = group.parentGroupIds.erase(
             std::remove_if(
-                group.parentRoleIds.begin(),
+                group.parentGroupIds.begin(),
                 last,
                 [&idsToRemove](auto id){ return idsToRemove.contains(id); }),
             last);
@@ -305,10 +305,10 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
 
         state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
             groupId);
-        state.isLdap = groupData.isLdap;
+        state.isLdap = (groupData.type == nx::vms::api::UserType::ldap);
         state.isPredefined = groupData.isPredefined;
 
-        for (const auto& parentGroupId: groupData.parentRoleIds)
+        for (const auto& parentGroupId: groupData.parentGroupIds)
             state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), parentGroupId));
 
         QList<QnUuid> users;
@@ -324,8 +324,8 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
 
         for (const auto& group: systemContext()->userRolesManager()->userRoles())
         {
-            if (std::find(group.parentRoleIds.begin(), group.parentRoleIds.end(), groupId)
-                != group.parentRoleIds.end())
+            if (std::find(group.parentGroupIds.begin(), group.parentGroupIds.end(), groupId)
+                != group.parentGroupIds.end())
             {
                 state.groups.insert(group.id);
             }
@@ -346,9 +346,9 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 
     groupData.name = state.name;
     groupData.description = state.description;
-    groupData.parentRoleIds.clear();
+    groupData.parentGroupIds.clear();
     for (const auto& group: state.parentGroups)
-        groupData.parentRoleIds.push_back(group.id);
+        groupData.parentGroupIds.push_back(group.id);
 
     groupData.permissions = state.globalPermissions;
 
@@ -410,7 +410,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
                 for (const auto& id: groupsDiff.added)
                 {
                     auto userGroup = systemContext()->userRolesManager()->userRole(id);
-                    userGroup.parentRoleIds.push_back(groupData.id);
+                    userGroup.parentGroupIds.push_back(groupData.id);
                     qnResourcesChangesManager->saveUserRole(
                         userGroup, systemContext(), handleGroupAdded);
                 }
@@ -456,12 +456,12 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     {
         auto userGroup = systemContext()->userRolesManager()->userRole(id);
 
-        userGroup.parentRoleIds.erase(
+        userGroup.parentGroupIds.erase(
             std::remove(
-                userGroup.parentRoleIds.begin(),
-                userGroup.parentRoleIds.end(),
+                userGroup.parentGroupIds.begin(),
+                userGroup.parentGroupIds.end(),
                 groupData.id),
-            userGroup.parentRoleIds.end());
+            userGroup.parentGroupIds.end());
 
         qnResourcesChangesManager->saveUserRole(userGroup, systemContext(), handleGroupRemoved);
     }

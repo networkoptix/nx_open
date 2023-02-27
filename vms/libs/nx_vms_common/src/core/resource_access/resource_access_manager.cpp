@@ -816,10 +816,10 @@ bool QnResourceAccessManager::canModifyStorage(
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     const nx::vms::api::UserData& data) const
 {
-    if (data.isCloud && !data.fullName.isEmpty())
+    if (data.type == UserType::cloud && !data.fullName.isEmpty())
         return false; //< Full name for cloud users is allowed to modify via cloud portal only.
 
-    return canCreateUser(subject, data.permissions, data.userRoleIds, data.isAdmin);
+    return canCreateUser(subject, data.permissions, data.groupIds, data.isOwner());
 }
 
 bool QnResourceAccessManager::canCreateUser(
@@ -861,7 +861,7 @@ bool QnResourceAccessManager::canModifyUser(
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!userRolesManager()->hasRoles(update.userRoleIds))
+    if (!userRolesManager()->hasRoles(update.groupIds))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();
@@ -870,14 +870,14 @@ bool QnResourceAccessManager::canModifyUser(
     if (!subject.isValid() || !target)
         return false;
 
-    // Nobody can make user an owner (isAdmin ec2 field) unless target user is already an owner.
-    if (!userResource->isOwner() && update.isAdmin)
+    // Nobody can make user an owner unless target user is already an owner.
+    if (!userResource->isOwner() && update.isOwner())
         return false;
 
     const auto sourcePermissions = accumulatePermissions(
         userResource->getRawPermissions(), userResource->userRoleIds());
 
-    const auto targetPermissions = accumulatePermissions(update.permissions, update.userRoleIds);
+    const auto targetPermissions = accumulatePermissions(update.permissions, update.groupIds);
 
     if (sourcePermissions.testFlag(GlobalPermission::admin)
         || targetPermissions.testFlag(GlobalPermission::admin))
@@ -887,7 +887,7 @@ bool QnResourceAccessManager::canModifyUser(
     }
 
     // Changing user type is always prohibited.
-    if (userResource->userType() != nx::vms::api::type(update))
+    if (userResource->userType() != update.type)
         return false;
 
     /* We should have full access to user to modify him. */

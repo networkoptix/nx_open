@@ -26,10 +26,16 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalP
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);
-    if (globalPermissions.testFlag(GlobalPermission::owner))
-        user->setOwner(true);
-    else
-        user->setRawPermissions(globalPermissions);
+
+    // Handle deprecated permission presets as predefined user groups.
+    globalPermissions.setFlag(GlobalPermission::customUser, false);
+    if (const auto id = QnPredefinedUserRoles::presetId(globalPermissions))
+    {
+        user->setUserRoleIds({*id});
+        globalPermissions &= ~QnPredefinedUserRoles::get(*id)->permissions;
+    }
+
+    user->setRawPermissions(globalPermissions);
     user->addFlags(Qn::remote);
     return user;
 }
@@ -216,16 +222,16 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
 }
 
 nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(
-    GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds)
+    GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds)
 {
     return createRole(NX_FMT("Role for %1", nx::reflect::json::serialize(permissions)),
-        permissions, parentRoleIds);
+        permissions, parentGroupIds);
 }
 
 nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(const QString& name,
-    GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds)
+    GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds)
 {
-    nx::vms::api::UserRoleData role{QnUuid::createUuid(), name, permissions, parentRoleIds};
+    nx::vms::api::UserRoleData role{QnUuid::createUuid(), name, permissions, parentGroupIds};
     userRolesManager()->addOrUpdateUserRole(role);
     return role;
 }

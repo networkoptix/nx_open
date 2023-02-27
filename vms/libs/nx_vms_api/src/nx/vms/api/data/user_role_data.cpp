@@ -10,12 +10,12 @@ UserRoleData::UserRoleData(
     const QnUuid& id,
     const QString& name,
     GlobalPermissions permissions,
-    std::vector<QnUuid> parentRoleIds)
+    std::vector<QnUuid> parentGroupIds)
     :
     IdData(id),
     name(name),
     permissions(permissions),
-    parentRoleIds(std::move(parentRoleIds))
+    parentGroupIds(std::move(parentGroupIds))
 {
 }
 

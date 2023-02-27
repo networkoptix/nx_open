@@ -16,11 +16,12 @@
 #include <core/resource/webpage_resource.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/app_info.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
-#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -555,26 +556,28 @@ void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& 
 
 QnUserResourcePtr fromApiToResource(const UserData& src)
 {
-    QnUserResourcePtr dst(new QnUserResource(nx::vms::api::type(src), src.externalId));
+    QnUserResourcePtr dst(new QnUserResource(src.type, src.externalId));
     fromApiToResource(src, dst);
     return dst;
 }
 
 void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 {
-    NX_ASSERT(dst->userType() == nx::vms::api::type(src), "Unexpected user type");
+    NX_ASSERT(dst->userType() == src.type, "Unexpected user type");
 
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
-    dst->setOwner(src.isAdmin);
+    dst->setOwner(src.isOwner());
     dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
-    dst->setUserRoleIds(src.userRoleIds);
+    dst->setUserRoleIds(src.groupIds);
     dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
 
-    dst->setPasswordHashes({src.realm, src.hash, src.digest, src.cryptSha512Hash});
+    dst->setPasswordHashes({
+        QString::fromStdString(nx::network::AppInfo::realm()),
+        src.hash, src.digest, src.cryptSha512Hash});
 }
 
 void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
@@ -582,16 +585,14 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     fromResourceToApi(src, static_cast<ResourceData&>(dst));
     dst.hash = src->getHash().toString();
     dst.digest = src->getDigest();
-    dst.isAdmin = src->isOwner();
     dst.isEnabled = src->isEnabled();
     dst.permissions = src->getRawPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
-    dst.realm = src->getRealm();
-    dst.userRoleIds = src->userRoleIds();
+    dst.groupIds = src->userRoleIds();
     dst.fullName = src->fullName();
     dst.externalId = src->externalId();
-    nx::vms::api::setType(&dst, src->userType());
+    dst.type = src->userType();
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)

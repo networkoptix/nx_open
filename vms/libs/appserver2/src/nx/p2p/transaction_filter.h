@@ -140,6 +140,10 @@ private:
     }
 
     MatchResult matchSpecificContents(
+        const nx::vms::api::UserDataDeprecated& user,
+        const std::map<std::string, std::string>& contents) const;
+
+    MatchResult matchSpecificContents(
         const nx::vms::api::UserData& user,
         const std::map<std::string, std::string>& contents) const;
 
