@@ -76,7 +76,7 @@ public:
 
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds.
-     *                                  For example, 'AreconVision' or 'IQInVision'.
+     *                                  For example, 'ArecontVision' or 'IQInVision'.
      */
     virtual QString manufacturer() const = 0;
 
