@@ -11,14 +11,12 @@ Group
     property string name: ""
     childrenItem: column
 
-    width: parent.width
+    property bool fillWidth: true
 
-    contentItem: AlignedColumn
+    contentItem: LabeledColumnLayout
     {
         id: column
 
-        labelWidthHint: (control.parent && control.parent.hasOwnProperty("labelWidth"))
-            ? control.parent.labelWidth - control.x - column.x
-            : 0
+        layoutControl: control
     }
 }

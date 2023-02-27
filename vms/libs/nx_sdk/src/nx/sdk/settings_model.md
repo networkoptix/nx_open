@@ -837,6 +837,32 @@ effects, so keeping it for internal usage.
     }
 
 ---------------------------------------------------------------------------------------------------
+## Flow
+
+Grouping element with a caption places items in a flow, ignoring their captions.
+
+![](doc/images/flow.png)
+
+### Setting Model
+
+    {
+        "type": "Flow",
+        "caption": "Buttons",
+        "items": [
+            {
+                "type": "Button",
+                "name": "button1",
+                "caption": "Button 1"
+            },
+            {
+                "type": "Button",
+                "name": "button2",
+                "caption": "Button 2"
+            }
+        ]
+    }
+
+---------------------------------------------------------------------------------------------------
 ## Column
 
 Acts like `GroupBox` but does not have any frame.

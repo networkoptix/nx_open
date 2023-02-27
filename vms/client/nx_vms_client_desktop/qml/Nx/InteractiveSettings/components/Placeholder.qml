@@ -6,6 +6,6 @@ Placeholder
 {
     property string image: "default"
     imageSource: `image://svg/skin/analytics_icons/placeholders/${image}.svg`
-    width: parent.width
-    height: parent.singleItemHeightHint //< Fill the view height, if it is defined.
+    property bool fillWidth: true
+    property bool stretchable: true
 }

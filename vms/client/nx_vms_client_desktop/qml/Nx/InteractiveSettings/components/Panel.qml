@@ -19,36 +19,25 @@ Group
     property bool collapsible: false
     property bool collapsed: false
 
-    childrenItem: panel.contentItem
+    property bool fillWidth: true
 
-    width: parent.width
+    childrenItem: panel.contentItem
 
     contentItem: Panel
     {
         id: panel
 
-        width: parent.width
-        contentWidth: width
         contentHeight: column.implicitHeight
         clip: true
 
         topPadding: 36
         bottomPadding: 16
 
-        contentItem: AlignedColumn
+        contentItem: LabeledColumnLayout
         {
             id: column
 
-            height: panel.contentHeight
-
-            Binding
-            {
-                target: column
-                property: "labelWidthHint"
-                value: control.parent.labelWidth - control.x - x
-                when: control.parent && control.parent.hasOwnProperty("labelWidth")
-                restoreMode: Binding.RestoreBindingOrValue
-            }
+            layoutControl: control
         }
 
         states: State
@@ -67,30 +56,30 @@ Group
                 duration: 200
             }
         }
+    }
 
-        MouseArea
+    MouseArea
+    {
+        id: expandCollapseButton
+        Layout.fillHeight: true
+
+        visible: control.collapsible
+        parent: panel.label
+        width: 20
+        height: parent.height
+        acceptedButtons: Qt.LeftButton
+        hoverEnabled: true
+
+        ArrowIcon
         {
-            id: expandCollapseButton
-            Layout.fillHeight: true
-
-            visible: control.collapsible
-            parent: panel.label
-            width: 20
-            height: parent.height
-            acceptedButtons: Qt.LeftButton
-            hoverEnabled: true
-
-            ArrowIcon
-            {
-                anchors.centerIn: parent
-                rotation: control.collapsed ? 0 : 180
-                color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
-                    ? ColorTheme.colors.light1
-                    : ColorTheme.colors.light4
-            }
-
-            onClicked:
-                control.collapsed = !control.collapsed
+            anchors.centerIn: parent
+            rotation: control.collapsed ? 0 : 180
+            color: expandCollapseButton.containsMouse && !expandCollapseButton.pressed
+                ? ColorTheme.colors.light1
+                : ColorTheme.colors.light4
         }
+
+        onClicked:
+            control.collapsed = !control.collapsed
     }
 }

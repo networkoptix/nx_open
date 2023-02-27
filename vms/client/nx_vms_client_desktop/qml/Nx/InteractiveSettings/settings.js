@@ -55,6 +55,14 @@ function _connectSignals(parent, item)
     }
 }
 
+function getItemProperties(model)
+{
+    if (model.visible === false)
+        model.opacity = 0 //< Layouts use opacity.
+
+    return model
+}
+
 function _createItemsRecursively(parent, visualParent, model, depth)
 {
     var type = model.type
@@ -73,7 +81,7 @@ function _createItemsRecursively(parent, visualParent, model, depth)
     }
 
     delete model.type
-    var item = component.createObject(visualParent || null, model)
+    var item = component.createObject(visualParent || null, getItemProperties(model))
 
     if (item)
     {
@@ -151,8 +159,8 @@ function _processItemsRecursively(item, f)
 
     if (item.childrenItem)
     {
-        for (var i = 0; i < item.childrenItem.children.length; ++i)
-            _processItemsRecursively(item.childrenItem.children[i], f)
+        for (var i = 0; i < item.childrenItem.layoutItems.length; ++i)
+            _processItemsRecursively(item.childrenItem.layoutItems[i], f)
     }
 
     if (item.sectionStack)

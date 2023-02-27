@@ -40,13 +40,13 @@ Item
             return []
 
         if (!Array.isArray(filledCheckItems))
-            return childrenItem.children
+            return childrenItem.layoutItems
 
         var result = []
 
-        for (var i = 0; i < childrenItem.children.length; ++i)
+        for (var i = 0; i < childrenItem.layoutItems.length; ++i)
         {
-            const item = childrenItem.children[i]
+            const item = childrenItem.layoutItems[i]
             if (item.hasOwnProperty("name") && filledCheckItems.indexOf(item.name) >= 0)
                 result.push(item)
         }
