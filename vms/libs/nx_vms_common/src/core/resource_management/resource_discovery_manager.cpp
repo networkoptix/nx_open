@@ -357,12 +357,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
-                // Do not allow drivers to add cameras which are supposed to be added by different
-                // drivers.
-                if (camRes && !isCameraAllowed(
-                    searcher->manufacturer(),
-                    camRes->getVendor(),
-                    camRes->getModel()))
+                if (camRes && !isCameraAllowed(searcher->manufacturer(), camRes))
                 {
                     it = lst.erase( it );
                     continue;
@@ -411,7 +406,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
             case DiscoveryMode::disabled:
                 //discovery totally disabled, ignoring resource
-                // Don't mark resource as as offline because no search actually was performed.
+                // Don't mark resource as offline because no search actually was performed.
                 continue;
 
             default:
@@ -449,11 +444,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 NX_VERBOSE(this, "Ignore auto discovered camera %1 because it is added manually", camRes);
                 if (isEdgeServer())
                 {
-                    /* Speed optimization for ARM servers. --akolesnikov */
-                    char mac[nx::network::MAC_ADDR_LEN];
-                    char* host = nullptr;
-                    nx::network::getMacFromPrimaryIF(mac, &host);
-                    if (existingCamRes->getPhysicalId().toLocal8Bit() == QByteArray(mac))
+                    // Speed optimization for ARM servers.
+                    if (existingCamRes->getPhysicalId() == nx::network::getMacFromPrimaryIF())
                     {
                         // On edge server, always discovering camera to be able to move it to the
                         // edge server if needed.

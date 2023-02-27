@@ -59,11 +59,17 @@ EdgeServerReducerProxySource::EdgeServerReducerProxySource(
     const auto notifier = systemContext->resourceAccessManager()->createNotifier();
     notifier->setSubjectId(m_subject.id());
 
+    const auto isEdgeServer =
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return QnMediaServerResource::isEdgeServer(server);
+        };
+
     const auto updateAllEdgeServers =
-        [this]()
+        [this, isEdgeServer]()
         {
             const auto servers = resourcePool()->servers();
-            const auto edgeServers = servers.filtered(QnMediaServerResource::isEdgeServer);
+            const auto edgeServers = servers.filtered(isEdgeServer);
 
             for (const auto& edgeServer: edgeServers)
                 updateEdgeServerReducedState(edgeServer);
@@ -76,7 +82,7 @@ EdgeServerReducerProxySource::EdgeServerReducerProxySource(
         this, updateAllEdgeServers);
 
     const auto servers = resourcePool()->servers();
-    const auto edgeServers = servers.filtered(QnMediaServerResource::isEdgeServer);
+    const auto edgeServers = servers.filtered(isEdgeServer);
 
     for (const auto& edgeServer: edgeServers)
     {

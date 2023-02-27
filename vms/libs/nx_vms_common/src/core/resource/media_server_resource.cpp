@@ -103,6 +103,11 @@ void QnMediaServerResource::at_cloudSettingsChanged()
     emit auxUrlsChanged(toSharedPointer(this));
 }
 
+bool QnMediaServerResource::isEdgeServer() const
+{
+    return getServerFlags().testFlag(vms::api::SF_Edge);
+}
+
 void QnMediaServerResource::resetCachedValues()
 {
     m_panicModeCache.reset();
@@ -127,7 +132,7 @@ QString QnMediaServerResource::getName() const
     if (!systemContext())
         return QnResource::getName();
 
-    if (getServerFlags().testFlag(vms::api::SF_Edge) && !m_edgeServerStateTracker.isNull())
+    if (isEdgeServer() && !m_edgeServerStateTracker.isNull())
     {
         if (const auto camera = m_edgeServerStateTracker->uniqueCoupledChildCamera())
             return camera->getName();
@@ -150,7 +155,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
     }
 
-    if (getServerFlags().testFlag(vms::api::SF_Edge))
+    if (isEdgeServer())
         return;
 
     {
@@ -642,7 +647,7 @@ nx::vms::api::ModuleInformationWithAddresses
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags().testFlag(vms::api::SF_Edge));
+        return server->isEdgeServer();
     return false;
 }
 
@@ -660,13 +665,13 @@ bool QnMediaServerResource::isArmServer(const QnResourcePtr& resource)
 
 bool QnMediaServerResource::isHiddenEdgeServer(const QnResourcePtr& resource)
 {
-    // EDGE server may be represented as single camera item if:
-    // 1. It have no child cameras except single non-virtual one with the same host address.
-    // 2. Redundancy is set off.
+    // An Edge Server may be represented as a single Device item if both conditions are true:
+    // 1. It has no child Devices except a single non-virtual one with the same host address.
+    // 2. Redundancy is turned off.
 
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
     {
-        if (!server->getServerFlags().testFlag(vms::api::SF_Edge) || server->isRedundancy())
+        if (!server->isEdgeServer() || server->isRedundancy())
             return false;
 
         if (server->edgeServerStateTracker())
@@ -749,7 +754,7 @@ void QnMediaServerResource::setSystemContext(nx::vms::common::SystemContext* sys
 
     if (auto context = this->systemContext())
     {
-        if (getServerFlags().testFlag(vms::api::SF_Edge))
+        if (isEdgeServer())
         {
             using namespace nx::core::resource::edge;
             m_edgeServerStateTracker.reset(new EdgeServerStateTracker(this));
@@ -757,12 +762,12 @@ void QnMediaServerResource::setSystemContext(nx::vms::common::SystemContext* sys
             connect(edgeServerStateTracker(),
                 &EdgeServerStateTracker::hasCoupledCameraChanged,
                 this,
-                [this] { emit this->nameChanged(toSharedPointer(this)); });
+                [this]() { emit this->nameChanged(toSharedPointer(this)); });
 
             connect(edgeServerStateTracker(),
                 &EdgeServerStateTracker::hasCanonicalStateChanged,
                 this,
-                [this] { emit this->edgeServerCanonicalStateChanged(toSharedPointer(this)); });
+                [this]() { emit this->edgeServerCanonicalStateChanged(toSharedPointer(this)); });
         }
 
         const auto& settings = context->globalSettings();
