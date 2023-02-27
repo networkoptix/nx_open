@@ -138,7 +138,8 @@ void insertOrReplaceCorsHeaders(
     HttpHeaders* headers,
     const Method& method,
     std::string origin,
-    const std::string& supportedOrigins)
+    const std::string& supportedOrigins,
+    std::string_view methods)
 {
     if (!origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin)))
     {
@@ -152,8 +153,7 @@ void insertOrReplaceCorsHeaders(
     if (method == Method::get)
         return;
 
-    insertOrReplaceHeader(headers,
-        HttpHeader("Access-Control-Allow-Methods", "POST, PUT, PATCH, DELETE, GET, OPTIONS"));
+    insertOrReplaceHeader(headers, HttpHeader("Access-Control-Allow-Methods", std::move(methods)));
     insertOrReplaceHeader(
         headers, HttpHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type"));
     insertOrReplaceHeader(headers, HttpHeader("Access-Control-Max-Age", "600"));
