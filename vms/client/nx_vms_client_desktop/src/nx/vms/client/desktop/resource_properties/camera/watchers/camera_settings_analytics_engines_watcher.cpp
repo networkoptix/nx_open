@@ -35,7 +35,8 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
         pluginManifest.version,
         pluginManifest.vendor,
         engine->manifest().deviceAgentSettingsModel,
-        engine->isDeviceDependent()
+        engine->isDeviceDependent(),
+        engine->integrationType()
     };
 }
 

@@ -16,6 +16,7 @@ public:
     Q_INVOKABLE static QString cloudName();
     Q_INVOKABLE static QString company();
     Q_INVOKABLE static QString companyUrl();
+    Q_INVOKABLE static QString vmsName();
     Q_INVOKABLE static bool isDesktopClientCustomized();
     Q_INVOKABLE static QString supportAddress();
 };

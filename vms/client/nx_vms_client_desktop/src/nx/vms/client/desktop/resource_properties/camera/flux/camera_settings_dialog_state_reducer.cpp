@@ -2621,14 +2621,11 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
     if (state.analytics.engines == value)
         return {false, std::move(state)};
 
-    // If no engine is currently selected, select the first available.
     state.analytics.engines = value;
 
     QnUuid currentEngineId = state.analytics.currentEngineId;
-    if (value.empty())
+    if (value.empty() || !analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
         currentEngineId = {};
-    else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
-        currentEngineId = state.analytics.engines[0].id;
 
     if (currentEngineId != state.analytics.currentEngineId)
     {
@@ -2651,7 +2648,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
     if (state.analytics.currentEngineId == value)
         return {false, std::move(state)};
 
-    if (!analyticsEngineIsPresentInList(value, state))
+    if (!value.isNull() && !analyticsEngineIsPresentInList(value, state))
         return {false, std::move(state)};
 
     state.analytics.currentEngineId = value;

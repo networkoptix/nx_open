@@ -76,7 +76,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
             setPageVisible(Analytics, analyticsSettingsWidget->shouldBeVisible());
         };
 
-    addPage(Analytics, analyticsSettingsWidget, tr("Plugins"));
+    addPage(
+        Analytics,
+        analyticsSettingsWidget,
+        ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
+
     connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
         updateAnalyticsSettingsWidgetVisibility);
 

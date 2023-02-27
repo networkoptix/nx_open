@@ -797,7 +797,8 @@ public:
         const QByteArray& body,
         PostCallback&& callback,
         QThread* targetThread = nullptr,
-        std::optional<QnUuid> proxyToServer = {});
+        std::optional<QnUuid> proxyToServer = {},
+        std::optional<Qn::SerializationFormat> contentType = Qn::UbjsonFormat);
 
     /** Sends PUT request with a response to be an EmptyResult. */
     Handle putEmptyResult(

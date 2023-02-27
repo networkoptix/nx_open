@@ -33,7 +33,8 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
         pluginManifest.version,
         pluginManifest.vendor,
         std::move(settingsModel),
-        engine->isDeviceDependent()
+        engine->isDeviceDependent(),
+        plugin->integrationType()
     };
 }
 

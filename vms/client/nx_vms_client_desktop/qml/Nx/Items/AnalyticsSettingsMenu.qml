@@ -5,96 +5,98 @@ import QtQuick 2.0
 import Nx 1.0
 import Nx.Controls.NavigationMenu 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "private/AnalyticsSettingsMenu"
 
 NavigationMenu
 {
     id: menu
 
-    property var engines: null
-    property var enabledEngines: []
-    property var currentEngineId
-
-    /** Settings model for current engine. */
-    property var currentEngineSettingsModel: null
-
-    /** A sequence of section numeric indexes in the treeish sections structure. */
-    property var currentSectionPath: []
-
-    property string lastClickedSectionId: ""
+    required property var viewModel
+    readonly property int sectionWidth: width - scrollBarWidth
 
     implicitWidth: 240
 
-    Repeater
+    NxObject
     {
-        model: engines
+        id: impl
 
-        Rectangle
+        readonly property var sectionIds: ({
+            "Plugins": plugins,
+            "ApiIntegrations": apiIntegrations
+        })
+
+        Connections
         {
-            id: container
+            target: viewModel
 
-            width: parent.width - menu.scrollBarWidth
-            height: column.height
-            color: isSelected ? ColorTheme.colors.dark9 : "transparent"
-
-            readonly property bool isSelected: currentEngineId === menuItem.engineId
-            readonly property var settingsModel: isSelected ? currentEngineSettingsModel : null
-
-            Column
+            function onCurrentItemChanged()
             {
-                id: column
-                width: parent.width
-
-                AnalyticsMenuItem
-                {
-                    id: menuItem
-
-                    width: parent.width
-
-                    active:
-                    {
-                        if (enabledEngines.indexOf(engineId) !== -1)
-                            return true
-
-                        // Can be undefined when items are being deleted.
-                        const engine = engines[index]
-                        if (!engine)
-                            return false
-
-                        return engine.isDeviceDependent || engine.isDeviceDependent === undefined
-                    }
-
-                    engineId: modelData.id
-                    navigationMenu: menu
-                    sections: []
-                    settingsModel: container.settingsModel
-                    selected: container.isSelected
-                    text: modelData.name || "" //< Engine name.
-                }
-
-                Rectangle
-                {
-                    id: separator
-
-                    width: parent.width
-                    height: 1
-                    color: ColorTheme.colors.dark7
-
-                    Rectangle
-                    {
-                        y: 1
-                        z: 1
-                        width: parent.width
-                        height: 1
-                        color: ColorTheme.colors.dark9
-                    }
-                }
+                menu.currentItemId =
+                    viewModel.currentSectionId
+                    || viewModel.currentEngineId
+                    || impl.sectionIds[viewModel.currentItemType]
             }
         }
     }
 
-    function getItemId(engineId, path)
+    MenuSection
     {
-        return engineId.toString() + "|" + path.join(",")
+        id: plugins
+
+        property var engines: viewModel.engines.filter(engine => engine.type === "sdk")
+
+        text: qsTr("Plugins")
+        font.weight: Font.Medium
+        width: sectionWidth
+
+        content: EngineList
+        {
+            navigationMenu: menu
+            engines: plugins.engines
+            enabledEngines: viewModel.enabledEngines
+        }
+
+        onClicked:
+            viewModel.setCurrentItem("Plugins", /*engineId*/ null, /*sectionId*/ null)
+
+        onCollapsedChanged:
+        {
+            if (!collapsed)
+                apiIntegrations.collapsed = true
+        }
+    }
+
+    MenuSection
+    {
+        id: apiIntegrations
+
+        property var engines: viewModel.engines.filter(engine => engine.type === "api")
+        property var requestCount: viewModel.requests ? viewModel.requests.length : 0
+
+        text: qsTr("API Integrations")
+        indicatorText: requestCount > 0 ? `+${requestCount}` : ""
+        collapsible: engines.length > 0
+        collapsed: true
+        visible: ClientSettings.iniConfigValue("enableMetadataApi")
+        font.weight: Font.Medium
+        width: sectionWidth
+
+        content: EngineList
+        {
+            navigationMenu: menu
+            engines: apiIntegrations.engines
+            enabledEngines: viewModel.enabledEngines
+        }
+
+        onClicked:
+            viewModel.setCurrentItem("ApiIntegrations", /*engineId*/ null, /*sectionId*/ null)
+
+        onCollapsedChanged:
+        {
+            if (!collapsed)
+                plugins.collapsed = true
+        }
     }
 }
