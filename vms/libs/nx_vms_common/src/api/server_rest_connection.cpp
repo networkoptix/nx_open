@@ -1451,13 +1451,16 @@ Handle ServerConnection::postEmptyResult(
     const QByteArray& body,
     PostCallback&& callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<QnUuid> proxyToServer,
+    std::optional<Qn::SerializationFormat> contentType)
 {
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    const auto contentTypeString
+        = contentType ? Qn::serializationFormatToHttpContentType(*contentType) : "";
+
     return executePost<EmptyResponseType>(
         action,
         params,
-        contentType,
+        contentTypeString,
         body,
         callback,
         targetThread,

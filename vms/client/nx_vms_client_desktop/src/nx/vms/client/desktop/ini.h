@@ -265,6 +265,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableCameraHotspotsFeature,
         "[Feature] Makes Camera Hotspots feature available in the client.");
 
+    // VMS-32420
+    NX_INI_FLAG(false, enableMetadataApi,
+        "[Feature] Enables MetadataApi feature.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

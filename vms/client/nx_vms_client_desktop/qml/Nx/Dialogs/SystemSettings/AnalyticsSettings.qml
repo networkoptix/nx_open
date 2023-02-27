@@ -2,6 +2,7 @@
 
 import QtQuick 2.11
 import QtQuick.Layouts 1.11
+
 import Nx 1.0
 import Nx.Items 1.0
 import Nx.Utils 1.0
@@ -13,10 +14,42 @@ Item
 {
     id: analyticsSettings
 
-    property var store
-    readonly property alias currentEngineId: menu.currentEngineId
-    property var engines: store ? store.analyticsEngines : []
-    property var currentEngineInfo: engines.find(engine => engine.id == currentEngineId)
+    property var store: null
+
+    function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
+
+    AnalyticsSettingsViewModel
+    {
+        id: viewModel
+
+        requestsModel: store ? store.makeApiIntegrationRequestsModel() : null
+
+        onEngineRequested: (engineId) =>
+        {
+            if (store)
+                store.setCurrentEngineId(engineId ?? NxGlobals.uuid(""))
+        }
+
+        function storeUpdated()
+        {
+            const engineId = store.getCurrentEngineId()
+            viewModel.updateState(
+                store.analyticsEngines,
+                engineId,
+                store.settingsModel(engineId),
+                store.settingsValues(engineId),
+                store.errors(engineId))
+        }
+
+        Connections
+        {
+            target: analyticsSettings.store
+
+            function onAnalyticsEnginesChanged() { viewModel.storeUpdated() }
+            function onCurrentSettingsStateChanged() { viewModel.storeUpdated() }
+            function onCurrentErrorsChanged() { viewModel.storeUpdated() }
+        }
+    }
 
     AnalyticsSettingsMenu
     {
@@ -25,13 +58,7 @@ Item
         width: 240
         height: parent.height
 
-        engines: analyticsSettings.engines
-        enabledEngines: engines.map(engine => engine.id)
-
-        onCurrentEngineIdChanged:
-            activateEngine(currentEngineId)
-        onCurrentSectionPathChanged:
-            settingsView.selectSection(currentSectionPath)
+        viewModel: viewModel
     }
 
     Item
@@ -45,12 +72,11 @@ Item
         anchors.bottom: parent.bottom
     }
 
-    SettingsView
+    AnalyticsSettingsView
     {
-        id: settingsView
+        id: settings
 
-        enabled: !!store && !store.loading
-        scrollBarParent: scrollBarParent
+        viewModel: viewModel
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -58,94 +84,39 @@ Item
         anchors.right: scrollBarParent.left
         anchors.margins: 16
 
-        headerItem: InformationPanel
+        settingsView.enabled: !!store && !store.loading
+        settingsView.scrollBarParent: scrollBarParent
+
+        settingsViewHeader
         {
             checkable: false
             refreshable: false
             streamSelectorVisible: false
-            engineInfo: currentEngineInfo
         }
 
-        placeholderItem: SettingsPlaceholder
+        settingsViewPlaceholder
         {
             header: qsTr("This plugin has no settings at the System level.")
             description: qsTr("Check Camera Settings to configure this plugin.")
             visible: !!store && !store.loading
         }
 
-        onValuesEdited: function(activeItem)
+        settingsView.onValuesEdited: (activeItem) =>
         {
             store.setSettingsValues(
-                currentEngineId,
+                viewModel.currentEngineId,
                 activeItem ? activeItem.name : "",
                 activeItem ? activeItem.parametersModel : "",
-                getValues())
+                settings.settingsView.getValues())
+        }
+
+        Binding
+        {
+            target: viewModel.requestsModel
+            property: "isActive"
+            value: settings.visible
         }
     }
 
-    Connections
-    {
-        target: analyticsSettings.store || null
-
-        function onSettingsValuesChanged(engineId)
-        {
-            if (engineId === currentEngineId)
-                settingsView.setValues(store.settingsValues(engineId))
-        }
-
-        function onSettingsModelChanged(engineId)
-        {
-            if (engineId === currentEngineId)
-                updateModel(engineId)
-        }
-
-        function onErrorsChanged(engineId)
-        {
-            settingsView.setErrors(store.errors(engineId))
-        }
-
-        function onAnalyticsEnginesChanged()
-        {
-            for (var i = 0; i < store.analyticsEngines.length; ++i)
-            {
-                if (store.analyticsEngines[i].id === currentEngineId)
-                    return
-            }
-
-            if (store.analyticsEngines.length > 0)
-                activateEngine(store.analyticsEngines[0].id)
-            else
-                activateEngine(null)
-        }
-    }
-
-    function activateEngine(engineId)
-    {
-        if (currentEngineId !== engineId)
-        {
-            menu.currentEngineId = engineId
-            menu.currentSectionPath = []
-            menu.currentItemId = engineId ? (engineId + "|") : ""
-        }
-
-        updateModel(engineId)
-    }
-
-    function updateModel(engineId)
-    {
-        const model = engineId ? store.settingsModel(engineId) : {}
-        const values = engineId ? store.settingsValues(engineId) : {}
-        settingsView.loadModel(model, values, /*restoreScrollPosition*/ true)
-        settingsView.selectSection(menu.currentSectionPath)
-        menu.currentEngineSettingsModel = model
-    }
-
-    onCurrentEngineIdChanged:
-    {
-        // Workaround for META-183.
-        // TODO: #dklychkov Fix properly.
-        // For some reason the notify signal of currentEngineId is not caught by C++ for the very
-        // first time. However any handler on QML side fixes it. This is why this empty handler is
-        // here.
-    }
+    onStoreChanged: store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))
 }

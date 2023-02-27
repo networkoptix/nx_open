@@ -23,6 +23,11 @@ QString QmlProxy::companyUrl()
     return nx::branding::companyUrl();
 }
 
+QString QmlProxy::vmsName()
+{
+    return nx::branding::vmsName();
+}
+
 bool QmlProxy::isDesktopClientCustomized()
 {
     return nx::branding::isDesktopClientCustomized();

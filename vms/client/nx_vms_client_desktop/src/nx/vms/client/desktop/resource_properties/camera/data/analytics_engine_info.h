@@ -6,7 +6,9 @@
 #include <QtCore/QVariantMap>
 
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/to_string.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/analytics_integration_model.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,6 +21,7 @@ struct AnalyticsEngineInfo
     QString vendor;
     QJsonObject settingsModel;
     bool isDeviceDependent = false;
+    nx::vms::api::analytics::IntegrationType type;
 
     bool operator==(const AnalyticsEngineInfo& other) const = default;
 
@@ -32,7 +35,8 @@ struct AnalyticsEngineInfo
             {"version", version},
             {"vendor", vendor},
             {"settingsModel", settingsModel},
-            {"isDeviceDependent", isDeviceDependent}
+            {"isDeviceDependent", isDeviceDependent},
+            {"type", QString::fromStdString(nx::reflect::toString(type))}
         };
     }
 };

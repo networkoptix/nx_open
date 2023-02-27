@@ -7,11 +7,15 @@ Canvas
     id: icon
 
     property color color: "black"
+    property real lineWidth: 1.2
 
     width: 10
     height: 10
 
     onColorChanged: requestPaint()
+    onLineWidthChanged: requestPaint()
+    onVisibleChanged:
+        requestPaint() //< Helps to repaint the arrow when QQuickWidget visibility is changed.
 
     onPaint:
     {
@@ -19,7 +23,7 @@ Canvas
         ctx.reset()
         ctx.strokeStyle = icon.color
         ctx.lineJoin = "miter"
-        ctx.lineWidth = 1.2
+        ctx.lineWidth = icon.lineWidth
         ctx.moveTo(1, 3)
         ctx.lineTo(5, 7)
         ctx.lineTo(9, 3)

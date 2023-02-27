@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
-import QtQuick.Controls 2.4
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
+import Nx
 
 import "settings.js" as Settings
 import "components"
@@ -23,17 +23,14 @@ Item
     property Item placeholderItem: null
     property alias thumbnailSource: sharedResources.thumbnailSource
 
-    property var resourceId: NxGlobals.uuid("")
-    property var engineId: NxGlobals.uuid("")
-
     implicitWidth: 100
     implicitHeight: contentItem ? contentItem.heightHint : 0
 
     QtObject
     {
         id: impl
-        property var sectionPaths: ({})
         property bool valuesChangedEnabled: true
+        property var currentSectionScrollBar: null
     }
 
     QtObject
@@ -42,10 +39,11 @@ Item
         property var thumbnailSource: null
     }
 
-    function loadModel(model, initialValues, restoreScrollPosition)
+    function loadModel(model, initialValues, sectionPath, restoreScrollPosition)
     {
-        let focusState = takeFocusState()
-        let scrollPosition = contentItem ? contentItem.verticalScrollBar.position : 0.0
+        const focusState = takeFocusState()
+        const scrollPosition =
+            impl.currentSectionScrollBar ? impl.currentSectionScrollBar.position : 0.0
 
         if (contentItem)
         {
@@ -64,19 +62,21 @@ Item
         contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
         contentItem.extraHeaderItem = Qt.binding(function() { return headerItem })
         contentItem.placeholderItem = Qt.binding(function() { return placeholderItem })
-        impl.sectionPaths = Settings.buildSectionPaths(model)
 
-        if (restoreScrollPosition)
+        if (sectionPath)
+            settingsView.selectSection(sectionPath)
+
+        if (restoreScrollPosition && impl.currentSectionScrollBar)
         {
             let scroll =
                 () =>
                 {
-                    contentItem.verticalScrollBar.sizeChanged.disconnect(scroll)
-                    contentItem.verticalScrollBar.position = scrollPosition
+                    impl.currentSectionScrollBar.sizeChanged.disconnect(scroll)
+                    impl.currentSectionScrollBar.position = scrollPosition
                 }
 
             // Scroll after resize.
-            contentItem.verticalScrollBar.sizeChanged.connect(scroll)
+            impl.currentSectionScrollBar.sizeChanged.connect(scroll)
         }
 
         if (initialValues)
@@ -134,29 +134,16 @@ Item
         }
 
         if (stack)
+        {
             stack.currentIndex = 0
-    }
-
-    function sectionName(model, sectionPath)
-    {
-        return Settings.sectionNameByPath(model, sectionPath)
-    }
-
-    function sectionPath(sectionName)
-    {
-        return impl.sectionPaths[sectionName] ?? []
-    }
-
-    function preprocessedModel(model)
-    {
-        let modelCopy = JSON.parse(JSON.stringify(model))
-        Settings.preprocessModel(modelCopy)
-        return modelCopy
+            impl.currentSectionScrollBar = stack.verticalScrollBar
+        }
     }
 
     function setErrors(errors)
     {
-        Settings.setErrors(contentItem, errors)
+        if (contentItem)
+            Settings.setErrors(contentItem, errors)
     }
 
     function takeFocusState()

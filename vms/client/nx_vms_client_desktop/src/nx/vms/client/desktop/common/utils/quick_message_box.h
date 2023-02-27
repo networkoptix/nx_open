@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 #include <QtWidgets/QDialogButtonBox>
 
@@ -12,7 +13,7 @@ namespace nx::vms::client::desktop {
 class QuickMessageBox: public QObject
 {
     Q_OBJECT
-    Q_ENUMS(QDialogButtonBox::StandardButton QnMessageBox::Icon)
+    Q_ENUMS(QDialogButtonBox::StandardButton QDialogButtonBox::ButtonRole QnMessageBox::Icon)
     Q_FLAGS(QDialogButtonBox::StandardButtons)
 
 public:
@@ -23,7 +24,9 @@ public:
         const QString& text,
         const QString& extras = QString(),
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+        const QJsonObject& warningButton = {},
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton,
+        const QString& windowTitle = {});
 
     static void registerQmlType();
 };

@@ -10,9 +10,6 @@ function _nameSectionsRecursively(parentSection, parentSectionId)
     {
         let section = parentSection.sections[i]
 
-        if (section.name)
-            section.name = "name:" + section.name
-
         let occurences = captionOccurences[section.caption]
         if (!occurences)
             occurences = 0
@@ -111,10 +108,12 @@ function _createItemsRecursively(parent, visualParent, model, depth)
 
 function createItems(parent, model)
 {
-    let item = _createItemsRecursively(parent, parent.childrenItem, model, 0)
 
-    if (!item)
-        item = _createItemsRecursively(parent, parent.childrenItem, { "type": "Settings" }, 0)
+    let item = _createItemsRecursively(
+        parent,
+        parent.childrenItem ?? null,
+        model ?? { type: "Settings" },
+        /*depth*/ 0)
 
     if (item)
     {
@@ -144,18 +143,6 @@ function buildSectionPaths(model)
     _processSectionsRecursively(model, [],
         function(section, path) { sectionPaths[section.name] = path })
     return sectionPaths
-}
-
-function sectionNameByPath(model, path)
-{
-    if (!model || !model.sections || !path)
-        return undefined
-
-    const index = path[0]
-    if (model.sections.length <= index)
-        return undefined
-
-    return sectionNameByPath(model.sections[index], path.slice(1))
 }
 
 function _processItemsRecursively(item, f)

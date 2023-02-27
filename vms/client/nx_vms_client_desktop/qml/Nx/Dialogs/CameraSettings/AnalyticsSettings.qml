@@ -20,18 +20,12 @@ Item
 
     property var store: null
     property var backend: null
-
-    property var analyticsEngines: []
-    property var enabledAnalyticsEngines: []
-
-    property var currentEngineId
-    property var currentEngineInfo
-    property var currentSettingsModel
     property bool loading: false
     property bool supportsDualStreaming: false
+    readonly property bool isDeviceDependent: viewModel.currentEngineInfo !== undefined
+        && viewModel.currentEngineInfo.isDeviceDependent
 
-    readonly property bool isDeviceDependent: currentEngineInfo !== undefined
-        && currentEngineInfo.isDeviceDependent
+    readonly property var currentEngineId: viewModel.currentEngineId
 
     Connections
     {
@@ -44,102 +38,45 @@ Item
                 return
 
             loading = store.analyticsSettingsLoading()
-            analyticsEngines = store.analyticsEngines()
-            enabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
+            if (loading)
+                return
+
             supportsDualStreaming = store.dualStreamingEnabled()
-            let engineId = store.currentAnalyticsEngineId()
-
-            const canUseSectionPath =
-                (settingsView.resourceId === resourceId && engineId === currentEngineId)
-
-            if (settingsView.resourceId !== resourceId)
-                settingsView.resourceId = resourceId
             mediaResourceHelper.resourceId = resourceId
 
-            if (engineId === currentEngineId)
-            {
-                const actualModel = settingsView.preprocessedModel(
-                    store.deviceAgentSettingsModel(currentEngineId))
-                const actualValues = store.deviceAgentSettingsValues(currentEngineId)
-
-                if (JSON.stringify(currentSettingsModel) == JSON.stringify(actualModel))
-                {
-                    settingsView.setValues(actualValues)
-                }
-                else
-                {
-                    currentSettingsModel = actualModel
-                    settingsView.loadModel(
-                        currentSettingsModel, actualValues, /*restoreScrollPosition*/ true)
-
-                    if (navigationMenu.lastClickedSectionId || !canUseSectionPath)
-                    {
-                        navigationMenu.currentSectionPath =
-                            settingsView.sectionPath(navigationMenu.lastClickedSectionId)
-                        navigationMenu.currentItemId =
-                            navigationMenu.getItemId(engineId, navigationMenu.currentSectionPath)
-                    }
-                    settingsView.selectSection(navigationMenu.currentSectionPath)
-                }
-            }
-            else if (analyticsEngines.length > 0)
-            {
-                var engineInfo = undefined
-                for (var i = 0; i < analyticsEngines.length; ++i)
-                {
-                    var info = analyticsEngines[i]
-                    if (info.id === engineId)
-                    {
-                        engineInfo = info
-                        break
-                    }
-                }
-
-                // Select first engine in the list if nothing selected.
-                if (!engineInfo)
-                {
-                    engineInfo = analyticsEngines[0]
-                    engineId = engineInfo.id
-                }
-
-                currentEngineId = engineId
-                currentEngineInfo = engineInfo
-                navigationMenu.currentEngineId = engineId
-                navigationMenu.currentSectionPath =
-                    settingsView.sectionPath(navigationMenu.lastClickedSectionId)
-                navigationMenu.currentItemId =
-                    navigationMenu.getItemId(engineId, navigationMenu.currentSectionPath)
-
-                currentSettingsModel = settingsView.preprocessedModel(
-                    store.deviceAgentSettingsModel(engineInfo.id))
-                var actualValues = store.deviceAgentSettingsValues(engineInfo.id)
-
-                settingsView.engineId = currentEngineId
-                settingsView.loadModel(currentSettingsModel, actualValues)
-                settingsView.selectSection(navigationMenu.currentSectionPath)
-            }
-            else
-            {
-                currentEngineId = undefined
-                currentEngineInfo = undefined
-                currentSettingsModel = undefined
-                navigationMenu.currentItemId = undefined
-                navigationMenu.currentSectionPath = []
-                settingsView.loadModel({}, {})
-            }
-
-            settingsView.setErrors(store.deviceAgentSettingsErrors(engineId))
+            const currentEngineId = store.currentAnalyticsEngineId()
+            viewModel.enabledEngines = store.userEnabledAnalyticsEngines()
+            viewModel.updateState(
+                store.analyticsEngines(),
+                currentEngineId,
+                store.deviceAgentSettingsModel(currentEngineId),
+                store.deviceAgentSettingsValues(currentEngineId),
+                store.deviceAgentSettingsErrors(currentEngineId))
 
             if (currentEngineId)
-                header.currentStreamIndex = store.analyticsStreamIndex(currentEngineId)
+            {
+                analyticsSettingsView.settingsViewHeader.currentStreamIndex =
+                    store.analyticsStreamIndex(currentEngineId)
+            }
 
-            banner.visible = !store.recordingEnabled() && enabledAnalyticsEngines.length !== 0
+            banner.visible = !store.recordingEnabled() && viewModel.enabledEngines.length !== 0
         }
     }
 
     MediaResourceHelper
     {
         id: mediaResourceHelper
+    }
+
+    AnalyticsSettingsViewModel
+    {
+        id: viewModel
+
+        onEngineRequested: (engineId) =>
+        {
+            if (store)
+                store.setCurrentAnalyticsEngineId(engineId ?? NxGlobals.uuid(""))
+        }
     }
 
     AnalyticsSettingsMenu
@@ -149,69 +86,64 @@ Item
         width: 240
         height: parent.height - banner.height
 
-        engines: analyticsEngines
-        enabledEngines: enabledAnalyticsEngines
-        currentEngineSettingsModel: currentSettingsModel
-
-        onCurrentEngineIdChanged:
-            store.setCurrentAnalyticsEngineId(currentEngineId)
-        onCurrentSectionPathChanged:
-            settingsView.selectSection(currentSectionPath)
+        viewModel: viewModel
     }
 
-    SettingsView
+    AnalyticsSettingsView
     {
-        id: settingsView
+        id: analyticsSettingsView
+        property var resourceId: NxGlobals.uuid("")
+
+        viewModel: viewModel
 
         x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 24
         height: parent.height - 16 - banner.height
 
-        enabled: !loading
-        contentEnabled: header.checked || isDeviceDependent
-        contentVisible: contentEnabled
-        scrollBarParent: scrollBarsParent
-
-        thumbnailSource: RoiCameraThumbnail
+        settingsView
         {
-            cameraId: settingsView.resourceId
-            active: visible
+            enabled: !loading
+            contentEnabled: settingsViewHeader.checked || isDeviceDependent
+            contentVisible: settingsView.contentEnabled
+            scrollBarParent: scrollBarsParent
+
+            thumbnailSource: RoiCameraThumbnail
+            {
+                cameraId: analyticsSettingsView.resourceId
+                active: visible
+            }
+
+            onValuesEdited: (activeItem) =>
+            {
+                const parameters = activeItem && activeItem.parametersModel
+                    ? backend.requestParameters(activeItem.parametersModel)
+                    : {}
+
+                if (parameters == null)
+                    return
+
+                store.setDeviceAgentSettingsValues(
+                    currentEngineId,
+                    activeItem ? activeItem.name : "",
+                    analyticsSettingsView.settingsView.getValues(),
+                    parameters)
+            }
         }
 
-        onValuesEdited: function(activeItem)
+        settingsViewHeader
         {
-            let parameters = activeItem && activeItem.parametersModel
-                ? backend.requestParameters(activeItem.parametersModel)
-                : {}
-
-            if (parameters == null)
-                return
-
-            store.setDeviceAgentSettingsValues(
-                currentEngineId,
-                activeItem ? activeItem.name : "",
-                getValues(),
-                parameters)
-        }
-
-        headerItem: InformationPanel
-        {
-            id: header
-
             checkable: !isDeviceDependent && !!currentEngineId
-            checked: checkable && enabledAnalyticsEngines.indexOf(currentEngineId) !== -1
+            refreshable: settingsViewHeader.checked || !settingsViewHeader.checkable
             refreshing: analyticsSettings.loading
-            engineInfo: currentEngineInfo
-            streamSelectorVisible: supportsDualStreaming && currentStreamIndex >= 0
+            streamSelectorVisible:
+                supportsDualStreaming && settingsViewHeader.currentStreamIndex >= 0
             streamSelectorEnabled: settingsView.contentEnabled
-            Layout.bottomMargin: 16
-            Layout.fillWidth: true
 
             onEnableSwitchClicked:
             {
                 if (currentEngineId)
-                    setEngineEnabled(currentEngineId, !checked)
+                    setEngineEnabled(currentEngineId, !settingsViewHeader.checked)
             }
 
             onRefreshButtonClicked:
@@ -223,16 +155,18 @@ Item
             onCurrentStreamIndexChanged:
             {
                 if (currentEngineId)
-                    store.setAnalyticsStreamIndex(currentEngineId, currentStreamIndex)
+                {
+                    store.setAnalyticsStreamIndex(
+                        currentEngineId,
+                        settingsViewHeader.currentStreamIndex)
+                }
             }
         }
 
-        placeholderItem: SettingsPlaceholder
+        settingsViewPlaceholder
         {
             header: qsTr("This plugin has no settings for this camera.")
-            description:
-                qsTr("Check System Administration settings to configure this plugin.")
-
+            description: qsTr("Check System Administration settings to configure this plugin.")
             visible: !analyticsSettings.loading
         }
     }
@@ -257,7 +191,7 @@ Item
 
     function setEngineEnabled(engineId, enabled)
     {
-        var engines = enabledAnalyticsEngines.slice(0)
+        var engines = viewModel.enabledEngines.slice(0)
         if (enabled)
         {
             engines.push(engineId)
