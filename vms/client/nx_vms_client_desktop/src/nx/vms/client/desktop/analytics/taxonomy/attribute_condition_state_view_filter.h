@@ -13,7 +13,8 @@ class NX_VMS_CLIENT_DESKTOP_API AttributeConditionStateViewFilter: public Abstra
 public:
     AttributeConditionStateViewFilter(
         const AbstractStateViewFilter* baseFilter,
-        nx::common::metadata::Attributes attributeValues);
+        nx::common::metadata::Attributes attributeValues,
+        QObject* parent = nullptr);
 
     virtual ~AttributeConditionStateViewFilter() override;
 

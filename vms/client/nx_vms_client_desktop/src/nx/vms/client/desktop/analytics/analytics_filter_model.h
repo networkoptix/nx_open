@@ -129,11 +129,6 @@ private:
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
 
-    std::unique_ptr<AbstractStateViewFilter> m_liveTypeFilter;
-    std::unique_ptr<AbstractStateViewFilter> m_scopeFilter;
-    std::unique_ptr<AbstractStateViewFilter> m_conditionFilter;
-    std::unique_ptr<AbstractStateViewFilter> m_filter;
-
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
     std::set<QnUuid> m_devices;
     QVariantMap m_attributeValues;

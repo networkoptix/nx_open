@@ -16,8 +16,10 @@ struct AttributeConditionStateViewFilter::Private
 
 AttributeConditionStateViewFilter::AttributeConditionStateViewFilter(
     const AbstractStateViewFilter* baseFilter,
-    nx::common::metadata::Attributes attributeValues)
+    nx::common::metadata::Attributes attributeValues,
+    QObject* parent)
     :
+    AbstractStateViewFilter(parent),
     d(new Private{.baseFilter = baseFilter, .attributeValues = std::move(attributeValues)})
 {
 }
