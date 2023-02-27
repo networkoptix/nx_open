@@ -158,8 +158,10 @@ void AnalyticsFilterModel::update(
         m_devices = devices;
         m_liveTypesExcluded = liveTypesExcluded;
 
-        m_filter = std::make_unique<Filter>(m_engine, m_devices, m_liveTypesExcluded);
-        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(m_filter.get());
+        const auto filter =
+            new Filter(m_engine, m_devices, m_liveTypesExcluded, m_stateViewBuilder.get());
+
+        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(filter);
         setObjectTypes(state->rootNodes());
     }
 }

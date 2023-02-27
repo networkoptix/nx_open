@@ -116,7 +116,6 @@ private:
     QPointer<TaxonomyManager> m_taxonomyManager;
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
-    std::unique_ptr<AbstractStateViewFilter> m_filter;
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
     std::set<QnUuid> m_devices;
     bool m_liveTypesExcluded = false;
