@@ -8,7 +8,7 @@ Rectangle
 {
     id: separator
 
-    width: parent.width
+    property bool fillWidth: true
     implicitHeight: 1
     color: ColorTheme.dark
 }

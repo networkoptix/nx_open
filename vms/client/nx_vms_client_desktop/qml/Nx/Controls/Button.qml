@@ -78,6 +78,7 @@ Button
     {
         implicitWidth: iconLabel.implicitWidth
         implicitHeight: iconLabel.implicitHeight
+        baselineOffset: iconLabel.y + iconLabel.baselineOffset
 
         IconLabel
         {

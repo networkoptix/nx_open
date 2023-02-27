@@ -217,17 +217,24 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                     "isActive": true
                 },
                 {
-                    "type": "Button",
-                    "name": ")json" + kShowMessageButtonId + R"json(",
-                    "caption": "Show Message...",
-                    "isActive": true,
-                    "parametersModel": )json" + kParametersModel + R"json(
-                },
-                {
-                    "type": "Button",
-                    "name": ")json" + kShowUrlButtonId + R"json(",
-                    "caption": "Show Webpage...",
-                    "isActive": true
+                    "type": "Flow",
+                    "caption": "Buttons",
+                    "items":
+                    [
+                        {
+                            "type": "Button",
+                            "name": ")json" + kShowMessageButtonId + R"json(",
+                            "caption": "Show Message...",
+                            "isActive": true,
+                            "parametersModel": )json" + kParametersModel + R"json(
+                        },
+                        {
+                            "type": "Button",
+                            "name": ")json" + kShowUrlButtonId + R"json(",
+                            "caption": "Show Webpage...",
+                            "isActive": true
+                        }
+                    ]
                 }
             ]
         }
@@ -709,17 +716,24 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "isActive": true
                 },
                 {
-                    "type": "Button",
-                    "name": ")json" + kShowMessageButtonId + R"json(",
-                    "caption": "Show Message...",
-                    "isActive": true,
-                    "parametersModel": )json" + kParametersModel + R"json(
-                },
-                {
-                    "type": "Button",
-                    "name": ")json" + kShowUrlButtonId + R"json(",
-                    "caption": "Show Webpage...",
-                    "isActive": true
+                    "type": "Flow",
+                    "caption": "Buttons",
+                    "items":
+                    [
+                        {
+                            "type": "Button",
+                            "name": ")json" + kShowMessageButtonId + R"json(",
+                            "caption": "Show Message...",
+                            "isActive": true,
+                            "parametersModel": )json" + kParametersModel + R"json(
+                        },
+                        {
+                            "type": "Button",
+                            "name": ")json" + kShowUrlButtonId + R"json(",
+                            "caption": "Show Webpage...",
+                            "isActive": true
+                        }
+                    ]
                 }
             ]
         }

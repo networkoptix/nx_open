@@ -27,9 +27,10 @@ StackLayout
     property bool contentVisible: true
 
     readonly property bool hasOtherSections: control.children.length > 1
-    readonly property bool hasItems: childrenItem.children.length
+    readonly property bool hasItems: childrenItem.layoutItems.length > 0
     readonly property bool isEmpty: !hasOtherSections && !hasItems
 
+    property bool fillWidth: true
     implicitWidth: 100
     property int heightHint: view.contentItem.implicitHeight
 
@@ -95,15 +96,12 @@ StackLayout
                 visible: extraHeaderItem && control.hasItems
             }
 
-            AlignedColumn
+            LabeledColumnLayout
             {
                 id: column
 
-                // It's allowed to fill the height if there is only one item.
-                readonly property var singleItemHeightHint:
-                    (children.length == 1) ? view.height - y : undefined
-
                 spacing: 16
+                preferredHeight: view.height - y
                 width: parent.width
                 enabled: control.contentEnabled
                 visible: control.contentVisible && control.hasItems

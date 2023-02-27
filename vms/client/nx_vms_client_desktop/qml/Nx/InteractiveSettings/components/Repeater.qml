@@ -10,6 +10,7 @@ import "../settings.js" as Settings
 
 Item
 {
+    id: control
     property string addButtonCaption: ""
     property string deleteButtonCaption: ""
 
@@ -17,7 +18,8 @@ Item
 
     readonly property real buttonSpacing: 24
 
-    implicitWidth: parent.width
+    property bool fillWidth: true
+
     implicitHeight: column.implicitHeight + addButton.implicitHeight + buttonSpacing
 
     property int visibleItemsCount: 0
@@ -31,12 +33,13 @@ Item
         filled = (lastFilled >= 0)
     }
 
-    AlignedColumn
+    LabeledColumnLayout
     {
         id: column
         width: parent.width
+        layoutControl: control
 
-        onChildrenChanged: initialVisibilityUpdateTimer.restart()
+        onLayoutItemsChanged: initialVisibilityUpdateTimer.restart()
     }
 
     Row
@@ -50,12 +53,12 @@ Item
             id: addButton
 
             text: addButtonCaption || qsTr("Add")
-            visible: visibleItemsCount < column.children.length
+            visible: visibleItemsCount < column.layoutItems.length
             iconUrl: "qrc:///skin/buttons/plus.png"
 
             onClicked:
             {
-                if (visibleItemsCount < column.children.length)
+                if (visibleItemsCount < column.layoutItems.length)
                     ++visibleItemsCount
             }
         }
@@ -74,7 +77,7 @@ Item
                     return
 
                 --visibleItemsCount
-                let itemToReset = column.children[visibleItemsCount]
+                let itemToReset = column.layoutItems[visibleItemsCount]
                 Settings.resetValues(itemToReset)
             }
         }
@@ -97,9 +100,9 @@ Item
 
     function lastFilledItemIndex()
     {
-        for (var i = column.children.length - 1; i >= 0; --i)
+        for (var i = column.layoutItems.length - 1; i >= 0; --i)
         {
-            if (Utils.isItemFilled(column.children[i]))
+            if (Utils.isItemFilled(column.layoutItems[i]))
                 return i
         }
         return -1
@@ -107,7 +110,7 @@ Item
 
     function updateVisibility()
     {
-        for (var i = 0; i < column.children.length; ++i)
-            column.children[i].visible = (i < visibleItemsCount)
+        for (var i = 0; i < column.layoutItems.length; ++i)
+            column.layoutItems[i].opacity = (i < visibleItemsCount)
     }
 }

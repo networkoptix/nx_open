@@ -12,8 +12,8 @@ Control
     property string icon: "info"
     property alias text: label.text
 
-    width: parent.width
     padding: 12
+    property bool fillWidth: true
 
     background: Rectangle
     {

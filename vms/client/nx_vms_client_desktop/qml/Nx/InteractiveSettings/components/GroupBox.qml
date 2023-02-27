@@ -15,36 +15,22 @@ Group
     property alias caption: groupBox.title
     property string description: ""
 
+    property bool isGroup: true
+    property bool fillWidth: true
+
     childrenItem: groupBox.contentItem
 
-    width: parent.width
-    implicitWidth: content.implicitWidth
-    implicitHeight: content.implicitHeight
+    implicitWidth: groupBox.implicitWidth
+    implicitHeight: groupBox.implicitHeight
 
-    contentItem: BottomPaddedItem
+    contentItem: GroupBox
     {
-        id: content
+        id: groupBox
 
-        isGroup: true
-        width: parent.width
-
-        paddedItem: GroupBox
+        contentItem: LabeledColumnLayout
         {
-            id: groupBox
-
-            contentItem: AlignedColumn
-            {
-                id: column
-
-                Binding
-                {
-                    target: column
-                    property: "labelWidthHint"
-                    value: control.parent.labelWidth - control.x - column.x
-                    when: control.parent && control.parent.hasOwnProperty("labelWidth")
-                    restoreMode: Binding.RestoreBindingOrValue
-                }
-            }
+            id: column
+            layoutControl: control
         }
     }
 }
