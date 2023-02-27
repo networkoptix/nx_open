@@ -2290,10 +2290,11 @@ QString QnMediaResourceWidget::calculatePositionText() const
 
             return result;
         };
-
-    const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
-        ? tr("LIVE")
-        : extractTime(getDisplayTimeUsec()));
+    
+    const QString timeString =
+        (navigator()->isPlaying() && d->display()->camDisplay()->isRealTimeSource()
+            ? tr("LIVE")
+            : extractTime(getDisplayTimeUsec()));
 
     static const int kPositionTextPixelSize = 12;
 

@@ -3,6 +3,7 @@
 #include "playback_position_item.h"
 
 #include <QtCore/QTimer>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <qt_graphics_items/graphics_label.h>
@@ -70,7 +71,8 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     m_positionAndRecording->setOptions(positionOptions);
 
     auto mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    mainLayout->setContentsMargins(4, 4, 8, 8);
+    const auto ratio = qApp->devicePixelRatio();
+    mainLayout->setContentsMargins(0, 0, 8 / ratio, 8 / ratio);
     mainLayout->addItem(m_pauseButton);
     mainLayout->addItem(m_positionAndRecording);
 

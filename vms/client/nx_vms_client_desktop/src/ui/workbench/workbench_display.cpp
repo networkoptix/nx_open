@@ -101,7 +101,7 @@ using namespace std::chrono;
 /**
  * Show paused timeline notification in fullscreen mode after this inactivity period.
  */
-static constexpr milliseconds kActivityTimeout = 60s;
+static constexpr milliseconds kActivityTimeout = 30s;
 
 QnWorkbenchItem* getWorkbenchItem(QGraphicsItem* item)
 {
