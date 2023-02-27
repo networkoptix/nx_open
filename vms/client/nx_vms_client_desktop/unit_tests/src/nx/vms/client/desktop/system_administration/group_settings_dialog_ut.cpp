@@ -58,7 +58,7 @@ public:
         api::UserRoleData group;
         group.setId(QnUuid::createUuid());
         group.name = name;
-        group.parentRoleIds = parents;
+        group.parentGroupIds = parents;
         m_env.systemContext()->userRolesManager()->addOrUpdateUserRole(group);
         return group.id;
     }

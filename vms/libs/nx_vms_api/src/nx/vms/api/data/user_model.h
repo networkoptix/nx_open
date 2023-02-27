@@ -38,11 +38,6 @@ struct NX_VMS_API UserModelBase
     /**%apidoc[opt] Full name. */
     QString fullName;
 
-   /**%apidoc[proprietary] Intended for internal use; keep the value when saving a previously
-     * received object, use false when creating a new one.
-     */
-    bool isOwner = false;
-
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
 
@@ -62,7 +57,6 @@ struct NX_VMS_API UserModelBase
     std::optional<QnLatin1Array> digest; /**<%apidoc[unused] */
     std::optional<QnLatin1Array> hash; /**<%apidoc[unused] */
     std::optional<QnLatin1Array> cryptSha512Hash; /**<%apidoc[unused] */
-    std::optional<QString> realm; /**<%apidoc[unused] */
 
     bool operator==(const UserModelBase& other) const = default;
 
@@ -78,15 +72,13 @@ struct NX_VMS_API UserModelBase
     (type) \
     (fullName) \
     (email) \
-    (isOwner) \
     (permissions) \
     (isEnabled) \
     (isHttpDigestEnabled) \
     (password) \
     (digest) \
     (hash) \
-    (cryptSha512Hash) \
-    (realm)
+    (cryptSha512Hash)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelBase, UserModelBase_Fields)
 
@@ -94,6 +86,11 @@ NX_REFLECTION_INSTRUMENT(UserModelBase, UserModelBase_Fields)
 
 struct NX_VMS_API UserModelV1: public UserModelBase
 {
+    /**%apidoc[proprietary] Intended for internal use; keep the value when saving a previously
+     * received object, use false when creating a new one.
+     */
+    bool isOwner = false;
+
     /**%apidoc[opt] User Role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
@@ -120,7 +117,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     static_assert(isCreateModelV<UserModelV1>);
     static_assert(isUpdateModelV<UserModelV1>);
 };
-#define UserModelV1_Fields UserModelBase_Fields(userRoleId)(accessibleResources)(externalId)
+#define UserModelV1_Fields UserModelBase_Fields(isOwner)(userRoleId)(accessibleResources)(externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
@@ -132,7 +129,7 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS
 struct NX_VMS_API UserModelV3: public UserModelBase
 {
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
-    std::vector<QnUuid> userGroupIds;
+    std::vector<QnUuid> groupIds;
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     std::optional<UserExternalId> externalId;
@@ -156,7 +153,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     static_assert(isCreateModelV<UserModelV3>);
     static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelV3_Fields UserModelBase_Fields(userGroupIds)(externalId)(resourceAccessRights)
+#define UserModelV3_Fields UserModelBase_Fields(groupIds)(externalId)(resourceAccessRights)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

@@ -15,6 +15,17 @@
 
 namespace nx::vms::api {
 
+NX_REFLECTION_ENUM_CLASS(UserType,
+    /**%apidoc This User is managed by VMS. */
+    local = 0,
+
+    /**%apidoc This User is imported from LDAP Server. */
+    ldap = 1,
+
+    /**%apidoc This is a Cloud User with access to this VMS System. */
+    cloud = 2
+)
+
 /**%apidoc User information object.
  * %param[readonly] id Internal user identifier. This identifier can be used as {id} path parameter in
  *     requests related to user.
@@ -39,32 +50,34 @@ struct NX_VMS_API UserData: ResourceData
 
     static const QString kResourceTypeName;
     static const QnUuid kResourceTypeId;
+    static const QnUuid kOwnerGroupId;
 
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
     static constexpr const char* kHttpIsDisabledStub = "http_is_disabled";
 
-    /**
-     * Actually, this flag should be named isOwner, but we must keep it to maintain mobile client
-     * compatibility.
-     */
-    /**%apidoc[proprietary] Intended for internal use; keep the value when saving a previously
-     * received object, use false when creating a new one.
-     */
-     bool isAdmin = false;
+    /**%apidoc[opt] Type of the user. */
+    UserType type = UserType::local;
 
-    GlobalPermissions permissions = GlobalPermission::none;
+    /**%apidoc[opt] Whether the user is enabled.*/
+    bool isEnabled = true;
 
-    /**%apidoc[opt]
-     * User role unique id.
-     * %deprecated Use `userRoleIds` instead.
-     */
-    QnUuid userRoleId;
-
-    /**%apidoc[opt] List of roles to inherit permissions. */
-    std::vector<QnUuid> userRoleIds; //< TODO: Rename to userGroupIds on general renaming.
+    /**%apidoc[opt] Full name of the user.*/
+    QString fullName;
 
     /**%apidoc[opt] User's email.*/
     QString email;
+
+    /**%apidoc[opt] Own user global permissions. */
+    GlobalPermissions permissions = GlobalPermission::none;
+
+    /**%apidoc[opt] List of groups to inherit permissions. */
+    std::vector<QnUuid> groupIds;
+
+    /** Checks if this user is a member of the owner group. */
+    bool isOwner() const;
+
+    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    UserExternalId externalId;
 
     /**%apidoc[proprietary] HA1 digest hash from user password, as per RFC 2069. When modifying an
      * existing user, supply empty string. When creating a new user, calculate the value based on
@@ -82,60 +95,21 @@ struct NX_VMS_API UserData: ResourceData
      * value when modifying.
      */
     QnLatin1Array cryptSha512Hash; /**< Hash suitable to be used in /etc/shadow file.*/
-
-    /**%apidoc[proprietary] HTTP authorization realm as defined in RFC 2617, can be obtained via
-     * /api/getTime.
-     */
-    QString realm;
-
-    /**%apidoc[opt] Whether the user was imported from LDAP.*/
-    bool isLdap = false;
-
-    /**%apidoc[opt] Whether the user is enabled.*/
-    bool isEnabled = true;
-
-    /**%apidoc[opt] Whether the user is a cloud user, as opposed to a local one.*/
-    bool isCloud = false;
-
-    /**%apidoc[opt] Full name of the user.*/
-    QString fullName;
-
-    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
-    UserExternalId externalId;
-
-    // TODO: Remove when /ec2/getUsers and /ec2/saveUser compatibility below 5.1 can be dropped.
-    bool adaptFromDeprecatedApi();
-    void cleanOnDeprecatedApiMerge(const QJsonValue& overrideValue);
-    void adaptForDeprecatedApi();
 };
 #define UserData_Fields \
     ResourceData_Fields \
-    (isAdmin) \
-    (permissions) \
+    (type) \
+    (isEnabled) \
+    (fullName) \
     (email) \
+    (permissions) \
+    (groupIds) \
+    (externalId) \
     (digest) \
     (hash) \
-    (cryptSha512Hash) \
-    (realm) \
-    (isLdap) \
-    (isEnabled) \
-    (userRoleId)  \
-    (isCloud)  \
-    (fullName) \
-    (userRoleIds) \
-    (externalId)
+    (cryptSha512Hash)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
-
-// TODO: UserData should be refactored to use this enum, when we can break API compatibility.
-NX_REFLECTION_ENUM_CLASS(UserType,
-    local,
-    ldap,
-    cloud
-)
-
-NX_VMS_API UserType type(const UserData& user);
-NX_VMS_API void setType(UserData* user, UserType type);
 
 } // namespace nx::vms::api
 

@@ -217,7 +217,8 @@ struct LdapSettingsWidget::Private
         return std::count_if(groups.begin(), groups.end(),
             [](auto g)
             {
-                return g.isLdap && g.id != nx::vms::api::UserRoleData::kLdapDefaultId;
+                return g.type == nx::vms::api::UserType::ldap
+                    && g.id != nx::vms::api::UserRoleData::kLdapDefaultId;
             });
     }
 };

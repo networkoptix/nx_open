@@ -63,7 +63,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
                 return updateSubjectRoles(subject, user->userRoleIds());
 
             const auto role = m_context->userRolesManager()->userRole(subject.id());
-            updateSubjectRoles(subject, role.parentRoleIds);
+            updateSubjectRoles(subject, role.parentGroupIds);
         }, Qt::DirectConnection);
 
     for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
@@ -162,7 +162,7 @@ void QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated(const nx::vms::api:
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_subjects.insert(subject);
-    updateSubjectRoles(subject, userRole.parentRoleIds, lock);
+    updateSubjectRoles(subject, userRole.parentGroupIds, lock);
 }
 
 void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)

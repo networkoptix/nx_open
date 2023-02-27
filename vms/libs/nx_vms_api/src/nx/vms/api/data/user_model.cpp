@@ -17,9 +17,8 @@ UserDataEx UserModelBase::toUserData() &&
     UserDataEx user;
     user.id = std::move(id);
     user.name = std::move(name);
-    user.isAdmin = std::move(isOwner);
-    setType(&user, type);
-    if (type == UserType::cloud)
+    user.type = std::move(type);
+    if (user.type == UserType::cloud)
     {
         user.digest = UserData::kCloudPasswordStub;
         user.hash = UserData::kCloudPasswordStub;
@@ -32,8 +31,6 @@ UserDataEx UserModelBase::toUserData() &&
             user.hash = std::move(*hash);
         if (cryptSha512Hash)
             user.cryptSha512Hash = std::move(*cryptSha512Hash);
-        if (realm)
-            user.realm = std::move(*realm);
     }
     user.fullName = std::move(fullName);
     user.permissions = std::move(permissions);
@@ -53,19 +50,17 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     UserModelBase model;
     model.id = std::move(baseData.id);
     model.name = std::move(baseData.name);
-    model.type = api::type(baseData);
+    model.type = std::move(baseData.type);
     model.fullName = std::move(baseData.fullName);
-    model.isOwner = baseData.isAdmin;
     model.permissions = std::move(baseData.permissions);
     model.email = std::move(baseData.email);
-    model.isHttpDigestEnabled = baseData.isCloud
+    model.isHttpDigestEnabled = (model.type == UserType::cloud)
         ? false
         : (baseData.digest != UserData::kHttpIsDisabledStub);
     model.isEnabled = std::move(baseData.isEnabled);
     model.digest = std::move(baseData.digest);
     model.hash = std::move(baseData.hash);
     model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
-    model.realm = std::move(baseData.realm);
     return model;
 }
 
@@ -77,13 +72,14 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     auto user = std::move(*this).toUserData();
     if (externalId)
         user.externalId = std::move(*externalId);
-
+    if (isOwner)
+        user.groupIds.push_back(UserData::kOwnerGroupId);
     if (!userRoleId.isNull())
-        user.userRoleIds.push_back(std::move(userRoleId));
+        user.groupIds.push_back(std::move(userRoleId));
 
     auto accessRights =
         PermissionConverter::accessRights(&user.permissions, user.id, accessibleResources);
-    if (!user.isAdmin && !user.userRoleIds.empty() && accessibleResources)
+    if (!user.isOwner() && !user.groupIds.empty() && accessibleResources)
         accessRights.checkResourceExists = CheckResourceExists::customRole;
     return {std::move(user), std::move(accessRights)};
 }
@@ -100,10 +96,19 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         UserModelV1 model;
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
+        model.isOwner = baseData.isOwner();
         if (!baseData.externalId.isEmpty())
             model.externalId = std::move(baseData.externalId);
-        if (!baseData.userRoleIds.empty())
-            model.userRoleId = baseData.userRoleIds.front();
+        for (const auto& id: baseData.groupIds)
+        {
+            // TODO: Replace when QnPredefinedUserRoles is moved into nx::vms::api.
+            // if (QnPredefinedUserRoles::enumValue(id) == Qn::UserRole::customUserRole)
+            if (!id.toSimpleString().startsWith("00000000-0000-0000-0000-1000"))
+            {
+                model.userRoleId = id;
+                break;
+            }
+        }
 
         PermissionConverter::extractFromResourceAccessRights(
             allAccessRights, model.id, &model.permissions, &model.accessibleResources);
@@ -118,7 +123,7 @@ QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml))
 UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
-    user.userRoleIds = std::move(userGroupIds);
+    user.groupIds = std::move(groupIds);
     if (externalId)
         user.externalId = std::move(*externalId);
 
@@ -147,7 +152,7 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         UserModelV3 model;
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
-        model.userGroupIds = std::move(baseData.userRoleIds);
+        model.groupIds = std::move(baseData.groupIds);
         model.externalId = std::move(baseData.externalId);
         auto accessRights = nx::utils::find_if(allAccessRights,
             [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });

@@ -54,7 +54,7 @@ public:
 
     void handleGroupAddedOrUpdated(const nx::vms::api::UserRoleData& group)
     {
-        q->addOrUpdate(group.getId(), {group.parentRoleIds.cbegin(), group.parentRoleIds.cend()});
+        q->addOrUpdate(group.getId(), {group.parentGroupIds.cbegin(), group.parentGroupIds.cend()});
     }
 
     void handleGroupRemoved(const nx::vms::api::UserRoleData& group)

@@ -3,6 +3,7 @@
 #include "user_data.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
 
@@ -10,12 +11,15 @@ const QString UserData::kResourceTypeName = lit("User");
 const QnUuid UserData::kResourceTypeId =
     ResourceData::getFixedTypeId(UserData::kResourceTypeName);
 
+// TODO: This value should be in sync with QnPredefinedUserRoles::id(Qn::UserRole::owner).
+const QnUuid UserData::kOwnerGroupId("00000000-0000-0000-0000-100000000000");
+
 constexpr const char* UserData::kCloudPasswordStub;
 
 void UserData::fillId()
 {
     // ATTENTION: This logic is similar to QnUserResource::fillId().
-    if (isCloud)
+    if (type == UserType::cloud)
     {
         if (!email.isEmpty())
             id = QnUuid::fromArbitraryData(email);
@@ -28,67 +32,14 @@ void UserData::fillId()
     }
 }
 
-bool UserData::adaptFromDeprecatedApi()
+bool UserData::isOwner() const
 {
-    if (userRoleId.isNull())
-        return true;
-
-    if (!userRoleIds.empty())
-    {
-        if (userRoleIds.size() == 1 && userRoleIds[0] == userRoleId)
-        {
-            userRoleId = QnUuid();
-            return true;
-        }
-        return false;
-    }
-
-    userRoleIds.push_back(userRoleId);
-    userRoleId = QnUuid();
-    return true;
-}
-
-void UserData::cleanOnDeprecatedApiMerge(const QJsonValue& overrideValue)
-{
-    const auto overrides =
-        [obj = overrideValue.toObject()](const auto& n) { return obj.find(n) != obj.end(); };
-    if (overrides("userRoleId") || overrides("userRoleIds"))
-    {
-        userRoleId = QnUuid();
-        userRoleIds.clear();
-    }
-}
-
-void UserData::adaptForDeprecatedApi()
-{
-    if (!userRoleIds.empty())
-        userRoleId = userRoleIds.front();
+    return nx::utils::find_if(groupIds, [](const auto id) { return id == kOwnerGroupId; });
 }
 
 QString toString(UserType type)
 {
     return QJson::serialized(type);
-}
-
-UserType type(const UserData& user)
-{
-    if (user.isLdap) return UserType::ldap;
-    if (user.isCloud) return UserType::cloud;
-    return UserType::local;
-}
-
-void setType(UserData* user, UserType type)
-{
-    user->isLdap = false;
-    user->isCloud = false;
-    switch (type)
-    {
-        case UserType::local: return;
-        case UserType::ldap: user->isLdap = true; return;
-        case UserType::cloud: user->isCloud = true; return;
-    }
-
-    NX_ASSERT(false, "Unexpected user type: %1", type);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

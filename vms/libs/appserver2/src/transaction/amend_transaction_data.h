@@ -51,10 +51,6 @@ bool amendOutputDataIfNeeded(
     QnResourceAccessManager* accessManager,
     nx::vms::api::StorageData* storageData);
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
-    nx::vms::api::UserData* userData);
-
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,

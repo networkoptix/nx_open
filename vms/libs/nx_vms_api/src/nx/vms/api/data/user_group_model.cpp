@@ -17,11 +17,11 @@ UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
     userRole.name = std::move(name);
     userRole.description = std::move(description);
     userRole.isPredefined = isPredefined;
-    userRole.isLdap = (type == UserType::ldap);
+    userRole.type = type;
     if (externalId)
         userRole.externalId = std::move(*externalId);
     userRole.permissions = std::move(permissions);
-    userRole.parentRoleIds = std::move(parentGroupIds);
+    userRole.parentGroupIds = std::move(parentGroupIds);
 
     std::optional<AccessRightsData> accessRights;
     if (resourceAccessRights)
@@ -47,12 +47,12 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         model.id = std::move(baseData.id);
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
-        model.type = baseData.isLdap ? UserType::ldap : UserType::local;
+        model.type = baseData.type;
         if (!baseData.externalId.isEmpty())
             model.externalId = std::move(baseData.externalId);
         model.permissions = std::move(baseData.permissions);
         model.isPredefined = baseData.isPredefined;
-        model.parentGroupIds = std::move(baseData.parentRoleIds);
+        model.parentGroupIds = std::move(baseData.parentGroupIds);
 
         auto accessRights = nx::utils::find_if(
             std::get<AccessRightsDataList>(all),

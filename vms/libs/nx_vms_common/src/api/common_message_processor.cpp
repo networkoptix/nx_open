@@ -1011,7 +1011,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
     resetAccessRights(fullData.accessRights);
-    resetUserRoles(fullData.userRoles);
+    resetUserRoles(fullData.userGroups);
     resetLicenses(fullData.licenses);
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 

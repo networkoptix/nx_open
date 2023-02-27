@@ -34,7 +34,7 @@ struct NX_VMS_API FullInfoData
     CameraDataList cameras;
     CameraAttributesDataList cameraUserAttributesList;
     UserDataList users;
-    UserRoleDataList userRoles;
+    UserRoleDataList userGroups;
     AccessRightsDataList accessRights;
     LayoutDataList layouts;
     VideowallDataList videowalls;
@@ -70,7 +70,7 @@ struct NX_VMS_API FullInfoData
     (resStatusList) \
     (webPages) \
     (accessRights) \
-    (userRoles) \
+    (userGroups) \
     (showreels) \
     (analyticsPlugins) \
     (analyticsEngines)

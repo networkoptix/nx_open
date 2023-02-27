@@ -112,14 +112,6 @@ bool amendOutputDataIfNeeded(
     return true;
 }
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* accessManager,
-    nx::vms::api::UserData* userData)
-{
-    userData->adaptForDeprecatedApi();
-    return true;
-}
-
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,

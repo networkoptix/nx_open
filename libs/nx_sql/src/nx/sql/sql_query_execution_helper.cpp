@@ -60,17 +60,17 @@ bool SqlQueryExecutionHelper::execSQLQuery(const QString& queryStr, QSqlDatabase
 
 bool SqlQueryExecutionHelper::execSQLQuery(QSqlQuery* query, const char* details)
 {
-    NX_ASSERT_HEAVY_CONDITION(validateParams(*query));
+    NX_ASSERT_HEAVY_CONDITION(validateParams(*query), "Failure SQL in %2: %3", details, query->lastQuery());
     if (query->exec())
         return true;
 
     auto error = query->lastError();
     // Assert only on statement error type as other errors are not our code responsibility.
-    if (!NX_ASSERT(error.type() != QSqlError::StatementError,
+    if (NX_ASSERT(error.type() != QSqlError::StatementError,
         "%1 to execute SQL query in %2: %3", error, details, query->lastQuery()))
     {
-        NX_DEBUG(
-            NX_SCOPE_TAG, "%1 to execute SQL query in %2: %3", error, details, query->lastQuery());
+        NX_DEBUG(NX_SCOPE_TAG, "%1 to execute SQL query in %2: %3",
+            error, details, query->lastQuery());
     }
     return false;
 }
@@ -96,19 +96,14 @@ bool SqlQueryExecutionHelper::execSQLScript(const QByteArray& scriptData, QSqlDa
 
     QByteArray dataWithoutComments = scriptWithoutComments.toUtf8();
     QList<QByteArray> commands = quotedSplit(dataWithoutComments);
-#ifdef DB_DEBUG
-    int n = commands.size();
-    qDebug() << "creating db" << n << "commands queued";
-    int i = 0;
-#endif // DB_DEBUG
+    size_t currentCommand = 1;
     for (const QByteArray& singleCommand : commands)
     {
-#ifdef DB_DEBUG
-        qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
-#endif // DB_DEBUG
         QString command = QString::fromUtf8(singleCommand).trimmed();
         if (command.isEmpty())
             continue;
+        NX_VERBOSE(NX_SCOPE_TAG, "Executing %1/%2 command from script:\n%3",
+            currentCommand++, commands.size(), command);
         QSqlQuery ddlQuery(database);
         if (!prepareSQLQuery(&ddlQuery, command, Q_FUNC_INFO))
             return false;
@@ -131,9 +126,10 @@ bool SqlQueryExecutionHelper::execSQLFile(
 
     if (!execSQLScript(data, database))
     {
-        NX_ERROR(typeid(SqlQueryExecutionHelper), nx::format("Error while executing SQL file %1").arg(fileName));
+        NX_ASSERT(false, "Error while executing SQL file %1", fileName);
         return false;
     }
+    NX_DEBUG(NX_SCOPE_TAG, "Successfully executed SQL file %1", fileName);
     return true;
 }
 

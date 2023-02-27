@@ -201,7 +201,6 @@ private:
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
     std::vector<QnUuid> m_userRoleIds;
-    std::atomic<bool> m_isOwner{false};
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;

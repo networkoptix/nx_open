@@ -142,7 +142,7 @@ int QnUserManager<QueryProcessorType>::getUserRoles(
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::UserRoleDataList>(
-        ApiCommand::getUserRoles,
+        ApiCommand::getUserGroups,
         QnUuid(),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
@@ -157,7 +157,7 @@ int QnUserManager<QueryProcessorType>::saveUserRole(
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::saveUserRole,
+        ApiCommand::saveUserGroup,
         data,
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
@@ -172,7 +172,7 @@ int QnUserManager<QueryProcessorType>::removeUserRole(
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::removeUserRole,
+        ApiCommand::removeUserGroup,
         nx::vms::api::IdData(id),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;

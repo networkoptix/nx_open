@@ -63,7 +63,7 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
         {
             const auto groupsManager = m_context->systemContext()->userRolesManager();
             const auto group = groupsManager->userRole(m_groups.at(index.row()));
-            return group.isLdap;
+            return group.type == nx::vms::api::UserType::ldap;
         }
         case isParent:
         {

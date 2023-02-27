@@ -28,7 +28,7 @@ struct UserGroupListModel::Private
     QStringList getParentGroupNames(const UserGroupData& group) const
     {
         QStringList result;
-        for (const auto parentId: group.parentRoleIds)
+        for (const auto parentId: group.parentGroupIds)
         {
             const auto it = findGroup(parentId);
             if (NX_ASSERT(it != orderedGroups.cend()))
@@ -212,7 +212,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupTypeColumn:
                 {
-                    if (group.isLdap)
+                    if (group.type == nx::vms::api::UserType::ldap)
                         return tr("LDAP group");
 
                     return Private::isBuiltIn(group)
@@ -231,7 +231,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupTypeColumn:
                 {
-                    if (group.isLdap)
+                    if (group.type == nx::vms::api::UserType::ldap)
                         return {};
 
                     return Private::isBuiltIn(group)
@@ -429,9 +429,9 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     // Remove group from other groups.
     for (auto& group: d->orderedGroups)
     {
-        auto groupIt = std::find(group.parentRoleIds.begin(), group.parentRoleIds.end(), groupId);
-        if (groupIt != group.parentRoleIds.end())
-            group.parentRoleIds.erase(groupIt);
+        auto groupIt = std::find(group.parentGroupIds.begin(), group.parentGroupIds.end(), groupId);
+        if (groupIt != group.parentGroupIds.end())
+            group.parentGroupIds.erase(groupIt);
     }
     return true;
 }

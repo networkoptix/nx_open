@@ -7,11 +7,12 @@
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <client_core/client_core_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <network/system_helpers.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -408,19 +409,14 @@ struct CloudCrossSystemContext::Private
         if (user)
             return;
 
-        user = QnUserResourcePtr(
-            new QnUserResource(model.type, model.externalId.value_or(QString())));
-        user->setIdUnsafe(model.id);
-        user->setName(model.name);
-        user->setOwner(model.isOwner);
-        user->setFullName(model.fullName);
-        user->setEmail(model.email);
+        // TODO: #sivanov Check this logic according to API changes.
+        const auto modelPermissions = model.permissions;
+        const auto modelData = std::move(model).toDbTypes();
+        user = ec2::fromApiToResource(std::get<0>(modelData));
 
         // Avoid resources access recalculation. Inaccessible resources are filtered on a server
         // side.
-        auto fixedPermissions = model.permissions
-            | nx::vms::api::GlobalPermission::accessAllMedia;
-        user->setRawPermissions(fixedPermissions);
+        user->setRawPermissions(modelPermissions | nx::vms::api::GlobalPermission::accessAllMedia);
 
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);

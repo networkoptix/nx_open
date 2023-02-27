@@ -145,7 +145,7 @@ private:
             if (role)
             {
                 list->push_back(*role);
-                appendUserRolesWithParents(list, role->parentRoleIds, lock);
+                appendUserRolesWithParents(list, role->parentGroupIds, lock);
             }
         }
     }

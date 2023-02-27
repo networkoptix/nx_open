@@ -186,7 +186,7 @@ protected:
     {
         UserData data;
         ec2::fromResourceToApi(target, data);
-        data.userRoleIds = {adminGroupId};
+        data.groupIds = {adminGroupId};
 
         auto info = nx::format("check: %1 -> %2", source->getName(), target->getName())
             .toStdString();
@@ -909,11 +909,14 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
 
     QnUserResourceList users = {owner, cloudOwner, admin, inheritedAdmin, cloud, ldap, other};
     QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
+        {owner, owner},
         {owner, admin},
         {owner, inheritedAdmin},
         {owner, ldap},
         {owner, other},
         {owner, cloud},
+        {cloudOwner, owner},
+        {cloudOwner, cloudOwner},
         {cloudOwner, admin},
         {cloudOwner, inheritedAdmin},
         {cloudOwner, cloud},
@@ -1040,13 +1043,13 @@ TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
     UserData userData;
     ec2::fromResourceToApi(user, userData);
 
-    userData.userRoleIds = {predefinedId, customId};
+    userData.groupIds = {predefinedId, customId};
     ASSERT_TRUE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
 
-    userData.userRoleIds = {predefinedId, zeroId, customId};
+    userData.groupIds = {predefinedId, zeroId, customId};
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
 
-    userData.userRoleIds = {predefinedId, unknownId, customId};
+    userData.groupIds = {predefinedId, unknownId, customId};
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
 }
 
@@ -1190,7 +1193,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleAccessChange)
     ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 
-    role.parentRoleIds.push_back(QnPredefinedUserRoles::id(Qn::UserRole::liveViewer));
+    role.parentGroupIds.push_back(QnPredefinedUserRoles::id(Qn::UserRole::liveViewer));
     userRolesManager()->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
@@ -1209,12 +1212,12 @@ TEST_F(ResourceAccessManagerTest, checkInheritedRoleAccessChange)
     ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 
-    parentRole.parentRoleIds = {QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)};
+    parentRole.parentGroupIds = {QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)};
     userRolesManager()->addOrUpdateUserRole(parentRole);
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 
-    inheritedRole.parentRoleIds = {};
+    inheritedRole.parentGroupIds = {};
     userRolesManager()->addOrUpdateUserRole(inheritedRole);
     ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
@@ -1295,7 +1298,7 @@ TEST_F(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
     EXPECT_TRUE(hasPermission(user, cameraOfInheritedRole, Qn::ReadPermission));
     EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
 
-    inheritedRole.parentRoleIds = {};
+    inheritedRole.parentGroupIds = {};
     userRolesManager()->addOrUpdateUserRole(inheritedRole);
     EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
     EXPECT_FALSE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
