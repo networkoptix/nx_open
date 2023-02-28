@@ -34,7 +34,14 @@ bool UserData::adaptFromDeprecatedApi()
         return true;
 
     if (!userRoleIds.empty())
+    {
+        if (userRoleIds.size() == 1 && userRoleIds[0] == userRoleId)
+        {
+            userRoleId = QnUuid();
+            return true;
+        }
         return false;
+    }
 
     userRoleIds.push_back(userRoleId);
     userRoleId = QnUuid();
