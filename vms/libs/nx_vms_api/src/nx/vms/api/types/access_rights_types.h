@@ -188,18 +188,15 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 
-constexpr GlobalPermissions nonDeprecatedGlobalPermissions()
-{
-    return GlobalPermission::admin
-        | GlobalPermission::owner
-        | GlobalPermission::requireFreshSession
-        | GlobalPermission::viewLogs;
-}
+constexpr GlobalPermissions kNonDeprecatedGlobalPermissions{
+    GlobalPermission::admin
+    | GlobalPermission::owner
+    | GlobalPermission::viewLogs
+    | GlobalPermission::customUser
+    | GlobalPermission::requireFreshSession
+};
 
-constexpr GlobalPermissions deprecatedGlobalPermissions()
-{
-    return ~nonDeprecatedGlobalPermissions();
-}
+constexpr GlobalPermissions kDeprecatedGlobalPermissions{~kNonDeprecatedGlobalPermissions};
 
 // Stored in the database. QFlags uses int internally, so we are limited to 32 bits.
 /**%apidoc

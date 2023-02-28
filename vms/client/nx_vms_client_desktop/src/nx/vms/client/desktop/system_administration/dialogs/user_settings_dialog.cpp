@@ -318,7 +318,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         user->getId());
 
     state.globalPermissions =
-        user->getRawPermissions() & nx::vms::api::nonDeprecatedGlobalPermissions();
+        user->getRawPermissions() & nx::vms::api::kNonDeprecatedGlobalPermissions;
 
     return state;
 }
