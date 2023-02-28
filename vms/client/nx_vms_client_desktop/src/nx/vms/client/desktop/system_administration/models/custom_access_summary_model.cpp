@@ -135,7 +135,7 @@ void CustomAccessSummaryModel::Private::updateInfo()
 
     if (hasEnabledPermissions != hasDisplayableItems)
     {
-        if (hasDisplayableItems)
+        if (hasEnabledPermissions)
         {
             model->beginInsertRows({}, 0, permissions.size() - 1);
             hasDisplayableItems = hasEnabledPermissions;
