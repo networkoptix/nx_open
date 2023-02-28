@@ -74,6 +74,12 @@ public:
     /** Device is initialized. */
     virtual bool isValid() const = 0;
 
+    /** Is Z-axis was found on the device. */
+    int zAxisIsInitialized() const;
+
+    /** The number of buttons which has been returned by device. */
+    int initializedButtonsNumber() const;
+
     void updateStickAxisLimits(const JoystickDescriptor& modelInfo);
 
     StickPosition currentStickPosition() const;
@@ -89,12 +95,6 @@ signals:
     void buttonReleased(int id);
 
     /**
-     * Stick has been moved.
-     * x, y and z are values in range [-1, 1], where 0 corresponds to neutral stick position.
-     */
-    void stickMoved(double x, double y, double z);
-
-    /**
      * State of any button has changed or the stick has been moved.
      * This signal is necessary for command processing since we need to check modifier state
      * changes before processing any other button state change.
@@ -106,6 +106,9 @@ signals:
      */
     void failed();
 
+    void axisIsInitializedChanged(AxisIndexes index);
+    void initializedButtonsNumberChanged();
+
 protected:
     virtual State getNewState() = 0;
     virtual AxisLimits parseAxisLimits(
@@ -113,6 +116,10 @@ protected:
         const AxisLimits& oldLimits) const = 0;
     double mapAxisState(int rawValue, const AxisLimits& limits);
     void pollData();
+
+    bool axisIsInitialized(AxisIndexes index) const;
+    void setAxisInitialized(AxisIndexes index, bool isInitialized);
+    void setInitializedButtonsNumber(int number);
 
 protected:
     QString m_id;
@@ -123,6 +130,13 @@ protected:
 
     StickPosition m_stickPosition;
     ButtonStates m_buttonStates;
+
+private:
+    bool m_xAxisInitialized = false;
+    bool m_yAxisInitialized = false;
+    bool m_zAxisInitialized = false;
+
+    int m_initializedButtonsNumber = 0;
 };
 
 using DevicePtr = QSharedPointer<Device>;

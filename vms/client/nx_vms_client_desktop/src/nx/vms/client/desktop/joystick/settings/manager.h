@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
 #include <QtCore/QString>
@@ -13,15 +14,15 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/impl_ptr.h>
 
+#include "device.h"
+
 namespace nx::vms::client::desktop {
 namespace joystick {
 
 class ActionFactory;
-class Device;
 struct JoystickDescriptor;
 
 using ActionFactoryPtr = QSharedPointer<ActionFactory>;
-using DevicePtr = QSharedPointer<Device>;
 using DeviceConfigs = QMap<QString, JoystickDescriptor>;
 
 /**
@@ -51,14 +52,13 @@ public:
      * however devices created for such models are dummy and provide only basic device info
      * such as manufacturer and model identifiers.
      */
-    QList<DevicePtr> devices() const;
+    QList<const Device*> devices() const;
+
+    JoystickDescriptor createDeviceDescription(const QString& model);
 
     JoystickDescriptor getDefaultDeviceDescription(const QString& model) const;
-    JoystickDescriptor getDeviceDescription(const QString& model) const;
+    const JoystickDescriptor& getDeviceDescription(const QString& model) const;
     void updateDeviceDescription(const JoystickDescriptor& config);
-
-    /** Load config files. */
-    void loadConfig();
 
     /** Save config files. */
     void saveConfig(const QString& model);
@@ -71,22 +71,35 @@ public:
 
 protected:
     virtual void enumerateDevices() = 0;
+    virtual void updateSearchState();
+
+    /** Load config files. */
+    void loadConfigs();
+
     void loadConfig(
-        const QString& searchDir,
+        const QDir& searchDir,
         DeviceConfigs& destConfigs,
-        QMap<QString, QString>& destIdToRelativePath) const;
+        QMap<QString, QString>& destIdToFileName) const;
+
+    void loadGeneralConfig(const QDir& searchDir, JoystickDescriptor& destConfig) const;
+
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
     void initializeDevice(
-        DevicePtr& device,
+        const DevicePtr& device,
         const JoystickDescriptor& description,
         const QString& devicePath);
 
+    bool isGeneralJoystickConfig(const JoystickDescriptor& config);
+
     QTimer* pollTimer() const;
+
+    const DeviceConfigs& getKnownJoystickConfigs() const;
+
+private:
+    QDir getLocalConfigDirPath() const;
 
 protected:
     mutable nx::Mutex m_mutex;
-
-    DeviceConfigs m_deviceConfigs;
 
     QMap<QString, DevicePtr> m_devices;
 

@@ -29,6 +29,8 @@ public:
 
     virtual bool isValid() const override;
 
+    void setFoundControlsNumber(int axesNumber, int buttonsNumber);
+
 protected:
     virtual State getNewState() override;
     virtual AxisLimits parseAxisLimits(

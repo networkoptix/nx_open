@@ -4,11 +4,14 @@
 
 #include <vector>
 
+#ifndef DIRECTINPUT_VERSION
+    #define DIRECTINPUT_VERSION 0x0800
+#endif
+#include <dinput.h>
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QTimer>
-
-#include <dinput.h>
 
 #include "device.h"
 
@@ -46,9 +49,9 @@ protected:
 
 private:
     LPDIRECTINPUTDEVICE8 m_inputDevice;
-    bool m_xAxisInitialized = false;
-    bool m_yAxisInitialized = false;
-    bool m_zAxisInitialized = false;
 };
+
+
+using DeviceWindowsPtr = QSharedPointer<DeviceWindows>;
 
 } // namespace nx::vms::client::desktop::joystick

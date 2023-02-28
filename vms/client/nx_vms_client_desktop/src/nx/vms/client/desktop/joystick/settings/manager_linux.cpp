@@ -12,11 +12,22 @@
 #include "device_linux.h"
 #include "descriptors.h"
 
+using namespace std::chrono;
+
+namespace {
+
+constexpr milliseconds kEnumerationInterval = 2500ms;
+
+} // namespace
+
 namespace nx::vms::client::desktop::joystick {
 
 ManagerLinux::ManagerLinux(QObject* parent):
     base_type(parent)
 {
+    connect(&m_enumerateTimer, &QTimer::timeout, this, &ManagerLinux::enumerateDevices);
+    m_enumerateTimer.setInterval(kEnumerationInterval);
+    m_enumerateTimer.start();
 }
 
 void ManagerLinux::enumerateDevices()
@@ -41,46 +52,63 @@ void ManagerLinux::enumerateDevices()
         static constexpr int kNameMaxSize = 256;
         char name[kNameMaxSize];
         __u32 version;
-        __u8 axes;
-        __u8 buttons;
+        __u8 axesNumber;
+        __u8 buttonsNumber;
 
         ioctl(fd, JSIOCGNAME(kNameMaxSize), name);
         ioctl(fd, JSIOCGVERSION, &version);
-        ioctl(fd, JSIOCGAXES, &axes);
-        ioctl(fd, JSIOCGBUTTONS, &buttons);
+        ioctl(fd, JSIOCGAXES, &axesNumber);
+        ioctl(fd, JSIOCGBUTTONS, &buttonsNumber);
 
         close(fd);
 
-        const QString modelName(name);
+        const QString modelAndManufacturer(name);
         NX_VERBOSE(this,
             "A new Joystick has been found. "
             "Model: %1, path: %2",
-            modelName, path);
+            modelAndManufacturer, path);
 
-        const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
-            [modelName](const JoystickDescriptor& description)
-            {
-                return modelName.contains(description.model);
-            });
+        const auto model = findDeviceModel(modelAndManufacturer);
+        if (model.isEmpty())
+            continue;
 
-        if (iter != m_deviceConfigs.end())
-        {
-            const auto config = *iter;
+        const auto config = createDeviceDescription(findDeviceModel(modelAndManufacturer));
+        DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
+        DevicePtr device(deviceLinux);
+        deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
 
-            DevicePtr device(new DeviceLinux(config, path, pollTimer()));
-            if (device->isValid())
-                initializeDevice(device, config, path);
-        }
+        if (device->isValid())
+            initializeDevice(device, config, path);
         else
-        {
-            NX_VERBOSE(this,
-                "An unsupported Joystick has been found. "
-                "Model: %1, path: %2",
-                modelName, path);
-        }
+            NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelAndManufacturer, path);
     }
 
     removeUnpluggedJoysticks(foundDevices);
+}
+
+QString ManagerLinux::findDeviceModel(const QString& modelAndManufacturer) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto knownConfigsList = getKnownJoystickConfigs();
+
+    const auto iter = std::find_if(knownConfigsList.begin(),
+        knownConfigsList.end(),
+        [modelAndManufacturer](const JoystickDescriptor& config)
+        {
+            QString model = modelAndManufacturer;
+
+            int manufacturerStart = model.indexOf(config.manufacturer);
+            if (manufacturerStart != -1)
+            {
+                model.remove(manufacturerStart, config.manufacturer.size());
+                model = model.trimmed();
+            }
+
+            return model == config.model;
+        });
+
+    return iter != knownConfigsList.end() ? iter->model : "";
 }
 
 } // namespace nx::vms::client::desktop::joystick

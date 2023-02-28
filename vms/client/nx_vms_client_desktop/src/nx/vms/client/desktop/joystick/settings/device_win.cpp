@@ -47,7 +47,8 @@ bool DeviceWindows::isValid() const
 
 bool DeviceWindows::isInitialized() const
 {
-    return m_xAxisInitialized && m_yAxisInitialized && m_zAxisInitialized;;
+    // Z-axis is optional
+    return axisIsInitialized(Device::xIndex) && axisIsInitialized(Device::yIndex);
 }
 
 Device::State DeviceWindows::getNewState()
@@ -74,7 +75,7 @@ Device::State DeviceWindows::getNewState()
     };
 
     ButtonStates newButtonStates = m_buttonStates;
-    for (int i = 0; i < newButtonStates.size() && i < sizeof(state.rgbButtons); ++i)
+    for (int i = 0; i < std::min(newButtonStates.size(), sizeof(state.rgbButtons)); ++i)
         newButtonStates[i] = state.rgbButtons[i];
 
     return {newStickPosition, newButtonStates};
@@ -117,19 +118,23 @@ bool DeviceWindows::enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, 
             if (deviceObject->guidType == GUID_XAxis)
             {
                 formAxisLimits(range.lMin, range.lMax, &device->m_axisLimits[xIndex]);
-                device->m_xAxisInitialized = true;
+                device->setAxisInitialized(Device::xIndex, true);
             }
             else if (deviceObject->guidType == GUID_YAxis)
             {
                 formAxisLimits(range.lMin, range.lMax, &device->m_axisLimits[yIndex]);
-                device->m_yAxisInitialized = true;
+                device->setAxisInitialized(Device::yIndex, true);
             }
             else if (deviceObject->guidType == GUID_ZAxis)
             {
                 formAxisLimits(range.lMin, range.lMax, &device->m_axisLimits[zIndex]);
-                device->m_zAxisInitialized = true;
+                device->setAxisInitialized(Device::zIndex, true);
             }
         }
+    }
+    else if (deviceObject->dwType & DIDFT_BUTTON)
+    {
+        device->setInitializedButtonsNumber(device->initializedButtonsNumber() + 1);
     }
 
     return DIENUM_CONTINUE;

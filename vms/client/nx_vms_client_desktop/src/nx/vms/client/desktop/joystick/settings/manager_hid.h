@@ -6,6 +6,7 @@
 
 namespace nx::vms::client::desktop::joystick {
 
+/** This implementation cannot support general joystick config. */
 class ManagerHid: public Manager
 {
     Q_OBJECT
@@ -18,6 +19,9 @@ public:
 
 private:
     virtual void enumerateDevices() override;
+
+private:
+    QTimer m_enumerateTimer;
 };
 
 } // namespace nx::vms::client::desktop::joystick

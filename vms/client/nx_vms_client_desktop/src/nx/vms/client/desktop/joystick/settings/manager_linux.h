@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QTimer>
+
 #include "manager.h"
 
 namespace nx::vms::client::desktop::joystick {
@@ -17,6 +19,11 @@ public:
 
 private:
     virtual void enumerateDevices() override;
+
+    QString findDeviceModel(const QString& modelAndManufacturer) const;
+
+private:
+    QTimer m_enumerateTimer;
 };
 
 } // namespace nx::vms::client::desktop::joystick

@@ -31,6 +31,11 @@ DeviceHid::DeviceHid(
     m_bufferSize = (m_bitCount + 7) / 8;
     m_buffer.reset(new unsigned char[m_bufferSize]);
 
+    for (int axisIndex = 0; axisIndex < Device::axisIndexCount; ++axisIndex)
+        setAxisInitialized((Device::AxisIndexes)axisIndex, true);
+
+    setInitializedButtonsNumber(modelInfo.buttons.size());
+
     // Initialize stick axes (x, y, z).
     m_axisLocations.push_back(parseLocation(modelInfo.xAxis.bits));
     m_axisLocations.push_back(parseLocation(modelInfo.yAxis.bits));
@@ -68,15 +73,15 @@ Device::State DeviceHid::getNewState()
 
     StickPosition newStickPosition;
     newStickPosition.fill(0);
-    for (int i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
+    for (size_t i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
     {
         const auto state = parseData(m_reportData, m_axisLocations[i]);
 
         int rawValue = 0;
-        for (int i = 0; i < state.size(); ++i)
+        for (int j = 0; j < state.size(); ++j)
         {
-            if (state.at(i))
-                rawValue |= 1 << i;
+            if (state.at(j))
+                rawValue |= 1 << j;
         }
 
         newStickPosition[i] = mapAxisState(rawValue, m_axisLimits[i]);
@@ -116,7 +121,7 @@ DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& loc
 {
     DeviceHid::ParsedFieldLocation result;
 
-    for (const auto& interval: location.split(',', QString::SkipEmptyParts))
+    for (const auto& interval: location.split(',', Qt::SkipEmptyParts))
     {
         auto borders = interval.split('-');
 
@@ -135,7 +140,7 @@ DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& loc
         if (!ok1 || !ok2)
             return {};
 
-        result.intervals.push_back(QPair(first, last));
+        result.intervals.push_back({first, last});
         // Calc and store the field size.
         // It never changes after initialization, so there's no need for a separate function.
         result.size += last - first + 1;

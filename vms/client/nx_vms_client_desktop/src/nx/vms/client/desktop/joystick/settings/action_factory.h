@@ -5,8 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-#include <common/common_module_aware.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 
@@ -19,7 +19,7 @@ struct JoystickDescriptor;
 
 class ActionFactory:
     public QObject,
-    public QnCommonModuleAware
+    public core::CommonModuleAware
 {
     Q_OBJECT
 

@@ -10,10 +10,10 @@
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include "action_factory.h"
-#include "device.h"
 #include "descriptors.h"
 
 #if defined(Q_OS_LINUX)
@@ -30,28 +30,11 @@ namespace nx::vms::client::desktop::joystick {
 
 namespace {
 
-enum class SearchState
-{
-    /** Client just started, try to find a joystick quickly. */
-    initial,
-
-    /** No joysticks found, repeat search periodically. */
-    periodic,
-
-    /** Joystick is found, stop search. */
-    idle,
-};
-
-// Other constants.
-static const QMap<SearchState, milliseconds> kSearchIntervals{
-    {SearchState::initial, 2500ms},
-    {SearchState::periodic, 10s}
-};
-
 constexpr milliseconds kUsbPollInterval = 100ms;
-constexpr milliseconds kInitialSearchPeriod = 20s;
 
 const QString kSettingsDirName("/hid_configs/");
+const QString kGeneralConfigFileName("general_device.json");
+const QString kGeneralConfigFileNameTemplate("general_device_%1.json");
 
 } // namespace
 
@@ -59,64 +42,19 @@ struct Manager::Private
 {
     Manager* const q;
 
+    // Config for unknown device models.
+    JoystickDescriptor defaultGeneralDeviceConfig;
+
     // Configs for known device models.
     DeviceConfigs defaultDeviceConfigs;
+    DeviceConfigs deviceConfigs;
+
     std::map<QString, nx::utils::ScopedConnections> deviceConnections;
-    QMap<QString, QString> deviceConfigRelativePath;
+    QMap<QString, QString> deviceConfigFileNames;
     QMap<QString, ActionFactoryPtr> actionFactories;
     bool deviceActionsEnabled = true;
 
-    SearchState searchState = SearchState::initial;
-    QTimer* const enumerateTimer;
     QTimer* const pollTimer;
-    QElapsedTimer initialSearchTimer;
-
-    void updateSearchState()
-    {
-        SearchState targetState = searchState;
-        const bool devicesFound = !q->devices().empty();
-
-        switch (searchState)
-        {
-            case SearchState::initial:
-            {
-                if (devicesFound)
-                    targetState = SearchState::idle;
-                else if (!initialSearchTimer.isValid())
-                    initialSearchTimer.start();
-                else if (initialSearchTimer.hasExpired(kInitialSearchPeriod.count()))
-                    targetState = SearchState::periodic;
-                break;
-            }
-            case SearchState::periodic:
-            {
-                // If joystick was found, stop search.
-                if (devicesFound)
-                    targetState = SearchState::idle;
-                break;
-            }
-            case SearchState::idle:
-            {
-                // If joystick was disconnected, switch to quick search.
-                if (!devicesFound)
-                    targetState = SearchState::initial;
-                break;
-            }
-        }
-
-        if (targetState != searchState)
-        {
-            searchState = targetState;
-            initialSearchTimer.invalidate();
-            enumerateTimer->stop();
-            if (searchState != SearchState::idle)
-            {
-                enumerateTimer->setInterval(kSearchIntervals[searchState]);
-                enumerateTimer->start();
-            }
-            NX_VERBOSE(this, "Switch to search state %1", (int)searchState);
-        }
-    }
 };
 
 Manager* Manager::create(QObject* parent)
@@ -136,21 +74,10 @@ Manager::Manager(QObject* parent):
     m_mutex(nx::Mutex::Recursive),
     d(new Private{
         .q = this,
-        .enumerateTimer = new QTimer(this),
         .pollTimer = new QTimer(this)
     })
 {
-    loadConfig();
-
-    connect(d->enumerateTimer, &QTimer::timeout, this,
-        [this]()
-        {
-            enumerateDevices();
-            d->updateSearchState();
-        });
-    d->enumerateTimer->setInterval(kSearchIntervals[d->searchState]);
-    d->enumerateTimer->start();
-    d->initialSearchTimer.start();
+    loadConfigs();
 
     d->pollTimer->setInterval(kUsbPollInterval);
     d->pollTimer->start();
@@ -176,28 +103,68 @@ Manager::~Manager()
 {
 }
 
-QList<DevicePtr> Manager::devices() const
+QList<const Device*> Manager::devices() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_devices.values();
+
+    QList<const Device*> result;
+    for (const auto& device: m_devices)
+        result.push_back(device.get());
+
+    return result;
+}
+
+JoystickDescriptor Manager::createDeviceDescription(const QString& modelName)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto configIter = d->deviceConfigs.find(modelName);
+    if (d->deviceConfigs.end() != configIter)
+        return *configIter;
+
+    JoystickDescriptor result = d->defaultGeneralDeviceConfig;
+    result.model = modelName;
+
+    d->deviceConfigs[modelName] = result;
+    d->deviceConfigFileNames[modelName] = kGeneralConfigFileNameTemplate.arg(
+        nx::utils::replaceNonFileNameCharacters(modelName, ' '));
+
+    return result;
 }
 
 JoystickDescriptor Manager::getDefaultDeviceDescription(const QString& modelName) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return d->defaultDeviceConfigs[modelName];
+
+    const auto configIter = d->defaultDeviceConfigs.find(modelName);
+    if (d->defaultDeviceConfigs.end() != configIter)
+        return *configIter;
+
+    JoystickDescriptor result = d->defaultGeneralDeviceConfig;
+    result.model = modelName;
+
+    return result;
 }
 
-JoystickDescriptor Manager::getDeviceDescription(const QString& modelName) const
+const JoystickDescriptor& Manager::getDeviceDescription(const QString& modelName) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_deviceConfigs[modelName];
+
+    const auto configIter = d->deviceConfigs.find(modelName);
+    if (d->deviceConfigs.end() != configIter)
+        return *configIter;
+
+    NX_ASSERT(false, "General config hasn't been initialized for the device %1", modelName);
+
+    return d->defaultGeneralDeviceConfig;
 }
 
 void Manager::updateDeviceDescription(const JoystickDescriptor& config)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_deviceConfigs[config.model] = config;
+
+    d->deviceConfigs[config.model] = config;
+
     for (auto& actionFactory: d->actionFactories)
     {
         if (actionFactory->modelName() == config.model)
@@ -219,35 +186,18 @@ void Manager::setDeviceActionsEnabled(bool enabled)
     d->deviceActionsEnabled = enabled;
 }
 
-void Manager::loadConfig()
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    d->defaultDeviceConfigs.clear();
-    d->deviceConfigRelativePath.clear();
-    loadConfig(":" + kSettingsDirName,
-        d->defaultDeviceConfigs,
-        d->deviceConfigRelativePath);
-
-    m_deviceConfigs = d->defaultDeviceConfigs;
-    loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + kSettingsDirName,
-        m_deviceConfigs,
-        d->deviceConfigRelativePath);
-}
-
 void Manager::saveConfig(const QString& model)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    const auto configPathIter = d->deviceConfigRelativePath.find(model);
-    if (configPathIter == d->deviceConfigRelativePath.end())
+    const auto configFileNameIter = d->deviceConfigFileNames.find(model);
+    if (configFileNameIter == d->deviceConfigFileNames.end())
     {
         NX_ASSERT(false, "Invalid joystick device model.");
         return;
     }
 
-    const QString absoluteConfigPath =
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + *configPathIter;
+    const QString absoluteConfigPath = getLocalConfigDirPath().absoluteFilePath(*configFileNameIter);
 
     const QString dirPath = QFileInfo(absoluteConfigPath).dir().path();
 
@@ -265,23 +215,41 @@ void Manager::saveConfig(const QString& model)
         return;
     }
 
-    const auto configIter = m_deviceConfigs.find(model);
-    if (configIter == m_deviceConfigs.end())
-    {
-        NX_ASSERT(false, "Invalid joystick device model.");
-        return;
-    }
+    file.write(QByteArray::fromStdString(nx::reflect::json::serialize(
+        getDeviceDescription(model))));
+}
 
-    file.write(QByteArray::fromStdString(
-        nx::reflect::json::serialize(*configIter)));
+void Manager::updateSearchState()
+{
+}
+
+void Manager::loadConfigs()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    d->defaultGeneralDeviceConfig = {};
+    d->defaultDeviceConfigs.clear();
+    d->deviceConfigFileNames.clear();
+
+    loadGeneralConfig(":" + kSettingsDirName, d->defaultGeneralDeviceConfig);
+
+    loadConfig({":" + kSettingsDirName},
+        d->defaultDeviceConfigs,
+        d->deviceConfigFileNames);
+
+    d->deviceConfigs = d->defaultDeviceConfigs;
+
+    loadConfig(getLocalConfigDirPath(),
+        d->deviceConfigs,
+        d->deviceConfigFileNames);
 }
 
 void Manager::loadConfig(
-    const QString& searchDir,
+    const QDir& searchDir,
     DeviceConfigs& destConfigs,
-    QMap<QString, QString>& destIdToRelativePath) const
+    QMap<QString, QString>& destIdToFileName) const
 {
-    for (const auto& fileInfo: QDir(searchDir).entryInfoList(QDir::Files))
+    for (const auto& fileInfo: searchDir.entryInfoList(QDir::Files))
     {
         QFile file(fileInfo.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -294,12 +262,28 @@ void Manager::loadConfig(
             continue;
         }
 
-        destConfigs[config.model] = config;
+        if (fileInfo.fileName() == kGeneralConfigFileName)
+            continue;
 
-        const QString tempAbsPath = QFileInfo(file).absoluteFilePath();
-        const int startPos = tempAbsPath.indexOf(kSettingsDirName);
-        destIdToRelativePath[config.model] = tempAbsPath.mid(startPos);
+        destConfigs[config.model] = config;
+        destIdToFileName[config.model] = QFileInfo(file).fileName();
     }
+}
+
+void Manager::loadGeneralConfig(const QDir& searchDir, JoystickDescriptor& destConfig) const
+{
+    QFile file(searchDir.filePath(kGeneralConfigFileName));
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    JoystickDescriptor config;
+    if (!nx::reflect::json::deserialize<JoystickDescriptor>(
+        file.readAll().toStdString(), &config))
+    {
+        return;
+    }
+
+    destConfig = config;
 }
 
 void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
@@ -308,7 +292,7 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 
     for (auto it = m_devices.begin(); it != m_devices.end(); )
     {
-        const auto path = it.key();
+        const QString path = it.key();
         if (!foundDevicePaths.contains(path))
         {
             NX_VERBOSE(this, "Joystick has been removed: %1", path);
@@ -327,11 +311,11 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 
     // Restart search if needed.
     if (deviceWasRemoved)
-        d->updateSearchState();
+        updateSearchState();
 }
 
 void Manager::initializeDevice(
-    DevicePtr& device,
+    const DevicePtr& device,
     const JoystickDescriptor& description,
     const QString& devicePath)
 {
@@ -357,9 +341,25 @@ void Manager::initializeDevice(
     m_devices[devicePath] = device;
 }
 
+bool Manager::isGeneralJoystickConfig(const JoystickDescriptor& config)
+{
+    return d->defaultGeneralDeviceConfig.model == config.model;
+}
+
 QTimer* Manager::pollTimer() const
 {
     return d->pollTimer;
+}
+
+const DeviceConfigs& Manager::getKnownJoystickConfigs() const
+{
+    return d->deviceConfigs;
+}
+
+QDir Manager::getLocalConfigDirPath() const
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+        + kSettingsDirName;
 }
 
 } // namespace nx::vms::client::desktop::joystick

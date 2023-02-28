@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <algorithm>
+
 #include <QtCore/QPair>
 
 #include "descriptors.h"
@@ -100,6 +102,18 @@ bool DeviceLinux::isValid() const
     return m_dev != kInvalidDeviceId;
 }
 
+void DeviceLinux::setFoundControlsNumber(int axesNumber, int buttonsNumber)
+{
+    for (int axisIndex = 0;
+        axisIndex < std::min(axesNumber, (int)Device::axisIndexCount);
+        ++axisIndex)
+    {
+        setAxisInitialized((Device::AxisIndexes)axisIndex, true);
+    }
+
+    setInitializedButtonsNumber(buttonsNumber);
+}
+
 Device::State DeviceLinux::getNewState()
 {
     if (!isValid())
@@ -113,16 +127,16 @@ Device::State DeviceLinux::getNewState()
     {
         if (event.isAxis())
         {
-            if (!NX_ASSERT(event.axisOrButtonIndex() < newStickPosition.size()))
-                continue;
+            if (event.axisOrButtonIndex() >= newStickPosition.size())
+                continue; // We don't use additional axes.
 
             newStickPosition[event.axisOrButtonIndex()] =
                 mapAxisState(event.axisOrButtonState(), m_axisLimits[event.axisOrButtonIndex()]);
         }
         else if (event.isButton())
         {
-            if (!NX_ASSERT(event.axisOrButtonIndex() < newButtonStates.size()))
-                continue;
+            if (event.axisOrButtonIndex() >= newButtonStates.size())
+                continue; // We don't use more buttons, than in joystick config.
 
             newButtonStates[event.axisOrButtonIndex()] = event.axisOrButtonState();
         }
