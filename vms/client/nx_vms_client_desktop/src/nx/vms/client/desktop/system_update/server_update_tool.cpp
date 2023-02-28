@@ -1388,14 +1388,13 @@ void ServerUpdateTool::atDownloadFinished(const QString& fileName)
         return;
     }
 
-    for (auto& package: m_manualPackages)
+    for (const update::Package& package: m_manualPackages)
     {
         if (package.file == fileName)
         {
-            m_activeDownloads.erase(it);
             m_completeDownloads.insert(it->first);
-            QString file =  m_downloader->filePath(fileName);
-            m_packageProperties[package.file].localFile = file;
+            m_activeDownloads.erase(it);
+            m_packageProperties[package.file].localFile = m_downloader->filePath(fileName);
 
             emit packageDownloaded(package);
             return;
