@@ -229,11 +229,11 @@ void BackupStatusWidget::updateBackupStatus()
     const auto backupPositionRequestHandles = std::make_shared<std::set<rest::Handle>>();
 
     const auto currentTimePoint = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
-    const auto resultBackupTimePoint = std::make_shared<milliseconds>(currentTimePoint);
+    const auto backupTimePoints = std::make_shared<QList<milliseconds>>();
 
     const auto actualPositionCallback = nx::utils::guarded(this,
         [this, mutex, server = m_server, backupPositionRequestHandles, currentTimePoint,
-            resultBackupTimePoint]
+            backupTimePoints]
         (bool success, rest::Handle requestId, nx::vms::api::BackupPositionEx actualPosition)
         {
             NX_MUTEX_LOCKER lock(mutex.get());
@@ -259,18 +259,24 @@ void BackupStatusWidget::updateBackupStatus()
                         return duration_cast<milliseconds>(backupPosition.time_since_epoch());
                     };
 
-                *resultBackupTimePoint = std::min(*resultBackupTimePoint,
+                backupTimePoints->push_back(
                     backupTimePoint(actualPosition.positionLowMs, actualPosition.toBackupLowMs));
 
-                *resultBackupTimePoint = std::min(*resultBackupTimePoint,
+                backupTimePoints->push_back(
                     backupTimePoint(actualPosition.positionHighMs, actualPosition.toBackupHighMs));
 
                 if (backupPositionRequestHandles->empty())
                 {
+                    backupTimePoints->removeAll(milliseconds::zero());
+                    std::sort(backupTimePoints->begin(), backupTimePoints->end());
+                    milliseconds resultBackupTimePoint = backupTimePoints->empty()
+                        ? milliseconds::zero()
+                        : backupTimePoints->front();
+
                     executeLater(
-                        [this, server, timePoint = *resultBackupTimePoint]
+                        [this, server, resultBackupTimePoint]
                         {
-                            onBackupTimePointCalculated(server, timePoint);
+                            onBackupTimePointCalculated(server, resultBackupTimePoint);
                         }, this);
                 }
             }
