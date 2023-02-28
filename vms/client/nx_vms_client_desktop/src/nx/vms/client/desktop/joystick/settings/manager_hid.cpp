@@ -11,6 +11,8 @@
 #include "device_hid.h"
 #include "descriptors.h"
 
+using namespace std::chrono;
+
 namespace {
 
 // Supported Usages.
@@ -19,6 +21,8 @@ constexpr uint16_t kJoystick = 0x04;
 // Supported HID Usage Pages.
 constexpr uint16_t kGenericDesktopPage = 0x01;
 
+constexpr milliseconds kEnumerationInterval = 2500ms;
+
 } // namespace
 
 namespace nx::vms::client::desktop::joystick {
@@ -26,6 +30,10 @@ namespace nx::vms::client::desktop::joystick {
 ManagerHid::ManagerHid(QObject* parent):
     base_type(parent)
 {
+    connect(&m_enumerateTimer, &QTimer::timeout, this, &ManagerHid::enumerateDevices);
+    m_enumerateTimer.setInterval(kEnumerationInterval);
+    m_enumerateTimer.start();
+
     hid_init();
 }
 
