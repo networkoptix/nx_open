@@ -30,26 +30,7 @@ namespace nx::vms::client::desktop::joystick {
 
 namespace {
 
-enum class SearchState
-{
-    /** Client just started, try to find a joystick quickly. */
-    initial,
-
-    /** No joysticks found, repeat search periodically. */
-    periodic,
-
-    /** Joystick is found, stop search. */
-    idle,
-};
-
-// Other constants.
-static const QMap<SearchState, milliseconds> kSearchIntervals{
-    {SearchState::initial, 2500ms},
-    {SearchState::periodic, 10s}
-};
-
 constexpr milliseconds kUsbPollInterval = 100ms;
-constexpr milliseconds kInitialSearchPeriod = 20s;
 
 const QString kSettingsDirName("/hid_configs/");
 const QString kGeneralConfigFileName("general_device.json");
@@ -73,57 +54,7 @@ struct Manager::Private
     QMap<QString, ActionFactoryPtr> actionFactories;
     bool deviceActionsEnabled = true;
 
-    SearchState searchState = SearchState::initial;
-    QTimer* const enumerateTimer;
     QTimer* const pollTimer;
-    QElapsedTimer initialSearchTimer;
-
-    void updateSearchState()
-    {
-        SearchState targetState = searchState;
-        const bool devicesFound = !q->devices().empty();
-
-        switch (searchState)
-        {
-            case SearchState::initial:
-            {
-                if (devicesFound)
-                    targetState = SearchState::idle;
-                else if (!initialSearchTimer.isValid())
-                    initialSearchTimer.start();
-                else if (initialSearchTimer.hasExpired(kInitialSearchPeriod.count()))
-                    targetState = SearchState::periodic;
-                break;
-            }
-            case SearchState::periodic:
-            {
-                // If joystick was found, stop search.
-                if (devicesFound)
-                    targetState = SearchState::idle;
-                break;
-            }
-            case SearchState::idle:
-            {
-                // If joystick was disconnected, switch to quick search.
-                if (!devicesFound)
-                    targetState = SearchState::initial;
-                break;
-            }
-        }
-
-        if (targetState != searchState)
-        {
-            searchState = targetState;
-            initialSearchTimer.invalidate();
-            enumerateTimer->stop();
-            if (searchState != SearchState::idle)
-            {
-                enumerateTimer->setInterval(kSearchIntervals[searchState]);
-                enumerateTimer->start();
-            }
-            NX_VERBOSE(this, "Switch to search state %1", (int)searchState);
-        }
-    }
 };
 
 Manager* Manager::create(QObject* parent)
@@ -143,21 +74,10 @@ Manager::Manager(QObject* parent):
     m_mutex(nx::Mutex::Recursive),
     d(new Private{
         .q = this,
-        .enumerateTimer = new QTimer(this),
         .pollTimer = new QTimer(this)
     })
 {
     loadConfigs();
-
-    connect(d->enumerateTimer, &QTimer::timeout, this,
-        [this]()
-        {
-            enumerateDevices();
-            d->updateSearchState();
-        });
-    d->enumerateTimer->setInterval(kSearchIntervals[d->searchState]);
-    d->enumerateTimer->start();
-    d->initialSearchTimer.start();
 
     d->pollTimer->setInterval(kUsbPollInterval);
     d->pollTimer->start();
@@ -299,6 +219,10 @@ void Manager::saveConfig(const QString& model)
         getDeviceDescription(model))));
 }
 
+void Manager::updateSearchState()
+{
+}
+
 void Manager::loadConfigs()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -387,7 +311,7 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 
     // Restart search if needed.
     if (deviceWasRemoved)
-        d->updateSearchState();
+        updateSearchState();
 }
 
 void Manager::initializeDevice(
