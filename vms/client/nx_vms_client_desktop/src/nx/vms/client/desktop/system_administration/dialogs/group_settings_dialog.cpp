@@ -114,6 +114,18 @@ GroupSettingsDialog::GroupSettingsDialog(
         connect(rootObjectHolder()->object(), SIGNAL(deleteRequested()),
             this, SLOT(onDeleteRequested()));
     }
+
+    connect(systemContext->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        [this](const nx::vms::api::UserRoleData& userGroup)
+        {
+            if (this->systemContext()->userRolesManager()->hasRole(userGroup.id)
+                && userGroup.id == d->groupId)
+            {
+                updateStateFrom(userGroup.id);
+            }
+        });
+
+    connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
 }
 
 GroupSettingsDialog::~GroupSettingsDialog()
