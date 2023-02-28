@@ -43,7 +43,7 @@ QString Error::toString() const
         case Code::dataNotFound:
             return tr("No data exported.");
         case Code::encryptedArchive:
-            return tr("Archive is encrypted.");
+            return tr("Unlock this portion of the archive to export its contents.");
         case Code::temporaryUnavailable:
             return tr("Archive is unavailable now. Please try again later.");
     }
