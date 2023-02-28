@@ -167,7 +167,7 @@ QString ExportProcess::errorString(ExportProcessError error)
             return tr("No data exported.");
 
         case ExportProcessError::encryptedArchive:
-            return tr("Archive is encrypted.");
+            return tr("Unlock this portion of the archive to export its contents.");
 
         case ExportProcessError::temporaryUnavailable:
             return tr("Archive is unavailable now. Please try again later.");
