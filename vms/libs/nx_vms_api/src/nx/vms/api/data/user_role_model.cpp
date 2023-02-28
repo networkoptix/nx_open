@@ -5,6 +5,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
 
+#include "permission_converter.h"
+
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT(UserRoleModel, UserRoleModel_Fields)
@@ -18,21 +20,16 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
     userRole.description = std::move(description);
     userRole.permissions = std::move(permissions);
 
-    std::optional<AccessRightsData> accessRights;
-    if (accessibleResources)
-    {
-        AccessRightsData data;
-        data.userId = userRole.id;
-        data.resourceRights = migrateAccessRights(userRole.permissions, *accessibleResources);
-        data.checkResourceExists = CheckResourceExists::no;
-        accessRights = std::move(data);
-    }
+    auto accessRights = PermissionConverter::accessRights(
+        &userRole.permissions, userRole.id, accessibleResources);
     return {std::move(userRole), std::move(accessRights)};
 }
 
 std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
 {
     auto& baseList = std::get<UserRoleDataList>(all);
+    auto& allAccessRights = std::get<AccessRightsDataList>(all);
+
     std::vector<UserRoleModel> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
@@ -42,19 +39,8 @@ std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
         model.permissions = std::move(baseData.permissions);
-
-        auto accessRights = nx::utils::find_if(
-            std::get<AccessRightsDataList>(all),
-            [&](const auto& accessRights) { return accessRights.userId == model.id; });
-        if (accessRights)
-        {
-            std::vector<QnUuid> resources;
-            resources.reserve(accessRights->resourceRights.size());
-            for (const auto& [id, _]: accessRights->resourceRights)
-                resources.push_back(id);
-            model.accessibleResources = std::move(resources);
-        }
-
+        PermissionConverter::extractFromResourceAccessRights(
+            allAccessRights, model.id, &model.permissions, &model.accessibleResources);
         result.emplace_back(std::move(model));
     }
     return result;

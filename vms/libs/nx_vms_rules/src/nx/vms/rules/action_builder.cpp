@@ -55,7 +55,7 @@ EventPtr permissionFilter(
         return {};
 
     const auto& permissions = manifest->permissions;
-    const auto deprecatedPermissions = nx::vms::api::deprecatedGlobalPermissions()
+    const auto deprecatedPermissions = nx::vms::api::kDeprecatedGlobalPermissions
         & permissions.globalPermission;
     NX_ASSERT(!deprecatedPermissions, "Deprecated permissions %1 in manifest for %2",
         deprecatedPermissions, event->type());

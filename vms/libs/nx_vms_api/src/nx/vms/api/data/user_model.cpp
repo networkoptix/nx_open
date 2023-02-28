@@ -4,7 +4,8 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/api/data/access_rights_data.h>
+
+#include "permission_converter.h"
 
 namespace nx::vms::api {
 
@@ -80,19 +81,10 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     if (!userRoleId.isNull())
         user.userRoleIds.push_back(std::move(userRoleId));
 
-    std::optional<AccessRightsData> accessRights;
-    if (accessibleResources)
-    {
-        AccessRightsData data;
-        data.userId = user.id;
-        data.resourceRights = nx::vms::api::migrateAccessRights(
-            user.permissions, *accessibleResources);
-        data.checkResourceExists = (user.isAdmin || user.userRoleIds.empty())
-            ? CheckResourceExists::no
-            : CheckResourceExists::customRole;
-        accessRights = std::move(data);
-    }
-
+    auto accessRights =
+        PermissionConverter::accessRights(&user.permissions, user.id, accessibleResources);
+    if (!user.isAdmin && !user.userRoleIds.empty() && accessibleResources)
+        accessRights.checkResourceExists = CheckResourceExists::customRole;
     return {std::move(user), std::move(accessRights)};
 }
 
@@ -112,17 +104,9 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
             model.externalId = std::move(baseData.externalId);
         if (!baseData.userRoleIds.empty())
             model.userRoleId = baseData.userRoleIds.front();
-        auto accessRights = nx::utils::find_if(allAccessRights,
-            [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });
-        if (accessRights)
-        {
-            std::vector<QnUuid> resources;
-            resources.reserve(accessRights->resourceRights.size());
-            for (const auto& [id, _]: accessRights->resourceRights)
-                resources.push_back(id);
-            model.accessibleResources = std::move(resources);
-        }
 
+        PermissionConverter::extractFromResourceAccessRights(
+            allAccessRights, model.id, &model.permissions, &model.accessibleResources);
         result.push_back(std::move(model));
     }
     return result;
