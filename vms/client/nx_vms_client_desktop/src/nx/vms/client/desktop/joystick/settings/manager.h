@@ -71,6 +71,7 @@ public:
 
 protected:
     virtual void enumerateDevices() = 0;
+    virtual void updateSearchState();
 
     /** Load config files. */
     void loadConfigs();

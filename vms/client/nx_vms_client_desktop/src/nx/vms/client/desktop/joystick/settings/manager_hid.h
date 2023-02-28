@@ -19,6 +19,9 @@ public:
 
 private:
     virtual void enumerateDevices() override;
+
+private:
+    QTimer m_enumerateTimer;
 };
 
 } // namespace nx::vms::client::desktop::joystick

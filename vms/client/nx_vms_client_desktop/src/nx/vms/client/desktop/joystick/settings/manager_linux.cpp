@@ -12,11 +12,22 @@
 #include "device_linux.h"
 #include "descriptors.h"
 
+using namespace std::chrono;
+
+namespace {
+
+constexpr milliseconds kEnumerationInterval = 2500ms;
+
+} // namespace
+
 namespace nx::vms::client::desktop::joystick {
 
 ManagerLinux::ManagerLinux(QObject* parent):
     base_type(parent)
 {
+    connect(&m_enumerateTimer, &QTimer::timeout, this, &ManagerLinux::enumerateDevices);
+    m_enumerateTimer.setInterval(kEnumerationInterval);
+    m_enumerateTimer.start();
 }
 
 void ManagerLinux::enumerateDevices()
