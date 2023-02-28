@@ -5,6 +5,7 @@
 #include <libloaderapi.h>
 
 #include <QtCore/QDir>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/qset.h>
@@ -12,9 +13,31 @@
 #include "device_win.h"
 #include "descriptors.h"
 
+using namespace std::chrono;
+
 namespace nx::vms::client::desktop::joystick {
 
 namespace {
+
+enum class SearchState
+{
+    /** Client just started, try to find a joystick quickly. */
+    initial,
+
+    /** No joysticks found, repeat search periodically. */
+    periodic,
+
+    /** Joystick is found, stop search. */
+    idle,
+};
+
+// Other constants.
+static const QMap<SearchState, milliseconds> kSearchIntervals{
+    {SearchState::initial, 2500ms},
+    {SearchState::periodic, 10s}
+};
+
+constexpr milliseconds kInitialSearchPeriod = 20s;
 
 QString errorCodeToString(HRESULT code)
 {
@@ -38,29 +61,58 @@ QString errorCodeToString(HRESULT code)
 
 } // namespace
 
+struct ManagerWindows::Private
+{
+    ManagerWindows* const q;
+
+    LPDIRECTINPUT8 directInput = nullptr; //< Actually, it must be single per app.
+
+    QVector<FoundDeviceInfo> foundDevices;
+
+    QMap<QString, DeviceWindowsPtr> intitializingDevices;
+
+    SearchState searchState = SearchState::initial;
+    QTimer* const enumerateTimer;
+    QElapsedTimer initialSearchTimer;
+};
+
 ManagerWindows::ManagerWindows(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    d(new Private{
+        .q = this,
+        .enumerateTimer = new QTimer(this)
+    })
 {
     HRESULT status = DirectInput8Create(
         GetModuleHandle(nullptr),
         DIRECTINPUT_VERSION,
         IID_IDirectInput8,
-        reinterpret_cast<LPVOID*>(&m_directInput),
+        reinterpret_cast<LPVOID*>(&d->directInput),
         nullptr);
 
     if (status != DI_OK)
         NX_WARNING(this, "DirectInput8Create failed: %1", errorCodeToString(status));
+
+    connect(d->enumerateTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            enumerateDevices();
+            updateSearchState();
+        });
+    d->enumerateTimer->setInterval(kSearchIntervals[d->searchState]);
+    d->enumerateTimer->start();
+    d->initialSearchTimer.start();
 }
 
 ManagerWindows::~ManagerWindows()
 {
-    m_directInput->Release();
+    d->directInput->Release();
 }
 
 void ManagerWindows::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 {
     base_type::removeUnpluggedJoysticks(foundDevicePaths);
-    m_foundDevices.clear();
+    d->foundDevices.clear();
 }
 
 DeviceWindowsPtr ManagerWindows::createDevice(
@@ -68,22 +120,22 @@ DeviceWindowsPtr ManagerWindows::createDevice(
     const QString& path,
     LPDIRECTINPUTDEVICE8 directInputDeviceObject)
 {
-    const auto iter = m_intitializingDevices.find(path);
+    const auto iter = d->intitializingDevices.find(path);
 
-    if (iter != m_intitializingDevices.end())
+    if (iter != d->intitializingDevices.end())
     {
         if (!iter.value()->isInitialized())
             return {};
 
         const auto result = iter.value();
-        m_intitializingDevices.erase(iter);
+        d->intitializingDevices.erase(iter);
         return result;
     }
 
     auto device = QSharedPointer<DeviceWindows>(
         new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer()));
     connect(device.data(), &Device::failed, this, [this, path] { onDeviceFailed(path); });
-    m_intitializingDevices[path] = device;
+    d->intitializingDevices[path] = device;
 
     return {};
 }
@@ -94,9 +146,9 @@ void ManagerWindows::enumerateDevices()
 
     QSet<QString> foundDevicePaths;
 
-    if (!m_foundDevices.isEmpty())
+    if (!d->foundDevices.isEmpty())
     {
-        for (const auto& deviceInfo: m_foundDevices)
+        for (const auto& deviceInfo: d->foundDevices)
         {
             const QString modelName(deviceInfo.model);
             const QString path = deviceInfo.guid;
@@ -126,9 +178,9 @@ void ManagerWindows::enumerateDevices()
 
     removeUnpluggedJoysticks(foundDevicePaths);
 
-    m_foundDevices.clear();
+    d->foundDevices.clear();
 
-    HRESULT status = m_directInput->EnumDevices(
+    HRESULT status = d->directInput->EnumDevices(
         DI8DEVCLASS_GAMECTRL,
         (LPDIENUMDEVICESCALLBACK)&ManagerWindows::enumDevicesCallback,
         this,
@@ -136,6 +188,53 @@ void ManagerWindows::enumerateDevices()
 
     if (status != DI_OK)
         NX_WARNING(this, "Set callback on EnumDevices failed");
+}
+
+void ManagerWindows::updateSearchState()
+{
+    SearchState targetState = d->searchState;
+    const bool devicesFound = !devices().empty();
+
+    switch (d->searchState)
+    {
+        case SearchState::initial:
+        {
+            if (devicesFound)
+                targetState = SearchState::idle;
+            else if (!d->initialSearchTimer.isValid())
+                d->initialSearchTimer.start();
+            else if (d->initialSearchTimer.hasExpired(kInitialSearchPeriod.count()))
+                targetState = SearchState::periodic;
+            break;
+        }
+        case SearchState::periodic:
+        {
+            // If joystick was found, stop search.
+            if (devicesFound)
+                targetState = SearchState::idle;
+            break;
+        }
+        case SearchState::idle:
+        {
+            // If joystick was disconnected, switch to quick search.
+            if (!devicesFound)
+                targetState = SearchState::initial;
+            break;
+        }
+    }
+
+    if (targetState != d->searchState)
+    {
+        d->searchState = targetState;
+        d->initialSearchTimer.invalidate();
+        d->enumerateTimer->stop();
+        if (d->searchState != SearchState::idle)
+        {
+            d->enumerateTimer->setInterval(kSearchIntervals[d->searchState]);
+            d->enumerateTimer->start();
+        }
+        NX_VERBOSE(this, "Switch to search state %1", (int)d->searchState);
+    }
 }
 
 std::pair<QString, QString> ManagerWindows::getDeviceModelAndGuid(
@@ -166,7 +265,7 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
 
     LPDIRECTINPUTDEVICE8 inputDevice;
 
-    HRESULT status = manager->m_directInput->CreateDevice(
+    HRESULT status = manager->d->directInput->CreateDevice(
         deviceInstance->guidInstance,
         &inputDevice,
         nullptr);
@@ -215,7 +314,7 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
         return DIENUM_CONTINUE;
     }
 
-    manager->m_foundDevices.append({inputDevice, modelName, guid});
+    manager->d->foundDevices.append({inputDevice, modelName, guid});
 
     return DIENUM_CONTINUE;
 }

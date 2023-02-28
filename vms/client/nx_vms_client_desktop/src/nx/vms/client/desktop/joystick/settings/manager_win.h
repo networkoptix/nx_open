@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/utils/impl_ptr.h>
+
 #include "device_win.h"
 #include "manager.h"
 
@@ -35,6 +37,7 @@ protected:
 
 private:
     virtual void enumerateDevices() override;
+    virtual void updateSearchState() override;
 
     DeviceWindowsPtr createDevice(
         const JoystickDescriptor& deviceConfig,
@@ -47,11 +50,8 @@ private:
     void onDeviceFailed(const QString& path);
 
 private:
-    LPDIRECTINPUT8 m_directInput = nullptr; // Actually, it must be single per app.
-
-    QVector<FoundDeviceInfo> m_foundDevices;
-
-    QMap<QString, DeviceWindowsPtr> m_intitializingDevices;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop::joystick
