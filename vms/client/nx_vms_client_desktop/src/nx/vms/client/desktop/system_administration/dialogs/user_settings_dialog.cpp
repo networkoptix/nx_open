@@ -109,6 +109,8 @@ UserSettingsDialog::UserSettingsDialog(
             });
     }
 
+    connect(this, &QmlDialogWrapper::rejected, [this] { setUser({}); });
+
     if (dialogType == EditUser)
     {
         // It is important to make the connections queued so we would not block inside QML code.
@@ -281,9 +283,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     if (!user)
     {
-        NX_ASSERT(d->dialogType == CreateUser);
         // We need non-null uuid to make editingContext happy.
-        state.userId = QnUuid::createUuid();
+        if (d->dialogType == CreateUser)
+            state.userId = QnUuid::createUuid();
         return state;
     }
 
@@ -420,6 +422,7 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnResource::propertyChanged, this, updateState);
         connect(user.get(), &QnUserResource::digestChanged, this, updateState);
         connect(user.get(), &QnUserResource::userRolesChanged, this, updateState);
+        connect(user.get(), &QnUserResource::nameChanged, this, updateState);
     }
 
     createStateFrom(user);
