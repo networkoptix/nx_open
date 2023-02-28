@@ -54,7 +54,7 @@ ItemOrder layoutsOrder()
             const bool rhsIsIntercomLayout = rhsIconKey == QnResourceIconCache::IntercomLayout;
 
             if (lhsIsIntercomLayout != rhsIsIntercomLayout)
-                return lhsIsSharedLayout;
+                return lhsIsIntercomLayout;
 
             return mainOrder.comp(lhs, rhs);
         },
