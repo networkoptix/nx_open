@@ -264,17 +264,18 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 
         case ActionsColumn:
         {
+            // Calculate predefined column width.
             if (forcedText)
-                return tr("Use to store analytics data"); // Calculate predefined column width.
+                return tr("Use to store analytics and motion data");
 
             if (storageData.id == m_metadataStorageId)
-                return tr("Stores analytics data");
+                return tr("Stores analytics and motion data");
 
             if (canRemoveStorage(storageData))
                 return tr("Remove");
 
             if (couldStoreAnalytics(storageData))
-                return tr("Use to store analytics data");
+                return tr("Use to store analytics and motion data");
 
             return QString();
         }
