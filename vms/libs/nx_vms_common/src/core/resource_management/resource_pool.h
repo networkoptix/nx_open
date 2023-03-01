@@ -212,6 +212,9 @@ public:
      */
     QnMediaServerResourceList servers() const;
 
+    /** All Storages in the System. */
+    QnStorageResourceList storages() const;
+
     /**
      * All Servers with given status in the System. Never returns fake servers.
      */

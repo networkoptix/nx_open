@@ -22,5 +22,6 @@ struct QnResourcePool::Private
     QSet<QnVirtualCameraResourcePtr> ioModules;
     std::atomic_bool hasIoModules{false};
     QSet<QnMediaServerResourcePtr> mediaServers;
+    QSet<QnStorageResourcePtr> storages;
     QMap<QString, QnNetworkResourcePtr> resourcesByPhysicalId;
 };
