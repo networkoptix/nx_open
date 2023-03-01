@@ -34,10 +34,10 @@ struct DifferencesResult
 };
 
 /** Returns differences between two sets. */
-template <template <typename...> class SortedContainer>
+template <typename SortedContainer>
 DifferencesResult differences(
-    const SortedContainer<QnUuid>& original,
-    const SortedContainer<QnUuid>& current)
+    const SortedContainer& original,
+    const SortedContainer& current)
 {
     DifferencesResult result;
 
@@ -311,14 +311,16 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         for (const auto& parentGroupId: groupData.parentRoleIds)
             state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), parentGroupId));
 
+        QList<QnUuid> users;
         for (const auto& user: systemContext()->resourcePool()->getResources<QnUserResource>())
         {
             const auto groupIds = user->userRoleIds();
 
             if (std::find(groupIds.begin(), groupIds.end(), groupId) != groupIds.end())
-                state.users.append(user->getId());
+                users.append(user->getId());
         }
-        std::sort(state.users.begin(), state.users.end());
+        std::sort(users.begin(), users.end());
+        state.users = users;
 
         for (const auto& group: systemContext()->userRolesManager()->userRoles())
         {
@@ -350,7 +352,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 
     groupData.permissions = state.globalPermissions;
 
-    const auto usersDiff = differences(originalState().users, state.users);
+    const auto usersDiff = differences(originalState().users.list(), state.users.list());
     const auto groupsDiff = differences(originalState().groups, state.groups);
 
     auto resultsReporter = ResultsReporter::create(

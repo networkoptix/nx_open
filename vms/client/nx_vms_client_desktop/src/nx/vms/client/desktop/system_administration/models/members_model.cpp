@@ -389,7 +389,7 @@ nx::core::access::ResourceAccessMap MembersModel::ownSharedResources() const
     return m_subjectContext->ownResourceAccessMap();
 }
 
-QList<QnUuid> MembersModel::users() const
+MembersListWrapper MembersModel::users() const
 {
     if (m_subjectContext.isNull())
         return {};
@@ -397,7 +397,7 @@ QList<QnUuid> MembersModel::users() const
     return m_subjectMembers.users;
 }
 
-void MembersModel::setUsers(const QList<QnUuid>& users)
+void MembersModel::setUsers(const MembersListWrapper& users)
 {
     if (m_subjectContext.isNull())
         return;
@@ -415,7 +415,7 @@ void MembersModel::setUsers(const QList<QnUuid>& users)
     }
 
     // Add users.
-    for (const auto& id: users)
+    for (const auto& id: users.list())
         newMembers.insert(id);
 
     m_subjectContext->setRelations(parents, members);

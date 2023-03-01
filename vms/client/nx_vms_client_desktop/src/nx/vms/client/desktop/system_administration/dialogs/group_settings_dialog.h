@@ -29,7 +29,7 @@ struct GroupSettingsDialogState
         READ getParentGroups
         WRITE setParentGroups)
     Q_PROPERTY(QList<QnUuid> groups READ getGroups WRITE setGroups)
-    Q_PROPERTY(QList<QnUuid> users MEMBER users)
+    Q_PROPERTY(MembersListWrapper users MEMBER users)
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
 
@@ -60,7 +60,7 @@ public:
     QList<QnUuid> getGroups() const { return {groups.begin(), groups.end()}; }
     void setGroups(const QList<QnUuid>& v) { groups = {v.begin(), v.end()}; }
 
-    QList<QnUuid> users;
+    MembersListWrapper users;
 
     nx::vms::api::GlobalPermissions globalPermissions;
     nx::core::access::ResourceAccessMap sharedResources;
