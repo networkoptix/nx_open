@@ -23,6 +23,8 @@ class PollbableWithDependants:
     using base_type = Base;
 
 public:
+    using base_type::base_type;
+
     ~PollbableWithDependants()
     {
         // Dependants should have been cancelled within the AIO thread.
