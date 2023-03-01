@@ -650,14 +650,6 @@
       <translation>Paramètres ONVIF</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Ne pas exporter automatiquement la vidéo</translation>
-    </message>
-    <message>
-      <source>Export From Device</source>
-      <translation>Exporter depuis l'appareil</translation>
-    </message>
-    <message>
       <source>Do not record primary stream</source>
       <translation type="unfinished">Do not record primary stream</translation>
     </message>
@@ -672,6 +664,22 @@
     <message>
       <source>Primary Stream Profile</source>
       <translation type="unfinished">Primary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Page Web</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1356,10 +1364,6 @@
       <source>Camera</source>
       <translation>Caméra</translation>
     </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Caméra source</translation>
-    </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
@@ -1995,6 +1999,18 @@
     <message>
       <source>Advanced settings</source>
       <translation>Paramètres avancés</translation>
+    </message>
+    <message>
+      <source>Get Update File</source>
+      <translation type="unfinished">Get Update File</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation type="unfinished">Check Again</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Réessayez</translation>
     </message>
   </context>
   <context>

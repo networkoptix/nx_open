@@ -5295,14 +5295,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>พาร์ติชันของระบบขนาดเล็กเกินไปและมีการสงวนไว้และไม่ใช้สำหรับการเขียนหากมีพื้นที่เก็บข้อมูลอื่นเพียงพอ</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>ใช้เพื่อการวิเคราะห์พื้นที่จัดเก็บ</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>การวิเคราะห์พื้นที่จัดเก็บ</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>สงวนไว้แล้ว</translation>
     </message>
@@ -5337,6 +5329,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>smb</source>
       <translation type="unfinished">smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation type="unfinished">Use to store analytics and motion data</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation type="unfinished">Stores analytics and motion data</translation>
     </message>
   </context>
   <context>
@@ -7254,6 +7254,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7396,8 +7400,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>อัตโนมัติ</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>

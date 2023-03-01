@@ -650,14 +650,6 @@
       <translation>ONVIF-Einstellungen</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Video nicht automatisch exportieren</translation>
-    </message>
-    <message>
-      <source>Export From Device</source>
-      <translation>Vom Gerät exportieren</translation>
-    </message>
-    <message>
       <source>Do not record primary stream</source>
       <translation>Primärstream nicht aufzeichnen</translation>
     </message>
@@ -672,6 +664,22 @@
     <message>
       <source>Primary Stream Profile</source>
       <translation type="unfinished">Primary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webseite:</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1356,10 +1364,6 @@
       <source>Camera</source>
       <translation>Kamera</translation>
     </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Quellkamera</translation>
-    </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
@@ -1995,6 +1999,18 @@
     <message>
       <source>Advanced settings</source>
       <translation>Erweiterte Einstellungen</translation>
+    </message>
+    <message>
+      <source>Get Update File</source>
+      <translation type="unfinished">Get Update File</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation type="unfinished">Check Again</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Erneut versuchen</translation>
     </message>
   </context>
   <context>

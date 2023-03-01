@@ -1631,6 +1631,10 @@
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
       <translation>Sunucud kod çevrimi kullanan maksimum HTTP bağlantısı miktarı. Chrome aynı anda 2 bağlantı açar, ardından ilkini kapatır. Bu parametreyi &apos; olarak veya 2 ve daha fazla olarak ayarlamanızı öneririz.</translation>
     </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation type="unfinished">Update releases.json file URL</translation>
+    </message>
   </context>
   <context>
     <name>nx::recording::Error</name>

@@ -5368,14 +5368,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Les partitions trop petites et système sont réservées, elles ne sont pas utilisées pour l'écriture s'il existe suffisamment d'espace de stockage disponible.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Utiliser pour stocker les données d'analyse</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Conserver les données d'analyse</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Réservé</translation>
     </message>
@@ -5410,6 +5402,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation type="unfinished">Use to store analytics and motion data</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation type="unfinished">Stores analytics and motion data</translation>
     </message>
   </context>
   <context>
@@ -7369,6 +7369,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Les images de ces caméras sont sauvegardées jusqu'à %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7513,8 +7517,8 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
