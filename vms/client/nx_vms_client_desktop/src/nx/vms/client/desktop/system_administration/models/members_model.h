@@ -18,6 +18,27 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
+/* Wrapper for a QList<QnUuid> to enable implicit sharing when passing through QML. */
+struct NX_VMS_CLIENT_DESKTOP_API MembersListWrapper
+{
+    Q_GADGET
+
+    Q_PROPERTY(qsizetype length READ length)
+
+public:
+    MembersListWrapper() {}
+    MembersListWrapper(const QList<QnUuid>& members): m_members(members) {}
+    bool operator==(const MembersListWrapper& other) const { return m_members == other.m_members; }
+    bool operator==(const QList<QnUuid>& other) const { return m_members == other; }
+    operator QList<QnUuid>() const { return m_members; }
+
+    qsizetype length() const { return m_members.size(); }
+    QList<QnUuid> list() const { return m_members; }
+
+private:
+    QList<QnUuid> m_members;
+};
+
 struct NX_VMS_CLIENT_DESKTOP_API MembersModelGroup
 {
     Q_GADGET
@@ -53,7 +74,7 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
         WRITE setParentGroups
         NOTIFY parentGroupsChanged)
     Q_PROPERTY(QList<QnUuid> groups READ groups WRITE setGroups NOTIFY groupsChanged)
-    Q_PROPERTY(QList<QnUuid> users READ users WRITE setUsers NOTIFY usersChanged)
+    Q_PROPERTY(MembersListWrapper users READ users WRITE setUsers NOTIFY usersChanged)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources
         READ ownSharedResources
         WRITE setOwnSharedResources
@@ -109,8 +130,8 @@ public:
     void setOwnSharedResources(const nx::core::access::ResourceAccessMap& resources);
     nx::core::access::ResourceAccessMap ownSharedResources() const;
 
-    QList<QnUuid> users() const;
-    void setUsers(const QList<QnUuid>& users);
+    MembersListWrapper users() const;
+    void setUsers(const MembersListWrapper& users);
 
     QList<QnUuid> groups() const;
     void setGroups(const QList<QnUuid>& groups);
