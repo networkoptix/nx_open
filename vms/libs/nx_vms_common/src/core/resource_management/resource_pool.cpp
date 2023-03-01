@@ -407,6 +407,12 @@ QnMediaServerResourceList QnResourcePool::servers() const
     return d->mediaServers.values();
 }
 
+QnStorageResourceList QnResourcePool::storages() const
+{
+    NX_READ_LOCKER lock(&m_resourcesMutex);
+    return d->storages.values();
+}
+
 QnMediaServerResourceList QnResourcePool::getAllServers(nx::vms::api::ResourceStatus status) const
 {
     NX_READ_LOCKER lock(&m_resourcesMutex);
@@ -502,6 +508,7 @@ void QnResourcePool::clear()
         d->ioModules.clear();
         d->hasIoModules = false;
         d->mediaServers.clear();
+        d->storages.clear();
         d->resourcesByPhysicalId.clear();
     }
 
