@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 
 QnResourcePool::Private::Private(
     QnResourcePool* owner,
@@ -20,6 +21,10 @@ void QnResourcePool::Private::handleResourceAdded(const QnResourcePtr& resource)
     {
         mediaServers.insert(server);
     }
+    else if (const auto storage = resource.dynamicCast<QnStorageResource>())
+    {
+        storages.insert(storage);
+    }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         resourcesByPhysicalId.insert(camera->getPhysicalId(), camera);
@@ -35,6 +40,10 @@ void QnResourcePool::Private::handleResourceRemoved(const QnResourcePtr& resourc
     if (const auto server = resource.dynamicCast<QnMediaServerResource>())
     {
         mediaServers.remove(server);
+    }
+    else if (const auto storage = resource.dynamicCast<QnStorageResource>())
+    {
+        storages.remove(storage);
     }
     else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
