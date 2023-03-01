@@ -5295,14 +5295,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Quá nhỏ và phân vùng hệ thống được dành riêng và không được sử dụng để ghi nếu có đủ không gian lưu trữ khác có sẵn.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Sử dụng để lưu trữ dữ liệu phân tích</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Lưu trữ dữ liệu phân tích</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Đã đặt trước</translation>
     </message>
@@ -5337,6 +5329,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation type="unfinished">Use to store analytics and motion data</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation type="unfinished">Stores analytics and motion data</translation>
     </message>
   </context>
   <context>
@@ -7254,6 +7254,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Cảnh quay từ camera này được sao lưu đến %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7396,8 +7400,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tự động</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation>Video được quay trên bộ nhớ nội bộ của camera sẽ không được tự động tải lên kho lưu trữ chính.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>

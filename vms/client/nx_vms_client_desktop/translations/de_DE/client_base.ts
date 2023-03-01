@@ -5364,14 +5364,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Zu kleine und Systempartitionen sind reserviert und werden nicht zum Schreiben verwendet, wenn genügend Speicherplatz vorhanden ist.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Verwendung zur Speicherung von Analysedaten</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Speichert Analysedaten</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Reserviert</translation>
     </message>
@@ -5406,6 +5398,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation type="unfinished">Use to store analytics and motion data</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation type="unfinished">Stores analytics and motion data</translation>
     </message>
   </context>
   <context>
@@ -7365,6 +7365,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Das Bildmaterial dieser Kameras wird bis zu %1 %2 gesichert</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7509,8 +7513,8 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>

@@ -5368,14 +5368,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>For små partisjoner og systempartisjoner er reservert og ikke brukes til skriving hvis det er nok annen lagringsplass tilgjengelig.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Brukes til å lagre analysedata</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Lagrer analysedata</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Reservert</translation>
     </message>
@@ -5410,6 +5402,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation type="unfinished">Use to store analytics and motion data</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation type="unfinished">Stores analytics and motion data</translation>
     </message>
   </context>
   <context>
@@ -7369,6 +7369,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Opptak fra disse kameraene sikkerhetskopieres til %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7513,8 +7517,8 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not automatically be uploaded to the main archive.</source>
-      <translation>Video tatt opp på det interne kameraets lagring vil ikke automatisk bli lastet opp til hovedarkivet.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>

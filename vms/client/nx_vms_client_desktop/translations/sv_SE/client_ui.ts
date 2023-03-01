@@ -650,14 +650,6 @@
       <translation>ONVIF inställningar</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Exportera inte video automatiskt</translation>
-    </message>
-    <message>
-      <source>Export From Device</source>
-      <translation>Exportera från enhet</translation>
-    </message>
-    <message>
       <source>Do not record primary stream</source>
       <translation>Spela inte in primärström</translation>
     </message>
@@ -672,6 +664,22 @@
     <message>
       <source>Primary Stream Profile</source>
       <translation>Primär strömningsprofil</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1356,10 +1364,6 @@
       <source>Camera</source>
       <translation>Kamera</translation>
     </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Källkamera</translation>
-    </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
@@ -1995,6 +1999,18 @@
     <message>
       <source>Advanced settings</source>
       <translation>Avancerade inställningar</translation>
+    </message>
+    <message>
+      <source>Get Update File</source>
+      <translation type="unfinished">Get Update File</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation type="unfinished">Check Again</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Försök Igen</translation>
     </message>
   </context>
   <context>
