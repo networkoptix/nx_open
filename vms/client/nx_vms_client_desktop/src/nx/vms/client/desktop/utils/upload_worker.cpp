@@ -383,11 +383,11 @@ void UploadWorker::checkRemoteFile()
         return;
 
     d->upload.status = UploadState::WaitingFileOnServer;
-    auto callback =
+    auto callback = nx::utils::guarded(this,
         [this](bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
         {
             handleWaitForFileOnServer(success, handle, result);
-        };
+        });
     auto handle = d->connectedServerApi()->fileDownloadStatus(
         d->server->getId(),
         d->upload.destination,
