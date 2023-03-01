@@ -9,6 +9,7 @@
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
+#include <analytics/common/object_metadata.h>
 #include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -72,8 +73,8 @@ protected:
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
-    virtual bool saveAnalyticsMetadata(const std::shared_ptr<const
-        nx::common::metadata::QnCompressedObjectMetadataPacket>& metadata);
+    virtual bool saveAnalyticsMetadata(
+        const nx::common::metadata::ConstObjectMetadataPacketPtr& packet);
 
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const = 0;
