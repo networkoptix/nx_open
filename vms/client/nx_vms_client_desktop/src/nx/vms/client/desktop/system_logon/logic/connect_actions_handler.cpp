@@ -607,7 +607,9 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
     qnClientCoreModule->networkModule()->setSession(session);
     appContext()->currentSystemContext()->setSession(session);
-    mainWindow()->welcomeScreen()->connectionToSystemEstablished(systemId);
+    const auto welcomeScreen = mainWindow()->welcomeScreen();
+    if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
+        welcomeScreen->connectionToSystemEstablished(systemId);
 
     const QString userName = QString::fromStdString(connection->credentials().username);
 
