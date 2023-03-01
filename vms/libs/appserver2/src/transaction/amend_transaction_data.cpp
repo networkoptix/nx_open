@@ -112,6 +112,14 @@ bool amendOutputDataIfNeeded(
     return true;
 }
 
+bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::UserData* userData)
+{
+    userData->adaptForDeprecatedApi();
+    return true;
+}
+
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
@@ -177,6 +185,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     auto result = amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
     result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->storages);
+    result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->users);
     return result;
 }
 
