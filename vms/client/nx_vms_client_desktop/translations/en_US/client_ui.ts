@@ -650,14 +650,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Do not export video automatically</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export From Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not record primary stream</source>
         <translation type="unfinished"></translation>
     </message>
@@ -671,6 +663,22 @@
     </message>
     <message>
         <source>Primary Stream Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import From Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page Port</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1356,10 +1364,6 @@
         <source>Camera</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Source camera</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
@@ -1995,6 +1999,18 @@
     <message>
         <source>Advanced settings</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Get Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try Again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
