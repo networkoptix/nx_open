@@ -18,11 +18,12 @@ extern const std::set<QString> kResourceParamToAmend;
 namespace {
 
 template<typename RequestData>
-inline void fixRequestDataIfNeeded(RequestData* /*requestData*/)
+inline Result fixRequestDataIfNeeded(RequestData* /*requestData*/)
 {
+    return Result();
 }
 
-void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
+Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 {
     if (!userDataEx->password.isEmpty())
     {
@@ -46,31 +47,34 @@ void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
         if (userDataEx->digest.isEmpty())
             userDataEx->digest = nx::vms::api::UserData::kCloudPasswordStub;
     }
+    if (userDataEx->adaptFromDeprecatedApi())
+        return Result();
+    return Result(ErrorCode::badRequest, "Conflict in Deprecated API fields");
 }
 
-void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
+Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 {
     if (kResourceParamToAmend.contains(paramData->name))
         paramData->value = nx::crypt::encodeHexStringFromStringAES128CBC(paramData->value);
+    return Result();
 }
 
-void fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
+Result fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
 {
     nx::utils::Url url = paramData->url;
     if (url.password().isEmpty())
-        return;
+        return Result();
 
     url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
     paramData->url = url.toString();
+    return Result();
 }
 
 template<typename Data>
 auto doFix(const QnTransaction<Data>& original, Result* result)
 {
-    *result = Result();
-
     auto fixedTransaction = original;
-    fixRequestDataIfNeeded(&fixedTransaction.params);
+    *result = fixRequestDataIfNeeded(&fixedTransaction.params);
 
     return fixedTransaction;
 }
@@ -80,10 +84,8 @@ auto doFix(const QnTransaction<Data>& original, Result* result)
 QnTransaction<nx::vms::api::UserData> fixTransactionInputFromApi(
     const QnTransaction<nx::vms::api::UserDataEx>& originalTran, Result* result)
 {
-    *result = Result();
-
     auto originalParams = originalTran.params;
-    fixRequestDataIfNeeded(&originalParams);
+    *result = fixRequestDataIfNeeded(&originalParams);
 
     QnTransaction<nx::vms::api::UserData> resultTran(
         static_cast<const QnAbstractTransaction&>(originalTran));
@@ -106,10 +108,8 @@ QnTransaction<nx::vms::api::ResourceParamData> fixTransactionInputFromApi(
 QnTransaction<nx::vms::api::ResourceParamWithRefData> fixTransactionInputFromApi(
     const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran, Result* result)
 {
-    *result = Result();
-
     auto resultTran = originalTran;
-    fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData*>(&resultTran.params));
+    *result = fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData*>(&resultTran.params));
 
     return resultTran;
 }
