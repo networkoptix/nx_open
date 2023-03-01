@@ -16,6 +16,7 @@ import "Components"
 Dialog
 {
     id: dialog
+    objectName: "passwordChangeDialog"
 
     modality: Qt.ApplicationModal
 
