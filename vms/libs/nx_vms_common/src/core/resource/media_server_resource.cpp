@@ -345,13 +345,15 @@ QString QnMediaServerResource::rtspUrl() const
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    auto result = resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
-    for (const auto& s: resourcePool()->getResources<QnStorageResource>())
+    const QnUuid ownId = getId();
+    QnStorageResourceList result;
+    for (const auto& storage: resourcePool()->storages())
     {
-        if (s->getParentId().isNull()) //< Cloud, system-wide storage.
-            result.append(s);
+        // Add own storages and system-wide (cloud) storages which have empty parent ID.
+        const QnUuid parentId = storage->getParentId();
+        if (parentId == ownId || parentId.isNull())
+            result.append(storage);
     }
-
     return result;
 }
 
