@@ -126,6 +126,8 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     }
 
     registerDebugCounterActions();
+    registerDebugAction("Crash the Client", [](auto) { NX_CRITICAL(false); });
+
     AnimationsControlDialog::registerAction();
     ApplauncherControlDialog::registerAction();
     CamerasActions::registerAction();
