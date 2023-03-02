@@ -22,9 +22,16 @@ public:
 
     void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);
 
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
-    bool hasSharedResource(const QnResourceAccessSubject& subject, const QnUuid& resourceId) const;
+    /**
+     * List of resources ids, the given user has access to.
+     * @param precalculatedEffectiveIds Precalculated user roles effective IDs.
+     */
+    QSet<QnUuid> sharedResources(
+        const QnResourceAccessSubject& subject,
+        const std::vector<QnUuid>* const precalculatedEffectiveIds = nullptr) const;
+
+    bool hasSharedResource(
+        const std::vector<QnUuid>& subjectRolesEffectiveIds, const QnUuid& resourceId) const;
     void setSharedResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
 
     /**

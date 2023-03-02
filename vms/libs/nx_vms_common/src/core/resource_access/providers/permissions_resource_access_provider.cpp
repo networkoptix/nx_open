@@ -37,9 +37,11 @@ Source PermissionsResourceAccessProvider::baseSource() const
     return Source::permissions;
 }
 
-bool PermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool PermissionsResourceAccessProvider::calculateAccess(
+    const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
-    GlobalPermissions globalPermissions) const
+    GlobalPermissions globalPermissions,
+    const std::vector<QnUuid>& /*effectiveIds*/) const
 {
     if (!NX_ASSERT(acceptable(subject, resource)))
         return false;

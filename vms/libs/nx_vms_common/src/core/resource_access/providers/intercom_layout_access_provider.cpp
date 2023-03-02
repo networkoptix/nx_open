@@ -52,7 +52,8 @@ Source IntercomLayoutAccessProvider::baseSource() const
 bool IntercomLayoutAccessProvider::calculateAccess(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
-    GlobalPermissions globalPermissions) const
+    GlobalPermissions globalPermissions,
+    const std::vector<QnUuid>& /*effectiveIds*/) const
 {
     if (!resource->hasFlags(Qn::layout))
         return false;
@@ -61,10 +62,7 @@ bool IntercomLayoutAccessProvider::calculateAccess(
         return false;
 
     const auto intercom = resource->getParentResource();
-
-    NX_ASSERT(intercom);
-
-    return resourceAccessProvider()->hasAccess(subject, intercom);
+    return NX_ASSERT(intercom) && resourceAccessProvider()->hasAccess(subject, intercom);
 }
 
 void IntercomLayoutAccessProvider::fillProviders(

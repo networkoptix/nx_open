@@ -58,15 +58,19 @@ GlobalPermissions QnGlobalPermissionsManager::dependentPermissions(GlobalPermiss
 }
 
 GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
-    const QnResourceAccessSubject& subject) const
+    const QnResourceAccessSubject& subject,
+    const std::vector<QnUuid>* const precalculatedEffectiveIds) const
 {
     if (m_mode == Mode::cached)
     {
         GlobalPermissions result;
         bool haveUnknownValues = false;
         NX_MUTEX_LOCKER lk(&m_mutex);
-        for (const auto& effectiveId:
-            m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+
+        const std::vector<QnUuid>& effectiveIds = precalculatedEffectiveIds
+            ? *precalculatedEffectiveIds
+            : m_context->resourceAccessSubjectsCache()->subjectWithParents(subject);
+        for (const auto& effectiveId: effectiveIds)
         {
             auto iter = m_cache.find(effectiveId);
             if (iter == m_cache.cend())
