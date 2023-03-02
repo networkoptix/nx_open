@@ -115,8 +115,8 @@ struct Manager::Private
                 // Add fixed address only if not a cloud address used for connection to avoid loop.
                 if (!newCloudHost.isEmpty()
                     && !resolver.isCloudHostname(module.endpoint.address.toString())
-                    && NX_ASSERT(resolvedEndpoint.address.isIpAddress(), resolvedEndpoint)
-                    && NX_ASSERT(resolvedEndpoint.port > 0, resolvedEndpoint))
+                    && resolvedEndpoint.address.isIpAddress()
+                    && resolvedEndpoint.port > 0)
                 {
                     resolver.addFixedAddress(newCloudHost, resolvedEndpoint);
                 }
