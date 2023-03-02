@@ -68,8 +68,7 @@ void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& acces
 QSet<QnUuid> QnSharedResourcesManager::sharedResources(
     const QnResourceAccessSubject& subject) const
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
+    if (!NX_ASSERT(subject.isValid()))
         return QSet<QnUuid>();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -82,8 +81,7 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResources(
 QSet<QnUuid> QnSharedResourcesManager::sharedResourcesInternal(
     const QnResourceAccessSubject& subject) const
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
+    if (!NX_ASSERT(subject.isValid()))
         return QSet<QnUuid>();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -106,8 +104,7 @@ bool QnSharedResourcesManager::hasSharedResource(
 void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
+    if (!NX_ASSERT(subject.isValid()))
         return;
 
     setSharedResourcesInternal(subject, resources);
@@ -123,8 +120,7 @@ void QnSharedResourcesManager::setSharedResourcesById(const QnUuid& subjectId,
 void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
+    if (!NX_ASSERT(subject.isValid()))
         return;
 
     QSet<QnUuid> oldValue;

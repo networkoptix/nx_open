@@ -39,23 +39,21 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
     const QnResourcePtr& resource,
     GlobalPermissions /*globalPermissions*/) const
 {
-    NX_ASSERT(acceptable(subject, resource));
-    if (!acceptable(subject, resource))
+    if (!NX_ASSERT(acceptable(subject, resource)))
         return false;
 
-    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    if (resource->hasFlags(Qn::layout))
     {
+        auto layout = resource.staticCast<QnLayoutResource>();
         if (!layout->isShared())
         {
-            NX_VERBOSE(this, "%1 is not shared, ignore it",
-                layout->getName());
+            NX_VERBOSE(this, "%1 is not shared, ignore it", layout->getName());
             return false;
         }
     }
     else if (!isMediaResource(resource))
     {
-        NX_VERBOSE(this, "%1 has invalid type, ignore it",
-            resource->getName());
+        NX_VERBOSE(this, "%1 has invalid type, ignore it", resource->getName());
         return false;
     }
 
