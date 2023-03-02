@@ -117,6 +117,45 @@ void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
         });
 }
 
+void MembersModel::checkCycles()
+{
+    if (m_subjectId.isNull())
+        return;
+
+    // Check direct parents.
+    QSet<QnUuid> groupsWithCycles;
+    const auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
+    for (const auto& parent: parents)
+    {
+        if (m_subjectContext->subjectHierarchy()->recursiveParents({parent}).contains(m_subjectId))
+            groupsWithCycles.insert(parent);
+    }
+
+    const auto allParents = m_subjectContext->subjectHierarchy()->recursiveParents({m_subjectId});
+
+    // Check direct member groups.
+    for (const auto& id: m_subjectMembers.groups)
+    {
+        if (allParents.contains(id))
+            groupsWithCycles.insert(id);
+    }
+
+    if (groupsWithCycles == m_groupsWithCycles)
+        return;
+
+    // Notify about groups that (maybe no longer) cause cycles.
+    const auto modifiedGroups = m_groupsWithCycles + groupsWithCycles;
+
+    m_groupsWithCycles = groupsWithCycles;
+
+    for (const auto& id: modifiedGroups)
+    {
+        const auto row = m_cache->sorted().users.size()
+            + m_cache->indexIn(m_cache->sorted().groups, id);
+        emit dataChanged(index(row, 0), index(row, 0));
+    }
+}
+
 void MembersModel::readUsersAndGroups()
 {
     if (m_subjectContext.isNull() && !m_subjectId.isNull())
@@ -133,7 +172,10 @@ void MembersModel::readUsersAndGroups()
             [this](int at, const QnUuid& id, const QnUuid& parentId)
             {
                 if (!parentId.isNull())
-                    return; //< TODO Update allowed parents/members.
+                {
+                    checkCycles();
+                    return;
+                }
 
                 const int row = m_cache->info(id).isGroup
                     ? m_cache->sorted().users.size() + at
@@ -150,6 +192,8 @@ void MembersModel::readUsersAndGroups()
                     this->endInsertRows();
                     return;
                 }
+
+                checkCycles();
 
                 if (parentId == m_subjectId)
                 {
@@ -169,14 +213,16 @@ void MembersModel::readUsersAndGroups()
                     else
                         emit usersChanged();
                 }
-                // TODO Update allowed parents/members.
             });
 
         connect(m_cache.get(), &MembersCache::beginRemove, this,
             [this](int at, const QnUuid& id, const QnUuid& parentId)
             {
                 if (!parentId.isNull())
-                    return; //< TODO Update allowed parents/members.
+                {
+                    checkCycles();
+                    return;
+                }
 
                 const int row = m_cache->info(id).isGroup
                     ? m_cache->sorted().users.size() + at
@@ -193,6 +239,8 @@ void MembersModel::readUsersAndGroups()
                     this->endRemoveRows();
                     return;
                 }
+
+                checkCycles();
 
                 if (parentId == m_subjectId)
                 {
@@ -212,7 +260,6 @@ void MembersModel::readUsersAndGroups()
                     else
                         emit usersChanged();
                 }
-                // TODO Update allowed parents/members.
             });
 
         auto userRolesManager = systemContext()->userRolesManager();
@@ -228,6 +275,8 @@ void MembersModel::readUsersAndGroups()
                     /*removed*/ {userGroup.id}, /*added*/ {userGroup.id}, {}, {});
 
                 emit customGroupCountChanged();
+
+                checkCycles();
             });
 
         connect(userRolesManager, &QnUserRolesManager::userRoleRemoved, this,
@@ -242,6 +291,8 @@ void MembersModel::readUsersAndGroups()
                 m_cache->modify({}, {userGroup.id}, groupsWithChangedMembers, {});
 
                 emit customGroupCountChanged();
+
+                checkCycles();
             });
 
         auto resourcePool = systemContext()->resourcePool();
@@ -295,13 +346,6 @@ void MembersModel::readUsersAndGroups()
                 m_cache->modify({}, removedIds, modifiedGroups, {});
             });
 
-        connect(m_subjectContext.get(), &AccessSubjectEditingContext::hierarchyChanged,
-            this,
-            [this]
-            {
-                // TODO Update allowed parents/members.
-            });
-
         connect(m_subjectContext->subjectHierarchy(), &nx::core::access::SubjectHierarchy::changed,
             this, [this](
                 const QSet<QnUuid>& added,
@@ -329,6 +373,8 @@ void MembersModel::readUsersAndGroups()
                     removed,
                     groupsWithChangedMembers,
                     subjectsWithChangedParents);
+
+                checkCycles();
             });
 
         connect(m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
@@ -339,6 +385,7 @@ void MembersModel::readUsersAndGroups()
         beginResetModel();
         m_subjectMembers = {};
         m_cache.reset();
+        m_groupsWithCycles.clear();
         endResetModel();
 
         disconnect(systemContext()->userRolesManager());
@@ -501,6 +548,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[MemberSectionRole] = "memberSection";
     roles[GroupSectionRole] = "groupSection";
     roles[IsLdap] = "isLdap";
+    roles[Cycle] = "cycle";
     return roles;
 }
 
@@ -591,6 +639,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case IsLdap:
             return m_cache->info(id).isLdap;
+
+        case Cycle:
+            return m_groupsWithCycles.contains(id);
 
         default:
             return {};
@@ -725,7 +776,8 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-        return sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
+        return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
+            || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -758,7 +810,8 @@ public:
             return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-        return sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
+        return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
+            || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
