@@ -692,8 +692,7 @@ QnResourceList QnResourceDiscoveryManager::remapPhysicalIdIfNeed(const QnResourc
 
 bool QnResourceDiscoveryManager::isCameraAllowed(
     const QString& /*driverName*/,
-    const QString& /*cameraVendor*/,
-    const QString& /*cameraModel*/) const
+    const QnSecurityCamResource* /*securityCamResource*/) const
 {
     return true;
 }

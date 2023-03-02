@@ -171,10 +171,13 @@ protected:
     bool isRedundancyUsing() const;
     virtual QnResourceList remapPhysicalIdIfNeed(const QnResourceList& resources);
 
+    /**
+     * Intended to prevent the camera drivers from discovering cameras which are supposed to be
+     * discovered by different drivers, or which must not be discovered due to other reasons.
+     */
     virtual bool isCameraAllowed(
         const QString& driverName,
-        const QString& cameraVendor,
-        const QString& cameraModel) const;
+        const QnSecurityCamResource* securityCamResource) const;
 
 protected:
     QThreadPool m_threadPool;
