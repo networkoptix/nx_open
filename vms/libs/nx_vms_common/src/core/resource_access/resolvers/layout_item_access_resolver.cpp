@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
@@ -165,7 +166,12 @@ ResourceAccessDetails LayoutItemAccessResolver::accessDetails(
         if (accessRights(subjectId, layout).testFlag(accessRight))
         {
             const auto parentResource = layout->getParentResource();
-            details[subjectId].insert(parentResource ? parentResource : (QnResourcePtr) layout);
+            const bool isLocalLayout = parentResource.objectCast<QnUserResource>() != nullptr;
+            NX_ASSERT(d->subjectEditingMode || !isLocalLayout);
+
+            details[subjectId].insert(parentResource && !isLocalLayout
+                ? parentResource
+                : (QnResourcePtr) layout);
         }
     }
 
