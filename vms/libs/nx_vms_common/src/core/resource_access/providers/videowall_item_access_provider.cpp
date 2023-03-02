@@ -78,9 +78,11 @@ Source VideoWallItemAccessProvider::baseSource() const
     return Source::videowall;
 }
 
-bool VideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& /*subject*/,
+bool VideoWallItemAccessProvider::calculateAccess(
+    const QnResourceAccessSubject& /*subject*/,
     const QnResourcePtr& resource,
-    GlobalPermissions globalPermissions) const
+    GlobalPermissions globalPermissions,
+    const std::vector<QnUuid>& /*effectiveIds*/) const
 {
     if (!globalPermissions.testFlag(GlobalPermission::controlVideowall))
         return false;

@@ -24,9 +24,11 @@ public:
 protected:
     virtual Source baseSource() const override;
 
-    virtual bool calculateAccess(const QnResourceAccessSubject& subject,
+    virtual bool calculateAccess(
+        const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        nx::vms::api::GlobalPermissions globalPermissions) const override;
+        nx::vms::api::GlobalPermissions globalPermissions,
+        const std::vector<QnUuid>& effectiveIds) const override;
 
     virtual void fillProviders(
         const QnResourceAccessSubject& subject,

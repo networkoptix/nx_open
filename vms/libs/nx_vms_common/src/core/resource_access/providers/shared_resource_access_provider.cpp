@@ -35,9 +35,11 @@ Source SharedResourceAccessProvider::baseSource() const
     return Source::shared;
 }
 
-bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool SharedResourceAccessProvider::calculateAccess(
+    const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
-    GlobalPermissions /*globalPermissions*/) const
+    GlobalPermissions /*globalPermissions*/,
+    const std::vector<QnUuid>& effectiveIds) const
 {
     if (!NX_ASSERT(acceptable(subject, resource)))
         return false;
@@ -58,7 +60,7 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
     }
 
     bool result =
-        m_context->sharedResourcesManager()->hasSharedResource(subject, resource->getId());
+        m_context->sharedResourcesManager()->hasSharedResource(effectiveIds, resource->getId());
 
     NX_VERBOSE(this, "update access %1 to %2: %3",
         subject, resource->getName(), result);

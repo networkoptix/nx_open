@@ -35,11 +35,14 @@ public:
         GlobalPermission requiredPermission);
 
     /**
-    * \param user                      User or role to get global permissions for.
-    * \returns                         Global permissions of the given user,
-    *                                  adjusted to take dependencies and superuser status into account.
-    */
-    GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
+     * @param subject User or role to get global permissions for.
+     * @param precalculatedEffectiveIds Precalculated user roles effective IDs.
+     * @return Global permissions of the given user, adjusted to take dependencies and superuser
+     *     status into account.
+     */
+    GlobalPermissions globalPermissions(
+        const QnResourceAccessSubject& subject,
+        const std::vector<QnUuid>* const precalculatedEffectiveIds = nullptr) const;
 
     /**
     * \param user                      User to get global permissions for.

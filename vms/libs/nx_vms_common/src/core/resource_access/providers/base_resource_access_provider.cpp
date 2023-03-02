@@ -59,8 +59,14 @@ bool BaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subjec
             return false;
         }
 
-        const auto result = calculateAccess(subject, resource,
-            m_context->globalPermissionsManager()->globalPermissions(subject));
+        // Precalculate list of all parent roles for the optimization purposes.
+        const auto effectiveIds = m_context->resourceAccessSubjectsCache()->subjectWithParents(
+            subject);
+        const auto result = calculateAccess(
+            subject,
+            resource,
+            m_context->globalPermissionsManager()->globalPermissions(subject, &effectiveIds),
+            effectiveIds);
         NX_VERBOSE(this, "%1 -> %2 is %3", subject, resource, result ? "accessible" : "inaccessible");
         return result;
     }
@@ -127,12 +133,17 @@ void BaseResourceAccessProvider::afterUpdate()
             NX_VERBOSE(this, "%1 is disabled after update", subject);
             continue;
         }
+
+        // Precalculate list of all parent roles for the optimization purposes.
+        const std::vector<QnUuid> effectiveIds =
+            m_context->resourceAccessSubjectsCache()->subjectWithParents(subject);
+
         const auto globalPermissions =
-            m_context->globalPermissionsManager()->globalPermissions(subject);
+            m_context->globalPermissionsManager()->globalPermissions(subject, &effectiveIds);
         auto& accessible = m_accessibleResources[subject.id()];
         for (const auto& resource: resources)
         {
-            if (calculateAccess(subject, resource, globalPermissions))
+            if (calculateAccess(subject, resource, globalPermissions, effectiveIds))
                 accessible.insert(resource->getId());
         }
         NX_VERBOSE(this, "%1 has acces to %2 after update", subject, nx::containerString(accessible));
@@ -203,8 +214,17 @@ void BaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& sub
         auto targetId = resource->getId();
 
         bool oldValue = accessible.contains(targetId);
-        newValue = isSubjectEnabled(subject) && calculateAccess(
-            subject, resource, m_context->globalPermissionsManager()->globalPermissions(subject));
+
+        // Precalculate list of all parent roles for the optimization purposes.
+        const auto effectiveIds = m_context->resourceAccessSubjectsCache()->subjectWithParents(
+            subject);
+        newValue = isSubjectEnabled(subject)
+            && calculateAccess(
+                subject,
+                resource,
+                m_context->globalPermissionsManager()->globalPermissions(subject, &effectiveIds),
+                effectiveIds);
+
         if (oldValue == newValue)
             return;
 

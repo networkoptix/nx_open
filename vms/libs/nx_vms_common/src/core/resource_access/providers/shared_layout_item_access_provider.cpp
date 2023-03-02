@@ -38,9 +38,11 @@ Source SharedLayoutItemAccessProvider::baseSource() const
     return Source::layout;
 }
 
-bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool SharedLayoutItemAccessProvider::calculateAccess(
+    const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
-    GlobalPermissions /*globalPermissions*/) const
+    GlobalPermissions /*globalPermissions*/,
+    const std::vector<QnUuid>& effectiveIds) const
 {
     if (!isMediaResource(resource))
         return false;
@@ -49,7 +51,7 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
     {
         const auto resourcePool = m_context->resourcePool();
         const auto sharedLayouts = resourcePool->getResourcesByIds<QnLayoutResource>(
-            m_context->sharedResourcesManager()->sharedResources(subject));
+            m_context->sharedResourcesManager()->sharedResources(subject, &effectiveIds));
 
         const auto resourceId = resource->getId();
         for (const auto& layout: sharedLayouts)
@@ -72,8 +74,7 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
 
     // Method is called under the mutex.
     // Using effective ids as aggregators are created for users and roles separately.
-    for (const auto& effectiveId:
-        m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    for (const auto& effectiveId: effectiveIds)
     {
         QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(effectiveId);
 

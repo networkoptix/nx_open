@@ -46,7 +46,8 @@ protected:
 
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
-        nx::vms::api::GlobalPermissions globalPermissions) const = 0;
+        nx::vms::api::GlobalPermissions globalPermissions,
+        const std::vector<QnUuid>& effectiveIds) const = 0;
 
     bool acceptable(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;

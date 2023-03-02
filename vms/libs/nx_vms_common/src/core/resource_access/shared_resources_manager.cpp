@@ -66,14 +66,19 @@ void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& acces
 }
 
 QSet<QnUuid> QnSharedResourcesManager::sharedResources(
-    const QnResourceAccessSubject& subject) const
+    const QnResourceAccessSubject& subject,
+    const std::vector<QnUuid>* const precalculatedEffectiveIds) const
 {
     if (!NX_ASSERT(subject.isValid()))
         return QSet<QnUuid>();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     QSet<QnUuid> result;
-    for (const auto& id: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    const std::vector<QnUuid>& effectiveIds = precalculatedEffectiveIds
+        ? *precalculatedEffectiveIds
+        : m_context->resourceAccessSubjectsCache()->subjectWithParents(subject);
+
+    for (const auto& id: effectiveIds)
         result.unite(m_sharedResources[id]);
     return result;
 }
@@ -89,11 +94,11 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResourcesInternal(
 }
 
 bool QnSharedResourcesManager::hasSharedResource(
-    const QnResourceAccessSubject& subject, const QnUuid& resourceId) const
+    const std::vector<QnUuid>& subjectRolesEffectiveIds,
+    const QnUuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    for (const auto& effectiveId:
-        m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    for (const auto& effectiveId: subjectRolesEffectiveIds)
     {
         if (m_sharedResources[effectiveId].contains(resourceId))
             return true;
