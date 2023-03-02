@@ -143,7 +143,7 @@ bool BaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subje
     const QnResourcePtr& resource) const
 {
     return resource
-        && resource->resourcePool()
+        && resource->systemContext()
         && !resource->hasFlags(Qn::removed)
         && subject.isValid();
 }

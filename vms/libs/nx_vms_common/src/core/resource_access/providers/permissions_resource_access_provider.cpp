@@ -41,8 +41,7 @@ bool PermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSu
     const QnResourcePtr& resource,
     GlobalPermissions globalPermissions) const
 {
-    NX_ASSERT(acceptable(subject, resource));
-    if (!acceptable(subject, resource))
+    if (!NX_ASSERT(acceptable(subject, resource)))
         return false;
 
     if (resource == subject.user())
