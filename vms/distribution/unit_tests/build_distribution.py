@@ -92,6 +92,9 @@ def get_go_unit_tests_list(tests_directory: str):
         "nx_storage_cleaner_ut_licenserapi_ut",
         "nx_storage_cleaner_ut_model_ut",
         "nx_storage_cleaner_ut_storagecleaner_ut",
+        "nx_cs_motion_db_ut_bitmask_ut",
+        "nx_cs_motion_db_ut_model_runner_ut",
+        "nx_cs_motion_db_ut_model_ut",
     ]
     for test_name in GO_UNIT_TEST_NAMES:
         test_full_name = f"{test_name}{extension}"

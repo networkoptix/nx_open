@@ -71,6 +71,7 @@ public:
         nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
 
     void setHttpCredentials(Credentials credentials);
+    std::optional<Credentials> getHttpCredentials() const;
 
 protected:
     /**
@@ -104,7 +105,8 @@ protected:
         const std::string& requestPath,
         InputArgsAndCompletionHandler&&... args);
 
-    template<typename Output, typename InputTuple, typename Handler>
+    template<typename Output, typename InputTuple, typename Handler,
+        typename SerializationLibWrapper = detail::NxReflectWrapper>
     void makeAsyncCallWithRetries(
         const network::http::Method& method,
         const std::string& requestPath,
@@ -140,7 +142,7 @@ private:
     unsigned int m_numRetries = 1;
     std::optional<nx::utils::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
 
-    template<typename Output, typename... Args>
+    template<typename Output, typename SerializationLibWrapper, typename... Args>
     auto createHttpClient(
         const nx::utils::Url& url,
         network::http::Credentials credentials,
@@ -243,6 +245,12 @@ void GenericApiClient<ResultCode, Base>::setHttpCredentials(Credentials credenti
     m_credentials = std::move(credentials);
 }
 
+template<HasResultCodeT ResultCode, typename Base>
+std::optional<Credentials> GenericApiClient<ResultCode, Base>::getHttpCredentials() const
+{
+    return m_credentials;
+}
+
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 {
@@ -295,7 +303,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename InputTuple, typename Handler>
+template<typename Output, typename InputTuple, typename Handler, typename SerializationLibWrapper>
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRetries(
     const network::http::Method& method,
     const std::string& requestPath,
@@ -308,7 +316,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
     auto request = std::apply(
         [this, &requestPath, &urlQuery, &credentials](auto&&... inputArgs)
         {
-            return this->template createHttpClient<Output>(
+            return this->template createHttpClient<Output, SerializationLibWrapper>(
                 network::url::Builder(m_baseApiUrl).appendPath(requestPath).setQuery(urlQuery),
                 credentials,
                 std::forward<decltype(inputArgs)>(inputArgs)...);
@@ -385,15 +393,16 @@ const utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() 
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename... Args>
+template<typename Output, typename SerializationLibWrapper, typename... Args>
 auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
     const nx::utils::Url& url, network::http::Credentials credentials, Args&&... args)
 {
     using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;
 
     auto httpClient =
-        std::make_unique<network::http::FusionDataHttpClient<InputParamType, Output>>(
-            url, std::move(credentials), m_adapterFunc, std::forward<Args>(args)...);
+        std::make_unique<
+            network::http::FusionDataHttpClient<InputParamType, Output, SerializationLibWrapper>>(
+                url, std::move(credentials), m_adapterFunc, std::forward<Args>(args)...);
     httpClient->bindToAioThread(this->getAioThread());
 
     if (m_requestTimeout)
