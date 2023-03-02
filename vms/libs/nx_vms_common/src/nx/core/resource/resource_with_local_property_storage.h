@@ -5,9 +5,9 @@
 #include <QtCore/QMetaObject>
 
 #include <core/resource/resource.h>
+#include <core/resource_management/resource_properties.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/delayed.h>
-
-class QnCommonModule;
 
 namespace nx::core::resource {
 
@@ -54,6 +54,12 @@ public:
                 changedProperty,
                 m_propertiesPrevValues[changedProperty],
                 m_properties[changedProperty]);
+            if (auto systemContext = BaseResource::systemContext())
+            {
+                systemContext->resourcePropertyDictionary()->propertyChanged(
+                    BaseResource::getId(),
+                    changedProperty);
+            }
         }
 
         return true;

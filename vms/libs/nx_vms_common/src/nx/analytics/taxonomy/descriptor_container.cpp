@@ -6,9 +6,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/common/resource/property_watcher.h>
 #include <nx/vms/common/system_context.h>
 
 using namespace nx::vms::api::analytics;
+using namespace nx::vms::common;
 
 namespace nx::analytics::taxonomy {
 
@@ -17,19 +19,38 @@ DescriptorContainer::DescriptorContainer(
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::SystemContextAware(context),
-    m_propertyWatcher(context->resourcePool())
+    nx::vms::common::SystemContextAware(context)
 {
-    connect(&m_propertyWatcher, &PropertyWatcher::propertyChanged,
-        this, &DescriptorContainer::at_descriptorsUpdated);
-
-    m_propertyWatcher.watch(
-        {kDescriptorsProperty},
+    auto serverFilter =
         [](const QnResourcePtr& res)
         {
             auto server = res.dynamicCast<QnMediaServerResource>();
             return server && server->isCompatible() && !server->flags().testFlag(Qn::fake);
-        });
+        };
+
+    m_propertyWatcher = std::make_unique<PropertyWatcher>(
+        context,
+        std::set<QString>{kDescriptorsProperty},
+        serverFilter);
+
+    connect(m_propertyWatcher.get(), &PropertyWatcher::propertyChanged,
+        this, &DescriptorContainer::at_descriptorsUpdated);
+
+    auto handleServerChanges =
+        [this, serverFilter](const QnResourceList& resources)
+        {
+            if (std::any_of(resources.cbegin(), resources.cend(), serverFilter))
+                at_descriptorsUpdated();
+        };
+
+    connect(context->resourcePool(), &QnResourcePool::resourcesAdded, this, handleServerChanges);
+    connect(context->resourcePool(), &QnResourcePool::resourcesRemoved, this, handleServerChanges);
+
+    at_descriptorsUpdated();
+}
+
+DescriptorContainer::~DescriptorContainer()
+{
 }
 
 Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
