@@ -310,7 +310,7 @@ ResourceAccessInfo::ProvidedVia ResourceAccessRightsModel::providerType(QnResour
     if (qobject_cast<QnVideoWallResource*>(provider))
         return ResourceAccessInfo::ProvidedVia::videowall;
 
-    NX_ASSERT(false, "Unknown indirect provider type.");
+    NX_ASSERT(false, "Unknown indirect provider type: %1", provider);
     return ResourceAccessInfo::ProvidedVia::unknown;
 }
 
