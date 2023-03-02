@@ -6,7 +6,6 @@
 
 #include <api/helpers/camera_id_helper.h>
 #include <api/helpers/layout_id_helper.h>
-#include <common/common_module.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/vms/api/data/stored_file_data.h>
@@ -41,7 +40,7 @@ void serialize(const T& value, const QString& key, QUrlQuery* target)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& command,
     const nx::network::rest::Params& params,
     QString* value)
@@ -51,7 +50,7 @@ bool parseHttpRequestParams(
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& command,
     const nx::network::rest::Params& params,
     nx::vms::api::StoredFilePath* value)
@@ -66,7 +65,7 @@ void toUrlParams(const nx::vms::api::StoredFilePath& name, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     QByteArray* value)
@@ -83,13 +82,13 @@ void toUrlParams(const QByteArray& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     const QString& command,
     const nx::network::rest::Params& params,
     QnCameraDataExQuery* query)
 {
     // Semantics of the returned value is quite strange. We must parse both params anyway.
-    parseHttpRequestParams(commonModule, command, params, &query->id);
+    parseHttpRequestParams(systemContext, command, params, &query->id);
     deserialize(params, "showDesktopCameras", &query->showDesktopCameras);
     return true;
 }
@@ -101,7 +100,7 @@ void toUrlParams(const QnCameraDataExQuery& filter, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     QnUuid* id)
@@ -110,7 +109,7 @@ bool parseHttpRequestParams(
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     QnCameraUuid* id)
@@ -121,7 +120,7 @@ bool parseHttpRequestParams(
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::camera_id_helper::flexibleIdToId(
-            commonModule->resourcePool(), stringValue);
+            systemContext->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }
@@ -129,7 +128,7 @@ bool parseHttpRequestParams(
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     QnLayoutUuid* id)
@@ -140,7 +139,7 @@ bool parseHttpRequestParams(
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
         *id = nx::layout_id_helper::flexibleIdToId(
-            commonModule->resourcePool(), stringValue);
+            systemContext->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }
@@ -153,7 +152,7 @@ void toUrlParams(const QnUuid& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     nx::vms::api::StorageParentId* id)
@@ -182,7 +181,7 @@ void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     ApiTranLogFilter* tranLogFilter)
@@ -199,7 +198,7 @@ void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
+    nx::vms::common::SystemContext* /*systemContext*/,
     const QString&,
     const nx::network::rest::Params& /*params*/,
     std::nullptr_t*)

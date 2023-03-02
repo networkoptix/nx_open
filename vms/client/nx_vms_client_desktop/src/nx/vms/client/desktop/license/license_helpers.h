@@ -4,8 +4,8 @@
 
 #include <functional>
 
-#include <QtCore/QHash>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QHash>
 
 #include <licensing/license_fwd.h>
 #include <nx/reflect/enum_instrument.h>

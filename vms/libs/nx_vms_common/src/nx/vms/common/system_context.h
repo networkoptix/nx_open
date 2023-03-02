@@ -8,7 +8,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
-#include "system_context_aware.h"  //< Forward declarations.
+#include "system_context_aware.h" //< Forward declarations.
 
 class QnLicensePool;
 class QnResourceAccessSubjectsCache;
@@ -31,6 +31,7 @@ class GlobalPermissionsWatcher;
 class ResourceAccessSubjectHierarchy;
 } // namespace nx::core::access
 
+namespace nx::metrics { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
@@ -255,6 +256,8 @@ public:
     nx::analytics::taxonomy::AbstractStateWatcher* analyticsTaxonomyStateWatcher() const;
 
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
+
+    std::shared_ptr<nx::metrics::Storage> metrics() const;
 
 protected:
     Mode mode() const;

@@ -4,7 +4,6 @@
 
 #include <QtCore/QPointer>
 
-#include <nx/metrics/metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
 
@@ -25,8 +24,6 @@ QnCommonModule::QnCommonModule(SystemContext* systemContext):
     d(new Private)
 {
     d->systemContext = systemContext;
-
-    m_metrics = std::make_shared<nx::metrics::Storage>(); //< Depends on nothing.
 }
 
 SystemContext* QnCommonModule::systemContext() const
@@ -38,38 +35,6 @@ QnCommonModule::~QnCommonModule()
 {
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
-}
-
-void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
-{
-    NX_INFO(this, "System identity time has changed from %1 to %2", m_systemIdentityTime, value);
-    m_systemIdentityTime = value;
-    emit systemIdentityTimeChanged(value, sender);
-}
-
-qint64 QnCommonModule::systemIdentityTime() const
-{
-    return m_systemIdentityTime;
-}
-
-nx::metrics::Storage* QnCommonModule::metrics() const
-{
-    return m_metrics.get();
-}
-
-std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
-{
-    return std::weak_ptr<nx::metrics::Storage>(m_metrics);
-}
-
-void QnCommonModule::setAuditManager(QnAuditManager* auditManager)
-{
-    m_auditManager = auditManager;
-}
-
-QnAuditManager* QnCommonModule::auditManager() const
-{
-    return m_auditManager;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -203,6 +168,20 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->messageProcessor()
         : nullptr;
+}
+
+nx::metrics::Storage* QnCommonModule::metrics() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->metrics().get()
+        : nullptr;
+}
+
+std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? std::weak_ptr<nx::metrics::Storage>(d->systemContext->metrics())
+        : std::weak_ptr<nx::metrics::Storage>{};
 }
 
 //-------------------------------------------------------------------------------------------------

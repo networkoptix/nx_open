@@ -2,31 +2,25 @@
 
 #pragma once
 
-#include <utility>
+#include <cstring>
 #include <functional>
-#include <utility>
+#include <memory>
+#include <set>
 #include <tuple>
 #include <type_traits>
-#include <cstring>
-#include <set>
-#include <memory>
+#include <utility>
 
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/identity.hpp>
-#include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index_container.hpp>
 
 #include <core/resource_access/user_access_data.h>
-
-#include "transaction.h"
-#include <transaction/amend_transaction_data.h>
-#include "abstract_persistent_storage.h"
-#include <nx_ec/ec_api_fwd.h>
-
 #include <nx/utils/type_utils.h>
-#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/cleanup_db_data.h>
 #include <nx/vms/api/data/discovery_data.h>
@@ -35,7 +29,6 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/license_overflow_data.h>
-#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/peer_sync_time_data.h>
@@ -47,12 +40,17 @@
 #include <nx/vms/api/data/update_data.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx/vms/api/data/webpage_data.h>
-#include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx_ec/ec_api_fwd.h>
+#include <transaction/amend_transaction_data.h>
 
-class QnCommonModule;
+#include "abstract_persistent_storage.h"
+#include "transaction.h"
+
+namespace nx::vms::common { class SystemContext; }
 
 namespace ec2 {
 
@@ -101,22 +99,40 @@ namespace detail {
 struct NoneType {};
 
 template<typename ParamType>
-using CheckSavePermissionFuncType = std::function<Result(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckSavePermissionFuncType = std::function<Result(
+    nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<Result(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
+using CheckReadPermissionFuncType = std::function<Result(
+    nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    ParamType&)>;
 
 template<typename ParamType>
-using FilterByReadPermissionFuncType = std::function<void(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
+using FilterByReadPermissionFuncType = std::function<void(
+    nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    ParamType&)>;
 
 template<typename ParamType>
-using FilterBySavePermissionFuncType = std::function<void(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
+using FilterBySavePermissionFuncType = std::function<void(
+    nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    ParamType&)>;
 
 template<typename ParamType>
-using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(
+    nx::vms::common::SystemContext* systemContext,
+    const Qn::UserAccessData& accessData,
+    const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType(QnCommonModule*, const ParamType&, AbstractPersistentStorage*)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType(
+    nx::vms::common::SystemContext* systemContext,
+    const ParamType&,
+    AbstractPersistentStorage*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;

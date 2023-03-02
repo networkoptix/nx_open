@@ -7,7 +7,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCryptographicHash>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_property_key.h>
@@ -33,6 +32,7 @@
 #include "amend_transaction_data.h"
 
 using namespace nx::vms;
+using SystemContext = nx::vms::common::SystemContext;
 
 namespace ec2 {
 
@@ -436,7 +436,7 @@ void apiIdDataListTriggerNotificationHelper(
 struct InvalidAccess
 {
     template<typename Param>
-    Result operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&)
+    Result operator()(SystemContext*, const Qn::UserAccessData&, const Param&)
     {
         NX_ASSERT(false, "Invalid access check for %1", typeid(Param));
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -447,7 +447,7 @@ struct InvalidAccess
 struct InvalidAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(QnCommonModule* commonModule,
+    RemotePeerAccess operator()(SystemContext* systemContext,
         const Qn::UserAccessData&, const Param&)
     {
         NX_ASSERT(false,
@@ -464,7 +464,7 @@ bool hasSystemAccess(const Qn::UserAccessData& accessData)
 struct SystemSuperUserAccessOnly
 {
     template<typename Param>
-    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, const Param&)
+    bool operator()(SystemContext*, const Qn::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData);
     }
@@ -473,7 +473,7 @@ struct SystemSuperUserAccessOnly
 struct SystemSuperUserAccessOnlyOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(QnCommonModule*, const Qn::UserAccessData& accessData, const Param&)
+    RemotePeerAccess operator()(SystemContext*, const Qn::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData)
             ? RemotePeerAccess::Allowed
@@ -484,7 +484,7 @@ struct SystemSuperUserAccessOnlyOut
 struct AllowForAllAccess
 {
     template<typename Param>
-    Result operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&)
+    Result operator()(SystemContext*, const Qn::UserAccessData&, const Param&)
     {
         return Result();
     }
@@ -493,29 +493,29 @@ struct AllowForAllAccess
 struct AllowForAllAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
+    RemotePeerAccess operator()(SystemContext*, const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
 };
 
 static Result checkExistingResourceAccess(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
     const QnUuid& resourceId,
     Qn::Permissions permissions)
 {
-    const auto resPool = commonModule->resourcePool();
+    const auto resPool = systemContext->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
 
     // Null resource Id can not be handled by permissions engine, since there is no such resource.
     // System settings are stored as admin user properties
     if ((resourceId.isNull() || resourceId == QnUserResource::kAdminGuid)
         && userResource
-        && commonModule->resourceAccessManager()->hasAdminPermissions(userResource))
+        && systemContext->resourceAccessManager()->hasAdminPermissions(userResource))
     {
         return Result();
     }
 
     QnResourcePtr target = resPool->getResourceById(resourceId);
-    if (commonModule->resourceAccessManager()->hasPermission(
+    if (systemContext->resourceAccessManager()->hasPermission(
         userResource, target, permissions))
     {
         return Result();
@@ -530,7 +530,7 @@ static Result checkExistingResourceAccess(
 }
 
 static Result checkReadResourceAccess(
-    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
@@ -538,22 +538,22 @@ static Result checkReadResourceAccess(
     if (accessData.access == Qn::UserAccessData::Access::ReadAllResources)
         return Result();
 
-    return checkExistingResourceAccess(commonModule, accessData, resourceId, Qn::ReadPermission);
+    return checkExistingResourceAccess(systemContext, accessData, resourceId, Qn::ReadPermission);
 }
 
 static Result checkSaveResourceAccess(
-    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
 {
     if (hasSystemAccess(accessData))
         return Result();
 
-    return checkExistingResourceAccess(commonModule, accessData, resourceId, Qn::SavePermission);
+    return checkExistingResourceAccess(systemContext, accessData, resourceId, Qn::SavePermission);
 }
 
 static Result checkReadResourceParamAccess(
-    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
 {
-    return checkReadResourceAccess(commonModule, accessData, resourceId);
+    return checkReadResourceAccess(systemContext, accessData, resourceId);
 }
 
 struct ModifyResourceAccess
@@ -561,7 +561,7 @@ struct ModifyResourceAccess
     ModifyResourceAccess() {}
 
     template<typename Param>
-    Result operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const Param& param)
     {
         NX_VERBOSE(this,
@@ -571,16 +571,16 @@ struct ModifyResourceAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = systemContext->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId)
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
         bool result = false;
         if (!target)
-            result = commonModule->resourceAccessManager()->canCreateResourceFromData(userResource, param);
+            result = systemContext->resourceAccessManager()->canCreateResourceFromData(userResource, param);
         else
-            result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
+            result = systemContext->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
         {
@@ -608,7 +608,7 @@ struct ModifyResourceAccess
 struct ModifyStorageAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::StorageData& param)
     {
@@ -620,7 +620,7 @@ struct ModifyStorageAccess
         }
 
         transaction_descriptor::CanModifyStorageData data;
-        const auto existingResource = commonModule->resourcePool()->getResourceById(param.id);
+        const auto existingResource = systemContext->resourcePool()->getResourceById(param.id);
         data.hasExistingStorage = (bool) existingResource;
         data.getExistingStorageDataFunc =
             [&]()
@@ -631,9 +631,9 @@ struct ModifyStorageAccess
             };
 
         data.logErrorFunc = [this](const QString& message) { NX_DEBUG(this, message); };
-        data.modifyResourceResult = ModifyResourceAccess()(commonModule, accessData, param);
+        data.modifyResourceResult = ModifyResourceAccess()(systemContext, accessData, param);
         data.request = param;
-        amendOutputDataIfNeeded(accessData, commonModule->resourceAccessManager(), &data.request);
+        amendOutputDataIfNeeded(accessData, systemContext->resourceAccessManager(), &data.request);
 
         return transaction_descriptor::canModifyStorage(data);
     }
@@ -644,7 +644,7 @@ struct RemoveResourceAccess
     RemoveResourceAccess()  {}
 
     template<typename Param>
-    Result operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const Param& param)
     {
         NX_VERBOSE(this,
@@ -654,11 +654,11 @@ struct RemoveResourceAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = systemContext->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId)
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
-        if (!commonModule->resourceAccessManager()->hasPermission(
+        if (!systemContext->resourceAccessManager()->hasPermission(
             userResource, target, Qn::RemovePermission))
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -668,7 +668,7 @@ struct RemoveResourceAccess
         }
 
         const auto storage = target.dynamicCast<QnStorageResource>();
-        bool isOwnStorage = (storage && storage->getParentId() == commonModule->peerId());
+        bool isOwnStorage = (storage && storage->getParentId() == systemContext->peerId());
         if (isOwnStorage && !storage->isExternal() && storage->isWritable())
         {
             NX_DEBUG(this, "Attempt to delete own local storage %1", storage->getId());
@@ -683,13 +683,13 @@ struct RemoveResourceAccess
 
 struct SaveUserAccess
 {
-    Result operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const nx::vms::api::UserData& param)
     {
         if (hasSystemAccess(accessData))
-            return ModifyResourceAccess()(commonModule, accessData, param);
+            return ModifyResourceAccess()(systemContext, accessData, param);
 
-        const bool hasUserWithSameName = commonModule->resourcePool()->contains<QnUserResource>(
+        const bool hasUserWithSameName = systemContext->resourcePool()->contains<QnUserResource>(
             [name = param.name.toLower(), id = param.id](const auto& u)
             {
                 return u->getName().toLower() == name && u->getId() != id;
@@ -701,7 +701,7 @@ struct SaveUserAccess
         }
 
         const auto existingUser =
-            commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
+            systemContext->resourcePool()->getResourceById<QnUserResource>(param.id);
         if (existingUser)
         {
             if (!param.externalId.isEmpty())
@@ -752,7 +752,7 @@ struct SaveUserAccess
                 "Creating an owner user is not allowed.")));
         }
 
-        if (!commonModule->userRolesManager()->hasRoles(param.userRoleIds))
+        if (!systemContext->userRolesManager()->hasRoles(param.userRoleIds))
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "User Role does not exist.")));
@@ -767,7 +767,7 @@ struct SaveUserAccess
                 nx::branding::shortCloudName()));
         }
 
-        auto r = ModifyResourceAccess()(commonModule, accessData, param);
+        auto r = ModifyResourceAccess()(systemContext, accessData, param);
         return r;
     }
 };
@@ -775,7 +775,7 @@ struct SaveUserAccess
 struct ModifyCameraDataAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::CameraData& param)
     {
@@ -793,23 +793,23 @@ struct ModifyCameraDataAccess
             }
         }
 
-        return ModifyResourceAccess()(commonModule, accessData, param);
+        return ModifyResourceAccess()(systemContext, accessData, param);
     }
 };
 
 template<typename Param>
-void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/)
+void applyColumnFilter(SystemContext*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/)
 {
 }
 
 void applyColumnFilter(
-    QnCommonModule*, const Qn::UserAccessData& accessData, api::MediaServerData& data)
+    SystemContext*, const Qn::UserAccessData& accessData, api::MediaServerData& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
 }
 
-void applyColumnFilter(QnCommonModule* /*commonModule*/,
+void applyColumnFilter(SystemContext* /*systemContext*/,
     const Qn::UserAccessData& accessData,
     api::MediaServerDataEx& data)
 {
@@ -818,10 +818,10 @@ void applyColumnFilter(QnCommonModule* /*commonModule*/,
 }
 
 void applyColumnFilter(
-    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
+    SystemContext* systemContext, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData)
-        && !commonModule->resourceAccessManager()->hasAdminPermissions(accessData))
+        && !systemContext->resourceAccessManager()->hasAdminPermissions(accessData))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -830,12 +830,12 @@ void applyColumnFilter(
 struct ReadResourceAccess
 {
     template<typename Param>
-    Result operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, Param& param)
+    Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, Param& param)
     {
-        if (const auto r = checkReadResourceAccess(commonModule, accessData, param.id); !r)
+        if (const auto r = checkReadResourceAccess(systemContext, accessData, param.id); !r)
             return r;
 
-        applyColumnFilter(commonModule, accessData, param);
+        applyColumnFilter(systemContext, accessData, param);
         return Result();
     }
 };
@@ -843,9 +843,9 @@ struct ReadResourceAccess
 struct ReadResourceAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
+    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.id)
+        return checkReadResourceAccess(systemContext, accessData, param.id)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -854,30 +854,30 @@ struct ReadResourceAccessOut
 struct ReadResourceParamAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         nx::vms::api::ResourceParamWithRefData& param)
     {
         if (const auto r =
-            checkReadResourceParamAccess(commonModule, accessData, param.resourceId)
+            checkReadResourceParamAccess(systemContext, accessData, param.resourceId)
             ;
             !r)
         {
             return r;
         }
         operator()(
-            commonModule,
+            systemContext,
             accessData,
             static_cast<nx::vms::api::ResourceParamData&>(param));
         return Result();
     }
 
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         nx::vms::api::ResourceParamData& param)
     {
-        const auto accessManager = commonModule->resourceAccessManager();
+        const auto accessManager = systemContext->resourceAccessManager();
         if (accessData == Qn::kSystemAccess
             || accessData.access == Qn::UserAccessData::Access::ReadAllResources
             || accessManager->hasAdminPermissions(accessData))
@@ -894,11 +894,11 @@ struct ReadResourceParamAccess
 struct ReadResourceParamAccessOut
 {
     RemotePeerAccess operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
-        return checkReadResourceParamAccess(commonModule, accessData, param.resourceId)
+        return checkReadResourceParamAccess(systemContext, accessData, param.resourceId)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -913,9 +913,9 @@ struct ModifyResourceParamAccess
         return user ? user->getName() : accessData.userId.toString();
     }
 
-    static QString userNameOrId(const Qn::UserAccessData& accessData, QnCommonModule* commonModule)
+    static QString userNameOrId(const Qn::UserAccessData& accessData, SystemContext* systemContext)
     {
-        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
+        auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
         return userNameOrId(user, accessData);
     }
 
@@ -927,16 +927,16 @@ struct ModifyResourceParamAccess
     }
 
     static bool hasSameProperty(
-        QnCommonModule* commonModule, const nx::vms::api::ResourceParamWithRefData& param)
+        SystemContext* systemContext, const nx::vms::api::ResourceParamWithRefData& param)
     {
-        auto target = commonModule->resourcePool()->getResourceById(param.resourceId);
+        auto target = systemContext->resourcePool()->getResourceById(param.resourceId);
         return target && hasSameProperty(target, param);
     }
 
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
@@ -948,7 +948,7 @@ struct ModifyResourceParamAccess
 
         if (!isRemove
             && isNewApiCompoundTransaction
-            && hasSameProperty(commonModule, param))
+            && hasSameProperty(systemContext, param))
         {
             // CRUD API PATCH merges with existing values represented as JSON object so some of
             // them are not changed.
@@ -959,10 +959,10 @@ struct ModifyResourceParamAccess
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User '%1' with %2 permissions is not allowed to modify Resource parameter '%3'."),
-                userNameOrId(accessData, commonModule), accessData.access, param.name));
+                userNameOrId(accessData, systemContext), accessData.access, param.name));
         }
 
-        const auto accessManager = commonModule->resourceAccessManager();
+        const auto accessManager = systemContext->resourceAccessManager();
         const auto hasAdminPermissions = accessManager->hasAdminPermissions(accessData);
 
         // System properties are stored in resource unrelated places and should be handled
@@ -980,12 +980,12 @@ struct ModifyResourceParamAccess
                 return Result();
         }
 
-        const auto resPool = commonModule->resourcePool();
+        const auto resPool = systemContext->resourcePool();
         const auto target = resPool->getResourceById(param.resourceId);
 
         if (!isRemove && param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
         {
-            if (param.resourceId != commonModule->peerId())
+            if (param.resourceId != systemContext->peerId())
             {
                 return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                     "Setting analytics Storage for a different Server is forbidden."));
@@ -1027,7 +1027,7 @@ struct ModifyResourceParamAccess
             ? Result()
             : Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User '%1' with %2 permissions is not allowed to modify Resource parameter of %3."),
-                userNameOrId(accessData, commonModule), accessData.access, param.resourceId));
+                userNameOrId(accessData, systemContext), accessData.access, param.resourceId));
     }
 
     bool isRemove;
@@ -1040,22 +1040,22 @@ const std::set<QString> ModifyResourceParamAccess::kSystemAccessOnlyProperties =
 struct ReadFootageDataAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.serverGuid);
+        return checkReadResourceAccess(systemContext, accessData, param.serverGuid);
     }
 };
 
 struct ReadFootageDataAccessOut
 {
     RemotePeerAccess operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.serverGuid)
+        return checkReadResourceAccess(systemContext, accessData, param.serverGuid)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1064,33 +1064,33 @@ struct ReadFootageDataAccessOut
 struct ModifyFootageDataAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ServerFootageData& param)
     {
-        return checkSaveResourceAccess(commonModule, accessData, param.serverGuid);
+        return checkSaveResourceAccess(systemContext, accessData, param.serverGuid);
     }
 };
 
 struct ReadCameraAttributesAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.cameraId);
+        return checkReadResourceAccess(systemContext, accessData, param.cameraId);
     }
 };
 
 struct ReadCameraAttributesAccessOut
 {
     RemotePeerAccess operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.cameraId)
+        return checkReadResourceAccess(systemContext, accessData, param.cameraId)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1099,15 +1099,15 @@ struct ReadCameraAttributesAccessOut
 struct ModifyCameraAttributesAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::CameraAttributesData& param)
     {
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
-        auto accessManager = commonModule->resourceAccessManager();
+        const auto& resPool = systemContext->resourcePool();
+        auto accessManager = systemContext->resourceAccessManager();
         auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.cameraId);
         if (camera)
         {
@@ -1143,7 +1143,7 @@ struct ModifyCameraAttributesAccess
         if (param.scheduleEnabled && !camera->isScheduleEnabled())
         {
             using namespace nx::vms::license;
-            CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
+            CamLicenseUsageHelper licenseUsageHelper(systemContext);
             QnVirtualCameraResourceList cameras;
 
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
@@ -1162,7 +1162,7 @@ struct ModifyCameraAttributesAccess
 struct ModifyCameraAttributesListAccess
 {
     void operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         nx::vms::api::CameraAttributesDataList& param)
     {
@@ -1171,7 +1171,7 @@ struct ModifyCameraAttributesListAccess
 
         for (const auto& p: param)
         {
-            if (!checkSaveResourceAccess(commonModule, accessData, p.cameraId))
+            if (!checkSaveResourceAccess(systemContext, accessData, p.cameraId))
             {
                 param = {};
                 return;
@@ -1179,10 +1179,10 @@ struct ModifyCameraAttributesListAccess
         }
 
         using namespace nx::vms::license;
-        CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
+        CamLicenseUsageHelper licenseUsageHelper(systemContext);
         QnVirtualCameraResourceList cameras;
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = systemContext->resourcePool();
         for (const auto& p: param)
         {
             auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource
@@ -1210,20 +1210,20 @@ struct ModifyCameraAttributesListAccess
 struct ReadServerAttributesAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.serverId);
+        return checkReadResourceAccess(systemContext, accessData, param.serverId);
     }
 };
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
-        return checkReadResourceAccess(commonModule, accessData, param.serverId)
+        return checkReadResourceAccess(systemContext, accessData, param.serverId)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1232,15 +1232,15 @@ struct ReadServerAttributesAccessOut
 struct ModifyServerAttributesAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
-        auto accessManager = commonModule->resourceAccessManager();
+        const auto& resPool = systemContext->resourcePool();
+        auto accessManager = systemContext->resourceAccessManager();
         auto server = resPool->getResourceById<QnMediaServerResource>(param.serverId);
         if (server)
         {
@@ -1264,15 +1264,15 @@ struct ModifyServerAttributesAccess
 };
 
 static Result userHasGlobalAccess(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
     GlobalPermission permissions)
 {
     if (hasSystemAccess(accessData))
         return Result();
-    const auto& resPool = commonModule->resourcePool();
+    const auto resPool = systemContext->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (!commonModule->resourceAccessManager()->hasGlobalPermission(userResource, permissions))
+    if (!systemContext->resourceAccessManager()->hasGlobalPermission(userResource, permissions))
     {
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
             "User %1 with %2 permissions has no %3 permissions."),
@@ -1285,19 +1285,19 @@ static Result userHasGlobalAccess(
 }
 
 static Result userHasAccess(
-    QnCommonModule* commonModule,
+    SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
     const QnUuid& targetResourceOrGroupId,
     nx::vms::api::AccessRights requiredAccess)
 {
     if (hasSystemAccess(accessData))
         return Result();
-    const auto& resPool = commonModule->resourcePool();
+    const auto& resPool = systemContext->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
 
     if (auto group = nx::vms::api::specialResourceGroup(targetResourceOrGroupId))
     {
-        if (!commonModule->resourceAccessManager()->hasAccessRights(
+        if (!systemContext->resourceAccessManager()->hasAccessRights(
             userResource, targetResourceOrGroupId, requiredAccess))
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -1314,7 +1314,7 @@ static Result userHasAccess(
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "Resource %1 does not exist."), targetResourceOrGroupId));
         }
-        if (!commonModule->resourceAccessManager()->hasAccessRights(
+        if (!systemContext->resourceAccessManager()->hasAccessRights(
             userResource, targetResource, requiredAccess))
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -1331,10 +1331,10 @@ struct UserInputAccess
 {
     template<typename Event>
     Result operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Event& event)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Event& event)
     {
         // TODO: Check if this requirenment is not too strict.
-        return userHasAccess(commonModule, accessData, nx::vms::api::kAllDevicesGroupId,
+        return userHasAccess(systemContext, accessData, nx::vms::api::kAllDevicesGroupId,
             nx::vms::api::AccessRight::userInput);
     }
 };
@@ -1343,9 +1343,9 @@ struct AdminOnlyAccess
 {
     template<typename Param>
     Result operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userHasGlobalAccess(commonModule, accessData, GlobalPermission::admin);
+        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::admin);
     }
 };
 
@@ -1353,9 +1353,9 @@ struct AdminOnlyAccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userHasGlobalAccess(commonModule, accessData, GlobalPermission::admin)
+        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::admin)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1364,18 +1364,18 @@ struct AdminOnlyAccessOut
 struct SaveUserRoleAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserRoleData& param)
     {
-        if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
+        if (auto r = AdminOnlyAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
                 "Saving Role is forbidden because the user has no admin access.");
             return r;
         }
 
-        auto userRoleManager = commonModule->userRolesManager();
+        auto userRoleManager = systemContext->userRolesManager();
         const auto parentRoles = userRoleManager->userRolesWithParents(param.parentRoleIds);
         if (const auto cycledRole =
             nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
@@ -1405,18 +1405,18 @@ struct SaveUserRoleAccess
 struct RemoveUserRoleAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& param)
     {
-        if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
+        if (auto r = AdminOnlyAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
                 "Removing Role is forbidden because the user has no admin access.");
             return r;
         }
 
-        for (const auto& user: commonModule->resourcePool()->getResources<QnUserResource>())
+        for (const auto& user: systemContext->resourcePool()->getResources<QnUserResource>())
         {
             if (nx::utils::find_if(user->userRoleIds(), [&](const auto& id) { return id == param.id; }))
             {
@@ -1426,7 +1426,7 @@ struct RemoveUserRoleAccess
             }
         }
 
-        for (const auto& role: commonModule->userRolesManager()->userRoles())
+        for (const auto& role: systemContext->userRolesManager()->userRoles())
         {
             if (nx::utils::find_if(role.parentRoleIds, [&](const auto& id) { return id == param.id; }))
             {
@@ -1443,14 +1443,14 @@ struct RemoveUserRoleAccess
 struct ModifyAccessRightsChecker
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::AccessRightsData& param)
     {
         if (hasSystemAccess(accessData))
             return Result();
 
-        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(param.userId);
+        auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(param.userId);
         if (!param.resourceRights.empty())
         {
             if ((param.checkResourceExists == nx::vms::api::CheckResourceExists::customRole)
@@ -1462,18 +1462,18 @@ struct ModifyAccessRightsChecker
             }
         }
 
-        auto accessManager = commonModule->resourceAccessManager();
+        auto accessManager = systemContext->resourceAccessManager();
 
         // CRUD API PATCH merges with existing shared resources so they can be not changed.
         std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights;
         if (user)
         {
             sharedResourceRights =
-                commonModule->sharedResourcesManager()->sharedResourceRights(user);
+                systemContext->sharedResourcesManager()->sharedResourceRights(user);
         }
         else
         {
-            auto role = commonModule->userRolesManager()->userRole(param.userId);
+            auto role = systemContext->userRolesManager()->userRole(param.userId);
             if (role.id.isNull())
             {
                 // We can clear shared Resources even after the User or Role is deleted.
@@ -1488,7 +1488,7 @@ struct ModifyAccessRightsChecker
             else
             {
                 sharedResourceRights =
-                    commonModule->sharedResourcesManager()->sharedResourceRights(role);
+                    systemContext->sharedResourcesManager()->sharedResourceRights(role);
             }
         }
         if (sharedResourceRights == param.resourceRights)
@@ -1503,11 +1503,11 @@ struct ModifyAccessRightsChecker
 struct VideoWallControlAccess
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::VideowallControlMessageData& data)
     {
-        return userHasAccess(commonModule, accessData, data.videowallGuid,
+        return userHasAccess(systemContext, accessData, data.videowallGuid,
             nx::vms::api::AccessRight::view);
     }
 };
@@ -1515,7 +1515,7 @@ struct VideoWallControlAccess
 struct ShowreelAccess
 {
     Result operator()(
-        QnCommonModule* /*commonModule*/,
+        SystemContext*,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ShowreelData& showreel)
     {
@@ -1535,22 +1535,22 @@ struct ShowreelAccess
 struct ShowreelAccessById
 {
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& showreelId)
     {
-        const auto showreel = commonModule->systemContext()->showreelManager()->showreel(
+        const auto showreel = systemContext->showreelManager()->showreel(
             showreelId.id);
         if (!showreel.isValid())
             return Result(); //< Allow everyone to work with tours which are already deleted.
-        return ShowreelAccess()(commonModule, accessData, showreel);
+        return ShowreelAccess()(systemContext, accessData, showreel);
     }
 };
 
 struct InvalidFilterFunc
 {
     template<typename ParamType>
-    void operator()(QnCommonModule*, const Qn::UserAccessData&, ParamType&)
+    void operator()(SystemContext*, const Qn::UserAccessData&, ParamType&)
     {
         NX_ASSERT(false,
             "This transaction (%1) param type doesn't support filtering", typeid(ParamType));
@@ -1562,9 +1562,9 @@ struct AccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param& param)
     {
-        return SingleAccess()(commonModule, accessData, param)
+        return SingleAccess()(systemContext, accessData, param)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1575,32 +1575,32 @@ struct FilterListByAccess
 {
     template<typename ParamContainer>
     void operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
             outList.end(),
-            [&accessData, commonModule](auto& param) -> bool
+            [&accessData, systemContext](auto& param) -> bool
             {
-                return !SingleAccess()(commonModule, accessData, param);
+                return !SingleAccess()(systemContext, accessData, param);
             }),
             outList.end());
     }
 
     void operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::MediaServerDataExList& outList)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, api::MediaServerDataExList& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
             outList.end(),
-            [&accessData, commonModule](const auto& param) -> bool
+            [&accessData, systemContext](const auto& param) -> bool
             {
-                return !SingleAccess()(commonModule, accessData, param);
+                return !SingleAccess()(systemContext, accessData, param);
             }),
             outList.end());
 
         for (auto& i: outList)
-            FilterListByAccess()(commonModule, accessData, i.storages);
+            FilterListByAccess()(systemContext, accessData, i.storages);
 
     }
 };
@@ -1612,14 +1612,14 @@ struct FilterListByAccess<ModifyResourceAccess>
 
     template<typename ParamContainer>
     void operator()(
-        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
+        SystemContext* systemContext, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
             outList.end(),
-            [&accessData, commonModule](const auto& param) -> bool
+            [&accessData, systemContext](const auto& param) -> bool
             {
-                return !ModifyResourceAccess()(commonModule, accessData, param);
+                return !ModifyResourceAccess()(systemContext, accessData, param);
             }),
             outList.end());
     }
@@ -1631,16 +1631,16 @@ struct FilterListByAccess<ModifyResourceParamAccess>
     FilterListByAccess(bool isRemove): isRemove(isRemove) {}
 
     void operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         nx::vms::api::ResourceParamWithRefDataList& outList)
     {
         outList.erase(std::remove_if(
             outList.begin(),
             outList.end(),
-            [&accessData, commonModule, this](const auto& param) -> bool
+            [&accessData, systemContext, this](const auto& param) -> bool
             {
-                return !ModifyResourceParamAccess(isRemove)(commonModule, accessData, param);
+                return !ModifyResourceParamAccess(isRemove)(systemContext, accessData, param);
             }),
             outList.end());
     }
@@ -1653,12 +1653,12 @@ struct ModifyListAccess
 {
     template<typename ParamContainer>
     Result operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
         const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(systemContext, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size())
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -1675,10 +1675,10 @@ template<typename SingleAccess>
 struct ReadListAccess
 {
     template<typename ParamContainer>
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    bool operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(systemContext, accessData, tmpContainer);
         return tmpContainer.size() != paramContainer.size() && tmpContainer.empty();
     }
 };
@@ -1687,10 +1687,10 @@ template<typename SingleAccess>
 struct ReadListAccessOut
 {
     template<typename ParamContainer>
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    RemotePeerAccess operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(systemContext, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size() && tmpContainer.empty())
             return RemotePeerAccess::Forbidden;
         if (tmpContainer.size() == paramContainer.size())
@@ -1702,7 +1702,7 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
+    ec2::TransactionType operator()(SystemContext*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Regular;
     }
@@ -1711,7 +1711,7 @@ struct RegularTransactionType
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
+    ec2::TransactionType operator()(SystemContext*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Local;
     }
@@ -1721,12 +1721,12 @@ template <typename ParamsType>
 struct SetStatusTransactionType
 {
     ec2::TransactionType operator()(
-        QnCommonModule* commonModule,
+        SystemContext* systemContext,
         const ParamsType& params,
         AbstractPersistentStorage* db)
     {
         const auto isServer =
-            [resourcePool = commonModule->resourcePool(), db, &id = params.id]() -> bool
+            [resourcePool = systemContext->resourcePool(), db, &id = params.id]() -> bool
             {
                 if (QnResourcePtr resource = resourcePool->getResourceById<QnResource>(id))
                     return (bool) resource.dynamicCast<QnMediaServerResource>();

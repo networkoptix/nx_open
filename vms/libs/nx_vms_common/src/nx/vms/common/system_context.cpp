@@ -25,6 +25,7 @@
 #include <licensing/license.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
+#include <nx/metrics/metrics_storage.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -66,6 +67,7 @@ struct SystemContext::Private
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
+    std::shared_ptr<nx::metrics::Storage> metrics;
     std::unique_ptr<DeviceLicenseUsageWatcher> deviceLicenseUsageWatcher;
     std::unique_ptr<VideoWallLicenseUsageWatcher> videoWallLicenseUsageWatcher;
 
@@ -135,6 +137,7 @@ SystemContext::SystemContext(
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
         d->analyticsDescriptorContainer.get());
 
+    d->metrics = std::make_shared<nx::metrics::Storage>();
     switch (mode)
     {
         case Mode::client:
@@ -357,6 +360,11 @@ std::shared_ptr<taxonomy::AbstractState> SystemContext::analyticsTaxonomyState()
         return d->analyticsTaxonomyStateWatcher->state();
 
     return nullptr;
+}
+
+std::shared_ptr<nx::metrics::Storage> SystemContext::metrics() const
+{
+    return d->metrics;
 }
 
 SystemContext::Mode SystemContext::mode() const

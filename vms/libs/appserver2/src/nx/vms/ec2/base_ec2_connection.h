@@ -26,10 +26,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 
-#include "ec_connection_audit_manager.h"
 #include "ec_connection_notification_manager.h"
-
-class QnCommonModule;
 
 namespace ec2 {
 
@@ -43,7 +40,7 @@ public:
     BaseEc2Connection(QueryProcessorType* queryProcessor);
     virtual ~BaseEc2Connection();
 
-    void init(QnCommonModule* commonModule, nx::vms::discovery::Manager* discoveryManager);
+    void init(nx::vms::discovery::Manager* discoveryManager);
 
     virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserSession& userSession) override;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserSession& userSession) override;
@@ -107,7 +104,6 @@ public:
 
     QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     virtual ECConnectionNotificationManager* notificationManager() override;
-    virtual ECConnectionAuditManager* auditManager() override { return m_auditManager.get(); }
 
     virtual QnUuid routeToPeerVia(
         const QnUuid& dstPeer,
@@ -133,7 +129,6 @@ protected:
     QnTimeNotificationManagerPtr m_timeNotificationManager;
     AnalyticsNotificationManagerPtr m_analyticsNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
-    std::unique_ptr<ECConnectionAuditManager> m_auditManager;
 };
 
 template<class QueryProcessorType>
@@ -148,9 +143,7 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::init(
-    QnCommonModule* commonModule,
-    nx::vms::discovery::Manager* discoveryManager)
+void BaseEc2Connection<QueryProcessorType>::init(nx::vms::discovery::Manager* discoveryManager)
 {
     m_licenseNotificationManager = std::make_shared<QnLicenseNotificationManager>();
     m_resourceNotificationManager = std::make_shared<QnResourceNotificationManager>();
@@ -187,8 +180,6 @@ void BaseEc2Connection<QueryProcessorType>::init(
         m_miscNotificationManager.get(),
         m_discoveryNotificationManager.get(),
         m_analyticsNotificationManager.get());
-
-    m_auditManager = std::make_unique<ECConnectionAuditManager>(this, commonModule);
 }
 
 template<class QueryProcessorType>

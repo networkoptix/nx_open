@@ -77,11 +77,12 @@ struct GotUnicastTransactionFuction
 // ---------------------- P2pMessageBus --------------
 
 MessageBus::MessageBus(
+    nx::vms::common::SystemContext* systemContext,
     vms::api::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
-:
+    :
     TransactionMessageBusBase(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
@@ -354,7 +355,7 @@ void MessageBus::createOutgoingConnections(
             P2pConnectionPtr connection(new Connection(
                 remoteConnection.adapterFunc,
                 remoteConnection.credentials,
-                commonModule(),
+                systemContext(),
                 remoteConnection.peerId,
                 remoteConnection.peerType,
                 localPeerEx(),
@@ -475,7 +476,6 @@ vms::api::PeerDataEx MessageBus::localPeerEx() const
 
     result.systemId = globalSettings()->localSystemId();
     result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
-    result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx::vms::api::protocolVersion();
@@ -886,7 +886,9 @@ void MessageBus::sendTransactionImpl(
 
     const auto& descriptor = ec2::getTransactionDescriptorByTransaction(srcTran);
     auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
-        commonModule(), connection.staticCast<Connection>()->userAccessData(), srcTran.params);
+        systemContext(),
+        connection.staticCast<Connection>()->userAccessData(),
+        srcTran.params);
     if (remoteAccess == RemotePeerAccess::Forbidden)
     {
         NX_VERBOSE(this, "Permission check failed while sending transaction %1 to peer %2",
@@ -1293,7 +1295,7 @@ bool MessageBus::handlePushTransactionData(
     // Workaround for compatibility with server 3.1/3.2 with p2p mode on
     // It could send subscribeForDataUpdates binary message among json data.
     // TODO: we have to remove this checking in 4.0 because it is fixed on server side.
-    if (localPeerEx().dataFormat == Qn::JsonFormat && !serializedTran.isEmpty()
+    if (localPeer().dataFormat == Qn::JsonFormat && !serializedTran.isEmpty()
         && serializedTran[0] == (quint8)MessageType::subscribeForDataUpdates)
     {
         return true; //< Ignore binary message

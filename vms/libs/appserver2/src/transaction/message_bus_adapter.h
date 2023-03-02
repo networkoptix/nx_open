@@ -4,8 +4,9 @@
 
 #include <QtCore/QThread>
 
-#include "abstract_transaction_message_bus.h"
 #include <nx/p2p/p2p_message_bus.h>
+
+#include "abstract_transaction_message_bus.h"
 
 namespace ec2 {
 
@@ -19,11 +20,12 @@ namespace ec2 {
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
 
-        template <typename MessageBusType>
-        MessageBusType* init(nx::vms::api::PeerType peerType)
+        template <typename MessageBusType, typename SystemContextType>
+        MessageBusType* init(nx::vms::api::PeerType peerType, SystemContextType* systemContext)
         {
             reset();
             m_bus.reset(new MessageBusType(
+                systemContext,
                 peerType,
                 commonModule(),
                 m_jsonTranSerializer,

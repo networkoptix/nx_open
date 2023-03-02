@@ -3,14 +3,14 @@
 #pragma once
 
 #include <nx/network/ssl/helpers.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 #include "p2p_connection_base.h"
 
 namespace nx {
 namespace p2p {
 
-class Connection: public ConnectionBase, public /*mixin*/ QnCommonModuleAware
+class Connection: public ConnectionBase, public /*mixin*/ nx::vms::common::SystemContextAware
 {
 public:
     using ValidateRemotePeerFunc =
@@ -19,7 +19,7 @@ public:
     Connection(
         nx::network::ssl::AdapterFunc adapterFunc,
         std::optional<nx::network::http::Credentials> credentials,
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         const QnUuid& remoteId,
         nx::vms::api::PeerType remotePeerType,
         const vms::api::PeerDataEx& localPeer,
@@ -29,7 +29,7 @@ public:
         ValidateRemotePeerFunc validateRemotePeerFunc);
 
     Connection(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         P2pTransportPtr p2pTransport,
