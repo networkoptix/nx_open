@@ -20,6 +20,13 @@ public:
 
     virtual std::shared_ptr<AbstractState> state() const override;
 
+protected:
+    /** Called in first beginUpdate(). isUpdating is false. */
+    virtual void beforeUpdate() override;
+
+    /** Called in last endUpdate(). isUpdating is false. */
+    virtual void afterUpdate() override;
+
 private:
     nx::vms::api::analytics::Descriptors currentDescriptors() const;
 

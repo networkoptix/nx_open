@@ -5,6 +5,15 @@
 #include <QtCore/QElapsedTimer>
 
 #include <common/common_module.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -16,16 +25,8 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_factory.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/videowall_resource.h>
-#include <core/resource/webpage_resource.h>
 #include <licensing/license.h>
+#include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -61,23 +62,6 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/network/socket_common.h>
-#include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/discovery_data.h>
-#include <nx/vms/api/data/event_rule_data.h>
-#include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/license_data.h>
-#include <nx/vms/api/data/resource_type_data.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/system_context.h>
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <utils/common/synctime.h>
 
 #include "runtime_info_manager.h"
@@ -1019,6 +1003,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
 {
     m_context->resourceAccessManager()->beginUpdate();
     m_context->resourceAccessProvider()->beginUpdate();
+    m_context->analyticsTaxonomyStateWatcher()->beginUpdate();
 
     m_context->serverAdditionalAddressesDictionary()->clear();
 
@@ -1034,6 +1019,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetLicenses(fullData.licenses);
     m_context->layoutTourManager()->resetTours(fullData.layoutTours);
 
+    m_context->analyticsTaxonomyStateWatcher()->endUpdate();
     m_context->resourceAccessProvider()->endUpdate();
     m_context->resourceAccessManager()->endUpdate();
 

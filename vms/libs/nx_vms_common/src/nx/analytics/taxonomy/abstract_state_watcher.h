@@ -5,10 +5,11 @@
 #include <memory>
 
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <utils/common/updatable.h>
 
 namespace nx::analytics::taxonomy {
 
-class NX_VMS_COMMON_API AbstractStateWatcher: public QObject
+class NX_VMS_COMMON_API AbstractStateWatcher: public QObject, public QnUpdatable
 {
     Q_OBJECT
 

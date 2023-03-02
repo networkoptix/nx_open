@@ -24,6 +24,20 @@ StateWatcher::StateWatcher(
         this, &StateWatcher::at_descriptorsUpdated);
 }
 
+void StateWatcher::beforeUpdate()
+{
+    m_taxonomyDescriptorContainer->disconnect(this);
+}
+
+void StateWatcher::afterUpdate()
+{
+    connect(m_taxonomyDescriptorContainer,
+        &DescriptorContainer::descriptorsUpdated,
+        this,
+        &StateWatcher::at_descriptorsUpdated);
+    at_descriptorsUpdated();
+}
+
 std::shared_ptr<AbstractState> StateWatcher::state() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
