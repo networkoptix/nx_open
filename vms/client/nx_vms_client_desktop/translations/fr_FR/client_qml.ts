@@ -158,15 +158,15 @@
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Vérifiez les paramètres d'administration du système pour configurer ce plugin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Ce plugin n'a pas de paramètres au niveau du système.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Ce plugin n'a pas de paramètres pour cette caméra.</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@ pour activer le PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Vous n'avez pas accès à %1. Veuillez vérifier votre connexion Internet.</translation>
     </message>
   </context>
 </TS>

@@ -1587,7 +1587,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>releases.json ファイルの URL を更新</translation>
     </message>
   </context>
   <context>
