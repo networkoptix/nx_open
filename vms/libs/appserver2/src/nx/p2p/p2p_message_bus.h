@@ -6,23 +6,23 @@
 
 #include <QtCore/QTimer>
 
-#include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
-#include <transaction/transaction_message_bus_base.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/tran_state_data.h>
+#include <transaction/amend_transaction_data.h>
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/transaction.h>
+#include <transaction/transaction_descriptor.h>
+#include <transaction/transaction_message_bus_base.h>
+#include <transaction/ubjson_transaction_serializer.h>
+
+#include "connection_context.h"
 #include "p2p_connection.h"
 #include "p2p_fwd.h"
-#include <transaction/transaction.h>
-#include <transaction/ubjson_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-#include <transaction/transaction_descriptor.h>
-#include "routing_helpers.h"
-#include "connection_context.h"
 #include "p2p_serialization.h"
-#include <transaction/amend_transaction_data.h>
-#include <nx/utils/elapsed_timer.h>
-#include <common/common_module.h>
+#include "routing_helpers.h"
 
 namespace nx {
 namespace p2p {
@@ -52,6 +52,7 @@ public:
     const static QString kCloudPathPrefix;
 
     MessageBus(
+        nx::vms::common::SystemContext* systemContext,
         vms::api::PeerType peerType,
         QnCommonModule* commonModule,
         ec2::QnJsonTransactionSerializer* jsonTranSerializer,
@@ -73,7 +74,7 @@ public:
 
     // Self peer information
     vms::api::PeerData localPeer() const;
-    vms::api::PeerDataEx localPeerEx() const;
+    virtual vms::api::PeerDataEx localPeerEx() const;
 
     virtual void start() override;
     virtual void stop() override;

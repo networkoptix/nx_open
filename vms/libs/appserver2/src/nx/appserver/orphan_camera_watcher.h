@@ -2,28 +2,26 @@
 
 #pragma once
 
-#include <QObject>
+#include <chrono>
+#include <set>
+
+#include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-#include <common/common_module_aware.h>
-#include <set>
-#include <chrono>
-
 #include <nx/utils/uuid.h>
-
-class QnCommonModule;
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx {
 namespace appserver {
 
 /** Monitor cameras without parent server and remove them.*/
-class OrphanCameraWatcher : public QObject, public /*mixin*/ QnCommonModuleAware
+class OrphanCameraWatcher: public QObject, public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    using base_type = QnCommonModuleAware;
+    using base_type = QObject;
 
 public:
-    OrphanCameraWatcher(QnCommonModule* commonModule);
+    OrphanCameraWatcher(nx::vms::common::SystemContext* systemContext);
     virtual ~OrphanCameraWatcher() override;
     void start();
     void update();

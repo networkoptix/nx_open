@@ -18,7 +18,6 @@ class QnUserRolesManager;
 class QnCameraHistoryPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
-class QnAuditManager;
 class QnResourceDataPool;
 class QnCommonMessageProcessor;
 
@@ -56,7 +55,6 @@ public:
     QnResourceStatusDictionary* statusDictionary() const;
     nx::vms::common::SystemSettings* globalSettings() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
-    QnAuditManager* auditManager() const;
     QnResourceDataPool* dataPool() const;
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
     QnCommonMessageProcessor* messageProcessor() const;

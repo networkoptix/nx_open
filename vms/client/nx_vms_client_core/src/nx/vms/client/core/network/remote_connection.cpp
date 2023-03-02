@@ -28,12 +28,15 @@ namespace nx::vms::client::core {
  * represent an abstraction layer to send and receive transactions. Managers are using query
  * processor adaptor via this class interface to send actual network requests.
  */
-class MessageBusConnection: public BaseEc2Connection<QueryProcessor>
+class MessageBusConnection:
+    public BaseEc2Connection<QueryProcessor>,
+    public SystemContextAware
 {
     using base_type = BaseEc2Connection<QueryProcessor>;
 
 public:
     MessageBusConnection(
+        SystemContext* systemContext,
         nx::vms::api::PeerType peerType,
         nx::vms::api::ModuleInformation moduleInformation,
         QueryProcessorPtr queryProcessor,
@@ -41,6 +44,7 @@ public:
         nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager)
         :
         base_type(queryProcessor.get()),
+        SystemContextAware(systemContext),
         m_peerType(peerType),
         m_moduleInformation(moduleInformation),
         m_messageBus(messageBus),
@@ -57,7 +61,7 @@ public:
             .setEndpoint(address)
             .toUrl();
 
-        m_messageBus->init<nx::p2p::MessageBus>(m_peerType);
+        m_messageBus->init<nx::p2p::MessageBus>(m_peerType, systemContext());
         m_messageBus->setHandler(notificationManager());
 
         NX_VERBOSE(this, "Start receiving notifications from %1 (%2)",
@@ -243,12 +247,13 @@ void RemoteConnection::initializeMessageBusConnection(
         d->jsonTranSerializer.get(),
         d->ubjsonTranSerializer.get());
     d->messageBusConnection = std::make_shared<MessageBusConnection>(
+        systemContext,
         d->peerType,
         d->moduleInformation,
         d->queryProcessor,
         d->messageBus.get(),
         d->timeSynchronizationManager);
-    d->messageBusConnection->init(commonModule, appContext()->moduleDiscoveryManager());
+    d->messageBusConnection->init(appContext()->moduleDiscoveryManager());
 }
 
 const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() const

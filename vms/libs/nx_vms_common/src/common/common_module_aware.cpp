@@ -119,11 +119,6 @@ nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
         : nullptr;
 }
 
-QnAuditManager* QnCommonModuleAware::auditManager() const
-{
-    return NX_ASSERT(m_commonModule) ? m_commonModule->auditManager() : nullptr;
-}
-
 QnResourceDataPool* QnCommonModuleAware::dataPool() const
 {
     return NX_ASSERT(m_commonModule)

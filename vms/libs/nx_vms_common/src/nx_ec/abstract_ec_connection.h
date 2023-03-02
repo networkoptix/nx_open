@@ -23,15 +23,14 @@
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
 
-#include "ec_api_fwd.h"
 #include "ec_api_common.h"
+#include "ec_api_fwd.h"
 
 namespace ec2 {
 
 class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
 class QnAbstractTransactionTransport;
-class ECConnectionAuditManager;
 
 /*!
     \note All methods are asynchronous if other not specified
@@ -121,8 +120,6 @@ public:
     virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() = 0;
     virtual AbstractVmsRulesNotificationManagerPtr vmsRulesNotificationManager() = 0;
     virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
-
-    virtual ECConnectionAuditManager* auditManager() = 0;
 
     virtual QnUuid routeToPeerVia(
         const QnUuid& dstPeer,

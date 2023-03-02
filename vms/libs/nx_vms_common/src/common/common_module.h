@@ -11,7 +11,6 @@
 #include <utils/common/instance_storage.h>
 
 class QSettings;
-class QnAuditManager;
 
 namespace nx::vms::common {
 
@@ -50,20 +49,6 @@ public:
 
     nx::vms::common::SystemContext* systemContext() const;
 
-    /*
-    * This timestamp is using for database backup/restore operation.
-    * Server has got systemIdentity time after DB restore operation
-    * This time help pushing database from current server to all others
-    */
-    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
-    qint64 systemIdentityTime() const;
-
-    nx::metrics::Storage* metrics() const;
-    std::weak_ptr<nx::metrics::Storage> metricsWeakRef() const;
-
-    void setAuditManager(QnAuditManager* auditManager);
-    QnAuditManager* auditManager() const;
-
     //---------------------------------------------------------------------------------------------
     // Temporary methods for the migration simplification.
     nx::vms::common::AbstractCertificateVerifier* certificateVerifier() const;
@@ -85,16 +70,11 @@ public:
     QnResourceDataPool* resourceDataPool() const;
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
     QnCommonMessageProcessor* messageProcessor() const;
+    nx::metrics::Storage* metrics() const;
+    std::weak_ptr<nx::metrics::Storage> metricsWeakRef() const;
     //---------------------------------------------------------------------------------------------
-
-signals:
-    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
-    std::shared_ptr<nx::metrics::Storage> m_metrics;
-    qint64 m_systemIdentityTime = 0;
-
-    QnAuditManager* m_auditManager = nullptr;
 };

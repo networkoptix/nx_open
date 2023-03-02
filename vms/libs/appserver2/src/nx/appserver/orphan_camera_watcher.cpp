@@ -1,21 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "nx/appserver/orphan_camera_watcher.h"
+#include "orphan_camera_watcher.h"
 
 #include <algorithm>
 #include <chrono>
 
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_camera_manager.h>
-
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/kit/debug.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 namespace nx {
 namespace appserver {
@@ -23,9 +21,8 @@ namespace appserver {
 using namespace std::literals::chrono_literals;
 static const std::chrono::milliseconds kDefaultUpdateInterval = 15min;
 
-OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
-    :
-    base_type(commonModule),
+OrphanCameraWatcher::OrphanCameraWatcher(nx::vms::common::SystemContext* systemContext):
+    SystemContextAware(systemContext),
     m_updateInterval(kDefaultUpdateInterval)
 {
     qRegisterMetaType<std::chrono::milliseconds>();
@@ -66,7 +63,7 @@ void OrphanCameraWatcher::start()
 
 void OrphanCameraWatcher::update()
 {
-    auto connectionPtr = ec2Connection();
+    auto connectionPtr = systemContext()->ec2Connection();
     if (!connectionPtr)
         return;
 

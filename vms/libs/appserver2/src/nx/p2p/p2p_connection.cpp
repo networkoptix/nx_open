@@ -3,17 +3,16 @@
 #include "p2p_connection.h"
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/abstract_ec_connection.h>
 
 namespace nx {
 namespace p2p {
@@ -21,7 +20,7 @@ namespace p2p {
 Connection::Connection(
     nx::network::ssl::AdapterFunc adapterFunc,
     std::optional<nx::network::http::Credentials> credentials,
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     const QnUuid& remoteId,
     nx::vms::api::PeerType remotePeerType,
     const vms::api::PeerDataEx& localPeer,
@@ -35,11 +34,11 @@ Connection::Connection(
         remotePeerType,
         localPeer,
         remotePeerUrl,
-        commonModule->globalSettings()->aliveUpdateInterval(),
+        systemContext->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject),
         std::move(adapterFunc),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
-    QnCommonModuleAware(commonModule),
+    nx::vms::common::SystemContextAware(systemContext),
     m_validateRemotePeerFunc(std::move(validateRemotePeerFunc)),
     m_credentials(std::move(credentials))
 {
@@ -65,7 +64,7 @@ Connection::Connection(
 }
 
 Connection::Connection(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
     P2pTransportPtr p2pTransport,
@@ -83,16 +82,16 @@ Connection::Connection(
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard)),
         pingSupported),
-    QnCommonModuleAware(commonModule),
+    nx::vms::common::SystemContextAware(systemContext),
     m_userAccessData(userAccessData)
 {
-    commonModule->metrics()->tcpConnections().p2p()++;
+    systemContext->metrics()->tcpConnections().p2p()++;
 }
 
 Connection::~Connection()
 {
     if (m_direction == Direction::incoming)
-        commonModule()->metrics()->tcpConnections().p2p()--;
+        systemContext()->metrics()->tcpConnections().p2p()--;
     pleaseStopSync();
 }
 
