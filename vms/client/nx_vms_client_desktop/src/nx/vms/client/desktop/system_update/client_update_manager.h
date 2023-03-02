@@ -9,13 +9,18 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/software_version.h>
 
+class QnUuid;
+
+namespace nx::vms::common::update { struct Information; }
+
 namespace nx::vms::client::desktop {
 
 namespace workbench { class LocalNotificationsManager; }
+
 /**
  * Client-only auto-update manager.
  */
-class ClientUpdateManager: public QObject
+class NX_VMS_CLIENT_DESKTOP_API ClientUpdateManager: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool clientUpdateEnabled READ clientUpdateEnabled WRITE setClientUpdateEnabled
@@ -43,6 +48,17 @@ public:
     Q_INVOKABLE void speedUpCurrentUpdate();
     Q_INVOKABLE bool isPlannedUpdateDatePassed() const;
     Q_INVOKABLE QUrl releaseNotesUrl() const;
+
+    struct UpdateDate
+    {
+        std::chrono::milliseconds date;
+        std::chrono::milliseconds shift;
+    };
+    static UpdateDate calculateUpdateDate(
+        std::chrono::milliseconds currentDateTime,
+        const common::update::Information& updateInfo,
+        const QnUuid& localSystemId,
+        std::chrono::milliseconds minimumAllowedUpdateDate);
 
 signals:
     void clientUpdateEnabledChanged();
