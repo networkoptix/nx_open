@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/algorithm/diff_sorted_lists.h>
@@ -72,6 +73,23 @@ struct GroupSettingsDialog::Private
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         self(q->rootObjectHolder(), "self")
     {
+    }
+
+    bool hasCycles(const GroupSettingsDialogState& state)
+    {
+        QSet<QnUuid> directParents;
+        for (const auto& group: state.parentGroups)
+            directParents.insert(group.id);
+
+        const auto allParents =
+            q->systemContext()->accessSubjectHierarchy()->recursiveParents(directParents)
+            + directParents;
+
+        if (allParents.contains(state.groupId))
+            return true;
+
+        return std::any_of(state.groups.begin(), state.groups.end(),
+            [&allParents](const auto& id){ return allParents.contains(id); });
     }
 };
 
@@ -349,6 +367,12 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     groupData.parentGroupIds.clear();
     for (const auto& group: state.parentGroups)
         groupData.parentGroupIds.push_back(group.id);
+
+    if (d->hasCycles(state))
+    {
+        // TODO: show a banner about cycles.
+        return;
+    }
 
     groupData.permissions = state.globalPermissions;
 
