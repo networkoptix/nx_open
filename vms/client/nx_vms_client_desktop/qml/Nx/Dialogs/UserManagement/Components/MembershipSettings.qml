@@ -54,6 +54,8 @@ Item
         property string text: ""
         property string description: ""
 
+        property bool cycle: false
+
         readonly property bool selected: groupMouseArea.containsMouse || groupCheckbox.checked
         readonly property color selectedColor: selected
             ? ColorTheme.colors.light4
@@ -146,7 +148,7 @@ Item
                 Layout.leftMargin: 2
 
                 font: Qt.font({pixelSize: 12, weight: Font.Normal})
-                color: checkableItem.selectedColor
+                color: checkableItem.cycle ? ColorTheme.colors.red_core : checkableItem.selectedColor
                 elide: Text.ElideRight
 
                 textFormat: Text.StyledText
@@ -221,6 +223,7 @@ Item
                 width: parent ? parent.width : 0
                 text: model.text
                 description: model.description
+                cycle: model.cycle
             }
 
             hoverHighlightColor: "transparent"

@@ -102,6 +102,7 @@ public:
         IsLdap,
         MemberSectionRole, //< IsUserRole ? "U" : "G"
         GroupSectionRole, // Built-in? "B" : "C"
+        Cycle,
     };
 
     MembersModel();
@@ -170,6 +171,8 @@ private:
 
     void subscribeToUser(const QnUserResourcePtr& user);
 
+    void checkCycles();
+
 private:
     QScopedPointer<AccessSubjectEditingContext> m_subjectContext;
 
@@ -181,6 +184,7 @@ private:
     MembersCache::Members m_subjectMembers; //< Sorted by id so states can be matched.
 
     QScopedPointer<MembersCache> m_cache;
+    QSet<QnUuid> m_groupsWithCycles;
 };
 
 } // namespace nx::vms::client::desktop
