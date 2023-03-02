@@ -2,8 +2,8 @@
 
 #include "client_update_manager.h"
 
-#include <future>
 #include <chrono>
+#include <future>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimer>
@@ -27,13 +27,13 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/synctime.h>
 
 #include "client_update_tool.h"
-#include "update_verification.h"
 #include "requests.h"
+#include "update_verification.h"
 
 using namespace std::chrono;
 using namespace nx::vms::common;
@@ -463,91 +463,18 @@ void ClientUpdateManager::Private::planUpdate()
         return;
     }
 
-    const auto isSuitableDay = [](int day) { return day <= Qt::Wednesday || day == Qt::Sunday; };
-
-    const auto now = qnSyncTime->value();
-    updateDateTimeShift = milliseconds(
-        nx::utils::random::number<long>(0, kClientUpdateRolloutPeriod.count()));
-
     milliseconds kUpdatesProhibitedSinceActivationPeriod = 24h;
     const auto updateAllowedSince = globalClientUpdateSettings().updateEnabledTimestamp
         + kUpdatesProhibitedSinceActivationPeriod;
 
-    milliseconds startOfDeliveryPeriod = updateContents.info.releaseDate;
-    milliseconds endOfDeliveryPeriod =
-        startOfDeliveryPeriod + updateContents.info.releaseDeliveryDays * 24h;
+    const UpdateDate plannedDate = calculateUpdateDate(
+        qnSyncTime->value(),
+        updateContents.info,
+        systemSettings()->localSystemId(),
+        updateAllowedSince);
 
-    if (endOfDeliveryPeriod < now) //< Update rollout period has already passed.
-    {
-        const milliseconds updateDate = std::max(now, updateAllowedSince);
-        QDate date = QDateTime::fromMSecsSinceEpoch(updateDate.count()).date();
-        if (const auto dayOfWeek = date.dayOfWeek(); isSuitableDay(dayOfWeek))
-        {
-            generatedUpdateDateTime = updateDate;
-            updateDateTimeShift = 0ms;
-        }
-        else
-        {
-            date = date.addDays(Qt::Sunday - dayOfWeek);
-            generatedUpdateDateTime = milliseconds(date.startOfDay(Qt::UTC).toMSecsSinceEpoch());
-        }
-        NX_VERBOSE(this,
-            "planUpdate(): Update rollout period has already passed. Update planned to %1.",
-            QDateTime::fromMSecsSinceEpoch(generatedUpdateDateTime.count()));
-        return;
-    }
-
-    startOfDeliveryPeriod = std::max(startOfDeliveryPeriod, updateAllowedSince);
-    endOfDeliveryPeriod = std::max(startOfDeliveryPeriod, endOfDeliveryPeriod);
-
-    QRandomGenerator64 randomGenerator =
-        getRandomGenerator(systemSettings()->localSystemId(), updateContents.info.version);
-
-    generatedUpdateDateTime = milliseconds(nx::utils::random::number(
-       randomGenerator,
-       startOfDeliveryPeriod.count(),
-       (endOfDeliveryPeriod - kClientUpdateRolloutPeriod).count()));
-
-    if (const QDate date = QDateTime::fromMSecsSinceEpoch(generatedUpdateDateTime.count()).date();
-        !isSuitableDay(date.dayOfWeek()))
-    {
-        // Pick a random suitable day in the current or next week.
-
-        constexpr int kChoiceDays = 6;
-
-        std::vector<QDate> days;
-        days.reserve(2 * kChoiceDays);
-
-        for (int i = -kChoiceDays; i <= kChoiceDays; ++i)
-        {
-            const auto day = date.addDays(i);
-            if (isSuitableDay(day.dayOfWeek())
-                && day.endOfDay().toMSecsSinceEpoch() > startOfDeliveryPeriod.count()
-                && day.startOfDay().toMSecsSinceEpoch() < endOfDeliveryPeriod.count())
-            {
-                days.push_back(day);
-            }
-        }
-
-        // Pick the next suitable day if there are no suitable days in the rollout period.
-        for (auto day = date.addDays(1); days.empty(); day = day.addDays(1))
-        {
-            if (isSuitableDay(day.dayOfWeek()))
-                days.push_back(day);
-        }
-
-        // Pick a time point in the chosen day.
-        const auto day = days[randomGenerator.bounded((int) days.size())];
-        generatedUpdateDateTime = milliseconds(nx::utils::random::number(
-            randomGenerator,
-            std::max<qint64>(
-                startOfDeliveryPeriod.count(), day.startOfDay().toMSecsSinceEpoch()),
-            day.endOfDay().toMSecsSinceEpoch() - kClientUpdateRolloutPeriod.count()));
-    }
-
-    NX_VERBOSE(this,
-        "planUpdate(): Update planned to %1.",
-        QDateTime::fromMSecsSinceEpoch(generatedUpdateDateTime.count()));
+    generatedUpdateDateTime = plannedDate.date;
+    updateDateTimeShift = plannedDate.shift;
     emit q->plannedUpdateDateChanged();
 }
 
@@ -823,6 +750,130 @@ bool ClientUpdateManager::isPlannedUpdateDatePassed() const
 QUrl ClientUpdateManager::releaseNotesUrl() const
 {
     return d->updateContents.info.releaseNotesUrl;
+}
+
+ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
+    milliseconds currentDateTime,
+    const common::update::Information& updateInfo,
+    const QnUuid& localSystemId,
+    milliseconds minimumAllowedUpdateDate)
+{
+    // IMPORTANT! This function must generate the same timestamp on all Clients in the system
+    // independently on the Client timezone. Thus all QDateTime <-> std::chrono conversion calls
+    // must be done with Qt::UTC timezone specification.
+
+    const auto isSuitableDay =
+        [](const QDate& day)
+        {
+            return day.dayOfWeek() <= Qt::Wednesday || day.dayOfWeek() == Qt::Sunday;
+        };
+
+    const auto qdt =
+        [](milliseconds ts) { return QDateTime::fromMSecsSinceEpoch(ts.count(), Qt::UTC); };
+
+    QRandomGenerator64 randomGenerator = getRandomGenerator(localSystemId, updateInfo.version);
+
+    const milliseconds endOfDeliveryPeriod =
+        updateInfo.releaseDate + updateInfo.releaseDeliveryDays * 24h;
+    const milliseconds minDate =
+        std::max(std::max(updateInfo.releaseDate, minimumAllowedUpdateDate), currentDateTime);
+    const milliseconds maxDate = std::max(minDate, endOfDeliveryPeriod);
+
+    NX_VERBOSE(typeid(ClientUpdateManager),
+        "calculatePlannedUpdateDate(): Planning update date. "
+            "Now: %1, release date: %2, delivery days: %3, minimum allowed date: %4, "
+            "end of delivery: %5, min date: %6, max date: %7",
+        qdt(currentDateTime),
+        qdt(updateInfo.releaseDate),
+        updateInfo.releaseDeliveryDays,
+        qdt(minimumAllowedUpdateDate),
+        qdt(endOfDeliveryPeriod),
+        qdt(minDate),
+        qdt(maxDate));
+
+    QDate date;
+
+    if (endOfDeliveryPeriod <= currentDateTime) //< Update rollout period has already passed.
+    {
+        date = qdt(minDate).date();
+        if (!isSuitableDay(date))
+            date = date.addDays(Qt::Sunday - date.dayOfWeek());
+
+        NX_DEBUG(typeid(ClientUpdateManager),
+            "calculatePlannedUpdateDate(): Update rollout period has already passed. "
+                "Period ended at %1, now: %2",
+            endOfDeliveryPeriod,
+            qdt(currentDateTime));
+    }
+    else
+    {
+        date = qdt(milliseconds(nx::utils::random::number(
+            randomGenerator, minDate.count(), maxDate.count()))).date();
+
+        if (!isSuitableDay(date))
+        {
+            // Pick a random suitable day in the current or next week.
+
+            constexpr int kChoiceDays = 6;
+
+            std::vector<QDate> days;
+            days.reserve(2 * kChoiceDays);
+
+            for (int i = -kChoiceDays; i <= kChoiceDays; ++i)
+            {
+                const auto day = date.addDays(i);
+                if (isSuitableDay(day)
+                    && day.endOfDay(Qt::UTC).toMSecsSinceEpoch() > minDate.count()
+                    && day.startOfDay(Qt::UTC).toMSecsSinceEpoch() < maxDate.count())
+                {
+                    days.push_back(day);
+                }
+            }
+
+            // Pick the next suitable day if there are no suitable days in the rollout period.
+            for (auto day = date.addDays(1); days.empty(); day = day.addDays(1))
+            {
+                if (isSuitableDay(day))
+                    days.push_back(day);
+            }
+
+            date = days[randomGenerator.bounded((int) days.size())];
+        }
+    }
+
+    NX_VERBOSE(typeid(ClientUpdateManager), "calculatePlannedUpdateDate(): Picked date: %1", date);
+
+    UpdateDate plannedDate;
+
+    const milliseconds minStartTime =
+        std::max(minDate, milliseconds(date.startOfDay(Qt::UTC).toMSecsSinceEpoch()));
+    const milliseconds maxStartTime = std::max(
+        minStartTime, std::min(maxDate, milliseconds(date.endOfDay(Qt::UTC).toMSecsSinceEpoch())));
+    const milliseconds maxRolloutStartTime =
+        std::max(minStartTime, maxStartTime - kClientUpdateRolloutPeriod);
+    const milliseconds localShiftWindow = maxStartTime - maxRolloutStartTime;
+
+    NX_VERBOSE(typeid(ClientUpdateManager),
+        "calculatePlannedUpdateDate(): min start time: %1, max start time: %2, "
+            "max rollout start time: %3, local shift window: %4",
+        qdt(minStartTime),
+        qdt(maxStartTime),
+        qdt(maxRolloutStartTime),
+        localShiftWindow);
+
+    // Pick a time point in the chosen day.
+    plannedDate.date = milliseconds(nx::utils::random::number(
+        randomGenerator, minStartTime.count(), maxRolloutStartTime.count()));
+    plannedDate.shift = milliseconds(nx::utils::random::number<long>(0, localShiftWindow.count()));
+
+    NX_DEBUG(typeid(ClientUpdateManager),
+        "calculatePlannedUpdateDate(): Update planned to %1. Local shift: %2. "
+            "This client will start installation at %3",
+        qdt(plannedDate.date),
+        plannedDate.shift,
+        qdt(plannedDate.date + plannedDate.shift));
+
+    return plannedDate;
 }
 
 } // namespace nx::vms::client::desktop
