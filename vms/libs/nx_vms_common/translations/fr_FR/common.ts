@@ -1153,7 +1153,7 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Paramètre invalide `%1`: %2.</translation>
     </message>
   </context>
   <context>
@@ -1570,72 +1570,72 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Activer la politique inter-domaine</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>Activer WebSocket pour P2P</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>Afficher les serveurs dans l'arborescence des ressources pour les non-administrateurs</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Utiliser uniquement HTTPS pour les caméras</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+      <translation>Activer les fonctions API obsolètes (non sécurisées)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+      <translation>Activer les fonctions API obsolètes actuellement utilisées par le logiciel %1 (non sécurisées)</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Exposer les adresses IP pour la découverte automatique</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Garder l'état du port IO activé lorsque le serveur se connecte au périphérique</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Taille du tampon multimédia pour les périphériques audio uniquement (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>Activer l'A2F pour le Système</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>Exposer les mots de passe de l'appareil stockés dans VMS pour les administrateurs (pour les pages web)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Nombre maximum de threads pour la synchronisation d'archives distantes (&lt;=0 - auto, max 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>Limite du nombre de threads pour la synchronisation des archives de la caméra</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Nombre maximum d'enregistrements de journaux d'événements à conserver dans la base de données. Le nombre réel d'enregistrements non supprimés peut être jusqu'à 20% supérieur à la valeur spécifiée.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Indique s'il faut ou non mettre en cache certaines images pour le flux principal. Valeurs : &apos;oui&apos; - toujours activé (peut utiliser beaucoup de RAM), &apos;non&apos; - toujours désactivé sauf lorsque requis par la lecture (par exemple HLS), &apos;auto&apos; - similaire à &apos;non&apos;, mais activé lors de l'amélioration de la l'expérience utilisateur (par exemple, lorsqu'un plug-in Analytics fonctionne sur la caméra).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Quantité maximale de connexions HTTP utilisant le transcodage pour le serveur. Chrome ouvre 2 connexions à la fois, puis ferme la première. Nous recommandons de régler la valeur&apos;s de ce paramètre sur 2 ou plus.</translation>
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>Mettre à jour l'URL du fichier releases.json</translation>
     </message>
   </context>
   <context>
@@ -2261,11 +2261,11 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>Afficher l'informateur d'interphone</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Faire une requête HTTP(S)</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -2281,31 +2281,31 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>Impossible de forcer l'utilisation du temps de la caméra, car il est trop lent. L'heure du système sera utilisée à la place.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Erreur de stockage des analytiques &quot;%1&quot; base de données : permissions insuffisantes sur le point de montage.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Impossible d'initialiser le chiffrement AES lorsque l'enregistrement est activé dans l'archive média. Les données sont écrites non chiffrées.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Erreur RAID : %1.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les appareils suivants :</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les caméras suivantes:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les modules d'E/S suivants :</translation>
     </message>
   </context>
   <context>

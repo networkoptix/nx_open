@@ -5405,11 +5405,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Brukes til å lagre analyser og bevegelsesdata</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Lagrer analyser og bevegelsesdata</translation>
     </message>
   </context>
   <context>
@@ -7371,7 +7371,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>Fremdriften vil vises når sikkerhetskopieringsprosessen starter</translation>
     </message>
   </context>
   <context>
@@ -7518,7 +7518,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <translation>Video tatt opp på det interne kameraet&apos; lagring vil ikke automatisk lastes opp til hovedarkivet.</translation>
     </message>
   </context>
   <context>

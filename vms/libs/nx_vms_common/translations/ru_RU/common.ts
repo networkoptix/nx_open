@@ -1725,7 +1725,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>Обновить URL файла releases.json</translation>
     </message>
   </context>
   <context>
