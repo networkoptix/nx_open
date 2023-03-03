@@ -5,8 +5,6 @@
 #include <string>
 #include <string_view>
 
-#include <QtCore/QByteArray>
-#include <QtCore/QDataStream>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
@@ -122,7 +120,7 @@ NX_UTILS_API QString changedGuidByteOrder(const QString& guid);
 using QnUuidSet = QSet<QnUuid>;
 using QnUuidList = QList<QnUuid>;
 
-NX_UTILS_API size_t qHash(const QnUuid& uuid, size_t seed = 0 ) throw();
+NX_UTILS_API size_t qHash(const QnUuid& uuid, size_t seed = 0 ) noexcept;
 NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
 NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);

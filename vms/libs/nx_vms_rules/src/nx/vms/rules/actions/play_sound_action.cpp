@@ -16,6 +16,7 @@ const ItemDescriptor& PlaySoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PlaySoundAction>(),
         .displayName = tr("Play sound"),
+        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),

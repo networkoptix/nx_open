@@ -109,6 +109,7 @@ private:
     void setAggregationInterval(std::chrono::microseconds interval);
     Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
     ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
+    const Engine* engine() const;
 
     QnUuid m_id;
     QString m_actionType;

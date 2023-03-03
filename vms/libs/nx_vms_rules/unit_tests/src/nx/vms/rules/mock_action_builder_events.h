@@ -35,10 +35,14 @@ private:
     {
         actionReceived();
 
+        if (const auto prop = action->property(utils::kUsersFieldName);
+            prop.canConvert<UuidSelection>())
+        {
+            targetedUsers(prop.value<UuidSelection>());
+        }
+
         if (auto targetedAction = action.dynamicCast<TestActionWithTargetUsers>())
         {
-            targetedUsers(targetedAction->m_users);
-
             if (!targetedAction->m_cameraId.isNull())
                 targetedCameraId(targetedAction->m_cameraId);
 

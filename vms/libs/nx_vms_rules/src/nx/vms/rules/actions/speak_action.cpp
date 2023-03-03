@@ -16,6 +16,7 @@ const ItemDescriptor& SpeakAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SpeakAction>(),
         .displayName = tr("Speak"),
+        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),

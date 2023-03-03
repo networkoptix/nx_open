@@ -40,6 +40,11 @@ AnalyticsEvent::AnalyticsEvent(
     setState(state);
 }
 
+QString AnalyticsEvent::subtype() const
+{
+    return eventTypeId();
+}
+
 QString AnalyticsEvent::resourceKey() const
 {
     return utils::makeName(

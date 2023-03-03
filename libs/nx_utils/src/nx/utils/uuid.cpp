@@ -3,8 +3,10 @@
 #include "uuid.h"
 
 #include <type_traits>
+
+#include <QtCore/QCryptographicHash>
+
 #include <nx/utils/log/assert.h>
-#include <QCryptographicHash>
 
 QnUuid::QnUuid()
 {
@@ -224,7 +226,7 @@ QString changedGuidByteOrder(const QString& guid)
 
 } // namespace nx::utils
 
-size_t qHash(const QnUuid& uuid, size_t seed) throw()
+size_t qHash(const QnUuid& uuid, size_t seed) noexcept
 {
     return qHash(uuid.getQUuid()) ^ seed;
 }

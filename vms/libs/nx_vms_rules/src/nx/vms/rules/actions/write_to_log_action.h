@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_action.h>
+#include "../basic_action.h"
+#include "../data_macros.h"
 
 namespace nx::vms::rules {
 
@@ -10,6 +11,11 @@ class NX_VMS_RULES_API WriteToLogAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.writeToLog")
+
+    FIELD(std::chrono::microseconds, interval, setInterval)
+
+public:
+    static const ItemDescriptor& manifest();
 };
 
 } // namespace nx::vms::rules

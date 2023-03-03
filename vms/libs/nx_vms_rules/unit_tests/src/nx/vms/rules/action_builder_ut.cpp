@@ -58,7 +58,15 @@ public:
     {
         registerEvent<ServerStartedEvent>();
         registerEvent<ServerFailureEvent>();
-        mockRule = std::make_unique<Rule>(QnUuid(), engine.get());
+
+        m_engine->registerActionField(
+            fieldMetatype<TargetUserField>(),
+            [this] { return new TargetUserField(context()->systemContext()); });
+
+        registerAction<TestActionWithTargetUsers>();
+        registerAction<TestActionForUserAndServer>();
+
+        mockRule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
     }
 
     QSharedPointer<ActionBuilder> makeSimpleBuilder() const
@@ -127,10 +135,11 @@ public:
         event->m_deviceIds = deviceIds;
         return event;
     }
+protected:
+    std::unique_ptr<Rule> mockRule;
 
 private:
     QnSyncTime syncTime;
-    std::unique_ptr<Rule> mockRule;
 };
 
 TEST_F(ActionBuilderTest, builderWithoutTargetUserFieldProduceOnlyOneAction)
@@ -440,6 +449,30 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
         new ServerStartedEvent(0ms, QnUuid()))));
     builder->process(AggregatedEventPtr::create(EventPtr(
         new ServerFailureEvent(0ms, QnUuid(), nx::vms::api::EventReason::none))));
+}
+
+TEST_F(ActionBuilderTest, clientAndServerAction)
+{
+    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
+
+    UuidSelection selection{
+        .ids = {user->getId()},
+        .all = false};
+
+    auto builder = engine->buildActionBuilder(TestActionForUserAndServer::manifest().id);
+    builder->setRule(mockRule.get());
+
+    auto userField = builder->fieldByName<TargetUserField>(utils::kUsersFieldName);
+    userField->setIds(selection.ids);
+
+    MockActionBuilderEvents mock{builder.get()};
+
+    // Expecting two action copies. One for target user and one for server processing.
+    EXPECT_CALL(mock, actionReceived()).Times(2);
+    EXPECT_CALL(mock, targetedUsers(selection)).Times(1);
+    EXPECT_CALL(mock, targetedUsers(UuidSelection())).Times(1);
+
+    builder->process(makeSimpleEvent());
 }
 
 TEST_F(ActionBuilderTest, builderWithoutIntervalNotAggregatesEvents)

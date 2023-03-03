@@ -6,13 +6,16 @@
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_user_field.h>
+
+#include "test_field.h"
 
 namespace nx::vms::rules::test {
 
 class TestAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.testAction")
+    Q_CLASSINFO("type", "nx.actions.test.instant")
 };
 
 class TestProlongedAction: public nx::vms::rules::BasicAction
@@ -27,7 +30,7 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestProlongedAction>(),
-            .displayName = "Test prolonged event",
+            .displayName = "Test prolonged action",
             .flags = ItemFlag::prolonged,
             .fields = {
                 makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, "Cameras")},
@@ -48,9 +51,45 @@ class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
     Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
 
 public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionWithTargetUsers>(),
+            .displayName = "Test action with users",
+            .flags = ItemFlag::instant,
+            .fields = {
+                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
+        };
+    }
+
+public:
     nx::vms::rules::UuidSelection m_users;
     QnUuid m_cameraId;
     QnUuidList m_deviceIds;
+};
+
+
+class TestActionForUserAndServer: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.user&server")
+
+    Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionForUserAndServer>(),
+            .displayName = "Test action for user & server",
+            .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
+            .fields = {
+                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users")},
+        };
+    }
+
+public:
+    nx::vms::rules::UuidSelection m_users;
 };
 
 } // namespace nx::vms::rules::test

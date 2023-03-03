@@ -18,7 +18,15 @@ namespace nx::vms::rules {
 
 NX_REFLECTION_ENUM_CLASS(ItemFlag,
     instant = 1 << 0,
-    prolonged = 1 << 1
+    prolonged = 1 << 1,
+
+    /**
+    * Separate action copies with different resources (filtered according to user permissions)
+    * may be created for different target users. One action copy without any filtration,
+    * containing all of the resources and no target users may be needed for server processing.
+    * The flag marks actions requiring such separate copy.
+    */
+    executeOnClientAndServer = 1 << 2
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

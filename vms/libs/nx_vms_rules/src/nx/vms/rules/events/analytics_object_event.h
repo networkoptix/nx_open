@@ -29,6 +29,7 @@ public:
         QnUuid objectTrackId,
         const nx::common::metadata::Attributes& attributes);
 
+    virtual QString subtype() const override;
     virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;
     virtual QString aggregationKey() const override;

@@ -458,7 +458,11 @@ EventPtr Engine::cloneEvent(const EventPtr& event) const
     if (!NX_ASSERT(event))
         return {};
 
-    auto result = EventPtr(m_eventTypes[event->type()]());
+    auto ctor = m_eventTypes.value(event->type());
+    if (!NX_ASSERT(ctor))
+        return {};
+
+    auto result = EventPtr(ctor());
     for (const auto& propName:
         nx::utils::propertyNames(event.get(), nx::utils::PropertyAccess::fullAccess))
     {
@@ -473,7 +477,11 @@ ActionPtr Engine::cloneAction(const ActionPtr& action) const
     if (!NX_ASSERT(action))
         return {};
 
-    auto result = ActionPtr(m_actionTypes[action->type()]());
+    auto ctor = m_actionTypes.value(action->type());
+    if (!NX_ASSERT(ctor))
+        return {};
+
+    auto result = ActionPtr(ctor());
     for (const auto& propName:
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::fullAccess))
     {

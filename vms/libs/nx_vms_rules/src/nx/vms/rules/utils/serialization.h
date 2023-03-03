@@ -14,4 +14,6 @@ NX_VMS_RULES_API void deserializeProperties(
     const QMap<QString, QJsonValue>& propMap,
     QObject* object);
 
+NX_VMS_RULES_API QByteArray serialized(const QObject* object);
+
 } // namespace nx::vms::rules

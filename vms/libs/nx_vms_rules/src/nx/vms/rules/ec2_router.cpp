@@ -72,7 +72,7 @@ void Ec2Router::routeEvent(
 
     for (const auto ruleId: triggeredRules)
     {
-        info.id = ruleId;
+        info.ruleId = ruleId;
 
         if (nx::vms::rules::ini().fullSupport)
         {
@@ -88,8 +88,7 @@ void Ec2Router::routeEvent(
 
 void Ec2Router::onEventReceived(const nx::vms::api::rules::EventInfo& eventInfo)
 {
-    const auto& ruleId = eventInfo.id;
-    emit eventReceived(ruleId, eventInfo.props);
+    emit eventReceived(eventInfo.ruleId, eventInfo.props);
 }
 
 } // namespace nx::vms::rules

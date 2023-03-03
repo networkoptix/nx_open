@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include "field_types.h"
-#include "manifest.h"
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {
@@ -20,6 +19,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API BasicAction: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString type READ type CONSTANT FINAL)
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
     Q_PROPERTY(QnUuid ruleId READ ruleId WRITE setRuleId)
