@@ -17,7 +17,6 @@ for line in args.input:
     if line.startswith('APPLY'):
         dataTypes.add(line.split(',')[2].strip())
 
-args.output.write('#pragma once\n\n')
 args.output.write('#define TransactionDataTypes')
 for dataType in dataTypes:
     args.output.write(' \\\n({})'.format(dataType))
