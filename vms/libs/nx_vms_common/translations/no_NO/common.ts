@@ -1633,7 +1633,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>Oppdater nettadressen til releases.json-filen</translation>
     </message>
   </context>
   <context>

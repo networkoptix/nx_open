@@ -5399,11 +5399,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Analitik ve hareket verilerini depolamak için kullanın</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Analitik ve hareket verilerini depolar</translation>
     </message>
   </context>
   <context>
@@ -7365,7 +7365,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>Yedekleme işlemi başladığında ilerleme görüntülenecektir</translation>
     </message>
   </context>
   <context>
@@ -7512,7 +7512,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <translation>Kamera&apos;s dahili deposunda kaydedilen video otomatik olarak ana arşive yüklenecektir.</translation>
     </message>
   </context>
   <context>

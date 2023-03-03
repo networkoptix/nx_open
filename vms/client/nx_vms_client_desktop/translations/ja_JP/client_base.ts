@@ -5333,11 +5333,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>分析データとモーションデータの保存に使用</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>分析データとモーションデータの保存先</translation>
     </message>
   </context>
   <context>
@@ -7256,7 +7256,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>バックアッププロセスが開始されると進行状況が表示されます</translation>
     </message>
   </context>
   <context>
@@ -7401,7 +7401,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <translation>カメラの内部ストレージに保存された映像は、メインアーカイブに自動的にアップロードされます。</translation>
     </message>
   </context>
   <context>
