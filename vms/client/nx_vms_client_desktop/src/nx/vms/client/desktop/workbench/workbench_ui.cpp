@@ -122,11 +122,11 @@ int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
             return kUnlimitedFps; //< Item is not camera - do not limit fps.
     }
 
-    const QPair<int, int> result = Qn::calculateMaxFps(cameras);
+    int result = Qn::calculateMaxFps(cameras);
 
-    return result.second == std::numeric_limits<int>::max()
+    return result == std::numeric_limits<int>::max()
         ? kUnlimitedFps
-        : result.second;
+        : result;
 }
 
 DelegateState serializeState(const QnPaneSettingsMap& settings)
