@@ -11,11 +11,14 @@
 #include "data.h"
 
 namespace nx::sdk::cloud_storage {
-    
+
 class TimePeriods: public nx::sdk::RefCountable<ITimePeriods>
 {
 public:
+    TimePeriods() = default;
     TimePeriods(const TimePeriodList& periods);
+
+    void setPeriods(const TimePeriodList& timePeriods);
 
     virtual void goToBeginning() const override;
     virtual bool next() const override;
