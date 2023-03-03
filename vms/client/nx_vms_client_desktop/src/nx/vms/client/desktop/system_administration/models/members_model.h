@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/core/access/access_types.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
@@ -170,10 +173,14 @@ private:
     void removeMember(const QnUuid& memberId);
 
     void subscribeToUser(const QnUserResourcePtr& user);
+    void unsubscribeFromUser(const QnUserResourcePtr& user);
 
     void checkCycles();
 
 private:
+    nx::utils::ScopedConnections m_connections;
+    std::unordered_map<QnUuid, nx::utils::ScopedConnections> m_userConnections;
+
     QScopedPointer<AccessSubjectEditingContext> m_subjectContext;
 
     QnUuid m_subjectId;
