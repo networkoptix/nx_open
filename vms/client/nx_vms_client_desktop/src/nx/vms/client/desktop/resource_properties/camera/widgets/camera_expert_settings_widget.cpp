@@ -384,7 +384,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     const bool hasDualStreaming =
         state.devicesDescription.hasDualStreamingCapability != CombinedValue::None;
 
-    const bool hasArecontCameras =
+    const bool hasArecontCameras = 
         state.devicesDescription.isArecontCamera != CombinedValue::None;
 
     ui->settingsGroupBox->setHidden(hasArecontCameras);

@@ -9,16 +9,12 @@ namespace Qn {
 
 void calculateMaxFps(
     const QnVirtualCameraResourceList& cameras,
-    int* maxFps,
-    int* maxDualStreamFps,
-    bool motionDetectionAllowed)
+    int* maxFps)
 {
     using namespace nx::vms::api;
 
     if (maxFps)
         *maxFps = std::numeric_limits<int>::max();
-    if (maxDualStreamFps)
-        *maxDualStreamFps = std::numeric_limits<int>::max();
 
     for (const auto& camera: cameras)
     {
@@ -26,47 +22,25 @@ void calculateMaxFps(
             ? camera->getMaxFps()
             : QnSecurityCamResource::kDefaultMaxFps;
 
-        int cameraDualStreamingFps = cameraFps;
-        const int reservedSecondStreamFps = camera->reservedSecondStreamFps();
-        const auto motionType = motionDetectionAllowed
-            ? camera->getMotionType()
-            : MotionType::none;
-
-        switch (motionType)
-        {
-            case MotionType::hardware:
-                cameraDualStreamingFps -= reservedSecondStreamFps;
-                break;
-            case MotionType::software:
-                cameraFps -= reservedSecondStreamFps;
-                cameraDualStreamingFps -= reservedSecondStreamFps;
-                break;
-            default:
-                break;
-        }
-
+        if (camera->hasDualStreaming())
+            cameraFps -= camera->reservedSecondStreamFps();
         if (maxFps)
             *maxFps = qMin(*maxFps, cameraFps);
-        if (maxDualStreamFps)
-            *maxDualStreamFps = qMin(*maxDualStreamFps, cameraDualStreamingFps);
     }
 }
 
-QPair<int, int> calculateMaxFps(
-    const QnVirtualCameraResourceList& cameras,
-    bool motionDetectionAllowed)
+int calculateMaxFps(
+    const QnVirtualCameraResourceList& cameras)
 {
     int maxFps = std::numeric_limits<int>::max();
-    int maxDualStreamingFps = maxFps;
-    calculateMaxFps(cameras, &maxFps, &maxDualStreamingFps, motionDetectionAllowed);
-    return {maxFps, maxDualStreamingFps};
+    calculateMaxFps(cameras, &maxFps);
+    return maxFps;
 }
 
-QPair<int, int> calculateMaxFps(
-    const QnVirtualCameraResourcePtr& camera,
-    bool motionDetectionAllowed)
+int calculateMaxFps(
+    const QnVirtualCameraResourcePtr& camera)
 {
-    return calculateMaxFps(QnVirtualCameraResourceList() << camera, motionDetectionAllowed);
+    return calculateMaxFps(QnVirtualCameraResourceList() << camera);
 }
 
 } //namespace Qn
