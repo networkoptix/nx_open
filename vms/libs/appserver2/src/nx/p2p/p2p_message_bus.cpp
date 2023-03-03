@@ -1689,7 +1689,7 @@ template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vm
 template void MessageBus::sendTransactionImpl(const P2pConnectionPtr&, \
     const ec2::QnTransaction<T>&, TransportHeader);
 
-#include <transaction_types.h>
+#include <transaction_types.i>
 BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
 
 
