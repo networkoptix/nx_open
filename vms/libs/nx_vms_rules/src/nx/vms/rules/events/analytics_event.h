@@ -34,6 +34,7 @@ public:
         QnUuid objectTrackId,
         const QString& key);
 
+    virtual QString subtype() const override;
     virtual QString resourceKey() const override;
     virtual QString aggregationKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;

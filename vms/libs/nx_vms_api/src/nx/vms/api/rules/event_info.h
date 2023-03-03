@@ -14,14 +14,13 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventInfo
 {
-    QnUuid id;
-    QString eventType;
-    State state = State::none;
+    QnUuid ruleId;
+
     QMap<QString, QJsonValue> props;
 };
 
 #define nx_vms_api_rules_EventInfo_Fields \
-    (id)(eventType)(state)(props)
+    (ruleId)(props)
 NX_VMS_API_DECLARE_STRUCT(EventInfo)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventInfo, (json)(ubjson), NX_VMS_API)

@@ -330,11 +330,8 @@ microseconds ActionBuilder::aggregationInterval() const
 
 bool ActionBuilder::isProlonged() const
 {
-    if (NX_ASSERT(m_rule))
-    {
-        if (auto engine = m_rule->engine(); NX_ASSERT(engine))
-            return nx::vms::rules::isProlonged(engine, this);
-    }
+    if (const auto engine = this->engine(); NX_ASSERT(engine))
+        return nx::vms::rules::isProlonged(engine, this);
 
     return {};
 }
@@ -374,18 +371,53 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
     if (!NX_ASSERT(m_constructor) || !NX_ASSERT(aggregatedEvent))
         return;
 
+    const bool isProlonged = this->isProlonged();
+    if (isProlonged &&
+        ((m_isActionRunning && aggregatedEvent->state() == State::started)
+            || (!m_isActionRunning && aggregatedEvent->state() == State::stopped)))
+    {
+        return;
+    }
+
+    // Action with all data without any user filtration for logging.
+    ActionPtr logAction = buildAction(aggregatedEvent);
+    if (!NX_ASSERT(logAction))
+        return;
+
     Actions actions;
 
     if (m_fields.contains(utils::kUsersFieldName))
+    {
         actions = buildActionsForTargetUsers(aggregatedEvent);
+
+        if (engine()->actionDescriptor(actionType())->flags
+            .testFlag(ItemFlag::executeOnClientAndServer))
+        {
+            // Action with all data, but without users for server processing.
+            auto serverAction = engine()->cloneAction(logAction);
+            serverAction->setProperty(utils::kUsersFieldName, {});
+            actions.push_back(serverAction);
+        }
+    }
     else
-        actions.push_back(buildAction(aggregatedEvent));
+    {
+        actions.push_back(logAction);
+    }
+
+    // TODO: #amalov The flag is taken from the old engine algorithms.
+    // Think of more clever solution to support "Use source" flag.
+    if (isProlonged && !actions.empty())
+    {
+        m_isActionRunning = (actions.front()->state() == State::started);
+    }
 
     for (const auto& action: actions)
     {
         if(action)
             emit this->action(action);
     }
+
+    emit engine()->actionBuilt(aggregatedEvent, logAction);
 }
 
 ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
@@ -426,8 +458,6 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
             }
         }
 
-        // Checks whether the user has rights to view the event. At the moment only cameras are
-        // required to be checked.
         auto filteredAggregatedEvent = aggregatedEvent->filtered(
             [&user, context = targetUsersField->systemContext()](const EventPtr& event)
             {
@@ -472,14 +502,6 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
     if (!action)
         return {};
 
-    const bool isProlonged = this->isProlonged();
-    if (isProlonged &&
-        ((m_isActionRunning && aggregatedEvent->state() == State::started)
-            || (!m_isActionRunning && aggregatedEvent->state() == State::stopped)))
-    {
-        return {};
-    }
-
     action->setRuleId(m_rule ? m_rule->id() : QnUuid());
 
     const auto propertyNames =
@@ -503,13 +525,6 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
         }
     }
 
-    // TODO: #amalov The flag is taken from the old engine algorithms.
-    // Think of more clever solution to support "Use source" flag.
-    if (action && isProlonged)
-    {
-        m_isActionRunning = (action->state() == State::started);
-    }
-
     return action;
 }
 
@@ -517,6 +532,11 @@ void ActionBuilder::handleAggregatedEvents()
 {
     for (const auto& aggregationInfo: m_aggregator->popEvents())
         buildAndEmitAction(AggregatedEventPtr::create(aggregationInfo));
+}
+
+const Engine* ActionBuilder::engine() const
+{
+    return m_rule ? m_rule->engine() : nullptr;
 }
 
 } // namespace nx::vms::rules

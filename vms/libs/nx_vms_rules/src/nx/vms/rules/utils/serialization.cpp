@@ -5,6 +5,7 @@
 #include <QtCore/QMetaProperty>
 
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/qobject.h>
 
 namespace nx::vms::rules {
 
@@ -65,7 +66,7 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
         const auto& propName = it.key();
         const auto& propValue = it.value();
         auto propIndex = meta->indexOfProperty(propName.toUtf8());
-        if (!NX_ASSERT(propIndex >= 0, "Absent property %1", propName))
+        if (!NX_ASSERT(propIndex >= 0, "Absent property: %1", propName))
             continue;
 
         auto prop = meta->property(propIndex);
@@ -90,6 +91,11 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
         if (NX_ASSERT(propVariant.isValid()))
             prop.write(object, propVariant);
     }
+}
+
+QByteArray serialized(const QObject* object)
+{
+    return QJson::serialized(serializeProperties(object, nx::utils::propertyNames(object)));
 }
 
 } // namespace nx::vms::rules

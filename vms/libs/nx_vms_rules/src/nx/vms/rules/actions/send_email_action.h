@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_action.h>
+#include <QtCore/QVariant>
+
 #include <utils/email/message.h>
 
+#include "../basic_action.h"
 #include "../data_macros.h"
 
 namespace nx::vms::rules {

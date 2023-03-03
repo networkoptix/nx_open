@@ -2,6 +2,21 @@
 
 #include "write_to_log_action.h"
 
+#include "../utils/field.h"
+#include "../utils/type.h"
+
 namespace nx::vms::rules {
+
+const ItemDescriptor& WriteToLogAction::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<WriteToLogAction>(),
+        .displayName = tr("Write to log"),
+        .fields = {
+            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
+        }
+    };
+    return kDescriptor;
+}
 
 } // namespace nx::vms::rules

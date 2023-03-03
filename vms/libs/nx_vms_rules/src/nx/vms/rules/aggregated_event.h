@@ -50,12 +50,13 @@ public:
     size_t totalCount() const;
     size_t uniqueCount() const;
 
+    EventPtr initialEvent() const;
+
 private:
     QnUuid m_id = QnUuid::createUuid(); //< TODO: #amalov Get from initial event if needed.
     AggregationInfoList m_aggregationInfoList;
 
     AggregatedEvent() = default;
-    EventPtr initialEvent() const;
 };
 
 } // namespace nx::vms::rules

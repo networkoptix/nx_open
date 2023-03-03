@@ -6,6 +6,7 @@
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../aggregated_event.h"
+#include "../basic_action.h"
 #include "../event_filter_fields/state_field.h"
 
 namespace nx::vms::rules::utils {
@@ -71,6 +72,27 @@ QnUuidList getDeviceIds(const AggregatedEventPtr& event)
     QnUuidList result;
     result << getFieldValue<QnUuid>(event, utils::kCameraIdFieldName);
     result << getFieldValue<QnUuidList>(event, utils::kDeviceIdsFieldName);
+    result.removeAll(QnUuid());
+
+    return result;
+}
+
+QnUuidList getResourceIds(const AggregatedEventPtr& event)
+{
+    auto result = getDeviceIds(event);
+    result << getFieldValue<QnUuid>(event, kServerIdFieldName);
+    // TODO: #amalov Consider reporting analytics engine and user as resources.
+    result.removeAll(QnUuid());
+
+    return result;
+}
+
+QnUuidList getResourceIds(const ActionPtr& action)
+{
+    QnUuidList result;
+    result << getFieldValue<QnUuid>(action, kCameraIdFieldName);
+    result << getFieldValue<QnUuidList>(action, kDeviceIdsFieldName);
+    result << getFieldValue<QnUuid>(action, kServerIdFieldName);
     result.removeAll(QnUuid());
 
     return result;

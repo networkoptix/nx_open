@@ -64,6 +64,7 @@ void Initializer::registerActions() const
     registerAction<ShowOnAlarmLayoutAction>();
     registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();
+    registerAction<WriteToLogAction>();
 }
 
 void Initializer::registerFields() const

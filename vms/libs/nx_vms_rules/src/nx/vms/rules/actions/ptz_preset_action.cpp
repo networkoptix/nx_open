@@ -14,7 +14,7 @@ const ItemDescriptor& PtzPresetAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PtzPresetAction>(),
         .displayName = tr("Execute PTZ preset"),
-        .flags = ItemFlag::instant,
+        .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("Camera")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),

@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/utils/log/assert.h>
+
 #include "../manifest.h"
 #include "../rules_fwd.h"
-
-#include <nx/utils/log/assert.h>
 
 namespace nx::vms::rules::utils {
 
@@ -61,5 +61,7 @@ T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
 }
 
 NX_VMS_RULES_API QnUuidList getDeviceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API QnUuidList getResourceIds(const AggregatedEventPtr& event);
+NX_VMS_RULES_API QnUuidList getResourceIds(const ActionPtr& action);
 
 } // namespace nx::vms::rules::utils

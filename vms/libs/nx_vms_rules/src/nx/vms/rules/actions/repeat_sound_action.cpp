@@ -18,6 +18,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<RepeatSoundAction>(),
         .displayName = tr("Repeat sound"),
+        .flags = {ItemFlag::prolonged, ItemFlag::executeOnClientAndServer},
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Play to users")),

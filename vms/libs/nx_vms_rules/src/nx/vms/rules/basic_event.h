@@ -25,7 +25,7 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QString type READ type)
+    Q_PROPERTY(QString type READ type CONSTANT FINAL)
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
 
@@ -35,6 +35,13 @@ public:
         State state = State::instant);
 
     QString type() const;
+
+    /**
+     * Detailed type information, which can be used for extended event log filtration.
+     * Empty by default. Actual mostly for the analytics events and actions where it
+     * contains plugin-based event/action type.
+     */
+    virtual QString subtype() const;
 
     std::chrono::microseconds timestamp() const;
     void setTimestamp(const std::chrono::microseconds& timestamp);

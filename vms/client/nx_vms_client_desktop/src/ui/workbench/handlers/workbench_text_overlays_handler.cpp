@@ -20,6 +20,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/text_overlay_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/manifest.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -167,7 +168,7 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     connect(display(), &QnWorkbenchDisplay::widgetAdded,
         this, &QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded);
 
-    nx::vms::client::desktop::appContext()->currentSystemContext()->vmsRulesEngine()->addActionExecutor(
+    systemContext()->vmsRulesEngine()->addActionExecutor(
         nx::vms::rules::TextOverlayAction::manifest().id,
         this);
 }

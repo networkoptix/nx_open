@@ -269,7 +269,6 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetSingleDeviceField>();
     testActionFieldRegistration<VolumeField>();
 
-    // TODO: #amalov Uncomment all types after manifest definition.
     testActionRegistration<BookmarkAction>();
     testActionRegistration<BuzzerAction>();
     testActionRegistration<DeviceOutputAction>();
@@ -288,7 +287,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<ShowOnAlarmLayoutAction>();
     testActionRegistration<SpeakAction>();
     testActionRegistration<TextOverlayAction>();
-    //testActionRegistration<WriteToLogAction>();
+    testActionRegistration<WriteToLogAction>();
 }
 
 } // namespace nx::vms::rules::test

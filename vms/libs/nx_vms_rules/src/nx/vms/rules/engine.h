@@ -94,6 +94,10 @@ signals:
     void ruleRemoved(QnUuid ruleId);
     void rulesReset();
 
+    void actionBuilt(
+        const nx::vms::rules::AggregatedEventPtr& event,
+        const nx::vms::rules::ActionPtr& action) const;
+
 public:
     using EventConstructor = std::function<BasicEvent*()>;
     using ActionConstructor = std::function<BasicAction*()>;

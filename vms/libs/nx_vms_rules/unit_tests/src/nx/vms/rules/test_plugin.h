@@ -26,6 +26,7 @@ public:
         registerEventField<StateField>();
         registerEventField<TestEventField>();
 
+        registerActionField<TestActionField>();
         registerActionField<TargetDeviceField>();
     }
 

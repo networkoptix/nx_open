@@ -26,6 +26,11 @@ QString BasicEvent::type() const
     return utils::type(metaObject()); //< Assert?
 }
 
+QString BasicEvent::subtype() const
+{
+    return {};
+}
+
 std::chrono::microseconds BasicEvent::timestamp() const
 {
     return m_timestamp;
