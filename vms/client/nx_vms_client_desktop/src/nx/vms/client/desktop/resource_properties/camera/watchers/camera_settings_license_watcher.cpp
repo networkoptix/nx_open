@@ -10,12 +10,13 @@
 #include <nx/vms/client/desktop/resource_properties/camera/utils/license_usage_provider.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "../flux/camera_settings_dialog_store.h"
 #include "../flux/camera_settings_dialog_state.h"
+#include "../flux/camera_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
 
@@ -63,9 +64,11 @@ public:
         NX_ASSERT(m_store);
         connect(m_store, &CameraSettingsDialogStore::stateChanged, this, &Private::updateText);
 
-        using namespace nx::vms::license;
-        const auto watcher = new CamLicenseUsageWatcher(q->commonModule(), this);
-        connect(watcher, &UsageWatcher::licenseUsageChanged, this, &Private::updateText);
+        using namespace nx::vms::common;
+        connect(q->commonModule()->deviceLicenseUsageWatcher(),
+            &LicenseUsageWatcher::licenseUsageChanged,
+            this,
+            &Private::updateText);
     }
 
     LicenseUsageProvider* licenseUsageProvider() const

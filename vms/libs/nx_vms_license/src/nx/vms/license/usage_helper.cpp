@@ -8,11 +8,11 @@
 
 #include <QtCore/QJsonObject>
 
-#include <boost/range/algorithm/sort.hpp>
-#include <boost/range/algorithm/fill.hpp>
-#include <boost/range/adaptor/reversed.hpp>
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/algorithm/fill.hpp>
+#include <boost/range/algorithm/sort.hpp>
 
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
@@ -23,6 +23,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 
 #include "validator.h"
 
@@ -133,32 +134,6 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
     {Qn::LC_Trial, Qn::LC_AnalogEncoder},
     {Qn::LC_Trial, Qn::LC_Bridge},
 };
-
-/************************************************************************/
-/* UsageHelper                                                 */
-/************************************************************************/
-
-UsageWatcher::UsageWatcher(QnCommonModule* commonModule, QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(commonModule)
-{
-    connect(licensePool(), &QnLicensePool::licensesChanged, this,
-        &UsageWatcher::licenseUsageChanged);
-
-    // Call update if server was added or removed or changed its status.
-    auto updateIfServerStatusChanged =
-        [this](const QnPeerRuntimeInfo& data)
-        {
-            if (data.data.peer.peerType == nx::vms::api::PeerType::server)
-                emit licenseUsageChanged();
-        };
-
-    // Ignoring runtimeInfoChanged as hardwareIds must not change in runtime.
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
-        updateIfServerStatusChanged);
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
-        updateIfServerStatusChanged);
-}
 
 /************************************************************************/
 /* UsageHelper                                                 */
@@ -365,89 +340,20 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 }
 
 /************************************************************************/
-/* CamLicenseUsageWatcher                                             */
-/************************************************************************/
-
-CamLicenseUsageWatcher::CamLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent):
-    CamLicenseUsageWatcher(QnVirtualCameraResourcePtr(), commonModule, parent)
-{
-}
-
-CamLicenseUsageWatcher::CamLicenseUsageWatcher(
-    const QnVirtualCameraResourcePtr& camera,
-    QnCommonModule* commonModule,
-    QObject* parent)
-    :
-    base_type(commonModule, parent)
-{
-    const auto& resPool = commonModule->resourcePool();
-
-    /* Listening to all changes that can affect licenses usage. */
-    auto connectToCamera =
-        [this](const QnVirtualCameraResourcePtr& camera)
-        {
-            connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
-                &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnVirtualCameraResource::groupNameChanged, this,
-                &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnVirtualCameraResource::groupIdChanged, this,
-                &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnSecurityCamResource::licenseTypeChanged, this,
-                &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnSecurityCamResource::parentIdChanged, this,
-                &UsageWatcher::licenseUsageChanged);
-    };
-
-    if (camera)
-    {
-        connectToCamera(camera);
-        return;
-    }
-
-    /* Call update if camera was added or removed. */
-    auto updateIfNeeded =
-        [this](const QnResourcePtr &resource)
-        {
-            if (resource.dynamicCast<QnVirtualCameraResource>())
-                emit licenseUsageChanged();
-        };
-
-    connect(resPool, &QnResourcePool::resourceAdded, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, updateIfNeeded);
-
-    connect(resPool, &QnResourcePool::resourceAdded, this,
-        [connectToCamera](const QnResourcePtr& resource)
-        {
-            if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
-                connectToCamera(camera);
-        });
-
-    connect(resPool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
-                camera->disconnect(this);
-        });
-
-    for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
-        connectToCamera(camera);
-}
-
-/************************************************************************/
 /* CamLicenseUsageHelper                                              */
 /************************************************************************/
 CamLicenseUsageHelper::CamLicenseUsageHelper(
-    QnCommonModule* commonModule, 
+    QnCommonModule* commonModule,
     QObject* parent,
     bool watchCameraChanges)
     :
     base_type(commonModule, parent)
 {
-
     if (watchCameraChanges)
     {
-        m_watcher = new CamLicenseUsageWatcher(commonModule, this);
-        connect(m_watcher, &CamLicenseUsageWatcher::licenseUsageChanged, this,
+        connect(commonModule->deviceLicenseUsageWatcher(),
+            &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
+            this,
             [this]()
             {
                 invalidate();
@@ -650,56 +556,6 @@ UsageStatus SingleCamLicenseStatusHelper::status() const
 }
 
 /************************************************************************/
-/* VideoWallLicenseUsageWatcher                                       */
-/************************************************************************/
-VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
-    QnCommonModule* commonModule,
-    QObject* parent)
-    :
-    base_type(commonModule, parent)
-{
-    auto connectTo =
-        [this](const QnVideoWallResourcePtr& videowall)
-        {
-            connect(videowall,
-                &QnVideoWallResource::itemAdded,
-                this,
-                &UsageWatcher::licenseUsageChanged);
-            connect(videowall,
-                &QnVideoWallResource::itemRemoved,
-                this,
-                &UsageWatcher::licenseUsageChanged);
-        };
-
-    auto resourceAdded =
-        [this, connectTo](const QnResourcePtr& resource)
-        {
-            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
-            {
-                connectTo(videowall);
-                emit licenseUsageChanged();
-            }
-        };
-
-    auto resourceRemoved =
-        [this](const QnResourcePtr& resource)
-        {
-            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
-            {
-                videowall->disconnect(this);
-                emit licenseUsageChanged();
-            }
-        };
-
-    const auto& resPool = commonModule->resourcePool();
-
-    connect(resPool, &QnResourcePool::resourceAdded, this, resourceAdded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this, resourceRemoved);
-    for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
-        connectTo(videowall);
-}
-
-/************************************************************************/
 /* VideoWallLicenseUsageHelper                                        */
 /************************************************************************/
 VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
@@ -708,8 +564,9 @@ VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
     :
     base_type(commonModule, parent)
 {
-    auto usageWatcher = new VideoWallLicenseUsageWatcher(commonModule, this);
-    connect(usageWatcher, &VideoWallLicenseUsageWatcher::licenseUsageChanged, this,
+    connect(commonModule->videoWallLicenseUsageWatcher(),
+        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
+        this,
         &UsageHelper::invalidate);
 }
 

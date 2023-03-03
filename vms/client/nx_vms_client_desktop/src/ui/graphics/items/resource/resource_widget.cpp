@@ -6,15 +6,17 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/private/qpixmapfilter_p.h>
+#include <qt_graphics_items/graphics_label.h>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
+#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
@@ -30,8 +32,8 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/license/usage_helper.h>
-#include <qt_graphics_items/graphics_label.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
@@ -203,8 +205,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         };
 
     using namespace nx::vms::license;
-    auto videoWallLicenseUsageWatcher = new VideoWallLicenseUsageWatcher(commonModule(), this);
-    connect(videoWallLicenseUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateOverlay);
+    connect(commonModule()->videoWallLicenseUsageWatcher(),
+        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
+        this,
+        updateOverlay);
 
     if (qnRuntime->isVideoWallMode())
     {

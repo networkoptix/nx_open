@@ -35,19 +35,6 @@ enum class UsageStatus
     used
 };
 
-class UsageWatcher:
-    public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
-{
-    Q_OBJECT
-    using base_type = Connective<QObject>;
-public:
-    UsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
-
-signals:
-    void licenseUsageChanged();
-};
-
 typedef std::array<int, Qn::LC_Count> licensesArray;
 
 class UsageHelper:
@@ -152,17 +139,6 @@ private:
     QTimer m_invalidateTimer;
 };
 
-class CamLicenseUsageWatcher: public UsageWatcher
-{
-    Q_OBJECT
-    using base_type = UsageWatcher;
-public:
-    CamLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
-    CamLicenseUsageWatcher(const QnVirtualCameraResourcePtr& camera,
-        QnCommonModule* commonModule,
-        QObject* parent = nullptr);
-};
-
 class CamLicenseUsageHelper: public UsageHelper
 {
     Q_OBJECT
@@ -173,8 +149,8 @@ public:
         With empty watcher parameter creates instance which tracks all cameras.
     */
     CamLicenseUsageHelper(
-        QnCommonModule* commonModule, 
-        QObject* parent = nullptr, 
+        QnCommonModule* commonModule,
+        QObject* parent = nullptr,
         bool watchCameraChanges = true);
 
     CamLicenseUsageHelper(
@@ -205,7 +181,6 @@ protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    CamLicenseUsageWatcher* m_watcher{nullptr};
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
@@ -228,14 +203,6 @@ signals:
 private:
     const QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<CamLicenseUsageHelper> m_helper;
-};
-
-class VideoWallLicenseUsageWatcher: public UsageWatcher
-{
-    Q_OBJECT
-    using base_type = UsageWatcher;
-public:
-    VideoWallLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
 };
 
 class VideoWallLicenseUsageHelper: public UsageHelper

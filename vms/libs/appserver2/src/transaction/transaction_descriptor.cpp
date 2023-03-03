@@ -1073,7 +1073,9 @@ struct ModifyCameraAttributesAccess
         if (param.scheduleEnabled && !camera->isLicenseUsed())
         {
             using namespace nx::vms::license;
-            CamLicenseUsageHelper licenseUsageHelper(commonModule);
+            CamLicenseUsageHelper licenseUsageHelper(commonModule,
+                /*parent*/ nullptr,
+                /*watchCameraChanges*/ false);
             QnVirtualCameraResourceList cameras;
 
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
@@ -1109,7 +1111,9 @@ struct ModifyCameraAttributesListAccess
         }
 
         using namespace nx::vms::license;
-        CamLicenseUsageHelper licenseUsageHelper(commonModule);
+        CamLicenseUsageHelper licenseUsageHelper(commonModule,
+            /*parent*/ nullptr,
+            /*watchCameraChanges*/ false);
         QnVirtualCameraResourceList cameras;
 
         const auto& resPool = commonModule->resourcePool();

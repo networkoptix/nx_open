@@ -2,73 +2,64 @@
 
 #include "common_module.h"
 
-#include <cassert>
-
 #include <QtCore/QCoreApplication>
-#include <QtCore/QFile>
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QFile>
 
 #include <api/common_message_processor.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
+#include <audit/audit_manager.h>
 #include <common/common_meta_types.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_access/global_permissions_manager.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
-#include <core/resource_access/providers/intercom_layout_access_provider.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_access/providers/permissions_resource_access_provider.h>
-#include <core/resource_access/providers/shared_resource_access_provider.h>
-#include <core/resource_access/providers/shared_layout_item_access_provider.h>
-#include <core/resource_access/providers/videowall_item_access_provider.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/providers/intercom_layout_access_provider.h>
+#include <core/resource_access/providers/permissions_resource_access_provider.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/providers/shared_layout_item_access_provider.h>
+#include <core/resource_access/providers/shared_resource_access_provider.h>
+#include <core/resource_access/providers/videowall_item_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <licensing/license.h>
 #include <network/router.h>
-#include <nx/vms/api/protocol_version.h>
-#include <nx/vms/utils/installation_info.h>
-
-#include <nx_ec/abstract_ec_connection.h>
-
-#include <nx/analytics/plugin_descriptor_manager.h>
 #include <nx/analytics/engine_descriptor_manager.h>
+#include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/analytics/group_descriptor_manager.h>
 #include <nx/analytics/object_type_descriptor_manager.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
-
-#include <nx/analytics/taxonomy/state_watcher.h>
+#include <nx/analytics/plugin_descriptor_manager.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
-#include <nx/network/app_info.h>
-#include <nx/vms/discovery/manager.h>
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/ec2_router.h>
-#include <nx/vms/rules/initializer.h>
-
-#include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/metrics/metrics_storage.h>
-#include <audit/audit_manager.h>
-#include <core/resource_management/camera_driver_restriction_list.h>
-#include <core/resource_management/resource_data_pool.h>
-
-#include <core/resource/storage_plugin_factory.h>
-
-#include <nx/utils/timer_manager.h>
-
+#include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
-
+#include <nx/metrics/metrics_storage.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/vms/api/protocol_version.h>
+#include <nx/vms/common/license/license_usage_watcher.h>
+#include <nx/vms/discovery/manager.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/rules/ec2_router.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/initializer.h>
+#include <nx/vms/utils/installation_info.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/media/ffmpeg_helper.h>
 
 using namespace nx;
@@ -80,6 +71,8 @@ using namespace nx::vms::common;
 struct QnCommonModule::Private
 {
     AbstractCertificateVerifier* certificateVerifier = nullptr;
+    std::unique_ptr<DeviceLicenseUsageWatcher> deviceLicenseUsageWatcher;
+    std::unique_ptr<VideoWallLicenseUsageWatcher> videoWallLicenseUsageWatcher;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -169,6 +162,9 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     m_resourceDataPool = instance<QnResourceDataPool>();
     m_engineVersion = nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion());
+
+    d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
+    d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -309,6 +305,16 @@ qint64 QnCommonModule::systemIdentityTime() const
 QnLicensePool* QnCommonModule::licensePool() const
 {
     return m_licensePool;
+}
+
+DeviceLicenseUsageWatcher* QnCommonModule::deviceLicenseUsageWatcher() const
+{
+    return d->deviceLicenseUsageWatcher.get();
+}
+
+VideoWallLicenseUsageWatcher* QnCommonModule::videoWallLicenseUsageWatcher() const
+{
+    return d->videoWallLicenseUsageWatcher.get();
 }
 
 QnUserRolesManager* QnCommonModule::userRolesManager() const

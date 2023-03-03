@@ -60,7 +60,15 @@ class DescriptorContainer;
 
 namespace nx::core::access { class ResourceAccessProvider; }
 namespace nx::metrics { struct Storage; }
-namespace nx::vms::common { class AbstractCertificateVerifier; }
+
+namespace nx::vms::common {
+
+class AbstractCertificateVerifier;
+class DeviceLicenseUsageWatcher;
+class VideoWallLicenseUsageWatcher;
+
+} // namespace nx::vms::common
+
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
@@ -223,6 +231,13 @@ public:
     bool isNeedToStop() const { return m_needToStop; }
 
     QnLicensePool* licensePool() const;
+
+    /** Watches and notifies when Device license usage is changed in the System. */
+    nx::vms::common::DeviceLicenseUsageWatcher* deviceLicenseUsageWatcher() const;
+
+    /** Watches and notifies when Video Wall license usage is changed in the System. */
+    nx::vms::common::VideoWallLicenseUsageWatcher* videoWallLicenseUsageWatcher() const;
+
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
