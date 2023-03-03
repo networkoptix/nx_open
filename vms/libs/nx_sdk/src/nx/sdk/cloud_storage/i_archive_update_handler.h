@@ -3,16 +3,32 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
+#include <nx/sdk/i_list.h>
 
 #include "i_device_agent.h"
 #include "i_time_periods.h"
 
 namespace nx::sdk::cloud_storage {
 
-enum class ArchiveAction
+/**
+ * Added and removed time period lists per one stream.
+ */
+class IIndexArchive: public Interface<IIndexArchive>
 {
-    add,
-    remove,
+public:
+    virtual const ITimePeriods* addedTimePeriods() const = 0;
+    virtual const ITimePeriods* removedTimePeriods() const = 0;
+    virtual int streamIndex() const = 0;
+};
+
+/**
+ * A Device Archive consisting of the list of the stream Archives.
+ */
+class IDeviceArchive: public Interface<IDeviceArchive>
+{
+public:
+    virtual IList<IIndexArchive>* indexArchive() = 0;
+    virtual IDeviceAgent* deviceAgent() const = 0;
 };
 
 /**
@@ -29,16 +45,16 @@ public:
     }
 
     /**
-     * Engine should call this periodically when/if something is changed on the backend:
-     * some data was removed due to the retention policy, new data has been recorded,
+     * Engine should call this periodically to check if something is changed on the backend.
+     * I.e. some data was removed due to the retention policy, new data has been recorded,
      * new device appeared.
+     * The deviceArchive may be destroyed by the plugin right after the onArchiveUpdated function
+     * has returned.
      */
     virtual void onArchiveUpdated(
         const char* engineId,
-        IDeviceAgent* deviceAgent,
-        int streamIndex,
-        const ITimePeriods* timePeriods, //< Time periods that were added/removed to the backend archive.
-        ArchiveAction archiveAction) const = 0;
+        nx::sdk::ErrorCode errorCode,
+        const IList<IDeviceArchive>* deviceArchive) const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

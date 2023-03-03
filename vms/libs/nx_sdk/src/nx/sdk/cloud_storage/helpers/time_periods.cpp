@@ -3,7 +3,7 @@
 #include "time_periods.h"
 
 namespace nx::sdk::cloud_storage {
-    
+
 TimePeriods::TimePeriods(const TimePeriodList& periods):
     m_periods(periods),
     m_it(m_periods.cbegin())
@@ -39,6 +39,12 @@ bool TimePeriods::get(int64_t* outStartUs, int64_t* outEndUs) const
     *outEndUs = *outStartUs + m_it->duration.count() * 1000;
 
     return true;
+}
+
+void TimePeriods::setPeriods(const TimePeriodList& timePeriods)
+{
+    m_periods = timePeriods;
+    m_it = m_periods.cbegin();
 }
 
 } // namespace nx::sdk::cloud_storage
