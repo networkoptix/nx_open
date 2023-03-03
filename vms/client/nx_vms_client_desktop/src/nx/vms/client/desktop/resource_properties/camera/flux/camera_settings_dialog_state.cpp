@@ -23,12 +23,7 @@ QnUuid CameraSettingsDialogState::singleCameraId() const
 
 int CameraSettingsDialogState::maxRecordingBrushFps() const
 {
-    if (isSingleCamera() && !isMotionDetectionEnabled() && !isObjectDetectionSupported())
-        return singleCameraProperties.maxFpsWithoutMotion;
-
-    return recording.brush.recordingType == Qn::RecordingType::metadataAndLowQuality
-        ? devicesDescription.maxDualStreamingFps
-        : devicesDescription.maxFps;
+    return devicesDescription.maxFps;
 }
 
 bool CameraSettingsDialogState::isMotionDetectionEnabled() const
