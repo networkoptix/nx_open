@@ -319,11 +319,11 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
     m_nestedResourceLevel = -1;
 
     const auto selection = tree.selection();
-    if (!NX_ASSERT(!selection.empty()))
+    if (selection.empty())
         return;
 
     auto [index, level] = findResourceIndex(selection[0]);
-    if (!NX_ASSERT(index.isValid()))
+    if (!index.isValid())
         return;
 
     // If explicitly selected a recorder's child.
