@@ -292,7 +292,11 @@ Rectangle
         hideActionEnabled: welcomeScreen.complexVisibilityMode
         onTileClicked: context.setGlobalPreloaderEnabled(false)
         onLockInterface: locked => { globalInterfaceLock.enabled = locked }
-        onOpenedTileModalityInterfaceLock: openedTileModalityInterfaceLock.enabled = true
+        onSetOpenedTileModalityInterfaceLock:
+            enabled =>
+            {
+                openedTileModalityInterfaceLock.enabled = enabled
+            }
 
         TileGridPlaceholder
         {

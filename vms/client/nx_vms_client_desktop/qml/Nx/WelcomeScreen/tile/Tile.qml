@@ -51,6 +51,7 @@ Button
     property bool isExpanded: false
 
     signal startExpanding()
+    signal shrinked()
     signal clickedToConnect()
     signal releaseFocus()
 
@@ -118,6 +119,7 @@ Button
 
         state = "compact"
         releaseFocus()
+        shrinked()
     }
 
     function setErrorMessage(errorMessage, isLoginError)
@@ -150,6 +152,8 @@ Button
     state: "compact"
 
     Component.onCompleted: _initialParent = parent
+
+    Component.onDestruction: shrink()
 
     Keys.onPressed:
     {
