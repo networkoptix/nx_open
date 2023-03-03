@@ -84,30 +84,8 @@ public:
         connect(accessRightsManager.get(), &ProxyAccessRightsManager::ownAccessRightsChanged,
             q, &AccessSubjectEditingContext::resourceAccessChanged);
 
-        connect(systemSubjectHierarchy, &SubjectHierarchy::changed, this,
-            [this](const QSet<QnUuid>& added, const QSet<QnUuid>& removed)
-            {
-                if (!hierarchyChanged)
-                {
-                    this->q->resetRelations();
-                }
-                else
-                {
-                    for (const auto& id: added)
-                    {
-                        const auto directParents = systemSubjectHierarchy->directParents(id);
-                        const auto directMembers = systemSubjectHierarchy->directMembers(id);
-                        currentHierarchy->addOrUpdate(id, directParents, directMembers);
-                    }
-                    currentHierarchy->remove(removed);
-                }
-
-                if (removed.contains(currentSubjectId))
-                {
-                    this->q->setCurrentSubjectId({});
-                    emit this->q->currentSubjectRemoved();
-                }
-            });
+        connect(systemSubjectHierarchy, &SubjectHierarchy::changed,
+            this, &Private::handleSystemHierarchyChanged);
 
         connect(currentHierarchy.get(), &SubjectHierarchy::changed,
             q, &AccessSubjectEditingContext::hierarchyChanged);
@@ -161,6 +139,32 @@ public:
 
         NX_ASSERT(false, "Unhandled special resource group type");
         return {};
+    }
+
+    void handleSystemHierarchyChanged(
+        const QSet<QnUuid>& added,
+        const QSet<QnUuid>& removed,
+        const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+        const QSet<QnUuid>& subjectsWithChangedParents)
+    {
+        if (removed.contains(currentSubjectId))
+        {
+            q->setCurrentSubjectId({});
+            emit q->currentSubjectRemoved();
+        }
+        else
+        {
+            for (const auto& id: (subjectsWithChangedParents + added))
+            {
+                // Make sure that edited current subject parents are not changed.
+                if (hierarchyChanged && id == currentSubjectId)
+                    continue;
+
+                currentHierarchy->addOrUpdate(id, systemSubjectHierarchy->directParents(id));
+            }
+
+            currentHierarchy->remove(removed);
+        }
     }
 };
 
