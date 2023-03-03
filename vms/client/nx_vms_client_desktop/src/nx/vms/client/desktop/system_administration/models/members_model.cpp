@@ -102,19 +102,28 @@ void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
             m_cache->modify({id}, {id}, {}, {});
         };
 
-    connect(user.get(), &QnResource::nameChanged, this,
+    nx::utils::ScopedConnections userConnections;
+
+    userConnections << connect(user.get(), &QnResource::nameChanged, this,
         [updateUser](const QnResourcePtr& resource)
         {
             updateUser(resource->getId());
         });
 
-    connect(user.get(), &QnUserResource::userRolesChanged, this,
+    userConnections << connect(user.get(), &QnUserResource::userRolesChanged, this,
         [updateUser](
             const QnUserResourcePtr& user,
             const std::vector<QnUuid>&)
         {
             updateUser(user->getId());
         });
+
+    m_userConnections[user->getId()] = std::move(userConnections);
+}
+
+void MembersModel::unsubscribeFromUser(const QnUserResourcePtr& user)
+{
+    m_userConnections.erase(user->getId());
 }
 
 void MembersModel::checkCycles()
@@ -264,7 +273,8 @@ void MembersModel::readUsersAndGroups()
 
         auto userRolesManager = systemContext()->userRolesManager();
 
-        connect(userRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        m_connections << connect(
+            userRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
             [this](const nx::vms::api::UserRoleData& userGroup)
             {
                 if (!m_cache)
@@ -279,7 +289,7 @@ void MembersModel::readUsersAndGroups()
                 checkCycles();
             });
 
-        connect(userRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        m_connections << connect(userRolesManager, &QnUserRolesManager::userRoleRemoved, this,
             [this](const nx::vms::api::UserRoleData& userGroup)
             {
                 if (!m_cache)
@@ -301,7 +311,7 @@ void MembersModel::readUsersAndGroups()
         for (const auto& user: allUsers)
             subscribeToUser(user);
 
-        connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+        m_connections << connect(resourcePool, &QnResourcePool::resourcesAdded, this,
             [this](const QnResourceList &resources)
             {
                 if (m_subjectId.isNull())
@@ -324,7 +334,8 @@ void MembersModel::readUsersAndGroups()
                 m_cache->modify(addedIds, {}, modifiedGroups, {});
             });
 
-        connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+        m_connections << connect(
+            resourcePool, &QnResourcePool::resourcesRemoved, this,
             [this](const QnResourceList &resources)
             {
                 if (m_subjectId.isNull())
@@ -337,7 +348,7 @@ void MembersModel::readUsersAndGroups()
 
                 for (const auto& user: users)
                 {
-                    disconnect(user.get());
+                    unsubscribeFromUser(user);
                     removedIds.insert(user->getId());
                     const auto groupIds = user->userRoleIds();
                     modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
@@ -346,7 +357,8 @@ void MembersModel::readUsersAndGroups()
                 m_cache->modify({}, removedIds, modifiedGroups, {});
             });
 
-        connect(m_subjectContext->subjectHierarchy(), &nx::core::access::SubjectHierarchy::changed,
+        m_connections << connect(
+            m_subjectContext->subjectHierarchy(), &nx::core::access::SubjectHierarchy::changed,
             this, [this](
                 const QSet<QnUuid>& added,
                 const QSet<QnUuid>& removed,
@@ -377,19 +389,20 @@ void MembersModel::readUsersAndGroups()
                 checkCycles();
             });
 
-        connect(m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
+        m_connections << connect(
+            m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
             this, &MembersModel::sharedResourcesChanged);
     }
     else if (m_subjectId.isNull())
     {
         beginResetModel();
+        m_userConnections.clear();
+        m_connections.reset();
         m_subjectMembers = {};
         m_cache.reset();
         m_groupsWithCycles.clear();
         endResetModel();
 
-        disconnect(systemContext()->userRolesManager());
-        disconnect(systemContext()->resourcePool());
         m_subjectContext.reset(nullptr);
         emit editingContextChanged();
 

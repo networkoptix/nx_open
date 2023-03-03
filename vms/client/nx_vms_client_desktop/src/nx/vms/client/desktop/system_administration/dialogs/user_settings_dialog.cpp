@@ -411,7 +411,7 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
     d->tabIndex = 0;
 
     if (auto oldUser = d->user.value_or(QnUserResourcePtr{}))
-        disconnect(oldUser.get());
+        oldUser->disconnect(this);
 
     d->user = user;
 
