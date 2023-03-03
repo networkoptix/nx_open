@@ -46,7 +46,7 @@ Item
 
     signal tileClicked()
     signal lockInterface(bool locked)
-    signal openedTileModalityInterfaceLock()
+    signal setOpenedTileModalityInterfaceLock(bool enabled)
 
     function closeOpenedTile()
     {
@@ -136,8 +136,10 @@ Item
                                     return
                                 }
                             }
-                            tileGrid.openedTileModalityInterfaceLock()
+                            tileGrid.setOpenedTileModalityInterfaceLock(true)
                         }
+
+                        onShrinked: tileGrid.setOpenedTileModalityInterfaceLock(false)
 
                         visibilityMenuModel: model
                         hideActionEnabled: tileGrid.hideActionEnabled
