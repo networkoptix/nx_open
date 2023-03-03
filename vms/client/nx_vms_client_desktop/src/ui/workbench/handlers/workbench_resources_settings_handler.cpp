@@ -262,15 +262,8 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                 camera->setScheduleEnabled(settings.recording.enabled());
 
             const int maxFps = camera->getMaxFps();
-            const int reservedSecondStreamFps = camera->reservedSecondStreamFps();
-
-            // Maximum fps should always been decreased by this value.
-            const int decreaseAlways = camera->getMotionType() == MotionType::software
-                ? reservedSecondStreamFps
-                : 0;
-
-            // Fps in the Motion+LQ cells should be decreased by this value.
-            const int decreaseIfMotionPlusLQ = reservedSecondStreamFps;
+            const int reservedSecondStreamFps =
+                camera->hasDualStreaming() ? camera->reservedSecondStreamFps() : 0;
 
             const QnScheduleTaskList schedule = settings.recording.schedule();
 
@@ -284,10 +277,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                 }
 
                 const int originalFps = task.fps;
-                if (task.recordingType == RecordingType::metadataAndLowQuality)
-                    task.fps = qMin(task.fps, maxFps - decreaseIfMotionPlusLQ);
-                else
-                    task.fps = qMin(task.fps, maxFps - decreaseAlways);
+                task.fps = qMin(task.fps, maxFps - reservedSecondStreamFps);
 
                 // Try to calculate new custom bitrate.
                 if (const auto bitrate = task.bitrateKbps)

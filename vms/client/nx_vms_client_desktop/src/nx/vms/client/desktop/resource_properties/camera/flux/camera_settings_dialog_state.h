@@ -61,8 +61,6 @@ struct SingleCameraProperties
     bool networkLink = false;
     bool usbDevice = false;
 
-    int maxFpsWithoutMotion = 0;
-
     QSize primaryStreamResolution;
     QSize secondaryStreamResolution;
 
@@ -76,7 +74,7 @@ NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
     (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(baseCameraUrl)(settingsUrlPath)
     (webPageLabelText)(settingsUrl)
     (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
-    (editableStreamUrls)(networkLink)(usbDevice)(maxFpsWithoutMotion)
+    (editableStreamUrls)(networkLink)(usbDevice)
     (primaryStreamResolution)(secondaryStreamResolution))
 
 struct CombinedProperties
@@ -104,7 +102,6 @@ struct CombinedProperties
     CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
 
     int maxFps = 0;
-    int maxDualStreamingFps = 0;
 };
 NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isDtsBased)(isVirtualCamera)(isIoModule)(isArecontCamera)(supportsAudio)(supportsVideo)
@@ -112,8 +109,7 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
     (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
     (canForceZoomCapability)(canAdjustPtzSensitivity)(hasCustomMediaPortCapability)
-    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(maxFps)
-    (maxDualStreamingFps))
+    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(maxFps))
 
 struct MotionConstraints
 {

@@ -883,12 +883,6 @@ State loadSingleCameraProperties(
     state.singleCameraSettings.logicalId.setBase(singleCamera->logicalId());
     state = updateDuplicateLogicalIdInfo(std::move(state));
 
-    Qn::calculateMaxFps(
-        {singleCamera},
-        /*maxFps*/ &state.singleCameraProperties.maxFpsWithoutMotion,
-        /*maxDualStreamingFps*/ nullptr,
-        /*motionDetectionAllowed*/ false);
-
     if (analyticsEnginesWatcher)
     {
         bool changed = false;
@@ -1345,9 +1339,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     Qn::calculateMaxFps(
         cameras,
-        &state.devicesDescription.maxFps,
-        &state.devicesDescription.maxDualStreamingFps,
-        /*motionDetectionAllowed*/ false);
+        &state.devicesDescription.maxFps);
 
     state.imageControl = calculateImageControlSettings(cameras);
 
@@ -1429,9 +1421,7 @@ State CameraSettingsDialogStateReducer::handleMotionTypeChanged(
 
     Qn::calculateMaxFps(
         cameras,
-        &state.devicesDescription.maxFps,
-        &state.devicesDescription.maxDualStreamingFps,
-        /*motionDetectionAllowed*/ false);
+        &state.devicesDescription.maxFps);
 
     return state;
 }
@@ -1588,9 +1578,7 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
 
     Qn::calculateMaxFps(
         cameras,
-        &state.devicesDescription.maxFps,
-        &state.devicesDescription.maxDualStreamingFps,
-        /*motionDetectionAllowed*/ false);
+        &state.devicesDescription.maxFps);
 
     return state;
 }
