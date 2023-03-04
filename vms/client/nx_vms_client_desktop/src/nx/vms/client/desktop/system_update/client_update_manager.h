@@ -7,7 +7,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/software_version.h>
 
 class QnUuid;
 
@@ -25,7 +25,7 @@ class NX_VMS_CLIENT_DESKTOP_API ClientUpdateManager: public QObject
     Q_OBJECT
     Q_PROPERTY(bool clientUpdateEnabled READ clientUpdateEnabled WRITE setClientUpdateEnabled
         NOTIFY clientUpdateEnabledChanged)
-    Q_PROPERTY(nx::vms::api::SoftwareVersion pendingVersion READ pendingVersion
+    Q_PROPERTY(nx::utils::SoftwareVersion pendingVersion READ pendingVersion
         NOTIFY pendingVersionChanged)
     Q_PROPERTY(QDateTime plannedUpdateDate READ plannedUpdateDate NOTIFY plannedUpdateDateChanged)
     Q_PROPERTY(bool installationNeeded READ installationNeeded NOTIFY installationNeededChanged)
@@ -38,7 +38,7 @@ public:
     bool clientUpdateEnabled() const;
     void setClientUpdateEnabled(bool enabled);
 
-    api::SoftwareVersion pendingVersion() const;
+    nx::utils::SoftwareVersion pendingVersion() const;
     QDateTime plannedUpdateDate() const;
     bool installationNeeded() const;
 

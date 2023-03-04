@@ -42,7 +42,6 @@
 #include "data/runtime_data.h"
 #include "data/server_runtime_event_data.h"
 #include "data/showreel_data.h"
-#include "data/software_version.h"
 #include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
 #include "data/timestamp.h"
@@ -149,7 +148,6 @@ void Metatypes::initialize()
     qRegisterMetaType<ServerFootageData>();
     qRegisterMetaType<ServerFootageDataList>();
     qRegisterMetaType<ServerRuntimeEventData>();
-    qRegisterMetaType<SoftwareVersion>();
     qRegisterMetaType<StorageData>();
     qRegisterMetaType<StorageDataList>();
     qRegisterMetaType<SyncRequestData>();

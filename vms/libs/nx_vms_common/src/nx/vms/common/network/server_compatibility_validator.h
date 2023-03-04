@@ -15,7 +15,6 @@ namespace nx::vms::api {
 
 struct ModuleInformation;
 struct SystemInformation;
-class SoftwareVersion;
 
 } // namespace nx::vms::api
 

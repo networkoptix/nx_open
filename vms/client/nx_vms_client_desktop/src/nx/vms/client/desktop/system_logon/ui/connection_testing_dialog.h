@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <QtWidgets/QDialog>
 #include <QtCore/QTimer>
+#include <QtWidgets/QDialog>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/api/data/software_version.h>
-#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 
@@ -27,7 +27,7 @@ public:
     void testConnection(
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
-        const nx::vms::api::SoftwareVersion& engineVersion);
+        const nx::utils::SoftwareVersion& engineVersion);
 
 signals:
     void connectRequested(nx::vms::client::core::RemoteConnectionPtr connection);

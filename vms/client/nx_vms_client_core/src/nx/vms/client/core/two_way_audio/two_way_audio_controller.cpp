@@ -81,7 +81,7 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
         });
 
     auto serverVersion = q->connection()->moduleInformation().version;
-    if (serverVersion < nx::vms::api::SoftwareVersion(5, 0))
+    if (serverVersion < nx::utils::SoftwareVersion(5, 0))
     {
         return orderedRequestsHelper.getJsonResult(q->connectedServerApi(),
             "/api/transmitAudio", params, requestCallback, QThread::currentThread());

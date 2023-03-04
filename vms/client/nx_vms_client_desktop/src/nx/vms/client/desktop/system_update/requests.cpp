@@ -95,7 +95,7 @@ UpdateContents getUpdateContents(
             contents.source = nx::format("%1 by getUpdateContents", url);
         }
 
-        api::SoftwareVersion currentVersion;
+        nx::utils::SoftwareVersion currentVersion;
         if (const auto p = std::get_if<LatestVmsVersionParams>(&params))
             currentVersion = p->currentVersion;
         else if (const auto p = std::get_if<LatestDesktopClientVersionParams>(&params))

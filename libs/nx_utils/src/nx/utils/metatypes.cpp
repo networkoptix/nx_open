@@ -4,12 +4,13 @@
 
 #include <atomic>
 
+#include "async_handler_executor_detail.h"
 #include "buffer.h"
 #include "mac_address.h"
+#include "scope_guard.h"
+#include "software_version.h"
 #include "url.h"
 #include "uuid.h"
-#include "scope_guard.h"
-#include "async_handler_executor_detail.h"
 
 namespace nx::utils {
 
@@ -31,6 +32,7 @@ void Metatypes::initialize()
     qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
 
     qRegisterMetaType<SharedGuardPtr>();
+    qRegisterMetaType<SoftwareVersion>();
 
     qRegisterMetaType<async_handler_executor_detail::ExecuteArg>();
 

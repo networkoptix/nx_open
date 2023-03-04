@@ -6,9 +6,8 @@
 #include <QtCore/QMap>
 
 #include <network/base_system_description.h>
-
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 
 class NX_VMS_CLIENT_CORE_API QnSystemDescription: public QnBaseSystemDescription
@@ -102,5 +101,5 @@ private:
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
     IdsSet m_reachableServers;
-    nx::vms::api::SoftwareVersion m_version;
+    nx::utils::SoftwareVersion m_version;
 };

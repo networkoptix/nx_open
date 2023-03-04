@@ -6,19 +6,18 @@
 
 #include <QtCore/QBuffer>
 
+#include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/optional.h>
-#include <nx/utils/stree/node.h>
 #include <nx/utils/stree/attribute_dictionary.h>
+#include <nx/utils/stree/node.h>
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
-
-#include <nx/branding.h>
-#include <nx/build_info.h>
 
 namespace nx::network::cloud {
 
@@ -237,16 +236,16 @@ private:
         const nx::utils::SoftwareVersion productVersion(nx::build_info::vmsVersion());
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
-            productVersion.major());
+            productVersion.major);
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionMinor,
-            productVersion.minor());
+            productVersion.minor);
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionBugfix,
-            productVersion.bugfix());
+            productVersion.bugfix);
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionBuild,
-            productVersion.build());
+            productVersion.build);
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionFull,
             nx::build_info::vmsVersion());

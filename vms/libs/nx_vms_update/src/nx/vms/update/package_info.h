@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/os_info.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/data/software_version_serialization.h>
 
 namespace nx::vms::update {
 
@@ -40,7 +40,7 @@ inline size_t qHash(Component component, size_t seed = 0)
 
 struct NX_VMS_UPDATE_API PackageInfo
 {
-    nx::vms::api::SoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     Component component;
     QString cloudHost;
     QString platform;

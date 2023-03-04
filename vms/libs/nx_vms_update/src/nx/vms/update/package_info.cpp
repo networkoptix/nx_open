@@ -6,7 +6,7 @@
 
 namespace nx::vms::update {
 
-using nx::vms::api::SoftwareVersion;
+using nx::utils::SoftwareVersion;
 
 bool PackageInfo::isValid() const
 {

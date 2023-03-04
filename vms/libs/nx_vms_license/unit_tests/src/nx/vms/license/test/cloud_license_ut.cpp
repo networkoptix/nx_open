@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <licensing/license.h>
-#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/cloud_license_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace nx::vms::license::test {
 
@@ -76,8 +76,8 @@ TEST(CloudLicense, serialize)
 	ASSERT_TRUE(license.params.services.contains("localRecording"));
 	ASSERT_TRUE(license.params.services.contains("cloudStorage"));
 	ASSERT_EQ("10", license.params.services["localRecording"]["totalChannelNumber"]);
-	ASSERT_EQ(2, license.version.major());
-	ASSERT_EQ(0, license.version.minor());
+	ASSERT_EQ(2, license.version.major);
+	ASSERT_EQ(0, license.version.minor);
 
 	ASSERT_EQ("2W36-ELIH-42VB-UO9G", license.params.orderParams.licenseKey);
 	ASSERT_EQ("nx", license.params.orderParams.brand);
@@ -102,7 +102,7 @@ TEST(CloudLicense, serialize)
 					"signature" : "ABSCDEF",
 					"issue" : "ok"
 #endif
-	
+
 }
 
 } // namespace nx::vms::license::test

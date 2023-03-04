@@ -79,7 +79,7 @@ bool compatibleCloudHost(const QString& remoteCloudHost)
 std::optional<ServerCompatibilityValidator::Reason> checkInternal(
     const QString& customization,
     int protoVersion,
-    const SoftwareVersion& version,
+    const nx::utils::SoftwareVersion& version,
     const QString& cloudHost,
     ServerCompatibilityValidator::Purpose purpose)
 {

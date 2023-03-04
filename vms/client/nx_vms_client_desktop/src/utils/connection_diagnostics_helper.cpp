@@ -17,7 +17,6 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -67,7 +66,7 @@ QString getDiffVersionsFullText(
 QString getDiffVersionFullExtras(
     const nx::vms::api::ModuleInformation& moduleInformation,
     const QString& extraText,
-    const nx::vms::api::SoftwareVersion& engineVersion)
+    const nx::utils::SoftwareVersion& engineVersion)
 {
     const QString clientVersion = engineVersion.toString();
     const QString serverVersion = moduleInformation.version.toString();
@@ -85,7 +84,7 @@ QString getDiffVersionFullExtras(
 
 void showApplauncherErrorDialog(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     const QString extras = getDiffVersionFullExtras(moduleInformation,
@@ -102,7 +101,7 @@ void showApplauncherErrorDialog(
 
 bool agreeToDownloadVersion(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     auto extras = getDiffVersionFullExtras(moduleInformation,
@@ -129,7 +128,7 @@ bool agreeToDownloadVersion(
 std::pair<bool /*success*/, bool /*confirmRestart*/> downloadCompatibleVersion(
     const nx::vms::api::ModuleInformation& moduleInformation,
     const nx::vms::client::core::LogonData& logonData,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
@@ -166,7 +165,7 @@ std::pair<bool /*success*/, bool /*confirmRestart*/> downloadCompatibleVersion(
 
 bool confirmRestart(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     const auto extras = getDiffVersionFullExtras(moduleInformation,
@@ -196,7 +195,7 @@ bool agreeToTryAgain(
     QWidget* parentWidget)
 {
     const QString version =
-        moduleInformation.version.toString(nx::utils::SoftwareVersion::MinorFormat);
+        moduleInformation.version.toString(nx::utils::SoftwareVersion::Format::minor);
     QnMessageBox dialog(QnMessageBoxIcon::Critical,
         QnConnectionDiagnosticsHelper::tr("Failed to download and launch version %1").arg(version),
         /*extras*/ QString(),
@@ -229,7 +228,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     QWidget* parentWidget,
     const nx::vms::api::ModuleInformation& moduleInformation,
     nx::vms::client::core::LogonData logonData,
-    const nx::vms::api::SoftwareVersion& engineVersion)
+    const nx::utils::SoftwareVersion& engineVersion)
 {
     using namespace nx::vms::applauncher::api;
 
@@ -323,7 +322,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
     QnWorkbenchContext* context,
     RemoteConnectionError error,
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     if (!parentWidget)
@@ -418,7 +417,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
 }
 
 void QnConnectionDiagnosticsHelper::showCompatibilityModeFailureMessage(
-        const nx::vms::api::SoftwareVersion& version,
+        const nx::utils::SoftwareVersion& version,
         const QString& errorDescription,
         QWidget* parentWidget)
 {
@@ -465,7 +464,7 @@ void QnConnectionDiagnosticsHelper::failedRestartClientMessage(QWidget* parent)
 
 QString QnConnectionDiagnosticsHelper::developerModeText(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::api::SoftwareVersion& engineVersion)
+    const nx::utils::SoftwareVersion& engineVersion)
 {
     auto asError =
         [](const auto& value)

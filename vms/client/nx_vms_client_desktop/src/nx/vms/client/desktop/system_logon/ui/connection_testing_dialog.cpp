@@ -98,7 +98,7 @@ bool alwaysShowDeveloperError(
 
 struct ConnectionTestingDialog::Private
 {
-    nx::vms::api::SoftwareVersion engineVersion;
+    nx::utils::SoftwareVersion engineVersion;
     RemoteConnectionFactory::ProcessPtr connectionProcess;
     DiagnosticResult result;
     QPushButton* connectButton = nullptr;
@@ -229,7 +229,7 @@ ConnectionTestingDialog::ConnectionTestingDialog(QWidget* parent):
 void ConnectionTestingDialog::testConnection(
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials,
-    const nx::vms::api::SoftwareVersion& engineVersion)
+    const nx::utils::SoftwareVersion& engineVersion)
 {
     d->engineVersion = engineVersion;
 

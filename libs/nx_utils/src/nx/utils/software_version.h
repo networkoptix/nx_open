@@ -2,36 +2,30 @@
 
 #pragma once
 
-#include <array>
-
 #include <QtCore/QString>
+#include <QtCore/qobjectdefs.h>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
-
-/* On some Linux systems "major" and "minor" are pre-defined macros in sys/types.h */
+// On some Linux systems "major" and "minor" are pre-defined macros in sys/types.h.
 #undef major
 #undef minor
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
-class NX_UTILS_API SoftwareVersion:
-    public boost::equality_comparable1<SoftwareVersion,
-        boost::less_than_comparable1<SoftwareVersion>>
+struct NX_UTILS_API SoftwareVersion
 {
+    Q_GADGET
+    Q_PROPERTY(int major MEMBER major CONSTANT)
+    Q_PROPERTY(int minor MEMBER minor CONSTANT)
+    Q_PROPERTY(int bugfix MEMBER bugfix CONSTANT)
+    Q_PROPERTY(int build MEMBER build CONSTANT)
+
 public:
-    enum Format
+    constexpr SoftwareVersion() {}
+
+    constexpr SoftwareVersion(int major, int minor, int bugfix = 0, int build = 0):
+        major(major), minor(minor), bugfix(bugfix), build(build)
     {
-        FullFormat = 4,
-        BugfixFormat = 3,
-        MinorFormat = 2
-    };
-
-    SoftwareVersion();
-
-    SoftwareVersion(int major, int minor, int bugfix = 0, int build = 0);
+    }
 
     /**
      * Creates a software version object from a string. Note that this function
@@ -44,37 +38,24 @@ public:
     explicit SoftwareVersion(const QByteArray& versionString);
     explicit SoftwareVersion(const std::string_view& versionString);
 
-    QString toString(Format format = FullFormat) const;
+    enum class Format { minor, bugfix, full };
+    Q_INVOKABLE QString toString(Format format = Format::full) const;
+
+    Q_INVOKABLE bool isNull() const;
+
+    bool deserialize(const QString& versionString);
+
     static SoftwareVersion fromStdString(const std::string& string);
 
-    bool isNull() const;
+    auto operator<=>(const SoftwareVersion&) const = default;
 
-    int major() const
-    {
-        return m_data[0];
-    }
-
-    int minor() const
-    {
-        return m_data[1];
-    }
-
-    int bugfix() const
-    {
-        return m_data[2];
-    }
-
-    int build() const
-    {
-        return m_data[3];
-    }
-
-    friend bool NX_UTILS_API operator<(const SoftwareVersion& l, const SoftwareVersion& r);
-    friend bool NX_UTILS_API operator==(const SoftwareVersion& l, const SoftwareVersion& r);
-
-protected:
-    std::array<int, 4> m_data;
+public:
+    int major = 0;
+    int minor = 0;
+    int bugfix = 0;
+    int build = 0;
 };
 
-} // namespace utils
-} // namespace nx
+NX_UTILS_API std::ostream& operator<<(std::ostream&, const SoftwareVersion&);
+
+} // namespace nx::utils

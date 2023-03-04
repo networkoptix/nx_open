@@ -9,9 +9,9 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/peer_data.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/math/math.h>
 
@@ -86,9 +86,9 @@ public:
 
     void resetModel();
 
-    nx::vms::api::SoftwareVersion getIncompatibleVersion(
+    nx::utils::SoftwareVersion getIncompatibleVersion(
         const QnSystemDescriptionPtr& systemDescription) const;
-    nx::vms::api::SoftwareVersion getCompatibleVersion(
+    nx::utils::SoftwareVersion getCompatibleVersion(
         const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
@@ -538,7 +538,7 @@ void QnSystemsModelPrivate::resetModel()
         addSystem(system);
 }
 
-nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
+nx::utils::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     for (const auto& serverInfo: systemDescription->servers())
@@ -550,7 +550,7 @@ nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
     return {};
 }
 
-nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
+nx::utils::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
@@ -566,7 +566,7 @@ nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
         });
 
     return incompatibleIt == servers.end()
-        ? nx::vms::api::SoftwareVersion()
+        ? nx::utils::SoftwareVersion()
         : incompatibleIt->version;
 }
 

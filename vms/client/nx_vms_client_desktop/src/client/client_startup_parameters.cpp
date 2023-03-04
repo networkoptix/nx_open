@@ -3,8 +3,8 @@
 #include "client_startup_parameters.h"
 
 #if defined(Q_OS_WIN)
-    #include <Windows.h>
-    #include <shellapi.h>
+#include <Windows.h>
+#include <shellapi.h>
 #endif
 
 #include <QtCore/QDir>
@@ -43,7 +43,7 @@ void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const char
 
 static const QString kEncodeAuthMagic_v30 = "@@";
 static const QString kEncodeAuthMagic_v50_token = "@T@";
-static const nx::vms::api::SoftwareVersion kTokenSupportVersion(5, 0, 0, 0);
+static const nx::utils::SoftwareVersion kTokenSupportVersion(5, 0);
 
 constexpr std::string_view kUserTypeParam = "user_type";
 
@@ -189,7 +189,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 
 QString QnStartupParameters::createAuthenticationString(
     const nx::vms::client::core::LogonData& logonData,
-    std::optional<nx::vms::api::SoftwareVersion> version)
+    std::optional<nx::utils::SoftwareVersion> version)
 {
     auto builder = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)

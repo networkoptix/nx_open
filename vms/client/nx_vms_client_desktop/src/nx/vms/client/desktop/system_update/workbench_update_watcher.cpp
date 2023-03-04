@@ -259,8 +259,8 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
     m_notifiedVersion = targetVersion;
 
     const auto current = appContext()->version();
-    const bool majorVersionChange = ((targetVersion.major() > current.major())
-        || (targetVersion.minor() > current.minor())) && !description.isEmpty();
+    const bool majorVersionChange = ((targetVersion.major > current.major)
+        || (targetVersion.minor > current.minor)) && !description.isEmpty();
 
     const auto text = tr("%1 version available").arg(targetVersion.toString());
     const auto releaseNotesLink = common::html::link(tr("Release Notes"), releaseNotesUrl);

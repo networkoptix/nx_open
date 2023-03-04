@@ -17,8 +17,8 @@
 #include <nx/zip/extractor.h>
 
 #if defined(Q_OS_MACX)
-#include <nx/utils/platform/core_foundation_mac/cf_url.h>
 #include <nx/utils/platform/core_foundation_mac/cf_dictionary.h>
+#include <nx/utils/platform/core_foundation_mac/cf_url.h>
 #endif
 
 using namespace std::chrono;
@@ -37,7 +37,7 @@ QString kInstallationPathPrefix = "AppData/Local";
 QString versionToString(const nx::utils::SoftwareVersion& version)
 {
     if (version < nx::utils::SoftwareVersion(2, 2))
-        return version.toString(nx::utils::SoftwareVersion::MinorFormat);
+        return version.toString(nx::utils::SoftwareVersion::Format::minor);
     return version.toString();
 }
 
@@ -299,7 +299,7 @@ void InstallationManager::createGhostsForVersion(const nx::utils::SoftwareVersio
     targetDir.cdUp();
 
     auto entries = nx::utils::toQSet(targetDir.entryList(QDir::Files));
-    entries.remove(version.toString(nx::utils::SoftwareVersion::MinorFormat));
+    entries.remove(version.toString(nx::utils::SoftwareVersion::Format::minor));
 
     std::unique_lock<std::mutex> lk(m_mutex);
     QList<nx::utils::SoftwareVersion> versions = m_installationByVersion.keys();
@@ -310,7 +310,8 @@ void InstallationManager::createGhostsForVersion(const nx::utils::SoftwareVersio
         if (ghostVersion == version)
             continue;
 
-        QString ghostVersionString = ghostVersion.toString(nx::utils::SoftwareVersion::MinorFormat);
+        QString ghostVersionString =
+            ghostVersion.toString(nx::utils::SoftwareVersion::Format::minor);
 
         if (entries.contains(ghostVersionString))
         {
@@ -398,19 +399,19 @@ nx::utils::SoftwareVersion InstallationManager::nearestInstalledVersion(
 
         nx::utils::SoftwareVersion v = it.key();
         // too early
-        if (v.major() > version.major())
+        if (v.major > version.major)
             continue;
 
         // to last (
-        if (v.major() < version.major())
+        if (v.major < version.major)
             break;
 
         // too early
-        if (v.minor() > version.minor())
+        if (v.minor > version.minor)
             continue;
 
         // to last (
-        if (v.minor() < version.minor())
+        if (v.minor < version.minor)
             break;
 
         // got it!
@@ -446,7 +447,7 @@ QnClientInstallationPtr InstallationManager::installationForVersion(
         return QnClientInstallationPtr();
 
     nx::utils::SoftwareVersion ver = nearestInstalledVersion(
-        nx::utils::SoftwareVersion(version.major(), version.minor()));
+        nx::utils::SoftwareVersion(version.major, version.minor));
     if (ver.isNull())
         return QnClientInstallationPtr();
 

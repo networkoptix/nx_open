@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-namespace nx::utils { class SoftwareVersion; }
+namespace nx::utils { struct SoftwareVersion; }
 namespace nx::vms::api { struct ModuleInformation; }
 
 namespace nx::vms::client::core {

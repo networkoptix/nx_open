@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include <set>
 #include <map>
+#include <set>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
-#include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/data/software_version.h>
-#include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
 
 namespace nx::vms::client::desktop {
 

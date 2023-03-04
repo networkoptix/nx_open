@@ -6,7 +6,6 @@
 #include <QtCore/QUuid>
 
 #include <ui/models/sort_filter_list_model.h>
-#include <nx/vms/api/data/software_version.h>
 
 class QnSystemHostsModel: public QnSortFilterListModel
 {

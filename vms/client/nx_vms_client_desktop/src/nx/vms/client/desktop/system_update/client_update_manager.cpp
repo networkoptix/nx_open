@@ -45,21 +45,21 @@ namespace {
 milliseconds kClientUpdateRolloutPeriod = 4h;
 
 QRandomGenerator64 getRandomGenerator(
-    const QnUuid& localSystemId, const api::SoftwareVersion& version)
+    const QnUuid& localSystemId, const nx::utils::SoftwareVersion& version)
 {
     // We need a seeded random generator to ensure that all clients of one system pick the same
     // date. So we seed it with the localSystemId. The update version is also fed to the generator
     // to avoid cases when clients in the system pick the same date shift for every update.
     QByteArray seed = localSystemId.toRfc4122();
 
-    int n = version.major();
+    int n = version.major;
     seed.reserve(seed.size() + 4 * sizeof(n));
     seed.append((char*) &n, sizeof(n));
-    n = version.minor();
+    n = version.minor;
     seed.append((char*) &n, sizeof(n));
-    n = version.bugfix();
+    n = version.bugfix;
     seed.append((char*) &n, sizeof(n));
-    n = version.build();
+    n = version.build;
     seed.append((char*) &n, sizeof(n));
 
     return QRandomGenerator64((const quint32*) seed.data(), seed.size() / sizeof(quint32));
@@ -86,7 +86,8 @@ public:
     void hideErrorNotification();
 
     void setEnabled(bool enabled);
-    void setGlobalPlannedUpdate(const api::SoftwareVersion& version, milliseconds updateDateTime);
+    void setGlobalPlannedUpdate(
+        const nx::utils::SoftwareVersion& version, milliseconds updateDateTime);
     bool isGlobalUpdateDateUsed() const;
     void planUpdate();
 
@@ -110,7 +111,7 @@ public:
     bool connected = false;
 
     bool enabled = false;
-    api::SoftwareVersion globalPlannedVersion;
+    nx::utils::SoftwareVersion globalPlannedVersion;
     milliseconds globalPlannedUpdateDateTime{0};
 
     milliseconds generatedUpdateDateTime{0};
@@ -297,7 +298,7 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
         updateContents.info.version);
 
     const auto versionUrl = QString("<a href=\"%2\">%1</a>").arg(
-        updateContents.info.version.toString(nx::utils::SoftwareVersion::BugfixFormat),
+        updateContents.info.version.toString(nx::utils::SoftwareVersion::Format::bugfix),
         q->releaseNotesUrl().toString());
     installationNotificationId = notificationsManager->add(tr("Client update is installed"),
         tr("Client is updated to version %1. Restart %2 to finish update.",
@@ -432,7 +433,7 @@ void ClientUpdateManager::Private::setEnabled(bool enabled)
 }
 
 void ClientUpdateManager::Private::setGlobalPlannedUpdate(
-    const api::SoftwareVersion& version, milliseconds updateDateTime)
+    const nx::utils::SoftwareVersion& version, milliseconds updateDateTime)
 {
     globalPlannedVersion = version;
     globalPlannedUpdateDateTime = updateDateTime;
@@ -685,7 +686,7 @@ void ClientUpdateManager::setClientUpdateEnabled(bool enabled)
     d->setEnabled(enabled);
 }
 
-api::SoftwareVersion ClientUpdateManager::pendingVersion() const
+nx::utils::SoftwareVersion ClientUpdateManager::pendingVersion() const
 {
     return d->updateContents.info.version;
 }

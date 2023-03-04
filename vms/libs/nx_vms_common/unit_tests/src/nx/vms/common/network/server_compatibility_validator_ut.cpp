@@ -9,7 +9,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx_ec/ec_api_common.h>
@@ -117,7 +116,7 @@ private:
     std::string m_validatorLabel = "Unknown";
     int m_protocolVersion = 0;
     QString m_customization;
-    nx::vms::api::SoftwareVersion m_version;
+    nx::utils::SoftwareVersion m_version;
     QString m_cloudHost;
     std::unique_ptr<std::string> m_publicationType;
     std::unique_ptr<nx::kit::IniConfig::Tweaks> iniTweaks;

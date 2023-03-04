@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
 #include <QtCore/QModelIndex>
+#include <QtCore/QObject>
 #include <QtCore/QPersistentModelIndex>
+#include <QtCore/QVariant>
 #include <QtGui/QCursor>
 #include <QtQuick/QQuickItem>
 
-#include <nx/utils/uuid.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/time/date_range.h>
 
@@ -40,7 +40,7 @@ public:
     /** Operations with QModelIndexList in QML are incredibly slow, pass QVariantList instead. */
     Q_INVOKABLE QVariantList toVariantList(const QModelIndexList& indexList) const;
 
-    Q_INVOKABLE nx::vms::api::SoftwareVersion softwareVersion(const QString& version) const;
+    Q_INVOKABLE nx::utils::SoftwareVersion softwareVersion(const QString& version) const;
 
     Q_INVOKABLE QCursor cursor(Qt::CursorShape shape) const;
 

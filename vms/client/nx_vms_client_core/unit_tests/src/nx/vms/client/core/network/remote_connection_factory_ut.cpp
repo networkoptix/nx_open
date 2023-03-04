@@ -195,7 +195,7 @@ public:
             serverInfo.customization = nx::branding::customization();
             serverInfo.cloudHost = nx::branding::cloudHost();
             serverInfo.port = ::helpers::kDefaultConnectionPort;
-            serverInfo.protoVersion = data.version.major() * 1000 + data.version.minor() * 100;
+            serverInfo.protoVersion = data.version.major * 1000 + data.version.minor * 100;
 
             requestsManager->addServer(serverInfo);
         }

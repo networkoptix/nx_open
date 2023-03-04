@@ -5,7 +5,6 @@
 #include <QtWidgets/QDialog>
 
 #include <nx/utils/software_version.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <ui/dialogs/common/dialog.h>
 
@@ -26,7 +25,7 @@ public:
     CompatibilityVersionInstallationDialog(
         const nx::vms::api::ModuleInformation& moduleInformation,
         const nx::vms::client::core::LogonData& logonData,
-        const nx::vms::api::SoftwareVersion& engineVersion,
+        const nx::utils::SoftwareVersion& engineVersion,
         QWidget* parent);
     virtual ~CompatibilityVersionInstallationDialog();
 
@@ -71,7 +70,7 @@ protected:
 
     InstallResult m_installationResult = InstallResult::initial;
     bool m_autoInstall = true;
-    const nx::vms::api::SoftwareVersion m_engineVersion;
+    const nx::utils::SoftwareVersion m_engineVersion;
     QString m_errorMessage;
 
 private:

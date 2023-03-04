@@ -4,9 +4,9 @@
 
 #include <QtCore/QRect>
 
+#include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/utils/system_uri.h>
 
@@ -19,7 +19,7 @@ struct QnStartupParameters
 
     static QString createAuthenticationString(
         const nx::vms::client::core::LogonData& logonData,
-        std::optional<nx::vms::api::SoftwareVersion> version = std::nullopt);
+        std::optional<nx::utils::SoftwareVersion> version = std::nullopt);
 
     static nx::vms::client::core::LogonData parseAuthenticationString(QString string);
     nx::vms::client::core::LogonData parseAuthenticationString() const;

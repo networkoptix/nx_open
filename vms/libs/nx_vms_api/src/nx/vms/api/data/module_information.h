@@ -16,7 +16,7 @@
 #include "data_macros.h"
 #include "os_information.h"
 #include "runtime_data.h"
-#include "software_version.h"
+#include "software_version_serialization.h"
 #include "timestamp.h"
 
 namespace nx::vms::api {
@@ -41,7 +41,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     QString type;
     QString customization;
     QString brand;
-    SoftwareVersion version; /**<%apidoc:string */
+    nx::utils::SoftwareVersion version; /**<%apidoc:string */
     QString systemName;
     QString name;
     bool sslAllowed = true;

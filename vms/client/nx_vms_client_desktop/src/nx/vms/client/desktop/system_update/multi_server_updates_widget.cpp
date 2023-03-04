@@ -799,8 +799,8 @@ nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
         systemContext()->globalSettings()->targetPersistentUpdateStorage();
 
     const bool useLatest = m_updateInfo.sourceType == UpdateSourceType::internet;
-    const api::SoftwareVersion targetVersion = useLatest
-        ? api::SoftwareVersion()
+    const nx::utils::SoftwareVersion targetVersion = useLatest
+        ? nx::utils::SoftwareVersion()
         : m_updateInfo.info.version;
 
     QUrlQuery query;
@@ -816,7 +816,7 @@ nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
     {
         query.addQueryItem("version", m_updateInfo.info.version.toString());
         query.addQueryItem("password",
-            common::update::passwordForBuild(QString::number(m_updateInfo.info.version.build())));
+            common::update::passwordForBuild(QString::number(m_updateInfo.info.version.build)));
     }
 
     query.addQueryItem("customization", nx::branding::customization());

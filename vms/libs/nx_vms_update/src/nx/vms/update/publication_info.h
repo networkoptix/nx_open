@@ -52,7 +52,7 @@ enum class FindPackageError
 
 struct NX_VMS_UPDATE_API PublicationInfo
 {
-    nx::vms::api::SoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     QString cloudHost;
     QString eulaLink;
     int eulaVersion = 0;

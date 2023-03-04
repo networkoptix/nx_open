@@ -103,9 +103,9 @@ QString UpdateStrings::getReportForUnsupportedOs(const nx::utils::OsInfo& info)
         version.clear();
 
         const nx::utils::SoftwareVersion ver(info.variantVersion);
-        if (ver.major() == 6)
+        if (ver.major == 6)
         {
-            switch (ver.minor())
+            switch (ver.minor)
             {
                 case 0: version = "Vista"; break;
                 case 1: version = "7"; break;
@@ -114,7 +114,7 @@ QString UpdateStrings::getReportForUnsupportedOs(const nx::utils::OsInfo& info)
                 default: break;
             }
         }
-        else if (ver.major() == 10)
+        else if (ver.major == 10)
         {
             version = "10";
         }
@@ -202,7 +202,7 @@ bool verifyUpdateContents(
         && !contents.packagesGenerated)
     {
         contents.filesToUpload.clear();
-        QString uploadDestination = QString("updates/%1/").arg(targetVersion.build());
+        QString uploadDestination = QString("updates/%1/").arg(targetVersion.build);
         QList<nx::vms::update::Package> checked;
         for (auto& pkg: contents.info.packages)
         {
