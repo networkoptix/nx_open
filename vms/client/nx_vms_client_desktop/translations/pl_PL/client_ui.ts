@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Port strony internetowej</translation>
     </message>
   </context>
   <context>
@@ -2002,11 +2002,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Wybierz plik aktualizacji</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Sprawdź ponownie</translation>
     </message>
     <message>
       <source>Try Again</source>

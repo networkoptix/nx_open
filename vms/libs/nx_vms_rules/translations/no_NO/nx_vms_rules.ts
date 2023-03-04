@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -160,9 +160,9 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>Enhet frakoblet</numerusform>
+        <numerusform>Enhet frakoblet</numerusform>
       </translation>
     </message>
     <message>
@@ -171,9 +171,9 @@
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>Kamera frakoblet</numerusform>
+        <numerusform>Kamera frakoblet</numerusform>
       </translation>
     </message>
   </context>
@@ -206,9 +206,9 @@
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Kamera IP-konflikt</numerusform>
+        <numerusform>Kamera IP-konflikt</numerusform>
       </translation>
     </message>
   </context>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -262,7 +262,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Login</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -684,7 +684,7 @@
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Sikkerhetskopiering av arkiv mislyktes. Kunne ikke sikkerhetskopiere fil %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Bildetekst: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Årsak: %1</translation>
     </message>
   </context>
   <context>
