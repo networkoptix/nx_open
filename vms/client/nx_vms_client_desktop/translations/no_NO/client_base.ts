@@ -12046,7 +12046,7 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maksimalt nivå for nesting er nådd</translation>
     </message>
   </context>
   <context>

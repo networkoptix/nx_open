@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Filtr archiwum...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Zamień kamerę...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
@@ -1029,11 +1029,11 @@
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Zapisz układ chmury</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Zapisz układ chmury jako...</translation>
     </message>
   </context>
   <context>
@@ -1334,7 +1334,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Nie udało się aktywować bezpłatnej licencji</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1343,20 +1343,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Identyfikator sprzętu: %1
+Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Kopiuj parametry</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Jeśli Twój System nie ma dostępu do Internetu, prześlij dostarczony Klucz Licencyjny i Identyfikator Sprzętu na adres %1, aby otrzymać plik aktywacyjny.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Jeśli Twój system nie ma dostępu do Internetu, wyślij dostarczony klucz licencyjny i identyfikator sprzętu do regionalnego zespołu wsparcia technicznego/licencyjnego, aby otrzymać plik aktywacyjny:</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1515,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Niezabezpieczone</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1527,7 +1527,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>Adres URL jest nieprawidłowy.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1535,11 +1535,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktywne</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Nie skonfigurowano</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1547,7 +1547,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Ustaw swój adres e-mail lub serwer SMTP</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -5536,11 +5536,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Użyj do przechowywania danych analitycznych i danych detekcji ruchu</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Przechowuje dane analityczne i detekcji ruchu</translation>
     </message>
   </context>
   <context>
@@ -7585,7 +7585,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>Postęp zostanie wyświetlony po rozpoczęciu procesu tworzenia kopii zapasowej</translation>
     </message>
   </context>
   <context>

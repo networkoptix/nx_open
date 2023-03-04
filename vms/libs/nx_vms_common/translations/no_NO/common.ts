@@ -1099,21 +1099,21 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Mangler nødvendig parameter: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Kunne ikke behandle forespørselen.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Forbudt.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Konflikt.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1123,7 +1123,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Ikke implementert.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1136,11 +1136,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Ustøttet medietype.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Tjenesten er utilgjengelig.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1148,7 +1148,7 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Sesjon utløpt.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Anonym statistikk rapporterer siste nummer</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Anonym statistikk rapporterer Klientinnstillinger</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
@@ -1319,15 +1319,15 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Siste hovedsystemsammenslåings-ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>Siste slave Systemsammenslåings-ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Deaktiver enhetsleverandører</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1360,7 +1360,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Revisjonslogg (dager, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1368,15 +1368,15 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Håndheve HTTPS (datatrafikkryptering)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Håndheve RTSPS (kryptering av videotrafikk)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Aktiver automatisk oppdagelse</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1404,19 +1404,19 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Aktiver sekvensiell Flir ONVIF-søker</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Maks P2P-køstørrelse (byte, 32–512 Mb)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Maks P2P alle klientstørrelser (byte, 32–512 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Maks opptakskøstørrelse (byte, 6–96 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
@@ -1424,7 +1424,7 @@
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Antall RTP-forsøk på nytt</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1432,19 +1432,19 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Maks RTSP-tilkoblingsvarighet (sekunder)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Aktiver cloud-connect UDP-hullhulling</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Aktiver bruk av cloud-connect-reléer</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Håndhev SSL for skytilkoblingsreléer</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
@@ -1452,7 +1452,7 @@
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Informasjon om måloppdatering</translation>
     </message>
     <message>
       <source>Installed update information</source>
@@ -1460,7 +1460,7 @@
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Peers for nedlasting av filer</translation>
     </message>
     <message>
       <source>Client update settings</source>
@@ -1472,23 +1472,23 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Levetid for autorisasjonsøkttoken (minutter)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Begrensning for antall sesjonstokener på en enkelt server</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Maks antall økttokener per bruker på enkelt server</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Oppdateringsintervall for ekstern sesjonstoken (andre servere og sky)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Tidsavbrudd for ekstern sesjonstoken (andre servere og sky)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Standard kodek for eksport av video</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URI for resource_data.json automatisk oppdatering</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1516,80 +1516,80 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Vedvarende servere for oppdateringslagring</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Vedvarende servere hvor oppdateringer lagres</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>VMS Server versjonsspesifikke funksjoner</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Ytterligere lokale FS-lagringstyper for opptak</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Tving analytics DB-lagringsmonteringspunkttillatelser i tilfelle feil</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Sjekk videostrømperiode (millisekunder)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Lagringskryptering aktivert</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Gjeldende lagringskrypteringsnøkkel</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>HTTP-header: Opprinnelse</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>HTTP-header: X-Frame-Options</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Vis forhåndsvisning av musens tidslinje</translation>
     </message>
     <message>
       <source>Language for Cloud notifications</source>
-      <translation type="unfinished">Language for Cloud notifications</translation>
+      <translation>Språk for skyvarsler</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+      <translation>Mediebufferstørrelse (KB, 10KB-4MB)</translation>
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Aktiver policy på tvers av domener</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>Aktiver WebSocket for P2P</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>Vis servere i ressurstreet for ikke-administratorer</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Bruk kun HTTPS for kameraer</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+      <translation>Aktiver utdaterte API-funksjoner (usikre)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+      <translation>Aktiver utdaterte API-funksjoner som for øyeblikket brukes av %1 programvare (usikkert)</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
@@ -2238,16 +2238,16 @@
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Adresse %1 er allerede i bruk av %2 på primærstrømmen.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Adresse %1 er allerede i bruk av %2 på sekundærstrøm.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Multicast-adressekonflikt oppdaget.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
