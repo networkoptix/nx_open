@@ -94,8 +94,8 @@ nx::utils::SoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(
 bool QnWorkbenchVersionMismatchWatcher::versionMismatches(const nx::utils::SoftwareVersion& left,
     const nx::utils::SoftwareVersion& right, bool concernBuild)
 {
-    return (left.major() != right.major() || left.minor() != right.minor()
-        || left.bugfix() != right.bugfix() || (concernBuild && (left.build() != right.build())));
+    return (left.major != right.major || left.minor != right.minor
+        || left.bugfix != right.bugfix || (concernBuild && (left.build != right.build)));
 }
 
 void QnWorkbenchVersionMismatchWatcher::updateHasMismatches()

@@ -9,12 +9,7 @@
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx_ec/ec_api_fwd.h>
 
-namespace nx::vms::api {
-
-class SoftwareVersion;
-struct ModuleInformation;
-
-} // namespace nx::vms::api
+namespace nx::vms::api { struct ModuleInformation; }
 
 class QnWorkbenchContext;
 
@@ -30,7 +25,7 @@ public:
         QWidget* parentWidget,
         const nx::vms::api::ModuleInformation& moduleInformation,
         nx::vms::client::core::LogonData logonData,
-        const nx::vms::api::SoftwareVersion& engineVersion);
+        const nx::utils::SoftwareVersion& engineVersion);
 
     /**
      * Show message box with connection error description. If parent widget is not passed, main
@@ -40,11 +35,11 @@ public:
         QnWorkbenchContext* context,
         RemoteConnectionError errorCode,
         const nx::vms::api::ModuleInformation& moduleInformation,
-        const nx::vms::api::SoftwareVersion& engineVersion,
+        const nx::utils::SoftwareVersion& engineVersion,
         QWidget* parentWidget = nullptr);
 
     static void showCompatibilityModeFailureMessage(
-        const nx::vms::api::SoftwareVersion& version,
+        const nx::utils::SoftwareVersion& version,
         const QString& errorDescription,
         QWidget* parentWidget);
 
@@ -52,7 +47,7 @@ public:
 
     static QString developerModeText(
         const nx::vms::api::ModuleInformation& moduleInformation,
-        const nx::vms::api::SoftwareVersion& engineVersion);
+        const nx::utils::SoftwareVersion& engineVersion);
 
 private:
     static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);

@@ -73,11 +73,11 @@ nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSy
     result.cloudSystemId = system.cloudId;
     result.localSystemId = system.localId;
     result.remoteAddresses.insert(system.cloudId);
-    result.version = nx::vms::api::SoftwareVersion(system.version);
+    result.version = nx::utils::SoftwareVersion(system.version);
 
-    const auto localVersion = nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion());
-    const bool sameVersion = result.version.major() == localVersion.major()
-        && result.version.minor() == localVersion.minor();
+    const auto localVersion = nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
+    const bool sameVersion = (result.version.major == localVersion.major)
+        && (result.version.minor == localVersion.minor);
 
     result.protoVersion = sameVersion ? nx::vms::api::protocolVersion() : 0;
 

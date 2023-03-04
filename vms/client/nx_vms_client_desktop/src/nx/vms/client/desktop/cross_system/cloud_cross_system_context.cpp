@@ -5,8 +5,8 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <camera/camera_data_manager.h>
+#include <client_core/client_core_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -45,7 +45,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr auto kUpdateConnectionInterval = 30s;
-static const nx::vms::api::SoftwareVersion kMinApiSupportedVersion("5.1.0.0");
+static const nx::utils::SoftwareVersion kMinApiSupportedVersion(5, 1);
 
 } // namespace
 

@@ -21,7 +21,7 @@ struct NX_VMS_API SystemInformation
 {
     QString name;
     QString customization;
-    SoftwareVersion version; /**<%apidoc:string */
+    nx::utils::SoftwareVersion version; /**<%apidoc:string */
     int protoVersion = 0;
     QString cloudHost;
 

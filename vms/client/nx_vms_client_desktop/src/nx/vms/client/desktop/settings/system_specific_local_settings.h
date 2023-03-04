@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 
 #include <nx/utils/property_storage/storage.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/software_version.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 
@@ -30,7 +30,7 @@ public:
     // Updates-related settings.
 
     /** Do not show update notification for the selected version. */
-    Property<nx::vms::api::SoftwareVersion> ignoredUpdateVersion{this, "ignoredUpdateVersion"};
+    Property<nx::utils::SoftwareVersion> ignoredUpdateVersion{this, "ignoredUpdateVersion"};
 
     /** Latest known update info. */
     Property<UpdateDeliveryInfo> updateDeliveryInfo{this, "updateDeliveryInfo"};

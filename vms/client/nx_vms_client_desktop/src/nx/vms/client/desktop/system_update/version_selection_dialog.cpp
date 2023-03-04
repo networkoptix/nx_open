@@ -6,8 +6,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <nx/vms/common/update/tools.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/common/update/tools.h>
 
 namespace nx::vms::client::desktop {
 
@@ -43,7 +43,7 @@ VersionSelectionDialog::VersionSelectionDialog(QWidget* parent):
                 return ValidationResult::kValid;
 
             const nx::utils::SoftwareVersion version(text);
-            return (version.major() > 0 && version.build() > 0)
+            return (version.major > 0 && version.build > 0)
                 ? ValidationResult::kValid
                 : ValidationResult(tr("Invalid version."));
         });
@@ -55,7 +55,7 @@ VersionSelectionDialog::VersionSelectionDialog(QWidget* parent):
             if (ui->versionInputField->text().isEmpty())
                 return ValidationResult::kValid;
 
-            return checkPassword(QString::number(version().build()), password.trimmed())
+            return checkPassword(QString::number(version().build), password.trimmed())
                 ? ValidationResult::kValid
                 : ValidationResult(tr("The password is incorrect."));
         });

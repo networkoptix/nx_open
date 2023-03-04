@@ -1,40 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <ostream>
+
 #include "software_version.h"
 
-#include <algorithm>
+namespace nx::utils {
 
-#include <QtCore/QStringList>
-
-namespace nx {
-namespace utils {
-
-SoftwareVersion::SoftwareVersion()
+SoftwareVersion::SoftwareVersion(const QString& versionString)
 {
-    m_data.fill(0);
-}
-
-SoftwareVersion::SoftwareVersion(int major, int minor, int bugfix /* = 0*/, int build /* = 0*/) :
-    m_data{{major, minor, bugfix, build}}
-{
-}
-
-SoftwareVersion::SoftwareVersion(const QString& versionString):
-    SoftwareVersion()
-{
-    // Implementation differs a little bit from QnLexical conventions.
-    // We try to set target to some sane value regardless of whether
-    // deserialization has failed or not. We also support OpenGL-style
-    // extended versions.
-
-    QString s = versionString.trimmed();
-    int index = s.indexOf(' ');
-    if (index != -1)
-        s = s.mid(0, index);
-
-    QStringList versionList = s.split(QLatin1Char('.'));
-    for (int i = 0, count = std::min<int>(static_cast<int>(m_data.size()), versionList.size()); i < count; i++)
-        m_data[i] = versionList[i].toInt();
+    deserialize(versionString);
 }
 
 SoftwareVersion::SoftwareVersion(const char* versionString):
@@ -54,9 +28,11 @@ SoftwareVersion::SoftwareVersion(const std::string_view& versionString):
 
 QString SoftwareVersion::toString(SoftwareVersion::Format format) const
 {
-    QString result = QString::number(m_data[0]);
-    for (int i = 1; i < format; i++)
-        result += QLatin1Char('.') + QString::number(m_data[i]);
+    QString result = QString::number(major) + "." + QString::number(minor);
+    if (format > Format::minor)
+        result += "." + QString::number(bugfix);
+    if (format > Format::bugfix)
+        result += "." + QString::number(build);
     return result;
 }
 
@@ -67,19 +43,44 @@ SoftwareVersion SoftwareVersion::fromStdString(const std::string& string)
 
 bool SoftwareVersion::isNull() const
 {
-    return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
+    return major == 0 && minor == 0 && bugfix == 0 && build == 0;
 }
 
-bool operator<(const SoftwareVersion& l, const SoftwareVersion& r)
+bool SoftwareVersion::deserialize(const QString& versionString)
 {
-    return std::lexicographical_compare(l.m_data.begin(), l.m_data.end(),
-        r.m_data.begin(), r.m_data.end());
+    // Strip everything after the first space.
+    QString s = versionString.trimmed();
+    int index = s.indexOf(' ');
+    if (index != -1)
+        s.truncate(index);
+
+    // Set segment values.
+
+    bool ok = true;
+    auto setSegment =
+        [index = 0, s, &ok](int& segment) mutable
+        {
+            if (index == -1)
+                return;
+
+            const int dotIndex = s.indexOf('.', index);
+            bool segmentOk = false;
+            segment = s.mid(index, dotIndex - index).toInt(&segmentOk);
+            ok &= segmentOk;
+            index = dotIndex >= 0 ? dotIndex + 1 : -1;
+        };
+
+    setSegment(major);
+    setSegment(minor);
+    setSegment(bugfix);
+    setSegment(build);
+
+    return ok;
 }
 
-bool operator==(const SoftwareVersion& l, const SoftwareVersion& r)
+std::ostream& operator<<(std::ostream& stream, const SoftwareVersion& version)
 {
-    return std::equal(l.m_data.begin(), l.m_data.end(), r.m_data.begin());
+    return stream << version.toString().toStdString();
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

@@ -2,11 +2,11 @@
 
 #include "rtsp_ffmpeg_encoder.h"
 
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <utils/common/util.h>
 #include <nx/network/socket.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/video_data_packet.h>
+#include <utils/common/util.h>
 
 namespace {
     static const int kMaxPacketLen = 1024 * 32;
@@ -100,7 +100,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         if (!m_contextSent || !m_contextSent->isEqual(*currentContext.get()))
         {
             m_contextSent = currentContext;
-            if (!m_serverVersion.isNull() && m_serverVersion.major() < 5)
+            if (!m_serverVersion.isNull() && m_serverVersion.major < 5)
                 m_codecParamsData = currentContext->serializeInDeprecatedFormat42();
             else
                 m_codecParamsData = currentContext->serialize();

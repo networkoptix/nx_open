@@ -11,14 +11,13 @@
 #include <QtCore/QString>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/software_version.h>
 #include <nx/vms/common/update/update_information.h>
 
 namespace nx::vms::client::desktop {
 
 struct UpdateDeliveryInfo
 {
-    nx::vms::api::SoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     /** Release date - in msecs since epoch. */
     std::chrono::milliseconds releaseDateMs{0};
     /** Maximum days for release delivery. */

@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/url.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/data/software_version_serialization.h>
 
 namespace nx::vms::update {
 
@@ -24,7 +24,7 @@ NX_REFLECTION_ENUM_CLASS(Product,
 
 struct NX_VMS_UPDATE_API ReleaseInfo
 {
-    nx::vms::api::SoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     Product product;
     int protocol_version = 0;
     PublicationType publication_type = PublicationType::release;

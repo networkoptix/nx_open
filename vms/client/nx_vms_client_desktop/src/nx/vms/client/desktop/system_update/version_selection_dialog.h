@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/utils/software_version.h>
-
 #include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui { class VersionSelectionDialog; }

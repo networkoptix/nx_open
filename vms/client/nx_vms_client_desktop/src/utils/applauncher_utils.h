@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/applauncher/api/applauncher_api.h>
-
 #include <nx/utils/software_version.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
 
 namespace nx::vms::applauncher::api {
 

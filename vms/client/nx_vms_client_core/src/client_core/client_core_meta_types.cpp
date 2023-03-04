@@ -16,7 +16,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
@@ -31,9 +31,9 @@
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/media/media_player.h>
-#include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
@@ -116,7 +116,7 @@ void initializeMetaTypes()
         "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
     qmlRegisterUncreatableType<utils::Url>(
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
-    qmlRegisterUncreatableType<nx::vms::api::SoftwareVersion>(
+    qmlRegisterUncreatableType<nx::utils::SoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
     qRegisterMetaType<DateRange>();
     qmlRegisterUncreatableType<DateRange>(

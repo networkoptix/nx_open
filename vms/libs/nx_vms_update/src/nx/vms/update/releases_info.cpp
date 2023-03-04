@@ -45,8 +45,8 @@ bool canReceiveUnpublishedBuild(
         || nx::build_info::publicationType() == PublicationType::rc;
 
     bool isUnpublishedVersionAppropriate =
-        releaseInfo.version.major() == currentVersion.major()
-        && releaseInfo.version.minor() == currentVersion.minor()
+        releaseInfo.version.major == currentVersion.major
+        && releaseInfo.version.minor == currentVersion.minor
         && releaseInfo.version > currentVersion;
 
     return canPublicationTypeReceiveUnpublishedBuild && isUnpublishedVersionAppropriate;

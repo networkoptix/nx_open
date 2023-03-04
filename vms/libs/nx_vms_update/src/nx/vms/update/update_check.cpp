@@ -17,7 +17,7 @@ namespace nx::vms::update {
 namespace {
 
 constexpr milliseconds kFetchBodyTimeout = 1min;
-const vms::api::SoftwareVersion kPackagesJsonAppearedVersion(4, 0);
+const nx::utils::SoftwareVersion kPackagesJsonAppearedVersion(4, 0);
 
 static utils::OsInfo osInfoFromLegacySystemInformation(
     const QString& platform, const QString& arch, const QString& modification)
@@ -94,7 +94,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
     auto effectiveUrl = urlPrefix;
 
     FetchPublicationInfoResult result = FetchError::httpError;
-    if (version.major() != 0)
+    if (version.major != 0)
     {
         // Check by full version.
         effectiveUrl.setPath(urlPrefix.path() + nx::format("/%1/packages.json", version));
@@ -105,7 +105,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
         error && *error == FetchError::httpError && version < kFullVersionUrlsAppearedVersion)
     {
         // Fallback to build-number-only URL.
-        effectiveUrl.setPath(urlPrefix.path() + nx::format("/%1/packages.json", version.build()));
+        effectiveUrl.setPath(urlPrefix.path() + nx::format("/%1/packages.json", version.build));
         result = fetchJson<PublicationInfo>(effectiveUrl);
     }
 
@@ -168,7 +168,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
     const nx::utils::SoftwareVersion& version, const utils::Url& urlPrefix)
 {
     // Legacy versions don't have full version in URLs.
-    auto publicationUrlPath = urlPrefix.path() + nx::format("/%1/", version.build());
+    auto publicationUrlPath = urlPrefix.path() + nx::format("/%1/", version.build);
 
     auto effectiveUrl = urlPrefix;
     effectiveUrl.setPath(publicationUrlPath + "update.json");
@@ -265,7 +265,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
 
     try
     {
-        info.version = nx::vms::api::SoftwareVersion(getStringField(json, "version"));
+        info.version = nx::utils::SoftwareVersion(getStringField(json, "version"));
         if (info.version.isNull())
             throw std::exception();
         info.cloudHost = getStringField(json, "cloudHost");

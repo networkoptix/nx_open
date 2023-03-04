@@ -8,7 +8,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/update/update_information.h>
 
 #include "client_update_tool.h"

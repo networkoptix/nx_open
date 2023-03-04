@@ -3,7 +3,7 @@
 #include "applauncher_control_dialog.h"
 #include "ui_applauncher_control_dialog.h"
 
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/software_version.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/applauncher_utils.h>
 

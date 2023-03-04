@@ -4,7 +4,6 @@
 
 #include <set>
 
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/core/network/connection_info.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>

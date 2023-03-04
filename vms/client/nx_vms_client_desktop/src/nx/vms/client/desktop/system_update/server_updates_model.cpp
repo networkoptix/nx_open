@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "server_updates_model.h"
+
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -15,7 +17,6 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "server_updates_model.h"
 #include "peer_state_tracker.h"
 
 namespace nx::vms::client::desktop {
@@ -135,7 +136,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                 case VersionColumn:
                     if (item->offline)
                         return QString("–");
-                    return item->version.toString(nx::utils::SoftwareVersion::FullFormat);
+                    return item->version.toString();
                 case StatusMessageColumn:
                     return item->statusMessage;
                 default:

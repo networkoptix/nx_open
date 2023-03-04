@@ -9,7 +9,6 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/data/software_version.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "peer_state_tracker.h"

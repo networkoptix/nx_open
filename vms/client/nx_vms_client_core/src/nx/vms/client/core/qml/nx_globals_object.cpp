@@ -3,8 +3,8 @@
 #include "nx_globals_object.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QtMath>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QtMath>
 #include <QtGui/QClipboard>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
@@ -108,9 +108,9 @@ QVariantList NxGlobalsObject::toVariantList(const QModelIndexList& indexList) co
     return result;
 }
 
-nx::vms::api::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const
+nx::utils::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const
 {
-    return nx::vms::api::SoftwareVersion(version);
+    return nx::utils::SoftwareVersion(version);
 }
 
 bool NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)

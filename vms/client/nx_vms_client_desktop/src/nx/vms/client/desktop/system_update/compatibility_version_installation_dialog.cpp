@@ -16,8 +16,8 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
+#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/update/tools.h>
@@ -62,7 +62,7 @@ struct CompatibilityVersionInstallationDialog::Private
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     const nx::vms::api::ModuleInformation& moduleInformation,
     const nx::vms::client::core::LogonData& logonData,
-    const nx::vms::api::SoftwareVersion& engineVersion,
+    const nx::utils::SoftwareVersion& engineVersion,
     QWidget* parent)
     :
     base_type(parent),

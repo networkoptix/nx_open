@@ -135,7 +135,7 @@ struct StoredState
     QString file;
     int state = 0;
     // Update version we have initiated update for.
-    nx::vms::api::SoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     // Id of the system we have initiated update for.
     QnUuid systemId;
 };
