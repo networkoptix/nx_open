@@ -112,11 +112,7 @@ Settings::Settings(QSettings* settings)
         return;
 
     LoggerSettings baseValues;
-    readRotationParams(settings, &baseValues, LoggerSettings{
-        .maxVolumeSizeB = kDefaultMaxLogVolumeSizeB,
-        .maxFileSizeB = kDefaultMaxLogFileSizeB,
-        .maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS,
-    });
+    readRotationParams(settings, &baseValues, LoggerSettings());
 
     for (const auto& group: settings->childGroups())
     {
