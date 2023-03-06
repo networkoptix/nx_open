@@ -384,10 +384,12 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     const bool hasDualStreaming =
         state.devicesDescription.hasDualStreamingCapability != CombinedValue::None;
 
-    const bool hasArecontCameras = 
+    const bool hasArecontCameras =
         state.devicesDescription.isArecontCamera != CombinedValue::None;
 
-    ui->settingsGroupBox->setHidden(hasArecontCameras);
+    ui->settingsDisableControlCheckBox->setHidden(hasArecontCameras);
+    ui->bitratePerGopCheckBox->setHidden(hasArecontCameras);
+
     if (!hasArecontCameras)
     {
         ui->settingsDisableControlCheckBox->setVisible(state.recording.parametersAvailable);
