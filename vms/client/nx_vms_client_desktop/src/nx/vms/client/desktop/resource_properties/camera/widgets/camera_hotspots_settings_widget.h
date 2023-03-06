@@ -6,6 +6,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+class QnResourcePool;
+
 namespace nx::vms::client::desktop {
 
 class CameraSettingsDialogStore;
@@ -18,6 +20,7 @@ class CameraHotspotsSettingsWidget: public QWidget
 
 public:
     CameraHotspotsSettingsWidget(
+        QnResourcePool* resourcePool,
         CameraSettingsDialogStore* store,
         const QSharedPointer<LiveCameraThumbnail>& cameraThumbnail,
         QWidget* parent = nullptr);

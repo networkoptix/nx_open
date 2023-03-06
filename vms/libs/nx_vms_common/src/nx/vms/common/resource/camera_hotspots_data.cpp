@@ -28,7 +28,7 @@ QString fixupColorName(const QString& colorName)
 
 QPointF fixupDirection(const QPointF& direction)
 {
-    if (qFuzzyIsNull(direction.x()) || qFuzzyIsNull(direction.y()))
+    if (qFuzzyIsNull(direction))
         return {};
 
     return direction / std::sqrt(QPointF::dotProduct(direction, direction)); //< Normalize length.
@@ -41,6 +41,11 @@ namespace nx::vms::common {
 bool CameraHotspotData::isValid() const
 {
     return !cameraId.isNull() && QRectF(0, 0, 1, 1).contains(pos);
+}
+
+bool CameraHotspotData::hasDirection() const
+{
+    return !qFuzzyIsNull(direction);
 }
 
 void CameraHotspotData::fixupData()

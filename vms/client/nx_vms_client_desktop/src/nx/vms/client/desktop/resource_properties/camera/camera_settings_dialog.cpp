@@ -339,13 +339,14 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     addPage(
         int(CameraSettingsTab::dewarping),
-        new CameraDewarpingSettingsWidget(
-            d->store, d->cameraPreview, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+        new CameraDewarpingSettingsWidget(d->store, d->cameraPreview,
+            qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         tr("Dewarping"));
 
     addPage(
         int(CameraSettingsTab::hotspots),
-        new CameraHotspotsSettingsWidget(d->store, d->cameraPreview),
+        new CameraHotspotsSettingsWidget(systemContext()->resourcePool(), d->store,
+            d->cameraPreview),
         tr("Hotspots"));
 
     d->initializeAdvancedSettingsWidget();

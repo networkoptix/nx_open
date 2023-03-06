@@ -52,6 +52,12 @@ struct NX_VMS_COMMON_API CameraHotspotData
     bool isValid() const;
 
     /**
+     * @return True if described hotspot item is directional one, i.e direction field is non-zero
+     *     vector.
+     */
+    bool hasDirection() const;
+
+    /**
      * Normalize direction vector and leave either escaped and valid accentColorName or
      * the empty one.
      */
