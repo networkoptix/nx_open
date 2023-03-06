@@ -175,6 +175,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
     static const QList<const char*> boolProperties{
         "enabled",
         "visible",
+        "selected",
     };
 
     for (const auto i: boolProperties)
