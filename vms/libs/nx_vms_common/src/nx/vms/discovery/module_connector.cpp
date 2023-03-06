@@ -64,8 +64,8 @@ void ModuleConnector::forgetModule(const QnUuid& id)
 
 void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
-    validateEndpoints(&endpoints);
     NX_ASSERT(endpoints.size());
+    validateEndpoints(&endpoints);
     if (endpoints.empty())
         return;
 
