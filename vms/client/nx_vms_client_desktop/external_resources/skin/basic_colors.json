@@ -168,7 +168,7 @@
         }
     },
 
-   "resourceTree": {
+    "resourceTree": {
         "mainText":          "light10",
         "mainTextSelected":  "light4",
         "mainTextAccented":  "brand_core",
@@ -183,25 +183,25 @@
             "obsolescenceDimmer": "dark5.setAlpha(179)",
             "obsolescenceText": "light10"
         }
-   },
+    },
 
-   "scene": {
-       "curtain": "dark1",
-       "customLayoutBackground": "#1d2327",
-       "panelEdgeShadow": "dark1.setAlpha(38)",
-       "grid": {
+    "scene": {
+        "curtain": "dark1",
+        "customLayoutBackground": "#1d2327",
+        "panelEdgeShadow": "dark1.setAlpha(38)",
+        "grid": {
             "allowedCell": "#00ff00.setAlpha(64)",
             "disallowedCell": "#ff0000.setAlpha(64)"
-       },
-       "banner": {
+        },
+        "banner": {
             "_": "Over-scene graphics message boxes",
             "frame": "brand_d2",
             "window": "brand_d2.setAlpha(204)",
             "text": "brand_contrast"
-       }
-   },
+        }
+    },
 
-   "camera": {
+    "camera": {
         "_": "Scene media item",
         "bookmarkBackground": "#2e6996",
         "hudElementsBackground": "dark1.setAlpha(128)",
@@ -234,10 +234,21 @@
             "#e97119",
             "#d24729",
             "#c22626"
-        ]
-   },
+        ],
+        "hotspots": {
+            "palette": [
+                "#a5b7c0",
+                "#ffab40",
+                "#18ffff",
+                "#7c4dff"
+            ],
+            "invalid": "#f02c2c",
+            "text": "#ffffff",
+            "paletteCheckMark": "#000000"
+        }
+    },
 
-   "server": {
+    "server": {
         "_": "Scene server statistics item",
         "statistics": {
             "cpu": "#428ced",
@@ -245,32 +256,31 @@
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
         }
-   },
+    },
 
-   "imageEnhancement": {
+    "imageEnhancement": {
         "background": "dark4",
         "border": "dark8",
         "histogram": "#c0c0c0ff",
         "selection": "brand_core.setAlpha(110)",
         "grid": "#00800080",
         "text": "#ffffffff"
-   },
+    },
 
-   "ptz": {
+    "ptz": {
         "_": "All PTZ-related colors",
         "main": "brand_core",
         "fill": "brand_l1",
-
-        "manage":
-        {
+ 
+        "manage": {
             "_": "Manage PTZ dialog",
             "title": "#404040",
             "invalid": "#401010",
             "warning": "#404010"
         }
-   },
+    },
 
-   "auditLog": {
+    "auditLog": {
         "actions": {
             "login": "#65991c",
             "failedLogin": "#cf2727",
@@ -286,9 +296,9 @@
         },
         "httpLink": "brand_d2",
         "chart": "brand_d3"
-   },
+    },
 
-   "failoverPriority": {
+    "failoverPriority": {
         "never": "#808080",
         "low":  "#9eb236",
         "medium": "#cc853d",

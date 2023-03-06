@@ -7,28 +7,29 @@
 
 #include <QtGui/QPainter>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
 static constexpr auto kHotspotRadius = 16;
 static constexpr auto kHotspotPointerAngle = 90.0;
 static constexpr auto kHotspotBoundsOffset = 4;
-
-static constexpr QSize kHotspotItemIconSize =
-{nx::style::Metrics::kDefaultIconSize, nx::style::Metrics::kDefaultIconSize};
-
-static constexpr auto kHotspotItemOpacity = 0.4;
-static constexpr auto kSelectedHotspotItemOpacity = 0.6;
 static constexpr auto kSelectedHotspotOutlineWidth = 2.0;
 
-static constexpr auto kHotspotItemColorKey = "dark1";
-static constexpr auto kHighlightedHotspotItemColorKey = "blue10";
-static constexpr auto kInvalidHotspotItemColorKey = "red_l2";
+static constexpr QSize kHotspotItemIconSize =
+    {nx::style::Metrics::kDefaultIconSize, nx::style::Metrics::kDefaultIconSize};
+
+static constexpr auto kHotspotBodyOpacity = 0.4;
+static constexpr auto kHoveredHotspotBodyOpacity = 0.6;
+static constexpr auto kNoCameraIconOpacity = 0.4;
+
+static constexpr auto kHotspotFontSize = 16;
 
 } // namespace
 
@@ -102,64 +103,94 @@ void paintHotspot(
 {
     using namespace nx::vms::client::core;
 
+    static const auto kInvalidColor = colorTheme()->color("camera.hotspots.invalid");
+
     // Paint hotspot body.
     const auto hotspotOutline = makeHotspotOutline(hotspot, option.rect);
 
-    const QBrush regularBrush(
+    const QBrush brush(
         option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
-            ? colorTheme()->color(kInvalidHotspotItemColorKey)
-            : colorTheme()->color(kHotspotItemColorKey));
+            ? kInvalidColor
+            : QColor(hotspot.accentColorName));
 
-    const QBrush higlightedBrush(
-        option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
-            ? colorTheme()->color(kInvalidHotspotItemColorKey)
-            : colorTheme()->color(kHighlightedHotspotItemColorKey));
-
-    QBrush brush = regularBrush;
-    double opacity = kHotspotItemOpacity;
-
-    if (option.state == CameraHotspotDisplayOption::State::hovered)
+    double hotspotBodyOpacity = 0.0;
+    switch (option.state)
     {
-        brush = higlightedBrush;
-        if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
-            opacity = kSelectedHotspotItemOpacity;
+        case CameraHotspotDisplayOption::State::none:
+            hotspotBodyOpacity = kHotspotBodyOpacity;
+            break;
+
+        case CameraHotspotDisplayOption::State::hovered:
+        case CameraHotspotDisplayOption::State::selected:
+            hotspotBodyOpacity = kHoveredHotspotBodyOpacity;
+            break;
+
+        case CameraHotspotDisplayOption::State::disabled:
+            hotspotBodyOpacity = kHotspotBodyOpacity * nx::style::Hints::kDisabledItemOpacity;
+            break;
+
+        default:
+            NX_ASSERT(false, "Unexpected hotspot display state");
+            break;
     }
 
-    if (option.state == CameraHotspotDisplayOption::State::selected)
     {
-        brush = higlightedBrush;
-        opacity = kSelectedHotspotItemOpacity;
+        QnScopedPainterOpacityRollback opacityRollback(painter, hotspotBodyOpacity);
+        painter->fillPath(hotspotOutline, brush);
     }
-
-    painter->setOpacity(opacity);
-    painter->fillPath(hotspotOutline, brush);
 
     // Paint selected item outline.
     if (option.state == CameraHotspotDisplayOption::State::selected)
     {
-        painter->setOpacity(1.0);
-        QPen selectedOutlinePen(higlightedBrush, kSelectedHotspotOutlineWidth);
+        QPen selectedOutlinePen(brush, kSelectedHotspotOutlineWidth);
         painter->strokePath(hotspotOutline, selectedOutlinePen);
     }
 
-    // Paint pixmap.
-    painter->setOpacity(1.0);
+    // Paint decoration which is icon or text.
+    if (option.decoration.canConvert<QString>())
+    {
+        static const auto kTextColor = colorTheme()->color("camera.hotspots.textColor");
 
-    if (option.state == CameraHotspotDisplayOption::State::disabled)
-        painter->setOpacity(nx::style::Hints::kDisabledItemOpacity);
+        double textOpacity = 1.0;
+        if (option.state == CameraHotspotDisplayOption::State::disabled)
+            textOpacity = nx::style::Hints::kDisabledItemOpacity;
 
-    QPixmap pixmap = qnResIconCache->icon(option.iconKey)
-        .pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
+        QnScopedPainterOpacityRollback opacityRollback(painter, textOpacity);
 
-    if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
-        pixmap = qnSkin->colorize(pixmap, colorTheme()->color(kInvalidHotspotItemColorKey));
+        QFont font;
+        font.setPixelSize(kHotspotFontSize);
+        QnScopedPainterFontRollback fontRollback(painter, font);
+        QnScopedPainterPenRollback penRollback(painter, kTextColor);
 
-    if (option.cameraState == CameraHotspotDisplayOption::CameraState::noCamera)
-        painter->setOpacity(0.4);
+        const auto hotspotCenter = hotspotOrigin(hotspot, option.rect);
+        QSize size(kHotspotRadius * 2, kHotspotRadius * 2);
+        QRect rect(hotspotCenter.toPoint() - QPoint(kHotspotRadius, kHotspotRadius), size);
 
-    const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);
-    const auto origin = hotspotOrigin(hotspot, option.rect);
-    painter->drawPixmap(origin + iconOffset, pixmap);
+        QTextOption textOption;
+        textOption.setAlignment(Qt::AlignCenter);
+        painter->drawText(rect, option.decoration.toString(), textOption);
+    }
+    else if (option.decoration.typeId() == QMetaType::QIcon)
+    {
+        double iconOpacity = 1.0;
+        if (option.cameraState == CameraHotspotDisplayOption::CameraState::noCamera)
+            iconOpacity = kNoCameraIconOpacity;
+
+        if (option.state == CameraHotspotDisplayOption::State::disabled)
+            iconOpacity *= nx::style::Hints::kDisabledItemOpacity;
+
+        QnScopedPainterOpacityRollback opacityRollback(painter, iconOpacity);
+
+        const auto icon = option.decoration.value<QIcon>();
+        QPixmap pixmap = icon.pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
+
+        if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
+            pixmap = qnSkin->colorize(pixmap, kInvalidColor);
+
+        const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);
+        const auto origin = hotspotOrigin(hotspot, option.rect);
+        painter->drawPixmap(origin + iconOffset, pixmap);
+    }
 }
 
 } // namespace camera_hotspots

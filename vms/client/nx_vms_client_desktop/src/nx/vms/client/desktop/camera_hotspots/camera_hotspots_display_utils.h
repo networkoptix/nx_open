@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QtGui/QPainterPath>
 #include <QtCore/QPointF>
+#include <QtCore/QVariant>
+#include <QtGui/QPainterPath>
 
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
@@ -45,8 +46,18 @@ struct CameraHotspotDisplayOption
     };
     CameraState cameraState = CameraState::noCamera;
 
+    /**
+     * A rectangle representing the geometry of the frame on which the hotspot marks are displayed.
+     */
     QRectF rect;
-    QnResourceIconCache::Key iconKey = QnResourceIconCache::Camera;
+
+    /**
+     * Decoration element painted in the center of the hotspot mark. Expected data types are QIcon
+     * or any type that can be converted to string. Due to the compact size of the hotspot mark, it
+     * makes sense to display short string values only, such as an ordinal index or some special
+     * character.
+     */
+    QVariant decoration;
 };
 
 void paintHotspot(

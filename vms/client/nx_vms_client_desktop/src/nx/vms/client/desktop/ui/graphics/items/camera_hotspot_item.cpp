@@ -119,7 +119,7 @@ void CameraHotspotItem::paint(
         hotspotOption.state = camera_hotspots::CameraHotspotDisplayOption::State::hovered;
 
     hotspotOption.cameraState = CameraHotspotDisplayOption::CameraState::valid;
-    hotspotOption.iconKey = QnResourceIconCache::key(d->cameraResource());
+    hotspotOption.decoration = qnResIconCache->icon(d->cameraResource());
 
     auto paintedHotspotData = d->hotspotData;
     if (!qFuzzyIsNull(nx::vms::client::core::Geometry::length(paintedHotspotData.direction)))

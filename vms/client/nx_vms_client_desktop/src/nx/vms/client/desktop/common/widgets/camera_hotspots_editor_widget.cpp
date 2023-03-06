@@ -133,8 +133,6 @@ void CameraHotspotsEditorWidget::Private::processContextMenuRequest(const QPoint
     if (!thumbnailRect().contains(pos))
         return;
 
-    // if loading return
-
     const auto menu = new QMenu(q);
     connect(menu, &QMenu::aboutToHide, menu, &QMenu::deleteLater);
 
@@ -344,6 +342,9 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         CameraHotspotDisplayOption option;
         option.rect = d->thumbnailRect();
 
+        const auto displayedHotspotIndex = QString::number(i + 1);
+        option.decoration = displayedHotspotIndex;
+
         if (d->isSelectedHotspotIndex(i))
             option.state = CameraHotspotDisplayOption::State::selected;
         else if (d->isHoveredHotspotIndex(i))
@@ -358,8 +359,6 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
 
             if (!camera)
                 option.cameraState = CameraHotspotDisplayOption::CameraState::invalid;
-            else
-                option.iconKey = QnResourceIconCache::key(camera);
         }
 
         if (!isEnabled())
