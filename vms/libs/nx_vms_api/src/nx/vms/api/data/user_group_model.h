@@ -40,7 +40,11 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
-    /**%apidoc Resource ids with access rights for the Group. */
+    /**%apidoc
+     * Resource ids (can be obtained from `GET /rest/v{3-}/devices`, `GET /rest/v{3-}/servers`,
+     * etc.) or Resource Group ids (can be obtained from `GET /rest/v{3-}/resourceGroups`) with
+     * access rights for this Users Group.
+     */
     std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
 
     /**%apidoc[readonly] Whether this Role comes with the System. */

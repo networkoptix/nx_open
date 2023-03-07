@@ -13,13 +13,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 const QnUuid kAllDevicesGroupId{"00000000-0000-0000-0000-200000000001"};
 const QnUuid kAllWebPagesGroupId{"00000000-0000-0000-0000-200000000002"};
 const QnUuid kAllServersGroupId{"00000000-0000-0000-0000-200000000003"};
-const QnUuid kAllVideowallsGroupId{"00000000-0000-0000-0000-200000000004"};
+const QnUuid kAllVideoWallsGroupId{"00000000-0000-0000-0000-200000000004"};
 
 const std::map<QnUuid, SpecialResourceGroup> kSpecialResourceGroupIds{
     {kAllDevicesGroupId, SpecialResourceGroup::allDevices},
     {kAllWebPagesGroupId, SpecialResourceGroup::allWebPages},
     {kAllServersGroupId, SpecialResourceGroup::allServers},
-    {kAllVideowallsGroupId, SpecialResourceGroup::allVideowalls}};
+    {kAllVideoWallsGroupId, SpecialResourceGroup::allVideowalls}};
 
 std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id)
 {
@@ -53,7 +53,7 @@ std::map<QnUuid, AccessRights> migrateAccessRights(
             {kAllDevicesGroupId, kFullAccessRights},
             {kAllServersGroupId, kViewAccessRights},
             {kAllWebPagesGroupId, kViewAccessRights},
-            {kAllVideowallsGroupId, kViewAccessRights}};
+            {kAllVideoWallsGroupId, kViewAccessRights}};
 
         return kAdminAccess;
     }
@@ -87,7 +87,7 @@ std::map<QnUuid, AccessRights> migrateAccessRights(
     }
 
     if (permissions.testFlag(GlobalPermission::controlVideowall))
-        accessMap.emplace(kAllVideowallsGroupId, fullAccessRights);
+        accessMap.emplace(kAllVideoWallsGroupId, fullAccessRights);
 
     for (const auto& id: accessibleResources)
         accessMap.emplace(id, fullAccessRights);

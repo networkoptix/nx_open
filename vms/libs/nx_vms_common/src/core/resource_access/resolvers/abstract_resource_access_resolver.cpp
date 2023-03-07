@@ -77,7 +77,7 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     }
 
     if (const auto videowall = resource.objectCast<QnVideoWallResource>())
-        return accessMap.value(videowall->getId()) | accessMap.value(kAllVideowallsGroupId);
+        return accessMap.value(videowall->getId()) | accessMap.value(kAllVideoWallsGroupId);
 
     return {};
 }

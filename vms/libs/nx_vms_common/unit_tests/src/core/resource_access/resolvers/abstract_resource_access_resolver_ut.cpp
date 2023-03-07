@@ -120,7 +120,7 @@ TEST_F(AbstractResourceAccessResolverTest, resolveViewOnlyAccess)
 
 TEST_F(AbstractResourceAccessResolverTest, resolveVideoWallAccess)
 {
-    testAccessMap[kAllVideowallsGroupId] = kFullAccessRights;
+    testAccessMap[kAllVideoWallsGroupId] = kFullAccessRights;
 
     const auto videoWall = addVideoWall();
     ASSERT_EQ(accessRights({}, videoWall), kFullAccessRights);
