@@ -121,7 +121,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 
 bool QnLicense::RegionalSupport::isValid() const
 {
-    return !company.isEmpty() && !address.isEmpty();
+    return !company.isEmpty();
 }
 
 bool QnLicense::RegionalSupport::operator<(const QnLicense::RegionalSupport& other) const
@@ -163,11 +163,10 @@ QnLicense::QnLicense(const api::DetailedLicenseData& value)
     if (!value.orderType.isEmpty())
         params << QByteArray("ORDERTYPE=").append(value.orderType.toUtf8());
 
-    if (!value.company.isEmpty() && !value.support.isEmpty())
-    {
+    if (!value.company.isEmpty())
         params << QByteArray("COMPANY=").append(value.company.toUtf8());
+    if (!value.support.isEmpty())
         params << QByteArray("SUPPORT=").append(value.support.toUtf8());
-    }
 
     if (value.deactivations > 0)
         params << QByteArray("DEACTIVATIONS=").append(QByteArray::number(value.deactivations));
