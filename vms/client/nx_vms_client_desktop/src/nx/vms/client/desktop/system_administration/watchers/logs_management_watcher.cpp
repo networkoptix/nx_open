@@ -202,7 +202,7 @@ void ClientLogCollector::run()
             return;
         }
 
-        const auto path = File::makeFileName(*baseFileName, rotation);
+        const auto path = File::makeFileName(*baseFileName, rotation, false);
         if (!QFile::exists(path))
         {
             NX_VERBOSE(this, "Log file for %1 does not exist at the path %2, skipping it", name, path);

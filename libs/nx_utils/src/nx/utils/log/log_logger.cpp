@@ -131,6 +131,7 @@ void Logger::setSettings(const LoggerSettings& loggerSettings)
         fileSettings.maxFileTimePeriodS = m_settings.maxFileTimePeriodS;
         fileSettings.maxFileSizeB = m_settings.maxFileSizeB;
         fileSettings.maxVolumeSizeB = m_settings.maxVolumeSizeB;
+        fileSettings.disableArchiving = m_settings.disableArchiving;
         file->setSettings(fileSettings);
 
         log(Level::info, this,
