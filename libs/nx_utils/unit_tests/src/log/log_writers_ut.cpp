@@ -34,19 +34,22 @@ public:
     {
     }
 
-    std::unique_ptr<AbstractWriter> makeWriter(size_t file, size_t volume = kDefaultMaxLogVolumeSizeB)
+    std::unique_ptr<AbstractWriter> makeWriter(size_t file, size_t volume = kDefaultMaxLogVolumeSizeB, bool disableArchiving = false)
     {
         File::Settings settings;
         settings.name = m_basePath;
         settings.maxFileSizeB = file;
         settings.maxVolumeSizeB = volume;
+        settings.disableArchiving = disableArchiving;
         return std::make_unique<File>(settings);
     }
 
-    void checkFile(const std::vector<QByteArray>& messages = {}, const QByteArray& suffix = {})
+    void checkFile(
+        const std::vector<QByteArray>& messages = {},
+        const QString& suffix = {},
+        const File::Extension& extension = File::Extension::log)
     {
-        const auto fileName = m_basePath + QString::fromUtf8(suffix.isEmpty()
-            ? QByteArray(File::kExtensionWithSeparator) : (suffix + File::kRotateExtensionWithSeparator));
+        const auto fileName = m_basePath + suffix + toQString(extension);
         if (messages.empty())
         {
             EXPECT_TRUE(!QFile::exists(fileName));
@@ -58,7 +61,7 @@ public:
             expectedContent += m + kLineSplit;
 
         QByteArray actualContent;
-        if (suffix.isEmpty())
+        if (extension == File::Extension::log)
         {
             ASSERT_TRUE(QFile::exists(fileName));
             QFile file(fileName);
@@ -84,8 +87,8 @@ public:
         auto dir = QFileInfo(m_basePath).dir();
         const auto logs = dir.entryList(
             {
-                QString("*") + File::kExtensionWithSeparator,
-                QString("*") + File::kRotateExtensionWithSeparator
+                QString("*") + toQString(File::Extension::log),
+                QString("*") + toQString(File::Extension::zip)
             },
             QDir::Files, QDir::Name);
         for (auto log: logs)
@@ -134,7 +137,7 @@ TEST_F(LogFile, Rotation)
         auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "1234567890"); //< Overflow
     }
-    checkFile({"1234567890", "1234567890"}, "_001");
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
     checkFile();
 
     {
@@ -142,7 +145,7 @@ TEST_F(LogFile, Rotation)
         w->write(Level::undefined, "xxx");
         w->write(Level::undefined, "yyy");
     }
-    checkFile({"1234567890", "1234567890"}, "_001");
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
     checkFile({"xxx", "yyy"});
 
     {
@@ -150,8 +153,8 @@ TEST_F(LogFile, Rotation)
         w->write(Level::undefined, "12345678901234567890"); // Overflow
         w->write(Level::undefined, "1234567890");
     }
-    checkFile({"1234567890", "1234567890"}, "_001");
-    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002");
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
     checkFile({"1234567890"});
 
     {
@@ -160,18 +163,18 @@ TEST_F(LogFile, Rotation)
         w->write(Level::undefined, "a");
         w->write(Level::undefined, "b");
     }
-    checkFile({"1234567890", "1234567890"}, "_001");
-    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002");
-    checkFile({"1234567890", "7777777777"}, "_003");
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"1234567890", "7777777777"}, "_003", File::Extension::zip);
     checkFile({"a", "b"});
 
     {
         auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "12345678901234567890"); //< Overflow + Rotation
     }
-    checkFile({"xxx", "yyy", "12345678901234567890"}, "_001");
-    checkFile({"1234567890", "7777777777"}, "_002");
-    checkFile({"a", "b", "12345678901234567890"}, "_003");
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_001", File::Extension::zip);
+    checkFile({"1234567890", "7777777777"}, "_002", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_003", File::Extension::zip);
     checkFile();
 
     {
@@ -180,10 +183,72 @@ TEST_F(LogFile, Rotation)
         w->write(Level::undefined, "1234567890"); //< Overflow + Rotation
         w->write(Level::undefined, "zzz");
     }
-    checkFile({"1234567890", "7777777777"}, "_001");
-    checkFile({"a", "b", "12345678901234567890"}, "_002");
-    checkFile({"6666666666", "1234567890"}, "_003");
+    checkFile({"1234567890", "7777777777"}, "_001", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"6666666666", "1234567890"}, "_003", File::Extension::zip);
     checkFile({"zzz"});
+}
+
+TEST_F(LogFile, RotationZipNoZip)
+{
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "1234567890");
+    }
+    checkFile({"1234567890"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize, true);
+        w->write(Level::undefined, "1234567890"); //< Overflow
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::log);
+    checkFile();
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize); //< Zip _001.log
+        w->write(Level::undefined, "xxx");
+        w->write(Level::undefined, "yyy");
+        w->write(Level::undefined, "2222222222"); //< Overflow
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "2222222222"}, "_002", File::Extension::zip);
+    checkFile();
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize, true);
+        w->write(Level::undefined, "a");
+        w->write(Level::undefined, "b");
+        w->write(Level::undefined, "c");
+        w->write(Level::undefined, "d");
+        w->write(Level::undefined, "3333333333"); //< Overflow
+        w->write(Level::undefined, "aaaaaa");
+        w->write(Level::undefined, "bbbbbb");
+        w->write(Level::undefined, "cccccc"); //< Overflow
+        w->write(Level::undefined, "dddddd");
+        w->write(Level::undefined, "aaaaaaaaa"); //< Overflow
+        w->write(Level::undefined, "bbbbbbbbb");
+        w->write(Level::undefined, "ccccccccc"); //< Overflow + Rotation
+        w->write(Level::undefined, "ddddddddd");
+    }
+    checkFile({"xxx", "yyy", "2222222222"}, "_001", File::Extension::zip);
+    checkFile({"a", "b", "c", "d", "3333333333"}, "_002", File::Extension::log);
+    checkFile({"aaaaaa", "bbbbbb", "cccccc"}, "_003", File::Extension::log);
+    checkFile({"dddddd", "aaaaaaaaa"}, "_004", File::Extension::log);
+    checkFile({"bbbbbbbbb", "ccccccccc"}, "_005", File::Extension::log);
+    checkFile({"ddddddddd"});
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize); //< Zip all text logs
+        w->write(Level::undefined, "111");
+    }
+    checkFile({"xxx", "yyy", "2222222222"}, "_001", File::Extension::zip);
+    checkFile({"a", "b", "c", "d", "3333333333"}, "_002", File::Extension::zip);
+    checkFile({"aaaaaa", "bbbbbb", "cccccc"}, "_003", File::Extension::zip);
+    checkFile({"dddddd", "aaaaaaaaa"}, "_004", File::Extension::zip);
+    checkFile({"bbbbbbbbb", "ccccccccc"}, "_005", File::Extension::zip);
+    checkFile({"ddddddddd", "111"});
 }
 
 } // namespace test

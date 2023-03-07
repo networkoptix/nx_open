@@ -13,6 +13,9 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <nx/reflect/enum_string_conversion.h>
+#include <nx/utils/scope_guard.h>
+
 #include "to_string.h"
 
 static constexpr int kBufferSize = 64 * 1024;
@@ -41,15 +44,19 @@ void StdOut::writeImpl(Level /*level*/, const QString& message)
 
 #endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
+QString toQString(File::Extension ext)
+{
+    return QString::fromStdString(nx::reflect::enumeration::toString(ext));
+}
+
 File::File(Settings settings):
     m_settings(std::move(settings)),
-    m_fileInfo(makeFileName(m_settings.name, 0, m_settings.disableArchiving)),
+    m_fileInfo(makeFileName(m_settings.name, 0, Extension::log)),
     m_volumeLock(m_fileInfo.path() + "/.lock")
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     NX_ASSERT(m_settings.maxVolumeSizeB >= m_settings.maxFileSizeB);
-    if (!m_settings.disableArchiving)
-        archiveLeftOvers(&lock);
+    rotateLeftovers();
 }
 
 File::~File()
@@ -84,28 +91,27 @@ void File::write(Level /*level*/, const QString& message)
     rotateIfNeeded(&lock);
 }
 
-QString File::makeFileName(QString fileName, size_t backupNumber, bool disableArchiving)
+QString File::makeFileName(QString fileName, size_t backupNumber, File::Extension ext)
 {
-    auto baseFileName = fileName;
-    if (baseFileName.endsWith(kExtensionWithSeparator))
-        baseFileName.chop(strlen(kExtensionWithSeparator));
+    auto removedExtension = fileName;
+    nx::reflect::enumeration::visitAllItems<Extension>(
+        [&removedExtension](auto&&... items)
+        {
+            for (auto value: {items.value...})
+            {
+                if (removedExtension.endsWith(toQString(value)))
+                    removedExtension.chop(toQString(value).size());
+            }
+        });
 
     if (backupNumber == 0)
     {
-        static const QString kTemplate("%1%2");
-        return kTemplate.arg(baseFileName, kExtensionWithSeparator);
-    }
-    else if (disableArchiving)
-    {
-        static const QString kTemplate("%1_%2%3");
-        return kTemplate.arg(baseFileName).arg((int) backupNumber, 3, 10, QLatin1Char('0'))
-            .arg(kExtensionWithSeparator);
+        return NX_FMT("%1%2", removedExtension, ext);
     }
     else
     {
-        static const QString kTemplate("%1_%2%3");
-        return kTemplate.arg(baseFileName).arg((int) backupNumber, 3, 10, QLatin1Char('0'))
-            .arg(kRotateExtensionWithSeparator);
+        return NX_FMT("%1_%2%3")
+            .arg(removedExtension).arg(backupNumber, 3, 10, QLatin1Char('0')).arg(ext);
     }
 }
 
@@ -114,38 +120,36 @@ QString File::makeBaseFileName(QString fullPath)
     // Remove the path.
     auto name = QFileInfo(fullPath).fileName();
 
-    // Remove the rotation counter if any.
-    if (name.endsWith(kRotateExtensionWithSeparator) ||
-        name.endsWith(kRotateTmpExtensionWithSeparator) ||
-        name.endsWith(kTmpExtensionWithSeparator))
-    {
-        if (name.endsWith(kRotateExtensionWithSeparator))
-            name.chop(strlen(kRotateExtensionWithSeparator));
-        else if (name.endsWith(kRotateTmpExtensionWithSeparator))
-            name.chop(strlen(kRotateTmpExtensionWithSeparator));
-        else if (name.endsWith(kTmpExtensionWithSeparator))
-            name.chop(strlen(kTmpExtensionWithSeparator));
-
-        if (name.right(4).startsWith('_'))
+    // Remove the extension if any.
+    nx::reflect::enumeration::visitAllItems<Extension>(
+        [&name](auto&&... items)
         {
-            bool ok = false;
-            name.right(3).toUInt(&ok);
-            if (ok)
-                name.chop(4);
-        }
-    }
-    else if (name.endsWith(kExtensionWithSeparator))
+            for (auto value: {items.value...})
+            {
+                if (name.endsWith(toQString(value)))
+                    name.chop(toQString(value).size());
+            }
+        });
+
+    // Remove the rotation counter if any.
+    if (name.right(4).startsWith('_'))
     {
-        return name;
+        bool ok = false;
+        name.right(3).toUInt(&ok);
+        if (ok)
+            name.chop(4);
     }
 
     // Return the base name with ".log" ending.
-    return name + kExtensionWithSeparator;
+    return name + toQString(Extension::log);
 }
 
 QString File::getFileName(size_t backupNumber) const
 {
-    return makeFileName(m_settings.name, backupNumber, m_settings.disableArchiving);
+    if (m_settings.disableArchiving || backupNumber == 0)
+        return makeFileName(m_settings.name, backupNumber, Extension::log);
+
+    return makeFileName(m_settings.name, backupNumber, Extension::zip);
 }
 
 bool File::openFile()
@@ -192,7 +196,7 @@ void File::archive(QString fileName, QString archiveName)
 {
     NX_ASSERT(!m_settings.disableArchiving);
     auto tmpArchiveName = archiveName;
-    tmpArchiveName.replace(kRotateExtensionWithSeparator, kRotateTmpExtensionWithSeparator);
+    tmpArchiveName.replace(toQString(Extension::zip), toQString(Extension::zipTmp));
 
     QFile textLog(fileName);
     if (!textLog.open(QIODevice::ReadOnly))
@@ -224,8 +228,8 @@ void File::archive(QString fileName, QString archiveName)
     QuaZipFile zippedLog(&archive);
     if (!zippedLog.open(QIODevice::WriteOnly,
         QuaZipNewInfo(
-            makeBaseFileName(fileName).chopped(strlen(kExtensionWithSeparator))
-                + "_" + QString::number(timestamp) + kExtensionWithSeparator,
+            makeBaseFileName(fileName).chopped(toQString(Extension::log).size())
+                + "_" + QString::number(timestamp) + toQString(Extension::log),
             fileName)))
     {
         std::cerr << nx::toString(this).toStdString() << ": Could not zip file "
@@ -255,13 +259,16 @@ void File::archive(QString fileName, QString archiveName)
     archiveFile.rename(archiveName);
 }
 
-void File::rotateAndArchive()
+void File::rotateAndStartArchivingIfNeeded()
 {
     m_volumeLock.lock();
+    auto guard = nx::utils::makeScopeGuard([&]() { m_volumeLock.unlock(); });
+
     auto dir = m_fileInfo.dir();
-    const auto pattern = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator))
-        + "_*" + kRotateExtensionWithSeparator;
-    const auto list = dir.entryList({pattern}, QDir::Files, QDir::Name);
+    const auto stem = makeBaseFileName(m_settings.name).chopped(toQString(Extension::log).size());
+    const auto list = dir.entryList({
+        stem + "_*" + toQString(Extension::log),
+        stem + "_*" + toQString(Extension::zip)}, QDir::Files, QDir::Name);
 
     int removedCount = 0;
     for (removedCount = 0; removedCount <= list.size() - kMaxLogRotation; removedCount++)
@@ -272,69 +279,52 @@ void File::rotateAndArchive()
     if (totalVolumeSize() >= m_settings.maxVolumeSizeB)
     {
         QFile::remove(getFileName());
-        m_volumeLock.unlock();
         return;
     }
 
     int firstFreeNumber = 1;
-    const auto remaining = dir.entryList({pattern}, QDir::Files, QDir::Name);
+    const auto remaining = dir.entryList({
+        stem + "_*" + toQString(Extension::log),
+        stem + "_*" + toQString(Extension::zip)}, QDir::Files, QDir::Name);
     for (auto fileName: remaining)
     {
-        const auto correctName = QFileInfo(getFileName(firstFreeNumber++)).fileName();
+        if (firstFreeNumber > kMaxLogRotation)
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Too many log files, removing "
+                << fileName.toStdString() << '\n';
+            dir.remove(fileName);
+            continue;
+        }
+
+        const auto correctName = makeFileName(stem, firstFreeNumber++,
+            fileName.endsWith(toQString(Extension::log))
+                ? Extension::log
+                : Extension::zip);
         if (fileName != correctName)
             dir.rename(fileName, correctName);
     }
-    NX_ASSERT(firstFreeNumber <= kMaxLogRotation);
 
-    auto archiveName = getFileName(firstFreeNumber);
-    auto tmpName = getFileName(firstFreeNumber).replace(kRotateExtensionWithSeparator,
-        kTmpExtensionWithSeparator);
-    NX_ASSERT(!QFile::exists(archiveName));
-    if (QFile::exists(tmpName))
+    if (m_settings.disableArchiving)
     {
-        std::cerr << nx::toString(this).toStdString() << ": Replacing existing log file "
-            << tmpName.toStdString() << '\n';
+        auto rotateName = makeFileName(m_settings.name, firstFreeNumber, Extension::log);
+        if (!NX_ASSERT(!QFile::exists(rotateName)))
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Replacing existing log file "
+                << rotateName.toStdString() << '\n';
+        }
+        QFile::rename(getFileName(), rotateName);
+        return;
+    }
+
+    auto archiveName = makeFileName(m_settings.name, firstFreeNumber, Extension::zip);
+    auto tmpName = makeFileName(m_settings.name, firstFreeNumber, Extension::tmp);
+    if (!NX_ASSERT(!QFile::exists(archiveName)))
+    {
+        std::cerr << nx::toString(this).toStdString() << ": Replacing existing archived log file "
+            << archiveName.toStdString() << '\n';
     }
     QFile::rename(getFileName(), tmpName);
     m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
-    m_volumeLock.unlock();
-}
-
-void File::rotateNoArchive()
-{
-    m_volumeLock.lock();
-    auto dir = m_fileInfo.dir();
-    const auto pattern = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator))
-        + "_*" + kExtensionWithSeparator;
-    const auto list = dir.entryList({pattern}, QDir::Files, QDir::Name);
-
-    int removedCount = 0;
-    for (removedCount = 0; removedCount <= list.size() - kMaxLogRotation; removedCount++)
-        dir.remove(list[removedCount]);
-    for ( ; totalVolumeSize() >= m_settings.maxVolumeSizeB && removedCount < list.size(); removedCount++)
-        dir.remove(list[removedCount]);
-
-    if (totalVolumeSize() >= m_settings.maxVolumeSizeB)
-    {
-        QFile::remove(getFileName());
-        m_volumeLock.unlock();
-        return;
-    }
-
-    int firstFreeNumber = 1;
-    const auto remaining = dir.entryList({pattern}, QDir::Files, QDir::Name);
-    for (auto fileName: remaining)
-    {
-        const auto correctName = QFileInfo(getFileName(firstFreeNumber++)).fileName();
-        if (fileName != correctName)
-            dir.rename(fileName, correctName);
-    }
-    NX_ASSERT(firstFreeNumber <= kMaxLogRotation);
-
-    auto rotateName = getFileName(firstFreeNumber);
-    NX_ASSERT(!QFile::exists(rotateName));
-    QFile::rename(getFileName(), rotateName);
-    m_volumeLock.unlock();
 }
 
 void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
@@ -351,37 +341,89 @@ void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
     if (!isCurrentLimitReached(lock))
         return;
 
-    if (!m_settings.disableArchiving)
-        return rotateAndArchive();
-
-    return rotateNoArchive();
+    rotateAndStartArchivingIfNeeded();
 }
 
-void File::archiveLeftOvers(nx::Locker<nx::Mutex>* /*lock*/)
+void File::rotateLeftovers()
 {
-    const auto stem = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator));
-    const auto dir = m_fileInfo.dir();
+    const auto stem = makeBaseFileName(m_settings.name).chopped(toQString(Extension::log).size());
+    auto dir = m_fileInfo.dir();
     if (!dir.exists())
         return;
 
-    for (const auto& name: dir.entryList(QStringList{stem + "_*"
-        + kTmpExtensionWithSeparator}, QDir::Files))
+    const auto brokenZipList = dir.entryList({
+        stem + "_*" + toQString(Extension::zipTmp)}, QDir::Files, QDir::Name);
+    for (auto fileName: brokenZipList)
     {
-        const QRegularExpression rx(
-            QRegularExpression::anchoredPattern(stem + "_(\\d+)" + kTmpExtensionWithSeparator));
-        if (const auto match = rx.match(name); match.hasMatch())
+        std::cerr << nx::toString(this).toStdString() << ": Found log file in unknown state, removing "
+            << fileName.toStdString() << '\n';
+        dir.remove(fileName);
+    }
+
+    int rotation = 1;
+    const auto tmpList = dir.entryList({stem + "_*" + toQString(Extension::tmp)}, QDir::Files, QDir::Name);
+    for (auto fileName: tmpList)
+    {
+        if (rotation > kMaxLogRotation)
         {
-            const auto rotation = match.capturedView(1).toInt();
-            const auto archiveName = getFileName(rotation);
-            const auto tmpName = getFileName(rotation).replace(kRotateExtensionWithSeparator,
-                kTmpExtensionWithSeparator);
-            if (QFile::exists(archiveName))
-            {
-                std::cerr << nx::toString(this).toStdString() << ": Replacing existing archive file "
-                    << archiveName.toStdString() << '\n';
-            }
-            archive(tmpName, archiveName);
+            std::cerr << nx::toString(this).toStdString() << ": Too many log files, removing "
+                << fileName.toStdString() << '\n';
+            dir.remove(fileName);
         }
+        else
+        {
+            const auto correctName = QFileInfo(makeFileName(m_settings.name, rotation++, Extension::tmp))
+                .fileName();
+            if (fileName != correctName)
+                dir.rename(fileName, correctName);
+        }
+    }
+
+    const auto logList = dir.entryList({
+        stem + "_*" + toQString(Extension::log),
+        stem + "_*" + toQString(Extension::zip)}, QDir::Files, QDir::Name);
+    for (auto fileName: logList)
+    {
+        if (rotation > kMaxLogRotation)
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Too many log files, removing "
+                << fileName.toStdString() << '\n';
+            dir.remove(fileName);
+        }
+        else
+        {
+            const auto correctName = QFileInfo(makeFileName(
+                m_settings.name,
+                rotation++,
+                fileName.endsWith(toQString(Extension::log)) ? Extension::tmp : Extension::zipTmp))
+                .fileName();
+            if (fileName != correctName)
+                dir.rename(fileName, correctName);
+        }
+    }
+
+    const auto rotatedList = dir.entryList({
+        stem + "_*" + toQString(Extension::tmp),
+        stem + "_*" + toQString(Extension::zipTmp)}, QDir::Files, QDir::Name);
+    for (auto fileName: rotatedList)
+    {
+        if (m_settings.disableArchiving || fileName.endsWith(toQString(Extension::zipTmp)))
+        {
+            const auto correctName = fileName.endsWith(toQString(Extension::tmp))
+                ? fileName.chopped(toQString(Extension::tmp).size()) + toQString(Extension::log)
+                : fileName.chopped(toQString(Extension::zipTmp).size()) + toQString(Extension::zip);
+            dir.rename(fileName, correctName);
+            continue;
+        }
+
+        const auto fullPath = dir.filePath(fileName);
+        const auto archivePath = fullPath.chopped(toQString(Extension::tmp).size()) + toQString(Extension::zip);
+        if (QFile::exists(archivePath))
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Replacing existing archived log file "
+                << archivePath.toStdString() << '\n';
+        }
+        archive(fullPath, archivePath);
     }
 }
 
@@ -446,9 +488,9 @@ qint64 File::totalVolumeSize()
 
     for (auto fileInfo: dir.entryInfoList(
         {
-            QString("*") + kExtensionWithSeparator,
-            QString("*") + kTmpExtensionWithSeparator,
-            QString("*") + kRotateExtensionWithSeparator
+            QString("*") + toQString(Extension::log),
+            QString("*") + toQString(Extension::tmp),
+            QString("*") + toQString(Extension::zip)
         },
         QDir::Files))
     {
