@@ -70,6 +70,9 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc[opt] Maximum time duration of a single log file. */
     std::chrono::seconds maxFileTimePeriodS = nx::utils::log::kDefaultMaxLogFileTimePeriodS;
 
+    /**%apidoc[opt] Disable/enable zipping of log files on the filesystem. */
+    bool disableArchiving = nx::utils::log::kDefaultDisableLogArchiving;
+
     /**%apidoc[opt] MAIN log settings. */
     LogSettings mainLog;
 
@@ -97,7 +100,7 @@ struct NX_VMS_API ServerLogSettings
     }
 };
 #define ServerLogSettings_Fields \
-    (id)(maxFileSizeB)(maxVolumeSizeB)(maxFileTimePeriodS)(directory)(mainLog)(httpLog)(systemLog)
+    (id)(maxFileSizeB)(maxVolumeSizeB)(maxFileTimePeriodS)(disableArchiving)(directory)(mainLog)(httpLog)(systemLog)
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
 
