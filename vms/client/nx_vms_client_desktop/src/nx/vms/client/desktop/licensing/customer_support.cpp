@@ -132,4 +132,12 @@ CustomerSupport::Contact::Contact(const QString& company, const QString& address
 {
 }
 
+QString CustomerSupport::Contact::toString() const
+{
+    QString result = company;
+    if (!address.href.isEmpty())
+        result +=  QString(": ") + address.href;
+    return result;
+}
+
 } // namespace nx::vms::client::desktop

@@ -59,6 +59,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CustomerSupport
         const ContactAddress address;
 
         Contact(const QString& company, const QString& address);
+
+        QString toString() const;
     };
 
     /**

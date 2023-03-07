@@ -227,7 +227,7 @@ QString QnLicenseWidget::calculateManualActivationLinkText() const
 
     QStringList contactsList;
     for (const CustomerSupport::Contact& contact: customerSupport.regionalContacts)
-        contactsList.push_back(contact.company + ": " + contact.address.href);
+        contactsList.push_back(contact.toString());
 
     return tr("Please send the provided License Key and Hardware ID "
         "to your Regional / License support (%1) to obtain an Activation Key file.",
