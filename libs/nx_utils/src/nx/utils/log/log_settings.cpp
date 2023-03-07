@@ -62,6 +62,12 @@ bool LoggerSettings::parse(const QString& str)
                 maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
             parseSucceeded = parseSucceeded && duration;
         }
+        else if (param.first == kDisableLogArchivingSymbolicName)
+        {
+            bool ok = false;
+            disableArchiving = QVariant(param.second.c_str()).toBool();
+            parseSucceeded = parseSucceeded && ok;
+        }
     }
 
     if (!NX_ASSERT(maxVolumeSizeB >= maxFileSizeB))
@@ -97,6 +103,8 @@ static void readRotationParams(
         kMaxLogFileSizeSymbolicName, defaults.maxFileSizeB).toLongLong();
     target->maxFileTimePeriodS = std::chrono::seconds((size_t) settings->value(
         kMaxLogFileTimePeriodSymbolicName, (int) defaults.maxFileTimePeriodS.count()).toLongLong());
+    target->disableArchiving = settings->value(
+        kDisableLogArchivingSymbolicName, defaults.disableArchiving).toBool();
 
     if (!NX_ASSERT(target->maxVolumeSizeB >= target->maxFileSizeB,
         "Volume size %1 is less then file size %2", target->maxVolumeSizeB, target->maxFileSizeB))
@@ -131,7 +139,8 @@ Settings::Settings(QSettings* settings)
         {
             if (levelKey == kMaxLogVolumeSizeSymbolicName
                 || levelKey == kMaxLogFileSizeSymbolicName
-                || levelKey == kMaxLogFileTimePeriodSymbolicName)
+                || levelKey == kMaxLogFileTimePeriodSymbolicName
+                || levelKey == kDisableLogArchivingSymbolicName)
             {
                 continue; //< Already parsed by readRotationParams.
             }
@@ -228,6 +237,8 @@ void Settings::loadCompatibilityLogger(
         settings.value(makeKey(kMaxLogFileTimePeriodSymbolicName)).toString().toStdString());
     if (duration)
         loggerSettings.maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
+
+    loggerSettings.disableArchiving = settings.value(makeKey(kDisableLogArchivingSymbolicName)).toBool();
 
     loggerSettings.logBaseName = settings.value(makeKey("baseName")).toString();
     if (loggerSettings.logBaseName.isEmpty())

@@ -42,12 +42,13 @@ void StdOut::writeImpl(Level /*level*/, const QString& message)
 
 File::File(Settings settings):
     m_settings(std::move(settings)),
-    m_fileInfo(makeFileName(m_settings.name, 0)),
+    m_fileInfo(makeFileName(m_settings.name, 0, m_settings.disableArchiving)),
     m_volumeLock(m_fileInfo.path() + "/.lock")
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     NX_ASSERT(m_settings.maxVolumeSizeB >= m_settings.maxFileSizeB);
-    archiveLeftOvers(&lock);
+    if (!m_settings.disableArchiving)
+        archiveLeftOvers(&lock);
 }
 
 File::~File()
@@ -64,6 +65,7 @@ void File::setSettings(const Settings& settings)
     m_settings.maxFileSizeB = settings.maxFileSizeB;
     m_settings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
     NX_ASSERT(m_settings.maxVolumeSizeB >= m_settings.maxFileSizeB);
+    m_settings.disableArchiving = settings.disableArchiving;
 }
 
 void File::write(Level /*level*/, const QString& message)
@@ -81,7 +83,7 @@ void File::write(Level /*level*/, const QString& message)
     rotateIfNeeded(&lock);
 }
 
-QString File::makeFileName(QString fileName, size_t backupNumber)
+QString File::makeFileName(QString fileName, size_t backupNumber, bool disableArchiving)
 {
     auto baseFileName = fileName;
     if (baseFileName.endsWith(kExtensionWithSeparator))
@@ -91,6 +93,12 @@ QString File::makeFileName(QString fileName, size_t backupNumber)
     {
         static const QString kTemplate("%1%2");
         return kTemplate.arg(baseFileName, kExtensionWithSeparator);
+    }
+    else if (disableArchiving)
+    {
+        static const QString kTemplate("%1_%2%3");
+        return kTemplate.arg(baseFileName).arg((int) backupNumber, 3, 10, QLatin1Char('0'))
+            .arg(kExtensionWithSeparator);
     }
     else
     {
@@ -136,7 +144,7 @@ QString File::makeBaseFileName(QString fullPath)
 
 QString File::getFileName(size_t backupNumber) const
 {
-    return makeFileName(m_settings.name, backupNumber);
+    return makeFileName(m_settings.name, backupNumber, m_settings.disableArchiving);
 }
 
 bool File::openFile()
@@ -181,6 +189,7 @@ bool File::openFile()
 
 void File::archive(QString fileName, QString archiveName)
 {
+    NX_ASSERT(!m_settings.disableArchiving);
     auto tmpArchiveName = archiveName;
     tmpArchiveName.replace(kRotateExtensionWithSeparator, kRotateTmpExtensionWithSeparator);
 
@@ -245,20 +254,8 @@ void File::archive(QString fileName, QString archiveName)
     archiveFile.rename(archiveName);
 }
 
-void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
+void File::rotateAndArchive()
 {
-    if (!isCurrentLimitReached(lock))
-        return;
-
-    m_file.close();
-
-    if (!queueToArchive(lock))
-        return;
-    NX_ASSERT(!m_archive.valid());
-
-    if (!isCurrentLimitReached(lock))
-        return;
-
     m_volumeLock.lock();
     auto dir = m_fileInfo.dir();
     const auto pattern = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator))
@@ -300,6 +297,63 @@ void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
     QFile::rename(getFileName(), tmpName);
     m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
     m_volumeLock.unlock();
+}
+
+void File::rotateNoArchive()
+{
+    m_volumeLock.lock();
+    auto dir = m_fileInfo.dir();
+    const auto pattern = QFileInfo(getFileName()).fileName().chopped(strlen(kExtensionWithSeparator))
+        + "_*" + kExtensionWithSeparator;
+    const auto list = dir.entryList({pattern}, QDir::Files, QDir::Name);
+
+    int removedCount = 0;
+    for (removedCount = 0; removedCount <= list.size() - kMaxLogRotation; removedCount++)
+        dir.remove(list[removedCount]);
+    for ( ; totalVolumeSize() >= m_settings.maxVolumeSizeB && removedCount < list.size(); removedCount++)
+        dir.remove(list[removedCount]);
+
+    if (totalVolumeSize() >= m_settings.maxVolumeSizeB)
+    {
+        QFile::remove(getFileName());
+        m_volumeLock.unlock();
+        return;
+    }
+
+    int firstFreeNumber = 1;
+    const auto remaining = dir.entryList({pattern}, QDir::Files, QDir::Name);
+    for (auto fileName: remaining)
+    {
+        const auto correctName = QFileInfo(getFileName(firstFreeNumber++)).fileName();
+        if (fileName != correctName)
+            dir.rename(fileName, correctName);
+    }
+    NX_ASSERT(firstFreeNumber <= kMaxLogRotation);
+
+    auto rotateName = getFileName(firstFreeNumber);
+    NX_ASSERT(!QFile::exists(rotateName));
+    QFile::rename(getFileName(), rotateName);
+    m_volumeLock.unlock();
+}
+
+void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
+{
+    if (!isCurrentLimitReached(lock))
+        return;
+
+    m_file.close();
+
+    if (!queueToArchive(lock))
+        return;
+    NX_ASSERT(!m_archive.valid());
+
+    if (!isCurrentLimitReached(lock))
+        return;
+
+    if (!m_settings.disableArchiving)
+        return rotateAndArchive();
+
+    return rotateNoArchive();
 }
 
 void File::archiveLeftOvers(nx::Locker<nx::Mutex>* /*lock*/)
