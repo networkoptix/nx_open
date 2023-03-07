@@ -1552,12 +1552,12 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 użytkowników otrzymuje e-maile</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 nie jest dostępny</translation>
     </message>
     <message>
       <source>Route via %1</source>
@@ -1586,12 +1586,12 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>Nie można przetestować ustawień e-mail ze względu na brak połączenia z internetem na żadnym z aktywnych serwerów</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 użytkowników rozpocznie otrzymywanie wiadomości e-mail zaraz po zastosowaniu tych ustawień</translation>
     </message>
   </context>
   <context>
@@ -1922,15 +1922,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Nie udało się zapisać logów do wybranego folderu</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Pobieranie ukończone!</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
