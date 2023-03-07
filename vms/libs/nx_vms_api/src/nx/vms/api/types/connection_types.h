@@ -41,6 +41,7 @@ enum class RuntimeFlag
     masterCloudSync = 1 << 0,
     noStorages = 1 << 1,
     noBackupStorages = 1 << 2,
+    masterLdapSync = 1 << 3,
 };
 
 template<typename Visitor>
@@ -50,7 +51,8 @@ constexpr auto nxReflectVisitAllEnumItems(RuntimeFlag*, Visitor&& visitor)
     return visitor(
         Item{RuntimeFlag::masterCloudSync, "MasterCloudSync"},
         Item{RuntimeFlag::noStorages, "NoStorages"},
-        Item{RuntimeFlag::noBackupStorages, "noBackupStorages"}
+        Item{RuntimeFlag::noBackupStorages, "noBackupStorages"},
+        Item{RuntimeFlag::masterLdapSync, "masterLdapSync"}
     );
 }
 
