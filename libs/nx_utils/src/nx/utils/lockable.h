@@ -11,30 +11,36 @@ template <typename Value>
 class ValueLocker
 {
 public:
-    ValueLocker(nx::Mutex* mutex, Value* value):
-        m_mutex(mutex),
-        m_value(value)
+    ValueLocker(nx::Mutex* mutex, Value* value): m_mutex(mutex), m_value(value)
     {
         m_mutex->lock();
     }
 
-    ValueLocker(ValueLocker&& other)
+    ValueLocker(ValueLocker&& other) { *this = std::move(other); }
+    ~ValueLocker() { unlock(); }
+
+    ValueLocker(const ValueLocker& other) = delete;
+    ValueLocker& operator=(const ValueLocker& other) = delete;
+
+    ValueLocker& operator=(ValueLocker&& other)
     {
         m_mutex = other.m_mutex;
         m_value = other.m_value;
         other.m_mutex = nullptr;
         other.m_value = nullptr;
+        return *this;
     }
 
-    ValueLocker(const ValueLocker& other) = delete;
-
-    ~ValueLocker()
+    void unlock()
     {
         if (m_mutex)
+        {
             m_mutex->unlock();
+            m_mutex = nullptr;
+            m_value = nullptr;
+        }
     }
 
-    ValueLocker& operator=(const ValueLocker& other) = delete;
     Value* operator->() { return m_value; }
     const Value* operator->() const { return m_value; }
     Value& operator*() { return *m_value; }

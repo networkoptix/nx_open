@@ -9,6 +9,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 #include "data_macros.h"
 #include "void.h"
@@ -128,11 +129,26 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
      */
     std::chrono::seconds continuousSyncIntervalS = 0s;
 
+    /**%apidoc[opt]
+     * Preferred Server in the System that will be used to execute synchronization with the LDAP
+     * Server if it is online and has connection with the LDAP Server.
+     */
+    QnUuid preferredMasterSyncServer;
+
+    /**%apidoc[opt]
+     * %example 10
+     */
+    std::chrono::seconds masterSyncServerCheckIntervalS = 10s;
+
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
 };
 #define LdapSettings_Fields LdapSettingsBase_Fields \
-    (filters)(continuousSync)(continuousSyncIntervalS)
+    (filters) \
+    (continuousSync) \
+    (continuousSyncIntervalS) \
+    (preferredMasterSyncServer) \
+    (masterSyncServerCheckIntervalS)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)
 
