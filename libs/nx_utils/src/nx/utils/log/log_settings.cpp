@@ -64,9 +64,7 @@ bool LoggerSettings::parse(const QString& str)
         }
         else if (param.first == kDisableLogArchivingSymbolicName)
         {
-            bool ok = false;
             disableArchiving = QVariant(param.second.c_str()).toBool();
-            parseSucceeded = parseSucceeded && ok;
         }
     }
 
@@ -124,6 +122,7 @@ Settings::Settings(QSettings* settings)
         .maxVolumeSizeB = kDefaultMaxLogVolumeSizeB,
         .maxFileSizeB = kDefaultMaxLogFileSizeB,
         .maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS,
+        .disableArchiving = kDefaultDisableLogArchiving,
     });
 
     for (const auto& group: settings->childGroups())

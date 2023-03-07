@@ -21,6 +21,7 @@ static constexpr int kMaxLogRotation = 999;
 static constexpr qint64 kDefaultMaxLogVolumeSizeB = 250 * 1024 * 1024;
 static constexpr qint64 kDefaultMaxLogFileSizeB = 10 * 1024 * 1024;
 static constexpr std::chrono::seconds kDefaultMaxLogFileTimePeriodS = std::chrono::seconds::zero();
+static constexpr bool kDefaultDisableLogArchiving = false;
 
 class NX_UTILS_API AbstractWriter
 {
@@ -48,12 +49,27 @@ private:
 class NX_UTILS_API File: public AbstractWriter
 {
 public:
-    static constexpr char kExtensionWithSeparator[] = ".log";
-    static constexpr char kTmpExtensionWithSeparator[] = ".log.tmp";
-    static constexpr char kRotateExtensionWithSeparator[] = ".log.zip";
-    static constexpr char kRotateTmpExtensionWithSeparator[] = ".log.zip.tmp";
+    enum Extension
+    {
+        log,
+        tmp,
+        zip,
+        zipTmp,
+    };
 
-    static QString makeFileName(QString fileName, size_t backupNumber, bool disableArchiving);
+    template<typename Visitor>
+    friend constexpr auto nxReflectVisitAllEnumItems(Extension*, Visitor&& visitor)
+    {
+        using Item = nx::reflect::enumeration::Item<Extension>;
+        return visitor(
+            Item{log, ".log"},
+            Item{tmp, ".log.tmp"},
+            Item{zip, ".log.zip"},
+            Item{zipTmp, ".log.zip.tmp"}
+        );
+    }
+
+    static QString makeFileName(QString fileName, size_t backupNumber, Extension ext);
     static QString makeBaseFileName(QString path);
 
     struct Settings
@@ -62,7 +78,7 @@ public:
         qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; /**< Maximum volume size. */
         qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; /**< Maximum file size. */
         std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; /**< Maximum file duration in time. */
-        bool disableArchiving = false;
+        bool disableArchiving = kDefaultDisableLogArchiving; /**< Zipping enabled/disabled flag. */
     };
 
     File(Settings settings);
@@ -76,9 +92,8 @@ public:
 private:
     bool openFile();
     void rotateIfNeeded(nx::Locker<nx::Mutex>* lock);
-    void rotateAndArchive();
-    void rotateNoArchive();
-    void archiveLeftOvers(nx::Locker<nx::Mutex>* lock);
+    void rotateAndStartArchivingIfNeeded();
+    void rotateLeftovers();
     bool queueToArchive(nx::Locker<nx::Mutex>* lock);
     bool isCurrentLimitReached(nx::Locker<nx::Mutex>* lock);
     void archive(QString fileName, QString archiveName);
@@ -95,6 +110,8 @@ private:
     std::future<void> m_archive;
     int m_archiveQueue = 0;
 };
+
+NX_UTILS_API QString toQString(File::Extension ext);
 
 /**
  * Writes messages to internal buffer.
