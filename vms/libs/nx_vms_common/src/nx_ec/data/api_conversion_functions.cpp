@@ -554,14 +554,14 @@ void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& 
     }
 }
 
-QnUserResourcePtr fromApiToResource(const UserData& src)
+QnUserResourcePtr fromApiToResource(const UserData& src, bool setPasswordHashes)
 {
     QnUserResourcePtr dst(new QnUserResource(src.type, src.externalId));
-    fromApiToResource(src, dst);
+    fromApiToResource(src, dst, setPasswordHashes);
     return dst;
 }
 
-void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
+void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPasswordHashes)
 {
     NX_ASSERT(dst->userType() == src.type, "Unexpected user type");
 
@@ -575,9 +575,14 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
 
     dst->setRawPermissions(src.permissions);
 
-    dst->setPasswordHashes({
-        QString::fromStdString(nx::network::AppInfo::realm()),
-        src.hash, src.digest, src.cryptSha512Hash});
+    if (setPasswordHashes)
+    {
+        dst->setPasswordHashes({
+            QString::fromStdString(nx::network::AppInfo::realm()),
+            src.hash,
+            src.digest,
+            src.cryptSha512Hash});
+    }
 }
 
 void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)

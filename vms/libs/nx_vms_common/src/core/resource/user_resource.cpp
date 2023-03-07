@@ -618,5 +618,6 @@ void QnUserResource::fillIdUnsafe()
 
 QString QnUserResource::idForToStringFromPtr() const
 {
-    return NX_FMT("%1: %2, %3", userType(), getName(), getId());
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return NX_FMT("%1: %2, %3", m_userType, m_name, getId());
 }
