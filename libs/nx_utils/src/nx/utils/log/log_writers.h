@@ -53,7 +53,7 @@ public:
     static constexpr char kRotateExtensionWithSeparator[] = ".log.zip";
     static constexpr char kRotateTmpExtensionWithSeparator[] = ".log.zip.tmp";
 
-    static QString makeFileName(QString fileName, size_t backupNumber);
+    static QString makeFileName(QString fileName, size_t backupNumber, bool disableArchiving);
     static QString makeBaseFileName(QString path);
 
     struct Settings
@@ -62,6 +62,7 @@ public:
         qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; /**< Maximum volume size. */
         qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; /**< Maximum file size. */
         std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; /**< Maximum file duration in time. */
+        bool disableArchiving = false;
     };
 
     File(Settings settings);
@@ -75,6 +76,8 @@ public:
 private:
     bool openFile();
     void rotateIfNeeded(nx::Locker<nx::Mutex>* lock);
+    void rotateAndArchive();
+    void rotateNoArchive();
     void archiveLeftOvers(nx::Locker<nx::Mutex>* lock);
     bool queueToArchive(nx::Locker<nx::Mutex>* lock);
     bool isCurrentLimitReached(nx::Locker<nx::Mutex>* lock);
