@@ -1796,6 +1796,53 @@ Handle ServerConnection::testLdapSettingsDeprecatedAsync(
         QJson::serialized(settings), callback_wrapper, targetThread, timeouts);
 }
 
+Handle ServerConnection::ldapAuthenticateAsync(
+    const nx::vms::api::Credentials& credentials,
+    LdapAuthenticateCallback&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::post,
+        prepareUrl(
+            "/rest/v3/ldap/authenticate",
+            /*params*/ {}),
+        nx::network::http::header::ContentType::kJson.toString(),
+        nx::reflect::json::serialize(credentials));
+
+    auto handle = request.isValid()
+        ? executeRequest(
+            request,
+            [callback = std::move(callback)](
+                bool success,
+                Handle requestId,
+                QByteArray body,
+                const nx::network::http::HttpHeaders& httpHeaders)
+            {
+                using AuthResult = nx::vms::common::AuthResult;
+                AuthResult authResult = AuthResult::Auth_LDAPConnectError;
+                const auto authResultString = nx::network::http::getHeaderValue(
+                    httpHeaders, Qn::AUTH_RESULT_HEADER_NAME);
+                if (!authResultString.empty())
+                    nx::reflect::fromString<AuthResult>(authResultString, &authResult);
+                if (!success)
+                {
+                    nx::network::rest::Result result;
+                    QJson::deserialize(body, &result);
+                    callback(requestId, std::move(result), authResult);
+                    return;
+                }
+
+                nx::vms::api::UserModelV3 user;
+                QJson::deserialize(body, &user);
+                callback(requestId, std::move(user), authResult);
+            },
+            targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::testLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
     Result<ErrorOrData<std::vector<QString>>>::type&& callback,

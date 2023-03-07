@@ -48,6 +48,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/auth/auth_result.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
@@ -704,6 +705,16 @@ public:
     Handle testLdapSettingsDeprecatedAsync(
         const nx::vms::api::LdapSettingsDeprecated& settings,
         LdapSettingsCallback&& callback,
+        QThread* targetThread = nullptr);
+
+    using LdapAuthenticateCallback = std::function<void(
+        Handle requestId,
+        ErrorOrData<nx::vms::api::UserModelV3> userOrError,
+        nx::vms::common::AuthResult authResult)>;
+
+    Handle ldapAuthenticateAsync(
+        const nx::vms::api::Credentials& credentials,
+        LdapAuthenticateCallback&& callback,
         QThread* targetThread = nullptr);
 
     /**
