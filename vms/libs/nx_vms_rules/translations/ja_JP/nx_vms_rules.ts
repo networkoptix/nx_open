@@ -453,7 +453,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
     <message>
       <source>Level</source>
