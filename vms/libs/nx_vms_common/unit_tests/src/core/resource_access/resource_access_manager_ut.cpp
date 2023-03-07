@@ -456,7 +456,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
 TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsVideowallUser)
 {
     loginAsCustom();
-    setOwnAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -487,7 +487,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
     const auto group = createRole("Group", GlobalPermission::none);
     loginAsMember({group.id});
 
-    setOwnAccessRights(group.id, {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(group.id, {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, true, videowall->getId());
@@ -505,7 +505,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
 TEST_F(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
 {
     loginAs(Qn::UserRole::liveViewer);
-    setOwnAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto camera = addDesktopCamera(m_currentUser);
 
@@ -538,7 +538,7 @@ TEST_F(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
 TEST_F(ResourceAccessManagerTest, canPushMyScreen)
 {
     loginAs(Qn::UserRole::viewer);
-    setOwnAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -557,7 +557,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreen)
 TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
 {
     loginAs(Qn::UserRole::liveViewer);
-    setOwnAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -662,7 +662,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
     auto videoWall = addVideoWall();
     auto otherScreen = addDesktopCamera(anotherUser);
 
-    setOwnAccessRights(anotherUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(anotherUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto layout = QnResourcePoolTestHelper::createLayout();
     layout->setParentId(videoWall->getId());
@@ -685,7 +685,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
     auto layout = addLayout();
     layout->setParentId(videoWall->getId());
 
-    setOwnAccessRights(anotherUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(anotherUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
@@ -1347,7 +1347,7 @@ TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
     auto videoWall = addVideoWall();
 
     auto user = addUser(Qn::UserRole::customPermissions);
-    setOwnAccessRights(user->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(user->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto layout = createLayout(Qn::remote, false, videoWall->getId());
     QnVideoWallItem vwitem;
@@ -1632,7 +1632,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsAdmin)
 TEST_F(ResourceAccessManagerTest, checkVideowallAsController)
 {
     loginAsCustom();
-    setOwnAccessRights(m_currentUser->getId(), {{kAllVideowallsGroupId, AccessRight::view}});
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::view}});
 
     auto videowall = addVideoWall();
 

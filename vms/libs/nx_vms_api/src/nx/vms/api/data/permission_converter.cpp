@@ -58,7 +58,7 @@ void PermissionConverter::extractFromResourceAccessRights(
     temporaryAccessibleResources.reserve(accessRights->resourceRights.size());
     for (const auto& [id, resourceRight]: accessRights->resourceRights)
     {
-        if (id == kAllVideowallsGroupId)
+        if (id == kAllVideoWallsGroupId)
         {
             if (resourceRight.testFlag(AccessRight::view))
                 permissions->setFlag(GlobalPermission::controlVideowall);

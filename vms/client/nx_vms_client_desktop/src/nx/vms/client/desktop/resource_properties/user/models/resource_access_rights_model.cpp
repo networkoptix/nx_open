@@ -188,7 +188,7 @@ QnUuid ResourceAccessRightsModel::groupId() const
             return nx::vms::api::kAllDevicesGroupId;
 
         case ResourceTree::NodeType::videoWalls:
-            return nx::vms::api::kAllVideowallsGroupId;
+            return nx::vms::api::kAllVideoWallsGroupId;
 
         case ResourceTree::NodeType::webPages:
             return nx::vms::api::kAllWebPagesGroupId;

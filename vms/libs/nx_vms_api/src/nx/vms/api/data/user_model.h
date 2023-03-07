@@ -137,7 +137,11 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     std::optional<UserExternalId> externalId;
 
-    /**%apidoc Resource ids with access rights for the User. */
+    /**%apidoc
+     * Resource ids (can be obtained from `GET /rest/v{3-}/devices`, `GET /rest/v{3-}/servers`,
+     * etc.) or Resource Group ids (can be obtained from `GET /rest/v{3-}/resourceGroups`) with
+     * access rights for this User.
+     */
     std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
 
     bool operator==(const UserModelV3& other) const = default;

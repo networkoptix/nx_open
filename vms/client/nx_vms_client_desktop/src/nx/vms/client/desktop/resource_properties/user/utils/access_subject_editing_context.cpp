@@ -345,7 +345,7 @@ QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr&
         return kAllDevicesGroupId;
 
     if (resource.objectCast<QnVideoWallResource>())
-        return kAllVideowallsGroupId;
+        return kAllVideoWallsGroupId;
 
     if (resource.objectCast<QnWebPageResource>())
         return kAllWebPagesGroupId;

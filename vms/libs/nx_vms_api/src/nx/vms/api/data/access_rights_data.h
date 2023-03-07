@@ -32,7 +32,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(AccessRightsData)
 NX_VMS_API extern const QnUuid kAllDevicesGroupId;
 NX_VMS_API extern const QnUuid kAllWebPagesGroupId;
 NX_VMS_API extern const QnUuid kAllServersGroupId;
-NX_VMS_API extern const QnUuid kAllVideowallsGroupId;
+NX_VMS_API extern const QnUuid kAllVideoWallsGroupId;
 
 NX_VMS_API std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id);
 NX_VMS_API QnUuid specialResourceGroupId(SpecialResourceGroup group);
