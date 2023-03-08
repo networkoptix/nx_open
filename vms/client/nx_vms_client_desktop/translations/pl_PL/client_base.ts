@@ -1934,7 +1934,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>Akceleracja sprzętowa NVIDIA jest w trybie beta</translation>
     </message>
   </context>
   <context>
@@ -2266,22 +2266,22 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Podłączony do %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Odłączono od %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Podłączony do %1 przez %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Odłączony od %1 przez %2</translation>
     </message>
   </context>
   <context>
@@ -2570,7 +2570,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Zapisać zmiany przed wyjściem?</translation>
     </message>
   </context>
   <context>
@@ -2612,7 +2612,7 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 Uruchomione</translation>
     </message>
   </context>
   <context>
@@ -3195,7 +3195,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>Nie udało się zalogować do Systemu &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3297,7 +3297,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Baza danych pomyślnie przywrócona. Serwer zostanie wkrótce ponownie uruchomiony.</translation>
     </message>
   </context>
   <context>
@@ -3670,7 +3670,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
   </context>
   <context>
@@ -4487,7 +4487,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>Te ustawienia dotyczą tylko systemu, do którego jesteś zalogowany i zostaną usunięte w przyszłych wersjach.</translation>
     </message>
   </context>
   <context>
@@ -4498,7 +4498,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Zapisać zmiany przed wyjściem?</translation>
     </message>
   </context>
   <context>
@@ -4688,7 +4688,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
   </context>
   <context>
@@ -5168,11 +5168,11 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>Serwery awaryjne failover automatycznie przejmą kamery z uszkodzonych serwerów.</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>Certyfikat otrzymany z serwera nie pasuje do przypiętego certyfikatu.</translation>
     </message>
   </context>
   <context>
@@ -5629,7 +5629,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Zarządzanie użytkownikami</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -5786,15 +5786,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+      <translation>Zdalna synchronizacja archiwum została zatrzymana</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Pamięć danych analitycznych nie jest ustawiona</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Pamięć systemu jest używana dla danych analitycznych</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5802,11 +5802,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>Dostępna jest zdalna synchronizacja archiwów</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Zalecane jest wybranie innej lokalizacji niż partycja systemowa.</translation>
     </message>
   </context>
   <context>
@@ -6985,7 +6985,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Wybierz co najmniej jednego użytkownika</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -7825,11 +7825,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Nie udało się zastąpić kamery</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Przerwać zamianę kamery?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
@@ -7849,7 +7849,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Kamera do zamiany</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
@@ -7857,7 +7857,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Kamera została zastąpiona!</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
@@ -8190,7 +8190,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Tylko magazyn kopii zapasowych</translation>
     </message>
   </context>
   <context>
@@ -8307,7 +8307,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Kliknij, aby zobaczyć kamery</translation>
     </message>
   </context>
   <context>
@@ -8507,7 +8507,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Nieznana kamera</translation>
     </message>
   </context>
   <context>
@@ -8936,7 +8936,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
   </context>
   <context>
@@ -9340,7 +9340,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
   </context>
   <context>
