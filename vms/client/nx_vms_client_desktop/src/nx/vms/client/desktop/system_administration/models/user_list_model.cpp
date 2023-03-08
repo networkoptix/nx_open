@@ -49,6 +49,7 @@ class UserListModel::Private:
 public:
     boost::container::flat_set<QnUserResourcePtr> users;
     QHash<QString, QSet<QnUuid>> sameNameUsers; //< Used for detection of non-unique user names.
+    QHash<QnUuid, QString> prevName; //< Cache for user names before change.
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
@@ -126,12 +127,18 @@ void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
         return;
 
     // Update map for non-unique name detection.
-    const auto lowercaseName = user->getName().toLower();
-    auto& usersWithName = sameNameUsers[lowercaseName];
+
+    // Remove old name.
+    const auto prevLowercaseName = prevName.value(user->getId());
+    auto& usersWithName = sameNameUsers[prevLowercaseName];
     usersWithName.remove(user->getId());
     if (usersWithName.isEmpty())
-        sameNameUsers.remove(lowercaseName);
+        sameNameUsers.remove(prevLowercaseName);
+
+    // Insert new name.
+    const auto lowercaseName = user->getName().toLower();
     sameNameUsers[lowercaseName].insert(user->getId());
+    prevName[user->getId()] = lowercaseName;
 
     const auto row = users.index_of(it);
     QModelIndex index = model->index(row);
@@ -259,7 +266,9 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 
 void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
-    sameNameUsers[user->getName().toLower()].insert(user->getId());
+    const auto lowercaseName = user->getName().toLower();
+    sameNameUsers[lowercaseName].insert(user->getId());
+    prevName[user->getId()] = lowercaseName;
 
     connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
@@ -287,6 +296,8 @@ void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
     usersWithName.remove(user->getId());
     if (usersWithName.isEmpty())
         sameNameUsers.remove(lowercaseName);
+
+    prevName.remove(user->getId());
 
     disconnect(user.get(), nullptr, this, nullptr);
     checkedUsers.remove(user);
