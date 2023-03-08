@@ -2291,8 +2291,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
             return result;
         };
     
-    const QString timeString =
-        (navigator()->isPlaying() && d->display()->camDisplay()->isRealTimeSource()
+    const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
             ? tr("LIVE")
             : extractTime(getDisplayTimeUsec()));
 
