@@ -681,8 +681,8 @@ void CloudStatusWatcher::Private::setStatus(
     if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);
     
-    if (isJustLoggedOut)
-        emit q->loggedOut();
+    if (isJustLoggedOut && errorCode != NoError)
+        emit q->loggedOutWithError();
 }
 
 void CloudStatusWatcher::Private::setCloudSystems(const QnCloudSystemList &newCloudSystems)
