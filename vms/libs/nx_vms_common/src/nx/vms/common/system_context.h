@@ -26,7 +26,6 @@ class DescriptorContainer;
 
 namespace nx::core::access {
 class AccessRightsManager;
-class DeprecatedAccessRightsConverter;
 class GlobalPermissionsWatcher;
 class ResourceAccessSubjectHierarchy;
 } // namespace nx::core::access
@@ -217,10 +216,8 @@ public:
     /**
      * Manages which Resources are directly shared with Users or Roles.
      */
-    QnSharedResourcesManager* sharedResourcesManager() const;
     nx::core::access::AccessRightsManager* accessRightsManager() const;
     nx::core::access::GlobalPermissionsWatcher* globalPermissionsWatcher() const;
-    nx::core::access::DeprecatedAccessRightsConverter* deprecatedAccessRightsConverter() const;
 
     /**
      * Manages which permissions User has on each of its accessible Resources.

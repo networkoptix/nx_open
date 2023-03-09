@@ -23,7 +23,9 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
@@ -440,50 +442,73 @@ void ResourceTreeModelTest::setupAccessToResourceForUser(
     const QnResourcePtr& resource,
     nx::vms::api::AccessRights accessRights) const
 {
-    if (!NX_ASSERT(resource
-        && user
-        && !user->getRawPermissions().testFlag(GlobalPermission::admin)
-        && user->userRoleIds().empty()))
-    {
+    if (NX_ASSERT(resource))
+        setupAccessToObjectForUser(user, resource->getId(), accessRights);
+}
+
+void ResourceTreeModelTest::setupAccessToObjectForUser(
+    const QnUserResourcePtr& user,
+    const QnUuid& resourceOrGroupId,
+    nx::vms::api::AccessRights accessRights) const
+{
+    if (!NX_ASSERT(user && !resourceAccessManager()->hasAdminPermissions(user)))
         return;
-    }
 
     const auto userId = user->getId();
     const auto accessRightsManager = commonModule()->systemContext()->accessRightsManager();
 
     auto accessRightsMap = accessRightsManager->ownResourceAccessMap(userId);
     if (accessRights != 0)
-        accessRightsMap.emplace(resource->getId(), accessRights);
+        accessRightsMap.emplace(resourceOrGroupId, accessRights);
     else
-        accessRightsMap.remove(resource->getId());
+        accessRightsMap.remove(resourceOrGroupId);
 
     accessRightsManager->setOwnResourceAccessMap(userId, accessRightsMap);
 }
 
-QnUserResourcePtr ResourceTreeModelTest::loginAsUserWithPermissions(
-    const QString& name,
-    GlobalPermissions permissions,
-    bool isOwner) const
+void ResourceTreeModelTest::setupAllMediaAccess(
+    const QnUserResourcePtr& user, AccessRights accessRights) const
+{
+    setupAccessToObjectForUser(user, kAllDevicesGroupId, accessRights);
+    setupAccessToObjectForUser(user, kAllWebPagesGroupId, accessRights & AccessRight::view);
+    setupAccessToObjectForUser(user, kAllServersGroupId, accessRights & AccessRight::view);
+}
+
+void ResourceTreeModelTest::setupAllVideowallsAccess(
+    const QnUserResourcePtr& user, AccessRights accessRights) const
+{
+    setupAccessToObjectForUser(user, kAllVideowallsGroupId, accessRights);
+}
+
+QnUserResourcePtr ResourceTreeModelTest::loginAs(
+    const QString& name, Qn::UserRole userGroup) const
 {
     logout();
     const auto users = resourcePool()->getResources<QnUserResource>();
+    const auto groupId = QnPredefinedUserRoles::id(userGroup);
+
+    const std::vector<QnUuid> groupIds = groupId.isNull()
+        ? std::vector<QnUuid>{}
+        : std::vector<QnUuid>{groupId};
+
     const auto itr = std::find_if(users.cbegin(), users.cend(),
-        [this, name, permissions](const QnUserResourcePtr& user)
+        [this, name, &groupIds](const QnUserResourcePtr& user)
         {
-            const auto permissionsForUser = resourceAccessManager()->globalPermissions(user);
-            return (user->getName() == name) && permissionsForUser == permissions;
+            return user->getName() == name && user->userRoleIds() == groupIds;
         });
 
     QnUserResourcePtr user;
     if (itr != users.cend())
-        user = *itr;
-    else
-        user = addUser(name, permissions);
-
-    if (isOwner)
     {
-        NX_ASSERT(permissions.testFlag(GlobalPermission::adminPermissions));
-        user->setOwner(true);
+        user = *itr;
+    }
+    else
+    {
+        user = addUser(name, GlobalPermission::none);
+        user->setUserRoleIds(groupIds);
+
+        if (userGroup == Qn::UserRole::owner)
+            user->setOwner(true);
     }
 
     systemContext()->accessController()->setUser(user);
@@ -492,27 +517,32 @@ QnUserResourcePtr ResourceTreeModelTest::loginAsUserWithPermissions(
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsOwner(const QString& name) const
 {
-    return loginAsUserWithPermissions(name, GlobalPermission::adminPermissions, /*isOwner*/ true);
+    return loginAs(name, Qn::UserRole::owner);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsAdmin(const QString& name) const
 {
-    return loginAsUserWithPermissions(name, GlobalPermission::adminPermissions);
+    return loginAs(name, Qn::UserRole::administrator);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
 {
-    return loginAsUserWithPermissions(name, GlobalPermission::liveViewerPermissions);
+    return loginAs(name, Qn::UserRole::liveViewer);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsAdvancedViewer(const QString& name) const
 {
-    return loginAsUserWithPermissions(name, GlobalPermission::advancedViewerPermissions);
+    return loginAs(name, Qn::UserRole::advancedViewer);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsCustomUser(const QString& name) const
 {
-    return loginAsUserWithPermissions(name, GlobalPermission::customUser);
+    return loginAs(name, Qn::UserRole::customPermissions);
+}
+
+QnUserResourcePtr ResourceTreeModelTest::currentUser() const
+{
+    return systemContext()->accessController()->user();
 }
 
 void ResourceTreeModelTest::logout() const

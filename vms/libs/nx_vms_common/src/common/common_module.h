@@ -60,7 +60,6 @@ public:
     QnResourceAccessManager* resourceAccessManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
-    QnSharedResourcesManager* sharedResourcesManager() const;
     QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;

@@ -12,7 +12,6 @@ class QnGlobalPermissionsManager;
 class QnResourceAccessManager;
 class QnResourcePool;
 class QnRuntimeInfoManager;
-class QnSharedResourcesManager;
 class QnUserRolesManager;
 
 namespace ec2 { class AbstractECConnection; }
@@ -95,11 +94,6 @@ public:
      * List of all User Roles.
      */
     QnUserRolesManager* userRolesManager() const;
-
-    /**
-     * Manages which Resources are directly shared with Users or Roles.
-     */
-    QnSharedResourcesManager* sharedResourcesManager() const;
 
     // TODO: #GDM Remove field.
     SystemContext* m_context = nullptr;

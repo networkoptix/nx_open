@@ -373,12 +373,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 
     NX_INI_STRING("", clientExecutableName,
         "[SQ] Special executable name to launch 'New Window' or Video Wall.");
-
-    // ---------------------------------------------------------------------------------------------
-    // Obsolete, no longer editable flags.
-
-    // VMS-37866.
-    const bool enableNewUserSettings = true;
 };
 
 NX_VMS_CLIENT_DESKTOP_API Ini& ini();

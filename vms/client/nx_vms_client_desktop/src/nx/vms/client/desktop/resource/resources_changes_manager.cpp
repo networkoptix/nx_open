@@ -17,7 +17,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -748,9 +747,13 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         }
         if (const auto password = user->getPassword(); !password.isEmpty())
             body.password = password;
+
         body.userGroupIds = user->userRoleIds();
-        body.resourceAccessRights =
-            sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(user));
+
+        const auto accessRights = systemContext->accessRightsManager()->ownResourceAccessMap(
+            user->getId());
+
+        body.resourceAccessRights = {accessRights.keyValueBegin(), accessRights.keyValueEnd()};
 
         const auto tokenHelper = helper
             ? helper
@@ -864,9 +867,13 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
 
             if (const auto password = user->getPassword(); !password.isEmpty())
                 body.password = password;
+
             body.userGroupIds = user->userRoleIds();
-            body.resourceAccessRights =
-                sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(user));
+
+            const auto accessRights = systemContext->accessRightsManager()->ownResourceAccessMap(
+                user->getId());
+
+            body.resourceAccessRights = {accessRights.keyValueBegin(), accessRights.keyValueEnd()};
 
             const auto tokenHelper = helper
                 ? helper
@@ -929,16 +936,6 @@ void ResourcesChangesManager::saveUsers(const QnUserResourceList& users,
 
         connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, replyProcessor, this);
     }
-}
-
-void ResourcesChangesManager::saveAccessibleResources(
-    const QnResourceAccessSubject&,
-    const QSet<QnUuid>&,
-    GlobalPermissions,
-    SystemContext*,
-	const nx::vms::common::SessionTokenHelperPtr&)
-{
-    NX_ASSERT(false, "This method is no longer supported.");
 }
 
 void ResourcesChangesManager::saveAccessRights(const QnResourceAccessSubject& subject,
@@ -1168,14 +1165,18 @@ void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& rol
                 if (callback)
                     callback(success, role);
             };
+
+        const auto accessRights = systemContext->accessRightsManager()->ownResourceAccessMap(
+            role.id);
+
         nx::vms::api::UserGroupModel body;
         body.id = role.id;
         body.name = role.name;
         body.description = role.description;
         body.parentGroupIds = role.parentRoleIds;
         body.permissions = role.permissions;
-        body.resourceAccessRights =
-            sharedResourcesManager()->sharedResourceRights(QnResourceAccessSubject(role));
+        body.resourceAccessRights = {accessRights.keyValueBegin(), accessRights.keyValueEnd()};
+
         const auto tokenHelper = helper
             ? helper
             : systemContext->restApiHelper()->getSessionTokenHelper();
