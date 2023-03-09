@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QCoreApplication>
 #include <QtWidgets/QGraphicsItem>
 
 #include <core/resource/resource_fwd.h>
@@ -15,6 +16,7 @@ namespace nx::vms::client::desktop {
 class CameraHotspotItem: public QGraphicsItem
 {
     using base_type = QGraphicsItem;
+    Q_DECLARE_TR_FUNCTIONS(CameraHotspotItem)
 
 public:
     CameraHotspotItem(
@@ -35,6 +37,8 @@ public:
 protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     struct Private;
