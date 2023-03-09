@@ -104,17 +104,8 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::NoInternetForTimeSync:
             return tr("No server has internet access for time synchronization");
 
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return tr("Remote archive synchronization is available");
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-            return tr("Remote archive synchronization has been finished");
-        case QnSystemHealth::RemoteArchiveSyncProgress:
-            return tr("Remote archive synchronization is in progress");
         case QnSystemHealth::RemoteArchiveSyncError:
             return tr("Error occurred during remote archive synchronization");
-        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-            return tr("Remote archive synchronization has been stopped");
 
         default:
             break;
@@ -164,9 +155,6 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::ArchiveRebuildCanceled:
             messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
-            break;
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-            messageParts << tr("Remote archive synchronization has been finished for the following device:") << resourceName;
             break;
         case QnSystemHealth::metadataOnSystemStorage:
             messageParts << tr("Analytics data can take up large amounts of space.");
