@@ -63,7 +63,7 @@ bool NvidiaVideoDecoderOldPlayer::decode(
     }
 
     CLVideoDecoderOutputPtr outFrame = *outFramePtr;
-    if (m_impl->decode(data) < 0)
+    if (!m_impl->decode(data))
     {
         NX_WARNING(this, "Failed to decode frame");
         m_impl.reset();
