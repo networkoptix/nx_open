@@ -33,14 +33,9 @@ bool isMessageVisibleInSettings(MessageType message)
     {
         case CloudPromo:
         case DefaultCameraPasswords:
-        case RemoteArchiveSyncAvailable:
 
         // TODO: remove these in VMS-7724
-        case RemoteArchiveSyncFinished:
-        case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
-        case RemoteArchiveSyncStopSchedule:
-        case RemoteArchiveSyncStopAutoMode:
         case replacedDeviceDiscovered:
             return false;
 
@@ -64,12 +59,7 @@ bool isMessageLocked(MessageType message)
         case NoInternetForTimeSync:
         case cameraRecordingScheduleIsInvalid:
         case replacedDeviceDiscovered:
-        case RemoteArchiveSyncAvailable:
-        case RemoteArchiveSyncProgress:
-        case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncError:
-        case RemoteArchiveSyncStopSchedule:
-        case RemoteArchiveSyncStopAutoMode:
         case metadataStorageNotSet:
         case metadataOnSystemStorage:
             return true;
@@ -99,11 +89,7 @@ bool skipPackedFlag(MessageType message)
         case ArchiveFastScanFinished:
 
         // TODO: remove these in VMS-7724
-        case RemoteArchiveSyncFinished:
-        case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
-        case RemoteArchiveSyncStopSchedule:
-        case RemoteArchiveSyncStopAutoMode:
             return true;
 
         default:

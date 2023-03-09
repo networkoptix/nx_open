@@ -31,14 +31,11 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
 
         // Gray notifications.
         case QnSystemHealth::ArchiveRebuildCanceled:
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::metadataOnSystemStorage:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
         case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::ArchiveFastScanFinished: //< This one is never displayed though.
             return QnNotificationLevel::Value::SuccessNotification;
 
@@ -51,8 +48,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
         case QnSystemHealth::replacedDeviceDiscovered:
-        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
         case QnSystemHealth::metadataStorageNotSet:
             return QnNotificationLevel::Value::ImportantNotification;
 

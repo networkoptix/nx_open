@@ -211,21 +211,8 @@ QString SystemHealthListModel::Private::text(int index) const
             return result;
         }
 
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return tr("On-device recordings were found");
-
-        case QnSystemHealth::RemoteArchiveSyncProgress:
-            return tr("Import in progress...");
-
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-            return tr("Import archive from %1 completed").arg(resourceName);
-
         case QnSystemHealth::RemoteArchiveSyncError:
             return tr("Import archive from %1 failed").arg(resourceName);
-
-        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-            return tr("Import archive from %1 stopped").arg(resourceName);
 
         case QnSystemHealth::metadataStorageNotSet:
             return tr("Storage for analytics data is not set on %n Servers", "",
@@ -339,59 +326,12 @@ QColor SystemHealthListModel::Private::color(int index) const
         QnNotificationLevel::valueOf(m_items[index].message));
 }
 
-QString SystemHealthListModel::Private::description(int index) const
-{
-    const auto& item = m_items[index];
-    const auto camera = item.resource.dynamicCast<QnVirtualCameraResource>();
-    const QString resourceName = item.resource ? item.resource->getName() : "";
-
-    switch (item.message)
-    {
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return QnDeviceDependentStrings::getNameFromSet(
-                resourcePool(),
-                QnCameraDeviceStringSet(
-                    tr("Not imported archive found on device %1").arg(resourceName),
-                    tr("Not imported archive found on camera %1").arg(resourceName)),
-                camera);
-
-        case QnSystemHealth::RemoteArchiveSyncProgress:
-            return tr("Import archive from %1").arg(resourceName);
-
-        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-            return tr("The archive stream settings have been changed by the user");
-
-        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
-            return tr("The recording settings have been changed by the user");
-
-        default:
-            return {};
-    }
-}
-
-QVariant SystemHealthListModel::Private::progress(int index) const
-{
-    const auto& item = m_items[index];
-    switch (item.message)
-    {
-        case QnSystemHealth::RemoteArchiveSyncProgress:
-            return QVariant::fromValue(
-                ProgressState(item.serverData->getRuntimeParams().progress));
-
-        default:
-            return {};
-    }
-}
-
 QVariant SystemHealthListModel::Private::timestamp(int index) const
 {
     const auto& item = m_items[index];
     switch (item.message)
     {
-        case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncError:
-        case QnSystemHealth::RemoteArchiveSyncStopSchedule:
-        case QnSystemHealth::RemoteArchiveSyncStopAutoMode:
             return QVariant::fromValue(std::chrono::microseconds(
                 item.serverData->getRuntimeParams().eventTimestampUsec));
 
@@ -417,8 +357,7 @@ bool SystemHealthListModel::Private::locked(int index) const
 
 bool SystemHealthListModel::Private::isCloseable(int index) const
 {
-    return m_items[index].message != QnSystemHealth::DefaultCameraPasswords
-        && m_items[index].message != QnSystemHealth::RemoteArchiveSyncProgress;
+    return m_items[index].message != QnSystemHealth::DefaultCameraPasswords;
 }
 
 CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
@@ -452,23 +391,6 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
                 {
                     const auto parameters = action::Parameters(resource);
                     menu()->triggerIfPossible(action::UndoReplaceCameraAction, parameters);
-                });
-
-            return action;
-        }
-
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-        {
-            const auto action = CommandActionPtr(new CommandAction(tr("Export")));
-            connect(action.data(), &QAction::triggered, this,
-                [resource = item.resource]
-                {
-                    auto camera = resource.dynamicCast<QnSecurityCamResource>();
-                    if (NX_ASSERT(camera))
-                    {
-                        camera->setManualRemoteArchiveSynchronizationTriggered();
-                        camera->savePropertiesAsync();
-                    }
                 });
 
             return action;
@@ -662,23 +584,6 @@ void SystemHealthListModel::Private::doAddItem(
         }
     }
 
-    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopSchedule
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopAutoMode)
-    {
-        removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, resource);
-    }
-
-    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopSchedule
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncStopAutoMode)
-    {
-        removeItemForResource(QnSystemHealth::MessageType::RemoteArchiveSyncAvailable, resource);
-    }
-
     Item item(message, resource);
     item.serverData = action;
 
@@ -686,18 +591,7 @@ void SystemHealthListModel::Private::doAddItem(
     const auto index = std::distance(m_items.begin(), position);
 
     if (position != m_items.end() && *position == item)
-    {
-        if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress)
-        {
-            *position = item;
-            q->dataChanged(q->index(index), q->index(index), {
-                    Qt::DisplayRole,
-                    Qn::DescriptionTextRole,
-                    Qn::ProgressValueRole
-                });
-        }
         return; //< Item already exists.
-    }
 
     {
         // New item.
@@ -842,9 +736,6 @@ QString SystemHealthListModel::Private::decorationPath(QnSystemHealth::MessageTy
 
         case QnSystemHealth::CloudPromo:
             return "cloud/cloud_20.png";
-
-        case QnSystemHealth::RemoteArchiveSyncAvailable:
-            return "events/sd_card.png";
 
         default:
             return QString();

@@ -48,12 +48,6 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return d->text(index.row());
 
-        case Qn::DescriptionTextRole:
-            return d->description(index.row());
-
-        case Qn::ProgressValueRole:
-            return d->progress(index.row());
-
         case Qn::TimestampRole:
             return d->timestamp(index.row());
 
