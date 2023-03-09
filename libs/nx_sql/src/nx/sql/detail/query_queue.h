@@ -94,6 +94,7 @@ private:
     int m_concurrentModificationQueryLimit = 0;
     int m_aggregationLimit = -1;
     std::map<int, Queries, std::greater<int>> m_priorityToQueue;
+    std::atomic<std::size_t> m_preliminaryQueueSize{0};
     std::atomic<std::size_t> m_pendingQueryCount{0};
 
     std::optional<std::chrono::milliseconds> m_itemStayTimeout;

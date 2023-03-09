@@ -158,7 +158,8 @@ protected:
             detail::QueryQueue::kDefaultPriority + 1);
     }
 
-    void addSeveralQueriesOfDifferentType()
+    // Returns number of posted queries.
+    int addSeveralQueriesOfDifferentType()
     {
         const int queryCount = 17;
         for (int i = 0; i < queryCount; ++i)
@@ -167,6 +168,8 @@ protected:
                 {QueryType::modification, QueryType::lookup});
             pushQuery(queryType);
         }
+
+        return queryCount;
     }
 
     void addSelectQuery()
@@ -437,6 +440,12 @@ TEST_F(QueryQueue, aggregation_limit)
     whenPopQueries();
 
     thenProvidedQueryCountIsNotGreaterThanAggregationLimit();
+}
+
+TEST_F(QueryQueue, pending_query_count_is_reported_correctly)
+{
+    const int expected = addSeveralQueriesOfDifferentType();
+    ASSERT_EQ(expected, queryQueue().pendingQueryCount());
 }
 
 //-------------------------------------------------------------------------------------------------
