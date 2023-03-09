@@ -22,6 +22,7 @@ void QueryQueue::push(value_type value)
         m_preliminaryQueue.push_back({
             .value = std::move(value),
             .enqueueTime = nx::utils::monotonicTime()});
+        ++m_preliminaryQueueSize;
 
         queueSize = m_preliminaryQueue.size();
     }
@@ -60,7 +61,7 @@ QueryQueueStats QueryQueue::stats() const
 
 std::size_t QueryQueue::pendingQueryCount() const
 {
-    return m_pendingQueryCount.load();
+    return m_preliminaryQueueSize.load() + m_pendingQueryCount.load();
 }
 
 std::optional<QueryQueue::value_type> QueryQueue::pop(
@@ -88,6 +89,7 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
         {
             const auto priority = getPriority(*task.value);
             m_priorityToQueue[priority].push_back(std::move(task));
+            --m_preliminaryQueueSize;
             ++m_pendingQueryCount;
         }
 
