@@ -15,8 +15,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -698,21 +698,8 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(
 
 void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& accessRights)
 {
-    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
-    {
-        m_context->sharedResourcesManager()->setSharedResourceRights(
-            user, accessRights.resourceRights);
-    }
-    else if (auto role = m_context->userRolesManager()->userRole(accessRights.userId);
-             !role.id.isNull())
-    {
-        m_context->sharedResourcesManager()->setSharedResourceRights(
-            role, accessRights.resourceRights);
-    }
-    else
-    {
-        m_context->sharedResourcesManager()->setSharedResourceRights(accessRights);
-    }
+    m_context->accessRightsManager()->setOwnResourceAccessMap(accessRights.userId,
+        {accessRights.resourceRights.begin(), accessRights.resourceRights.end()});
 }
 
 void QnCommonMessageProcessor::on_userRoleChanged(const UserRoleData& userRole)
@@ -891,7 +878,11 @@ void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList
 
 void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& accessRights)
 {
-    m_context->sharedResourcesManager()->reset(accessRights);
+    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
+    for (auto& data: accessRights)
+        accessMaps.insert(data.userId, {data.resourceRights.begin(), data.resourceRights.end()});
+
+    m_context->accessRightsManager()->resetAccessRights(accessMaps);
 }
 
 void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)

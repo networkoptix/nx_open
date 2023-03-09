@@ -34,7 +34,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
-#include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 

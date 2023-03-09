@@ -100,13 +100,6 @@ QnGlobalPermissionsManager* QnCommonModule::globalPermissionsManager() const
         : nullptr;
 }
 
-QnSharedResourcesManager* QnCommonModule::sharedResourcesManager() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->sharedResourcesManager()
-        : nullptr;
-}
-
 QnUserRolesManager* QnCommonModule::userRolesManager() const
 {
     return NX_ASSERT(d->systemContext)

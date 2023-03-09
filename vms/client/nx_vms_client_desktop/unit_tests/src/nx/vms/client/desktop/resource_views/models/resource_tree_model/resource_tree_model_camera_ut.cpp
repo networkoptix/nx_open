@@ -328,8 +328,8 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
 TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermissions)
 {
     // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsUserWithPermissions("custom_with_edit_cameras",
-        {GlobalPermission::customUser, GlobalPermission::editCameras});
+    const auto user = loginAsCustomUser("custom_with_edit_cameras");
+    setupAllMediaAccess(currentUser(), nx::vms::api::AccessRight::edit);
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -350,8 +350,7 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermiss
 TEST_F(ResourceTreeModelTest, cameraIsNotEditableByPlainCustomUser)
 {
     // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsUserWithPermissions("custom_with_edit_cameras",
-        {GlobalPermission::customUser});
+    const auto user = loginAsCustomUser("custom_with_edit_cameras");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -408,8 +407,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByAdmin)
 TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCamerasPermissions)
 {
     // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsUserWithPermissions("custom_with_edit_cameras",
-        {GlobalPermission::customUser, GlobalPermission::editCameras});
+    const auto user = loginAsCustomUser("custom_with_edit_cameras");
+    setupAllMediaAccess(currentUser(), nx::vms::api::AccessRight::edit);
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -429,9 +428,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCameras
 
 TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByPlainCustomUser)
 {
-    // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsUserWithPermissions("custom_with_edit_cameras",
-        {GlobalPermission::customUser});
+    // When custom user without permission to edit camera settings is logged in.
+    const auto user = loginAsCustomUser("custom_without_edit_cameras");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");

@@ -9,13 +9,11 @@
 #include <api/runtime_info_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource_access/access_rights_manager.h>
-#include <core/resource_access/deprecated_access_rights_converter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
-#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -55,13 +53,11 @@ struct SystemContext::Private
     std::unique_ptr<QnRuntimeInfoManager> runtimeInfoManager;
     std::unique_ptr<SystemSettings> globalSettings;
     std::unique_ptr<QnUserRolesManager> userRolesManager;
-    std::unique_ptr<QnSharedResourcesManager> sharedResourceManager;
     std::unique_ptr<ResourceAccessSubjectHierarchy> accessSubjectHierarchy;
     std::unique_ptr<GlobalPermissionsWatcher> globalPermissionsWatcher;
     std::unique_ptr<AccessRightsManager> accessRightsManager;
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
     std::unique_ptr<QnResourceAccessSubjectsCache> resourceAccessSubjectCache;
-    std::unique_ptr<DeprecatedAccessRightsConverter> deprecatedAccessRightsConverter;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<ShowreelManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
@@ -113,17 +109,8 @@ SystemContext::SystemContext(
     d->accessRightsManager = std::make_unique<AccessRightsManager>();
 
     // Depends on resource pool and roles.
-    d->sharedResourceManager = std::make_unique<QnSharedResourcesManager>(this);
-
-    // Depends on resource pool and roles.
     d->globalPermissionsManager =
         std::make_unique<QnGlobalPermissionsManager>(resourceAccessMode, this);
-
-    d->deprecatedAccessRightsConverter = std::make_unique<DeprecatedAccessRightsConverter>(
-        d->resourcePool.get(),
-        d->userRolesManager.get(),
-        d->sharedResourceManager.get(),
-        d->accessRightsManager.get());
 
     // Depends on resource pool, roles and global permissions.
     d->resourceAccessSubjectCache = std::make_unique<QnResourceAccessSubjectsCache>(this);
@@ -284,11 +271,6 @@ QnUserRolesManager* SystemContext::userRolesManager() const
     return d->userRolesManager.get();
 }
 
-QnSharedResourcesManager* SystemContext::sharedResourcesManager() const
-{
-    return d->sharedResourceManager.get();
-}
-
 GlobalPermissionsWatcher* SystemContext::globalPermissionsWatcher() const
 {
     return d->globalPermissionsWatcher.get();
@@ -297,11 +279,6 @@ GlobalPermissionsWatcher* SystemContext::globalPermissionsWatcher() const
 AccessRightsManager* SystemContext::accessRightsManager() const
 {
     return d->accessRightsManager.get();
-}
-
-DeprecatedAccessRightsConverter* SystemContext::deprecatedAccessRightsConverter() const
-{
-    return d->deprecatedAccessRightsConverter.get();
 }
 
 QnResourceAccessManager* SystemContext::resourceAccessManager() const

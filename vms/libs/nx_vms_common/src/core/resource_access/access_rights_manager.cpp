@@ -4,6 +4,7 @@
 
 #include <QtCore/QPointer>
 
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/thread/mutex.h>
@@ -34,6 +35,12 @@ AccessRightsManager::~AccessRightsManager()
 
 ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const QnUuid& subjectId) const
 {
+    if (const Qn::UserRole role = QnPredefinedUserRoles::enumValue(subjectId);
+        role != Qn::UserRole::customUserRole && role != Qn::UserRole::customPermissions)
+    {
+        return QnPredefinedUserRoles::accessRights(role);
+    }
+
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->ownAccessMaps.value(subjectId);
 }
@@ -55,6 +62,10 @@ void AccessRightsManager::resetAccessRights(const QHash<QnUuid, ResourceAccessMa
 void AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
     const ResourceAccessMap& value)
 {
+    const Qn::UserRole role = QnPredefinedUserRoles::enumValue(subjectId);
+    if (!NX_ASSERT(role == Qn::UserRole::customUserRole))
+        return;
+
     {
         NX_MUTEX_LOCKER lk(&d->mutex);
 

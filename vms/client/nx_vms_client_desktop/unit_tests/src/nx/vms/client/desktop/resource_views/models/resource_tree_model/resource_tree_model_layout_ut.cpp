@@ -299,17 +299,14 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
     // When non-admin user is added to the resource pool.
     const auto otherUser = addUser(kUniqueUserName, GlobalPermission::userInput);
 
+    // When intercom is not accessible for non-admin user.
+    // Then a single copy of intercom layout appears in the resource tree.
+    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 1);
+
     // When intercom is accessible for non-admin user.
     setupAccessToResourceForUser(otherUser, intercom, true);
 
-    // Then two copies of intercom layout appeard in the resource tree.
-    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(),
-        ini().enableNewUserSettings ? 1 : 2);
-
-    // When intercom is not accessible for non-admin user.
-    setupAccessToResourceForUser(otherUser, intercom, false);
-
-    // Then only single copy of intercom layout appeard in the resource tree.
+    // Then still a single copy of intercom layout appears in the resource tree.
     ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 1);
 }
 

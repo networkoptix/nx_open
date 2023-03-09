@@ -92,13 +92,6 @@ public:
         QnUserResource::DigestSupport digestSupport = QnUserResource::DigestSupport::keep,
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
-    /** Save accessible resources for the given user. */
-    void saveAccessibleResources(const QnResourceAccessSubject&,
-        const QSet<QnUuid>&,
-        GlobalPermissions,
-        SystemContext*,
-        const nx::vms::common::SessionTokenHelperPtr& = nullptr);
-
     /** Save accessible rights for the given subject. */
     void saveAccessRights(const QnResourceAccessSubject& subject,
         const nx::core::access::ResourceAccessMap& accessRights,

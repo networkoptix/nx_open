@@ -6,9 +6,12 @@
 #include <gtest/gtest.h>
 
 #include <core/resource/user_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
@@ -31,7 +34,7 @@
 
 namespace nx::vms::rules::test {
 
-using nx::vms::api::GlobalPermission;
+using namespace nx::vms::api;
 
 class TestActionBuilder: public ActionBuilder
 {
@@ -138,6 +141,12 @@ public:
 protected:
     std::unique_ptr<Rule> mockRule;
 
+    void setOwnAccessRights(
+        const QnUuid& subjectId, const nx::core::access::ResourceAccessMap accessRights)
+    {
+        systemContext()->accessRightsManager()->setOwnResourceAccessMap(subjectId, accessRights);
+    }
+
 private:
     QnSyncTime syncTime;
 };
@@ -166,7 +175,7 @@ TEST_F(ActionBuilderTest, builderWithTargetFieldButWithoutUserProducedNoAction)
 
 TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user = addUser(GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user->getId()},
@@ -184,8 +193,8 @@ TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::viewLogs);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user1 = addUser(GlobalPermission::viewLogs);
+    const auto user2 = addUser(GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -207,8 +216,8 @@ TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 {
-    const auto user1 = addUser(nx::vms::api::GlobalPermission::viewLogs);
-    const auto user2 = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user1 = addUser(GlobalPermission::viewLogs);
+    const auto user2 = addUser(GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {},
@@ -230,17 +239,18 @@ TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 {
-    const auto kAdminRoleId
-        = *QnPredefinedUserRoles::presetId(nx::vms::api::GlobalPermission::adminPermissions);
+    const QnUuid adminsGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
 
-    const auto admin = addUser(nx::vms::api::GlobalPermission::adminPermissions);
-    admin->setUserRoleIds({kAdminRoleId});
+    const auto admin = addUser(GlobalPermission::none);
+    admin->setUserRoleIds({adminsGroupId});
 
-    const auto user = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
+    const auto user = addUser(GlobalPermission::none);
+    user->setUserRoleIds({QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)});
+
     const auto camera = addCamera();
 
     UuidSelection selection{
-        .ids = {kAdminRoleId},
+        .ids = {adminsGroupId},
         .all = false};
 
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -260,7 +270,7 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user = addUser(GlobalPermission::viewLogs);
     const auto camera = addCamera();
 
     UuidSelection selection{
@@ -280,9 +290,10 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 {
     const auto camera = addCamera();
 
-    const auto accessAllMediaUser = addUser(
-        {GlobalPermission::accessAllMedia, GlobalPermission::viewLogs});
-    const auto accessNoneUser = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto accessAllMediaUser = addUser(GlobalPermission::viewLogs);
+    accessAllMediaUser->setUserRoleIds({QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)});
+
+    const auto accessNoneUser = addUser(GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {accessAllMediaUser->getId(), accessNoneUser->getId()},
@@ -307,11 +318,11 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 {
     auto user1 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
-    sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
+    setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
 
     auto user2 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
-    sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
+    setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
 
     EXPECT_TRUE(resourceAccessManager()->hasPermission(user1, cameraOfUser1, Qn::ViewContentPermission));
     EXPECT_FALSE(resourceAccessManager()->hasPermission(user1, cameraOfUser2, Qn::ViewContentPermission));
@@ -356,11 +367,11 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 {
     auto user1 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
-    sharedResourcesManager()->setSharedResources(user1, {cameraOfUser1->getId()});
+    setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
 
     auto user2 = addUser(GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
-    sharedResourcesManager()->setSharedResources(user2, {cameraOfUser2->getId()});
+    setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -448,7 +459,7 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     builder->process(AggregatedEventPtr::create(EventPtr(
         new ServerStartedEvent(0ms, QnUuid()))));
     builder->process(AggregatedEventPtr::create(EventPtr(
-        new ServerFailureEvent(0ms, QnUuid(), nx::vms::api::EventReason::none))));
+        new ServerFailureEvent(0ms, QnUuid(), EventReason::none))));
 }
 
 TEST_F(ActionBuilderTest, clientAndServerAction)

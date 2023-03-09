@@ -14,7 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -1462,14 +1462,14 @@ struct ModifyAccessRightsChecker
             }
         }
 
-        auto accessManager = systemContext->resourceAccessManager();
+        const auto accessRightMap = systemContext->accessRightsManager()->ownResourceAccessMap(
+            param.userId);
 
         // CRUD API PATCH merges with existing shared resources so they can be not changed.
         std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights;
         if (user)
         {
-            sharedResourceRights =
-                systemContext->sharedResourcesManager()->sharedResourceRights(user);
+            sharedResourceRights = {accessRightMap.keyValueBegin(), accessRightMap.keyValueEnd()};
         }
         else
         {
@@ -1488,13 +1488,14 @@ struct ModifyAccessRightsChecker
             else
             {
                 sharedResourceRights =
-                    systemContext->sharedResourcesManager()->sharedResourceRights(role);
+                    {accessRightMap.keyValueBegin(), accessRightMap.keyValueEnd()};
             }
         }
+
         if (sharedResourceRights == param.resourceRights)
             return Result();
 
-        return accessManager->hasAdminPermissions(accessData)
+        return systemContext->resourceAccessManager()->hasAdminPermissions(accessData)
             ? Result()
             : Result(ErrorCode::forbidden, ServerApiErrors::tr("Admin permissions required."));
     }

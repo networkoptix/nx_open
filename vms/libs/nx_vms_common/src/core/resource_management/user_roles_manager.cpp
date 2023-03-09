@@ -13,7 +13,22 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/system_context.h>
+
+using namespace nx::core::access;
+using namespace nx::vms::api;
+
+static const AccessRights kLiveViewerAccessRights = AccessRight::view;
+
+static const AccessRights kViewerAccessRights = kLiveViewerAccessRights
+    | AccessRight::viewArchive
+    | AccessRight::exportArchive
+    | AccessRight::viewBookmarks;
+
+static const AccessRights kAdvancedViewerAccessRights = kViewerAccessRights
+    | AccessRight::manageBookmarks
+    | AccessRight::userInput;
 
 const QList<Qn::UserRole>& QnPredefinedUserRoles::enumValues()
 {
@@ -215,6 +230,52 @@ const QList<QnUuid>& QnPredefinedUserRoles::adminIds()
 {
     static const QList<QnUuid> kIds{id(Qn::UserRole::owner), id(Qn::UserRole::administrator)};
     return kIds;
+}
+
+ResourceAccessMap QnPredefinedUserRoles::accessRights(Qn::UserRole predefinedGroup)
+{
+    switch (predefinedGroup)
+    {
+        case Qn::UserRole::owner:
+        case Qn::UserRole::administrator:
+            return kAdminResourceAccessMap;
+
+        case Qn::UserRole::advancedViewer:
+        {
+            static const ResourceAccessMap kAdvancedViewerResourceAccessMap{
+                {kAllDevicesGroupId, kAdvancedViewerAccessRights},
+                {kAllWebPagesGroupId, AccessRight::view},
+                {kAllServersGroupId, AccessRight::view}};
+
+            return kAdvancedViewerResourceAccessMap;
+        }
+
+        case Qn::UserRole::viewer:
+        {
+            static const ResourceAccessMap kViewerResourceAccessMap{
+                {kAllDevicesGroupId, kViewerAccessRights},
+                {kAllWebPagesGroupId, AccessRight::view},
+                {kAllServersGroupId, AccessRight::view}};
+
+            return kViewerResourceAccessMap;
+        }
+
+        case Qn::UserRole::liveViewer:
+        {
+            static const ResourceAccessMap kLiveViewerResourceAccessMap{
+                {kAllDevicesGroupId, kLiveViewerAccessRights},
+                {kAllWebPagesGroupId, AccessRight::view},
+                {kAllServersGroupId, AccessRight::view}};
+
+            return kLiveViewerResourceAccessMap;
+        }
+
+        default:
+        {
+            NX_ASSERT(false);
+            return {};
+        }
+    }
 }
 
 QnUserRolesManager::QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent):

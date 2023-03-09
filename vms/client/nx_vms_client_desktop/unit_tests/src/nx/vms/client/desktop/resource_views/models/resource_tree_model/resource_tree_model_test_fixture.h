@@ -114,14 +114,24 @@ protected:
         const QnResourcePtr& resource,
         nx::vms::api::AccessRights accessRights) const;
 
-    QnUserResourcePtr loginAsUserWithPermissions(const QString& name,
-        nx::vms::api::GlobalPermissions permissions,
-        bool isOwner = false) const;
+    void setupAccessToObjectForUser(
+        const QnUserResourcePtr& user,
+        const QnUuid& resourceOrGroupId,
+        nx::vms::api::AccessRights accessRights) const;
+
+    void setupAllMediaAccess(
+        const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
+
+    void setupAllVideowallsAccess(
+        const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
+
+    QnUserResourcePtr loginAs(const QString& name, Qn::UserRole userGroup) const;
     QnUserResourcePtr loginAsOwner(const QString& name) const;
     QnUserResourcePtr loginAsAdmin(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;
     QnUserResourcePtr loginAsAdvancedViewer(const QString& name) const;
     QnUserResourcePtr loginAsCustomUser(const QString& name) const;
+    QnUserResourcePtr currentUser() const;
     void logout() const;
 
     void setFilterMode(entity_resource_tree::ResourceTreeComposer::FilterMode filterMode);

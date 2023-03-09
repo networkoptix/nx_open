@@ -4,6 +4,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_map.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_role_data.h>
@@ -55,6 +56,9 @@ public:
 
     // Returns list of ids of predefined admin roles.
     static const QList<QnUuid>& adminIds();
+
+    // Returns access rights of a specified predefined user group.
+    static nx::core::access::ResourceAccessMap accessRights(Qn::UserRole predefinedGroup);
 };
 
 class NX_VMS_COMMON_API QnUserRolesManager:

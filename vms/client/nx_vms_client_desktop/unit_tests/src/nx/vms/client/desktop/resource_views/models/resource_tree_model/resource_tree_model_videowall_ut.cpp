@@ -526,9 +526,9 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsVisibleAndEditableOnlyByUsersHaveSu
     // Then no video walls found in the resource tree.
     ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::VideoWall)));
 
-    // When custom user with 'controlVideowall' global permission is logged in.
-    loginAsUserWithPermissions(
-        "customUser", {GlobalPermission::customUser, GlobalPermission::controlVideowall});
+    // When custom user with videowall control is logged in.
+    loginAsCustomUser("customUser");
+    setupAllVideowallsAccess(currentUser(), nx::vms::api::AccessRight::view);
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);

@@ -99,9 +99,4 @@ QnUserRolesManager* SystemContextAware::userRolesManager() const
     return systemContext()->userRolesManager();
 }
 
-QnSharedResourcesManager* SystemContextAware::sharedResourcesManager() const
-{
-    return systemContext()->sharedResourcesManager();
-}
-
 } // namespace nx::vms::common
