@@ -10,6 +10,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/server_and_device_id_data.h>
 
 namespace nx::vms::api {
 
@@ -18,23 +19,7 @@ constexpr auto kDefaultBackupPosition =
 
 constexpr auto kBackupFailurePosition =
     std::chrono::system_clock::time_point(std::chrono::milliseconds{-2});
-
-struct NX_VMS_API BackupPositionIdData
-{
-    QString toString() const { return NX_FMT("deviceId: %1, serverId: %2", deviceId, serverId); }
-    QnUuid deviceId;
-    QnUuid serverId;
-
-    bool operator==(const BackupPositionIdData& other) const = default;
-};
-
-#define BackupPositionIdData_Fields \
-    (deviceId) \
-    (serverId)
-
-QN_FUSION_DECLARE_FUNCTIONS(BackupPositionIdData, (json), NX_VMS_API)
-
-struct NX_VMS_API BackupPosition: BackupPositionIdData
+struct NX_VMS_API BackupPosition: ServerAndDeviceIdData
 {
     /**%apidoc[opt] */
     std::chrono::system_clock::time_point positionLowMs = kDefaultBackupPosition;
@@ -45,14 +30,14 @@ struct NX_VMS_API BackupPosition: BackupPositionIdData
     /**%apidoc[opt] */
     std::chrono::system_clock::time_point bookmarkStartPositionMs = kDefaultBackupPosition;
 
-    const BackupPositionIdData& getId() const { return *this; }
-    void setId(BackupPositionIdData id) { static_cast<BackupPositionIdData&>(*this) = std::move(id); }
+    const ServerAndDeviceIdData& getId() const { return *this; }
+    void setId(ServerAndDeviceIdData id) { static_cast<ServerAndDeviceIdData&>(*this) = std::move(id); }
 
     bool operator==(const BackupPosition& other) const = default;
 };
 
 #define BackupPosition_Fields \
-    BackupPositionIdData_Fields \
+    ServerAndDeviceIdData_Fields \
     (positionLowMs) \
     (positionHighMs) \
     (bookmarkStartPositionMs)

@@ -14,11 +14,6 @@ BackupPositionEx::BackupPositionEx(const BackupPosition& other)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    BackupPositionIdData,
-    (json)(ubjson),
-    BackupPositionIdData_Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BackupPosition,
     (json)(ubjson),
     BackupPosition_Fields)

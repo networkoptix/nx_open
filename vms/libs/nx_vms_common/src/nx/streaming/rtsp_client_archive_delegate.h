@@ -127,6 +127,7 @@ public:
     virtual bool reopen() override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
+    void needUpdateTimeLine();
 
 private:
     std::pair<QnAbstractDataPacketPtr, bool> processFFmpegRtpPayload(

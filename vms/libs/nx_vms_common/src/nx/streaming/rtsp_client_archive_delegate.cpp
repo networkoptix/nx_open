@@ -17,6 +17,7 @@
 #include <nx/media/codec_parameters.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/rtp/rtp.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -806,6 +807,11 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
         m_rtspSession->parseRangeHeader(QLatin1String(ba));
     else if (ba.startsWith("drop-report"))
         emit dataDropped(m_reader);
+    else if (ba.startsWith(nx::network::rtsp::kUpdateHeader))
+    {
+        NX_VERBOSE(this, "Got need-update header");
+        emit needUpdateTimeLine();
+    }
 }
 
 std::pair<QnAbstractDataPacketPtr, bool> QnRtspClientArchiveDelegate::processFFmpegRtpPayload(

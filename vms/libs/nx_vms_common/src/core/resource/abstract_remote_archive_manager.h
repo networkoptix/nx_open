@@ -87,12 +87,6 @@ using RemoteChunks = std::vector<RemoteArchiveChunk>;
 using OverlappedRemoteChunks = std::map<OverlappedId, RemoteChunks>;
 using OverlappedTimePeriods = std::map<OverlappedId, QnTimePeriodList>;
 
-enum class ImportOrder
-{
-    Direct, //< From begin to end.
-    Reverse, //< From rbegin to rend.
-};
-
 /**
  * Allows to control archive on remote device (e.g. on camera SD card).
  */
@@ -117,11 +111,6 @@ public:
         OverlappedRemoteChunks* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) = 0;
-
-    /**
-     * @return The order in which operlaped ids should be imported.
-     */
-    virtual ImportOrder overlappedIdImportOrder() const = 0;
 
     /**
      * Downloads specified entry content. Is used only if FullChunkCapability is present.
