@@ -62,7 +62,7 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     auto watcher = qnCloudStatusWatcher;
     connect(watcher, &core::CloudStatusWatcher::forcedLogout,
         this, &CloudActionsHandler::at_forcedLogout);
-    connect(watcher, &core::CloudStatusWatcher::loggedOut, this,
+    connect(watcher, &core::CloudStatusWatcher::loggedOutWithError, this,
         &CloudActionsHandler::at_logout);
 
     connect(
