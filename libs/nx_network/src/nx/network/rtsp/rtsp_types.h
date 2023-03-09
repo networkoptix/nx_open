@@ -44,7 +44,7 @@ public:
     enum class Type
     {
         npt, // start/end are offsets from the beginning of recording
-        clock, // start/end are UTC timestamps 
+        clock, // start/end are UTC timestamps
         nxClock, // start/end are UTC timestamps in non-standard format
     };
 
@@ -92,6 +92,7 @@ bool isUrlScheme(const S& s)
 const int DEFAULT_RTSP_PORT = 554;
 
 static const nx::network::http::MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };
+static constexpr std::string_view kUpdateHeader{"need-update"};
 
 class NX_NETWORK_API RtspResponse: public nx::network::http::Response
 {
