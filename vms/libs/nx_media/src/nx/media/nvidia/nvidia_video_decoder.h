@@ -20,7 +20,7 @@ class NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder
 public:
     NvidiaVideoDecoder();
     ~NvidiaVideoDecoder();
-    int decode(const QnConstCompressedVideoDataPtr& frame);
+    bool decode(const QnConstCompressedVideoDataPtr& frame);
 
     std::unique_ptr<NvidiaVideoFrame> getFrame();
     void releaseFrame(uint8_t* frame);

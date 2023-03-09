@@ -170,12 +170,15 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     return true;
 }
 
-int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
+bool NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
 {
+    if (!packet)
+        return true; // Do nothing, flush decoder using getFrame call.
+
     if (!m_impl->decoder && !initialize(packet))
     {
         NX_ERROR(this, "Failed to initialize nvidia decoder");
-        return -1;
+        return false;
     }
 
     auto packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
@@ -193,7 +196,7 @@ int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
         NX_WARNING(this, "Failed to decode frame: %1", e.what());
         return false;
     }
-    return 1;
+    return true;
 }
 
 std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
