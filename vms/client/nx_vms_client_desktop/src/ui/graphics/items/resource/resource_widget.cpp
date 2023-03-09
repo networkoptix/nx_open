@@ -212,10 +212,14 @@ QnResourceWidget::QnResourceWidget(
             updateStatusOverlay(animate);
         };
 
-    connect(m_resource->systemContext()->videoWallLicenseUsageWatcher(),
-        &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
-        this,
-        updateOverlay);
+    // License Usage Watcher may be absent in cross-system contexts.
+    if (auto licenseWatcher = m_resource->systemContext()->videoWallLicenseUsageWatcher())
+    {
+        connect(licenseWatcher,
+            &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged,
+            this,
+            updateOverlay);
+    }
 
     if (qnRuntime->isVideoWallMode())
     {
