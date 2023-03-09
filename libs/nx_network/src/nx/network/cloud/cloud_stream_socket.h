@@ -7,13 +7,12 @@
 #include <nx/network/debug/object_instance_counter.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
-#include "any_accessible_address_connector.h"
 #include "tunnel/tunnel_attributes.h"
+#include "detail/cloud_stream_socket_connector.h"
 
 namespace nx::network::cloud {
 
@@ -82,25 +81,19 @@ protected:
     virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
-    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
-        SocketResultPrimisePtr;
-
-    void connectToEntriesAsync(
-        std::deque<AddressEntry> dnsEntries, int port,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    using SocketResultPrimisePtr = std::promise<SystemError::ErrorCode>*;
 
     SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
 
-    void onConnectDone(
+    void saveConnectResult(
         SystemError::ErrorCode errorCode,
         std::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
 
     void stopWhileInAioThread();
 
+    std::unique_ptr<detail::CloudStreamSocketConnector> m_connector;
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
-    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     // TODO: #akolesnikov replace with aio::BasicPollable inheritance.
     aio::BasicPollable m_aioThreadBinder;
     aio::Timer m_timer;
@@ -108,15 +101,9 @@ private:
     aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
     TunnelAttributes m_cloudTunnelAttributes;
-    std::unique_ptr<AnyAccessibleAddressConnector> m_multipleAddressConnector;
-    debug::ObjectInstanceCounter<CloudStreamSocket> m_objectInstanceCounter;
+    std::atomic<bool> m_isClosed = false;
 
     const int m_ipVersion;
-
-    std::atomic<bool> m_isTerminated = false;
-    std::atomic<bool> m_isStopped = false;
-    std::promise<void> m_stoppedPromise;
-    std::future<void> m_stoppedFuture;
 };
 
 } // namespace nx::network::cloud
