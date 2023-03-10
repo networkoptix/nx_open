@@ -10,10 +10,11 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QToolTip>
 
+#include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
-#include <ui/common/palette.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -41,6 +42,8 @@ public:
     Private(CompactTabBar* q);
     ~Private() = default;
 
+    void setIconWidget(int index, QWidget* iconWidget);
+
     void paint();
     QSize tabSizeHint(int index) const;
 
@@ -56,6 +59,11 @@ public:
     void setCustomTabEnabledFunction(const CustomTabEnabledFunction& tabEnabledFunction);
 private:
     void paintTab(int index, QPainter* painter);
+    QRect paintIcon(int index, const QIcon& icon, QPainter* painter);
+    QRect paintIconWidget(int index, QWidget* iconWidget, QPainter* painter);
+
+    QIcon::Mode getIconMode(int index) const;
+
     void updateAnimation(int index);
     void updateLayout();
     bool tabCountChanging() const; //< Whether a tab is being inserted or removed.
@@ -65,6 +73,7 @@ private:
     int m_hoveredTab = -1;
     QList<QVariantAnimation*> m_animations; //< Animations are owned by q.
     CustomTabEnabledFunction m_customTabEnabledFunction;
+    std::map<int, QWidget*> m_iconWidgets;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -72,6 +81,16 @@ private:
 
 CompactTabBar::Private::Private(CompactTabBar* q) : q(q)
 {
+}
+
+void CompactTabBar::Private::setIconWidget(int index, QWidget* iconWidget)
+{
+    auto prevIter = m_iconWidgets.find(index);
+    if (prevIter != m_iconWidgets.end())
+        prevIter->second->deleteLater();
+
+    m_iconWidgets[index] = iconWidget;
+    iconWidget->setParent(q);
 }
 
 void CompactTabBar::Private::paint()
@@ -151,6 +170,14 @@ void CompactTabBar::Private::tabRemoved(int index)
     auto animation = m_animations.takeAt(index);
     animation->stop();
     animation->deleteLater();
+
+    auto prevIter = m_iconWidgets.find(index);
+    if (prevIter != m_iconWidgets.end())
+    {
+        prevIter->second->deleteLater();
+        m_iconWidgets.erase(prevIter);
+    }
+
     handleCurrentChanged();
     updateLayout();
 }
@@ -196,44 +223,27 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
     const auto rect = q->tabRect(index).adjusted(kTabMargin, 0, -kTabMargin, 0);
     const auto text = q->tabText(index);
     const auto icon = tabIcon(index);
-    NX_ASSERT(!icon.isNull());
 
     // Draw icon.
 
+    QRect iconRect;
+
+    auto iconWidgetIter = m_iconWidgets.find(index);
+
+    if (iconWidgetIter != m_iconWidgets.end() && iconWidgetIter->second)
+        iconRect = paintIconWidget(index, iconWidgetIter->second, painter);
+    else if (!icon.isNull())
+        iconRect = paintIcon(index, icon, painter);
+    else
+        NX_ASSERT(false, "Both icon and icon widget are not set.");
+
+    // Draw text.
+
     const auto textSize = QFontMetrics(q->font()).size(0, text);
-
-    const auto iconSize = qnSkin->maximumSize(icon);
-
     const auto fraction = tabCountChanging()
         ? 0.0
         : m_animations[index]->currentValue().toReal();
-
     const auto textWidth = static_cast<int>(textSize.width() * fraction);
-
-    QSize textAndIconSize(
-        iconSize.width() + (current ? (kTabInnerSpacing + textWidth) : 0),
-        std::max(iconSize.height(), textSize.height()));
-
-    const auto textAndIconRect = QStyle::alignedRect(q->layoutDirection(),
-        Qt::AlignHCenter | Qt::AlignVCenter, textAndIconSize, rect);
-
-    const auto iconRect = QStyle::alignedRect(q->layoutDirection(),
-        Qt::AlignLeft | Qt::AlignVCenter, iconSize, textAndIconRect);
-
-    icon.paint(painter, iconRect, Qt::AlignCenter,
-        [enabled, current, hovered]()
-        {
-            if (!enabled)
-                return QIcon::Disabled;
-            if (current)
-                return QIcon::Active;
-            if (hovered)
-                return QIcon::Selected;
-
-            return QIcon::Normal;
-        }());
-
-    // Draw text.
 
     auto textRect = rect;
     if (q->layoutDirection() == Qt::RightToLeft)
@@ -275,6 +285,105 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
         painter->translate(0, 0.5);
         painter->drawLine(tabRect.bottomLeft() + QPoint{1, 0}, tabRect.bottomRight());
     }
+}
+
+QRect CompactTabBar::Private::paintIcon(int index, const QIcon& icon, QPainter* painter)
+{
+    const auto isCurrent = q->currentIndex() == index;
+
+    const auto rect = q->tabRect(index).adjusted(kTabMargin, 0, -kTabMargin, 0);
+    const auto text = q->tabText(index);
+
+    const auto textSize = QFontMetrics(q->font()).size(0, text);
+    const auto fraction = tabCountChanging()
+        ? 0.0
+        : m_animations[index]->currentValue().toReal();
+    const auto textWidth = static_cast<int>(textSize.width() * fraction);
+
+    const auto iconSize = qnSkin->maximumSize(icon);
+
+    QSize textAndIconSize(
+        iconSize.width() + (isCurrent ? (kTabInnerSpacing + textWidth) : 0),
+        std::max(iconSize.height(), textSize.height()));
+
+    const auto textAndIconRect = QStyle::alignedRect(q->layoutDirection(),
+        Qt::AlignHCenter | Qt::AlignVCenter, textAndIconSize, rect);
+
+    const auto iconRect = QStyle::alignedRect(q->layoutDirection(),
+        Qt::AlignLeft | Qt::AlignVCenter, iconSize, textAndIconRect);
+
+    icon.paint(painter, iconRect, Qt::AlignCenter,
+        [this, index]()
+        {
+            return getIconMode(index);
+        }());
+
+    return iconRect;
+}
+
+QRect CompactTabBar::Private::paintIconWidget(int index, QWidget* iconWidget, QPainter* painter)
+{
+    NX_ASSERT(iconWidget, "Null icon widget");
+
+    // When we will want to add another iconWidget classes, we have to extract common interface
+    // and use it instead of QWidget in method argument.
+    auto notificationBellWidget = dynamic_cast<NotificationBellWidget*>(iconWidget);
+    NX_ASSERT(
+        notificationBellWidget,
+        "NotificationBellWidget is only supported as iconWidget for now.");
+
+    const auto isCurrent = q->currentIndex() == index;
+
+    const auto rect = q->tabRect(index).adjusted(kTabMargin, 0, -kTabMargin, 0);
+    const auto text = q->tabText(index);
+
+    const auto textSize = QFontMetrics(q->font()).size(0, text);
+    const auto fraction = tabCountChanging()
+        ? 0.0
+        : m_animations[index]->currentValue().toReal();
+    const auto textWidth = static_cast<int>(textSize.width() * fraction);
+
+    const auto iconSize = notificationBellWidget->size();
+
+    QSize textAndIconSize(
+        iconSize.width() + (isCurrent ? (kTabInnerSpacing + textWidth) : 0),
+        std::max(iconSize.height(), textSize.height()));
+
+    const auto textAndIconRect = QStyle::alignedRect(q->layoutDirection(),
+        Qt::AlignHCenter | Qt::AlignVCenter, textAndIconSize, rect);
+
+    const auto iconRect = QStyle::alignedRect(q->layoutDirection(),
+        Qt::AlignLeft | Qt::AlignVCenter, iconSize, textAndIconRect);
+
+    notificationBellWidget->setIconMode(getIconMode(index));
+    notificationBellWidget->setGeometry(iconRect);
+
+    return iconRect;
+}
+
+QIcon::Mode CompactTabBar::Private::getIconMode(int index) const
+{
+    const auto isCurrent = q->currentIndex() == index;
+    bool enabled = q->isTabEnabled(index);
+    if (m_customTabEnabledFunction)
+    {
+        enabled = m_customTabEnabledFunction(index);
+        if (!enabled && isCurrent)
+        {
+            // If the tab is current it must be drawn as enabled, even if custom state is disabled.
+            enabled = true;
+        }
+    }
+    const auto hovered = enabled && m_hoveredTab == index;
+
+    if (!enabled)
+        return QIcon::Disabled;
+    if (isCurrent)
+        return QIcon::Active;
+    if (hovered)
+        return QIcon::Selected;
+
+    return QIcon::Normal;
 }
 
 void CompactTabBar::Private::updateAnimation(int index)
@@ -345,6 +454,11 @@ CompactTabBar::CompactTabBar(QWidget* parent):
 
     connect(this, &QTabBar::tabMoved, [this](int from, int to) { d->tabMoved(from, to); });
     connect(this, &QTabBar::currentChanged, [this]() { d->handleCurrentChanged(); });
+}
+
+void CompactTabBar::setIconWidget(int index, QWidget* iconWidget)
+{
+    d->setIconWidget(index, iconWidget);
 }
 
 QSize CompactTabBar::tabSizeHint(int index) const

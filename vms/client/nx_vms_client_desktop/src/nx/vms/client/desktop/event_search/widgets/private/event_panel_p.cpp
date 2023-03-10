@@ -18,7 +18,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
+#include <nx/vms/client/desktop/common/widgets/animated_compact_tab_widget.h>
 #include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/analytics_search_synchronizer.h>
@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/overlappable_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -198,7 +199,7 @@ EventPanel::Private::Private(EventPanel* q):
                 return m_tabs->isTabEnabled(index);
             });
 
-        m_tabs = new AnimatedTabWidget(compactTabBar, q);
+        m_tabs = new AnimatedCompactTabWidget(compactTabBar, q);
         m_tabs->setStyleSheet("QTabWidget::tab-bar { left: -1px; } ");
 
         m_notificationsTab = new NotificationListWidget(m_tabs);
@@ -434,8 +435,15 @@ void EventPanel::Private::rebuildTabs()
 
     int currentIndex = 0;
 
+    static constexpr int kNotificationTabIndex = 0;
+
     const auto updateTab =
-        [this, &currentIndex](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
+        [this, &currentIndex](
+            QWidget* tab,
+            bool condition,
+            const QIcon& icon,
+            const QString& text,
+            QWidget* tabButton = nullptr)
         {
             const int oldIndex = m_tabs->indexOf(tab);
             NX_ASSERT(oldIndex < 0 || oldIndex == currentIndex);
@@ -446,8 +454,22 @@ void EventPanel::Private::rebuildTabs()
                 if (!tabVisible)
                 {
                     // Add tab.
-                    m_tabs->insertTab(currentIndex, tab, icon, text.toUpper());
+                    if (currentIndex == kNotificationTabIndex)
+                    {
+                        m_tabs->insertIconWidgetTab(
+                            currentIndex,
+                            tab,
+                            new NotificationBellWidget(q),
+                            text.toUpper());
+                    }
+                    else
+                    {
+                        m_tabs->insertTab(currentIndex, tab, icon, text.toUpper());
+                    }
                     m_tabs->setTabToolTip(currentIndex, text);
+
+                    if (tabButton)
+                        m_tabs->tabBar()->setTabButton(currentIndex, QTabBar::LeftSide, tabButton);
                 }
 
                 ++currentIndex;
