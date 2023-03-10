@@ -40,7 +40,7 @@ void TimeSyncManager::updateTime()
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))
             return;
 
-        const auto result = loadTimeFromServer(route);
+        const auto result = loadTimeFromServer(route, /*checkTimeSource*/ false);
         switch (result)
         {
             case Result::ok:
