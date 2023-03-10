@@ -12,6 +12,8 @@ FocusScope
     property string description: ""
     property string caption: ""
     property string errorMessage: ""
+    property bool isActive: false
+    property var parametersModel
 
     property alias contentItem: control.contentItem
 

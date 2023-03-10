@@ -23,7 +23,7 @@ Item
     property alias pressed: mouseArea.containsPress
     property bool editable: true
 
-    readonly property var thumbnailSource: sharedResources.thumbnailSource
+    readonly property var thumbnailSource: sharedData.thumbnailSource
     property int thumbnailReloadIntervalSeconds: 10
 
     signal editRequested()

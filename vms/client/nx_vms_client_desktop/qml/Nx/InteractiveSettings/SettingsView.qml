@@ -21,7 +21,7 @@ Item
     property Item scrollBarParent: null
     property Item headerItem: null
     property Item placeholderItem: null
-    property alias thumbnailSource: sharedResources.thumbnailSource
+    property alias thumbnailSource: sharedData.thumbnailSource
 
     implicitWidth: 100
     implicitHeight: contentItem ? contentItem.heightHint : 0
@@ -35,8 +35,10 @@ Item
 
     QtObject
     {
-        id: sharedResources
+        id: sharedData
+
         property var thumbnailSource: null
+        property var resourceId: thumbnailSource ? thumbnailSource.cameraId : NxGlobals.uuid("")
     }
 
     function loadModel(model, initialValues, sectionPath, restoreScrollPosition)

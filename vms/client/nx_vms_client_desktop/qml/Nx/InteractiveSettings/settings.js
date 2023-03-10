@@ -57,10 +57,19 @@ function _connectSignals(parent, item)
 
 function getItemProperties(model)
 {
+    const kInternalKeys = ["type", "items", "sections"]
+
     if (model.visible === false)
         model.opacity = 0 //< Layouts use opacity.
 
-    return model
+    return Object.keys(model)
+        .filter(key => !kInternalKeys.includes(key))
+        .reduce((result, key) =>
+            {
+                result[key] = model[key]
+                return result
+            },
+            {})
 }
 
 function _createItemsRecursively(parent, visualParent, model, depth)
@@ -80,7 +89,6 @@ function _createItemsRecursively(parent, visualParent, model, depth)
         return null
     }
 
-    delete model.type
     var item = component.createObject(visualParent || null, getItemProperties(model))
 
     if (item)

@@ -18,6 +18,7 @@ Control
     property alias value: button.checked
     property bool defaultValue: false
     property bool isActive: false
+    property var parametersModel
 
     readonly property bool filled: value
 

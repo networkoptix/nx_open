@@ -16,7 +16,6 @@ LabeledItem
     property var value: defaultValue
     property var defaultValue
     property var itemCaptions
-    property bool isActive: false
 
     defaultValueTooltipEnabled: true
 

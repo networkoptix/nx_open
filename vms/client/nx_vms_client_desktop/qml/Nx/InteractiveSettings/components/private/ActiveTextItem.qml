@@ -7,8 +7,6 @@ LabeledItem
 {
     id: control
 
-    property bool isActive: false
-
     /** Reference to a TextField item that is a source of signals. */
     property Item targetTextField: contentItem
 
