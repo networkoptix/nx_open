@@ -74,8 +74,14 @@ SpeedSlider::SpeedSlider(QnWorkbenchContext* context, QWidget* parent):
     m_hideTooltipTimer.setSingleShot(true);
 
     connect(this, &QSlider::valueChanged,
-        [this]
+        [this](int value)
         {
+            if (m_restricted && (value < m_restrictValue))
+            {
+                setValue(m_restrictValue);
+                emit sliderRestricted();
+            }
+
             updateTooltipPos();
             showToolTip();
         });
@@ -117,6 +123,12 @@ qreal SpeedSlider::roundedSpeed() const
 
 void SpeedSlider::setSpeed(qreal speed)
 {
+    if (m_restricted && (speed < m_restrictSpeed))
+    {
+        setValue(speedToPosition(m_restrictSpeed, m_minimalSpeedStep));
+        return;
+    }
+
     setValue(speedToPosition(speed, m_minimalSpeedStep));
 }
 
@@ -192,6 +204,25 @@ void SpeedSlider::setMinimalSpeedStep(qreal minimalSpeedStep)
 
     if (m_animator->isRunning())
         restartSpeedAnimation();
+}
+
+void SpeedSlider::setRestrictSpeed(qreal restrictSpeed)
+{
+    m_restrictSpeed = restrictSpeed;
+    m_restrictValue = speedToPosition(m_restrictSpeed, m_minimalSpeedStep);
+}
+
+void SpeedSlider::setRestrictEnable(bool enabled)
+{
+    if (m_restricted == enabled)
+        return;
+
+    m_restricted = enabled;
+    if (m_restricted && (value() < m_restrictValue))
+    {
+        setValue(m_restrictValue);
+        emit sliderRestricted();
+    }
 }
 
 void SpeedSlider::hideToolTip()

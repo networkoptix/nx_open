@@ -115,6 +115,12 @@ QnArchiveStreamReader* getReader(QnResourceWidget* widget)
     return dynamic_cast<QnArchiveStreamReader*>(reader);
 }
 
+bool resourceIsVmax(const QnMediaResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->isDtsBased() && camera->licenseType() == Qn::LC_VMAX;
+}
+
 } //namespace
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -210,6 +216,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         {
             m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
         });
+
+    connect(workbench(), &Workbench::currentLayoutItemRemoved, this, 
+        &QnWorkbenchNavigator::currentLayoutItemRemoved, Qt::QueuedConnection);
 
     connect(workbench(), &Workbench::currentLayoutChanged, this,
         [this]
@@ -552,6 +561,25 @@ bool QnWorkbenchNavigator::isPlayingSupported() const
         && !m_currentMediaWidget->display()->isStillImage();
 }
 
+bool QnWorkbenchNavigator::hasVmaxInSync() const
+{
+    auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+
+    const auto syncAllowed = streamSynchronizer->isEffective()
+        && currentWidgetFlags().testFlag(QnWorkbenchNavigator::WidgetSupportsSync);
+
+    auto isSync = syncAllowed && streamSynchronizer->isRunning();
+    if (!isSync)
+        return false;
+    
+    return std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(), resourceIsVmax);
+}
+
+bool QnWorkbenchNavigator::hasVmax() const
+{
+    return currentResourceIsVmax() || hasVmaxInSync();
+}
+
 bool QnWorkbenchNavigator::isTimelineRelevant() const
 {
     return m_timelineRelevant;
@@ -882,6 +910,11 @@ QnMediaResourceWidget* QnWorkbenchNavigator::currentMediaWidget() const
 QnResourcePtr QnWorkbenchNavigator::currentResource() const
 {
     return m_currentWidget ? m_currentWidget->resource() : QnResourcePtr();
+}
+
+bool QnWorkbenchNavigator::currentResourceIsVmax() const
+{
+    return resourceIsVmax(currentResource().dynamicCast<QnMediaResource>());
 }
 
 QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::currentWidgetFlags() const
@@ -1270,6 +1303,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
                 // TODO: #rvasilenko why should we make these delayed calls at all?
                 updatePlaying();
                 updateSpeed();
+                if (speed() <= 0 && hasVmax())
+                    setPlaying(false);
             };
 
         executeDelayedParented(callback, this);
