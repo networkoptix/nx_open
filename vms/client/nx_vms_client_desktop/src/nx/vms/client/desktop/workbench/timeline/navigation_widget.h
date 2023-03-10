@@ -41,6 +41,10 @@ private:
     void updateNavigatorSpeedFromSpeedSlider();
     void updateSpeedSliderSpeedFromNavigator();
     void updateSpeedSliderParametersFromNavigator();
+    void updateBackwardButtonEnabled();
+    void updatePlaybackButtonsTooltips();
+
+    void showMessage(const QString& text);
 
     void at_stepBackwardButton_clicked();
     void at_stepForwardButton_clicked();
@@ -54,8 +58,11 @@ private:
     CustomPaintedButton* m_stepForwardButton;
     CustomPaintedButton* m_jumpForwardButton;
 
+    QString m_rewindDisabledText;
+
     bool m_updatingSpeedSliderFromNavigator = false;
     bool m_updatingNavigatorFromSpeedSlider = false;
+    QSet<QnUuid> m_messages;
 };
 
 } // nx::vms::client::desktop::workbench::timeline
