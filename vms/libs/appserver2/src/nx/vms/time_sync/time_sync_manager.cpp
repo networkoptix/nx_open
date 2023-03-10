@@ -107,7 +107,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
     m_isTimeTakenFromInternet = false;
 }
 
-TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route)
+TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route, bool checkTimeSource)
 {
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
@@ -180,7 +180,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
     bool syncWithInternel = systemSettings()->primaryTimeServer().isNull();
-    if (syncWithInternel && !timeData.isTakenFromInternet)
+    if (syncWithInternel && !timeData.isTakenFromInternet && checkTimeSource)
         return Result::error; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
     m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)

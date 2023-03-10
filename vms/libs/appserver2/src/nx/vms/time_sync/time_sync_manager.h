@@ -92,7 +92,13 @@ public:
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
-    Result loadTimeFromServer(const QnRoute& route);
+    /**
+     * @return time from the VMS Server.
+     * @param route Routing information.
+     * @param checkTimeSource If the target server must load time from the Internet but can't do it then
+     * it returns local time. Consider this situation as an error if parameter is 'true'.
+     */
+    Result loadTimeFromServer(const QnRoute& route, bool checkTimeSource);
     void loadTimeFromLocalClock();
 
     virtual void updateTime() = 0;
