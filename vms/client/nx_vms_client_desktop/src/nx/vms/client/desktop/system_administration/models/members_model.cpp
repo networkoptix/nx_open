@@ -18,7 +18,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include "../globals/user_settings_global.h"
-#include "core/resource/resource_fwd.h"
 
 
 namespace nx::vms::client::desktop {
@@ -533,7 +532,7 @@ void MembersModel::addMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.insert(memberId);
-//    m_membersCache.remove(m_subjectId);
+
     m_subjectContext->setRelations(parents, members);
 }
 
@@ -542,7 +541,7 @@ void MembersModel::removeMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.remove(memberId);
-//    m_membersCache.remove(m_subjectId);
+
     m_subjectContext->setRelations(parents, members);
 }
 
