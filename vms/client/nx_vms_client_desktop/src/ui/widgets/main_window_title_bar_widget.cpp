@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/client/desktop/common/widgets/screen_recording_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -400,6 +401,30 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     return newActionButton(actionId, Qn::Empty_Help, fixedSize);
 }
 
+QWidget* QnMainWindowTitleBarWidget::newRecordingIndicator(const QSize& fixedSize)
+{
+    auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
+    if (!screenRecordingAction)
+        return nullptr;
+
+    auto indicator = new ScreenRecordingIndicator(this);
+
+    connect(
+        screenRecordingAction, &QAction::triggered,
+        indicator, &QWidget::setVisible);
+
+    connect(indicator, &QAbstractButton::clicked, this,
+        [this]
+        {
+            menu()->trigger(ui::action::ToggleScreenRecordingAction);
+        });
+
+    indicator->setFixedSize(fixedSize);
+    indicator->setVisible(screenRecordingAction->isChecked());
+
+    return indicator;
+}
+
 void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
 {
     Q_D(QnMainWindowTitleBarWidget);
@@ -432,6 +457,8 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     systemLayout->addWidget(newVLine());
     systemLayout->addWidget(d->cloudPanel);
     systemLayout->addWidget(newVLine());
+    if (auto indicator = newRecordingIndicator(kControlButtonSize))
+        systemLayout->addWidget(indicator);
     systemLayout->addWidget(newActionButton(
         action::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
@@ -476,6 +503,8 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
     layout->addWidget(newVLine());
     layout->addWidget(d->cloudPanel);
     layout->addWidget(newVLine());
+    if (auto indicator = newRecordingIndicator(kControlButtonSize))
+        layout->addWidget(indicator);
 #ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
         action::OpenLoginDialogAction,
