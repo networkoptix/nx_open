@@ -95,6 +95,9 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
+    bool hasVmaxInSync() const;
+    bool hasVmax() const;
+
     /** Timeline can be used to navigate through video.  */
     bool isTimelineRelevant() const;
 
@@ -126,6 +129,7 @@ public:
     QnMediaResourceWidget* currentMediaWidget() const;
 
     QnResourcePtr currentResource() const;
+    bool currentResourceIsVmax() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();
@@ -160,6 +164,7 @@ signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
     void currentResourceChanged();
+    void currentLayoutItemRemoved();
     void liveChanged();
     void liveSupportedChanged();
     void hasArchiveChanged();

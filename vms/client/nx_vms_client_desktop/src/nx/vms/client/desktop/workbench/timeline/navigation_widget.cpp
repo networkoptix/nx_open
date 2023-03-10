@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
@@ -58,6 +59,9 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     m_stepForwardButton(new CustomPaintedButton(this)),
     m_jumpForwardButton(new CustomPaintedButton(this))
 {
+    m_rewindDisabledText = tr("Rewind is not available for VMAX");
+    m_speedSlider->setRestrictSpeed(0.0);
+
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &NavigationWidget::geometryChanged);
 
@@ -95,8 +99,12 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     mainLayout->addWidget(new ClockLabel(this));
 
     /* Set up handlers. */
-    connect(m_speedSlider, &SpeedSlider::roundedSpeedChanged,
-        this, &NavigationWidget::updateNavigatorSpeedFromSpeedSlider);
+    connect(m_speedSlider, &SpeedSlider::roundedSpeedChanged, this,
+        [this]
+        {
+            updateNavigatorSpeedFromSpeedSlider();
+            updateBackwardButtonEnabled();
+        });
     connect(m_speedSlider, &SpeedSlider::wheelMoved, this,
         [this](bool forwardDirection)
         {
@@ -106,6 +114,18 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
                 m_stepBackwardButton->click();
         });
 
+    connect(m_speedSlider, &SpeedSlider::sliderRestricted, this,
+        [this]
+        { 
+            showMessage(m_rewindDisabledText);
+        });
+
+    connect(action(ui::action::ToggleSyncAction), &QAction::toggled, this,
+        [this]
+        { 
+            updateBackwardButtonEnabled();
+        },
+        Qt::QueuedConnection);
     connect(action(ui::action::PreviousFrameAction), &QAction::triggered,
         this, &NavigationWidget::at_stepBackwardButton_clicked);
     connect(action(ui::action::NextFrameAction), &QAction::triggered,
@@ -118,16 +138,23 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
         navigator(), &QnWorkbenchNavigator::setPlaying);
     connect(action(ui::action::PlayPauseAction), &QAction::toggled,
         this, &NavigationWidget::updateSpeedSliderParametersFromNavigator);
-    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
-        this, &NavigationWidget::updatePlaybackButtonsIcons);
+    connect(action(ui::action::PlayPauseAction), &QAction::toggled, this,
+        [this]
+        {
+            updatePlaybackButtonsIcons();
+            updatePlaybackButtonsEnabled();
+        });
 
-    /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
+    // Play button is not synced with the actual playing state, so we update it only when current
+    // widget changes.
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
         this, &NavigationWidget::updatePlayButtonChecked, Qt::QueuedConnection);
 
+    connect(navigator(), &QnWorkbenchNavigator::currentLayoutItemRemoved, 
+        this, &NavigationWidget::updateBackwardButtonEnabled);   
+
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,
         m_speedSlider, &SpeedSlider::finishAnimations);
-
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
         this, &NavigationWidget::updateJumpButtonsTooltips);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,
@@ -196,11 +223,7 @@ void NavigationWidget::initButton(
 void NavigationWidget::updatePlaybackButtonsIcons()
 {
     bool playing = m_playButton->isChecked();
-
-    action(ui::action::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
-    m_stepBackwardButton->setToolTip(action(ui::action::PreviousFrameAction)->toolTip());
-    action(ui::action::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
-    m_stepForwardButton->setToolTip(action(ui::action::NextFrameAction)->toolTip());
+    updatePlaybackButtonsTooltips();
 
     m_stepBackwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/backward.png")
@@ -208,10 +231,6 @@ void NavigationWidget::updatePlaybackButtonsIcons()
     m_stepForwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/forward.png")
         : qnSkin->icon("slider/navigation/step_forward.png"));
-
-    // TODO: #sivanov Remove this once buttonwidget <-> action enabled sync is implemented. OR when
-    // we disable actions and not buttons.
-    updatePlaybackButtonsEnabled();
 }
 
 void NavigationWidget::updatePlaybackButtonsEnabled()
@@ -248,8 +267,7 @@ void NavigationWidget::updatePlaybackButtonsEnabled()
     m_playButton->setEnabled(playable);
 
     /* Local/exported video, camera with footage. */
-    bool canStepBackwardOrSpeedDown = playable && (hasCameraFootage || isLocalFile ) && hasVideo;
-    m_stepBackwardButton->setEnabled(canStepBackwardOrSpeedDown);
+    updateBackwardButtonEnabled();
 
     /* Local/exported video, camera with footage but not on live. */
     bool canStepForwardOrSpeedUp = playable && ((hasCameraFootage && forwardable) || isLocalFile) && hasVideo;
@@ -338,6 +356,55 @@ void NavigationWidget::updateSpeedSliderParametersFromNavigator()
     m_speedSlider->setDefaultSpeed(defaultSpeed);
 }
 
+void NavigationWidget::updateBackwardButtonEnabled()
+{
+    const bool playable = navigator()->isPlayingSupported();
+    const bool isLocalFile = !navigator()->isLiveSupported();
+    const bool hasCameraFootage = navigator()->hasArchive();
+    const bool hasVideo = navigator()->currentWidgetHasVideo();
+    const bool canStepBackwardOrSpeedDown = playable && hasVideo
+        && (hasCameraFootage || isLocalFile);
+    const bool hasVmax = navigator()->hasVmax();
+    const bool canStepBackward = canStepBackwardOrSpeedDown
+        && (!hasVmax || navigator()->speed() > 1.0);
+
+    m_speedSlider->setRestrictEnable(hasVmax);
+    m_stepBackwardButton->setEnabled(canStepBackward);
+    updatePlaybackButtonsTooltips();
+}
+
+void NavigationWidget::updatePlaybackButtonsTooltips()
+{
+    const bool playing = m_playButton->isChecked();
+
+    if (!m_stepBackwardButton->isEnabled())
+    {
+        action(ui::action::PreviousFrameAction)->setText(m_rewindDisabledText);
+        m_stepBackwardButton->setToolTip(m_rewindDisabledText);
+    }
+    else
+    {
+        action(ui::action::PreviousFrameAction)->setText(
+            playing ? tr("Speed Down") : tr("Previous Frame"));
+        m_stepBackwardButton->setToolTip(action(ui::action::PreviousFrameAction)->toolTip());
+    }
+
+    action(ui::action::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
+    m_stepForwardButton->setToolTip(action(ui::action::NextFrameAction)->toolTip());
+}
+
+void NavigationWidget::showMessage(const QString& text)
+{
+    if (!m_messages.isEmpty())
+        return;
+
+    const auto id = SceneBanners::instance()->add(text);
+    m_messages.insert(id);
+
+    connect(SceneBanners::instance(), &SceneBanners::removed, this,
+        [this](const QnUuid& id) { m_messages.remove(id); });
+}
+
 void NavigationWidget::at_stepBackwardButton_clicked()
 {
     if (!m_stepBackwardButton->isEnabled())
@@ -353,6 +420,7 @@ void NavigationWidget::at_stepBackwardButton_clicked()
     {
         navigator()->stepBackward();
     }
+    updateBackwardButtonEnabled();
 }
 
 void NavigationWidget::at_stepForwardButton_clicked()
@@ -370,6 +438,7 @@ void NavigationWidget::at_stepForwardButton_clicked()
     {
         navigator()->stepForward();
     }
+    updateBackwardButtonEnabled();
 }
 
 } // nx::vms::client::desktop::workbench::timeline
