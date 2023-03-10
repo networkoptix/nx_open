@@ -45,6 +45,9 @@
 #include <nx/vms/api/data/overlapped_id_data.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/time_reply.h>
+#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/user_group_model.h>
+#include <nx/vms/api/data/user_model.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
@@ -745,6 +748,26 @@ public:
         QThread* targetThread);
 
     Handle resetLdapAsync(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrEmpty>::type&& callback,
+        QThread* targetThread);
+
+    Handle saveUserAsync(
+        bool newUser,
+        const nx::vms::api::UserModelV3& userData,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
+        QThread* targetThread);
+
+    Handle saveGroupAsync(
+        bool newGroup,
+        const nx::vms::api::UserGroupModel& groupData,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::UserGroupModel>>::type&& callback,
+        QThread* targetThread);
+
+    Handle removeGroupAsync(
+        const QnUuid& groupId,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrEmpty>::type&& callback,
         QThread* targetThread);
