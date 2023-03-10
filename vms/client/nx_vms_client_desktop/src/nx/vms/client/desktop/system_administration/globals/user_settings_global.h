@@ -5,6 +5,7 @@
 #include <QtGui/QColor>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -45,9 +46,9 @@ public:
 
     enum UserType
     {
-        LocalUser,
-        CloudUser,
-        LdapUser,
+        LocalUser = (int) nx::vms::api::UserType::local,
+        CloudUser = (int) nx::vms::api::UserType::cloud,
+        LdapUser = (int) nx::vms::api::UserType::ldap,
     };
     Q_ENUM(UserType)
 

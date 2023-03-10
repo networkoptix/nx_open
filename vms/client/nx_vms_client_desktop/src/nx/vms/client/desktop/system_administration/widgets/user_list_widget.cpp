@@ -26,7 +26,9 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
@@ -165,6 +167,7 @@ public:
         selectionControls)};
 
     bool m_hasChanges = false;
+    std::unique_ptr<UserGroupRequestChain> m_requestChain;
 
 public:
     explicit Private(UserListWidget* q);
@@ -220,48 +223,39 @@ void UserListWidget::loadDataToUi()
 
 void UserListWidget::applyChanges()
 {
-    const auto modelUsers = d->usersModel->users();
-    QMap<QnUserResource::DigestSupport, QSet<QnUserResourcePtr>> usersToSave;
     QnUserResourceList usersToDelete;
 
-    const auto digestSupport =
-        [&](const QnUserResourcePtr& user)
-        {
-            if (user->isCloud())
-                return QnUserResource::DigestSupport::keep;
-
-            return d->usersModel->isDigestEnabled(user)
-                ? QnUserResource::DigestSupport::enable
-                : QnUserResource::DigestSupport::disable;
-        };
-
-    const auto userModified =
-        [&](const QnUserResourcePtr& user)
-        {
-            usersToSave[digestSupport(user)].insert(user);
-        };
-
+    d->m_requestChain.reset(new UserGroupRequestChain(systemContext()));
     for (auto user: resourcePool()->getResources<QnUserResource>())
     {
-        if (!modelUsers.contains(user))
+        if (!d->usersModel->contains(user))
         {
             usersToDelete << user;
             continue;
         }
 
+        UserGroupRequest::UpdateUser updateUser;
+
         const bool enabled = d->usersModel->isUserEnabled(user);
         if (user->isEnabled() != enabled)
         {
-            user->setEnabled(enabled);
-            userModified(user);
+            updateUser.id = user->getId();
+            updateUser.enabled = enabled;
+        }
+        else
+        {
+            updateUser.enabled = user->isEnabled();
         }
 
         if (!d->usersModel->isDigestEnabled(user) && user->shouldDigestAuthBeUsed())
-            userModified(user);
-    }
+        {
+            updateUser.id = user->getId();
+            updateUser.enableDigest = false;
+        }
 
-    for (const auto& [digestSupport, userSet]: nx::utils::constKeyValueRange(usersToSave))
-        qnResourcesChangesManager->saveUsers(userSet.values(), digestSupport);
+        if (!updateUser.id.isNull())
+            d->m_requestChain->append(updateUser);
+    }
 
     // User still can press cancel on 'Confirm Remove' dialog.
     if (!usersToDelete.empty())
@@ -283,6 +277,8 @@ void UserListWidget::applyChanges()
         else
         {
             d->usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
+            d->m_requestChain.reset();
+            return;
         }
     }
     else
@@ -290,6 +286,22 @@ void UserListWidget::applyChanges()
         d->m_hasChanges = false;
         emit hasChangesChanged();
     }
+
+    d->m_requestChain->start(
+        [this](bool success, const QString& errorString)
+        {
+            if (success)
+                return;
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                errorString,
+                {},
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                this);
+            messageBox.exec();
+        });
 }
 
 bool UserListWidget::hasChanges() const
