@@ -2,13 +2,7 @@
 
 #include "group_settings_dialog.h"
 
-#include <algorithm>
-#include <memory>
-#include <vector>
-
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
@@ -16,13 +10,17 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/algorithm/diff_sorted_lists.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
 
-#include "../globals/results_reporter.h"
 #include "../globals/session_notifier.h"
+#include "../globals/user_group_request_chain.h"
+
 
 namespace nx::vms::client::desktop {
 
@@ -59,6 +57,7 @@ DifferencesResult differences(
 struct GroupSettingsDialog::Private
 {
     GroupSettingsDialog* q;
+    QWidget* parentWidget = nullptr;
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
     QmlProperty<int> tabIndex;
@@ -107,6 +106,7 @@ GroupSettingsDialog::GroupSettingsDialog(
     d(new Private(this, dialogType))
 {
     d->self = this;
+    d->parentWidget = parent;
 
     if (parent)
     {
@@ -186,90 +186,6 @@ void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
         ui::action::Parameters()
             .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
             .withArgument(Qn::ParentWidgetRole, QPointer(window())));
-}
-
-void GroupSettingsDialog::removeGroups(
-    nx::vms::client::desktop::SystemContext* systemContext,
-    const QSet<QnUuid>& idsToRemove,
-    std::function<void(bool)> callback)
-{
-    auto resultsReporter = ResultsReporter::create(
-        [callback = std::move(callback), idsToRemove, systemContext](bool success)
-        {
-            if (success)
-            {
-                for (const auto& id: idsToRemove)
-                    qnResourcesChangesManager->removeUserRole(id, systemContext);
-            }
-            if (callback)
-                callback(success);
-        });
-
-    // Delete the group from existing users and groups.
-
-    const auto handleUserSaved =
-        [resultsReporter](bool success, const QnUserResourcePtr&)
-        {
-            resultsReporter->add(success);
-        };
-
-    const auto applyRemove =
-        [idsToRemove](const QnUserResourcePtr& user)
-        {
-            std::vector<QnUuid> ids = user->userRoleIds();
-
-            ids.erase(
-                std::remove_if(
-                    ids.begin(),
-                    ids.end(),
-                    [&idsToRemove](auto id){ return idsToRemove.contains(id); }),
-                ids.end());
-
-            user->setUserRoleIds(ids);
-        };
-
-    for (const auto& user: systemContext->resourcePool()->getResources<QnUserResource>())
-    {
-        const auto groupIds = user->userRoleIds();
-
-        const auto it = std::find_if(
-            groupIds.begin(),
-            groupIds.end(),
-            [&idsToRemove](auto id){ return idsToRemove.contains(id); });
-
-        if (it != groupIds.end())
-        {
-            qnResourcesChangesManager->saveUser(user,
-                QnUserResource::DigestSupport::keep,
-                applyRemove,
-                systemContext,
-                handleUserSaved);
-        }
-    }
-
-    auto handleGroupSaved =
-        [resultsReporter](
-            bool roleIsStored,
-            const api::UserRoleData&)
-        {
-            resultsReporter->add(roleIsStored);
-        };
-
-    for (auto group: systemContext->userRolesManager()->userRoles())
-    {
-        const auto last = group.parentGroupIds.end();
-        const auto it = group.parentGroupIds.erase(
-            std::remove_if(
-                group.parentGroupIds.begin(),
-                last,
-                [&idsToRemove](auto id){ return idsToRemove.contains(id); }),
-            last);
-
-        if (it == last) // Nothing was removed.
-            continue;
-
-        qnResourcesChangesManager->saveUserRole(group, systemContext, handleGroupSaved);
-    }
 }
 
 void GroupSettingsDialog::onDeleteRequested()
@@ -352,168 +268,208 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
 
 void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 {
-    api::UserRoleData groupData;
-
-    if (d->dialogType == createGroup)
-        groupData.id = state.groupId;
-    else
-        groupData = systemContext()->userRolesManager()->userRole(d->groupId);
-
-    groupData.name = state.name;
-    groupData.description = state.description;
-    groupData.parentGroupIds.clear();
-    for (const auto& group: state.parentGroups)
-        groupData.parentGroupIds.push_back(group.id);
-
     if (d->hasCycles(state))
     {
         // TODO: show a banner about cycles.
         return;
     }
 
-    groupData.permissions = state.globalPermissions;
+    UserGroupRequest::AddOrUpdateGroup updateData;
+
+    updateData.newGroup = d->dialogType == createGroup;
+
+    updateData.groupData.id = state.groupId;
+    updateData.groupData.name = state.name;
+    updateData.groupData.description = state.description;
+    updateData.groupData.permissions = state.globalPermissions;
+    updateData.groupData.parentGroupIds.clear();
+    for (const auto& group: state.parentGroups)
+        updateData.groupData.parentGroupIds.push_back(group.id);
+
+    for (const auto& group: originalState().parentGroups)
+        updateData.originalParents.push_back(group.id);
+
+    updateData.groupData.type = state.isLdap
+        ? nx::vms::api::UserType::ldap
+        : nx::vms::api::UserType::local;
 
     const auto usersDiff = differences(originalState().users.list(), state.users.list());
     const auto groupsDiff = differences(originalState().groups, state.groups);
 
-    auto resultsReporter = ResultsReporter::create(
-        nx::utils::guarded(this,
-            [this, state](bool success)
-            {
-                if (success)
-                    saveStateComplete(state);
-            }));
-
     const auto resourcePool = QPointer<QnResourcePool>(systemContext()->resourcePool());
 
-    if (!groupData.isPredefined)
-    {
-        auto saveAccessRightsCallback = nx::utils::guarded(this,
-            [resultsReporter](bool ok)
-            {
-                resultsReporter->add(ok);
-            });
+    auto chain = new UserGroupRequestChain(systemContext(), /*parent*/ this);
 
-        auto setupAccessibleResources = nx::utils::guarded(this,
-            [this, saveAccessRightsCallback, resultsReporter, state, resourcePool](
-                bool roleIsStored,
-                const api::UserRoleData& group)
-            {
-                resultsReporter->add(roleIsStored);
-
-                qnResourcesChangesManager->saveAccessRights(
-                    group, state.sharedResources, saveAccessRightsCallback, systemContext());
-            });
-
-        qnResourcesChangesManager->saveUserRole(
-            groupData, systemContext(), setupAccessibleResources);
-    }
-
-    // There is no server API call to update the whole hierarchy with a single call and intermidiate
-    // hierarchy state may contain cycles. To prevent saving cycles to the server, handle addition
-    // of users/groups only after all remove opertaions have succeeded.
-    auto removeReporter = ResultsReporter::create(
-        nx::utils::guarded(this,
-            [this, resultsReporter, resourcePool, state, usersDiff, groupsDiff, groupData](
-                bool success)
-            {
-                if (!success)
-                    return;
-
-                // Add groups.
-
-                const auto handleGroupAdded = nx::utils::guarded(this,
-                    [resultsReporter](bool roleIsStored, const api::UserRoleData&)
-                    {
-                        resultsReporter->add(roleIsStored);
-                    });
-
-                for (const auto& id: groupsDiff.added)
-                {
-                    auto userGroup = systemContext()->userRolesManager()->userRole(id);
-                    userGroup.parentGroupIds.push_back(groupData.id);
-                    qnResourcesChangesManager->saveUserRole(
-                        userGroup, systemContext(), handleGroupAdded);
-                }
-
-                // Add users.
-
-                const auto handleUserAdded = nx::utils::guarded(this,
-                    [resultsReporter](bool success, const QnUserResourcePtr&)
-                    {
-                        resultsReporter->add(success);
-                    });
-
-                const auto applyAdd = nx::utils::guarded(this,
-                    [groupId = groupData.id](const QnUserResourcePtr& user)
-                    {
-                        std::vector<QnUuid> ids = user->userRoleIds();
-                        ids.push_back(groupId);
-                        user->setUserRoleIds(ids);
-                    });
-
-                for (const auto& userId: usersDiff.added)
-                {
-                    if (auto user = resourcePool->getResourceById<QnUserResource>(userId))
-                    {
-                        qnResourcesChangesManager->saveUser(user,
-                            QnUserResource::DigestSupport::keep,
-                            applyAdd,
-                            systemContext(),
-                            handleUserAdded);
-                    }
-                }
-            }));
-
-    // Remove groups.
-
-    const auto handleGroupRemoved = nx::utils::guarded(this,
-        [removeReporter](bool roleIsStored, const api::UserRoleData&)
-        {
-            removeReporter->add(roleIsStored);
-        });
+    // Remove group from groups.
 
     for (const auto& id: groupsDiff.removed)
     {
-        auto userGroup = systemContext()->userRolesManager()->userRole(id);
-
-        userGroup.parentGroupIds.erase(
-            std::remove(
-                userGroup.parentGroupIds.begin(),
-                userGroup.parentGroupIds.end(),
-                groupData.id),
-            userGroup.parentGroupIds.end());
-
-        qnResourcesChangesManager->saveUserRole(userGroup, systemContext(), handleGroupRemoved);
-    }
-
-    // Remove users.
-
-    const auto handleUserRemoved = nx::utils::guarded(this,
-        [removeReporter](bool success, const QnUserResourcePtr&)
+        if (const auto userGroup = systemContext()->userRolesManager()->userRole(id);
+            !userGroup.id.isNull())
         {
-            removeReporter->add(success);
-        });
-
-    const auto applyRemove = nx::utils::guarded(this,
-        [groupId = groupData.id](const QnUserResourcePtr& user)
-        {
-            std::vector<QnUuid> ids = user->userRoleIds();
-            ids.erase(std::remove(ids.begin(), ids.end(), groupId), ids.end());
-            user->setUserRoleIds(ids);
-        });
-
-    for (const auto& userId: usersDiff.removed)
-    {
-        if (auto user = resourcePool->getResourceById<QnUserResource>(userId))
-        {
-            qnResourcesChangesManager->saveUser(user,
-                QnUserResource::DigestSupport::keep,
-                applyRemove,
-                systemContext(),
-                handleUserRemoved);
+            UserGroupRequest::ModifyGroupParents mod;
+            mod.id = id;
+            mod.prevParents = userGroup.parentGroupIds;
+            for (const auto& groupId: mod.prevParents)
+            {
+                if (groupId != updateData.groupData.id)
+                    mod.newParents.emplace_back(groupId);
+            }
+            chain->append(mod);
         }
     }
+
+    // Remove group from users.
+
+    for (const auto& id: usersDiff.removed)
+    {
+        if (const auto user = resourcePool->getResourceById<QnUserResource>(id))
+        {
+            UserGroupRequest::ModifyUserParents mod;
+            mod.id = id;
+            mod.prevParents = user->userRoleIds();
+            for (const auto& groupId: mod.prevParents)
+            {
+                if (groupId != updateData.groupData.id)
+                    mod.newParents.emplace_back(groupId);
+            }
+            chain->append(mod);
+        }
+    }
+
+    if (!state.isPredefined)
+        chain->append(updateData);
+
+    // Add to groups.
+
+    for (const auto& id: groupsDiff.added)
+    {
+        if (const auto userGroup = systemContext()->userRolesManager()->userRole(id);
+            !userGroup.id.isNull())
+        {
+            UserGroupRequest::ModifyGroupParents mod;
+            mod.id = id;
+            mod.prevParents = userGroup.parentGroupIds;
+            mod.newParents = mod.prevParents;
+            mod.newParents.emplace_back(updateData.groupData.id);
+            chain->append(mod);
+        }
+    }
+
+    // Add to users.
+
+    for (const auto& userId: usersDiff.added)
+    {
+        if (const auto user = resourcePool->getResourceById<QnUserResource>(userId))
+        {
+            UserGroupRequest::ModifyUserParents mod;
+            mod.id = userId;
+            mod.prevParents = user->userRoleIds();
+            mod.newParents = mod.prevParents;
+            mod.newParents.emplace_back(updateData.groupData.id);
+            chain->append(mod);
+        }
+    }
+
+    chain->setTokenHelper(FreshSessionTokenHelper::makeHelper(
+        d->parentWidget,
+        tr("Save changes"),
+        tr("Enter your account password"),
+        tr("Save"),
+        FreshSessionTokenHelper::ActionType::updateSettings));
+
+    chain->start(nx::utils::guarded(this,
+        [chain, state, this](
+            bool success,
+            const QString& errorString)
+        {
+            if (success)
+            {
+                saveStateComplete(state);
+            }
+            else
+            {
+                QnMessageBox messageBox(
+                    QnMessageBoxIcon::Critical,
+                    errorString,
+                    {},
+                    QDialogButtonBox::Ok,
+                    QDialogButtonBox::Ok,
+                    nullptr);
+                messageBox.exec();
+            }
+
+            chain->deleteLater();
+        }));
+}
+
+void GroupSettingsDialog::removeGroups(
+    nx::vms::client::desktop::SystemContext* systemContext,
+    const QSet<QnUuid>& idsToRemove,
+    std::function<void(bool)> callback)
+{
+    auto chain = new UserGroupRequestChain(systemContext);
+
+    // Remove groups from groups.
+
+    for (const auto& group: systemContext->userRolesManager()->userRoles())
+    {
+        UserGroupRequest::ModifyGroupParents mod;
+        for (const auto& groupId: group.parentGroupIds)
+        {
+            if (!idsToRemove.contains(groupId))
+                mod.newParents.emplace_back(groupId);
+        }
+
+        if (group.parentGroupIds.size() == mod.newParents.size())
+            continue;
+
+        mod.id = group.id;
+        mod.prevParents = group.parentGroupIds;
+        chain->append(mod);
+    }
+
+    // Remove groups from users.
+
+    const auto resourcePool = systemContext->resourcePool();
+
+    for (const auto& user: resourcePool->getResources<QnUserResource>())
+    {
+        UserGroupRequest::ModifyUserParents mod;
+        mod.prevParents = user->userRoleIds();
+        for (const auto& groupId: mod.prevParents)
+        {
+            if (!idsToRemove.contains(groupId))
+                mod.newParents.emplace_back(groupId);
+        }
+        if (mod.prevParents.size() == mod.newParents.size())
+            continue;
+
+        mod.id = user->getId();
+        chain->append(mod);
+    }
+
+    // Remove groups.
+
+    for (const auto& id: idsToRemove)
+        chain->append(UserGroupRequest::RemoveGroup{.id = id});
+
+    chain->setTokenHelper( FreshSessionTokenHelper::makeHelper(
+        appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(),
+        tr("Delete groups"),
+        tr("Enter your account password"),
+        tr("Delete"),
+        FreshSessionTokenHelper::ActionType::updateSettings));
+
+    chain->start(nx::utils::guarded(chain,
+        [chain, callback = std::move(callback)](
+            bool success,
+            const QString& /*errorString*/)
+        {
+            if (callback)
+                callback(success);
+            chain->deleteLater();
+        }));
 }
 
 } // namespace nx::vms::client::desktop

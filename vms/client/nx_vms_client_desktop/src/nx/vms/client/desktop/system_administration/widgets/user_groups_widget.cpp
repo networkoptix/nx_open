@@ -220,6 +220,9 @@ void UserGroupsWidget::applyChanges()
     const auto deletedGroupIds = d->deletedGroupIds;
     d->deletedGroupIds = {};
 
+    if (deletedGroupIds.empty())
+        return;
+
     GroupSettingsDialog::removeGroups(systemContext(), deletedGroupIds);
 }
 
