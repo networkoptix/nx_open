@@ -20,7 +20,9 @@ class AnimatedTabWidget: public TabWidget
 
 public:
     explicit AnimatedTabWidget(QWidget* parent = nullptr);
-    explicit AnimatedTabWidget(QTabBar* tabBar, QWidget* parent = nullptr); //< Tab bar ownership is taken.
+
+    // Takes ownership of tabBar.
+    explicit AnimatedTabWidget(QTabBar* tabBar, QWidget* parent = nullptr);
 
 private:
     void handleCurrentChanged();

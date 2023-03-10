@@ -22,6 +22,8 @@ public:
     explicit CompactTabBar(QWidget* parent = nullptr);
     virtual ~CompactTabBar() override = default;
 
+    void setIconWidget(int index, QWidget* iconWidget);
+
     virtual bool event(QEvent* event) override;
 
     /** Functor should return whether given tab should be displayed as enabled or not. */

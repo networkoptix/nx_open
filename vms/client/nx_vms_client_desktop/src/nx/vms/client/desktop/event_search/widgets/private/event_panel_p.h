@@ -28,6 +28,7 @@ class AnalyticsSearchWidget;
 class MultiImageProvider;
 class AbstractSearchSynchronizer;
 class OverlappableSearchWidget;
+class AnimatedCompactTabWidget;
 
 class EventPanel::Private:
     public QObject,
@@ -65,7 +66,7 @@ private:
     };
 
     EventPanel* const q;
-    QTabWidget* m_tabs = nullptr;
+    AnimatedCompactTabWidget* m_tabs = nullptr;
 
     NotificationListWidget* m_notificationsTab = nullptr;
     NotificationCounterLabel* m_counterLabel = nullptr;
