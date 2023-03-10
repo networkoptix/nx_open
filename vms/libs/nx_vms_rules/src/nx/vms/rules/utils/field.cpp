@@ -81,7 +81,8 @@ QnUuidList getResourceIds(const AggregatedEventPtr& event)
 {
     auto result = getDeviceIds(event);
     result << getFieldValue<QnUuid>(event, kServerIdFieldName);
-    // TODO: #amalov Consider reporting analytics engine and user as resources.
+    result << getFieldValue<QnUuid>(event, kEngineIdFieldName);
+    // TODO: #amalov Consider reporting user in resource list.
     result.removeAll(QnUuid());
 
     return result;

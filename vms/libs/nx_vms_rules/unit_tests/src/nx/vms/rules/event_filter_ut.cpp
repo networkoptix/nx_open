@@ -69,7 +69,8 @@ protected:
             source,
             caption,
             description,
-            QnUuidList());
+            QnUuid::createUuid(),
+            QnUuidList({QnUuid::createUuid()}));
     }
 
     std::unique_ptr <Engine> engine;

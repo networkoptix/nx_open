@@ -16,10 +16,12 @@ GenericEvent::GenericEvent(
     const QString& caption,
     const QString& description,
     const QString& source,
+    QnUuid serverId,
     const QnUuidList& deviceIds)
     :
     base_type(timestamp, caption, description),
     m_source(source),
+    m_serverId(serverId),
     m_deviceIds(deviceIds)
 {
     setState(state);
@@ -34,6 +36,7 @@ QVariantMap GenericEvent::details(common::SystemContext* context) const
 {
     auto result = base_type::details(context);
 
+    result.remove(utils::kSourceIdDetailName);
     utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
