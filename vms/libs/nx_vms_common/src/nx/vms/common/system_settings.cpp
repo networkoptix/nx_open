@@ -352,7 +352,7 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
     m_osTimeChangeCheckPeriodAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             "osTimeChangeCheckPeriodMs",
-            duration_cast<milliseconds>(std::chrono::seconds(1)).count(),
+            duration_cast<milliseconds>(std::chrono::seconds(5)).count(),
             this,
             [] { return tr("OS time change check period"); });
     timeSynchronizationAdaptors << m_osTimeChangeCheckPeriodAdaptor;
