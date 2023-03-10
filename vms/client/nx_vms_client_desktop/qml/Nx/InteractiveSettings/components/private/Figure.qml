@@ -17,14 +17,14 @@ LabeledItem
     property var figureSettings
     property var figure
     property bool useLabelField: true
-    property bool isActive: false
-
-    isGroup: true
+    property var defaultValue //< Not used but required by the backend.
 
     signal valueChanged()
     signal activeValueEdited() //< This signal is emitted even if isActive is set to false.
 
     readonly property bool filled: !!figure
+
+    isGroup: true
 
     contentItem: Column
     {
@@ -101,7 +101,7 @@ LabeledItem
             {
                 figureType: control.figureType
                 figureSettings: control.figureSettings
-                resourceId: settingsView.resourceId
+                resourceId: sharedData.resourceId
 
                 onAccepted:
                 {

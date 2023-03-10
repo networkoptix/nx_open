@@ -18,7 +18,6 @@ LabeledItem
     property size maximum
     property point minBoxPosition
     property point maxBoxPosition
-    property bool isActive: false
 
     signal valueChanged()
 
@@ -35,8 +34,6 @@ LabeledItem
 
             figure: control.getValue()
             figureType: "size_constraints"
-
-            resourceId: settingsView.resourceId
 
             onEditRequested:
                 openEditDialog()
@@ -57,7 +54,7 @@ LabeledItem
             FigureEditorDialog
             {
                 figureType: figureView.figureType
-                resourceId: figureView.resourceId
+                resourceId: sharedData.resourceId
 
                 onAccepted:
                     setValue(serializeFigure())

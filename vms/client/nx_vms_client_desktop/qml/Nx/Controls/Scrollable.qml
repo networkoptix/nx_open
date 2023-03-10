@@ -85,7 +85,7 @@ Item
 
         AdaptiveMouseWheelTransmission { id: gearbox }
 
-        onWheel:
+        onWheel: (wheel) =>
         {
             if (flickable.contentHeight < flickable.height)
                 return;

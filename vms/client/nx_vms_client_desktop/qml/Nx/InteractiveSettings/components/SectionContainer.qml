@@ -12,6 +12,7 @@ StackLayout
 {
     id: control
 
+    property string name: ""
     property string caption: ""
     property Item childrenItem: column
     property StackLayout sectionStack: control

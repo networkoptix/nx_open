@@ -11,7 +11,7 @@ Button
     property alias caption: control.text
     property string description: ""
     property bool isActive: true
-    property var parametersModel: null
+    property var parametersModel
 
     GlobalToolTip.text: description
 

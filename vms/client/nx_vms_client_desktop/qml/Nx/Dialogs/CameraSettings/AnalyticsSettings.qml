@@ -26,6 +26,7 @@ Item
         && viewModel.currentEngineInfo.isDeviceDependent
 
     readonly property var currentEngineId: viewModel.currentEngineId
+    property var resourceId: NxGlobals.uuid("")
 
     Connections
     {
@@ -42,7 +43,7 @@ Item
                 return
 
             supportsDualStreaming = store.dualStreamingEnabled()
-            mediaResourceHelper.resourceId = resourceId
+            analyticsSettings.resourceId = resourceId
 
             const currentEngineId = store.currentAnalyticsEngineId()
             viewModel.enabledEngines = store.userEnabledAnalyticsEngines()
@@ -66,6 +67,8 @@ Item
     MediaResourceHelper
     {
         id: mediaResourceHelper
+
+        resourceId: analyticsSettings.resourceId
     }
 
     AnalyticsSettingsViewModel
@@ -92,7 +95,6 @@ Item
     AnalyticsSettingsView
     {
         id: analyticsSettingsView
-        property var resourceId: NxGlobals.uuid("")
 
         viewModel: viewModel
 
@@ -110,7 +112,7 @@ Item
 
             thumbnailSource: RoiCameraThumbnail
             {
-                cameraId: analyticsSettingsView.resourceId
+                cameraId: analyticsSettings.resourceId
                 active: visible
             }
 
