@@ -1914,6 +1914,78 @@ Handle ServerConnection::resetLdapAsync(
     return handle;
 }
 
+Handle ServerConnection::saveUserAsync(
+    bool newUser,
+    const nx::vms::api::UserModelV3& userData,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
+        prepareUrl(
+            QString("/rest/v3/users/%1").arg(userData.getId().toString()),
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(userData));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::saveGroupAsync(
+    bool newGroup,
+    const nx::vms::api::UserGroupModel& groupData,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::UserGroupModel>>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        newGroup ? nx::network::http::Method::put : nx::network::http::Method::patch,
+        prepareUrl(
+            QString("/rest/v3/userGroups/%1").arg(groupData.id.toString()),
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(groupData));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::removeGroupAsync(
+    const QnUuid& groupId,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrEmpty>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::delete_,
+        prepareUrl(
+            QString("/rest/v3/userGroups/%1").arg(groupId.toString()),
+            /*params*/ {}));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::loginAsync(
     const nx::vms::api::LoginSessionRequest& data,
     Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
