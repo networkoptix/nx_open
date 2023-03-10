@@ -47,6 +47,9 @@ public:
     qreal minimalSpeedStep() const;
     void setMinimalSpeedStep(qreal minimalSpeedStep);
 
+    void setRestrictSpeed(qreal restrictSpeed);
+    void setRestrictEnable(bool enabled);
+
     void hideToolTip();
     void showToolTip();
 
@@ -59,6 +62,7 @@ signals:
     void speedChanged(qreal speed);
     void roundedSpeedChanged(qreal roundedSpeed);
     void wheelMoved(bool forwardDirection);
+    void sliderRestricted();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -78,6 +82,9 @@ private:
     qreal m_roundedSpeed = 0.0;
     qreal m_minimalSpeedStep = 1.0;
     qreal m_defaultSpeed = 1.0;
+    qreal m_restrictSpeed = std::numeric_limits<qreal>::lowest();
+    int m_restrictValue = std::numeric_limits<int>::lowest();
+    bool m_restricted = false;
 
     bool m_tooltipsEnabled = false;
 
