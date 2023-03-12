@@ -7,8 +7,6 @@
 
 namespace nx::vms::api {
 
-static QString kMetadataStorageId = "metadataStorageId";
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModel, (json), ServerModel_Fields)
 
 ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
@@ -43,14 +41,6 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
         statusData = ResourceStatusData(mainData.id, *status);
 
     auto parameters = asList(mainData.id);
-    if (metadataStorageId)
-    {
-        parameters.push_back(ResourceParamWithRefData(
-            mainData.id,
-            kMetadataStorageId,
-            metadataStorageId->toString(),
-            CheckResourceExists::no));
-    }
     return {
         std::move(mainData),
         std::move(attributesData),
@@ -113,21 +103,6 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
 
             return model;
         });
-}
-
-void ServerModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list)
-{
-    ResourceWithParameters::extractFromList(id, list);
-
-    if (const auto it = parameters.find(kMetadataStorageId); it != parameters.end())
-    {
-        if (const auto value = it->second.toString(); !value.isEmpty())
-        {
-            if (const QnUuid storageId(value); !storageId.isNull())
-                metadataStorageId = storageId;
-        }
-        parameters.erase(it);
-    }
 }
 
 } // namespace nx::vms::api
