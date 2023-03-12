@@ -73,7 +73,6 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 
     /**%apidoc[readonly] */
     std::optional<nx::utils::OsInfo> osInfo;
-    std::optional<QnUuid> metadataStorageId;
 
     /**%apidoc[opt] */
     ServerFlags flags = SF_None;
@@ -115,11 +114,9 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<ServerModel> fromDbTypes(DbListTypes data);
-
-    void extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list);
 };
 #define ServerModel_Fields \
-    (id)(name)(url)(version)(endpoints)(authKey)(osInfo)(metadataStorageId)(flags) \
+    (id)(name)(url)(version)(endpoints)(authKey)(osInfo)(flags) \
     (isFailoverEnabled)(maxCameras)(backupBitrateBytesPerSecond)(status)(storages)(parameters)
 QN_FUSION_DECLARE_FUNCTIONS(ServerModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerModel, ServerModel_Fields);
