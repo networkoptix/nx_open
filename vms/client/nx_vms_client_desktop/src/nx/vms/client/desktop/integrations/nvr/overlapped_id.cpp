@@ -124,8 +124,10 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
                         NX_WARNING(this, "Overlapped id is not set.");
 
                     context->navigator()->reopenPlaybackConnection(cameras);
+                    context->navigator()->setPlaying(true);
                 });
 
+            context->navigator()->setPlaying(false);
             connection->setOverlappedId(
                 groupId,
                 m_store->state().currentId,
