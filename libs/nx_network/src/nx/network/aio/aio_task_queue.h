@@ -196,6 +196,21 @@ public:
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds newTimeout);
 
+    /**
+     * Adds "add socket to pollset" task to the queue unless:
+     * - there is a such task in the queue already
+     * - there is a "remove socket" task in the queue which is removed from the queue
+     * In this two cases, false is returned.
+     * Otherwise, task is pushed to the queue and true is reported.
+     * @return true if task was added. false, if there is no need to add such task.
+     */
+    bool pushAddSocketTaskIfNeeded(
+        Pollable* const sock,
+        aio::EventType eventToWatch,
+        AIOEventHandler* eventHandler,
+        std::chrono::milliseconds timeout,
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler);
+
     std::size_t newReadMonitorTaskCount() const;
     std::size_t newWriteMonitorTaskCount() const;
 
@@ -261,6 +276,29 @@ private:
         std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
     std::atomic<std::size_t> m_newReadMonitorTaskCount = 0;
     std::atomic<std::size_t> m_newWriteMonitorTaskCount = 0;
+
+    void addTask(
+        const nx::Locker<nx::Mutex>&,
+        SocketAddRemoveTask task);
+
+    bool taskExists(
+        const nx::Locker<nx::Mutex>&,
+        Pollable* sock,
+        aio::EventType eventType,
+        TaskType taskType) const;
+
+    /**
+     * @return tuple<true if reverse task has been cancelled and socket
+     *   is already in desired state and no futher processing is needed,
+     *   tasks taken out from the queue>.
+     */
+    std::tuple<bool, std::deque<SocketAddRemoveTask>> takeReverseTasksToRemove(
+        const nx::Locker<nx::Mutex>&,
+        Pollable* sock,
+        aio::EventType eventType,
+        TaskType taskType,
+        AIOEventHandler* eventHandler,
+        std::chrono::milliseconds newTimeout);
 
     void processAddTask(
         const nx::Locker<nx::Mutex>& lock,

@@ -115,36 +115,7 @@ private:
         aio::EventType eventToWatch,
         std::chrono::milliseconds* timeout);
 
-    void startMonitoringInternal(
-        const nx::Locker<nx::Mutex>& /*lock*/,
-        Pollable* const sock,
-        aio::EventType eventToWatch,
-        AIOEventHandler* const eventHandler,
-        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
-
-    void stopMonitoringInternal(
-        nx::Locker<nx::Mutex>* lock,
-        Pollable* const sock,
-        aio::EventType eventType);
-
-    /**
-     * Change timeout of existing polling sock for eventToWatch to timeoutMS.
-     *   eventHandler is changed also.
-     * NOTE: If sock is not polled, undefined behaviour can occur.
-     */
-    void changeSocketTimeout(
-        const nx::Locker<nx::Mutex>& /*lock*/,
-        Pollable* const sock,
-        aio::EventType eventToWatch,
-        AIOEventHandler* const eventHandler,
-        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
-        std::function<void()> socketAddedToPollHandler = std::function<void()>());
-
-    void post(
-        const nx::Locker<nx::Mutex>& /*lock*/,
-        Pollable* const sock,
-        nx::utils::MoveOnlyFunc<void()> functor);
+    void stopMonitoringInternal(Pollable* sock, aio::EventType eventType);
 };
 
 } // namespace nx::network::aio

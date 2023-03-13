@@ -28,16 +28,7 @@ AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
 void AioTaskQueue::addTask(SocketAddRemoveTask task)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-
-    m_pollSetModificationQueue.push_back(std::move(task));
-
-    if (task.type == TaskType::tAdding)
-    {
-        if (task.eventType == aio::etRead)
-            ++m_newReadMonitorTaskCount;
-        else if (task.eventType == aio::etWrite)
-            ++m_newWriteMonitorTaskCount;
-    }
+    addTask(lock, std::move(task));
 }
 
 bool AioTaskQueue::taskExists(
@@ -46,13 +37,7 @@ bool AioTaskQueue::taskExists(
     TaskType taskType) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-
-    return std::any_of(
-        m_pollSetModificationQueue.begin(), m_pollSetModificationQueue.end(),
-        [socket, eventType, taskType](const auto& task)
-        {
-            return task.socket == socket && task.eventType == eventType && task.type == taskType;
-        });
+    return taskExists(lock, socket, eventType, taskType);
 }
 
 bool AioTaskQueue::removeReverseTask(
@@ -64,68 +49,53 @@ bool AioTaskQueue::removeReverseTask(
 {
     // NOTE: Freeing tasks with no mutex lock since user handler destruction may produce
     // a recursive call to this object.
+    bool reverseTaskCancelled = false;
     std::deque<SocketAddRemoveTask> toRemove;
 
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    for (auto it = m_pollSetModificationQueue.begin();
-        it != m_pollSetModificationQueue.end();
-        ++it)
-    {
-        if (!(it->socket == sock && it->eventType == eventType && taskType != it->type))
-            continue;
+    std::tie(reverseTaskCancelled, toRemove) =
+        takeReverseTasksToRemove(lock, sock, eventType, taskType, eventHandler, newTimeout);
 
-        //removing reverse task (if any)
-        if (taskType == TaskType::tAdding && it->type == TaskType::tRemoving)
-        {
-            //cancelling removing socket
-            if (eventHandler != it->eventHandler)
-                continue;   //event handler changed, cannot ignore task
-                            //cancelling remove task
+    return reverseTaskCancelled;
+}
 
-            NX_ASSERT(sock->impl()->monitoredEvents[eventType].aioHelperData);
-            sock->impl()->monitoredEvents[eventType].aioHelperData->timeout = newTimeout;
-            sock->impl()->monitoredEvents[eventType].aioHelperData->markedForRemoval.store(0);
+bool AioTaskQueue::pushAddSocketTaskIfNeeded(
+    Pollable* sock,
+    aio::EventType eventToWatch,
+    AIOEventHandler* eventHandler,
+    std::chrono::milliseconds timeout,
+    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
+{
+    bool reverseTaskCancelled = false;
+    std::deque<SocketAddRemoveTask> tasksToRemove;
+    const auto taskType = detail::TaskType::tAdding;
 
-            toRemove.push_back(std::move(*it));
-            m_pollSetModificationQueue.erase(it);
-            return true;
-        }
-        else if (taskType == TaskType::tRemoving &&
-            (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout))
-        {
-            //if( it->type == TaskType::tChangingTimeout ) cancelling scheduled tasks, since socket removal from poll is requested
-            const TaskType foundTaskType = it->type;
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
-            //cancelling adding socket
-            toRemove.push_back(std::move(*it));
-            it = m_pollSetModificationQueue.erase(it);
+    // TODO: #akolesnikov Make following check complexity constant-time.
+    if (taskExists(lock, sock, eventToWatch, taskType))
+        return false;
 
-            //removing futher tChangingTimeout tasks
-            for (;
-                it != m_pollSetModificationQueue.end();
-                )
-            {
-                if (it->socket == sock && it->eventType == eventType)
-                {
-                    NX_ASSERT(it->type == TaskType::tChangingTimeout);
-                    toRemove.push_back(std::move(*it));
-                    it = m_pollSetModificationQueue.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
+    // Checking queue for reverse task for sock.
+    std::tie(reverseTaskCancelled, tasksToRemove) =
+        takeReverseTasksToRemove(lock, sock, eventToWatch, taskType, eventHandler, timeout);
 
-            if (foundTaskType == TaskType::tAdding)
-                return true;
-            else
-                return false;   //foundTaskEventType == TaskType::tChangingTimeout
-        }
-    }
+    if (reverseTaskCancelled)
+        return false;
 
-    return false;
+    addTask(
+        lock,
+        detail::SocketAddRemoveTask(
+            taskType,
+            sock,
+            eventToWatch,
+            eventHandler,
+            timeout,
+            nullptr,
+            std::move(socketAddedToPollHandler)));
+
+    return true;
 }
 
 std::size_t AioTaskQueue::newReadMonitorTaskCount() const
@@ -434,6 +404,108 @@ qint64 AioTaskQueue::getMonotonicTime()
 
 //-------------------------------------------------------------------------------------------------
 // private section.
+
+void AioTaskQueue::addTask(
+    const nx::Locker<nx::Mutex>&,
+    SocketAddRemoveTask task)
+{
+    m_pollSetModificationQueue.push_back(std::move(task));
+
+    if (task.type == TaskType::tAdding)
+    {
+        if (task.eventType == aio::etRead)
+            ++m_newReadMonitorTaskCount;
+        else if (task.eventType == aio::etWrite)
+            ++m_newWriteMonitorTaskCount;
+    }
+}
+
+bool AioTaskQueue::taskExists(
+    const nx::Locker<nx::Mutex>&,
+    Pollable* sock,
+    aio::EventType eventType,
+    TaskType taskType) const
+{
+    return std::any_of(
+        m_pollSetModificationQueue.begin(), m_pollSetModificationQueue.end(),
+        [sock, eventType, taskType](const auto& task)
+        {
+            return task.socket == sock && task.eventType == eventType && task.type == taskType;
+        });
+}
+
+std::tuple<bool, std::deque<SocketAddRemoveTask>> AioTaskQueue::takeReverseTasksToRemove(
+    const nx::Locker<nx::Mutex>&,
+    Pollable* sock,
+    aio::EventType eventType,
+    TaskType taskType,
+    AIOEventHandler* eventHandler,
+    std::chrono::milliseconds newTimeout)
+{
+    // NOTE: Freeing tasks with no mutex lock since user handler destruction may produce
+    // a recursive call to this object.
+    std::deque<SocketAddRemoveTask> toRemove;
+
+    for (auto it = m_pollSetModificationQueue.begin();
+        it != m_pollSetModificationQueue.end();
+        ++it)
+    {
+        if (!(it->socket == sock && it->eventType == eventType && taskType != it->type))
+            continue;
+
+        //removing reverse task (if any)
+        if (taskType == TaskType::tAdding && it->type == TaskType::tRemoving)
+        {
+            //cancelling removing socket
+            if (eventHandler != it->eventHandler)
+                continue;   //event handler changed, cannot ignore task
+            //cancelling remove task
+
+            NX_ASSERT(sock->impl()->monitoredEvents[eventType].aioHelperData);
+            sock->impl()->monitoredEvents[eventType].aioHelperData->timeout = newTimeout;
+            sock->impl()->monitoredEvents[eventType].aioHelperData->markedForRemoval.store(0);
+
+            toRemove.push_back(std::move(*it));
+            m_pollSetModificationQueue.erase(it);
+            return std::make_tuple(true, std::move(toRemove));
+        }
+        else if (taskType == TaskType::tRemoving &&
+            (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout))
+        {
+            //if( it->type == TaskType::tChangingTimeout )
+            //    cancelling scheduled tasks, since socket removal from poll is requested.
+            const TaskType foundTaskType = it->type;
+
+            //cancelling adding socket
+            toRemove.push_back(std::move(*it));
+            it = m_pollSetModificationQueue.erase(it);
+
+            //removing futher tChangingTimeout tasks
+            for (;
+                it != m_pollSetModificationQueue.end();
+                )
+            {
+                if (it->socket == sock && it->eventType == eventType)
+                {
+                    NX_ASSERT(it->type == TaskType::tChangingTimeout);
+                    toRemove.push_back(std::move(*it));
+                    it = m_pollSetModificationQueue.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+
+            if (foundTaskType == TaskType::tAdding)
+                return std::make_tuple(true, std::move(toRemove));
+            else
+                return std::make_tuple(false, std::move(toRemove));   //foundTaskEventType == TaskType::tChangingTimeout
+        }
+    }
+
+    return std::make_tuple(false, std::move(toRemove));
+}
 
 void AioTaskQueue::processAddTask(
     const nx::Locker<nx::Mutex>& lock,
