@@ -166,6 +166,17 @@ inline double qMod(double l, double r) {
  * \param step                          Rounding step, must be positive.
  * \returns                             Rounded value.
  */
+template<typename T>
+requires std::is_integral_v<T>
+T qCeil(T value, T step)
+{
+    auto remainder = value % step;
+    if (remainder == 0)
+        return value;
+
+    return value - remainder + step;
+}
+
 template<class T, class Step>
 T qCeil(T value, Step step)
 {
@@ -179,12 +190,20 @@ T qCeil(T value, Step step)
  * \param step                          Rounding step, must be positive.
  * \returns                             Rounded value.
  */
+template<typename T>
+requires std::is_integral_v<T>
+T qFloor(T value, T step)
+{
+    return value - value % step;
+}
+
 template<class T, class Step>
 T qFloor(T value, Step step)
 {
     NX_ASSERT(step > 0);
     return value - qMod(value, static_cast<T>(step));
 }
+
 
 /**
  * \param value                         Value to round.
