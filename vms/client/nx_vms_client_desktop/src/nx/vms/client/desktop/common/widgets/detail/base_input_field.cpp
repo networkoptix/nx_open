@@ -49,6 +49,7 @@ public:
     void setLastValidationResult(ValidationResult result);
     void setAcceptableValidationResult();
     void setIntermediateValidationResult();
+    void setInvalidValidationResult();
 
     void updateStateWhileActive();
     void updateVisualStateDelayed();
@@ -191,6 +192,11 @@ void BaseInputFieldPrivate::setAcceptableValidationResult()
 void BaseInputFieldPrivate::setIntermediateValidationResult()
 {
     setLastValidationResult(ValidationResult(QValidator::Intermediate));
+}
+
+void BaseInputFieldPrivate::setInvalidValidationResult()
+{
+    setLastValidationResult(ValidationResult(QValidator::Invalid));
 }
 
 bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
@@ -544,6 +550,12 @@ void BaseInputField::setIntermediateValidationResult()
 {
     Q_D(BaseInputField);
     d->setIntermediateValidationResult();
+}
+
+void BaseInputField::setInvalidValidationResult()
+{
+    Q_D(BaseInputField);
+    d->setInvalidValidationResult();
 }
 
 ValidationResult BaseInputField::calculateValidationResult() const

@@ -418,6 +418,11 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
                 {
                     setConfigurationStatus(Error);
                     setConfigurationStatusHint(smtpErrorCodeToString(result.data.errorCode));
+                    if (result.data.errorCode == email::SmtpError::authenticationFailed)
+                    {
+                        ui->userInput->setInvalidValidationResult();
+                        ui->passwordInput->setInvalidValidationResult();
+                    }
                 }
             }
             else
@@ -594,7 +599,7 @@ QString OutgoingMailSettingsWidget::Private::smtpErrorCodeToString(nx::email::Sm
             return tr("Connection timed out");
 
         case SmtpError::authenticationFailed:
-            return tr("Authentication failed");
+            return tr("Username or Password are incorrect");
 
         default:
             return tr("Unknown error");

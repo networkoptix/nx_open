@@ -87,6 +87,7 @@ public:
 
 public:
     void setIntermediateValidationResult();
+    void setInvalidValidationResult();
 
     virtual ValidationResult calculateValidationResult() const;
 
