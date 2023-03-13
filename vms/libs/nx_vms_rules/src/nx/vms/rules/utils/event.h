@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../rules_fwd.h"
+#include "../basic_event.h"
 
 namespace nx::vms::rules {
 
@@ -16,5 +16,7 @@ inline bool isInstant(const EventPtr& event)
 {
     return event->state() == State::instant;
 }
+
+NX_VMS_RULES_API bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor);
 
 } // namespace nx::vms::rules

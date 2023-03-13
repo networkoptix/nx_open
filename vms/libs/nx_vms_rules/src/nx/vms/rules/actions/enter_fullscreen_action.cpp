@@ -2,7 +2,6 @@
 
 #include "enter_fullscreen_action.h"
 
-#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_layout_field.h"
 #include "../action_builder_fields/target_single_device_field.h"
 #include "../utils/field.h"
@@ -20,7 +19,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
-            makeFieldDescriptor<OptionalTimeField>(utils::kPlaybackTimeFieldName, tr("Playback Time")),
+            utils::makePlaybackFieldDescriptor(tr("Playback Time")),
         }
     };
     return kDescriptor;

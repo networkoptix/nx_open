@@ -52,7 +52,7 @@ vms::rules::ActionBuilder* ParamsWidget::actionBuilder() const
 
 std::optional<vms::rules::ItemDescriptor> ParamsWidget::eventDescriptor() const
 {
-    return m_rule->actionDescriptor();
+    return m_rule->eventDescriptor();
 }
 
 vms::rules::EventFilter* ParamsWidget::eventFilter() const

@@ -11,6 +11,14 @@
 
 namespace nx::vms::rules::utils {
 
+namespace {
+
+constexpr auto kDefaultDurationValue = std::chrono::seconds{5};
+constexpr auto kDefaultIntervalValue = std::chrono::seconds{60};
+constexpr auto kDefaultPlaybackValue = std::chrono::seconds{1};
+
+} // namespace
+
 FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
     const QString& description)
@@ -19,7 +27,7 @@ FieldDescriptor makeIntervalFieldDescriptor(
         kIntervalFieldName,
         displayName,
         description,
-        {});
+        {{"value", QVariant::fromValue(kDefaultIntervalValue)}});
 }
 
 FieldDescriptor makeDurationFieldDescriptor(
@@ -30,7 +38,18 @@ FieldDescriptor makeDurationFieldDescriptor(
         kDurationFieldName,
         displayName,
         description,
-        {});
+        {{"value", QVariant::fromValue(kDefaultDurationValue)}});
+}
+
+FieldDescriptor makePlaybackFieldDescriptor(
+    const QString& displayName,
+    const QString& description)
+{
+    return makeFieldDescriptor<OptionalTimeField>(
+        kPlaybackTimeFieldName,
+        displayName,
+        description,
+        {{"value", QVariant::fromValue(kDefaultPlaybackValue)}});
 }
 
 FieldDescriptor makeStateFieldDescriptor(

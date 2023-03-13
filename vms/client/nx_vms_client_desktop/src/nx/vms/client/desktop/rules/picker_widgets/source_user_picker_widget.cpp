@@ -29,32 +29,31 @@ void SourceUserPicker::onDescriptorSet()
     if (nx::vms::rules::utils::type<nx::vms::rules::SoftTriggerEvent>()
         == parentParamsWidget()->descriptor().id)
     {
-        m_validationPolicy.reset(new QnRequiredPermissionSubjectPolicy{
+        m_validationPolicy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
             systemContext(),
             Qn::SoftTriggerPermission,
-            tr("Soft trigger")});
+            tr("Soft trigger"));
     }
     else
     {
-        m_validationPolicy.reset(new QnDefaultSubjectValidationPolicy);
+        m_validationPolicy = std::make_unique<QnDefaultSubjectValidationPolicy>();
     }
 }
 
 void SourceUserPicker::onSelectButtonClicked()
 {
     auto field = theField();
-    auto selectedUsers = field->ids();
 
     ui::SubjectSelectionDialog dialog(this);
-    dialog.setValidationPolicy(m_validationPolicy.get());
+    dialog.setCheckedSubjects(field->ids());
     dialog.setAllUsers(field->acceptAll());
-    dialog.setCheckedSubjects(selectedUsers);
+    dialog.setValidationPolicy(m_validationPolicy.get());
 
     if (dialog.exec() == QDialog::Rejected)
         return;
 
     field->setAcceptAll(dialog.allUsers());
-    field->setIds(dialog.totalCheckedUsers());
+    field->setIds(dialog.checkedSubjects());
 }
 
 void SourceUserPicker::updateUi()

@@ -103,7 +103,7 @@ QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
 const ItemDescriptor& AnalyticsEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.analytics",
+        .id = utils::type<AnalyticsEvent>(),
         .displayName = tr("Analytics Event"),
         .description = "",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},

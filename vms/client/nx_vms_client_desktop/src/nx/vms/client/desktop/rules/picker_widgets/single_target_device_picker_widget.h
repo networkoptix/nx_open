@@ -12,6 +12,7 @@
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
 
 #include "picker_widget_strings.h"
@@ -61,7 +62,17 @@ private:
     void updateUi() override
     {
         auto field = theField();
-        if (Policy::canUseSourceCamera() && field->useSource())
+        const auto canUseSource = Policy::canUseSourceCamera();
+        const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
+        const auto useSource = field->useSource();
+
+        if (canUseSource && useSource && !hasSource)
+        {
+            field->setUseSource(false);
+            return;
+        }
+
+        if (canUseSource && useSource)
         {
             m_selectButton->setText(CameraPickerStrings::sourceCameraString());
             m_selectButton->setIcon(Skin::maximumSizePixmap(
@@ -83,10 +94,13 @@ private:
                 /*correctDevicePixelRatio*/ false));
         }
 
-        if (Policy::canUseSourceCamera())
+        if (canUseSource)
         {
+            m_checkBox->setEnabled(hasSource);
+            m_selectButton->setEnabled(!useSource);
+
             const QSignalBlocker blocker{m_checkBox};
-            m_checkBox->setChecked(field->useSource());
+            m_checkBox->setChecked(useSource);
         }
     }
 

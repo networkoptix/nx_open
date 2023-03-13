@@ -22,11 +22,6 @@ private:
     {
         NumberPicker<vms::rules::FpsField>::updateUi();
 
-        updateMinMax();
-    }
-
-    void updateMinMax()
-    {
         auto targetDeviceField = getActionField<vms::rules::TargetDeviceField>(
             vms::rules::utils::kDeviceIdsFieldName);
 
@@ -50,6 +45,7 @@ private:
         }
 
         m_spinBox->setMinimum(maxFps > 0 ? 1 : 0);
+        m_spinBox->setEnabled(!cameras.empty());
     }
 };
 

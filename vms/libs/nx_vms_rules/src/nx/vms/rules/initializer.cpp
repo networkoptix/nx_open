@@ -80,6 +80,7 @@ void Initializer::registerFields() const
         [this] { return new AnalyticsObjectTypeField(this->m_context); });
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
+    registerEventField<DummyField>();
     registerEventField<EventTextField>();
     registerEventField<ExpectedUuidField>();
     registerEventField<InputPortField>();
