@@ -10,6 +10,7 @@
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -93,7 +94,7 @@ QString SoftTriggerEvent::extendedCaption(common::SystemContext* context) const
 const ItemDescriptor& SoftTriggerEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.softTrigger",
+        .id = utils::type<SoftTriggerEvent>(),
         .displayName = tr("Soft Trigger"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {

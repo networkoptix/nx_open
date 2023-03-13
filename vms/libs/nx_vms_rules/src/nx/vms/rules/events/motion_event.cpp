@@ -39,7 +39,7 @@ QString MotionEvent::extendedCaption(common::SystemContext* context) const
 const ItemDescriptor& MotionEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.motion",
+        .id = utils::type<MotionEvent>(),
         .displayName = tr("Motion on Camera"),
         .flags = ItemFlag::prolonged,
         .fields = {

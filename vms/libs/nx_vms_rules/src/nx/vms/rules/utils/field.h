@@ -41,7 +41,7 @@ FieldDescriptor makePlaybackFieldDescriptor(
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
     const QString& description = {},
-    const QVariantMap& properties = {});
+    vms::rules::State defaultState = vms::rules::State::started);
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,

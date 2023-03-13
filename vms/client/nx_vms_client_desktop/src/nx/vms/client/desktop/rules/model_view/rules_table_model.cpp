@@ -315,7 +315,11 @@ void SimplifiedRule::watchOn(QObject* object) const
         if (!metaProperty.hasNotifySignal())
             continue;
 
-        connect(object, metaProperty.notifySignal(), this, updateMetaMethod);
+        // A queued connection is used because field value validation occurs while the field is
+        // displayed. It may lead to the field value changing, which in turn tends to emit the
+        // signal again before the field display function ends, which may lead to troubles.
+        // TODO: #mmalofeev consider more convenient way to validate fields.
+        connect(object, metaProperty.notifySignal(), this, updateMetaMethod, Qt::QueuedConnection);
     }
 }
 

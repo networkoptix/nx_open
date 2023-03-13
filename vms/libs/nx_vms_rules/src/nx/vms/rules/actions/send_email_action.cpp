@@ -6,13 +6,14 @@
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../utils/field.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
 const ItemDescriptor& SendEmailAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.actions.sendEmail",
+        .id = utils::type<SendEmailAction>(),
         .displayName = tr("Send email"),
         .description = "",
         .fields = {

@@ -4,6 +4,7 @@
 
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -34,7 +35,7 @@ QString BackupFinishedEvent::extendedCaption(common::SystemContext* context) con
 const ItemDescriptor& BackupFinishedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.archiveBackupFinished",
+        .id = utils::type<BackupFinishedEvent>(),
         .displayName = tr("Backup Finished"),
         .permissions = {.globalPermission = GlobalPermission::admin},
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"

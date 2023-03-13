@@ -11,6 +11,7 @@
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -52,7 +53,7 @@ QString LicenseIssueEvent::extendedCaption(common::SystemContext* context) const
 const ItemDescriptor& LicenseIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.licenseIssue",
+        .id = utils::type<LicenseIssueEvent>(),
         .displayName = tr("License Issue"),
         .permissions = {
             .resourcePermissions = {{utils::kDeviceIdsFieldName, Qn::ViewContentPermission}}

@@ -11,7 +11,6 @@
 #include "../event_filter_fields/analytics_object_attributes_field.h"
 #include "../event_filter_fields/keywords_field.h"
 #include "../event_filter_fields/source_camera_field.h"
-#include "../event_filter_fields/state_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -102,6 +101,7 @@ QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
 
 const ItemDescriptor& AnalyticsEvent::manifest()
 {
+    static const QString kKeywordFieldDescription = tr("Keywords separated by space");
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsEvent>(),
         .displayName = tr("Analytics Event"),
@@ -112,8 +112,9 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
             makeFieldDescriptor<AnalyticsEventTypeField>(
                 "eventTypeId", tr("Event Type"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
-            makeFieldDescriptor<KeywordsField>("description", tr("Description")),
+            makeFieldDescriptor<KeywordsField>("caption", tr("Caption"), kKeywordFieldDescription),
+            makeFieldDescriptor<KeywordsField>(
+                "description", tr("Description"), kKeywordFieldDescription),
             // TODO: #amalov Consider adding following fields in 5.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },

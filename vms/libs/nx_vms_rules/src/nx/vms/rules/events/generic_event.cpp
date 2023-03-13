@@ -4,10 +4,9 @@
 
 #include "../event_filter_fields/dummy_field.h"
 #include "../event_filter_fields/keywords_field.h"
-#include "../event_filter_fields/state_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
-#include "../utils/string_helper.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -66,7 +65,7 @@ const ItemDescriptor& GenericEvent::manifest()
 {
     static const QString kKeywordFieldDescription = tr("Keywords separated by space");
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.generic",
+        .id = utils::type<GenericEvent>(),
         .displayName = tr("Generic Event"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
