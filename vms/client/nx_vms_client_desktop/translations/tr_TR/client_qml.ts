@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Tekrarı Değiştir</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL veya Ana Bilgisayar: Bağlantı Noktası</translation>
     </message>
     <message>
       <source>Login</source>
