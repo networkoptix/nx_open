@@ -50,7 +50,7 @@ QString ServerFailureEvent::uniqueName() const
         QString::number(static_cast<int>(reason())));
 }
 
-QString ServerFailureEvent::reason(common::SystemContext* context) const
+QString ServerFailureEvent::reason(common::SystemContext* /*context*/) const
 {
     using nx::vms::api::EventReason;
 

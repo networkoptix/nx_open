@@ -5,6 +5,7 @@
 #include "../event_filter_fields/int_field.h"
 #include "../event_filter_fields/text_field.h"
 #include "../utils/event_details.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -38,7 +39,7 @@ QString DebugEvent::description() const
 const ItemDescriptor& DebugEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.debug",
+        .id = utils::type<DebugEvent>(),
         .displayName = tr("Debug Event"),
         .description = "",
         .fields = {

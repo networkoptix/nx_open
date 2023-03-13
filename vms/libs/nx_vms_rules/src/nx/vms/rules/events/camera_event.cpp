@@ -9,7 +9,6 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../utils/event_details.h"
-#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {

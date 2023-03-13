@@ -8,7 +8,6 @@
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
 #include <nx/vms/rules/actions/bookmark_action.h>
-#include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/common/read_only.h>
@@ -173,36 +172,7 @@ private:
 
     void onStateChanged()
     {
-        if (m_checkBox->isChecked())
-        {
-            theField()->setValue(defaultValue());
-            if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
-            {
-                auto stateField = FieldPickerWidget<F>::template getEventField<vms::rules::StateField>(
-                    vms::rules::utils::kStateFieldName);
-                if (stateField && stateField->value() == vms::api::rules::State::none)
-                {
-                    const bool isInstantEvent =
-                        parentParamsWidget()->eventDescriptor()->flags.testFlag(
-                            vms::rules::ItemFlag::instant);
-                    stateField->setValue(isInstantEvent
-                        ? vms::api::rules::State::instant
-                        : vms::api::rules::State::started);
-                }
-            }
-        }
-        else
-        {
-            theField()->setValue(F::value_type::zero());
-
-            if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
-            {
-                auto stateField = FieldPickerWidget<F>::template getEventField<vms::rules::StateField>(
-                    vms::rules::utils::kStateFieldName);
-                if (stateField)
-                    stateField->setValue(vms::api::rules::State::none);
-            }
-        }
+        theField()->setValue(m_checkBox->isChecked() ? defaultValue() : F::value_type::zero());
     }
 };
 

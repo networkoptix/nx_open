@@ -52,7 +52,7 @@ QString StorageIssueEvent::uniqueName() const
         : utils::makeName(BasicEvent::uniqueName(), QString::number((int) m_reason), m_reasonText);
 }
 
-QString StorageIssueEvent::reason(common::SystemContext* context) const
+QString StorageIssueEvent::reason(common::SystemContext* /*context*/) const
 {
     using nx::vms::api::EventReason;
     const QString storageUrl = m_reasonText;

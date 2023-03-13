@@ -55,13 +55,13 @@ FieldDescriptor makePlaybackFieldDescriptor(
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
     const QString& description,
-    const QVariantMap& properties)
+    vms::rules::State defaultState)
 {
     return makeFieldDescriptor<StateField>(
         kStateFieldName,
         displayName,
         description,
-        properties);
+        {{"value", QVariant::fromValue(defaultState)}});
 }
 
 FieldDescriptor makeExtractDetailFieldDescriptor(

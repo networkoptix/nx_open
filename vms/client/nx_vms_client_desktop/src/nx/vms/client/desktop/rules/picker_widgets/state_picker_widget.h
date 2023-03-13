@@ -44,14 +44,39 @@ protected:
 
     void updateUi() override
     {
-        const auto state = theField()->value();
-        QSignalBlocker blocker{m_comboBox};
-        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(state)));
+        const auto actionDescriptor = parentParamsWidget()->actionDescriptor();
+        const auto hasProlongedFlag = actionDescriptor->flags.testFlag(vms::rules::ItemFlag::prolonged);
 
         const auto durationField =
             getActionField<vms::rules::OptionalTimeField>(vms::rules::utils::kDurationFieldName);
-        this->setVisible(!durationField
-            || durationField->value() != vms::rules::OptionalTimeField::value_type::zero());
+        const auto hasDuration = durationField
+            && durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
+
+        const auto isProlonged = hasProlongedFlag && !hasDuration;
+
+        const auto state = theField()->value();
+
+        if (isProlonged && state != api::rules::State::none)
+        {
+            theField()->setValue(api::rules::State::none);
+            return;
+        }
+
+        if (!isProlonged && state == api::rules::State::none)
+        {
+            const auto defaultValue =
+                m_fieldDescriptor->properties.value("value").value<api::rules::State>();
+
+            NX_ASSERT(defaultValue != api::rules::State::none);
+
+            theField()->setValue(defaultValue);
+            return;
+        }
+
+        this->setVisible(!isProlonged);
+
+        QSignalBlocker blocker{m_comboBox};
+        m_comboBox->setCurrentIndex(m_comboBox->findData(QVariant::fromValue(state)));
     }
 
     void onCurrentIndexChanged() override
