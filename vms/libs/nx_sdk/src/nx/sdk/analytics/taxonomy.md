@@ -383,3 +383,14 @@ override the same Attribute and declare it as a supported one.
     - A nested (aggregated) Object of the specified `"subtype"` Object type, or of any type (if
         `"subtype"` is omitted). 
     - Can be null, which is equivalent to the omitted attribute.
+    - The following rules are used to represent a nested Object in the Attribute values of a
+        particular instance of the owner (outer) Object:
+        - For each Attribute of an inner Object, an Attribute with the required type and the name
+            `<ownerAttributeName>.<innerAttributeName>` defines its value.
+        - Additionally, there may be a boolean Attribute with the name `<ownerAttributeName>`.
+            - If it equals `true`, the nested Object is considered present.
+            - If it equals `false`, the nested Object is considered omitted (null).
+            - If it is omitted, the presence of the nested Object is deduced by the presence of any
+                of its individual Attributes.
+        - NOTE: This scheme allows for an instance that contains a nested Object which has no
+            Attribute values, but the Object itself is considered to be present.
