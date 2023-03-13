@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Açık kaynak kitaplıkları</translation>
     </message>
   </context>
   <context>
@@ -194,15 +194,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Arşivi Şunun İçin Sakla...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Maks</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -283,15 +283,15 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Limit yok</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Sabit</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Zamanlanmış</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -311,7 +311,7 @@
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Yedek yok</translation>
     </message>
   </context>
   <context>
@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Akış Ayarları</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
@@ -615,7 +615,7 @@
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Eğim</translation>
     </message>
     <message>
       <source>Media Port</source>
@@ -635,7 +635,7 @@
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Kamera yerel ön ayarlarını kullan</translation>
     </message>
     <message>
       <source>Time Settings</source>
@@ -2757,7 +2757,7 @@
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Arşiv şifreleme</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
@@ -2811,7 +2811,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Sertifikayı veren</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2823,7 +2823,7 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Sertifikanın süresi doldu</translation>
     </message>
     <message>
       <source>Fingerprints</source>

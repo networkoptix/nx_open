@@ -221,7 +221,7 @@
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Sunucunun sertifikası geçersiz.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
@@ -229,11 +229,11 @@
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>sertifika detayları</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>yardım makalesi</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
