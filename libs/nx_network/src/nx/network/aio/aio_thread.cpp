@@ -41,66 +41,71 @@ void AioThread::startMonitoring(
     Pollable* const sock,
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
-    std::optional<std::chrono::milliseconds> timeoutMillis,
+    std::optional<std::chrono::milliseconds> timeout,
     nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
-    if (!timeoutMillis)
+    if (!timeout)
     {
-        timeoutMillis = std::chrono::milliseconds::zero();
-        if (!getSocketTimeout(sock, eventToWatch, &(*timeoutMillis)))
+        timeout = std::chrono::milliseconds::zero();
+        if (!getSocketTimeout(sock, eventToWatch, &(*timeout)))
         {
             post(
                 sock,
-                std::bind(&AIOEventHandler::eventTriggered, eventHandler, sock, aio::etError));
+                [eventHandler, sock]() { eventHandler->eventTriggered(sock, aio::etError); });
             return;
         }
     }
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
     if (sock->impl()->monitoredEvents[eventToWatch].isUsed)
     {
-        sock->impl()->monitoredEvents[eventToWatch].timeout = timeoutMillis;
-        changeSocketTimeout(
-            lock,
+        sock->impl()->monitoredEvents[eventToWatch].timeout = timeout;
+
+        m_taskQueue->addTask(detail::SocketAddRemoveTask(
+            detail::TaskType::tChangingTimeout,
             sock,
             eventToWatch,
             eventHandler,
-            *timeoutMillis);
+            *timeout,
+            nullptr,
+            std::move(socketAddedToPollHandler)));
     }
     else
     {
         sock->impl()->monitoredEvents[eventToWatch].isUsed = true;
-        startMonitoringInternal(
-            lock,
-            sock,
-            eventToWatch,
-            eventHandler,
-            *timeoutMillis,
-            std::move(socketAddedToPollHandler));
+
+        if (!m_taskQueue->pushAddSocketTaskIfNeeded(
+                sock, eventToWatch, eventHandler, *timeout, std::move(socketAddedToPollHandler)))
+        {
+            // No need to push task.
+            return;
+        }
     }
+
+    // If eventTriggered is down the stack, socket will be added to pollset before next poll call.
+    if (currentThreadSystemId() != systemThreadId())
+        m_pollSet->interrupt();
 }
 
 void AioThread::stopMonitoring(
     Pollable* const sock,
     aio::EventType eventType)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!sock->impl()->monitoredEvents[eventType].isUsed)
+        return;
 
-    if (sock->impl()->monitoredEvents[eventType].isUsed)
-    {
-        sock->impl()->monitoredEvents[eventType].isUsed = false;
-        stopMonitoringInternal(
-            &lock,
-            sock,
-            eventType);
-    }
+    sock->impl()->monitoredEvents[eventType].isUsed = false;
+
+    stopMonitoringInternal(sock, eventType);
 }
 
 void AioThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    post(lock, sock, std::move(functor));
+    m_taskQueue->addTask(
+        detail::PostAsyncCallTask(sock, std::move(functor)));
+
+    // If eventTriggered is lower on stack, socket will be added to pollset before the next poll call.
+    if (currentThreadSystemId() != systemThreadId())
+        m_pollSet->interrupt();
 }
 
 void AioThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
@@ -121,8 +126,8 @@ void AioThread::cancelPostedCalls(Pollable* const sock)
     if (inAIOThread)
     {
         // Removing postedCall tasks and posted calls.
-        auto postedCallsToRemove = m_taskQueue->cancelPostedCalls(
-            sock->impl()->socketSequence);
+        auto postedCallsToRemove =
+            m_taskQueue->cancelPostedCalls(sock->impl()->socketSequence);
         return;
     }
 
@@ -131,8 +136,8 @@ void AioThread::cancelPostedCalls(Pollable* const sock)
     // Posting cancellation task
     m_taskQueue->addTask(
         detail::CancelPostedCallsTask(
-            sock->impl()->socketSequence, //< Not passing socket here since it is allowed to be removed
-                                          // before posted call is actually cancelled.
+            sock->impl()->socketSequence, //< Not passing socket here since it is allowed to be
+                                          // removed before posted call is actually cancelled.
             nullptr));
     m_pollSet->interrupt();
 
@@ -283,40 +288,7 @@ bool AioThread::getSocketTimeout(
     return true;
 }
 
-void AioThread::startMonitoringInternal(
-    const nx::Locker<nx::Mutex>& /*lock*/,
-    Pollable* const sock,
-    aio::EventType eventToWatch,
-    AIOEventHandler* const eventHandler,
-    std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
-{
-    // TODO: #akolesnikov Make following check complexity constant-time.
-    if (m_taskQueue->taskExists(sock, eventToWatch, detail::TaskType::tAdding))
-        return;
-
-    // Checking queue for reverse task for sock.
-    if (m_taskQueue->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeout))
-        return;    //< Ignoring task.
-
-    m_taskQueue->addTask(detail::SocketAddRemoveTask(
-        detail::TaskType::tAdding,
-        sock,
-        eventToWatch,
-        eventHandler,
-        timeout,
-        nullptr,
-        std::move(socketAddedToPollHandler)));
-
-    // If eventTriggered is down the stack, socket will be added to pollset before next poll call.
-    if (currentThreadSystemId() != systemThreadId())
-        m_pollSet->interrupt();
-}
-
-void AioThread::stopMonitoringInternal(
-    nx::Locker<nx::Mutex>* lock,
-    Pollable* const sock,
-    aio::EventType eventType)
+void AioThread::stopMonitoringInternal(Pollable* sock, aio::EventType eventType)
 {
     // Checking queue for reverse task for sock.
     if (m_taskQueue->removeReverseTask(
@@ -339,7 +311,6 @@ void AioThread::stopMonitoringInternal(
     // inAIOThread is false in case async operation cancellation. In most cases, inAIOThread is true.
     if (inAIOThread)
     {
-        lock->unlock();
         // Removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack).
         m_taskQueue->removeSocketFromPollSet(sock, eventType);
         return;
@@ -359,47 +330,9 @@ void AioThread::stopMonitoringInternal(
 
     // We can be sure that socket will be removed before next poll.
 
-    lock->unlock();
-
     // Waiting for socket to be removed from pollset.
     while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
-        msleep(0); // Yield. TODO #akolesnikov Probably, it is better to replace it with conditional_variable.
-
-    lock->relock();
-}
-
-void AioThread::changeSocketTimeout(
-    const nx::Locker<nx::Mutex>& /*lock*/,
-    Pollable* const sock,
-    aio::EventType eventToWatch,
-    AIOEventHandler* const eventHandler,
-    std::chrono::milliseconds timeout,
-    std::function<void()> socketAddedToPollHandler)
-{
-    m_taskQueue->addTask(detail::SocketAddRemoveTask(
-        detail::TaskType::tChangingTimeout,
-        sock,
-        eventToWatch,
-        eventHandler,
-        timeout,
-        nullptr,
-        std::move(socketAddedToPollHandler)));
-    // If eventTriggered call is down the stack, socket will be added to pollset before next poll call.
-    if (currentThreadSystemId() != systemThreadId())
-        m_pollSet->interrupt();
-}
-
-void AioThread::post(
-    const nx::Locker<nx::Mutex>& /*lock*/,
-    Pollable* const sock,
-    nx::utils::MoveOnlyFunc<void()> functor)
-{
-    m_taskQueue->addTask(
-        detail::PostAsyncCallTask(sock, std::move(functor)));
-
-    // If eventTriggered is lower on stack, socket will be added to pollset before the next poll call.
-    if (currentThreadSystemId() != systemThreadId())
-        m_pollSet->interrupt();
+        std::this_thread::yield(); // TODO #akolesnikov Probably, it is better to replace it with conditional_variable.
 }
 
 } // namespace nx::network::aio
