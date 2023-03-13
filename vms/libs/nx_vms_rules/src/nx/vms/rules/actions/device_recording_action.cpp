@@ -26,7 +26,11 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
             makeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
             makeFieldDescriptor<TimeField>(
-                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording")),
+                vms::rules::utils::kRecordAfterFieldName,
+                tr("Post-recording"),
+                {},
+                {},
+                {utils::kDurationFieldName}),
         }
     };
     return kDescriptor;

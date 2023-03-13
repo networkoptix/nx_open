@@ -8,8 +8,10 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/field.h>
 
+#include "../params_widgets/common_params_widget.h"
 #include "picker_widget_strings.h"
 #include "resource_picker_widget_base.h"
 
@@ -89,10 +91,19 @@ protected:
     void updateUi() override
     {
         auto field = theField();
-        auto resources =
+        const auto useSource = field->useSource();
+        const auto hasSource = vms::rules::hasSourceCamera(*parentParamsWidget()->eventDescriptor());
+
+        if (useSource && !hasSource)
+        {
+            field->setUseSource(false);
+            return;
+        }
+
+        const auto resources =
             resourcePool()->template getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
-        if (field->useSource())
+        if (useSource)
         {
             m_selectButton->setText(CameraPickerStrings::sourceCameraString(resources.size()));
             m_selectButton->setIcon(Skin::maximumSizePixmap(
@@ -120,8 +131,10 @@ protected:
                 /*correctDevicePixelRatio*/ false));
         }
 
+        m_checkBox->setEnabled(hasSource);
+
         QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(field->useSource());
+        m_checkBox->setChecked(useSource);
     }
 
 private:
@@ -130,6 +143,7 @@ private:
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::m_selectButton;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::connect;
     using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::resourcePool;
+    using CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::parentParamsWidget;
 
     QCheckBox* m_checkBox{nullptr};
 

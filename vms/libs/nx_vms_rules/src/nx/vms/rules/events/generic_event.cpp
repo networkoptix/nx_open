@@ -2,8 +2,9 @@
 
 #include "generic_event.h"
 
-#include "../event_filter_fields/state_field.h"
+#include "../event_filter_fields/dummy_field.h"
 #include "../event_filter_fields/keywords_field.h"
+#include "../event_filter_fields/state_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -75,6 +76,8 @@ const ItemDescriptor& GenericEvent::manifest()
             makeFieldDescriptor<KeywordsField>("description",
                 tr("Description"),
                 kKeywordFieldDescription),
+
+            makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)
         },
         .permissions = {
             .resourcePermissions = {

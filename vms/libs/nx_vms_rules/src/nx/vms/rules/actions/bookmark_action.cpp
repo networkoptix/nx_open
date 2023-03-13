@@ -23,7 +23,10 @@ const ItemDescriptor& BookmarkAction::manifest()
             makeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
             makeFieldDescriptor<TimeField>(
-                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording")),
+                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording"),
+                {},
+                {},
+                {utils::kDurationFieldName}),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine

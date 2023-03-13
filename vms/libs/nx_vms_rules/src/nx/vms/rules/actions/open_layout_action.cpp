@@ -3,7 +3,6 @@
 #include "open_layout_action.h"
 
 #include "../action_builder_fields/layout_field.h"
-#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -18,8 +17,7 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .flags = ItemFlag::instant,
         .fields = {
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            makeFieldDescriptor<OptionalTimeField>(
-                utils::kPlaybackTimeFieldName, tr("Playback Time")),
+            utils::makePlaybackFieldDescriptor(tr("Playback Time")),
             makeFieldDescriptor<LayoutField>("layoutId", tr("Layout")),
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Show to")),
         }

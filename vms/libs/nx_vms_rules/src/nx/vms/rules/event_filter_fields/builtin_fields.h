@@ -9,6 +9,7 @@
 #include "analytics_object_type_field.h"
 #include "customizable_icon_field.h"
 #include "customizable_text_field.h"
+#include "dummy_field.h"
 #include "expected_uuid_field.h"
 #include "input_port_field.h"
 #include "int_field.h"

@@ -34,6 +34,10 @@ FieldDescriptor makeDurationFieldDescriptor(
     const QString& displayName,
     const QString& description = {});
 
+FieldDescriptor makePlaybackFieldDescriptor(
+    const QString& displayName,
+    const QString& description = {});
+
 FieldDescriptor makeStateFieldDescriptor(
     const QString& displayName,
     const QString& description = {},

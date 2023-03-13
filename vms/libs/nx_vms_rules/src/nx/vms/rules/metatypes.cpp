@@ -82,6 +82,7 @@ void Metatypes::initialize()
     qRegisterMetaType<QnUuidSet>("QnUuidSet");
     QnJsonSerializer::registerSerializer<QnUuidSet>();
 
+    QnJsonSerializer::registerSerializer<std::chrono::seconds>();
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();
 };
 

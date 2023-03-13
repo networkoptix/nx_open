@@ -6,10 +6,12 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/action_builder_fields/time_field.h>
 #include <nx/vms/rules/actions/bookmark_action.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
+#include <ui/common/read_only.h>
 #include <ui/widgets/business/time_duration_widget.h>
 
 #include "picker_widget.h"
@@ -48,41 +50,43 @@ public:
 
 protected:
     PICKER_WIDGET_COMMON_USINGS
-    TimeDurationWidget* m_timeDurationWidget;
+    TimeDurationWidget* m_timeDurationWidget{nullptr};
 
     virtual void updateUi()
     {
+        auto field = theField();
+
+        if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kDurationFieldName))
+        {
+            const auto durationField =
+                FieldPickerWidget<F>::template getActionField<vms::rules::OptionalTimeField>(
+                    vms::rules::utils::kDurationFieldName);
+            if (!NX_ASSERT(durationField))
+                return;
+
+            const auto isRecordAfterField =
+                m_fieldDescriptor->fieldName == vms::rules::utils::kRecordAfterFieldName;
+            const auto hasDuration =
+                durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
+            if (isRecordAfterField && hasDuration && field->value() != F::value_type::zero())
+            {
+                field->setValue(F::value_type::zero());
+                return;
+            }
+
+            if (isRecordAfterField)
+                this->setVisible(!hasDuration);
+        }
+
         QSignalBlocker blocker{m_timeDurationWidget};
         m_timeDurationWidget->setValue(
-            std::chrono::duration_cast<std::chrono::seconds>(theField()->value()).count());
-
-        auto durationField =
-            FieldPickerWidget<F>::template getActionField<vms::rules::OptionalTimeField>(
-                vms::rules::utils::kDurationFieldName);
-
-        if (!durationField)
-            return;
-
-        // TODO: #mmalofeev add property to the manifest to be able check dependencies.
-        const bool isRecordingBeforeField =
-            m_fieldDescriptor->fieldName == vms::rules::utils::kRecordBeforeFieldName;
-        const bool isRecordingAfterField =
-            m_fieldDescriptor->fieldName == vms::rules::utils::kRecordAfterFieldName;
-        const bool belongsToBookmarkAction = parentParamsWidget()->descriptor().id
-            == vms::rules::utils::type<vms::rules::BookmarkAction>();
-        if ((isRecordingBeforeField && !belongsToBookmarkAction) || isRecordingAfterField)
-        {
-            if (durationField->value() == vms::rules::OptionalTimeField::value_type::zero())
-                this->setEnabled(true);
-            else
-                this->setEnabled(false);
-        }
+            std::chrono::duration_cast<std::chrono::seconds>(field->value()).count());
     }
 
 private:
     void onValueChanged()
     {
-        theField()->setValue(std::chrono::seconds(m_timeDurationWidget->value()));
+        theField()->setValue(std::chrono::seconds{m_timeDurationWidget->value()});
     }
 };
 
@@ -90,7 +94,7 @@ template<typename F>
 class OptionalDurationPicker: public DurationPicker<F>
 {
 public:
-    OptionalDurationPicker(QnWorkbenchContext* context, CommonParamsWidget* parent = nullptr):
+    OptionalDurationPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
         DurationPicker<F>(context, parent)
     {
         m_label->setVisible(false);
@@ -111,6 +115,11 @@ private:
     QCheckBox* m_checkBox{nullptr};
     bool m_isDurationField{false};
 
+    std::chrono::microseconds defaultValue() const
+    {
+        return m_fieldDescriptor->properties.value("value").template value<std::chrono::seconds>();
+    }
+
     virtual void onDescriptorSet() override
     {
         DurationPicker<F>::onDescriptorSet();
@@ -120,13 +129,19 @@ private:
 
     void updateUi() override
     {
-        DurationPicker<F>::updateUi();
+        auto field = theField();
+        const bool isProlonged =
+            parentParamsWidget()->eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::prolonged);
 
-        const bool isZero = theField()->value() == F::value_type::zero();
+        if (!isProlonged && field->value() == F::value_type::zero())
         {
-            const QSignalBlocker blocker{m_checkBox};
-            m_checkBox->setChecked(!isZero);
+            field->setValue(defaultValue());
+            return;
         }
+
+        setReadOnly(m_checkBox, !isProlonged);
+
+        DurationPicker<F>::updateUi();
 
         if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName
             || m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
@@ -151,17 +166,16 @@ private:
         {
             m_timeDurationWidget->setEnabled(m_checkBox->isChecked());
         }
+
+        const QSignalBlocker blocker{m_checkBox};
+        m_checkBox->setChecked(field->value() != F::value_type::zero());
     }
 
     void onStateChanged()
     {
-        // TODO if event has state field change it
         if (m_checkBox->isChecked())
         {
-            // Synced with the old rules dialog.
-            constexpr auto kDefaultValue = std::chrono::seconds(60);
-
-            theField()->setValue(kDefaultValue);
+            theField()->setValue(defaultValue());
             if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
             {
                 auto stateField = FieldPickerWidget<F>::template getEventField<vms::rules::StateField>(
