@@ -57,6 +57,10 @@ private:
     nx::vms::client::desktop::ToolButton* newActionButton(
         nx::vms::client::desktop::ui::action::IDType actionId,
         const QSize& fixedSize = QSize());
+
+    /** Creates Screen Recording indicator. Returns nullptr if the recording is not avaliable. */
+    QWidget* newRecordingIndicator(const QSize& fixedSize = QSize());
+
     void initMultiSystemTabBar();
     void initLayoutsOnlyTabBar();
 
