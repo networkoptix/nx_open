@@ -249,6 +249,7 @@ if(compilerMsvc)
         /MP
         /bigobj
         /Zc:inline
+        /Zc:preprocessor
 
         # Enable most warnings by default.
         /W4
