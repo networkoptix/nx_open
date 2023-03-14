@@ -52,10 +52,11 @@ CString GenerateGuid()
 
 LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 {
+    wchar_t ws[1];
     LPWSTR szValueBuf = NULL;
 
     DWORD dwSize=0;
-    UINT uiStat = MsiGetProperty(hInstall, name, TEXT(""), &dwSize);
+    UINT uiStat = MsiGetProperty(hInstall, name, ws, &dwSize);
     if (ERROR_MORE_DATA == uiStat && dwSize != 0)
     {
         dwSize++; // add 1 for terminating '\0'

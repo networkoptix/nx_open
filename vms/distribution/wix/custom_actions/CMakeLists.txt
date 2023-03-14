@@ -34,4 +34,4 @@ nx_add_target(wix_custom_actions LIBRARY
         Version
     FOLDER distribution
 )
-set_property(TARGET wix_custom_actions PROPERTY CXX_STANDARD 17)
+set_property(TARGET wix_custom_actions PROPERTY CXX_STANDARD 20)
