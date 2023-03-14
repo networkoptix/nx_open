@@ -243,7 +243,7 @@ Dialog
                     visible: dialog.testState != LdapSettings.TestState.initial
 
                     Layout.alignment: Qt.AlignTop
-                    Layout.topMargin: baselineOffset - testButton.baselineOffset
+                    Layout.topMargin: testButton.baselineOffset - baselineOffset
                     Layout.fillWidth: true
 
                     text: dialog.testState == LdapSettings.TestState.connecting
