@@ -443,9 +443,6 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
         connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
-        connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged, this,
-            &QnResourceAccessManager::updatePermissionsToResource);
-
         connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
