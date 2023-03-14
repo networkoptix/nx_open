@@ -79,34 +79,7 @@ public:
         ServerChangesFunction applyChanges,
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
-    /** Apply changes to the given user. */
-    void saveUser(const QnUserResourcePtr& user,
-        QnUserResource::DigestSupport digestSupport,
-        UserChangesFunction applyChanges,
-        SystemContext* systemContext,
-        UserCallbackFunction callback = UserCallbackFunction(),
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
-
-    /** Apply changes to the given users. */
-    void saveUsers(const QnUserResourceList& users,
-        QnUserResource::DigestSupport digestSupport = QnUserResource::DigestSupport::keep,
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
-
-    /** Save accessible rights for the given subject. */
-    void saveAccessRights(const QnResourceAccessSubject& subject,
-        const nx::core::access::ResourceAccessMap& accessRights,
-        AccessRightsCallbackFunction callback,
-        SystemContext* systemContext,
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
-
-    void saveUserRole(const nx::vms::api::UserRoleData& role,
-        SystemContext* systemContext,
-        RoleCallbackFunction callback = RoleCallbackFunction(),
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
-
-    void removeUserRole(const QnUuid& id,
-        SystemContext* systemContext,
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
+    /* User resource management is handled by UserGroupRequestChain class. */
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr& videoWall,
