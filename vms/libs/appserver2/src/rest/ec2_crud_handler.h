@@ -263,6 +263,7 @@ private:
             std::is_same_v<T, nx::vms::api::UserRoleDataList> ||
             std::is_same_v<T, nx::vms::api::LayoutDataList> ||
             std::is_same_v<T, nx::vms::api::ShowreelDataList> ||
+            std::is_same_v<T, nx::vms::api::LookupListDataList> ||
             std::is_same_v<T, nx::vms::api::VideowallDataList> ||
             std::is_same_v<T, nx::vms::api::LicenseDataList> ||
             std::is_same_v<T, nx::vms::api::CameraDataList> ||
@@ -288,6 +289,8 @@ private:
             return ApiCommand::Value::getLayouts;
         else if constexpr(std::is_same_v<T, nx::vms::api::ShowreelDataList>)
             return ApiCommand::Value::getShowreels;
+        else if constexpr (std::is_same_v<T, nx::vms::api::LookupListDataList>)
+            return ApiCommand::Value::getLookupLists;
         else if constexpr(std::is_same_v<T, nx::vms::api::VideowallDataList>)
             return ApiCommand::Value::getVideowalls;
         else if constexpr(std::is_same_v<T, nx::vms::api::LicenseDataList>)
@@ -328,6 +331,7 @@ private:
             std::is_same_v<T, nx::vms::api::UserDataEx> ||
             std::is_same_v<T, nx::vms::api::LayoutData> ||
             std::is_same_v<T, nx::vms::api::ShowreelData> ||
+            std::is_same_v<T, nx::vms::api::LookupListData> ||
             std::is_same_v<T, nx::vms::api::VideowallData> ||
             std::is_same_v<T, nx::vms::api::LicenseData> ||
             std::is_same_v<T, nx::vms::api::CameraData> ||
@@ -353,6 +357,8 @@ private:
             return ApiCommand::Value::saveLayout;
         else if constexpr (std::is_same_v<T, nx::vms::api::ShowreelData>)
             return ApiCommand::Value::saveShowreel;
+        else if constexpr (std::is_same_v<T, nx::vms::api::LookupListData>)
+            return ApiCommand::Value::saveLookupList;
         else if constexpr (std::is_same_v<T, nx::vms::api::VideowallData>)
             return ApiCommand::Value::saveVideowall;
         else if constexpr (std::is_same_v<T, nx::vms::api::LicenseData>)

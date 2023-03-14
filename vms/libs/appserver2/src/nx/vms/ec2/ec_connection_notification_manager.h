@@ -8,6 +8,7 @@
 #include <managers/event_rules_notification_manager.h>
 #include <managers/layout_notification_manager.h>
 #include <managers/license_notification_manager.h>
+#include <managers/lookup_list_notification_manager.h>
 #include <managers/media_server_notification_manager.h>
 #include <managers/misc_notification_manager.h>
 #include <managers/resource_notification_manager.h>
@@ -44,7 +45,8 @@ public:
         QnStoredFileNotificationManager* storedFileManager,
         QnMiscNotificationManager* miscManager,
         QnDiscoveryNotificationManager* discoveryManager,
-        AnalyticsNotificationManager* analyticsManager);
+        AnalyticsNotificationManager* analyticsManager,
+        LookupListNotificationManager* lookupListManager);
 
     template<typename T>
     void triggerNotification(const QnTransaction<T> &tran, ec2::NotificationSource source)
@@ -67,6 +69,7 @@ public:
             m_miscManager,
             m_discoveryManager,
             m_analyticsManager,
+            m_lookupListManager,
             source
         };
 
@@ -96,6 +99,7 @@ private:
     QnMiscNotificationManager* m_miscManager;
     QnDiscoveryNotificationManager* m_discoveryManager;
     AnalyticsNotificationManager* m_analyticsManager;
+    LookupListNotificationManager* m_lookupListManager;
 };
 
 } // namespace ec2

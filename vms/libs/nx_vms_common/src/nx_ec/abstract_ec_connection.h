@@ -103,6 +103,8 @@ public:
         const Qn::UserSession& userSession) = 0;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
         const Qn::UserSession& userSession) = 0;
+    virtual AbstractLookupListManagerPtr getLookupListManager(
+        const Qn::UserSession& userSession) = 0;
 
     virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
     virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;
@@ -120,6 +122,7 @@ public:
     virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() = 0;
     virtual AbstractVmsRulesNotificationManagerPtr vmsRulesNotificationManager() = 0;
     virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
+    virtual AbstractLookupListNotificationManagerPtr lookupListNotificationManager() = 0;
 
     virtual QnUuid routeToPeerVia(
         const QnUuid& dstPeer,

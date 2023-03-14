@@ -16,6 +16,7 @@
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/hardware_id_mapping.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
@@ -1604,7 +1605,43 @@ APPLY(10500, serverRuntimeEvent, nx::vms::api::ServerRuntimeEventData, \
                         InvalidFilterFunc(), /* Filter save func */ \
                         InvalidFilterFunc(), /* Filter read func */ \
                         AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                        RegularTransactionType()) /* regular transaction type */
+                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(10600, getLookupLists, nx::vms::api::LookupListDataList, \
+    /*persistent*/ false, \
+    /*system*/ false, \
+    /*isRemoveOperation*/ false, \
+    InvalidGetHashHelper(), \
+    InvalidTriggerNotificationHelper(), \
+    InvalidAccess(), /*< Save permission checker. */ \
+    InvalidAccess(), /*< Read permission checker. */ \
+    FilterListByAccess<AdminOnlyAccess>(), /*< Filter save func. */ \
+    FilterListByAccess<AllowForAllAccess>(), /*< Filter read func. */ \
+    AllowForAllAccessOut(),  /*< Outgoing check is not actual for non-persistent transactions. */ \
+    RegularTransactionType()) \
+APPLY(10601, saveLookupList, nx::vms::api::LookupListData, \
+    /*perisistent*/ true, \
+    /*system*/ false, \
+    /*isRemoveOperation*/ false, \
+    CreateHashByIdHelper(), /*< Id is enough to generate hash. */ \
+    LookupListNotificationManagerHelper(), \
+    AdminOnlyAccess(), /*< Save permission checker. */ \
+    AllowForAllAccess(), /*< Read permission checker */ \
+    InvalidFilterFunc(), /*< Filter save func. */ \
+    InvalidFilterFunc(), /*< Filter read func. */ \
+    AllowForAllAccessOut(), /*< Check remote peer rights for outgoing transaction. */ \
+    RegularTransactionType()) \
+APPLY(10602, removeLookupList, nx::vms::api::IdData, \
+    /*perisistent*/ true, \
+    /*system*/ false, \
+    /*isRemoveOperation*/ true, \
+    CreateHashByIdHelper(), \
+    &apiIdDataTriggerNotificationHelper, \
+    AdminOnlyAccess(), /*< Save permission checker. */ \
+    AllowForAllAccess(), /*< Read permission checker */ \
+    InvalidFilterFunc(), /*< Filter save func. */ \
+    InvalidFilterFunc(), /*< Filter read func. */ \
+    AllowForAllAccessOut(), /*< Check remote peer rights for outgoing transaction. */ \
+    RegularTransactionType()) \
 
 //-------------------------------------------------------------------------------------------------
 
