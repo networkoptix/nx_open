@@ -71,6 +71,7 @@ class QnStoredFileNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
 class AnalyticsNotificationManager;
+class LookupListNotificationManager;
 
 enum class RemotePeerAccess
 {
@@ -159,6 +160,7 @@ struct NotificationParams
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
     AnalyticsNotificationManager* analyticsNotificationManager;
+    LookupListNotificationManager* lookupListNotificationManager;
     NotificationSource source;
 };
 

@@ -54,6 +54,9 @@ using AbstractWebPageManagerPtr = std::shared_ptr<AbstractWebPageManager>;
 class AbstractAnalyticsManager;
 using AbstractAnalyticsManagerPtr = std::shared_ptr<AbstractAnalyticsManager>;
 
+class AbstractLookupListManager;
+using AbstractLookupListManagerPtr = std::shared_ptr<AbstractLookupListManager>;
+
 
 class AbstractResourceNotificationManager;
 using AbstractResourceNotificationManagerPtr = std::shared_ptr<AbstractResourceNotificationManager>;
@@ -103,6 +106,8 @@ using AbstractVmsRulesNotificationManagerPtr = std::shared_ptr<AbstractVmsRulesN
 class AbstractUserNotificationManager;
 using AbstractUserNotificationManagerPtr = std::shared_ptr<AbstractUserNotificationManager>;
 
+class AbstractLookupListNotificationManager;
+using AbstractLookupListNotificationManagerPtr = std::shared_ptr<AbstractLookupListNotificationManager>;
 
 class AbstractECConnection;
 using AbstractECConnectionPtr = std::shared_ptr<AbstractECConnection>;

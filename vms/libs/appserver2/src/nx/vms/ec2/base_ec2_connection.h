@@ -13,6 +13,7 @@
 #include <managers/event_rules_manager.h>
 #include <managers/layout_manager.h>
 #include <managers/license_manager.h>
+#include <managers/lookup_list_manager.h>
 #include <managers/media_server_manager.h>
 #include <managers/misc_manager.h>
 #include <managers/resource_manager.h>
@@ -56,8 +57,8 @@ public:
     virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserSession& userSession) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserSession& userSession) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserSession& userSession) override;
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
-        const Qn::UserSession& userSession) override;
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserSession& userSession) override;
+    virtual AbstractLookupListManagerPtr getLookupListManager(const Qn::UserSession& userSession) override;
 
     virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
@@ -74,8 +75,8 @@ public:
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
-    virtual AbstractAnalyticsNotificationManagerPtr
-        analyticsNotificationManager() override;
+    virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() override;
+    virtual AbstractLookupListNotificationManagerPtr lookupListNotificationManager() override;
 
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
@@ -128,6 +129,7 @@ protected:
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
     QnTimeNotificationManagerPtr m_timeNotificationManager;
     AnalyticsNotificationManagerPtr m_analyticsNotificationManager;
+    LookupListNotificationManagerPtr m_lookupListNotificationManager;
     std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
 };
 
@@ -162,6 +164,7 @@ void BaseEc2Connection<QueryProcessorType>::init(nx::vms::discovery::Manager* di
         discoveryManager);
     m_timeNotificationManager = std::make_shared<QnTimeNotificationManager>();
     m_analyticsNotificationManager = std::make_shared<AnalyticsNotificationManager>();
+    m_lookupListNotificationManager = std::make_shared<LookupListNotificationManager>();
     m_notificationManager = std::make_unique<ECConnectionNotificationManager>(
         this,
         m_licenseNotificationManager.get(),
@@ -179,7 +182,8 @@ void BaseEc2Connection<QueryProcessorType>::init(nx::vms::discovery::Manager* di
         m_storedFileNotificationManager.get(),
         m_miscNotificationManager.get(),
         m_discoveryNotificationManager.get(),
-        m_analyticsNotificationManager.get());
+        m_analyticsNotificationManager.get(),
+        m_lookupListNotificationManager.get());
 }
 
 template<class QueryProcessorType>
@@ -424,6 +428,20 @@ AbstractAnalyticsManagerPtr BaseEc2Connection<QueryProcessorType>::getAnalyticsM
 {
     return std::make_shared<AnalyticsManager<QueryProcessorType>>(
         m_queryProcessor, userSession);
+}
+
+template<class QueryProcessorType>
+AbstractLookupListManagerPtr BaseEc2Connection<QueryProcessorType>::getLookupListManager(
+    const Qn::UserSession& userSession)
+{
+    return std::make_shared<LookupListManager<QueryProcessorType>>(m_queryProcessor, userSession);
+}
+
+template<class QueryProcessorType>
+AbstractLookupListNotificationManagerPtr
+    BaseEc2Connection<QueryProcessorType>::lookupListNotificationManager()
+{
+    return m_lookupListNotificationManager;
 }
 
 template<class QueryProcessorType>

@@ -21,7 +21,8 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
     QnStoredFileNotificationManager* storedFileManager,
     QnMiscNotificationManager* miscManager,
     QnDiscoveryNotificationManager* discoveryManager,
-    AnalyticsNotificationManager* analyticsManager)
+    AnalyticsNotificationManager* analyticsManager,
+    LookupListNotificationManager* lookupListManager)
     :
     m_ecConnection(ecConnection),
     m_licenseManager(licenseManager),
@@ -39,7 +40,8 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
     m_storedFileManager(storedFileManager),
     m_miscManager(miscManager),
     m_discoveryManager(discoveryManager),
-    m_analyticsManager(analyticsManager)
+    m_analyticsManager(analyticsManager),
+    m_lookupListManager(lookupListManager)
 {
 }
 

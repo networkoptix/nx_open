@@ -12,9 +12,9 @@
 #include <core/resource/resource_property_key.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -230,6 +230,10 @@ void apiIdDataTriggerNotificationHelper(
                 tran,
                 notificationParams.source);
             break;
+        case ApiCommand::removeLookupList:
+            return notificationParams.lookupListNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         default:
             NX_ASSERT(false);
     }
@@ -404,6 +408,16 @@ struct AnalyticsNotificationManagerHelper
     {
         notificationParams.analyticsNotificationManager
             ->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct LookupListNotificationManagerHelper
+{
+    template<typename Param>
+    void operator()(const QnTransaction<Param>& tran, const NotificationParams& notificationParams)
+    {
+        notificationParams.lookupListNotificationManager->triggerNotification(
+            tran, notificationParams.source);
     }
 };
 
