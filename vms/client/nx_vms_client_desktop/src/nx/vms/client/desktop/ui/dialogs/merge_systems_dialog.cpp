@@ -6,7 +6,6 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <api/server_rest_connection.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -19,7 +18,9 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
@@ -50,7 +51,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
         this,
         qnClientCoreModule->networkModule()->certificateVerifier(),
         m_delegate.get(),
-        qnSettings->locale().toStdString()))
+        appContext()->localSettings()->locale().toStdString()))
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -121,13 +122,14 @@ void MergeSystemsDialog::updateKnownSystems()
     for (const auto& server: resourcePool()->getIncompatibleServers())
     {
         QString url = server->getApiUrl().toString();
-        QString label = QnResourceDisplayInfo(server).toString(qnSettings->resourceInfoLevel());
+        QString label = QnResourceDisplayInfo(server).toString(
+            appContext()->localSettings()->resourceInfoLevel());
 
         const auto moduleInformation = server->getModuleInformation();
 
         QString systemName = helpers::getSystemName(moduleInformation);
         if (!systemName.isEmpty())
-            label += lit(" (%1)").arg(systemName);
+            label += nx::format(" (%1)", systemName);
 
         labelUrlMap.emplace(label, url);
     }

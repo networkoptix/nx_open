@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-bool isRadassSupportedInternal(const QnLayoutItemData& item)
+bool isRadassSupportedInternal(const common::LayoutItemData& item)
 {
     if (!item.zoomRect.isNull())
         return false;
@@ -31,8 +31,8 @@ bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
     if (!layout)
         return false;
 
-    return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(), match,
-        [](const QnLayoutItemData& item)
+    return GenericCondition::check<common::LayoutItemData>(layout->getItems().values(), match,
+        [](const common::LayoutItemData& item)
         {
             return isRadassSupportedInternal(item);
         });
@@ -43,8 +43,8 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
     if (!layout)
         return ConditionResult::None;
 
-    return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(),
-        [](const QnLayoutItemData& item)
+    return GenericCondition::check<common::LayoutItemData>(layout->getItems().values(),
+        [](const common::LayoutItemData& item)
         {
             return isRadassSupportedInternal(item);
         });

@@ -10,7 +10,6 @@
 #include <QtCore/QStorageInfo>
 #include <QtCore/QThread>
 
-#include <client/client_settings.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -27,6 +26,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/requests.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
@@ -129,69 +129,50 @@ void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
     m_downloader->startDownloads();
 }
 
-// We serialize state of the uploader using this struct.
-struct StoredState
-{
-    QString file;
-    int state = 0;
-    // Update version we have initiated update for.
-    nx::utils::SoftwareVersion version;
-    // Id of the system we have initiated update for.
-    QnUuid systemId;
-};
-
-#define StoredState_Fields (file)(state)(version)(systemId)
-QN_FUSION_DECLARE_FUNCTIONS(StoredState, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StoredState, (json), StoredState_Fields)
-
 void ServerUpdateTool::loadInternalState()
 {
     // The following assert causes a lot of problems
     //NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::initial);
     NX_ASSERT(!m_systemId.isNull());
 
-    QString raw = qnSettings->systemUpdaterState();
-    StoredState stored;
-    if (QJson::deserialize(raw, &stored))
+    const SystemUpdateState storedState = systemContext()->localSettings()->updateState();
+
+    m_initiatedUpdate = !storedState.file.isEmpty();
+    if (!m_initiatedUpdate)
+        return;
+
+    NX_VERBOSE(this, "loadInternalState() we have initiated update to this system.");
+    auto state = (OfflineUpdateState) storedState.state;
+    switch (state)
     {
-        m_initiatedUpdate = stored.systemId == m_systemId;
-        if (m_initiatedUpdate)
-        {
-            NX_VERBOSE(this, "loadInternalState() we have initiated update to this system.");
-            auto state = (OfflineUpdateState)stored.state;
-            switch(state)
-            {
-                case OfflineUpdateState::ready:
-                case OfflineUpdateState::done:
-                case OfflineUpdateState::push:
-                    // We have no idea whether update files are still good on server.
-                    // The most simple solution - to restart upload process.
-                    // TODO: Check if we really need more robust state restoration.
-                    NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
-                    m_checkFileUpdate = checkUpdateFromFile(stored.file);
-                    break;
-                default:
-                    NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
-                    m_offlineUpdaterState = OfflineUpdateState::initial;
-            }
-        }
-        else
-        {
-            NX_DEBUG(this,
-                "loadInternalState() - stored systemID=%1 is different from current systemID=%2",
-                stored.systemId, m_systemId);
-        }
-    }
-    else
-    {
-        NX_DEBUG(this, "loadInternalState() - no uploader state to restore");
+        case OfflineUpdateState::ready:
+        case OfflineUpdateState::done:
+        case OfflineUpdateState::push:
+            // We have no idea whether update files are still good on server.
+            // The most simple solution - to restart upload process.
+            // TODO: Check if we really need more robust state restoration.
+            NX_DEBUG(this, "loadInternalState() - restoring offline update from %1",
+                storedState.file);
+            m_checkFileUpdate = checkUpdateFromFile(storedState.file);
+            break;
+
+        default:
+            NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
+            m_offlineUpdaterState = OfflineUpdateState::initial;
     }
 }
 
 void ServerUpdateTool::saveInternalState()
 {
     NX_VERBOSE(this, "saveInternalState(%1)", m_offlineUpdaterState);
-    StoredState stored;
+
+    if (!m_initiatedUpdate)
+    {
+        systemContext()->localSettings()->updateState = {};
+        return;
+    }
+
+    SystemUpdateState state;
 
     switch (m_offlineUpdaterState)
     {
@@ -199,29 +180,19 @@ void ServerUpdateTool::saveInternalState()
         case OfflineUpdateState::ready:
             // These states occur during the update check (not the update itself) and should not be
             // stored.
-            stored.state = (int) OfflineUpdateState::initial;
+            state.state = (int) OfflineUpdateState::initial;
             break;
         default:
-            stored.state = (int) m_offlineUpdaterState;
+            state.state = (int) m_offlineUpdaterState;
             break;
     }
 
-    if (m_initiatedUpdate)
-    {
-        stored.systemId = m_systemId;
-        stored.version = m_remoteUpdateManifest.version;
+    state.version = m_remoteUpdateManifest.version;
 
-        if (stored.state != (int) OfflineUpdateState::initial)
-            stored.file = m_localUpdateFile;
-    }
-    else
-    {
-        stored.systemId = {};
-    }
+    if (state.state != (int) OfflineUpdateState::initial)
+        state.file = m_localUpdateFile;
 
-    QByteArray raw;
-    QJson::serialize(stored, &raw);
-    qnSettings->setSystemUpdaterState(raw);
+    systemContext()->localSettings()->updateState = state;
 }
 
 bool ServerUpdateTool::hasInitiatedThisUpdate() const

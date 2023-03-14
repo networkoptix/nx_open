@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cmath> /* For std::floor. */
 
-
 #include <QtCore/QMargins>
 #include <QtGui/QAction>
 #include <QtWidgets/QGraphicsLayout>
@@ -16,7 +15,6 @@
 #include <client/client_meta_types.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <nx/fusion/model_functions.h>
@@ -32,6 +30,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -100,7 +99,7 @@ int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
     static constexpr auto kIdleFps = 15;
     static constexpr auto kUnlimitedFps = 0;
 
-    if (!qnSettings->isAutoFpsLimit())
+    if (!appContext()->localSettings()->autoFpsLimit())
         return kUnlimitedFps;
 
     if (!layout)
@@ -369,8 +368,8 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
         kWorkbenchUiDataKey, std::make_unique<StateDelegate>(this));
     //TODO: #spanasenko Save state occasionally?
 
-    m_connections << connect(qnSettings->notifier(QnClientSettings::AUTO_FPS_LIMIT),
-        &QnPropertyNotifier::valueChanged,
+    m_connections << connect(&appContext()->localSettings()->autoFpsLimit,
+        &nx::utils::property_storage::BaseProperty::changed,
         this,
         &WorkbenchUi::updateAutoFpsLimit);
 

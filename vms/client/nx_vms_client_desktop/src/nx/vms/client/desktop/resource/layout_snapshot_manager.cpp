@@ -197,7 +197,7 @@ void LayoutSnapshotManager::restore(const LayoutResourcePtr &resource)
         restored->setFlags(resource->flags());
 
         // Cleanup from snapshot resources which are already deleted from the resource pool.
-        QnLayoutItemDataMap existingItems;
+        common::LayoutItemDataMap existingItems;
         for (const auto& item: restored->getItems())
         {
             if (!getResourceByDescriptor(item.resource))

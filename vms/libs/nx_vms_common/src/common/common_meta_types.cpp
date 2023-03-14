@@ -4,8 +4,8 @@
 
 #include <atomic>
 
-#include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
 
 #include <api/model/api_ioport_data.h>
 #include <api/model/audit/audit_record.h>
@@ -53,7 +53,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <health/system_health.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/rest/params.h>
@@ -71,6 +70,7 @@
 #include <nx/vms/common/ptz/override.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -89,6 +89,8 @@
 #include <recording/time_period_list.h>
 #include <utils/common/optional.h>
 #include <utils/math/space_mapper.h>
+
+using namespace nx::vms::common;
 
 void QnCommonMetaTypes::initialize()
 {
@@ -155,7 +157,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
 
-    qRegisterMetaType<QnLayoutItemData>();
+    qRegisterMetaType<LayoutItemData>();
     qRegisterMetaType<QnVideoWallItem>();
     qRegisterMetaType<QnVideoWallPcData>();
     qRegisterMetaType<QnVideoWallControlMessage>();
@@ -252,7 +254,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnBounds>();
     qRegisterMetaType<QnCameraAdvancedParameterOverload>();
 
-    qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
+    qRegisterMetaType<system_health::MessageType>();
 
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
     qRegisterMetaType<nx::media::CameraTraits>();

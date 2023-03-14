@@ -3,7 +3,6 @@
 #include "workbench_access_controller.h"
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>

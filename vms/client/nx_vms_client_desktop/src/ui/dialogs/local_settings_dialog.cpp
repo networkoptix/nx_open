@@ -7,9 +7,10 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
-#include <client/client_settings.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -26,8 +27,7 @@
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-namespace
-{
+namespace {
 
 QDialogButtonBox::StandardButton getRestartDialogAnswer()
 {
@@ -91,16 +91,11 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     addPage(AdvancedPage, m_advancedSettingsWidget, tr("Advanced"));
 
     setWarningStyle(ui->readOnlyWarningLabel);
-    ui->readOnlyWarningWidget->setVisible(!qnSettings->isWritable());
+    ui->readOnlyWarningWidget->setVisible(!appContext()->localSettings()->isWritable());
     ui->readOnlyWarningLabel->setText(
-#ifdef Q_OS_LINUX
-        tr("Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.")
-#else
-        tr("Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.")
-#endif
+        tr("Settings are read-only. Please contact your system administrator. "
+            "All changes will be lost after program exit.")
     );
-
-    //;
 
     addRestartLabel();
 
@@ -111,8 +106,7 @@ QnLocalSettingsDialog::~QnLocalSettingsDialog() {}
 
 bool QnLocalSettingsDialog::canApplyChanges() const
 {
-    return qnSettings->isWritable()
-        && base_type::canApplyChanges();
+    return appContext()->localSettings()->isWritable() && base_type::canApplyChanges();
 }
 
 void QnLocalSettingsDialog::applyChanges()
@@ -121,7 +115,6 @@ void QnLocalSettingsDialog::applyChanges()
         [this]
         {
             base_type::applyChanges();
-            qnSettings->save();
         });
 }
 

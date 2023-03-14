@@ -7,9 +7,10 @@
 #include <QtCore/QJsonObject>
 #include <QtGui/QMouseEvent>
 
-#include <client/client_settings.h>
 #include <core/resource/videowall_resource.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <ui/animation/animation_timer.h>
 #include <ui/processors/drag_processor.h>
@@ -62,7 +63,7 @@ void QnVideowallManageWidget::paintEvent(QPaintEvent* /*event*/)
 void QnVideowallManageWidget::loadFromResource(const QnVideoWallResourcePtr& videowall)
 {
     videowall::Model model;
-    const QnUuid pcUuid = qnSettings->pcUuid();
+    const QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     for (const QnVideoWallItem& item: videowall->items()->getItems())
     {
         if (item.pcUuid != pcUuid)
@@ -91,7 +92,7 @@ void QnVideowallManageWidget::submitToResource(const QnVideoWallResourcePtr& vid
         localScreens << screen;
     }
 
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     QnVideoWallPcData pcData;
     pcData.uuid = pcUuid;
     pcData.screens = localScreens;

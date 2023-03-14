@@ -39,7 +39,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (!layout)
         return;
 
-    for (QnLayoutItemData data: layout->getItems())
+    for (nx::vms::common::LayoutItemData data: layout->getItems())
     {
         if (isCrossSystemResource(data.resource))
             continue;

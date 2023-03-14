@@ -13,7 +13,6 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_message_processor.h>
-#include <client/client_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
@@ -22,6 +21,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -1107,7 +1107,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
     }
     else if (m_widgetState == WidgetUpdateState::ready && m_updateInfo.isValidToInstall())
     {
-        int acceptedEula = qnSettings->acceptedEulaVersion();
+        int acceptedEula = appContext()->localSettings()->acceptedEulaVersion();
         int newEula = m_updateInfo.info.eulaVersion;
         const bool showEula = acceptedEula < newEula;
 

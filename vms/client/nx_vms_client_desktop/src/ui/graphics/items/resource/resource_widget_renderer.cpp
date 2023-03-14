@@ -4,12 +4,15 @@
 
 #include <camera/gl_renderer.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <nx/streaming/config.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 #include "decodedpicturetoopengluploader.h"
 
 using namespace std::chrono;
+
+using namespace nx::vms::client::desktop;
 
 const microseconds kNoPtsValue{AV_NOPTS_VALUE};
 
@@ -56,7 +59,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         ctx.uploader.reset(new DecodedPictureToOpenGLUploader(m_openGLWidget));
         ctx.uploader->setForceSoftYUV(qnRuntime->isSoftwareYuv());
         ctx.renderer.reset(new QnGLRenderer(m_openGLWidget, *ctx.uploader));
-        ctx.renderer->setBlurEnabled(qnSettings->isGlBlurEnabled());
+        ctx.renderer->setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
         ctx.renderer->setScreenshotInterface(m_screenshotInterface);
         ctx.uploader->setYV12ToRgbShaderUsed(ctx.renderer->isYV12ToRgbShaderUsed());
         ctx.uploader->setNV12ToRgbShaderUsed(ctx.renderer->isNV12ToRgbShaderUsed());

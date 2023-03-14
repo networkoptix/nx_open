@@ -4,9 +4,9 @@
 
 #include <QtCore/QDir>
 
-#include "abstract_backend.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_backend.h"
 
 namespace nx::utils::property_storage {
 
@@ -16,9 +16,11 @@ class NX_VMS_COMMON_API FileSystemBackend: public AbstractBackend
 public:
     FileSystemBackend(const QDir& path);
 
+    virtual bool isWritable() const override;
     virtual QString readValue(const QString& name, bool* success = nullptr) override;
     virtual bool writeValue(const QString& name, const QString& value) override;
     virtual bool removeValue(const QString& name) override;
+    virtual bool exists(const QString& name) const override;
     virtual bool sync() override;
 
 protected:

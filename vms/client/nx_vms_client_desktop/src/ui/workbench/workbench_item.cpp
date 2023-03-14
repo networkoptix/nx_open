@@ -34,7 +34,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uu
 }
 
 QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
-    const QnLayoutItemData& data,
+    const nx::vms::common::LayoutItemData& data,
     QObject* parent)
     :
     QObject(parent),
@@ -82,19 +82,19 @@ void QnWorkbenchItem::setLayout(QnWorkbenchLayout* value)
     }
 }
 
-QnLayoutItemData QnWorkbenchItem::data() const
+nx::vms::common::LayoutItemData QnWorkbenchItem::data() const
 {
     if (!NX_ASSERT(m_resource) || !NX_ASSERT(m_layout))
         return {};
 
-    QnLayoutItemData data = layoutItemFromResource(m_resource,
+    nx::vms::common::LayoutItemData data = layoutItemFromResource(m_resource,
         /*forceCloud*/ m_layout->resource()->hasFlags(Qn::cross_system));
     data.uuid = m_uuid;
     submit(data);
     return data;
 }
 
-bool QnWorkbenchItem::update(const QnLayoutItemData &data)
+bool QnWorkbenchItem::update(const nx::vms::common::LayoutItemData& data)
 {
     NX_ASSERT(data.uuid == uuid());
     NX_ASSERT(m_resource);
@@ -120,7 +120,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
     return result;
 }
 
-void QnWorkbenchItem::submit(QnLayoutItemData &data) const
+void QnWorkbenchItem::submit(nx::vms::common::LayoutItemData& data) const
 {
     NX_ASSERT(data.uuid == uuid());
     NX_ASSERT(m_resource);

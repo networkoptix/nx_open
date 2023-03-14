@@ -21,7 +21,7 @@
 */
 class NX_VMS_COMMON_API QnLayoutResource:
     public QnResource,
-    private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
+    private QnThreadsafeItemStorageNotifier<nx::vms::common::LayoutItemData>
 {
     Q_OBJECT
     Q_PROPERTY(float cellAspectRatio
@@ -38,24 +38,24 @@ public:
     virtual void setStatus(nx::vms::api::ResourceStatus newStatus,
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
-    void setItems(const QnLayoutItemDataList &items);
+    void setItems(const nx::vms::common::LayoutItemDataList& items);
 
-    void setItems(const QnLayoutItemDataMap &items);
+    void setItems(const nx::vms::common::LayoutItemDataMap& items);
 
-    QnLayoutItemDataMap getItems() const;
+    nx::vms::common::LayoutItemDataMap getItems() const;
 
-    QnLayoutItemData getItem(const QnUuid &itemUuid) const;
+    nx::vms::common::LayoutItemData getItem(const QnUuid& itemUuid) const;
 
-    void addItem(const QnLayoutItemData &item);
+    void addItem(const nx::vms::common::LayoutItemData& item);
 
-    void removeItem(const QnLayoutItemData &item);
+    void removeItem(const nx::vms::common::LayoutItemData& item);
 
     Q_INVOKABLE void removeItem(const QnUuid &itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.
      */
-    void updateItem(const QnLayoutItemData &item);
+    void updateItem(const nx::vms::common::LayoutItemData& item);
 
     static constexpr float kDefaultCellAspectRatio
         = nx::vms::api::LayoutData::kDefaultCellAspectRatio;
@@ -115,9 +115,12 @@ public:
     bool isServiceLayout() const;
 
 signals:
-    void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
-    void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
-    void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+    void itemAdded(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
+    void itemRemoved(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
+    void itemChanged(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
 
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
@@ -128,16 +131,16 @@ signals:
     void lockedChanged(const QnLayoutResourcePtr &resource);
 
 protected:
-    virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
-    virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemAdded(const nx::vms::common::LayoutItemData& item) override;
+    virtual Qn::Notifier storedItemRemoved(const nx::vms::common::LayoutItemData& item) override;
     virtual Qn::Notifier storedItemChanged(
-        const QnLayoutItemData& item,
-        const QnLayoutItemData& oldItem) override;
+        const nx::vms::common::LayoutItemData& item,
+        const nx::vms::common::LayoutItemData& oldItem) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 protected:
-    QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
+    QScopedPointer<QnThreadsafeItemStorage<nx::vms::common::LayoutItemData> > m_items;
     float m_cellAspectRatio = 0; //< 0 means 'auto'.
     qreal m_cellSpacing = nx::vms::api::LayoutData::kDefaultCellSpacing;
     QSize m_fixedSize;

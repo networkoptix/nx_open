@@ -8,8 +8,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
-#include <client/client_model_types.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_meta_types.h>
 #include <common/common_module.h>
@@ -23,6 +21,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
 #include <nx/vms/client/desktop/common/models/linearization_list_model.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
@@ -47,6 +46,7 @@
 #include <nx/vms/client/desktop/resource_properties/user/utils/parent_groups_provider.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
 #include <nx/vms/client/desktop/system_administration/models/global_permissions_model.h>
@@ -85,6 +85,7 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/archive_frame_extractor.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
@@ -172,10 +173,10 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
     qRegisterMetaType<Qn::TimeMode>();
-    qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehavior>();
     qRegisterMetaType<ui::action::IDType>("ui::action::IDType");
     qRegisterMetaType<ui::action::Parameters>();
+    qRegisterMetaType<ThumbnailsSearchState>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
     qRegisterMetaType<Qn::ThumbnailStatus>();
@@ -216,7 +217,6 @@ void QnClientMetaTypes::initialize()
     WebViewController::registerMetaType();
 
     QnJsonSerializer::registerSerializer<Qn::ImageBehavior>();
-    QnJsonSerializer::registerSerializer<QnBackgroundImage>();
 
     qRegisterMetaType<RecordScheduleCellData>();
     qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
@@ -296,11 +296,11 @@ void QnClientMetaTypes::registerQmlTypes()
             return helpHandler;
         });
 
-    qmlRegisterSingletonType<QnClientSettings>("nx.vms.client.desktop", 1, 0, "ClientSettings",
+    qmlRegisterSingletonType<LocalSettings>("nx.vms.client.desktop", 1, 0, "LocalSettings",
         [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            qmlEngine->setObjectOwnership(qnSettings, QQmlEngine::CppOwnership);
-            return qnSettings;
+            qmlEngine->setObjectOwnership(appContext()->localSettings(), QQmlEngine::CppOwnership);
+            return appContext()->localSettings();
         });
 
     ui::scene::Instrument::registerQmlType();

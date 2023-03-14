@@ -24,6 +24,8 @@ struct AuthAllowedUrls
 
     std::map<Key, Urls> items;
 
+    bool operator==(const AuthAllowedUrls&) const = default;
+
     static Key key(const QnUuid& systemId, const QString& username)
     {
         return systemId.toString() + username;

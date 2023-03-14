@@ -22,41 +22,44 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::Ev
     return convert(nx::vms::event::levelOf(params));
 }
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType)
+QnNotificationLevel::Value QnNotificationLevel::valueOf(
+    nx::vms::common::system_health::MessageType messageType)
 {
+    using nx::vms::common::system_health::MessageType;
+
     switch (messageType)
     {
-        case QnSystemHealth::CloudPromo:
+        case MessageType::cloudPromo:
             return QnNotificationLevel::Value::OtherNotification;
 
         // Gray notifications.
-        case QnSystemHealth::ArchiveRebuildCanceled:
-        case QnSystemHealth::metadataOnSystemStorage:
+        case MessageType::archiveRebuildCanceled:
+        case MessageType::metadataOnSystemStorage:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
-        case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::ArchiveFastScanFinished: //< This one is never displayed though.
+        case MessageType::archiveRebuildFinished:
+        case MessageType::archiveFastScanFinished: //< This one is never displayed though.
             return QnNotificationLevel::Value::SuccessNotification;
 
         // Yellow notifications.
-        case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::NoLicenses:
-        case QnSystemHealth::SmtpIsNotSet:
-        case QnSystemHealth::DefaultCameraPasswords:
-        case QnSystemHealth::NoInternetForTimeSync:
-        case QnSystemHealth::UsersEmailIsEmpty:
-        case QnSystemHealth::cameraRecordingScheduleIsInvalid:
-        case QnSystemHealth::replacedDeviceDiscovered:
-        case QnSystemHealth::metadataStorageNotSet:
+        case MessageType::emailIsEmpty:
+        case MessageType::noLicenses:
+        case MessageType::smtpIsNotSet:
+        case MessageType::defaultCameraPasswords:
+        case MessageType::noInternetForTimeSync:
+        case MessageType::usersEmailIsEmpty:
+        case MessageType::cameraRecordingScheduleIsInvalid:
+        case MessageType::replacedDeviceDiscovered:
+        case MessageType::metadataStorageNotSet:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.
-        case QnSystemHealth::EmailSendError:
-        case QnSystemHealth::ArchiveIntegrityFailed:
-        case QnSystemHealth::backupStoragesNotConfigured:
-        case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::RemoteArchiveSyncError:
+        case MessageType::emailSendError:
+        case MessageType::archiveIntegrityFailed:
+        case MessageType::backupStoragesNotConfigured:
+        case MessageType::storagesNotConfigured:
+        case MessageType::remoteArchiveSyncError:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:

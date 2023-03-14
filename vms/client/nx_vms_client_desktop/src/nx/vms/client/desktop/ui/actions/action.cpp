@@ -7,7 +7,6 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>

@@ -2,23 +2,20 @@
 
 #pragma once
 
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <health/system_health.h>
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 class NX_VMS_COMMON_API SystemHealthAction: public CommonAction
 {
     using base_type = CommonAction;
 
 public:
-    explicit SystemHealthAction(QnSystemHealth::MessageType message,
+    explicit SystemHealthAction(
+        common::system_health::MessageType message,
         const QnUuid& eventResourceId = QnUuid(),
         const nx::common::metadata::Attributes& attributes = {});
 };
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event

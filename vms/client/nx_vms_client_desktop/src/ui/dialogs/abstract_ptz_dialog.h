@@ -5,14 +5,11 @@
 
 #include <QtCore/QQueue>
 
-#include <client/client_model_types.h>
-
-#include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_constants.h>
+#include <core/ptz/ptz_fwd.h>
 #include <nx/vms/client/core/ptz/types.h>
-#include <nx/vms/common/ptz/types_fwd.h>
 #include <nx/vms/common/ptz/datafield.h>
-
+#include <nx/vms/common/ptz/types_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 

@@ -17,7 +17,9 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -309,12 +311,11 @@ PtzInstrument::PtzInstrument(QObject *parent):
             updateExternalPtzSpeed();
         });
 
-    connect(qnSettings, &QnPropertyStorage::valueChanged, this,
-        [this](int id)
+    connect(&appContext()->localSettings()->ptzAimOverlayEnabled,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        [this]()
         {
-            if (id != QnClientSettings::PTZ_AIM_OVERLAY_ENABLED)
-                return;
-
             for (auto iter = m_dataByWidget.begin(); iter != m_dataByWidget.end(); ++iter)
             {
                 if (!iter->overlayWidget)
@@ -432,7 +433,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     overlay->modeButton()->setTarget(widget);
     overlay->modeButton()->setVisible(data.isFisheye() && isFisheyeEnabled);
 
-    overlay->setMarkersMode(qnSettings->isPtzAimOverlayEnabled()
+    overlay->setMarkersMode(appContext()->localSettings()->ptzAimOverlayEnabled()
         ? capabilitiesToMode(data.capabilities)
         : Qt::Orientations());
 
@@ -484,7 +485,7 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
     if (!data.promoOverlay)
     {
-        if (qnSettings->isPtzAimOverlayEnabled())
+        if (appContext()->localSettings()->ptzAimOverlayEnabled())
             return;
 
         data.promoOverlay = new PtzPromoOverlay();
@@ -507,7 +508,7 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
     }
 
     const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
-        && !qnSettings->isPtzAimOverlayEnabled()
+        && !appContext()->localSettings()->ptzAimOverlayEnabled()
         && widget->ptzActivationReason() != QnMediaResourceWidget::PtzEnabledBy::joystick;
 
     const bool animate = display()->animationAllowed();
@@ -626,7 +627,7 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         }
         else
         {
-            if (qnSettings->isPtzAimOverlayEnabled())
+            if (appContext()->localSettings()->ptzAimOverlayEnabled())
             {
                 m_movement = data.hasAdvancedPtz() ? ViewportMovement : NoMovement;
             }
@@ -763,7 +764,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
     const bool hasZoom = data.hasCapabilities(Ptz::ContinuousZoomCapability);
     const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
     const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
-    const bool showManipulator = canMove && qnSettings->isPtzAimOverlayEnabled();
+    const bool showManipulator = canMove && appContext()->localSettings()->ptzAimOverlayEnabled();
 
     data.overlayWidget->manipulatorWidget()->setVisible(showManipulator);
     data.overlayWidget->zoomInButton()->setVisible(hasZoom);
@@ -785,7 +786,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
     }
 
     data.overlayWidget->modeButton()->setVisible(data.isFisheye() && isFisheyeEnabled);
-    data.overlayWidget->setMarkersMode(qnSettings->isPtzAimOverlayEnabled()
+    data.overlayWidget->setMarkersMode(appContext()->localSettings()->ptzAimOverlayEnabled()
         ? capabilitiesToMode(data.capabilities)
         : Qt::Orientations());
 
@@ -800,12 +801,12 @@ void PtzInstrument::updateOverlayCursor(QnMediaResourceWidget* widget)
         return;
 
     const bool canMove = data.hasContinuousPanOrTilt();
-    const bool showManipulator = canMove && qnSettings->isPtzAimOverlayEnabled();
+    const bool showManipulator = canMove && appContext()->localSettings()->ptzAimOverlayEnabled();
 
-    const bool advancedPtzDragEnabled = qnSettings->isPtzAimOverlayEnabled()
+    const bool advancedPtzDragEnabled = appContext()->localSettings()->ptzAimOverlayEnabled()
         || context()->instance<KeyboardModifiersWatcher>()->modifiers().testFlag(Qt::ShiftModifier);
 
-    if (data.isFisheye() && !qnSettings->isPtzAimOverlayEnabled())
+    if (data.isFisheye() && !appContext()->localSettings()->ptzAimOverlayEnabled())
         data.cursorOverlay->setCursor(Qt::OpenHandCursor);
     else if (data.hasAdvancedPtz() && !data.isFisheye() && advancedPtzDragEnabled)
         data.cursorOverlay->setCursor(CustomCursors::cross);
@@ -1194,9 +1195,10 @@ void PtzInstrument::startDrag(DragInfo* info)
     ensureOverlayWidget(target());
 
     const auto data = m_dataByWidget[target()];
-    qApp->setOverrideCursor(data.isFisheye() && !qnSettings->isPtzAimOverlayEnabled()
-        ? QCursor(Qt::ClosedHandCursor)
-        : data.cursorOverlay->cursor());
+    qApp->setOverrideCursor(
+        data.isFisheye() && !appContext()->localSettings()->ptzAimOverlayEnabled()
+            ? QCursor(Qt::ClosedHandCursor)
+            : data.cursorOverlay->cursor());
 
     switch (m_movement)
     {
@@ -1207,7 +1209,7 @@ void PtzInstrument::startDrag(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (qnSettings->isPtzAimOverlayEnabled())
+            if (appContext()->localSettings()->ptzAimOverlayEnabled())
             {
                 opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
             }
@@ -1281,7 +1283,7 @@ void PtzInstrument::dragMove(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (qnSettings->isPtzAimOverlayEnabled())
+            if (appContext()->localSettings()->ptzAimOverlayEnabled())
             {
                 auto arrowItem = elementsWidget()->arrowItem();
                 arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
@@ -1321,7 +1323,7 @@ void PtzInstrument::dragMove(DragInfo* info)
             target()->ptzController()->getPosition(&position, CoordinateSpace::logical);
 
             const qreal speed = 0.5 * position.zoom
-                * (qnSettings->isPtzAimOverlayEnabled() ? 1 : -1);
+                * (appContext()->localSettings()->ptzAimOverlayEnabled() ? 1 : -1);
 
             const Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
             target()->ptzController()->absoluteMove(
@@ -1329,7 +1331,7 @@ void PtzInstrument::dragMove(DragInfo* info)
                 position + positionDelta,
                 /*instant movement*/ 2.0);
 
-            if (qnSettings->isPtzAimOverlayEnabled())
+            if (appContext()->localSettings()->ptzAimOverlayEnabled())
             {
                 ensureElementsWidget();
                 auto arrowItem = elementsWidget()->arrowItem();

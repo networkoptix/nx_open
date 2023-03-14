@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <set>
+
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QWidget>
 
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
-#include <health/system_health.h>
-
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -33,12 +34,12 @@ public:
 
 private:
     QList<nx::vms::api::EventType> watchedEvents() const;
-    QSet<QnSystemHealth::MessageType> watchedSystemHealth() const;
+    std::set<nx::vms::common::system_health::MessageType> storedSystemHealth() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
     QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
-    QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
+    QMap<nx::vms::common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;

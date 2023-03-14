@@ -20,10 +20,10 @@ void fromDataToResource(
     resource->setLocked(data.locked);
     resource->setFixedSize({data.fixedWidth, data.fixedHeight});
 
-    QnLayoutItemDataList dstItems;
+    common::LayoutItemDataList dstItems;
     for (const CrossSystemLayoutItemData& srcItem: data.items)
     {
-        QnLayoutItemData itemData;
+        common::LayoutItemData itemData;
         ec2::fromApiToResource(srcItem, itemData);
         itemData.resource.name = srcItem.name;
         dstItems.push_back(itemData);
@@ -45,10 +45,10 @@ void fromResourceToData(
     data.fixedWidth = fixedSize.isEmpty() ? 0 : fixedSize.width();
     data.fixedHeight = fixedSize.isEmpty() ? 0 : fixedSize.height();
 
-    const QnLayoutItemDataMap& srcItems = resource->getItems();
+    const common::LayoutItemDataMap& srcItems = resource->getItems();
     data.items.reserve(srcItems.size());
 
-    for (const QnLayoutItemData& item: srcItems)
+    for (const common::LayoutItemData& item: srcItems)
     {
         CrossSystemLayoutItemData itemData;
         ec2::fromResourceToApi(item, itemData);

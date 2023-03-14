@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <health/system_health.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -23,6 +23,8 @@ class QnWorkbenchNotificationsHandler:
     using base_type = QObject;
 
 public:
+    using MessageType = nx::vms::common::system_health::MessageType;
+
     explicit QnWorkbenchNotificationsHandler(QObject* parent = nullptr);
     virtual ~QnWorkbenchNotificationsHandler() override;
 
@@ -30,13 +32,11 @@ public:
     virtual void forcedUpdate() override;
 
     void setSystemHealthEventVisible(
-        QnSystemHealth::MessageType message,
-        const QnResourcePtr& resource,
-        bool visible);
+        MessageType message, const QnResourcePtr& resource, bool visible);
 
 signals:
-    void systemHealthEventAdded(QnSystemHealth::MessageType message, const QVariant& params);
-    void systemHealthEventRemoved(QnSystemHealth::MessageType message, const QVariant& params);
+    void systemHealthEventAdded(MessageType message, const QVariant& params);
+    void systemHealthEventRemoved(MessageType message, const QVariant& params);
 
     void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
     void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
@@ -55,11 +55,11 @@ private:
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
 
     void addSystemHealthEvent(
-        QnSystemHealth::MessageType message,
+        MessageType message,
         const nx::vms::event::AbstractActionPtr& action);
 
     void setSystemHealthEventVisibleInternal(
-        QnSystemHealth::MessageType message,
+        MessageType message,
         const QVariant& params,
         bool visible);
 

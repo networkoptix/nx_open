@@ -6,23 +6,21 @@
 #include <QtCore/QDir>
 #include <QtCore/QScopedValueRollback>
 
-#include <client/client_settings.h>
-#include <client/client_runtime_settings.h>
 #include <client/client_globals.h>
-
-#include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
+#include <client/client_runtime_settings.h>
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/translation_list_model.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-
-#include <nx/branding.h>
+#include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -94,31 +92,33 @@ QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 
 void QnLookAndFeelPreferencesWidget::applyChanges()
 {
-    qnSettings->setTourCycleTime(selectedTourCycleTimeMs());
-    qnSettings->setResourceInfoLevel(selectedInfoLevel());
-    qnSettings->setTimeMode(selectedTimeMode());
-    qnSettings->setLocale(selectedTranslation());
-    qnSettings->setPtzAimOverlayEnabled(isPtzAimOverlayEnabled());
+    appContext()->localSettings()->tourCycleTimeMs = selectedTourCycleTimeMs();
+    appContext()->localSettings()->resourceInfoLevel = selectedInfoLevel();
+    appContext()->localSettings()->timeMode = selectedTimeMode();
+    appContext()->localSettings()->locale = selectedTranslation();
+    appContext()->localSettings()->ptzAimOverlayEnabled = isPtzAimOverlayEnabled();
 
     /* Background changes are applied instantly. */
     if (backgroundAllowed())
-        m_oldBackground = qnSettings->backgroundImage();
+        m_oldBackground = appContext()->localSettings()->backgroundImage();
 }
 
 void QnLookAndFeelPreferencesWidget::loadDataToUi()
 {
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
-    ui->showIpInTreeCheckBox->setChecked(qnSettings->resourceInfoLevel() != Qn::RI_NameOnly);
+    ui->tourCycleTimeSpinBox->setValue(appContext()->localSettings()->tourCycleTimeMs() / 1000);
+    ui->showIpInTreeCheckBox->setChecked(appContext()->localSettings()->resourceInfoLevel() != Qn::RI_NameOnly);
 
-    ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
+    ui->timeModeComboBox->setCurrentIndex(
+        ui->timeModeComboBox->findData(appContext()->localSettings()->timeMode()));
 
-    ui->usePtzAimOverlayCheckBox->setChecked(qnSettings->isPtzAimOverlayEnabled());
+    ui->usePtzAimOverlayCheckBox->setChecked(
+        appContext()->localSettings()->ptzAimOverlayEnabled());
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
-    QString locale = qnSettings->locale();
+    QString locale = appContext()->localSettings()->locale();
     for (int i = 0; i < ui->languageComboBox->count(); i++)
     {
         const auto translation = ui->languageComboBox->itemData(
@@ -141,7 +141,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 
     ui->imageGroupBox->setEnabled(backgroundAllowed());
 
-    QnBackgroundImage background = qnSettings->backgroundImage();
+    BackgroundImage background = appContext()->localSettings()->backgroundImage();
     m_oldBackground = background;
 
     if (!backgroundAllowed())
@@ -160,21 +160,21 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 bool QnLookAndFeelPreferencesWidget::hasChanges() const
 {
     /* Background changes are applied instantly. */
-    if (backgroundAllowed() && qnSettings->backgroundImage() != m_oldBackground)
+    if (backgroundAllowed() && appContext()->localSettings()->backgroundImage() != m_oldBackground)
         return true;
 
-    return qnSettings->locale() != selectedTranslation()
-        || qnSettings->timeMode() != selectedTimeMode()
-        || qnSettings->resourceInfoLevel() != selectedInfoLevel()
-        || qnSettings->tourCycleTime() != selectedTourCycleTimeMs()
-        || qnSettings->isPtzAimOverlayEnabled() != isPtzAimOverlayEnabled();
+    return appContext()->localSettings()->locale() != selectedTranslation()
+        || appContext()->localSettings()->timeMode() != selectedTimeMode()
+        || appContext()->localSettings()->resourceInfoLevel() != selectedInfoLevel()
+        || appContext()->localSettings()->tourCycleTimeMs() != selectedTourCycleTimeMs()
+        || appContext()->localSettings()->ptzAimOverlayEnabled() != isPtzAimOverlayEnabled();
 }
 
 
 void QnLookAndFeelPreferencesWidget::discardChanges()
 {
     if (backgroundAllowed())
-        qnSettings->setBackgroundImage(m_oldBackground);
+        appContext()->localSettings()->backgroundImage = m_oldBackground;
 }
 
 bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
@@ -185,12 +185,12 @@ bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 {
-    QString prevOriginalName = qnSettings->backgroundImage().originalName;
+    QString prevOriginalName = appContext()->localSettings()->backgroundImage().originalName;
     QString folder = QFileInfo(prevOriginalName).absolutePath();
     if (folder.isEmpty())
-        folder = qnSettings->backgroundsFolder();
+        folder = appContext()->localSettings()->backgroundsFolder();
 
-    const QString previousCachedName = qnSettings->backgroundImage().name;
+    const QString previousCachedName = appContext()->localSettings()->backgroundImage().name;
 
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog(
@@ -208,7 +208,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     if (originalFileName.isEmpty())
         return;
 
-    qnSettings->setBackgroundsFolder(QFileInfo(originalFileName).absolutePath());
+    appContext()->localSettings()->backgroundsFolder = QFileInfo(originalFileName).absolutePath();
 
     QString cachedName = ServerImageCache::cachedImageFilename(originalFileName);
     if (previousCachedName == cachedName ||
@@ -228,10 +228,10 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
         {
             if (!progressDialog->wasCanceled())
             {
-                QnBackgroundImage background = qnSettings->backgroundImage();
+                BackgroundImage background = appContext()->localSettings()->backgroundImage();
                 background.name = storedFileName;
                 background.originalName = originalFileName;
-                qnSettings->setBackgroundImage(background);
+                appContext()->localSettings()->backgroundImage = background;
                 ui->imageNameLineEdit->setText(QFileInfo(originalFileName).fileName());
                 emit hasChangesChanged();
             }
@@ -301,8 +301,9 @@ void QnLookAndFeelPreferencesWidget::setupTimeModeUi()
     connect(ui->timeModeComboBox, QnComboboxActivated, this,
         [this]
         {
-            ui->timeModeWarningLabel->setVisible(qnSettings->timeMode() == Qn::ServerTimeMode
-                && selectedTimeMode() == Qn::ClientTimeMode);
+            ui->timeModeWarningLabel->setVisible(
+                appContext()->localSettings()->timeMode() == Qn::ServerTimeMode
+                    && selectedTimeMode() == Qn::ClientTimeMode);
             emit hasChangesChanged();
         });
     setWarningStyle(ui->timeModeWarningLabel);
@@ -321,9 +322,9 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
             if (m_updating)
                 return;
 
-            QnBackgroundImage background = qnSettings->backgroundImage();
+            BackgroundImage background = appContext()->localSettings()->backgroundImage();
             background.enabled = checked;
-            qnSettings->setBackgroundImage(background);
+            appContext()->localSettings()->backgroundImage = background;
             emit hasChangesChanged();
         });
 
@@ -336,9 +337,9 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
             if (m_updating)
                 return;
 
-            QnBackgroundImage background = qnSettings->backgroundImage();
+            BackgroundImage background = appContext()->localSettings()->backgroundImage();
             background.mode = selectedImageMode();
-            qnSettings->setBackgroundImage(background);
+            appContext()->localSettings()->backgroundImage = background;
             emit hasChangesChanged();
         });
 
@@ -348,9 +349,9 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
             if (m_updating)
                 return;
 
-            QnBackgroundImage background = qnSettings->backgroundImage();
+            BackgroundImage background = appContext()->localSettings()->backgroundImage();
             background.opacity = opacityFromPercent(value);
-            qnSettings->setBackgroundImage(background);
+            appContext()->localSettings()->backgroundImage = background;
             emit hasChangesChanged();
         });
 }

@@ -20,9 +20,15 @@ BaseProperty::BaseProperty(
     storage->registerProperty(this);
 }
 
+bool BaseProperty::exists() const
+{
+    return storage->exists(name);
+}
+
 void BaseProperty::notify()
 {
     emit changed(this);
+    emit storage->changed(this);
 }
 
 } // namespace nx::utils::property_storage

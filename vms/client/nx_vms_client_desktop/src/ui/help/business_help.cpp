@@ -93,22 +93,24 @@ int actionHelpId(ActionType type)
     }
 }
 
-int healthHelpId(QnSystemHealth::MessageType type)
+int healthHelpId(nx::vms::common::system_health::MessageType type)
 {
-    switch(type)
+    using nx::vms::common::system_health::MessageType;
+
+    switch (type)
     {
-        case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::UsersEmailIsEmpty:
+        case MessageType::emailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
             return Qn::EventsActions_EmailNotSet_Help;
-        case QnSystemHealth::NoLicenses:
+        case MessageType::noLicenses:
             return Qn::EventsActions_NoLicenses_Help;
-        case QnSystemHealth::SmtpIsNotSet:
+        case MessageType::smtpIsNotSet:
             return Qn::EventsActions_EmailServerNotSet_Help;
-        case QnSystemHealth::EmailSendError:
+        case MessageType::emailSendError:
             return Qn::EventsActions_SendMailError_Help;
-        case QnSystemHealth::StoragesNotConfigured:
+        case MessageType::storagesNotConfigured:
             return Qn::EventsActions_StoragesMisconfigured_Help;
-        case QnSystemHealth::backupStoragesNotConfigured:
+        case MessageType::backupStoragesNotConfigured:
             return Qn::ServerSettings_StoragesBackup_Help;
         default:
             return -1;

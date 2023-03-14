@@ -4,10 +4,11 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client/client_settings.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 namespace nx::vms::client::desktop {
@@ -42,7 +43,7 @@ bool ClientApiAuthDialog::isApproved(const QnResourcePtr& resource, const QUrl& 
         systemContext->moduleInformation().localSystemId,
         QString::fromStdString(connection->credentials().username));
 
-    auto allowedUrls = qnSettings->authAllowedUrls();
+    auto allowedUrls = appContext()->localSettings()->authAllowedUrls();
     if (allowedUrls.items[key].contains(url.toString()))
         return true;
 
@@ -53,7 +54,7 @@ bool ClientApiAuthDialog::isApproved(const QnResourcePtr& resource, const QUrl& 
     if (isApproved && dialog.isChecked())
     {
         allowedUrls.items[key].insert(url.toString());
-        qnSettings->setAuthAllowedUrls(allowedUrls);
+        appContext()->localSettings()->authAllowedUrls = allowedUrls;
     }
 
     return isApproved;

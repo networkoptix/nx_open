@@ -4,7 +4,6 @@
 
 #include <QtCore/QTimerEvent>
 
-#include <client/client_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -12,6 +11,7 @@
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -255,7 +255,7 @@ void ShowreelExecutor::processShowreelStepInternal(bool forward, bool force)
             if (!force
                 && item
                 && isTimerRunning()
-                && !m_showreel.elapsed.hasExpired(qnSettings->tourCycleTime()))
+                && !m_showreel.elapsed.hasExpired(appContext()->localSettings()->tourCycleTimeMs()))
             {
                 return;
             }
@@ -327,7 +327,7 @@ void ShowreelExecutor::processShowreelStepInternal(bool forward, bool force)
 
 void ShowreelExecutor::clearWorkbenchState()
 {
-    m_lastState = QnWorkbenchState();
+    m_lastState = WorkbenchState();
     workbench()->submit(m_lastState);
     workbench()->clear();
 }

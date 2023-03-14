@@ -23,7 +23,6 @@
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
@@ -2290,7 +2289,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
 
             return result;
         };
-    
+
     const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
             ? tr("LIVE")
             : extractTime(getDisplayTimeUsec()));

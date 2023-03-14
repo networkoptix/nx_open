@@ -5,21 +5,24 @@
 #include <chrono>
 
 #include <QtCore/QEvent>
-
 #include <QtWidgets/QWidget>
 
-#include "client/client_settings.h"     // conflicts with <X11/extensions/scrnsaver.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 #if defined(Q_OS_WIN)
-    #include <windows.h>
+#include <windows.h>
 #elif defined(Q_OS_MACOS)
-    #include <CoreGraphics/CGEventSource.h>
+#include <CoreGraphics/CGEventSource.h>
 #elif defined(Q_OS_LINUX)
-    #include <QtGui/private/qtx11extras_p.h>
-    #include <X11/extensions/scrnsaver.h>
+#include <QtGui/private/qtx11extras_p.h>
+
+#include <X11/extensions/scrnsaver.h>
 #endif
 
 using namespace std::chrono;
+
+using namespace nx::vms::client::desktop;
 
 namespace {
     const int timerIntervalMs = 1000; // check user inactivity every second
@@ -33,7 +36,11 @@ QnWorkbenchUserInactivityWatcher::QnWorkbenchUserInactivityWatcher(QObject *pare
     m_idleTimeout(0),
     m_mainWindow(0)
 {
-    connect(qnSettings->notifier(QnClientSettings::USER_IDLE_TIMEOUT_MSECS),    SIGNAL(valueChanged(int)),  this,   SLOT(updateTimeout()));
+    connect(&appContext()->localSettings()->userIdleTimeoutMs,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &QnWorkbenchUserInactivityWatcher::updateTimeout);
+
     updateTimeout();
 }
 
@@ -159,7 +166,8 @@ void QnWorkbenchUserInactivityWatcher::timerEvent(QTimerEvent *event) {
     checkInactivity();
 }
 
-void QnWorkbenchUserInactivityWatcher::updateTimeout() {
-    m_idleTimeout = qnSettings->userIdleTimeoutMSecs();
+void QnWorkbenchUserInactivityWatcher::updateTimeout()
+{
+    m_idleTimeout = appContext()->localSettings()->userIdleTimeoutMs();
     setEnabled(m_idleTimeout > 0);
 }

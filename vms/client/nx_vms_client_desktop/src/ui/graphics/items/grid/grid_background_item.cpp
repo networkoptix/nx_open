@@ -6,7 +6,6 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -14,8 +13,10 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
@@ -28,15 +29,15 @@
 #include <utils/math/math.h>
 
 #if defined(_WIN32)
-    /**
-     * if defined, background is drawn with native API (as gl texture),
-     * else - QPainter::drawImage is used
-     */
-    #define NATIVE_PAINT_BACKGROUND
-    #if defined(NATIVE_PAINT_BACKGROUND)
-        // Use YUV 420 with alpha plane
-        #define USE_YUVA420
-    #endif
+/**
+ * if defined, background is drawn with native API (as gl texture),
+ * else - QPainter::drawImage is used
+ */
+#define NATIVE_PAINT_BACKGROUND
+#if defined(NATIVE_PAINT_BACKGROUND)
+// Use YUV 420 with alpha plane
+#define USE_YUVA420
+#endif
 #endif
 
 using namespace nx::vms::client::desktop;
@@ -127,7 +128,7 @@ bool BackgroundImageData::imageIsVisible(bool connected) const
 
 BackgroundImageData BackgroundImageData::getForDefaultType()
 {
-    const auto background = qnSettings->backgroundImage();
+    const BackgroundImage background = appContext()->localSettings()->backgroundImage();
     return BackgroundImageData(
         background.name,
         kDefaultImageSize,
@@ -138,7 +139,7 @@ BackgroundImageData BackgroundImageData::getForDefaultType()
 
 BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourcePtr& layout)
 {
-    const auto background = qnSettings->backgroundImage();
+    const BackgroundImage background = appContext()->localSettings()->backgroundImage();
     return BackgroundImageData(
         layout->backgroundImageFilename(),
         layout->backgroundSize(),
@@ -213,9 +214,10 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
         this,
         &QnGridBackgroundItem::updateConnectedState);
 
-    const auto notifier = qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE);
-    connect(notifier, &QnPropertyNotifier::valueChanged,
-        this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(&appContext()->localSettings()->backgroundImage,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &QnGridBackgroundItem::updateDefaultBackground);
 
     /**
      * Don't disable this item here. When disabled, it starts accepting wheel events
@@ -246,7 +248,7 @@ void QnGridBackgroundItem::updateDefaultBackground()
     if (d->backgroundType != BackgroundType::Default)
         return;
 
-    const QnBackgroundImage background = qnSettings->backgroundImage();
+    const BackgroundImage background = appContext()->localSettings()->backgroundImage();
 
     bool hasChanges = false;
     if (d->imageData.fileName != background.name)

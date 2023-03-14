@@ -8,11 +8,12 @@
 #include <QtWidgets/QPushButton>
 
 #include <camera/camera_diagnose_tool.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topic_accessor.h>
@@ -108,14 +109,18 @@ void QnCameraDiagnosticsDialog::retranslateUi()
         return;
     }
 
-    ui->titleLabel->setText(QnDeviceDependentStrings::getNameFromSet(
-        resourcePool(),
-        QnCameraDeviceStringSet(
-            tr("Diagnostics for device %1"),
-            tr("Diagnostics for camera %1"),
-            tr("Diagnostics for I/O module %1")
-        ), m_resource)
-    .arg(QnResourceDisplayInfo(m_resource).toString(qnSettings->resourceInfoLevel())));
+    ui->titleLabel->setText(
+        nx::format(
+            QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("Diagnostics for device %1"),
+                    tr("Diagnostics for camera %1"),
+                    tr("Diagnostics for I/O module %1")
+                ),
+                m_resource),
+            QnResourceDisplayInfo(m_resource).toString(
+                appContext()->localSettings()->resourceInfoLevel())));
 
 
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(

@@ -1,12 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef SERVER_ADDRESSES_MODEL_H
-#define SERVER_ADDRESSES_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QSortFilterProxyModel>
-
-#include <client/client_model_types.h>
 
 #include <nx/utils/url.h>
 
@@ -85,5 +82,3 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 };
-
-#endif // SERVER_ADDRESSES_MODEL_H

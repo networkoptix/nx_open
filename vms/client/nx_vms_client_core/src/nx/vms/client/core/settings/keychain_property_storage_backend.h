@@ -11,9 +11,11 @@ class NX_VMS_CLIENT_CORE_API KeychainBackend: public nx::utils::property_storage
 public:
     explicit KeychainBackend(const QString& serviceName);
 
+    virtual bool isWritable() const override;
     virtual QString readValue(const QString& name, bool* success = nullptr) override;
     virtual bool writeValue(const QString& name, const QString& value) override;
     virtual bool removeValue(const QString& name) override;
+    virtual bool exists(const QString& name) const override;
 
 private:
     QString m_serviceName;

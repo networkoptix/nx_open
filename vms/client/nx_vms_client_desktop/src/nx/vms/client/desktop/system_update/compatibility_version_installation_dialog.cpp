@@ -8,7 +8,6 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QPushButton>
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>

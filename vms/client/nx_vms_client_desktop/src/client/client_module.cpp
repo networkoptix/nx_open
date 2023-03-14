@@ -7,7 +7,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QResource>
-#include <QtCore/QSettings>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QPalette>
 #include <QtGui/QSurfaceFormat>
@@ -19,7 +18,6 @@
 
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
@@ -51,6 +49,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/svg_icon_provider.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -67,13 +66,13 @@
 #include <utils/math/color_transformations.h>
 
 #if defined(Q_OS_WIN)
-    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
-    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
+#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
+#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
 #else
-    #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
 #endif
 #if defined(Q_OS_MAC)
-    #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
@@ -241,7 +240,7 @@ void QnClientModule::initSurfaceFormat()
 
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling))
         format.setSamples(2);
-    format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
+    format.setSwapBehavior(appContext()->localSettings()->glDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
     format.setSwapInterval(ini().limitFrameRate ? 1 : 0);

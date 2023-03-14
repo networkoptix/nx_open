@@ -4,14 +4,13 @@
 
 #include <QtGui/QFont>
 
+#include <client/client_globals.h>
 #include <common/common_globals.h>
-
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 using namespace nx::vms::client::core::ptz;
 using namespace nx::vms::client::desktop;

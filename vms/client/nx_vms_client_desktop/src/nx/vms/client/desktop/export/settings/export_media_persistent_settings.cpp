@@ -10,6 +10,7 @@
 #include <QtGui/QTextDocument>
 
 #include <client/client_meta_types.h>
+#include <nx/reflect/compare.h>
 #include <nx/utils/string.h>
 #include <nx/vms/common/html/html.h>
 #include <utils/math/math.h>
@@ -90,6 +91,12 @@ void ExportImageOverlayPersistentSettings::rescale(qreal factor)
     overlayWidth = qRound(overlayWidth * factor);
 }
 
+bool ExportImageOverlayPersistentSettings::operator==(
+    const ExportImageOverlayPersistentSettings& other) const
+{
+    return nx::reflect::equals(*this, other);
+}
+
 OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings() const
 {
     const qreal aspectRatio = image.isNull() ? 1.0 : qreal(image.width()) / image.height();
@@ -137,6 +144,12 @@ void ExportTextOverlayPersistentSettingsBase::rescale(qreal factor)
     static constexpr int kMinimumIndent = 4;
     indent = qMax(fontSize / 4, kMinimumIndent);
     roundingRadius = qMax(fontSize / 8, kMinimumRoundingRadius);
+}
+
+bool ExportTextOverlayPersistentSettingsBase::operator==(
+    const ExportTextOverlayPersistentSettingsBase& other) const
+{
+    return nx::reflect::equals(*this, other);
 }
 
 OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSettings() const

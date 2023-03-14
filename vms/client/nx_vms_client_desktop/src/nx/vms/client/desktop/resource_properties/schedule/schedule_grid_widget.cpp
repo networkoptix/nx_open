@@ -6,17 +6,16 @@
 
 #include <QtCore/QLocale>
 #include <QtCore/QScopeGuard>
+#include <QtCore/QTime>
 #include <QtGui/QColor>
-#include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <nx/vms/client/desktop/style/helper.h>
-
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 

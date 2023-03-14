@@ -12,16 +12,16 @@ Item
 {
     id: preview
 
-    property int delayMs: ClientSettings.iniConfigValue("intervalPreviewDelayMs")
-    property int loopDelayMs: ClientSettings.iniConfigValue("intervalPreviewLoopDelayMs")
+    property int delayMs: LocalSettings.iniConfigValue("intervalPreviewDelayMs")
+    property int loopDelayMs: LocalSettings.iniConfigValue("intervalPreviewLoopDelayMs")
     property bool active: false
     property var resourceId: NxGlobals.uuid("")
 
     property real timestampMs: -1
-    property real durationMs: ClientSettings.iniConfigValue("intervalPreviewDurationMs")
+    property real durationMs: LocalSettings.iniConfigValue("intervalPreviewDurationMs")
     property real startTimeMs: timestampMs - durationMs / 2
 
-    property real speedFactor: ClientSettings.iniConfigValue("intervalPreviewSpeedFactor")
+    property real speedFactor: LocalSettings.iniConfigValue("intervalPreviewSpeedFactor")
 
     property real aspectRatio: 1.0
 

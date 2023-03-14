@@ -13,7 +13,6 @@
 #include <client/client_installations_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -54,6 +53,7 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -95,8 +95,8 @@
 #include <utils/screen_utils.h>
 #include <utils/unity_launcher_workaround.h>
 
-using nx::vms::client::desktop::utils::UnityLauncherWorkaround;
 using nx::vms::client::core::MotionSelection;
+using nx::vms::common::LayoutItemData;
 
 using namespace std::chrono;
 using namespace nx::vms::client;
@@ -126,7 +126,7 @@ static const QString kSilentKey("silent");
 
 QnVideoWallItemIndexList getIndices(
     const LayoutResourcePtr& layout,
-    const QnLayoutItemData& data)
+    const LayoutItemData& data)
 {
     return layout->itemData(data.uuid, Qn::VideoWallItemIndicesRole)
         .value<QnVideoWallItemIndexList>();
@@ -134,7 +134,7 @@ QnVideoWallItemIndexList getIndices(
 
 void setIndices(
     const LayoutResourcePtr& layout,
-    const QnLayoutItemData& data,
+    const LayoutItemData& data,
     const QnVideoWallItemIndexList& value)
 {
     layout->setItemData(data.uuid, Qn::VideoWallItemIndicesRole, QVariant::fromValue(value));
@@ -161,7 +161,7 @@ void addItemToLayout(const LayoutResourcePtr& layout, const QnVideoWallItemIndex
     QRect geometry = pc.screens[screens.first()].layoutGeometry;
     if (geometry.isValid())
     {
-        for (const QnLayoutItemData &item : layout->getItems())
+        for (const LayoutItemData &item : layout->getItems())
         {
             if (!item.combinedGeometry.isValid())
                 continue;
@@ -172,7 +172,7 @@ void addItemToLayout(const LayoutResourcePtr& layout, const QnVideoWallItemIndex
         }
     }
 
-    QnLayoutItemData itemData;
+    LayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
     itemData.combinedGeometry = geometry;
     if (geometry.isValid())
@@ -232,7 +232,7 @@ public:
 
 auto offlineItemOnThisPc = []
     {
-        QnUuid pcUuid = qnSettings->pcUuid();
+        QnUuid pcUuid = appContext()->localSettings()->pcUuid();
         NX_ASSERT(!pcUuid.isNull(), "Invalid pc state.");
         return [pcUuid](const QnVideoWallItem& item)
             {
@@ -351,12 +351,11 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(m_controlMode.syncPlayTimer, &QTimer::timeout, this,
         [this]{ syncTimelinePosition(/*silent*/ true); });
 
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
     {
         pcUuid = QnUuid::createUuid();
-        qnSettings->setPcUuid(pcUuid);
-        qnSettings->save();
+        appContext()->localSettings()->pcUuid = pcUuid;
     }
     m_controlMode.pcUuid = pcUuid.toString();
 
@@ -1339,7 +1338,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
         return;
     }
 
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
     {
         NX_ERROR(this, "Warning: pc UUID is null, cannot start videowall %1 on this pc",
@@ -1465,7 +1464,7 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         int i = 0;
         for (const QnResourcePtr &resource: filtered)
         {
-            QnLayoutItemData item = layoutItemFromResource(resource);
+            LayoutItemData item = layoutItemFromResource(resource);
             item.flags = Qn::Pinned;
             item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
             layout->addItem(item);
@@ -2090,7 +2089,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     {
         const auto& values = currentLayout->getItems().values();
         hasDesktopCamera |= std::any_of(values.begin(), values.end(),
-            [this](const QnLayoutItemData &item)
+            [this](const LayoutItemData &item)
         {
             QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);
             return childResource && childResource->hasFlags(Qn::desktop_camera);
@@ -2401,7 +2400,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     auto handleAutoRunChanged =
         [getServerUrl](const QnVideoWallResourcePtr& videoWall)
         {
-            if (videoWall && videoWall->pcs()->hasItem(qnSettings->pcUuid()))
+            if (videoWall && videoWall->pcs()->hasItem(appContext()->localSettings()->pcUuid()))
             {
                 VideoWallShortcutHelper::setVideoWallAutorunEnabled(
                     videoWall->getId(),
@@ -2416,7 +2415,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     connect(videoWall.get(), &QnVideoWallResource::pcAdded, this,
         [getServerUrl](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
         {
-            if (pc.uuid != qnSettings->pcUuid())
+            if (pc.uuid != appContext()->localSettings()->pcUuid())
                 return;
 
             VideoWallShortcutHelper::setVideoWallAutorunEnabled(
@@ -2428,7 +2427,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     connect(videoWall.get(), &QnVideoWallResource::pcRemoved, this,
         [](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
         {
-            if (pc.uuid != qnSettings->pcUuid())
+            if (pc.uuid != appContext()->localSettings()->pcUuid())
                 return;
             VideoWallShortcutHelper::setVideoWallAutorunEnabled(videoWall->getId(), false);
         });
@@ -2540,7 +2539,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(
     QList<QnWorkbenchItem*> itemsToDelete;
     for (auto workbenchItem: layout->items())
     {
-        QnLayoutItemData data = workbenchItem->data();
+        LayoutItemData data = workbenchItem->data();
         auto indices = getIndices(layout->resource(), data);
         if (indices.isEmpty())
             continue;
@@ -3164,7 +3163,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     QSet<QnVideoWallResourcePtr> videowalls;
     for (QnWorkbenchItem* workbenchItem : layout->items())
     {
-        QnLayoutItemData data = workbenchItem->data();
+        LayoutItemData data = workbenchItem->data();
         auto indices = getIndices(layout->resource(), data);
         if (indices.isEmpty())
             continue;
@@ -3374,7 +3373,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
             QnWorkbenchItem* currentItem = nullptr;
             for (auto workbenchItem: layout->items())
             {
-                QnLayoutItemData data = workbenchItem->data();
+                LayoutItemData data = workbenchItem->data();
                 auto indices = getIndices(layoutResource, data);
                 if (indices.isEmpty())
                     continue;

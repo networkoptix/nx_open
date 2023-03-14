@@ -12,7 +12,6 @@
 #include <client/client_autorun_watcher.h>
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
@@ -53,6 +52,7 @@
 #include <nx/vms/client/desktop/session_manager/default_process_interface.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/fallback_shared_memory.h>
@@ -71,7 +71,7 @@
 #include <platform/platform_abstraction.h>
 
 #if defined(Q_OS_MACOS)
-    #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #include "system_context.h"
@@ -252,21 +252,21 @@ struct ApplicationContext::Private
         NX_ASSERT(!QCoreApplication::applicationName().isEmpty());
         NX_ASSERT(!QCoreApplication::organizationName().isEmpty());
 
-        settings = std::make_unique<QnClientSettings>(startupParameters);
-        settings->migrate();
+        localSettings = std::make_unique<LocalSettings>();
+        localSettings->migrateOldSettings();
 
         // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
         #if defined(Q_OS_WIN)
-            if (settings->createFullCrashDump())
+            if (localSettings->createFullCrashDump())
                 win32_exception::setCreateFullCrashDump(true);
         #endif
 
         // Runtime settings are standalone, but some values are initialized from the persistent
         // settings.
         runtimeSettings = std::make_unique<QnClientRuntimeSettings>(startupParameters);
-        runtimeSettings->setGLDoubleBuffer(settings->isGlDoubleBuffer());
-        runtimeSettings->setMaximumLiveBufferMs(settings->maximumLiveBufferMs());
-        runtimeSettings->setLocale(settings->locale());
+        runtimeSettings->setGLDoubleBuffer(localSettings->glDoubleBuffer());
+        runtimeSettings->setMaximumLiveBufferMs(localSettings->maximumLiveBufferMs());
+        runtimeSettings->setLocale(localSettings->locale());
 
         #ifdef Q_OS_MACX
             if (mac_isSandboxed())
@@ -301,7 +301,7 @@ struct ApplicationContext::Private
         clientStateHandler->setSharedMemoryManager(sharedMemoryManager.get());
 
         runningInstancesManager = std::make_unique<RunningInstancesManager>(
-            settings.get(),
+            localSettings.get(),
             sharedMemoryManager.get());
 
         processInterface = std::make_unique<session::DefaultProcessInterface>();
@@ -314,7 +314,7 @@ struct ApplicationContext::Private
         sessionManager = std::make_unique<SessionManager>(sessionConfig, processInterface.get());
 
         IpcSettingsSynchronizer::setup(
-            settings.get(),
+            localSettings.get(),
             showOnceSettings.get(),
             sharedMemoryManager.get());
     }
@@ -348,7 +348,7 @@ struct ApplicationContext::Private
 
         if (logLevel.isEmpty())
         {
-            logLevel = qnSettings->logLevel();
+            logLevel = appContext()->localSettings()->logLevel();
             NX_INFO(NX_SCOPE_TAG, "Log level is initialized from the settings");
         }
         else
@@ -421,7 +421,7 @@ struct ApplicationContext::Private
     void initializeTranslations()
     {
         translationManager = std::make_unique<nx::vms::utils::TranslationManager>();
-        bool loaded = translationManager->installTranslation(qnSettings->locale());
+        bool loaded = translationManager->installTranslation(localSettings->locale());
         if (!loaded)
             loaded = translationManager->installTranslation(nx::branding::defaultLocale());
         NX_ASSERT(loaded, "Translations could not be initialized");
@@ -526,7 +526,7 @@ struct ApplicationContext::Private
     std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
 
     // Settings modules.
-    std::unique_ptr<QnClientSettings> settings;
+    std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
     std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
     std::unique_ptr<QnClientShowOnceSettings> showOnceSettings;
@@ -765,6 +765,11 @@ ContextStatisticsModule* ApplicationContext::statisticsModule() const
 UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
 {
     return d->unifiedResourcePool.get();
+}
+
+LocalSettings* ApplicationContext::localSettings() const
+{
+    return d->localSettings.get();
 }
 
 ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const

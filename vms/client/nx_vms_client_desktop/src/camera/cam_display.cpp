@@ -5,7 +5,6 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <nx/branding.h>
@@ -17,6 +16,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
@@ -25,10 +25,11 @@
 #include "video_stream_display.h"
 
 #if defined(Q_OS_MAC)
-    #include <IOKit/pwr_mgt/IOPMLib.h>
+#include <IOKit/pwr_mgt/IOPMLib.h>
 #elif defined(Q_OS_WIN)
-    #include <qt_windows.h>
-    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
+#include <qt_windows.h>
+
+#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
 #endif
 
 using namespace nx::vms::client::desktop;
@@ -49,7 +50,7 @@ static void updateActivity()
         static IOPMAssertionID powerAssertionID = 0;
 
         // Prevent computer entering sleep mode unless it disabled in the local settings.
-        if (qnSettings->allowComputerEnteringSleepMode())
+        if (appContext()->localSettings()->allowComputerEnteringSleepMode())
         {
             if (powerAssertionID == 0)
                 return;
@@ -78,7 +79,7 @@ static void updateActivity()
         Q_UNUSED(screenSaverDisabled)
 
         // Prevent computer entering sleep mode unless it disabled in the local settings.
-        if (qnSettings->allowComputerEnteringSleepMode())
+        if (appContext()->localSettings()->allowComputerEnteringSleepMode())
         {
             SetThreadExecutionState(ES_CONTINUOUS);
         }
@@ -713,7 +714,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
             // Do not draw if computer is very slow and we still wanna sync with audio.
             const bool draw = !ignoreVideo;
-            const bool shouldPauseWhenIdle = qnSettings->userIdleTimeoutMSecs() > 0;
+            const bool shouldPauseWhenIdle =
+                (appContext()->localSettings()->userIdleTimeoutMs() > 0);
 
             if (draw && !shouldPauseWhenIdle)
                 updateActivity();
@@ -2168,12 +2170,13 @@ QnMediaResourcePtr QnCamDisplay::resource() const
 
 qint64 QnCamDisplay::initialLiveBufferMkSecs()
 {
-    return qMin(qnSettings->initialLiveBufferMs() * 1000ll, maximumLiveBufferMkSecs());
+    return qMin(appContext()->localSettings()->initialLiveBufferMs() * 1000ll,
+        maximumLiveBufferMkSecs());
 }
 
 qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 {
-    return qnSettings->maximumLiveBufferMs() * 1000ll;
+    return appContext()->localSettings()->maximumLiveBufferMs() * 1000ll;
 }
 
 nx::vms::common::MediaStreamEventPacket QnCamDisplay::lastMediaEvent() const

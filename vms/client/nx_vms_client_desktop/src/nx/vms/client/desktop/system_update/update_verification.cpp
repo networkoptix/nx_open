@@ -2,10 +2,10 @@
 
 #include "update_verification.h"
 
-#include <client/client_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
+#include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/client/desktop/application_context.h>

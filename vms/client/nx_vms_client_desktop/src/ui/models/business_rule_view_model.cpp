@@ -6,7 +6,6 @@
 
 #include <business/business_resource_validation.h> //< TODO: #vkutin Move these to proper locations and namespaces
 #include <business/business_types_comparator.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
@@ -27,7 +26,7 @@
 #include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -1361,7 +1360,10 @@ QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
         return braced(tr("System"));
 
     if (resources.size() == 1)
-        return QnResourceDisplayInfo(resources.first()).toString(qnSettings->resourceInfoLevel());
+    {
+        return QnResourceDisplayInfo(resources.first()).toString(
+            appContext()->localSettings()->resourceInfoLevel());
+    }
 
     if (vms::event::requiresServerResource(m_eventType))
     {
@@ -1460,7 +1462,10 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
     {
         QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
         if (cameras.size() == 1)
-            return QnResourceDisplayInfo(cameras.first()).toString(qnSettings->resourceInfoLevel());
+        {
+            return QnResourceDisplayInfo(cameras.first()).toString(
+                appContext()->localSettings()->resourceInfoLevel());
+        }
 
         if (cameras.isEmpty())
             return QnDeviceDependentStrings::getDefaultNameFromSet(

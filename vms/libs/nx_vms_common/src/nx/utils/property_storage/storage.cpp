@@ -13,6 +13,11 @@ Storage::Storage(AbstractBackend* backend, QObject* parent):
 {
 }
 
+bool Storage::isWritable() const
+{
+    return m_backend->isWritable();
+}
+
 void Storage::load()
 {
     for (const auto& property: m_properties)
@@ -40,6 +45,24 @@ void Storage::unregisterProperty(BaseProperty* property)
 {
     property->disconnect(this);
     m_properties.remove(property->name);
+}
+
+bool Storage::exists(const QString& name) const
+{
+    return m_backend->exists(name);
+}
+
+QVariant Storage::value(const QString& name) const
+{
+    if (const BaseProperty* property = m_properties[name])
+        return property->variantValue();
+    return {};
+}
+
+void Storage::setValue(const QString& name, const QVariant& value)
+{
+    if (BaseProperty* property = m_properties.value(name))
+        property->setVariantValue(value);
 }
 
 QList<BaseProperty*> Storage::properties() const

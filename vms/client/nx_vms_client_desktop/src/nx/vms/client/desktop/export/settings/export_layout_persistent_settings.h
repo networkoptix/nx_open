@@ -14,6 +14,8 @@ struct ExportLayoutPersistentSettings
     QString fileFormat;
 
     void updateRuntimeSettings(ExportLayoutSettings& runtimeSettings) const;
+
+    bool operator==(const ExportLayoutPersistentSettings&) const = default;
 };
 #define ExportLayoutPersistentSettings_Fields (readOnly)(fileFormat)
 NX_REFLECTION_INSTRUMENT(ExportLayoutPersistentSettings, ExportLayoutPersistentSettings_Fields)

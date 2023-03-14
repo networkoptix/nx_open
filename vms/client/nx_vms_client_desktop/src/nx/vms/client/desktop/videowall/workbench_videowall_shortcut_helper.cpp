@@ -6,13 +6,14 @@
 #include <QtCore/QStandardPaths>
 
 #include <client/client_installations_manager.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/videowall_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/desktop/app_icons.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <platform/platform_abstraction.h>
@@ -129,7 +130,7 @@ void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
 
 bool VideoWallShortcutHelper::canStartVideoWall(const QnVideoWallResourcePtr& videowall)
 {
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
     {
         NX_ERROR(NX_SCOPE_TAG, "Pc UUID is null, cannot start Video Wall on this pc");

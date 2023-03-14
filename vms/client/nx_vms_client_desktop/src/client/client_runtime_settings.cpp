@@ -3,9 +3,12 @@
 #include "client_runtime_settings.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
-#include "client_settings.h"
 #include "client_startup_parameters.h"
+
+using namespace nx::vms::client::desktop;
 
 static QnClientRuntimeSettings* s_instance = nullptr;
 
@@ -76,5 +79,5 @@ int QnClientRuntimeSettings::maxSceneItems() const
 
     return lightMode().testFlag(Qn::LightModeSingleItem)
         ? 1
-        : qnSettings->maxSceneVideoItems();
+        : appContext()->localSettings()->maxSceneVideoItems();
 }

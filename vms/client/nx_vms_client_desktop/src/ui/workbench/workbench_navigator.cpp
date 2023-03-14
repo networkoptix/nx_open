@@ -20,7 +20,6 @@
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
@@ -45,6 +44,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <server/server_storage_manager.h>
@@ -457,7 +457,6 @@ void QnWorkbenchNavigator::deinitialize()
     // TODO: #sivanov Actualize used system context.
     const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     timeWatcher->disconnect(this);
-    qnSettings->notifier(QnClientSettings::TIME_MODE)->disconnect(this);
 
     m_currentWidget = nullptr;
     m_currentWidgetFlags = {};
@@ -1491,7 +1490,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
     QScopedValueRollback<bool> guard(m_updatingSliderFromReader, true);
 
-    QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    auto searchState = workbench()->currentLayout()->data(
+        Qn::LayoutSearchStateRole).value<ThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
 
     qint64 startTimeMSec = 0;

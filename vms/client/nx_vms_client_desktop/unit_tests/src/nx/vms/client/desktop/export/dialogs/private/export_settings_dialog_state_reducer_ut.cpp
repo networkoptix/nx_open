@@ -29,12 +29,12 @@ TEST_F(ExportSettingsDialogStateReducerTest, enableTabs)
     ASSERT_FALSE(state.mediaAvailable);
     ASSERT_FALSE(state.layoutAvailable);
 
-    state = Reducer::enableTab(std::move(state), ExportSettingsDialog::Mode::Media);
+    state = Reducer::enableTab(std::move(state), ExportMode::media);
 
     ASSERT_TRUE(state.mediaAvailable);
     ASSERT_FALSE(state.layoutAvailable);
 
-    state = Reducer::enableTab(std::move(state), ExportSettingsDialog::Mode::Layout);
+    state = Reducer::enableTab(std::move(state), ExportMode::layout);
 
     ASSERT_TRUE(state.mediaAvailable);
     ASSERT_TRUE(state.layoutAvailable);
@@ -45,20 +45,20 @@ TEST_F(ExportSettingsDialogStateReducerTest, forbidMediaMode)
 {
     ASSERT_FALSE(state.mediaAvailable);
     ASSERT_FALSE(state.layoutAvailable);
-    ASSERT_EQ(ExportSettingsDialog::Mode::Media, state.mode);
+    ASSERT_EQ(ExportMode::media, state.mode);
 
-    state = Reducer::enableTab(std::move(state), ExportSettingsDialog::Mode::Layout);
+    state = Reducer::enableTab(std::move(state), ExportMode::layout);
     ASSERT_TRUE(state.layoutAvailable);
 
-    state = Reducer::setMode(std::move(state), ExportSettingsDialog::Mode::Layout).second;
-    ASSERT_EQ(ExportSettingsDialog::Mode::Layout, state.mode);
+    state = Reducer::setMode(std::move(state), ExportMode::layout).second;
+    ASSERT_EQ(ExportMode::layout, state.mode);
 
-    state = Reducer::setMode(std::move(state), ExportSettingsDialog::Mode::Media).second;
-    ASSERT_EQ(ExportSettingsDialog::Mode::Layout, state.mode);
+    state = Reducer::setMode(std::move(state), ExportMode::media).second;
+    ASSERT_EQ(ExportMode::layout, state.mode);
 
-    state = Reducer::disableTab(std::move(state), ExportSettingsDialog::Mode::Media, "reason");
-    state = Reducer::setMode(std::move(state), ExportSettingsDialog::Mode::Media).second;
-    ASSERT_EQ(ExportSettingsDialog::Mode::Layout, state.mode);
+    state = Reducer::disableTab(std::move(state), ExportMode::media, "reason");
+    state = Reducer::setMode(std::move(state), ExportMode::media).second;
+    ASSERT_EQ(ExportMode::layout, state.mode);
 }
 
 // Forbid switch to layout mode if its tab is not available or disabled.
@@ -66,17 +66,17 @@ TEST_F(ExportSettingsDialogStateReducerTest, forbidLayoutMode)
 {
     ASSERT_FALSE(state.mediaAvailable);
     ASSERT_FALSE(state.layoutAvailable);
-    ASSERT_EQ(ExportSettingsDialog::Mode::Media, state.mode);
+    ASSERT_EQ(ExportMode::media, state.mode);
 
-    state = Reducer::enableTab(std::move(state), ExportSettingsDialog::Mode::Media);
+    state = Reducer::enableTab(std::move(state), ExportMode::media);
     ASSERT_TRUE(state.mediaAvailable);
 
-    state = Reducer::setMode(std::move(state), ExportSettingsDialog::Mode::Layout).second;
-    ASSERT_EQ(ExportSettingsDialog::Mode::Media, state.mode);
+    state = Reducer::setMode(std::move(state), ExportMode::layout).second;
+    ASSERT_EQ(ExportMode::media, state.mode);
 
-    state = Reducer::disableTab(std::move(state), ExportSettingsDialog::Mode::Layout, "reason");
-    state = Reducer::setMode(std::move(state), ExportSettingsDialog::Mode::Layout).second;
-    ASSERT_EQ(ExportSettingsDialog::Mode::Media, state.mode);
+    state = Reducer::disableTab(std::move(state), ExportMode::layout, "reason");
+    state = Reducer::setMode(std::move(state), ExportMode::layout).second;
+    ASSERT_EQ(ExportMode::media, state.mode);
 }
 
 // Enable tab after disabling with reason.
@@ -85,14 +85,14 @@ TEST_F(ExportSettingsDialogStateReducerTest, disableEnableTab)
     ASSERT_FALSE(state.mediaAvailable);
     ASSERT_FALSE(state.layoutAvailable);
 
-    state = Reducer::disableTab(std::move(state), ExportSettingsDialog::Mode::Media, "reason");
+    state = Reducer::disableTab(std::move(state), ExportMode::media, "reason");
 
     ASSERT_TRUE(state.mediaAvailable);
     ASSERT_EQ("reason", state.mediaDisableReason);
     ASSERT_FALSE(state.layoutAvailable);
     ASSERT_TRUE(state.layoutDisableReason.isNull());
 
-    state = Reducer::enableTab(std::move(state), ExportSettingsDialog::Mode::Media);
+    state = Reducer::enableTab(std::move(state), ExportMode::media);
 
     ASSERT_TRUE(state.mediaAvailable);
     ASSERT_TRUE(state.mediaDisableReason.isNull());

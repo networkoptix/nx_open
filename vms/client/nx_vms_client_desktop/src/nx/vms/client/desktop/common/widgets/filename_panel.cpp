@@ -5,14 +5,13 @@
 
 #include <QtWidgets/QFileDialog>
 
-#include <client/client_settings.h>
-
+#include <nx/build_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/utils/log/log.h>
-
-#include <nx/build_info.h>
 
 namespace {
 
@@ -117,9 +116,9 @@ void FilenamePanel::setFilename(const Filename& value)
 {
     d->filename = value;
     if (d->filename.path.isEmpty())
-        d->filename.path = qnSettings->lastExportDir();
-    if (d->filename.path.isEmpty() && !qnSettings->mediaFolders().isEmpty())
-        d->filename.path = qnSettings->mediaFolders().first();
+        d->filename.path = appContext()->localSettings()->lastExportDir();
+    if (d->filename.path.isEmpty() && !appContext()->localSettings()->mediaFolders().isEmpty())
+        d->filename.path = appContext()->localSettings()->mediaFolders().first();
 
     ui->folderInputField->setText(d->filename.path);
 

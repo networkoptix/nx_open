@@ -3,21 +3,22 @@
 #include "call_notifications_list_model_p.h"
 
 #include <client/client_module.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
-#include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -111,7 +112,7 @@ QString CallNotificationsListModel::Private::tooltip(const vms::event::AbstractA
     const QStringList tooltip = m_helper->eventDescription(
         action,
         vms::event::AggregationInfo(),
-        qnSettings->resourceInfoLevel(),
+        appContext()->localSettings()->resourceInfoLevel(),
         nx::vms::event::AttrSerializePolicy::none);
 
     return tooltip.join(nx::vms::common::html::kLineBreak);

@@ -17,7 +17,6 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -30,11 +29,13 @@
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -132,7 +133,8 @@ bool inViewportPtzMode(QnResourceWidget* resourceWidget, Qt::KeyboardModifiers k
     return mediaResourceWidget->item()
         && mediaResourceWidget->item()->controlPtz()
         && mediaResourceWidget->ptzController()->hasCapabilities(Ptz::ViewportPtzCapability)
-        && (qnSettings->isPtzAimOverlayEnabled() || keyboardModifiers.testFlag(Qt::ShiftModifier));
+        && (appContext()->localSettings()->ptzAimOverlayEnabled()
+            || keyboardModifiers.testFlag(Qt::ShiftModifier));
 }
 
 } // namespace
@@ -1190,10 +1192,10 @@ void QnWorkbenchController::at_zoomTargetChanged(
     if (!NX_ASSERT(resource))
         return;
 
-    QnLayoutItemData existing = widget->item()->data();
+    nx::vms::common::LayoutItemData existing = widget->item()->data();
 
     // Create new layout item inplace of existing one.
-    QnLayoutItemData data = existing;
+    nx::vms::common::LayoutItemData data = existing;
     data.uuid = QnUuid::createUuid();
     data.resource = descriptor(resource);
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();

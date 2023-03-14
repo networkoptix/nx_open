@@ -6,8 +6,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchState;
-
 /** Delegate to maintain knowledge about current connection session. */
 class QnSessionAwareDelegate: public QnWorkbenchContextAware
 {

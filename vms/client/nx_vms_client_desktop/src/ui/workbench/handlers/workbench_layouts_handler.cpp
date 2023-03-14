@@ -6,7 +6,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -125,7 +124,7 @@ LayoutResourceList alreadyExistingLayouts(
 }
 
 QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
-    const QnLayoutItemDataMap& items)
+    const common::LayoutItemDataMap& items)
 {
     QSet<QnResourcePtr> result;
     for (const auto& item: items)
@@ -161,7 +160,7 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
 
     auto items = layout->getItems();
     return std::any_of(items.cbegin(), items.cend(),
-        [currentCloudSystemId](const QnLayoutItemData& item)
+        [currentCloudSystemId](const common::LayoutItemData& item)
         {
             return isCrossSystemResource(item.resource)
                 && crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
@@ -415,7 +414,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 nx::utils::guarded(this,
-                    [this, layout, snapshotManager](int /*reqId*/, ec2::ErrorCode errorCode)
+                    [layout, snapshotManager](int /*reqId*/, ec2::ErrorCode errorCode)
                 {
                     snapshotManager->markBeingSaved(layout->getId(), false);
                     if (errorCode != ec2::ErrorCode::ok)

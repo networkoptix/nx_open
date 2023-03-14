@@ -2,21 +2,20 @@
 
 #pragma once
 
-#include <client/client_settings.h>
 #include <qt_graphics_items/graphics_path_item.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/text_button_widget.h>
-#include <ui/graphics/items/generic/gui_elements_widget.h>
-#include <ui/graphics/items/generic/framed_widget.h>
-#include <ui/graphics/items/generic/splash_item.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/graphics/items/generic/gui_elements_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/splash_item.h>
+#include <ui/graphics/items/generic/text_button_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include "selection_item.h"
 

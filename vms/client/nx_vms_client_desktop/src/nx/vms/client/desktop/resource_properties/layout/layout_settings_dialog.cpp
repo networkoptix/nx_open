@@ -5,9 +5,10 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 
 #include "flux/layout_settings_dialog_state.h"
@@ -131,9 +132,9 @@ void LayoutSettingsDialog::accept()
             // Check if current image should be cropped and re-uploaded.
             if (background.canChangeAspectRatio() && background.cropToMonitorAspectRatio)
                 break;
-            qnSettings->setLayoutKeepAspectRatio(background.keepImageAspectRatio);
+            appContext()->localSettings()->layoutKeepAspectRatio = background.keepImageAspectRatio;
             LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
-                qnSettings->layoutKeepAspectRatio());
+                appContext()->localSettings()->layoutKeepAspectRatio());
             d->applyChanges();
             base_type::accept();
             return;

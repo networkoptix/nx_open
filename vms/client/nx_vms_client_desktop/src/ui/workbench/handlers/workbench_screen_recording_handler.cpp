@@ -10,7 +10,6 @@
 #include <QtWidgets/QGraphicsView>
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/file_processor.h>
@@ -20,9 +19,11 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_data_provider_base.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
 #include <nx/vms/client/desktop/resource/screen_recording/desktop_data_provider_wrapper.h>
 #include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/time/formatter.h>
@@ -207,10 +208,12 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     VideoRecorderSettings recorderSettings;
 
     QDateTime dt = QDateTime::currentDateTime();
-    QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
-        nx::utils::replaceNonFileNameCharacters(
-            QString(lit("video_recording_%1.avi"))
-                .arg(nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)), QLatin1Char('_'));
+    QString filePath = recorderSettings.recordingFolder()
+        + "/"
+        + nx::utils::replaceNonFileNameCharacters(
+            nx::format("video_recording_%1.avi",
+                nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)),
+            '_');
     core::AudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     core::AudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
@@ -242,7 +245,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
         return;
     }
 
-    m_recorder->setContainer(lit("avi"));
+    m_recorder->setContainer("avi");
 
     connect(m_recorder.get(), &QnStreamRecorder::recordingStarted, this,
         &QnWorkbenchScreenRecordingHandler::onStreamRecordingStarted);
@@ -333,7 +336,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished()
     QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
         mainWindowWidget(),
         tr("Save Recording As..."),
-        qnSettings->lastRecordingDir() + QLatin1Char('/') + suggestion,
+        appContext()->localSettings()->lastRecordingDir() + '/' + suggestion,
         QnCustomFileDialog::createFilter(tr("AVI (Audio/Video Interleaved)"), "avi")));
 
     dialog->setOption(QFileDialog::DontConfirmOverwrite);
@@ -373,7 +376,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished()
 
             QnFileProcessor::createResourcesForFile(filePath, resourcePool());
 
-            qnSettings->setLastRecordingDir(QFileInfo(filePath).absolutePath());
+            appContext()->localSettings()->lastRecordingDir = QFileInfo(filePath).absolutePath();
 
             break;
         }

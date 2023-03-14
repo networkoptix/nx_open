@@ -10,7 +10,6 @@
 #include <QtWidgets/QStyle>
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>

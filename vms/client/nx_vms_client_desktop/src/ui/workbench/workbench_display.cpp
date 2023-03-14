@@ -38,12 +38,14 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
+#include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/time/formatter.h>
@@ -333,7 +335,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
 
-    connect(qnSettings, &QnClientSettings::valueChanged, this, &QnWorkbenchDisplay::at_settingsValueChanged);
+    connect(&appContext()->localSettings()->playAudioForAllItems,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &QnWorkbenchDisplay::updateAudioPlayback);
 
     connect(AudioDispatcher::instance(), &AudioDispatcher::currentAudioSourceChanged,
         this, &QnWorkbenchDisplay::updateAudioPlayback);
@@ -345,12 +350,6 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay()
 {
     NX_ASSERT(!m_scene);
     NX_ASSERT(!m_view);
-}
-
-void QnWorkbenchDisplay::at_settingsValueChanged(int id)
-{
-    if (id == QnClientSettings::PLAY_AUDIO_FOR_ALL_ITEMS)
-        updateAudioPlayback();
 }
 
 void QnWorkbenchDisplay::updateAudioPlayback()
@@ -366,7 +365,7 @@ void QnWorkbenchDisplay::updateAudioPlayback()
         if (camDisplay)
         {
             camDisplay->playAudio(audioEnabled
-                && (qnSettings->playAudioForAllItems() || w == centralWidget));
+                && (appContext()->localSettings()->playAudioForAllItems() || w == centralWidget));
         }
     }
 }
@@ -959,7 +958,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             {
                 QnCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : nullptr;
                 if (oldCamDisplay)
-                    oldCamDisplay->playAudio(qnSettings->playAudioForAllItems());
+                    oldCamDisplay->playAudio(appContext()->localSettings()->playAudioForAllItems());
             }
 
             if (QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget))
@@ -1251,7 +1250,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         widget->setCheckedButtons(checkedButtons);
     }
     // If we are opening the widget for the first time, show info button by default if needed.
-    else if (qnSettings->showInfoByDefault())
+    else if (appContext()->localSettings()->showInfoByDefault())
     {
         // Block item signals to avoid dataChanged propagation to layout synchronizer. Otherwise it
         // will queue changes and post them to the snapshot manager, which will display '*'.
@@ -2130,7 +2129,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
     const auto layoutSearchStateData = workbenchLayout->data(Qn::LayoutSearchStateRole);
     const bool isPreviewSearchLayout = !layoutSearchStateData.isNull()
-        && layoutSearchStateData.value<QnThumbnailsSearchState>().step > 0
+        && layoutSearchStateData.value<ThumbnailsSearchState>().step > 0
         && !workbenchLayout->items().empty();
 
     const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();

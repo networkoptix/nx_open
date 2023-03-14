@@ -9,11 +9,12 @@
 
 #include <api/media_server_statistics_manager.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -444,7 +445,8 @@ QnServerResourceWidget::QnServerResourceWidget(
 
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     NX_ASSERT(m_resource, "Server resource widget was created with a non-server resource.");
-    m_manager->setFlagsFilter(Qn::StatisticsNETWORK, qnSettings->statisticsNetworkFilter());
+    m_manager->setFlagsFilter(
+        Qn::StatisticsNETWORK, appContext()->localSettings()->statisticsNetworkFilter());
     m_pointsLimit = QnMediaServerStatisticsManager::kPointsLimit;
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);

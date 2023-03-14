@@ -567,7 +567,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
     LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    LayoutItemData item;
+    nx::vms::api::LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -606,7 +606,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowa
     LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    LayoutItemData item;
+    nx::vms::api::LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -645,7 +645,7 @@ TEST_F(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
     LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    LayoutItemData item;
+    nx::vms::api::LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = ownScreen->getId();
     layoutData.items.push_back(item);
@@ -690,7 +690,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
     LayoutData layoutData;
     ec2::fromResourceToApi(layout, layoutData);
 
-    LayoutItemData item;
+    nx::vms::api::LayoutItemData item;
     item.id = QnUuid::createUuid();
     item.resourceId = otherScreen->getId();
     layoutData.items.push_back(item);
@@ -733,13 +733,13 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
     ec2::fromResourceToApi(layout, layoutData);
 
     {
-        LayoutItemData item;
+        nx::vms::api::LayoutItemData item;
         item.id = QnUuid::createUuid();
         item.resourceId = ownScreen->getId();
         layoutData.items.push_back(item);
     }
     {
-        LayoutItemData item;
+        nx::vms::api::LayoutItemData item;
         item.id = QnUuid::createUuid();
         item.resourceId = camera->getId();
         layoutData.items.push_back(item);
@@ -1354,7 +1354,7 @@ TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
     vwitem.layout = layout->getId();
     videoWall->items()->addItem(vwitem);
 
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.resource.id = target->getId();
     layout->addItem(item);
     resourcePool()->addResource(layout);
@@ -1380,7 +1380,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
     resourcePool()->addResource(layout);
 
     // Place a camera on it
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.resource.id = target->getId();
     layout->addItem(item);
 
@@ -1411,7 +1411,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
     resourcePool()->addResource(layout);
 
     // Place a camera on it
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.resource.id = target->getId();
     layout->addItem(item);
 

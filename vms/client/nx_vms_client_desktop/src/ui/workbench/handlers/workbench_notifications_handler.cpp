@@ -11,15 +11,16 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -252,7 +253,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
         && eventType <= vms::api::EventType::maxSystemHealthEvent)
     {
         int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
+        addSystemHealthEvent(MessageType(healthMessage), action);
         return;
     }
 
@@ -276,8 +277,8 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     emit notificationAdded(action);
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message,
-    const vms::event::AbstractActionPtr &action)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(
+    MessageType message, const vms::event::AbstractActionPtr& action)
 {
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
 }
@@ -292,17 +293,14 @@ void QnWorkbenchNotificationsHandler::forcedUpdate()
 {
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message,
-    const QnResourcePtr &resource,
-    bool visible)
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(
+    MessageType message, const QnResourcePtr& resource, bool visible)
 {
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
-    QnSystemHealth::MessageType message,
-    const QVariant& params,
-    bool visible)
+    MessageType message, const QVariant& params, bool visible)
 {
     bool canShow = true;
 
@@ -327,12 +325,13 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     }
 
     /* Some messages are not to be displayed to users. */
-    canShow &= (QnSystemHealth::isMessageVisible(message));
+    canShow &= (nx::vms::common::system_health::isMessageVisible(message));
 
     // Checking that user wants to see this message (if he is able to hide it).
     if (isMessageVisibleInSettings(message))
     {
-        const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(message);
+        const bool isAllowedByFilter =
+            appContext()->localSettings()->popupSystemHealth().contains(message);
         canShow &= isAllowedByFilter;
     }
 

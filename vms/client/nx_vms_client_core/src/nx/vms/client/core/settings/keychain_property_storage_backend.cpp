@@ -2,9 +2,9 @@
 
 #include "keychain_property_storage_backend.h"
 
-#include <QtCore/QEventLoop>
-
 #include <keychain.h>
+
+#include <QtCore/QEventLoop>
 
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
@@ -21,6 +21,11 @@ KeychainBackend::KeychainBackend(const QString& serviceName):
         writeValue("", ""); //< Force user to enter password.
     }
 
+}
+
+bool KeychainBackend::isWritable() const
+{
+    return true;
 }
 
 QString KeychainBackend::readValue(const QString& name, bool* success)
@@ -100,6 +105,11 @@ bool KeychainBackend::removeValue(const QString& name)
 
     NX_VERBOSE(this, "Successfully deleted \"%1\" from keychain", name);
     return ok;
+}
+
+bool KeychainBackend::exists(const QString& /*name*/) const
+{
+    return true; //< QtKeychain does not have API for existence check.
 }
 
 } // namespace nx::vms::client::core

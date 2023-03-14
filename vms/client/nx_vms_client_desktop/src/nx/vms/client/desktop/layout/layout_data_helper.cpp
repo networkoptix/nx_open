@@ -11,9 +11,10 @@
 
 namespace nx::vms::client::desktop {
 
-QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource, bool forceCloud)
+nx::vms::common::LayoutItemData layoutItemFromResource(
+    const QnResourcePtr& resource, bool forceCloud)
 {
-    QnLayoutItemData data;
+    nx::vms::common::LayoutItemData data;
 
     data.uuid = QnUuid::createUuid();
     data.resource = descriptor(resource, forceCloud);
@@ -54,7 +55,7 @@ LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
             cellGeometry = cellGeometry.transposed();
     }
 
-    QnLayoutItemData item = layoutItemFromResource(resource);
+    nx::vms::common::LayoutItemData item = layoutItemFromResource(resource);
     // TODO: #sivanov Move to api.
     item.flags = /*pinned*/ 0x1; // Layout data item flags are declared in the client module.
     item.combinedGeometry = cellGeometry;

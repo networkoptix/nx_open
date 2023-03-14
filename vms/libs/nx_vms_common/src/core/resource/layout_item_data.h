@@ -8,12 +8,15 @@
 #include <QtCore/QVariant>
 #include <QtGui/QColor>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/common/resource/resource_descriptor.h>
 
-struct NX_VMS_COMMON_API QnLayoutItemData
+namespace nx::vms::common {
+
+struct NX_VMS_COMMON_API LayoutItemData
 {
     nx::vms::common::ResourceDescriptor resource;
 
@@ -32,11 +35,26 @@ struct NX_VMS_COMMON_API QnLayoutItemData
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::dewarping::ViewData dewarpingParams;
 
-    bool operator==(const QnLayoutItemData& other) const;
+    bool operator==(const LayoutItemData& other) const;
 };
 
-Q_DECLARE_TYPEINFO(QnLayoutItemData, Q_MOVABLE_TYPE);
+NX_REFLECTION_INSTRUMENT(LayoutItemData,
+    (resource)
+    (uuid)
+    (flags)
+    (combinedGeometry)
+    (zoomTargetUuid)
+    (zoomRect)
+    (rotation)
+    (displayInfo)
+    (controlPtz)
+    (displayAnalyticsObjects)
+    (displayRoi)
+    (frameDistinctionColor)
+    (contrastParams)
+    (dewarpingParams))
 
-typedef QList<QnLayoutItemData> QnLayoutItemDataList;
-typedef QHash<QnUuid, QnLayoutItemData> QnLayoutItemDataMap;
+using LayoutItemDataList = QList<LayoutItemData>;
+using LayoutItemDataMap = QHash<QnUuid, LayoutItemData>;
 
+} // namespace nx::vms::common

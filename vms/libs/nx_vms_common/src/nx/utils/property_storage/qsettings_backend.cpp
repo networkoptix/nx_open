@@ -17,6 +17,11 @@ QSettingsBackend::~QSettingsBackend()
 {
 }
 
+bool QSettingsBackend::isWritable() const
+{
+    return m_settings->isWritable();
+}
+
 QString QSettingsBackend::readValue(const QString& name, bool* success)
 {
     if (success)
@@ -34,6 +39,11 @@ bool QSettingsBackend::removeValue(const QString& name)
 {
     m_settings->remove(name);
     return true;
+}
+
+bool QSettingsBackend::exists(const QString& name) const
+{
+    return m_settings->contains(name);
 }
 
 bool QSettingsBackend::sync()

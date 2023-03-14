@@ -8,7 +8,6 @@
 #include <QtWidgets/QLineEdit>
 
 #include <client/client_meta_types.h>
-#include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
 #include <core/resource/camera_history.h>
@@ -18,10 +17,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -665,7 +666,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
     if (infoLevel == Qn::RI_Invalid)
-        infoLevel = qnSettings->resourceInfoLevel();
+        infoLevel = appContext()->localSettings()->resourceInfoLevel();
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource && resource->hasFlags(Qn::virtual_camera))

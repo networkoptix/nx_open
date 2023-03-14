@@ -6,10 +6,11 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/server_rest_connection.h>
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -59,7 +60,7 @@ void QnDatabaseManagementWidget::backupDb()
     QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
         this,
         tr("Save Database Backup..."),
-        qnSettings->lastDatabaseBackupDir(),
+        appContext()->localSettings()->lastDatabaseBackupDir(),
         kDbFilesFilter));
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     if (!fileDialog->exec())
@@ -78,7 +79,7 @@ void QnDatabaseManagementWidget::backupDb()
         fileName += kDbExtension;
 
     const QFileInfo fileInfo(fileName);
-    qnSettings->setLastDatabaseBackupDir(fileInfo.absolutePath());
+    appContext()->localSettings()->lastDatabaseBackupDir = fileInfo.absolutePath();
 
     if (fileInfo.exists() && !fileInfo.isWritable())
     {
@@ -156,7 +157,7 @@ void QnDatabaseManagementWidget::restoreDb()
     QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
-        qnSettings->lastDatabaseBackupDir(),
+        appContext()->localSettings()->lastDatabaseBackupDir(),
         kDbFilesFilter,
         nullptr,
         QnCustomFileDialog::fileDialogOptions());
@@ -168,7 +169,7 @@ void QnDatabaseManagementWidget::restoreDb()
     if (!connection)
         return;
 
-    qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
+    appContext()->localSettings()->lastDatabaseBackupDir = QFileInfo(fileName).absolutePath();
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))

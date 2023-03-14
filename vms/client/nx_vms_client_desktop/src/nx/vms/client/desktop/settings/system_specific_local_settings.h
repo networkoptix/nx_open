@@ -11,6 +11,8 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 
+#include "types/system_update_state.h"
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -31,6 +33,8 @@ public:
 
     /** Do not show update notification for the selected version. */
     Property<nx::utils::SoftwareVersion> ignoredUpdateVersion{this, "ignoredUpdateVersion"};
+
+    Property<SystemUpdateState> updateState{this, "updateState"};
 
     /** Latest known update info. */
     Property<UpdateDeliveryInfo> updateDeliveryInfo{this, "updateDeliveryInfo"};

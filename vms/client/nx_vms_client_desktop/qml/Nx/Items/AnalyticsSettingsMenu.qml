@@ -79,7 +79,7 @@ NavigationMenu
         indicatorText: requestCount > 0 ? `+${requestCount}` : ""
         collapsible: engines.length > 0
         collapsed: true
-        visible: ClientSettings.iniConfigValue("enableMetadataApi")
+        visible: LocalSettings.iniConfigValue("enableMetadataApi")
         font.weight: Font.Medium
         width: sectionWidth
 

@@ -74,7 +74,7 @@ protected:
         systemContext()->resourcePool()->addResource(QnResourcePtr(camera));
         camera->setHasDualStreaming(hasDualStreaming);
 
-        QnLayoutItemData item;
+        common::LayoutItemData item;
         item.uuid = QnUuid::createUuid();
         item.resource.id = camera->getId();
 
@@ -93,7 +93,7 @@ protected:
         systemContext()->resourcePool()->addResource(QnResourcePtr(camera));
         camera->setHasDualStreaming(true);
 
-        QnLayoutItemData item;
+        common::LayoutItemData item;
         item.uuid = QnUuid::createUuid();
         item.resource.id = camera->getId();
         item.zoomRect = QRectF(0.1, 0.1, 0.5, 0.5);

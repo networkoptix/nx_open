@@ -1,35 +1,33 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "web_downloader.h"
-#include "reply_read_timeout.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QAction>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
+#include <QtGui/QAction>
 #include <QtWebEngineCore/QWebEngineDownloadRequest>
 
-#include <platform/environment.h>
-
-#include <nx/utils/app_info.h>
-#include <nx/utils/log/log.h>
+#include <client/client_message_processor.h>
 #include <common/common_module.h>
-
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
-#include <client/client_settings.h>
-#include <client/client_message_processor.h>
-
-#include <ui/workbench/workbench_context.h>
-#include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
-
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <platform/environment.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
+
+#include "reply_read_timeout.h"
 
 using namespace nx::vms::client::desktop::utils;
 
@@ -195,9 +193,12 @@ bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
 
 QString WebDownloader::selectFile(const QString& suggestedName, QWidget* widget)
 {
-    auto lastDir = qnSettings->lastDownloadDir();
-    if ((lastDir.isEmpty() || !QDir(lastDir).exists()) && !qnSettings->mediaFolders().isEmpty())
-        lastDir = qnSettings->mediaFolders().first();
+    auto lastDir = appContext()->localSettings()->lastDownloadDir();
+    if ((lastDir.isEmpty() || !QDir(lastDir).exists())
+        && !appContext()->localSettings()->mediaFolders().isEmpty())
+    {
+        lastDir = appContext()->localSettings()->mediaFolders().first();
+    }
 
     auto filePath = getUniqueFilePath(QDir(lastDir).filePath(suggestedName));
 
@@ -230,7 +231,7 @@ QString WebDownloader::selectFile(const QString& suggestedName, QWidget* widget)
         {
             file->close();
             file->remove();
-            qnSettings->setLastDownloadDir(fileInfo.absolutePath());
+            appContext()->localSettings()->lastDownloadDir = fileInfo.absolutePath();
             return filePath;
         }
 

@@ -4,23 +4,22 @@
 
 #include <memory>
 
-#include <QtCore/QVector>
 #include <QtCore/QStack>
+#include <QtCore/QVector>
 #include <QtMultimedia/QMediaDevices>
 #include <QtQml/QtQml>
 
-#include <client/client_globals.h>
-#include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_edit_delegate.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_interaction_handler.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
@@ -289,12 +289,10 @@ ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-    connect(qnSettings, &QnClientSettings::valueChanged, this,
-        [this](int id)
-        {
-            if (id == QnClientSettings::RESOURCE_INFO_LEVEL)
-                emit extraInfoRequiredChanged();
-        });
+    connect(&appContext()->localSettings()->resourceInfoLevel,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &ResourceTreeModelAdapter::extraInfoRequiredChanged);
 }
 
 ResourceTreeModelAdapter::~ResourceTreeModelAdapter()
@@ -646,7 +644,7 @@ bool ResourceTreeModelAdapter::activateOnSingleClick(const QModelIndex& index) c
 
 bool ResourceTreeModelAdapter::isExtraInfoRequired() const
 {
-    return qnSettings->resourceInfoLevel() > Qn::RI_NameOnly;
+    return appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
 }
 
 ui::action::Parameters ResourceTreeModelAdapter::actionParameters(

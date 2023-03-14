@@ -139,13 +139,13 @@ Item
                     wrapMode: Text.Wrap
                     elide: Text.ElideRight
 
-                    lineHeight: ClientSettings.iniConfigValue("attributeTableLineHeightFactor")
+                    lineHeight: LocalSettings.iniConfigValue("attributeTableLineHeightFactor")
 
                     // Copy icon requires more vertical space.
                     topPadding:
-                        copyable ? 4 : Math.round((ClientSettings.iniConfigValue("attributeTableSpacing") / 2))
+                        copyable ? 4 : Math.round((LocalSettings.iniConfigValue("attributeTableSpacing") / 2))
                     bottomPadding:
-                        copyable ? 4 : (ClientSettings.iniConfigValue("attributeTableSpacing") - topPadding)
+                        copyable ? 4 : (LocalSettings.iniConfigValue("attributeTableSpacing") - topPadding)
                 }
             }
         }

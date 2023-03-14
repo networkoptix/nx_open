@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
+
+#include <gtest/gtest.h>
 
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/layout_resource.h>
@@ -24,7 +24,7 @@ TEST_F(QnResourcePoolTest, removeCameraFromLayoutById)
     auto camera = addCamera();
     auto layout = addLayout();
 
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.uuid = QnUuid::createUuid();
     item.resource.id = camera->getId();
     layout->addItem(item);
@@ -39,7 +39,7 @@ TEST_F(QnResourcePoolTest, removeCameraFromLayoutByUniqueId)
     auto camera = addCamera();
     auto layout = addLayout();
 
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.uuid = QnUuid::createUuid();
     item.resource.path = camera->getPhysicalId();
     layout->addItem(item);

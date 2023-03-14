@@ -4,32 +4,30 @@
 
 #include <chrono>
 
+#include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
-#include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
+#include <client_core/client_core_module.h>
+#include <client_core/client_core_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
 #include <finders/systems_finder.h>
 #include <licensing/license.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/analytics/utils.h>
 #include <nx/build_info.h>
 #include <nx/monitoring/hardware_information.h>
@@ -59,6 +57,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -73,6 +72,8 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <statistics/statistics_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
@@ -166,7 +167,11 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     d(new Private(this))
 {
     d->timerManager = std::make_unique<nx::utils::TimerManager>("CrashReportTimers");
-    d->crashReporter = std::make_unique<ec2::CrashReporter>(systemContext(), d->timerManager.get());
+    d->crashReporter = std::make_unique<ec2::CrashReporter>(
+        systemContext(),
+        d->timerManager.get(),
+        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
+            + "/settings/crashReporter");
 
     // Videowall must not disconnect automatically as we may have not option to restart it.
     // ACS clients display only fixed part of the archive, so they look quite safe.
@@ -507,7 +512,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     setState(LogicalState::connecting);
     const auto session = std::make_shared<desktop::RemoteSession>(connection, systemContext());
 
-    session->setStickyReconnect(qnSettings->stickReconnectToServer());
+    session->setStickyReconnect(appContext()->localSettings()->stickReconnectToServer());
     LogonData logonData = connection->createLogonData();
     const auto serverModuleInformation = connection->moduleInformation();
     QnUuid systemId(::helpers::getTargetSystemId(serverModuleInformation));
@@ -616,7 +621,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 
     // TODO: #sivanov Implement separate address and credentials handling.
     appContext()->clientStateHandler()->clientConnected(
-        qnSettings->restoreUserSessionData(),
+        appContext()->localSettings()->restoreUserSessionData(),
         session->sessionId(),
         logonData);
 }
@@ -675,7 +680,8 @@ void ConnectActionsHandler::storeConnectionRecord(
     {
         nx::network::url::Builder builder;
         builder.setHost(info.cloudHost);
-        qnSettings->setLastUsedConnection({builder.toUrl(), QnUuid(info.cloudSystemId)});
+        appContext()->localSettings()->lastUsedConnection =
+            {builder.toUrl(), QnUuid(info.cloudSystemId)};
     }
     else if (storePassword)
     {
@@ -690,14 +696,14 @@ void ConnectActionsHandler::storeConnectionRecord(
         nx::network::url::Builder builder;
         builder.setEndpoint(connectionInfo.address);
         builder.setUserName(credentials.username);
-        qnSettings->setLastUsedConnection({builder.toUrl(), /*systemId*/ localId});
+        appContext()->localSettings()->lastUsedConnection =
+            {builder.toUrl(), /*systemId*/ localId};
     }
     else
     {
         // Clear the stored value to be sure that we wouldn't connect to the wrong system.
-        qnSettings->setLastUsedConnection({});
+        appContext()->localSettings()->lastUsedConnection = {};
     }
-    qnSettings->save();
 
     if (options.testFlag(StorePreferredCloudServer) && cloudConnection)
         core::settings()->setPreferredCloudServer(info.cloudSystemId, info.id);
@@ -732,7 +738,7 @@ void ConnectActionsHandler::showWarnMessagesOnce()
     d->warnMessagesDisplayed = true;
 
     /* Collect and send crash dumps if allowed */
-    d->crashReporter->scanAndReportAsync(qnSettings->rawSettings());
+    d->crashReporter->scanAndReportAsync();
 
     menu()->triggerIfPossible(ui::action::VersionMismatchMessageAction);
 
@@ -741,7 +747,7 @@ void ConnectActionsHandler::showWarnMessagesOnce()
     // Ask user for analytics storage locations (e.g. in the case of migration).
     const auto& servers = context()->resourcePool()->servers();
     if (std::any_of(servers.begin(), servers.end(),
-        [this](const auto& server)
+        [](const auto& server)
         {
             return server->metadataStorageId().isNull()
                 && nx::analytics::serverHasActiveObjectEngines(server);
@@ -906,8 +912,8 @@ void ConnectActionsHandler::at_connectAction_triggered()
             if (logonData.storeSession)
                 options |= StoreSession;
 
-            if ((logonData.storePassword || qnSettings->autoLogin())
-                && NX_ASSERT(qnSettings->saveCredentialsAllowed()))
+            if ((logonData.storePassword || appContext()->localSettings()->autoLogin())
+                && NX_ASSERT(appContext()->localSettings()->saveCredentialsAllowed()))
             {
                 options |= StorePassword;
             }
@@ -934,8 +940,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
             .setUserName(QString::fromStdString(connection->credentials().username))
             .toUrl();
 
-        qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog.toString());
-        qnSettings->save();
+        appContext()->localSettings()->lastLocalConnectionUrl = lastUrlForLoginDialog.toString();
 
         const auto savedCredentials = CredentialsManager::credentials(
             connection->moduleInformation().localSystemId,
@@ -944,8 +949,8 @@ void ConnectActionsHandler::at_connectAction_triggered()
             && !savedCredentials->authToken.empty();
 
         // In most cases we will connect succesfully by this url. So we can store it.
-        const bool storePasswordForTile = qnSettings->saveCredentialsAllowed()
-            && (passwordIsAlreadySaved || qnSettings->autoLogin());
+        const bool storePasswordForTile = appContext()->localSettings()->saveCredentialsAllowed()
+            && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin());
 
         ConnectionOptions options(StoreSession);
         if (storePasswordForTile)
@@ -1204,10 +1209,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     const bool force = flags.testFlag(DisconnectFlag::Force);
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
-    {
-        qnSettings->setLastUsedConnection({});
-        qnSettings->save();
-    }
+        appContext()->localSettings()->lastUsedConnection = {};
 
     appContext()->clientStateHandler()->storeSystemSpecificState();
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))

@@ -1,12 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ATTACH_TO_VIDEOWALL_DIALOG_H
-#define ATTACH_TO_VIDEOWALL_DIALOG_H
+#pragma once
 
-#include <client/client_model_types.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-
 
 namespace Ui {
 class QnAttachToVideowallDialog;
@@ -22,7 +19,7 @@ public:
     ~QnAttachToVideowallDialog();
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
-    void submitToResource(const QnVideoWallResourcePtr &videowall); 
+    void submitToResource(const QnVideoWallResourcePtr& videowall);
 private:
     void updateLicencesUsage();
 private:
@@ -30,5 +27,3 @@ private:
     QnVideoWallResourcePtr m_videowall;
     bool m_valid;
 };
-
-#endif // ATTACH_TO_VIDEOWALL_DIALOG_H

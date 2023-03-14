@@ -7,10 +7,11 @@
 #include <QtCore/QStandardPaths>
 #include <QtMultimedia/QAudioDevice>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -87,10 +88,11 @@ QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
 
 void QnGeneralPreferencesWidget::applyChanges()
 {
-    qnSettings->setMediaFolders(mediaFolders());
-    qnSettings->setUserIdleTimeoutMSecs(userIdleTimeoutMs());
-    qnSettings->setAutoStart(autoStart());
-    qnSettings->setPlayAudioForAllItems(ui->playAudioForAllCamerasCheckbox->isChecked());
+    appContext()->localSettings()->mediaFolders = mediaFolders();
+    appContext()->localSettings()->userIdleTimeoutMs = userIdleTimeoutMs();
+    appContext()->localSettings()->autoStart = autoStart();
+    appContext()->localSettings()->playAudioForAllItems =
+        ui->playAudioForAllCamerasCheckbox->isChecked();
 
     bool recorderSettingsChanged = false;
     if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
@@ -105,14 +107,13 @@ void QnGeneralPreferencesWidget::applyChanges()
         recorderSettingsChanged = true;
     }
 
-    qnSettings->setAutoLogin(autoLogin());
+    appContext()->localSettings()->autoLogin = autoLogin();
+    appContext()->localSettings()->restoreUserSessionData = restoreUserSessionData();
 
-    bool restoreData = restoreUserSessionData();
-    qnSettings->setRestoreUserSessionData(restoreData);
+    appContext()->localSettings()->allowComputerEnteringSleepMode =
+        allowComputerEnteringSleepMode();
 
-    qnSettings->setAllowComputerEnteringSleepMode(allowComputerEnteringSleepMode());
-
-    qnSettings->setMuteOnAudioTransmit(muteOnAudioTransmit());
+    appContext()->localSettings()->muteOnAudioTransmit = muteOnAudioTransmit();
 
     if (recorderSettingsChanged)
         emit recordingSettingsChanged();
@@ -120,27 +121,32 @@ void QnGeneralPreferencesWidget::applyChanges()
 
 void QnGeneralPreferencesWidget::loadDataToUi()
 {
-    setMediaFolders(qnSettings->mediaFolders());
-    setUserIdleTimeoutMs(qnSettings->userIdleTimeoutMSecs());
+    setMediaFolders(appContext()->localSettings()->mediaFolders());
+    setUserIdleTimeoutMs(appContext()->localSettings()->userIdleTimeoutMs());
     setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDeviceName());
     setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDeviceName());
-    setAutoStart(qnSettings->autoStart());
-    setAutoLogin(qnSettings->autoLogin());
-    setRestoreUserSessionData(qnSettings->restoreUserSessionData());
-    setAllowComputerEnteringSleepMode(qnSettings->allowComputerEnteringSleepMode());
-    ui->playAudioForAllCamerasCheckbox->setChecked(qnSettings->playAudioForAllItems());
-    setMuteOnAudioTransmit(qnSettings->muteOnAudioTransmit());
+    setAutoStart(appContext()->localSettings()->autoStart());
+    setAutoLogin(appContext()->localSettings()->autoLogin());
+    setRestoreUserSessionData(appContext()->localSettings()->restoreUserSessionData());
+    setAllowComputerEnteringSleepMode(
+        appContext()->localSettings()->allowComputerEnteringSleepMode());
+    ui->playAudioForAllCamerasCheckbox->setChecked(
+        appContext()->localSettings()->playAudioForAllItems());
+    setMuteOnAudioTransmit(appContext()->localSettings()->muteOnAudioTransmit());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
 {
-    if (ui->playAudioForAllCamerasCheckbox->isChecked() != qnSettings->playAudioForAllItems())
+    if (ui->playAudioForAllCamerasCheckbox->isChecked() !=
+        appContext()->localSettings()->playAudioForAllItems())
+    {
+        return true;
+    }
+
+    if (appContext()->localSettings()->mediaFolders() != mediaFolders())
         return true;
 
-    if (qnSettings->mediaFolders() != mediaFolders())
-        return true;
-
-    bool oldPauseOnInactivity = qnSettings->userIdleTimeoutMSecs() > 0;
+    bool oldPauseOnInactivity = (appContext()->localSettings()->userIdleTimeoutMs() > 0);
     bool newPauseOnInactivity = userIdleTimeoutMs() > 0;
     if (oldPauseOnInactivity != newPauseOnInactivity)
         return true;
@@ -148,13 +154,13 @@ bool QnGeneralPreferencesWidget::hasChanges() const
     /* Do not compare negative values. */
     if (newPauseOnInactivity)
     {
-        if (qnSettings->userIdleTimeoutMSecs() != userIdleTimeoutMs())
+        if (appContext()->localSettings()->userIdleTimeoutMs() != userIdleTimeoutMs())
             return true;
     }
 
     if (nx::vms::utils::isAutoRunSupported())
     {
-        if (qnSettings->autoStart() != autoStart())
+        if (appContext()->localSettings()->autoStart() != autoStart())
             return true;
     }
 
@@ -164,16 +170,19 @@ bool QnGeneralPreferencesWidget::hasChanges() const
     if (m_recorderSettings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
         return true;
 
-    if (qnSettings->autoLogin() != autoLogin())
+    if (appContext()->localSettings()->autoLogin() != autoLogin())
         return true;
 
-    if (qnSettings->restoreUserSessionData() != restoreUserSessionData())
+    if (appContext()->localSettings()->restoreUserSessionData() != restoreUserSessionData())
         return true;
 
-    if (qnSettings->allowComputerEnteringSleepMode() != allowComputerEnteringSleepMode())
+    if (appContext()->localSettings()->allowComputerEnteringSleepMode()
+        != allowComputerEnteringSleepMode())
+    {
         return true;
+    }
 
-    if (qnSettings->muteOnAudioTransmit() != muteOnAudioTransmit())
+    if (appContext()->localSettings()->muteOnAudioTransmit() != muteOnAudioTransmit())
         return true;
 
     return false;

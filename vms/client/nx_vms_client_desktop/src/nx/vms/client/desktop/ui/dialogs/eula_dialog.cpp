@@ -4,19 +4,20 @@
 #include "ui_eula_dialog.h"
 
 #include <QtCore/QFile>
+#include <QtGui/QAction>
 #include <QtGui/QScreen>
-#include <QtGui/QWindow>
 #include <QtGui/QTextDocument>
+#include <QtGui/QWindow>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
-#include <QtGui/QAction>
 
-#include <client/client_settings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
@@ -173,17 +174,9 @@ bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* paren
     NX_INFO(NX_SCOPE_TAG, "acceptEulaHtml(%1) - waiting for EULA to be accepted", version);
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
-        auto oldVersion = qnSettings->acceptedEulaVersion();
+        auto oldVersion = appContext()->localSettings()->acceptedEulaVersion();
         if (oldVersion < version)
-        {
-            qnSettings->setAcceptedEulaVersion(version);
-            // Preventing qnSettings from being lost. Client can be closed/restarted soon.
-            if (!qnSettings->save())
-            {
-                NX_ERROR(NX_SCOPE_TAG, "acceptEulaHtml(%1) - failed to save new EULA version. "
-                    "Client config is unaccessable. Try to check file permissions.", version);
-            }
-        }
+            appContext()->localSettings()->acceptedEulaVersion = version;
         return true;
     }
     return false;

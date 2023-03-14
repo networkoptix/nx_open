@@ -1,16 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "export_settings_dialog_state.h"
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 
-#include <client/client_settings.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/reflect/from_string.h>
 #include <nx/utils/file_system.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/common/html/html.h>
+
+#include "export_settings_dialog_state.h"
 
 using nx::core::transcoding::TimestampFormat;
 
@@ -155,32 +155,32 @@ void ExportSettingsDialogState::setCacheDirLocation(const QString& location)
     cacheDir = nx::utils::file_system::ensureDir(newCacheDir) ? newCacheDir : QDir();
 }
 
-State ExportSettingsDialogStateReducer::loadSettings(
-    State state, const QnClientSettings* settings, const QString& cacheDirLocation)
+State ExportSettingsDialogStateReducer::loadSettings(State state,
+    const LocalSettings* localSettings,
+    const QString& cacheDirLocation)
 {
     qint64 timestampOffsetMs =
         state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs;
     state.exportMediaPersistentSettings = state.bookmarkName.isEmpty()
-        ? settings->exportMediaSettings()
-        : settings->exportBookmarkSettings();
+        ? localSettings->exportMediaSettings()
+        : localSettings->exportBookmarkSettings();
     state.exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs =
         timestampOffsetMs;
 
     if (state.bookmarkName.isEmpty())
         state.exportMediaPersistentSettings.usedOverlays.removeOne(ExportOverlayType::bookmark);
 
-    state.exportLayoutPersistentSettings = settings->exportLayoutSettings();
+    state.exportLayoutPersistentSettings = localSettings->exportLayoutSettings();
 
-    auto lastExportDir = settings->lastExportDir();
-    if (lastExportDir.isEmpty() && !settings->mediaFolders().isEmpty())
-        lastExportDir = settings->mediaFolders().first();
+    auto lastExportDir = localSettings->lastExportDir();
+    if (lastExportDir.isEmpty() && !localSettings->mediaFolders().isEmpty())
+        lastExportDir = localSettings->mediaFolders().first();
     if (lastExportDir.isEmpty())
         lastExportDir = QDir::homePath();
 
     const auto mode = state.bookmarkName.isEmpty()
-        ? nx::reflect::fromString<ExportSettingsDialog::Mode>(
-            settings->lastExportMode().toStdString(), ExportSettingsDialog::Mode::Media)
-        : ExportSettingsDialog::Mode::Media;
+        ? localSettings->lastExportMode()
+        : ExportMode::media;
 
     state = setMode(std::move(state), mode).second;
 
@@ -210,7 +210,7 @@ State ExportSettingsDialogStateReducer::loadSettings(
     state = setSpeed(std::move(state), state.exportMediaPersistentSettings.rapidReview.speed);
 
     if (state.bookmarkName.isEmpty()
-        || mode == ExportSettingsDialog::Mode::Layout
+        || mode == ExportMode::layout
         || nx::core::layout::isLayoutExtension(
             state.exportMediaSettings.fileName.completeFileName()))
         return clearSelection(std::move(state));
@@ -378,14 +378,14 @@ State ExportSettingsDialogStateReducer::setSpeed(State state, int speed)
     return state;
 }
 
-std::pair<bool, State> ExportSettingsDialogStateReducer::setMode(State state, ExportSettingsDialog::Mode mode)
+std::pair<bool, State> ExportSettingsDialogStateReducer::setMode(State state, ExportMode mode)
 {
-    const bool mediaAllowed = state.mediaAvailable == true && state.mediaDisableReason.isEmpty();
-    if (mode == ExportSettingsDialog::Mode::Media && !mediaAllowed)
-        mode = ExportSettingsDialog::Mode::Layout;
-    const bool layoutAllowed = state.layoutAvailable == true && state.layoutDisableReason.isEmpty();
-    if (mode == ExportSettingsDialog::Mode::Layout && !layoutAllowed)
-        mode = ExportSettingsDialog::Mode::Media;
+    const bool mediaAllowed = state.mediaAvailable && state.mediaDisableReason.isEmpty();
+    if (mode == ExportMode::media && !mediaAllowed)
+        mode = ExportMode::layout;
+    const bool layoutAllowed = state.layoutAvailable && state.layoutDisableReason.isEmpty();
+    if (mode == ExportMode::layout && !layoutAllowed)
+        mode = ExportMode::media;
 
     if (state.mode == mode)
         return {false, std::move(state)};
@@ -497,9 +497,9 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
     return state;
 }
 
-State ExportSettingsDialogStateReducer::enableTab(State state, ExportSettingsDialog::Mode mode)
+State ExportSettingsDialogStateReducer::enableTab(State state, ExportMode mode)
 {
-    if (mode == ExportSettingsDialog::Mode::Media)
+    if (mode == ExportMode::media)
     {
         state.mediaAvailable = true;
         state.mediaDisableReason = QString();
@@ -512,9 +512,10 @@ State ExportSettingsDialogStateReducer::enableTab(State state, ExportSettingsDia
     return state;
 }
 
-State ExportSettingsDialogStateReducer::disableTab(State state, ExportSettingsDialog::Mode mode, const QString& reason)
+State ExportSettingsDialogStateReducer::disableTab(
+    State state, ExportMode mode, const QString& reason)
 {
-    if (mode == ExportSettingsDialog::Mode::Media)
+    if (mode == ExportMode::media)
     {
         state.mediaAvailable = true;
         state.mediaDisableReason = reason;

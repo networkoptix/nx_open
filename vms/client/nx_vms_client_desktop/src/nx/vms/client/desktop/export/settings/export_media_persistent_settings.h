@@ -8,9 +8,9 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 
 class QTextDocument;
 
@@ -41,11 +41,14 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportOverlayPersistentSettings
     virtual ~ExportOverlayPersistentSettings() = default;
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const = 0;
     virtual void rescale(qreal factor);
+
+    bool operator==(const ExportOverlayPersistentSettings&) const = default;
 };
 #define ExportOverlayPersistentSettings_Fields (offset)(alignment)
 NX_REFLECTION_INSTRUMENT(ExportOverlayPersistentSettings, ExportOverlayPersistentSettings_Fields)
 
-struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings: public ExportOverlayPersistentSettings
+struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings:
+    ExportOverlayPersistentSettings
 {
     QImage image;
     QString name;
@@ -55,6 +58,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings: public Ex
     ExportImageOverlayPersistentSettings();
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
     virtual void rescale(qreal factor) override;
+
+    bool operator==(const ExportImageOverlayPersistentSettings& other) const;
 };
 #define ExportImageOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -62,7 +67,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings: public Ex
 NX_REFLECTION_INSTRUMENT(ExportImageOverlayPersistentSettings,
     ExportImageOverlayPersistentSettings_Fields)
 
-struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSettings
+struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase:
+    ExportOverlayPersistentSettings
 {
     QString text;
     int fontSize = 15;
@@ -76,6 +82,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase: public
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
     virtual void rescale(qreal factor) override;
+
+    bool operator==(const ExportTextOverlayPersistentSettingsBase& other) const;
 };
 #define ExportTextOverlayPersistentSettingsBase_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -91,18 +99,22 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettings: public Exp
 NX_REFLECTION_INSTRUMENT(ExportTextOverlayPersistentSettings,
     ExportTextOverlayPersistentSettings_Fields)
 
-struct NX_VMS_CLIENT_DESKTOP_API ExportBookmarkOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
+struct NX_VMS_CLIENT_DESKTOP_API ExportBookmarkOverlayPersistentSettings:
+    ExportTextOverlayPersistentSettingsBase
 {
     bool includeDescription = true;
 
     ExportBookmarkOverlayPersistentSettings();
+
+    bool operator==(const ExportBookmarkOverlayPersistentSettings& other) const = default;
 };
 #define ExportBookmarkOverlayPersistentSettings_Fields \
     ExportTextOverlayPersistentSettingsBase_Fields (includeDescription)
 NX_REFLECTION_INSTRUMENT(ExportBookmarkOverlayPersistentSettings,
     ExportBookmarkOverlayPersistentSettings_Fields)
 
-struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentSettings
+struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings:
+    ExportOverlayPersistentSettings
 {
     using TimestampFormat = nx::core::transcoding::TimestampFormat;
 
@@ -118,6 +130,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings: publi
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
     virtual void rescale(qreal factor) override;
+
+    bool operator==(const ExportTimestampOverlayPersistentSettings&) const = default;
 };
 #define ExportTimestampOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -125,7 +139,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings: publi
 NX_REFLECTION_INSTRUMENT(ExportTimestampOverlayPersistentSettings,
     ExportTimestampOverlayPersistentSettings_Fields)
 
-struct NX_VMS_CLIENT_DESKTOP_API ExportInfoOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
+struct NX_VMS_CLIENT_DESKTOP_API ExportInfoOverlayPersistentSettings:
+    ExportTextOverlayPersistentSettingsBase
 {
     using TimestampFormat = nx::core::transcoding::TimestampFormat;
 
@@ -140,6 +155,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportInfoOverlayPersistentSettings: public Exp
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
     virtual void rescale(qreal factor) override;
+
+    bool operator==(const ExportInfoOverlayPersistentSettings& other) const = default;
 
 private:
     void fitDocumentHeight(QTextDocument* document, int maxHeight) const;
@@ -158,6 +175,8 @@ struct ExportRapidReviewPersistentSettings
 
     explicit ExportRapidReviewPersistentSettings() = default;
     ExportRapidReviewPersistentSettings(bool enabled, int speed);
+
+    bool operator==(const ExportRapidReviewPersistentSettings&) const = default;
 };
 #define ExportRapidReviewPersistentSettings_Fields (enabled)(speed)
 NX_REFLECTION_INSTRUMENT(ExportRapidReviewPersistentSettings,
@@ -207,6 +226,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
     void setDimension(int newDimension);
+
+    bool operator==(const ExportMediaPersistentSettings&) const = default;
 };
 
 #define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(dimension)(rapidReview)\

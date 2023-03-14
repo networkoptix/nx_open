@@ -54,9 +54,12 @@ private:
     void initialize();
 
     void at_resource_resourceChanged();
-    void at_resource_itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
-    void at_resource_itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
-    void at_resource_itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
+    void at_resource_itemAdded(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& itemData);
+    void at_resource_itemRemoved(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& itemData);
+    void at_resource_itemChanged(
+        const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& itemData);
 
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

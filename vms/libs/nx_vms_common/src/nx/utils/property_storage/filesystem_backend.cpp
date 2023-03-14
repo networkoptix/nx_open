@@ -2,6 +2,8 @@
 
 #include "filesystem_backend.h"
 
+#include <QtCore/QTemporaryFile>
+
 #include <nx/utils/log/log.h>
 
 namespace nx::utils::property_storage {
@@ -9,6 +11,12 @@ namespace nx::utils::property_storage {
 FileSystemBackend::FileSystemBackend(const QDir& path):
     m_path(path)
 {
+}
+
+bool FileSystemBackend::isWritable() const
+{
+    QTemporaryFile tempFile(m_path.absolutePath() + "/XXXXXXXXXXXX");
+    return tempFile.open();
 }
 
 QString FileSystemBackend::readValue(const QString& name, bool* success)
@@ -62,6 +70,12 @@ bool FileSystemBackend::removeValue(const QString& name)
         return true;
 
     return QFile::remove(path);
+}
+
+bool FileSystemBackend::exists(const QString& name) const
+{
+    const QString path = m_path.absoluteFilePath(name);
+    return QFileInfo::exists(path);
 }
 
 bool FileSystemBackend::sync()

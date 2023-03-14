@@ -3,15 +3,12 @@
 #pragma once
 
 #include <QtCore/QRect>
-
 #include <QtGui/QTransform>
 
-#include "videowall_model.h"
-
-#include <client/client_model_types.h>
-
-#include <core/resource/resource_fwd.h>
 #include <core/misc/screen_snap.h>
+#include <core/resource/resource_fwd.h>
+
+#include "videowall_model.h"
 
 class QnVideowallManageWidget;
 
@@ -261,7 +258,7 @@ private:
     TransformationProcess m_process;
 };
 
-/* 
+/*
  * If we allow this function in windows, 'case expression not constant' will be raised. MSVS 2012 does not support constexpr yet.
  * Without this function we have an error: invalid conversion from int to QnVideowallManageWidgetPrivate::ItemTransformation [-fpermissive] in GCC
  */

@@ -2,8 +2,8 @@
 
 #include "context_current_user_watcher.h"
 
+#include <client/client_globals.h>
 #include <client/client_message_processor.h>
-#include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>

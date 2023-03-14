@@ -2,29 +2,28 @@
 
 #pragma once
 
-#include "api_globals.h"
-
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <nx/vms/event/event_fwd.h>
-#include <nx_ec/ec_api_fwd.h>
-#include <utils/email/email_fwd.h>
-
-#include <nx/vms/api/data/event_rule_data.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/analytics_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
-#include <nx/vms/api/data/analytics_data.h>
-#include <nx/vms/api/data/module_information.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx_ec/ec_api_fwd.h>
+#include <utils/email/email_fwd.h>
+
+#include "api_globals.h"
 
 namespace nx { namespace network { class SocketAddress; }}
 
@@ -79,9 +78,9 @@ NX_VMS_COMMON_API void fromApiToResource(
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::LayoutItemData& src,
-    QnLayoutItemData& dst);
+    nx::vms::common::LayoutItemData& dst);
 NX_VMS_COMMON_API void fromResourceToApi(
-    const QnLayoutItemData& src,
+    const nx::vms::common::LayoutItemData& src,
     nx::vms::api::LayoutItemData& dst);
 
 NX_VMS_COMMON_API void fromApiToResource(

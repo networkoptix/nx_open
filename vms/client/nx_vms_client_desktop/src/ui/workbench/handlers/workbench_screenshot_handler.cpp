@@ -6,15 +6,14 @@
 
 #include <QtCore/QStack>
 #include <QtCore/QTimer>
+#include <QtGui/QAction>
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
-#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/media_resource.h>
@@ -27,6 +26,7 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -269,8 +269,8 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QStack<QString> keyStack;
 
-    if (!qnSettings->lastScreenshotDir().isEmpty())
-        keyStack.push(qnSettings->lastScreenshotDir() + lit("/"));
+    if (!appContext()->localSettings()->lastScreenshotDir().isEmpty())
+        keyStack.push(appContext()->localSettings()->lastScreenshotDir() + "/");
 
     keyStack.push(widget->resource()->toResource()->getName());
 
@@ -433,7 +433,6 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
     // TODO: #sivanov Store full screenshot settings.
-    // parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.resource = widget->resource();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
@@ -444,9 +443,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 }
 
 bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParameters &parameters) {
-    QString previousDir = qnSettings->lastScreenshotDir();
-    if (previousDir.isEmpty() && !qnSettings->mediaFolders().isEmpty())
-        previousDir = qnSettings->mediaFolders().first();
+    QString previousDir = appContext()->localSettings()->lastScreenshotDir();
+    if (previousDir.isEmpty() && !appContext()->localSettings()->mediaFolders().isEmpty())
+        previousDir = appContext()->localSettings()->mediaFolders().first();
 
     static constexpr int kMaxFileNameLength = 200;
     const auto baseFileName = parameters.filename.length() > kMaxFileNameLength
@@ -727,9 +726,9 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
             return;
 
         loader->setParameters(localParameters); //update changed fields
-        qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
+        appContext()->localSettings()->lastScreenshotDir =
+            QFileInfo(localParameters.filename).absolutePath();
         // TODO: #sivanov Store screenshot settings.
-        //qnSettings->setTimestampCorner(localParameters.timestampPosition);
 
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
         connect(m_screenshotProgressDialog, &ProgressDialog::canceled, loader.get(),

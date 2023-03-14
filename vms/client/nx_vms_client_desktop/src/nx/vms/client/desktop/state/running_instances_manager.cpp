@@ -4,9 +4,9 @@
 
 #include <QtCore/QPointer>
 
-#include <client/client_settings.h>
-
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 #include "shared_memory_manager.h"
 
@@ -14,13 +14,13 @@ namespace nx::vms::client::desktop {
 
 struct RunningInstancesManager::Private
 {
-    Private(QnClientSettings* settings, SharedMemoryManager* memoryManager):
+    Private(LocalSettings* settings, SharedMemoryManager* memoryManager):
         memory(memoryManager)
     {
         initPcUuid(settings);
     }
 
-    void initPcUuid(QnClientSettings* settings)
+    void initPcUuid(LocalSettings* settings)
     {
         if (!NX_ASSERT(settings))
             return;
@@ -29,7 +29,7 @@ struct RunningInstancesManager::Private
         if (pcUuid.isNull())
         {
             pcUuid = QnUuid::createUuid();
-            settings->setPcUuid(pcUuid);
+            settings->pcUuid = pcUuid;
         }
     }
 
@@ -43,7 +43,7 @@ struct RunningInstancesManager::Private
 };
 
 RunningInstancesManager::RunningInstancesManager(
-    QnClientSettings* settings,
+    LocalSettings* settings,
     SharedMemoryManager* memory)
     :
     d(new Private(settings, memory))

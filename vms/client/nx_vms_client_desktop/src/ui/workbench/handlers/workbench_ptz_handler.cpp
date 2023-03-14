@@ -8,7 +8,6 @@
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 
-#include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -16,6 +15,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -30,6 +31,7 @@
 
 using namespace std::chrono;
 using namespace nx::vms::common::ptz;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -177,7 +179,8 @@ public:
             || resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
         {
             messages::Ptz::failedToSetPosition(q->mainWindowWidget(),
-                QnResourceDisplayInfo(resource).toString(qnSettings->resourceInfoLevel()));
+                QnResourceDisplayInfo(resource).toString(
+                    appContext()->localSettings()->resourceInfoLevel()));
         }
         // TODO: #sivanov Check other cases.
     }
@@ -347,10 +350,10 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         || resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
     {
         messages::Ptz::failedToGetPosition(mainWindowWidget(),
-        QnResourceDisplayInfo(resource).toString(qnSettings->resourceInfoLevel()));
+        QnResourceDisplayInfo(resource).toString(
+            appContext()->localSettings()->resourceInfoLevel()));
         return;
     }
-
 
     QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindowWidget()));
     dialog->setController(widget->ptzController());

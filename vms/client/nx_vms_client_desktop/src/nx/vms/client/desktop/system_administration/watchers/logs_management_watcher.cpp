@@ -7,12 +7,8 @@
 #include <QtCore/QSettings>
 #include <QtGui/QAction>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -24,6 +20,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -33,6 +30,8 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/zip/extractor.h>
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -88,7 +87,7 @@ nx::vms::api::ServerLogSettings loadClientSettings()
     using namespace nx::utils::log;
 
     nx::vms::api::ServerLogSettings result;
-    result.mainLog.primaryLevel = levelFromString(qnSettings->logLevel());
+    result.mainLog.primaryLevel = levelFromString(appContext()->localSettings()->logLevel());
 
     QSettings rawSettings;
     result.maxVolumeSizeB = rawSettings.value(
@@ -110,7 +109,7 @@ void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
     using namespace nx::utils::log;
 
     const auto level = settings.mainLog.primaryLevel;
-    qnSettings->setLogLevel(LogsManagementModel::logLevelName(level));
+    appContext()->localSettings()->logLevel = LogsManagementModel::logLevelName(level);
 
     QSettings rawSettings;
     rawSettings.setValue(

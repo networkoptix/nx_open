@@ -79,7 +79,7 @@ private:
     void updateServersWithMetadataStorageIssues();
 
 private:
-    std::array<bool, SystemHealthIndex::Count> m_state;
+    std::array<bool, (int) SystemHealthIndex::count> m_state;
     QHash<SystemHealthIndex, QSet<QnResourcePtr>> m_resourcesForMessageType;
     std::unique_ptr<InvalidRecordingScheduleWatcher> m_invalidRecordingScheduleWatcher;
 };
@@ -99,27 +99,27 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(q->systemContext()->licensePool(),
         &QnLicensePool::licensesChanged,
         q,
-        update(NoLicenses));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(NoLicenses));
+        update(noLicenses));
+    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(noLicenses));
 
-    update(NoLicenses)();
+    update(noLicenses)();
 
     // SmtpIsNotSet.
 
-    connect(q->systemSettings(), &SystemSettings::emailSettingsChanged, q, update(SmtpIsNotSet));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(SmtpIsNotSet));
+    connect(q->systemSettings(), &SystemSettings::emailSettingsChanged, q, update(smtpIsNotSet));
+    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(smtpIsNotSet));
 
-    update(SmtpIsNotSet)();
+    update(smtpIsNotSet)();
 
     // NoInternetForTimeSync.
 
     NX_ASSERT(internetAccessWatcher(), "Internet access watcher is not initialized");
 
     connect(internetAccessWatcher(), &SystemInternetAccessWatcher::internetAccessChanged,
-        q, update(NoInternetForTimeSync));
+        q, update(noInternetForTimeSync));
 
     connect(q->systemSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
-        q, update(NoInternetForTimeSync));
+        q, update(noInternetForTimeSync));
 
     const auto messageProcessor =
         dynamic_cast<QnClientMessageProcessor*>(q->messageProcessor());
@@ -127,14 +127,14 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, q,
         [this]()
         {
-            update(NoInternetForTimeSync);
+            update(noInternetForTimeSync);
             updateServersWithoutStorages();
         });
 
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed,
-        q, update(NoInternetForTimeSync));
+        q, update(noInternetForTimeSync));
 
-    update(NoInternetForTimeSync)();
+    update(noInternetForTimeSync)();
 
     // replacedDeviceDiscovered.
 
@@ -146,7 +146,7 @@ SystemHealthState::Private::Private(SystemHealthState* q):
                 this->q->context()->instance<QnWorkbenchNotificationsHandler>();
 
             notificationsHandler->setSystemHealthEventVisible(
-                QnSystemHealth::replacedDeviceDiscovered, resource, false);
+                SystemHealthIndex::replacedDeviceDiscovered, resource, false);
         });
 
     // DefaultCameraPasswords.
@@ -177,9 +177,9 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     NX_ASSERT(userEmailsWatcher(), "User email watcher is not initialized");
 
-    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q, update(EmailIsEmpty));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(EmailIsEmpty));
-    update(EmailIsEmpty)();
+    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q, update(emailIsEmpty));
+    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(emailIsEmpty));
+    update(emailIsEmpty)();
 
     // UsersEmailIsEmpty.
 
@@ -213,11 +213,11 @@ SystemHealthState::Private::Private(SystemHealthState* q):
         [this]
         {
             qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
-            update(CloudPromo)();
+            update(cloudPromo)();
         });
 
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(CloudPromo));
-    update(CloudPromo)();
+    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(cloudPromo));
+    update(cloudPromo)();
 
     // Metadata storage issues.
 
@@ -244,7 +244,7 @@ void SystemHealthState::Private::updateCamerasWithDefaultPassword()
     for (const auto& camera: camerasWithDefaultPassword)
         resourceSet.insert(camera);
 
-    setResourcesForMessageType(SystemHealthIndex::DefaultCameraPasswords, resourceSet);
+    setResourcesForMessageType(SystemHealthIndex::defaultCameraPasswords, resourceSet);
 }
 
 void SystemHealthState::Private::updateCamerasWithInvalidSchedule()
@@ -276,7 +276,7 @@ void SystemHealthState::Private::updateUsersWithInvalidEmail()
         }
     }
 
-    setResourcesForMessageType(SystemHealthIndex::UsersEmailIsEmpty, resourceSet);
+    setResourcesForMessageType(SystemHealthIndex::usersEmailIsEmpty, resourceSet);
 }
 
 void SystemHealthState::Private::updateServersWithoutStorages()
@@ -302,7 +302,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
             return QSet<QnResourcePtr>(servers.cbegin(), servers.cend());
         };
 
-    setResourcesForMessageType(SystemHealthIndex::StoragesNotConfigured,
+    setResourcesForMessageType(SystemHealthIndex::storagesNotConfigured,
         calculateServersWithoutStorages(nx::vms::api::RuntimeFlag::noStorages));
 
     setResourcesForMessageType(SystemHealthIndex::backupStoragesNotConfigured,
@@ -316,7 +316,7 @@ void SystemHealthState::Private::updateServersWithMetadataStorageIssues()
 
     const auto resourcePool = q->context()->resourcePool();
     const auto servers = resourcePool->servers();
-    for (const auto server: servers)
+    for (const auto& server: servers)
     {
         const auto serverMetadataStorageId = server->metadataStorageId();
         if (serverMetadataStorageId.isNull())
@@ -326,7 +326,7 @@ void SystemHealthState::Private::updateServersWithMetadataStorageIssues()
         }
 
         const auto serverStorages = server->getStorages();
-        for (const auto storage: serverStorages)
+        for (const auto& storage: serverStorages)
         {
             if (storage->statusFlag().testFlag(nx::vms::api::StorageStatus::system)
                 && storage->getId() == serverMetadataStorageId)
@@ -348,7 +348,7 @@ void SystemHealthState::Private::updateServersWithMetadataStorageIssues()
 
 bool SystemHealthState::Private::state(SystemHealthIndex index) const
 {
-    return m_state[index];
+    return m_state[(int) index];
 }
 
 bool SystemHealthState::Private::setState(SystemHealthIndex index, bool value)
@@ -356,7 +356,7 @@ bool SystemHealthState::Private::setState(SystemHealthIndex index, bool value)
     if (state(index) == value)
         return false;
 
-    m_state[index] = value;
+    m_state[(int) index] = value;
     emit q->stateChanged(index, value, {});
 
     return true;
@@ -369,38 +369,38 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
     switch (index)
     {
-        case SystemHealthIndex::NoInternetForTimeSync:
+        case SystemHealthIndex::noInternetForTimeSync:
             return hasAdminPermissions()
                 && q->systemSettings()->isTimeSynchronizationEnabled()
                 && q->systemSettings()->primaryTimeServer().isNull()
                 && !internetAccessWatcher()->systemHasInternetAccess();
 
-        case SystemHealthIndex::NoLicenses:
+        case SystemHealthIndex::noLicenses:
             return hasAdminPermissions() && q->systemContext()->licensePool()->isEmpty();
 
-        case SystemHealthIndex::SmtpIsNotSet:
+        case SystemHealthIndex::smtpIsNotSet:
             return hasAdminPermissions() && !q->systemSettings()->emailSettings().isValid();
 
-        case SystemHealthIndex::DefaultCameraPasswords:
+        case SystemHealthIndex::defaultCameraPasswords:
             return hasAdminPermissions() && hasResourcesForMessageType(index);
 
-        case SystemHealthIndex::EmailIsEmpty:
+        case SystemHealthIndex::emailIsEmpty:
         {
             const auto user = q->context()->user();
             return user && userEmailsWatcher()->usersWithInvalidEmail().contains(user)
                 && q->accessController()->hasPermissions(user, Qn::WriteEmailPermission);
         }
 
-        case SystemHealthIndex::UsersEmailIsEmpty:
+        case SystemHealthIndex::usersEmailIsEmpty:
             return hasResourcesForMessageType(index);
 
-        case SystemHealthIndex::CloudPromo:
+        case SystemHealthIndex::cloudPromo:
             return q->context()->user()
                 && q->context()->user()->isOwner()
                 && q->systemSettings()->cloudSystemId().isEmpty()
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
-        case SystemHealthIndex::StoragesNotConfigured:
+        case SystemHealthIndex::storagesNotConfigured:
             return hasAdminPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::backupStoragesNotConfigured:
@@ -423,14 +423,14 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
 QVariant SystemHealthState::Private::data(SystemHealthIndex index) const
 {
-    if (!m_state[index])
+    if (!m_state[(int) index])
         return {};
 
     switch (index)
     {
-        case SystemHealthIndex::UsersEmailIsEmpty:
-        case SystemHealthIndex::StoragesNotConfigured:
-        case SystemHealthIndex::DefaultCameraPasswords:
+        case SystemHealthIndex::usersEmailIsEmpty:
+        case SystemHealthIndex::storagesNotConfigured:
+        case SystemHealthIndex::defaultCameraPasswords:
         case SystemHealthIndex::backupStoragesNotConfigured:
         case SystemHealthIndex::cameraRecordingScheduleIsInvalid:
         case SystemHealthIndex::metadataStorageNotSet:

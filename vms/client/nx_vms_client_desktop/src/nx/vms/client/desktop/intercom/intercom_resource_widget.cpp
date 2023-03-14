@@ -52,7 +52,7 @@ int IntercomResourceWidget::calculateButtonsVisibility() const
         QSet<QnUuid> otherIntercomLayoutItemIds; // Other intercom item copies on the layout.
 
         const auto intercomLayoutItems = layoutResource()->getItems();
-        for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
+        for (const common::LayoutItemData& intercomLayoutItem: intercomLayoutItems)
         {
             const auto itemResourceId = intercomLayoutItem.resource.id;
             if (itemResourceId == intercomToDeleteId && intercomLayoutItem.uuid != uuid())

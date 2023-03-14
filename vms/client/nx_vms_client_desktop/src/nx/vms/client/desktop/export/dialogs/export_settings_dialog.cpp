@@ -8,7 +8,6 @@
 #include <QtCore/QStandardPaths>
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_data.h>
@@ -16,6 +15,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button_group.h>
@@ -142,8 +142,8 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
 
-    ui->mediaFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Media));
-    ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
+    ui->mediaFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(ExportMode::media));
+    ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(ExportMode::layout));
 
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataEdited,
         d.get(), [this](const ExportMediaSettingsWidget::Data& data) { d->dispatch(Reducer::setApplyFilters, data.applyFilters); });
@@ -225,7 +225,7 @@ ExportSettingsDialog::ExportSettingsDialog(
             const auto isCameraMode = index == cameraTabIndex
                 && ui->tabWidget->isTabEnabled(cameraTabIndex);
 
-            d->dispatch(Reducer::setMode, isCameraMode ? Mode::Media : Mode::Layout);
+            d->dispatch(Reducer::setMode, isCameraMode ? ExportMode::media : ExportMode::layout);
         });
 
     d->dispatch(Reducer::setTimePeriod, timePeriod);
@@ -236,7 +236,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 int ExportSettingsDialog::exec()
 {
     d->dispatch(Reducer::loadSettings,
-        qnSettings,
+        appContext()->localSettings(),
         QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
     // Updates media resource related settings like camera name.
@@ -452,7 +452,7 @@ SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayTy
     }
 };
 
-ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
+ExportMode ExportSettingsDialog::mode() const
 {
     return d->state().mode;
 }
@@ -508,8 +508,8 @@ void ExportSettingsDialog::initSettingsWidgets()
     ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
     ui->infoSettingsPage->setData(mediaPersistentSettings.infoOverlay);
 
-    ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
-    ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
+    ui->mediaFilenamePanel->setFilename(d->selectedFileName(ExportMode::media));
+    ui->layoutFilenamePanel->setFilename(d->selectedFileName(ExportMode::layout));
 }
 
 void ExportSettingsDialog::updateTabWidgetSize()
@@ -517,17 +517,17 @@ void ExportSettingsDialog::updateTabWidgetSize()
     ui->tabWidget->setFixedSize(ui->tabWidget->minimumSizeHint());
 }
 
-void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
-    const QStringList& severeAlerts)
+void ExportSettingsDialog::updateAlerts(
+    ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts)
 {
     switch (mode)
     {
-        case Mode::Media:
+        case ExportMode::media:
             updateAlertsInternal(ui->weakMediaAlertsLayout, weakAlerts, false);
             updateAlertsInternal(ui->severeMediaAlertsLayout, severeAlerts, true);
             break;
 
-        case Mode::Layout:
+        case ExportMode::layout:
             updateAlertsInternal(ui->weakLayoutAlertsLayout, weakAlerts, false);
             updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
             break;
@@ -577,13 +577,13 @@ void ExportSettingsDialog::updateWidgetsState()
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
     auto mode = d->state().mode;
-    bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
+    bool overlayOptionsAvailable = mode == ExportMode::media && settings.canExportOverlays();
 
     auto exportButton = ui->buttonBox->button(QDialogButtonBox::StandardButton::Ok);
-    exportButton->setEnabled(mode == Mode::Layout || d->hasCameraData());
+    exportButton->setEnabled(mode == ExportMode::layout || d->hasCameraData());
 
     // No transcoding if no video.
-    if (mode == Mode::Media && !d->hasVideo())
+    if (mode == ExportMode::media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
@@ -599,7 +599,7 @@ void ExportSettingsDialog::updateWidgetsState()
     // Applying data to UI.
     // All UI events should be locked here.
     ui->exportMediaSettingsPage->setData({transcodingChecked, !transcodingLocked});
-    m_passwordWidget->setVisible(mode == Mode::Layout
+    m_passwordWidget->setVisible(mode == ExportMode::layout
         || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName()));
 
     ui->transcodingButtonsWidget->setVisible(overlayOptionsAvailable);
@@ -637,9 +637,9 @@ void ExportSettingsDialog::updateWidgetsState()
 
 void ExportSettingsDialog::setMediaParams(
     const QnMediaResourcePtr& mediaResource,
-    const QnLayoutItemData& itemData)
+    const nx::vms::common::LayoutItemData& itemData)
 {
-    d->dispatch(Reducer::enableTab, Mode::Media);
+    d->dispatch(Reducer::enableTab, ExportMode::media);
 
     const auto resource = mediaResource->toResourcePtr();
     auto systemContext = SystemContext::fromResource(resource);
@@ -707,7 +707,7 @@ void ExportSettingsDialog::setBookmarks(const QnCameraBookmarkList& bookmarks)
 
 void ExportSettingsDialog::setLayout(const LayoutResourcePtr& layout)
 {
-    d->dispatch(Reducer::enableTab, Mode::Layout);
+    d->dispatch(Reducer::enableTab, ExportMode::layout);
     const auto palette = ui->layoutPreviewWidget->palette();
     d->setLayout(layout, palette);
 
@@ -762,7 +762,7 @@ void ExportSettingsDialog::renderTabState()
             ui->tabWidget->setTabToolTip(tabIndex, tab.reason);
     }
 
-    const auto selectedTab = state.mode == Mode::Media ? ui->cameraTab : ui->layoutTab;
+    const auto selectedTab = state.mode == ExportMode::media ? ui->cameraTab : ui->layoutTab;
     if (ui->tabWidget->currentWidget() != selectedTab)
         ui->tabWidget->setCurrentWidget(selectedTab);
 }
@@ -774,7 +774,7 @@ void ExportSettingsDialog::renderState()
     initSettingsWidgets();
 
     // Place password input into the appropriate page.
-    if(d->state().mode == Mode::Media)
+    if(d->state().mode == ExportMode::media)
         ui->exportMediaSettingsPage->passwordPlaceholder()->addWidget(m_passwordWidget);
     else
         ui->exportLayoutSettingsPage->passwordPlaceholder()->addWidget(m_passwordWidget);
@@ -795,14 +795,14 @@ void ExportSettingsDialog::renderState()
     }
 }
 
-void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
+void ExportSettingsDialog::disableTab(ExportMode mode, const QString& reason)
 {
     d->dispatch(Reducer::disableTab, mode, reason);
 }
 
 void ExportSettingsDialog::accept()
 {
-    auto filenamePanel = d->state().mode == Mode::Media
+    auto filenamePanel = d->state().mode == ExportMode::media
         ? ui->mediaFilenamePanel
         : ui->layoutFilenamePanel;
 
@@ -832,7 +832,7 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
         if (isFileNameValid(suggested, true))
             return suggested;
 
-        suggested.name = lit("%1 (%2)").arg(baseName.name).arg(i);
+        suggested.name = nx::format("%1 (%2)", baseName.name, i);
     }
 
     NX_ASSERT(false, "Failed to generate suggested filename");

@@ -3,16 +3,17 @@
 #include "layout_background_settings_widget.h"
 #include "ui_layout_background_settings_widget.h"
 
-#include <QtCore/QtMath>
 #include <QtCore/QUrl>
+#include <QtCore/QtMath>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
@@ -74,7 +75,7 @@ LayoutBackgroundSettingsWidget::LayoutBackgroundSettingsWidget(
 
     LayoutSettingsDialogStateReducer::setScreenAspectRatio(screenAspectRatio());
     LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
-        qnSettings->layoutKeepAspectRatio());
+        appContext()->localSettings()->layoutKeepAspectRatio());
 
     connect(
         ui->viewButton,
@@ -304,9 +305,10 @@ void LayoutBackgroundSettingsWidget::at_imageStored(const QString& filename, boo
         return;
     }
 
-    qnSettings->setLayoutKeepAspectRatio(ui->keepAspectRatioCheckBox->isChecked());
+    appContext()->localSettings()->layoutKeepAspectRatio =
+        ui->keepAspectRatioCheckBox->isChecked();
     LayoutSettingsDialogStateReducer::setKeepBackgroundAspectRatio(
-        qnSettings->layoutKeepAspectRatio());
+        appContext()->localSettings()->layoutKeepAspectRatio());
 
     m_store->imageUploaded(filename);
     emit newImageUploadedSuccessfully();
@@ -361,7 +363,7 @@ void LayoutBackgroundSettingsWidget::selectFile()
         new QnCustomFileDialog(
             this,
             tr("Select file..."),
-            qnSettings->backgroundsFolder(),
+            appContext()->localSettings()->backgroundsFolder(),
             QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
@@ -372,7 +374,7 @@ void LayoutBackgroundSettingsWidget::selectFile()
     if (fileName.isEmpty())
         return;
 
-    qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+    appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
 
     QFileInfo fileInfo(fileName);
     if (fileInfo.size() == 0)

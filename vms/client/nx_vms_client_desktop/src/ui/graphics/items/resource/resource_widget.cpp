@@ -16,18 +16,19 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -1191,7 +1192,8 @@ void QnResourceWidget::updateHud(bool animate)
         || (!workbench()->windowContext()->streamSynchronizer()->isRunning()
             && (selectionState() == SelectionState::notSelected));
     const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible
-        && (m_mouseInWidget || qnRuntime->showFullInfo() || qnSettings->showFullInfo());
+        && (m_mouseInWidget || qnRuntime->showFullInfo()
+            || appContext()->localSettings()->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 

@@ -5,10 +5,10 @@
 #include <analytics/common/object_metadata.h>
 #include <business/business_resource_validation.h>
 #include <client/client_module.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -829,7 +830,8 @@ QString NotificationListModel::Private::description(
 QString NotificationListModel::Private::tooltip(const vms::event::AbstractActionPtr& action) const
 {
     const auto& params = action->getRuntimeParams();
-    const Qn::ResourceInfoLevel resourceInfoLevel = qnSettings->resourceInfoLevel();
+    const Qn::ResourceInfoLevel resourceInfoLevel =
+        appContext()->localSettings()->resourceInfoLevel();
 
     QStringList tooltip = m_helper->eventDescription(
         action,

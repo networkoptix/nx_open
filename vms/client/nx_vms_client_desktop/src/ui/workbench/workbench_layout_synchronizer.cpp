@@ -156,7 +156,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged()
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
-    const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& itemData)
+    const QnLayoutResourcePtr& /*layout*/, const nx::vms::common::LayoutItemData& itemData)
 {
     if (!m_update)
         return;
@@ -180,7 +180,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(
-    const QnLayoutResourcePtr&, const QnLayoutItemData& itemData)
+    const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& itemData)
 {
     if (!m_update)
         return;
@@ -207,7 +207,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(
-    const QnLayoutResourcePtr&, const QnLayoutItemData& itemData)
+    const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& itemData)
 {
     if (!m_update)
         return;

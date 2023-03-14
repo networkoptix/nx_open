@@ -6,11 +6,14 @@
 #include <QtGui/QClipboard>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/message_box.h>
+
+using namespace nx::vms::client::desktop;
 
 void QnTableExportHelper::exportToFile(
     const QAbstractItemModel* tableModel,
@@ -18,9 +21,9 @@ void QnTableExportHelper::exportToFile(
     QWidget* parent,
     const QString& caption)
 {
-    QString previousDir = qnSettings->lastExportDir();
-    if (previousDir.isEmpty() && !qnSettings->mediaFolders().isEmpty())
-        previousDir = qnSettings->mediaFolders().first();
+    QString previousDir = appContext()->localSettings()->lastExportDir();
+    if (previousDir.isEmpty() && !appContext()->localSettings()->mediaFolders().isEmpty())
+        previousDir = appContext()->localSettings()->mediaFolders().first();
     QString fileName;
     while (true)
     {
@@ -67,7 +70,8 @@ void QnTableExportHelper::exportToFile(
 
         break;
     }
-    qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
+
+    appContext()->localSettings()->lastExportDir = QFileInfo(fileName).absolutePath();
 
     QString textData;
     QString htmlData;
