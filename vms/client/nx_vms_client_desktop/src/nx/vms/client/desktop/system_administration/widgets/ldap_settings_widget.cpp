@@ -15,12 +15,14 @@
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_administration/globals/results_reporter.h>
@@ -221,6 +223,15 @@ struct LdapSettingsWidget::Private
                     && g.id != nx::vms::api::UserRoleData::kLdapDefaultId;
             });
     }
+
+    bool isAdmin() const
+    {
+        const auto systemContext = q->systemContext();
+
+        return systemContext
+            && systemContext->resourceAccessManager()->hasAdminPermissions(
+                systemContext->userWatcher()->user());
+    }
 };
 
 LdapSettingsWidget::LdapSettingsWidget(QWidget* parent):
@@ -258,6 +269,9 @@ void LdapSettingsWidget::discardChanges()
 
 void LdapSettingsWidget::checkStatus()
 {
+    if (!d->isAdmin())
+        return;
+
     const auto statusCallback = nx::utils::guarded(this,
         [this](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
