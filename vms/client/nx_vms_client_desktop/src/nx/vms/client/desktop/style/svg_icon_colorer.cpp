@@ -89,7 +89,7 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
     }},
     { QnIcon::Active, {
         { kBasePrimaryColor, "brand_core" },
-        { kBaseSecondaryColor, "brand_l2" },
+        { kBaseSecondaryColor, "light3" },
         { kBaseWindowTextColor, "light14" },
     }},
     { QnIcon::Error, {
