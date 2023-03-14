@@ -3,6 +3,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -98,6 +99,26 @@ def list_files(output_path):
         print(output_path / target)
 
 
+def get_value(package_path: Path, query: str) -> str:
+    with zipfile.ZipFile(package_path.as_posix(), "r") as archive:
+        description_bytes = archive.read("description.json")
+
+    current_object = json.loads(description_bytes.decode("utf-8"))
+    try:
+        for item in query.split("."):
+            if isinstance(current_object, dict):
+                current_object = current_object[item]
+            elif isinstance(current_object, list) and item.isnumeric():
+                current_object = current_object[int(item)]
+            else:
+                raise KeyError
+    except KeyError:
+        return f'Bad query {query!r}: item {item!r}" is not found in {current_object!r}.'
+    except IndexError:
+        return f'Bad query {query!r}: index {item!r} is out of list {current_object!r} boundary.'
+
+    return str(current_object)
+
 def _add_pack_command(subparsers):
 
     def pack_command(args):
@@ -137,6 +158,23 @@ def _add_list_command(subparsers):
     parser.set_defaults(func=list_command)
 
 
+def _add_get_value_command(subparsers):
+
+    def get_value_command(args):
+        print(get_value(args.input, args.query))
+
+    parser = subparsers.add_parser(
+        'get_value',
+        help=(
+            'Get the value determined by the parameter "query" from the customization package '
+            'description.'))
+    parser.add_argument('input', type=Path, help='Package path')
+    parser.add_argument('query', help='Query in the form of a JSON dot-notation expression')
+    parser.add_argument('-v', '--verbose', help='Verbose output', action='store_true')
+    parser.add_argument('-l', '--log', help='Log file path')
+    parser.set_defaults(func=get_value_command)
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -144,6 +182,7 @@ def main():
     _add_pack_command(subparsers)
     _add_unpack_command(subparsers)
     _add_list_command(subparsers)
+    _add_get_value_command(subparsers)
 
     args = parser.parse_args()
 
